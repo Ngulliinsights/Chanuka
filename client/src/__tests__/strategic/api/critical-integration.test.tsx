@@ -8,19 +8,19 @@
  * 80% of testing value with 20% of implementation effort.
  */
 
-import { useOfflineDetection } from '@client/core/hooks/useOfflineDetection';
+import { useOfflineDetection } from '@client/infrastructure/hooks/useOfflineDetection';
 import { ErrorBoundary } from '@client/lib/components/ErrorBoundary';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { ApiError, NetworkError } from '@client/core/api/errors';
-import { useApiConnection } from '@client/core/api/hooks';
-import { AuthProvider } from '@client/core/auth';
-import { useAuth } from '@client/core/auth/hooks/useAuth';
+import { ApiError, NetworkError } from '@client/infrastructure/api/errors';
+import { useApiConnection } from '@client/infrastructure/api/hooks';
+import { AuthProvider } from '@client/infrastructure/auth';
+import { useAuth } from '@client/infrastructure/auth/hooks/useAuth';
 
 // Mock API services
-vi.mock('@client/core/api/client', () => ({
+vi.mock('@client/infrastructure/api/client', () => ({
   apiClient: {
     get: vi.fn(),
     post: vi.fn(),
@@ -30,7 +30,7 @@ vi.mock('@client/core/api/client', () => ({
 }));
 
 // Mock authentication service
-vi.mock('@client/core/auth/service', () => ({
+vi.mock('@client/infrastructure/auth/service', () => ({
   authService: {
     login: vi.fn(),
     logout: vi.fn(),
@@ -61,7 +61,7 @@ describe('API Critical Integration', () => {
       const mockUser = { id: '123', email: 'test@example.com', token: 'valid-token' };
 
       // Mock successful authentication
-      const { authService } = await import('@client/core/auth/service');
+      const { authService } = await import('@client/infrastructure/auth/service');
       authService.login.mockResolvedValue(mockUser);
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -82,8 +82,8 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle token expiration gracefully', async () => {
-      const { apiClient } = await import('@client/core/api/client');
-      const { authService } = await import('@client/core/auth/service');
+      const { apiClient } = await import('@client/infrastructure/api/client');
+      const { authService } = await import('@client/infrastructure/auth/service');
 
       // Mock expired token response
       apiClient.get.mockRejectedValueOnce(new ApiError('Token expired', 401));
@@ -105,8 +105,8 @@ describe('API Critical Integration', () => {
     });
 
     it('should refresh tokens automatically', async () => {
-      const { apiClient } = await import('@client/core/api/client');
-      const { authService } = await import('@client/core/auth/service');
+      const { apiClient } = await import('@client/infrastructure/api/client');
+      const { authService } = await import('@client/infrastructure/auth/service');
 
       const mockResponse = { data: 'protected-data' };
 
@@ -133,7 +133,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle authentication errors', async () => {
-      const { authService } = await import('@client/core/auth/service');
+      const { authService } = await import('@client/infrastructure/auth/service');
       authService.login.mockRejectedValue(new Error('Invalid credentials'));
 
       const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -155,7 +155,7 @@ describe('API Critical Integration', () => {
 
   describe('Error Handling', () => {
     it('should handle API errors gracefully', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const apiError = new ApiError('Server error', 500);
       apiClient.get.mockRejectedValue(apiError);
 
@@ -174,7 +174,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should retry failed requests appropriately', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const networkError = new NetworkError('Network timeout');
 
       // Mock network error followed by success
@@ -195,7 +195,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle network timeouts', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const timeoutError = new NetworkError('Request timeout', 'TIMEOUT');
       apiClient.get.mockRejectedValue(timeoutError);
 
@@ -214,7 +214,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should process server error responses', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const serverError = new ApiError('Validation failed', 422, {
         field: 'email',
         message: 'Invalid email format',
@@ -238,7 +238,7 @@ describe('API Critical Integration', () => {
 
   describe('Data Consistency', () => {
     it('should maintain data consistency across requests', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const mockData = { id: 1, name: 'Test Item', version: 1 };
 
       apiClient.get.mockResolvedValue({ data: mockData });
@@ -263,7 +263,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle concurrent data updates', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const initialData = { id: 1, name: 'Initial', version: 1 };
       const updatedData1 = { id: 1, name: 'Update1', version: 2 };
       const updatedData2 = { id: 1, name: 'Update2', version: 3 };
@@ -293,7 +293,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should validate response data', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const invalidData = { id: 'invalid', name: null, version: 'not-a-number' };
 
       apiClient.get.mockResolvedValue({ data: invalidData });
@@ -315,7 +315,7 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle data transformation errors', async () => {
-      const { apiClient } = await import('@client/core/api/client');
+      const { apiClient } = await import('@client/infrastructure/api/client');
       const malformedData = { data: 'invalid-json-string' };
 
       apiClient.get.mockResolvedValue(malformedData);
@@ -337,8 +337,8 @@ describe('API Critical Integration', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete authentication flow', async () => {
-      const { authService } = await import('@client/core/auth/service');
-      const { apiClient } = await import('@client/core/api/client');
+      const { authService } = await import('@client/infrastructure/auth/service');
+      const { apiClient } = await import('@client/infrastructure/api/client');
 
       const mockUser = { id: '123', email: 'test@example.com', token: 'valid-token' };
       const mockProfile = { id: '123', name: 'Test User', email: 'test@example.com' };
@@ -366,8 +366,8 @@ describe('API Critical Integration', () => {
     });
 
     it('should handle error recovery scenarios', async () => {
-      const { apiClient } = await import('@client/core/api/client');
-      const { authService } = await import('@client/core/auth/service');
+      const { apiClient } = await import('@client/infrastructure/api/client');
+      const { authService } = await import('@client/infrastructure/auth/service');
 
       const networkError = new NetworkError('Network error');
       const mockUser = { id: '123', email: 'test@example.com', token: 'valid-token' };

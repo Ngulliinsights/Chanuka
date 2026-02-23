@@ -5,8 +5,8 @@
 **Implementation Status:** Migration complete, UnifiedCSPManager is now the single source
 
 The security module has **TWO CSP Manager implementations** with nearly identical interfaces but different names:
-1. `CSPManager` in `client/src/core/security/csp-manager.ts` (legacy)
-2. `UnifiedCSPManager` in `client/src/core/security/unified/csp-manager.ts` (new)
+1. `CSPManager` in `client/src/infrastructure/security/csp-manager.ts` (legacy)
+2. `UnifiedCSPManager` in `client/src/infrastructure/security/unified/csp-manager.ts` (new)
 
 The `unified/` directory represents an **in-progress refactoring** to create a more cohesive security system, not a permanent sub-namespace.
 
@@ -16,7 +16,7 @@ The `unified/` directory represents an **in-progress refactoring** to create a m
 
 ### 1. CSPManager (Legacy) - `csp-manager.ts`
 
-**Location**: `client/src/core/security/csp-manager.ts`
+**Location**: `client/src/infrastructure/security/csp-manager.ts`
 
 **Class Name**: `CSPManager`
 
@@ -56,7 +56,7 @@ interface CSPConfig {
 
 ### 2. UnifiedCSPManager (New) - `unified/csp-manager.ts`
 
-**Location**: `client/src/core/security/unified/csp-manager.ts`
+**Location**: `client/src/infrastructure/security/unified/csp-manager.ts`
 
 **Class Name**: `UnifiedCSPManager`
 
@@ -149,7 +149,7 @@ interface CSPConfig {
 The security system uses a **compatibility layer** that switches between implementations:
 
 ```typescript
-// From client/src/core/security/index.ts
+// From client/src/infrastructure/security/index.ts
 
 export interface SecuritySystem {
   csp: CSPManager | UnifiedCSPManager;  // Union type!
@@ -182,8 +182,8 @@ function isUnifiedSecurityEnabled(): boolean {
 ### Import Locations
 
 **UnifiedCSPManager** (2 imports):
-- `client/src/core/security/migration/compatibility-layer.ts`
-- `client/src/core/security/__tests__/unified-security.test.ts`
+- `client/src/infrastructure/security/migration/compatibility-layer.ts`
+- `client/src/infrastructure/security/__tests__/unified-security.test.ts`
 
 **CSPManager** (Legacy) (3 imports):
 - `client/src/lib/utils/security.ts` - Different CSPManager (singleton pattern)
@@ -204,7 +204,7 @@ The `unified/` directory is **NOT a permanent sub-namespace**. It represents an 
 
 1. **Migration Directory Exists**:
    ```
-   client/src/core/security/migration/
+   client/src/infrastructure/security/migration/
    ├── compatibility-layer.ts
    └── migration-utils.ts
    ```
@@ -242,7 +242,7 @@ The `unified/` directory is **NOT a permanent sub-namespace**. It represents an 
 Complete reimplementation of security components:
 
 ```
-client/src/core/security/unified/
+client/src/infrastructure/security/unified/
 ├── csp-config.ts          - CSP configuration utilities
 ├── csp-manager.ts         - UnifiedCSPManager
 ├── error-handler.ts       - SecurityErrorHandler
@@ -296,8 +296,8 @@ client/src/core/security/unified/
 
 **Problem**: Three different classes named `CSPManager`:
 
-1. `client/src/core/security/csp-manager.ts` - Legacy
-2. `client/src/core/security/unified/csp-manager.ts` - Unified (different name)
+1. `client/src/infrastructure/security/csp-manager.ts` - Legacy
+2. `client/src/infrastructure/security/unified/csp-manager.ts` - Unified (different name)
 3. `client/src/lib/utils/security.ts` - Singleton wrapper
 
 **Impact**: Naming confusion, unclear which to use
@@ -383,13 +383,13 @@ client/src/core/security/unified/
 1. **Flatten Directory Structure**
    ```
    Before:
-   client/src/core/security/
+   client/src/infrastructure/security/
    ├── csp-manager.ts (legacy)
    ├── unified/
    │   └── csp-manager.ts (new)
    
    After:
-   client/src/core/security/
+   client/src/infrastructure/security/
    └── csp-manager.ts (unified, renamed)
    ```
 
@@ -469,11 +469,11 @@ Following the analysis in this ADR, **Option A (Complete the Migration)** was im
    - Development now uses same implementation as production
 
 4. **Legacy Files Deleted**:
-   - `client/src/core/security/csp-manager.ts` (legacy)
-   - `client/src/core/security/migration/` directory
+   - `client/src/infrastructure/security/csp-manager.ts` (legacy)
+   - `client/src/infrastructure/security/migration/` directory
 
 5. **Barrel Exports Updated**:
-   - `client/src/core/security/index.ts` now exports UnifiedCSPManager as CSPManager
+   - `client/src/infrastructure/security/index.ts` now exports UnifiedCSPManager as CSPManager
    - Simplified export structure
 
 6. **Testing Complete**:

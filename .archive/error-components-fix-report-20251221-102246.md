@@ -24,14 +24,14 @@ Fixed syntax issues in error handling components that were causing 500 server er
 
 ## Files Processed
 
-- client/src/core/error/components/ErrorBoundary.tsx
-- client/src/core/error/components/ErrorFallback.tsx
-- client/src/core/error/components/ServiceUnavailable.tsx
-- client/src/core/error/components/RecoveryUI.tsx
-- client/src/core/error/components/SimpleErrorBoundary.tsx
-- client/src/core/error/components/UnifiedErrorBoundary.tsx
-- client/src/core/error/components/CommunityErrorBoundary.tsx
-- client/src/core/error/components/ErrorRecoveryManager.tsx
+- client/src/infrastructure/error/components/ErrorBoundary.tsx
+- client/src/infrastructure/error/components/ErrorFallback.tsx
+- client/src/infrastructure/error/components/ServiceUnavailable.tsx
+- client/src/infrastructure/error/components/RecoveryUI.tsx
+- client/src/infrastructure/error/components/SimpleErrorBoundary.tsx
+- client/src/infrastructure/error/components/UnifiedErrorBoundary.tsx
+- client/src/infrastructure/error/components/CommunityErrorBoundary.tsx
+- client/src/infrastructure/error/components/ErrorRecoveryManager.tsx
 
 ## Expected Results
 

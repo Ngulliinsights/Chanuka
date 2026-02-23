@@ -7,7 +7,7 @@
 import { Bell, Download, Trash, AlertTriangle } from 'lucide-react';
 import React from 'react';
 
-import { PrivacySettings } from '@client/core/auth';
+import { PrivacySettings } from '@client/infrastructure/auth';
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Switch } from '@client/lib/design-system/interactive/Switch';

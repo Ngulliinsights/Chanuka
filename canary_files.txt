@@ -45,18 +45,18 @@ client/src/app/shell/index.ts
 client/src/app/shell/NavigationBar.tsx
 client/src/app/shell/ProtectedRoute.tsx
 client/src/app/shell/SkipLinks.tsx
-client/src/core/analytics/AnalyticsIntegration.tsx
-client/src/core/analytics/AnalyticsProvider.tsx
-client/src/core/analytics/data-retention-service.ts
-client/src/core/analytics/service.ts
-client/src/core/api/authentication.ts
-client/src/core/api/bills.ts
-client/src/core/api/cache-manager.ts
-client/src/core/api/circuit-breaker/core.ts
-client/src/core/api/circuit-breaker/types.ts
-client/src/core/api/circuit-breaker-monitor.ts
-client/src/core/api/config.ts
-client/src/core/api/errors.ts
+client/src/infrastructure/analytics/AnalyticsIntegration.tsx
+client/src/infrastructure/analytics/AnalyticsProvider.tsx
+client/src/infrastructure/analytics/data-retention-service.ts
+client/src/infrastructure/analytics/service.ts
+client/src/infrastructure/api/authentication.ts
+client/src/infrastructure/api/bills.ts
+client/src/infrastructure/api/cache-manager.ts
+client/src/infrastructure/api/circuit-breaker/core.ts
+client/src/infrastructure/api/circuit-breaker/types.ts
+client/src/infrastructure/api/circuit-breaker-monitor.ts
+client/src/infrastructure/api/config.ts
+client/src/infrastructure/api/errors.ts
 
 (... and 674 more)
 

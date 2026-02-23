@@ -11,7 +11,7 @@
 |-------|----------|---------|
 | **Shared Types** | `shared/types/` | Server-client common types |
 | **Client Types** | `client/src/lib/types/` | Client-only types (single source of truth) |
-| **Core Modules** | `client/src/core/` | Infrastructure (API, storage, security, monitoring) |
+| **Core Modules** | `client/src/infrastructure/` | Infrastructure (API, storage, security, monitoring) |
 | **Features** | `client/src/features/` | FSD-organized feature modules |
 | **Design System** | `client/src/lib/design-system/` | UI components and tokens |
 
@@ -21,7 +21,7 @@
 
 1. **Single Source of Truth:** All client types live in `client/src/lib/types/`.
 2. **Module Bridges:** Core modules (`core/storage`, `core/security`) re-export from `lib/types` via their own `types.ts`.
-3. **No Deep Imports:** Import from module entry points (`@client/core/storage`), not `lib/types` internals.
+3. **No Deep Imports:** Import from module entry points (`@client/infrastructure/storage`), not `lib/types` internals.
 4. **Enum Exports:** Export enums as values, not `export type`, if used at runtime.
 
 ---
@@ -42,7 +42,7 @@
 - **DO NOT** import server-only code (`shared/core/observability`) into client.
 - **DO NOT** create ad-hoc types; check `lib/types` first.
 - **DO NOT** use `@types` folder for client types (legacy, being deprecated).
-- **DO** use the unified API client in `client/src/core/api`.
+- **DO** use the unified API client in `client/src/infrastructure/api`.
 - **DO** run `npx tsc --noEmit` before committing.
 
 ---

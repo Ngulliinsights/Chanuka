@@ -146,8 +146,8 @@ grep -r "from '@server/.*config" . --include="*.ts"
 
 ### Files Removed
 - ✅ `server/infrastructure/cache/` (5 files) - Redundant wrappers
-- ✅ `client/src/core/api/types/request.ts` - Already deleted (Session 1)
-- ✅ `client/src/core/api/types/error-response.ts` - Already deleted (Session 1)
+- ✅ `client/src/infrastructure/api/types/request.ts` - Already deleted (Session 1)
+- ✅ `client/src/infrastructure/api/types/error-response.ts` - Already deleted (Session 1)
 - ✅ 5 other cleanup files - Already deleted (Session 1)
 
 ### Duplicate Imports Updated

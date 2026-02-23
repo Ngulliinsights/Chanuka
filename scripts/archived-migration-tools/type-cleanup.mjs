@@ -20,14 +20,14 @@ const CONFIG = {
 
     // Source directories to scan for type files
     sourceDirs: [
-        'client/src/core/api/types',
-        'client/src/core/error/types',
-        'client/src/core/loading/types',
-        'client/src/core/storage/types',
-        'client/src/core/dashboard/types',
-        'client/src/core/performance/types',
-        'client/src/core/browser/types',
-        'client/src/core/mobile/types',
+        'client/src/infrastructure/api/types',
+        'client/src/infrastructure/error/types',
+        'client/src/infrastructure/loading/types',
+        'client/src/infrastructure/storage/types',
+        'client/src/infrastructure/dashboard/types',
+        'client/src/infrastructure/performance/types',
+        'client/src/infrastructure/browser/types',
+        'client/src/infrastructure/mobile/types',
         'client/src/features/users/types',
         'client/src/features/search/types',
         'client/src/features/analytics/types',
@@ -121,7 +121,7 @@ function categorizeTypeFile(filePath) {
     const relativePath = path.relative(CONFIG.rootDir, filePath);
 
     // Categorize based on path
-    if (relativePath.includes('client/src/core/')) {
+    if (relativePath.includes('client/src/infrastructure/')) {
         return { category: 'core', subcategory: relativePath.split('/')[2] };
     }
     if (relativePath.includes('client/src/features/')) {

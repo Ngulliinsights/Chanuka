@@ -3,8 +3,8 @@
  * This provides a convenient import path for components
  */
 
-import { useSafeQuery } from '@client/core/api/hooks/use-safe-query';
+import { useSafeQuery } from '@client/infrastructure/api/hooks/use-safe-query';
 
-export * from '@client/core/api/hooks/use-safe-query';
+export * from '@client/infrastructure/api/hooks/use-safe-query';
 
 export default useSafeQuery;

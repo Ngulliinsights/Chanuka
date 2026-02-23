@@ -27,7 +27,7 @@ const SHARED_DIR = join(__dirname, 'shared');
 const VALIDATION_RULES = {
   // Files that should not exist after migration
   FORBIDDEN_FILES: [
-    'client/src/core/api/types/websocket.ts'
+    'client/src/infrastructure/api/types/websocket.ts'
   ],
   
   // Patterns that indicate problems
@@ -68,12 +68,12 @@ const VALIDATION_RULES = {
   // Required imports that should be present
   REQUIRED_IMPORTS: [
     {
-      file: 'client/src/core/realtime/websocket-client.ts',
+      file: 'client/src/infrastructure/realtime/websocket-client.ts',
       pattern: /from ['"]@shared\/schema\/websocket['"]/,
       description: 'WebSocket client should import from shared schema'
     },
     {
-      file: 'client/src/core/realtime/types/index.ts',
+      file: 'client/src/infrastructure/realtime/types/index.ts',
       pattern: /from ['"]@shared\/schema\/websocket['"]/,
       description: 'Real-time types should import from shared schema'
     }

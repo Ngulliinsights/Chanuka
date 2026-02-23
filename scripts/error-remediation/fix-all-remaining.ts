@@ -46,7 +46,7 @@ let total = 0;
 
 // Fix TS2724: CommunityUpdate -> CommentUpdate
 total++;
-if (updateFile('client/src/core/realtime/services/community.ts', (content) =>
+if (updateFile('client/src/infrastructure/realtime/services/community.ts', (content) =>
   content.replace(/CommunityUpdate(?!s)/g, 'CommentUpdate')
 )) {
   console.log('✅ Fixed CommunityUpdate -> CommentUpdate');

@@ -9,7 +9,7 @@ import type {
   PersonaType,
   PersonaClassification,
   PersonaPreferences,
-} from '@client/core/personalization/types';
+} from '@client/infrastructure/personalization/types';
 import { BookOpen, Target, Users, ArrowRight, HelpCircle } from 'lucide-react';
 import React from 'react';
 

@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock accessibility services
-vi.mock('@client/core/accessibility/service', () => ({
+vi.mock('@client/infrastructure/accessibility/service', () => ({
   accessibilityService: {
     announce: vi.fn(),
     setFocus: vi.fn(),
@@ -27,7 +27,7 @@ describe('Accessibility Navigation', () => {
 
   describe('Keyboard Navigation', () => {
     it('should support keyboard navigation', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const keyboardEvents = [
         { key: 'Tab', shiftKey: false },
@@ -54,7 +54,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should handle focus management', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const focusTargets = [
         { id: 'main-content', priority: 'high' },
@@ -76,7 +76,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should support keyboard shortcuts', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const shortcuts = [
         { keys: ['Ctrl', 'K'], action: 'search' },
@@ -104,7 +104,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should provide focus indicators', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const focusIndicators = {
         visible: true,
@@ -127,7 +127,7 @@ describe('Accessibility Navigation', () => {
 
   describe('Screen Reader Support', () => {
     it('should work with screen readers', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const screenReaderData = {
         role: 'navigation',
@@ -148,7 +148,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should provide ARIA labels', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const ariaLabels = [
         { element: 'main', label: 'Main content area' },
@@ -169,7 +169,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should announce navigation changes', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const navigationEvents = [
         { type: 'route_change', from: '/home', to: '/dashboard' },
@@ -191,7 +191,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should support semantic structure', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const semanticStructure = {
         header: { role: 'banner', level: 1 },
@@ -218,7 +218,7 @@ describe('Accessibility Navigation', () => {
 
   describe('Focus Management', () => {
     it('should manage focus order', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const focusOrder = [
         'skip-link',
@@ -240,7 +240,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should handle focus trapping', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const trapConfig = {
         container: 'modal',
@@ -262,7 +262,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should restore focus after modal close', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const focusRestore = {
         previousElement: 'trigger-button',
@@ -284,7 +284,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should handle focus within dynamic content', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       const dynamicContent = {
         container: 'dynamic-list',
@@ -308,7 +308,7 @@ describe('Accessibility Navigation', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete accessibility workflow', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       // Complete workflow: keyboard navigation + screen reader + focus management
       const workflow = {
@@ -346,7 +346,7 @@ describe('Accessibility Navigation', () => {
     });
 
     it('should handle accessibility recovery scenarios', async () => {
-      const { accessibilityService } = await import('@client/core/accessibility/service');
+      const { accessibilityService } = await import('@client/infrastructure/accessibility/service');
 
       // Recovery scenario: focus lost, need to restore
       const recoveryScenario = {

@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 20, 2026 at 04:01 PM
+**Generated:** February 23, 2026 at 04:06 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,025
+**Total Items:** 4,032
 
 ```
 .
@@ -456,10 +456,6 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── websocket/
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── manager.d.ts
-│   │   │   │   ├── manager.d.ts.map
-│   │   │   │   ├── manager.js
-│   │   │   │   ├── manager.js.map
 │   │   │   │   └── manager.ts
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── core-monitoring.ts
@@ -793,21 +789,6 @@
 │   │   │   │   │   └── useSecurity.ts
 │   │   │   │   ├── pages/
 │   │   │   │   │   └── SecurityDemoPage.tsx
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── dashboard/
-│   │   │   │   │   │   ├── SecureForm.tsx
-│   │   │   │   │   │   ├── SecurityDashboard.tsx
-│   │   │   │   │   │   └── SecuritySettings.tsx
-│   │   │   │   │   ├── icons/
-│   │   │   │   │   │   └── ChanukaIcons.tsx
-│   │   │   │   │   ├── privacy/
-│   │   │   │   │   │   ├── CookieConsentBanner.tsx
-│   │   │   │   │   │   ├── DataUsageReportDashboard.tsx
-│   │   │   │   │   │   ├── GDPRComplianceManager.tsx
-│   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   ├── privacy-policy.tsx
-│   │   │   │   │   │   └── README.md
-│   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── sitemap/
 │   │   │   │   └── pages/
@@ -3158,7 +3139,6 @@
 │   │   │   ├── resilience.ts
 │   │   │   ├── result-types.ts
 │   │   │   └── types.ts
-│   │   ├── errors/
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
@@ -3977,11 +3957,26 @@
 ├── ARCHITECTURE.md
 ├── archive-docs.sh
 ├── baseline_analysis.md
+├── baseline_circular_client.txt
+├── baseline_circular_server.txt
+├── baseline_circular_shared.txt
+├── baseline_depcheck.json
+├── baseline_error_counts.json
+├── baseline_tsc_client.txt
+├── baseline_tsc_root.txt
+├── baseline_tsc_server.txt
+├── baseline_tsc_shared.txt
+├── baseline_unused_exports.txt
+├── baseline_vitest_full.txt
+├── baseline_vitest.txt
+├── canary_files.txt
 ├── CHANGELOG.md
 ├── CIRCULAR_DEPENDENCY_FIX.md
 ├── clear-sw.html
+├── CODEBASE_AMBITION_VS_REALITY_AUDIT.md
 ├── CODEBASE_CONSOLIDATION_COMPLETE.md
 ├── COMPLETE_MIGRATION_NOW.md
+├── COMPREHENSIVE_CODEBASE_AUDIT.md
 ├── CONSOLIDATION_PROGRESS_REPORT.md
 ├── CONSOLIDATION_SESSION_SUMMARY.md
 ├── CONTRIBUTING.md
@@ -3996,11 +3991,15 @@
 ├── DOCUMENTATION_AUDIT_REPORT.md
 ├── drizzle.config.ts
 ├── enum-alignment-report.json
+├── error_counts.txt
 ├── FINAL_MIGRATION_STATUS.md
+├── fix-root-cause.md
 ├── flat-imports.txt
 ├── generate-structure.mjs
 ├── gov-data-imports.txt
+├── identify-canaries.sh
 ├── IMPORT_EXPORT_AUDIT.json
+├── import-resolution-audit-progress.md
 ├── knip.config.ts
 ├── knip.json
 ├── MIGRATION_CHECKLIST.md
@@ -4013,17 +4012,25 @@
 ├── nx.json
 ├── package.json
 ├── performance-baselines.json
+├── PHASE_4_FINAL_REPORT.md
+├── phase4-completion-summary.md
+├── phase4-progress.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
+├── project-structure-reference.md
 ├── README.md
 ├── referenced-scripts.txt
+├── regression_canaries.json
 ├── run_codebase_stats.bat
 ├── schema-type-alignment-report.json
+├── security-consolidation-plan.md
 ├── start-dev.js
+├── structural-ambiguities.md
 ├── tailwind.config.js
 ├── test_api_integration.js
+├── tool_verification_summary.md
 ├── tsconfig.json
 ├── tsconfig.server.tsbuildinfo
 ├── tsconfig.tsbuildinfo

@@ -10,7 +10,7 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fc } from '@fast-check/vitest';
-import { WebSocketManagerImpl, type ReconnectionConfig } from '../core/websocket/manager';
+import { WebSocketManagerImpl, type ReconnectionConfig } from '../infrastructure/websocket/manager';
 
 // Mock WebSocket
 class MockWebSocket {

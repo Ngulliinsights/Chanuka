@@ -55,7 +55,7 @@ const clientImportReplacements: ImportReplacement[] = [
   },
   {
     pattern: /from ['"]\.\.\/\.\.\/core\/([^'"]+)['"]/g,
-    replacement: "from '@client/core/$1'",
+    replacement: "from '@client/infrastructure/$1'",
     description: 'Core imports'
   },
   {

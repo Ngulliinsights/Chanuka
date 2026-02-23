@@ -131,10 +131,10 @@ Always import directly from the source file, not from barrel exports:
 
 ```typescript
 // ❌ Bad
-import { something } from '@client/core/api';
+import { something } from '@client/infrastructure/api';
 
 // ✅ Good
-import { something } from '@client/core/api/specific-module';
+import { something } from '@client/infrastructure/api/specific-module';
 ```
 
 ### 2. Extract Shared Code
@@ -189,7 +189,7 @@ export * from './scripts/setup';
 
 // ✅ Good - Scripts are standalone
 // Import scripts directly when needed
-import { setupScript } from '@client/core/auth/scripts/setup';
+import { setupScript } from '@client/infrastructure/auth/scripts/setup';
 ```
 
 ## Fixing Circular Dependencies

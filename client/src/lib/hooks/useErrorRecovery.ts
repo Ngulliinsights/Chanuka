@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { useLoading } from '@client/core/loading';
+import { useLoading } from '@client/infrastructure/loading';
 import { logger } from '@client/lib/utils/logger';
 
 export interface RecoveryStrategy {

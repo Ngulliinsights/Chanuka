@@ -15,7 +15,7 @@ This report details the comprehensive fixes applied to address all remaining val
 - Ensures compatibility across React versions
 
 **Files Fixed:**
-- client/src/core/error/components/utils/error-icons.tsx
+- client/src/infrastructure/error/components/utils/error-icons.tsx
 - client/src/features/admin/ui/migration/MigrationManager.tsx
 - client/src/features/users/ui/verification/CredibilityScoring.tsx
 - client/src/features/users/ui/verification/ExpertBadge.tsx

@@ -6,7 +6,7 @@
  */
 
 import { DashboardError } from '@client/lib/ui/dashboard/errors';
-import type { ErrorContext } from '@client/core/error/types';
+import type { ErrorContext } from '@client/infrastructure/error/types';
 
 /**
  * UI component error - for component-level failures

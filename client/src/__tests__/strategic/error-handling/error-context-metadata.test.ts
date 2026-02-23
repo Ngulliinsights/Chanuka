@@ -7,10 +7,10 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { BaseError } from '@client/core/error/classes';
-import { ErrorDomain, ErrorSeverity } from '@client/core/error/constants';
-import { coreErrorHandler } from '@client/core/error/handler';
-import { AppError, ErrorContext, ErrorMetadata } from '@client/core/error/types';
+import { BaseError } from '@client/infrastructure/error/classes';
+import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error/constants';
+import { coreErrorHandler } from '@client/infrastructure/error/handler';
+import { AppError, ErrorContext, ErrorMetadata } from '@client/infrastructure/error/types';
 
 // Mock the error handler
 vi.mock('../../../core/error/handler', () => ({

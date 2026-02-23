@@ -7,7 +7,7 @@
 
 ## Recommended Structure
 
-### 1. Core Layer (`client/src/core/`)
+### 1. Core Layer (`client/src/infrastructure/`)
 Keep foundational systems here:
 ```
 core/
@@ -87,7 +87,7 @@ Update all imports to reflect new structure:
 ```typescript
 // Old
 import { errorAnalyticsBridge } from '@/services/errorAnalyticsBridge';
-import ErrorMonitoring from '@/core/monitoring/enhanced-error-monitoring';
+import ErrorMonitoring from '@/infrastructure/monitoring/enhanced-error-monitoring';
 
 // New  
 import { errorAnalyticsBridge } from '@/features/analytics/model/error-analytics-bridge';

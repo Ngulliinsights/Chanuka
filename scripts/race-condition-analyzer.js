@@ -51,7 +51,7 @@ class RaceConditionAnalyzer {
     // Updated file paths based on actual codebase structure
     const reduxFiles = [
       'client/src/lib/infrastructure/store/slices/errorAnalyticsSlice.ts',
-      'client/src/core/loading/reducer.ts'
+      'client/src/infrastructure/loading/reducer.ts'
     ];
 
     for (const file of reduxFiles) {

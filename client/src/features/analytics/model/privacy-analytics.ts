@@ -13,11 +13,11 @@
  * - Type-safe API integration with proper fallbacks
  */
 
-import { privacyAnalyticsApiService } from '@client/core/api/privacy';
+import { privacyAnalyticsApiService } from '@client/infrastructure/api/privacy';
 import { logger } from '@client/lib/utils/logger';
 import { privacyUtils, privacyCompliance } from '@client/lib/utils/privacy-compliance';
 import type { AnalyticsEvent, AnalyticsConfig, UserConsent, AnalyticsSystemMetrics as AnalyticsMetrics } from '@client/lib/types/analytics';
-import type { DataExportResponse, DataDeletionResponse } from '@client/core/api/types/error-response';
+import type { DataExportResponse, DataDeletionResponse } from '@client/infrastructure/api/types/error-response';
 
 // ============================================================================
 // Types & Interfaces

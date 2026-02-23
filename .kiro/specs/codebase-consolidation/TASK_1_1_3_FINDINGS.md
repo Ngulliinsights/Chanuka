@@ -11,13 +11,13 @@ grep -r "AuthenticationInterceptor\|TokenRefreshInterceptor\|createAuthIntercept
 ## Findings
 
 ### Direct Usage
-The authentication.ts file in `client/src/core/api/authentication.ts` is **ONLY** used by:
-1. `client/src/core/api/authenticated-client.ts` - The dead AuthenticatedApiClient
-2. `client/src/core/api/index.ts` - Barrel export file
+The authentication.ts file in `client/src/infrastructure/api/authentication.ts` is **ONLY** used by:
+1. `client/src/infrastructure/api/authenticated-client.ts` - The dead AuthenticatedApiClient
+2. `client/src/infrastructure/api/index.ts` - Barrel export file
 
 ### Duplicate Implementation Found
 There is a **DUPLICATE** implementation of the same authentication interceptors at:
-- `client/src/core/auth/http/authentication-interceptors.ts`
+- `client/src/infrastructure/auth/http/authentication-interceptors.ts`
 
 This duplicate implementation has the same classes:
 - `AuthenticationInterceptor`
@@ -29,12 +29,12 @@ This duplicate implementation has the same classes:
 
 ### Export Chain
 The duplicate implementation is exported through:
-1. `client/src/core/auth/index.ts` - Exports from `./http/authentication-interceptors`
-2. `client/src/core/index.ts` - Re-exports from auth module
+1. `client/src/infrastructure/auth/index.ts` - Exports from `./http/authentication-interceptors`
+2. `client/src/infrastructure/index.ts` - Re-exports from auth module
 
 ### GlobalApiClient Usage
-The `globalApiClient` (UnifiedApiClientImpl) in `client/src/core/api/client.ts`:
-- **DOES NOT** import or use anything from `client/src/core/api/authentication.ts`
+The `globalApiClient` (UnifiedApiClientImpl) in `client/src/infrastructure/api/client.ts`:
+- **DOES NOT** import or use anything from `client/src/infrastructure/api/authentication.ts`
 - Has its own inline token refresh logic in the `attemptTokenRefresh` method
 - Uses helper functions `createAuthRequestInterceptor` and `createLoggingResponseInterceptor` defined in the same file
 
@@ -48,7 +48,7 @@ However, deeper investigation reveals this may be outdated or incorrect:
 ### Evidence Against Keeping authentication.ts
 
 1. **Zero Active Usage**: Only used by dead `AuthenticatedApiClient` (0 usages)
-2. **Duplicate Implementation**: Complete duplicate exists at `client/src/core/auth/http/authentication-interceptors.ts`
+2. **Duplicate Implementation**: Complete duplicate exists at `client/src/infrastructure/auth/http/authentication-interceptors.ts`
 3. **GlobalApiClient Doesn't Use It**: The canonical client has inline auth logic
 4. **No Initialization Code**: No code in app initialization adds these interceptors to globalApiClient
 5. **Helper Function Unused**: `createAuthRequestInterceptor` in client.ts is defined but never called
@@ -91,7 +91,7 @@ However, deeper investigation reveals this may be outdated or incorrect:
 
 ### Recommended Action
 
-**KEEP** `client/src/core/api/authentication.ts` for now because:
+**KEEP** `client/src/infrastructure/api/authentication.ts` for now because:
 1. Design document explicitly says to keep it
 2. It's a more complete, production-ready implementation
 3. The auth module version appears to be a stub/placeholder
@@ -108,7 +108,7 @@ If we want to clean up, the better approach might be:
 
 ## Final Recommendation for Task 1.1.3
 
-**KEEP** `client/src/core/api/authentication.ts`
+**KEEP** `client/src/infrastructure/api/authentication.ts`
 
 ### Rationale
 1. Design document explicitly lists it as a shared utility to keep

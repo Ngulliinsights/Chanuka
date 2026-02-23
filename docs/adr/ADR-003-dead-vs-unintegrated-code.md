@@ -36,7 +36,7 @@ From `CLIENT_API_ARCHITECTURE_ANALYSIS.md`:
 **Evidence Found**:
 - Listed in test plan: `client/src/__tests__/STRATEGIC_TEST_PLAN.md`
   - "safe-client.ts - Safe API client wrapper"
-- Exported from `client/src/core/api/index.ts`
+- Exported from `client/src/infrastructure/api/index.ts`
 - Complete implementation with error-safe wrapper pattern
 
 **Questions to Answer**:

@@ -19,8 +19,8 @@ find client/src -type f \( -name "*.ts" -o -name "*.tsx" \) -print0 | while IFS=
     perl -i -pe "s|from\s+['\"]@client/types/expert['\"]|from '@client/features/users/types'|g" "$file"
     perl -i -pe "s|from\s+['\"]@client/types/community['\"]|from '@client/features/community/types'|g" "$file"
     perl -i -pe "s|from\s+['\"]@client/types/conflict-of-interest['\"]|from '@client/features/analysis/types'|g" "$file"
-    perl -i -pe "s|from\s+['\"]@client/types/auth['\"]|from '@client/core/auth'|g" "$file"
-    perl -i -pe "s|from\s+['\"]@client/types/realtime['\"]|from '@client/core/realtime/types'|g" "$file"
+    perl -i -pe "s|from\s+['\"]@client/types/auth['\"]|from '@client/infrastructure/auth'|g" "$file"
+    perl -i -pe "s|from\s+['\"]@client/types/realtime['\"]|from '@client/infrastructure/realtime/types'|g" "$file"
   fi
 done
 

@@ -25,7 +25,7 @@
  * ARTIFACTS:
  *   • Design System (shared/design-system)
  *   • Design Tokens (shared/design-system/tokens)
- *   • Core Module Structure (client/src/core/*/index.ts)
+ *   • Core Module Structure (client/src/infrastructure/*/index.ts)
  *   • Architecture Decision Records
  * 
  * SUCCESS CRITERIA:

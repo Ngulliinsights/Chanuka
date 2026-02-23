@@ -2,9 +2,9 @@ import React, { Suspense, useEffect, useState, useCallback, useMemo } from 'reac
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 
-import { AuthProvider, useAuth } from '@client/core/auth';
-import { ErrorBoundary } from '@client/core/error/components';
-import { createNavigationProvider } from '@client/core/navigation/context';
+import { AuthProvider, useAuth } from '@client/infrastructure/auth';
+import { ErrorBoundary } from '@client/infrastructure/error/components';
+import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
 import { Toaster } from '@client/lib/design-system';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
@@ -12,7 +12,7 @@ import {
   setCurrentPath,
   addToRecentPages,
   setUserRole,
-} from '@client/lib/infrastructure/store/slices/navigationSlice';
+} from '@client/infrastructure/store/slices/navigationSlice';
 import { LogoPattern } from '@client/lib/design-system/layout/LogoPattern';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@client/lib/ui/navigation/BreadcrumbNavigation';
@@ -20,9 +20,9 @@ import { useBreadcrumbNavigation } from '@client/lib/ui/navigation/hooks/useBrea
 import { OfflineProvider } from '@client/lib/ui/offline';
 import { logger } from '@client/lib/utils/logger';
 
-import { AnalyticsIntegration } from '../../core/analytics/AnalyticsIntegration';
-import { NavigationConsistency } from '../../core/navigation/NavigationConsistency';
-import { NavigationPerformance } from '../../core/navigation/NavigationPerformance';
+import { AnalyticsIntegration } from '../../infrastructure/analytics/AnalyticsIntegration';
+import { NavigationConsistency } from '../../infrastructure/navigation/NavigationConsistency';
+import { NavigationPerformance } from '../../infrastructure/navigation/NavigationPerformance';
 
 import { AppRouter } from './AppRouter';
 import { BrandedFooter } from './BrandedFooter';

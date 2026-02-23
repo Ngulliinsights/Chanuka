@@ -6,7 +6,7 @@
  * intelligent prefetching, and optimized memory management for large datasets.
  */
 
-import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from '@client/core/api/bills';
+import { billsApiService, BillsSearchParams, PaginatedBillsResponse } from '@client/infrastructure/api/bills';
 import type { Bill } from '@client/lib/types';
 import { logger } from '@client/lib/utils/logger';
 

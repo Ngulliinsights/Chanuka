@@ -43,14 +43,14 @@ print_status "Fixing error component syntax issues..."
 
 # List of error component files to check and fix
 error_components=(
-    "client/src/core/error/components/ErrorBoundary.tsx"
-    "client/src/core/error/components/ErrorFallback.tsx"
-    "client/src/core/error/components/ServiceUnavailable.tsx"
-    "client/src/core/error/components/RecoveryUI.tsx"
-    "client/src/core/error/components/SimpleErrorBoundary.tsx"
-    "client/src/core/error/components/UnifiedErrorBoundary.tsx"
-    "client/src/core/error/components/CommunityErrorBoundary.tsx"
-    "client/src/core/error/components/ErrorRecoveryManager.tsx"
+    "client/src/infrastructure/error/components/ErrorBoundary.tsx"
+    "client/src/infrastructure/error/components/ErrorFallback.tsx"
+    "client/src/infrastructure/error/components/ServiceUnavailable.tsx"
+    "client/src/infrastructure/error/components/RecoveryUI.tsx"
+    "client/src/infrastructure/error/components/SimpleErrorBoundary.tsx"
+    "client/src/infrastructure/error/components/UnifiedErrorBoundary.tsx"
+    "client/src/infrastructure/error/components/CommunityErrorBoundary.tsx"
+    "client/src/infrastructure/error/components/ErrorRecoveryManager.tsx"
 )
 
 for file in "${error_components[@]}"; do

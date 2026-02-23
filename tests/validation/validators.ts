@@ -273,7 +273,7 @@ export class MigrationValidator {
 
     // Test 1: Verify unified error handler singleton
     try {
-      const { UnifiedErrorHandler } = require('../../../client/src/core/error');
+      const { UnifiedErrorHandler } = require('../../../client/src/infrastructure/error');
       const errorHandler = UnifiedErrorHandler?.getInstance?.();
       const hasErrorHandler = typeof errorHandler?.handleError === 'function' &&
         typeof errorHandler?.getRecentErrors === 'function';
@@ -290,7 +290,7 @@ export class MigrationValidator {
 
     // Test 2: Verify error classes work correctly
     try {
-      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/core/error');
+      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/infrastructure/error');
 
       const testError = new BaseError('Test error', {
         domain: ErrorDomain.SYSTEM,
@@ -419,7 +419,7 @@ export class MigrationValidator {
 
     // Test 2: Verify error handling compatibility
     try {
-      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/core/error');
+      const { BaseError, ErrorDomain, ErrorSeverity } = require('../../../client/src/infrastructure/error');
 
       const errorCompatible = typeof BaseError === 'function' &&
         typeof ErrorDomain === 'object' &&
@@ -566,7 +566,7 @@ export class ArchitectureValidator {
 
     try {
       // Dynamically import the service locator to avoid circular dependencies
-      const { globalServiceLocator } = require('../../../client/src/core/api/registry');
+      const { globalServiceLocator } = require('../../../client/src/infrastructure/api/registry');
 
       for (const serviceName of requiredServices) {
         if (!globalServiceLocator?.hasService?.(serviceName)) {

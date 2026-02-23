@@ -7,8 +7,8 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/core/error/constants';
-import { coreErrorHandler } from '@client/core/error/handler';
+import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/infrastructure/error/constants';
+import { coreErrorHandler } from '@client/infrastructure/error/handler';
 import {
   networkRetryStrategy,
   cacheClearStrategy,
@@ -26,8 +26,8 @@ import {
   executeRecovery,
   isRecoverable,
   registerDefaultRecoveryStrategies,
-} from '@client/core/error/recovery';
-import { AppError } from '@client/core/error/types';
+} from '@client/infrastructure/error/recovery';
+import { AppError } from '@client/infrastructure/error/types';
 
 // Mock dependencies
 vi.mock('../../../core/error/handler', () => ({

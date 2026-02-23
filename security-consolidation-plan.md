@@ -43,7 +43,7 @@
 
 **Why Keep**:
 - Demo/example page showing security features
-- Already updated to import from `@client/core/security/ui/`
+- Already updated to import from `@client/infrastructure/security/ui/`
 - Pages belong in features/ per FSD
 
 **Action**:
@@ -68,8 +68,8 @@
 ## Consolidation Steps
 
 ### Step 1: Verify Import Updates ✅ DONE
-- ✅ Updated `SecurityDemoPage.tsx` to import from `@client/core/security/ui/`
-- ✅ Updated `privacy-center.tsx` to import from `@client/core/security/ui/`
+- ✅ Updated `SecurityDemoPage.tsx` to import from `@client/infrastructure/security/ui/`
+- ✅ Updated `privacy-center.tsx` to import from `@client/infrastructure/security/ui/`
 
 ### Step 2: Update features/security/index.ts
 Change from:

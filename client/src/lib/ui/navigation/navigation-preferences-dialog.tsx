@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNavigationPreferences } from '@client/core/navigation/hooks';
+import { useNavigationPreferences } from '@client/infrastructure/navigation/hooks';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Switch } from '@client/lib/design-system/interactive/Switch';
 import { Label } from '@client/lib/design-system/typography/Label';

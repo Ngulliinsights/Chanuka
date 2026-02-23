@@ -250,7 +250,7 @@ import React from 'react';
 import { useState } from 'react';
 
 // 2. Internal modules
-import { authService } from '@client/core/auth';
+import { authService } from '@client/infrastructure/auth';
 import { CacheService } from '@client/lib/services/cache';
 
 // 3. Local files

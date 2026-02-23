@@ -2373,7 +2373,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api.backup/index.ts",
+      "path": "client/src/infrastructure/api.backup/index.ts",
       "category": "API",
       "loc": 16,
       "size_kb": 1,
@@ -2384,7 +2384,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/analytics.ts",
+      "path": "client/src/infrastructure/api/analytics.ts",
       "category": "Analytics",
       "loc": 358,
       "size_kb": 11,
@@ -2395,7 +2395,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/bills.ts",
+      "path": "client/src/infrastructure/api/bills.ts",
       "category": "API",
       "loc": 831,
       "size_kb": 25,
@@ -2406,7 +2406,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/examples/circuit-breaker-usage.ts",
+      "path": "client/src/infrastructure/api/examples/circuit-breaker-usage.ts",
       "category": "API",
       "loc": 361,
       "size_kb": 11,
@@ -2417,7 +2417,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/hooks/index.ts",
+      "path": "client/src/infrastructure/api/hooks/index.ts",
       "category": "Hook",
       "loc": 9,
       "size_kb": 0,
@@ -2428,7 +2428,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/hooks/use-api-with-fallback.ts",
+      "path": "client/src/infrastructure/api/hooks/use-api-with-fallback.ts",
       "category": "Hook",
       "loc": 430,
       "size_kb": 12,
@@ -2439,7 +2439,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/hooks/use-safe-mutation.ts",
+      "path": "client/src/infrastructure/api/hooks/use-safe-mutation.ts",
       "category": "Hook",
       "loc": 114,
       "size_kb": 2,
@@ -2450,7 +2450,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/hooks/use-safe-query.ts",
+      "path": "client/src/infrastructure/api/hooks/use-safe-query.ts",
       "category": "Hook",
       "loc": 317,
       "size_kb": 10,
@@ -2461,7 +2461,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/hooks/useApiConnection.ts",
+      "path": "client/src/infrastructure/api/hooks/useApiConnection.ts",
       "category": "Hook",
       "loc": 760,
       "size_kb": 27,
@@ -2472,7 +2472,7 @@
       "has_todos": "yes"
     },
     {
-      "path": "client/src/core/api/notifications.ts",
+      "path": "client/src/infrastructure/api/notifications.ts",
       "category": "API",
       "loc": 891,
       "size_kb": 27,
@@ -2483,7 +2483,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/privacy.ts",
+      "path": "client/src/infrastructure/api/privacy.ts",
       "category": "API",
       "loc": 624,
       "size_kb": 20,
@@ -2494,7 +2494,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/system.ts",
+      "path": "client/src/infrastructure/api/system.ts",
       "category": "API",
       "loc": 632,
       "size_kb": 19,
@@ -2505,7 +2505,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/user.ts",
+      "path": "client/src/infrastructure/api/user.ts",
       "category": "API",
       "loc": 771,
       "size_kb": 25,
@@ -2516,7 +2516,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/api/websocket.ts",
+      "path": "client/src/infrastructure/api/websocket.ts",
       "category": "API",
       "loc": 1211,
       "size_kb": 36,
@@ -2527,7 +2527,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/dashboard/index.ts",
+      "path": "client/src/infrastructure/dashboard/index.ts",
       "category": "Dashboard",
       "loc": 12,
       "size_kb": 0,
@@ -2538,7 +2538,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/error/index.ts",
+      "path": "client/src/infrastructure/error/index.ts",
       "category": "Error",
       "loc": 316,
       "size_kb": 10,
@@ -2549,7 +2549,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/index.ts",
+      "path": "client/src/infrastructure/index.ts",
       "category": "Other",
       "loc": 85,
       "size_kb": 2,
@@ -2560,7 +2560,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/components/GlobalLoadingIndicator.tsx",
+      "path": "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx",
       "category": "Component",
       "loc": 100,
       "size_kb": 3,
@@ -2571,7 +2571,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/components/LoadingSkeleton.tsx",
+      "path": "client/src/infrastructure/loading/components/LoadingSkeleton.tsx",
       "category": "Component",
       "loc": 146,
       "size_kb": 4,
@@ -2582,7 +2582,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/components/index.ts",
+      "path": "client/src/infrastructure/loading/components/index.ts",
       "category": "Component",
       "loc": 8,
       "size_kb": 0,
@@ -2593,7 +2593,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/hooks/useTimeoutAwareLoading.ts",
+      "path": "client/src/infrastructure/loading/hooks/useTimeoutAwareLoading.ts",
       "category": "Hook",
       "loc": 385,
       "size_kb": 11,
@@ -2604,7 +2604,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/index.ts",
+      "path": "client/src/infrastructure/loading/index.ts",
       "category": "Loading",
       "loc": 36,
       "size_kb": 1,
@@ -2615,7 +2615,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/loading/validation.ts",
+      "path": "client/src/infrastructure/loading/validation.ts",
       "category": "Loading",
       "loc": 171,
       "size_kb": 6,
@@ -2626,7 +2626,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/hooks/use-navigation-accessibility.ts",
+      "path": "client/src/infrastructure/navigation/hooks/use-navigation-accessibility.ts",
       "category": "Hook",
       "loc": 499,
       "size_kb": 13,
@@ -2637,7 +2637,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/hooks/use-navigation-performance.ts",
+      "path": "client/src/infrastructure/navigation/hooks/use-navigation-performance.ts",
       "category": "Hook",
       "loc": 353,
       "size_kb": 9,
@@ -2648,7 +2648,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/hooks/use-navigation-preferences.tsx",
+      "path": "client/src/infrastructure/navigation/hooks/use-navigation-preferences.tsx",
       "category": "Hook",
       "loc": 227,
       "size_kb": 7,
@@ -2659,7 +2659,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/hooks/use-unified-navigation.ts",
+      "path": "client/src/infrastructure/navigation/hooks/use-unified-navigation.ts",
       "category": "Hook",
       "loc": 94,
       "size_kb": 2,
@@ -2670,7 +2670,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/index.ts",
+      "path": "client/src/infrastructure/navigation/index.ts",
       "category": "Navigation",
       "loc": 11,
       "size_kb": 0,
@@ -2681,7 +2681,7 @@
       "has_todos": "no"
     },
     {
-      "path": "client/src/core/navigation/reducer.ts",
+      "path": "client/src/infrastructure/navigation/reducer.ts",
       "category": "Navigation",
       "loc": 179,
       "size_kb": 5,

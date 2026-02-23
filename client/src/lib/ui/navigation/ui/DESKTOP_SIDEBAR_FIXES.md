@@ -44,7 +44,7 @@
 - **State Change Detection**: Only updates when actual state changes occur
 - **Mount Tracking**: Prevents updates after component unmount
 
-### Navigation Context (`client/src/core/navigation/context.tsx`)
+### Navigation Context (`client/src/infrastructure/navigation/context.tsx`)
 
 - **Enhanced Debouncing**: Reduced debounce time for better responsiveness
 - **Race Condition Prevention**: Added proper state tracking and cleanup
@@ -52,7 +52,7 @@
 - **Improved Error Handling**: Added try-catch blocks and error recovery
 - **Optimized Persistence**: Better timing and mount state checks
 
-### Navigation Reducer (`client/src/core/navigation/reducer.ts`)
+### Navigation Reducer (`client/src/infrastructure/navigation/reducer.ts`)
 
 - **Batch Updates**: Optimized BATCH_NAVIGATION_UPDATE for minimal object creation
 - **Conditional Updates**: Avoid unnecessary state changes when values haven't changed

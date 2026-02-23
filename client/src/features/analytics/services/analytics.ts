@@ -4,7 +4,7 @@
  * data transformation, and caching capabilities
  */
 
-import { analyticsApiService } from '@client/core/api';
+import { analyticsApiService } from '@client/infrastructure/api';
 import type {
   BillAnalytics,
   AnalyticsFilters,

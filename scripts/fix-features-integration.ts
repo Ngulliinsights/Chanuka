@@ -42,7 +42,7 @@ interface FeatureAnalysis {
 
 class FeaturesIntegrationFixer {
   private featuresDir = 'client/src/features';
-  private coreDir = 'client/src/core';
+  private coreDir = 'client/src/infrastructure';
   private issues: IntegrationIssue[] = [];
   private features: FeatureAnalysis[] = [];
 
@@ -98,19 +98,19 @@ class FeaturesIntegrationFixer {
       const content = await fs.readFile(file, 'utf-8');
       
       // Check core imports
-      if (content.includes('@client/core/auth') || content.includes('../../../core/auth')) {
+      if (content.includes('@client/infrastructure/auth') || content.includes('../../../core/auth')) {
         analysis.coreIntegration.usesAuth = true;
       }
-      if (content.includes('@client/core/api') || content.includes('../../../core/api')) {
+      if (content.includes('@client/infrastructure/api') || content.includes('../../../core/api')) {
         analysis.coreIntegration.usesApi = true;
       }
-      if (content.includes('@client/core/error') || content.includes('../../../core/error')) {
+      if (content.includes('@client/infrastructure/error') || content.includes('../../../core/error')) {
         analysis.coreIntegration.usesError = true;
       }
-      if (content.includes('@client/core/performance') || content.includes('../../../core/performance')) {
+      if (content.includes('@client/infrastructure/performance') || content.includes('../../../core/performance')) {
         analysis.coreIntegration.usesPerformance = true;
       }
-      if (content.includes('@client/core/loading') || content.includes('../../../core/loading')) {
+      if (content.includes('@client/infrastructure/loading') || content.includes('../../../core/loading')) {
         analysis.coreIntegration.usesLoading = true;
       }
 
@@ -130,7 +130,7 @@ class FeaturesIntegrationFixer {
     
     lines.forEach((line, index) => {
       // Check for circular dependencies
-      if (line.includes('from \'@client/core/') && 
+      if (line.includes('from \'@client/infrastructure/') && 
           filePath.includes('/core/') && 
           line.includes(`/features/${analysis.name}`)) {
         this.issues.push({
@@ -150,7 +150,7 @@ class FeaturesIntegrationFixer {
           line: index + 1,
           type: 'deprecated-import',
           description: 'Using deprecated useAuth import',
-          suggestion: 'Replace with: import { useAuth } from \'@client/core/auth\'',
+          suggestion: 'Replace with: import { useAuth } from \'@client/infrastructure/auth\'',
           severity: 'warning',
         });
       }
@@ -215,7 +215,7 @@ class FeaturesIntegrationFixer {
           line: 0,
           type: 'missing-export',
           description: 'Feature has API layer but doesn\'t use core API services',
-          suggestion: 'Consider using @client/core/api for consistency',
+          suggestion: 'Consider using @client/infrastructure/api for consistency',
           severity: 'info',
         });
       }
@@ -237,7 +237,7 @@ class FeaturesIntegrationFixer {
             line: index + 1,
             type: 'deprecated-import',
             description: 'Using deprecated auth import',
-            suggestion: 'Replace with: import { useAuth } from \'@client/core/auth\'',
+            suggestion: 'Replace with: import { useAuth } from \'@client/infrastructure/auth\'',
             severity: 'warning',
           });
         }
@@ -249,7 +249,7 @@ class FeaturesIntegrationFixer {
             line: index + 1,
             type: 'deprecated-import',
             description: 'Direct fetch usage instead of core API services',
-            suggestion: 'Consider using @client/core/api services for consistency',
+            suggestion: 'Consider using @client/infrastructure/api services for consistency',
             severity: 'info',
           });
         }
@@ -347,7 +347,7 @@ class FeaturesIntegrationFixer {
     if (lines[issue.line - 1].includes('@/features/users/hooks/useAuth')) {
       lines[issue.line - 1] = lines[issue.line - 1].replace(
         '@/features/users/hooks/useAuth',
-        '@client/core/auth'
+        '@client/infrastructure/auth'
       );
       
       await fs.writeFile(issue.file, lines.join('\n'));

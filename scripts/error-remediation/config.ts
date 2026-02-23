@@ -60,7 +60,7 @@ export const defaultConfig: RemediationConfig = {
   fsdLayers: {
     app: path.join(workspaceRoot, 'client/src/app'),
     features: path.join(workspaceRoot, 'client/src/features'),
-    core: path.join(workspaceRoot, 'client/src/core'),
+    core: path.join(workspaceRoot, 'client/src/infrastructure'),
     lib: path.join(workspaceRoot, 'client/src/lib'),
     shared: path.join(workspaceRoot, 'shared')
   },

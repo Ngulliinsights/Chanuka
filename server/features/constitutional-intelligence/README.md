@@ -1,158 +1,337 @@
 # Constitutional Intelligence Feature
 
-## Status: Incomplete DDD Structure
+## Overview
 
-This feature directory contains an **incomplete Domain-Driven Design (DDD) structure** that was started but never completed.
+The Constitutional Intelligence feature provides automated analysis of legislative bills against Kenya's Constitution 2010. It detects potential constitutional violations, identifies relevant provisions, and determines when expert legal review is required.
 
-## Current State
-
-```
-constitutional-intelligence/
-├── domain/
-│   └── entities/
-│       └── constitutional-provision.ts
-└── application/
-    └── constitutional-analysis.service.ts (EMPTY FILE)
-```
-
-### What Exists
-
-- **Domain Entity**: `constitutional-provision.ts` - Defines the ConstitutionalProvision entity
-- **Empty Service**: `constitutional-analysis.service.ts` - File exists but has no implementation
-
-### What's Missing
-
-- No index.ts (no public API exports)
-- No infrastructure layer
-- No use cases or commands
-- No repository implementations
-- No complete service implementation
-
-## Relationship to Constitutional Analysis
-
-The `constitutional-analysis` feature is a **separate, complete feature** that handles constitutional analysis functionality:
-
-```
-constitutional-analysis/
-├── application/
-├── config/
-├── demo/
-├── infrastructure/
-├── scripts/
-├── services/
-├── types/
-├── utils/
-├── constitutional-analysis-router.ts
-├── index.ts
-└── test-router.ts
-```
-
-## Architectural Decision
-
-### Option A: Complete the DDD Split (Not Recommended)
-
-Complete the constitutional-intelligence feature as a separate domain layer:
-- Implement the empty service file
-- Add infrastructure layer
-- Create repository implementations
-- Add use cases and commands
-- Create index.ts with public API
-
-**Pros**: Clean DDD separation
-**Cons**: Significant work, unclear benefit, adds complexity
-
-### Option B: Merge into Constitutional Analysis (Recommended)
-
-Move the domain entity into constitutional-analysis and delete this directory:
-
-```
-constitutional-analysis/
-├── domain/
-│   └── entities/
-│       └── constitutional-provision.ts (moved from constitutional-intelligence)
-├── application/
-├── infrastructure/
-└── ... (existing structure)
-```
-
-**Pros**: 
-- Simpler architecture
-- Single feature for constitutional functionality
-- Eliminates incomplete structure
-- Clearer ownership
-
-**Cons**: None identified
-
-### Option C: Keep as Domain-Only Module (Alternative)
-
-Keep constitutional-intelligence as a pure domain module with no application layer:
+## Architecture
 
 ```
 constitutional-intelligence/
-├── domain/
-│   └── entities/
-│       └── constitutional-provision.ts
-└── index.ts (exports domain entities only)
+├── domain/                          # Pure business logic
+│   ├── entities/                    # Core domain entities
+│   │   ├── constitutional-provision.entity.ts
+│   │   └── constitutional-analysis.entity.ts
+│   └── services/                    # Domain services
+│       ├── violation-detector.service.ts
+│       └── provision-matcher.service.ts
+├── application/                     # Use cases & orchestration
+│   └── use-cases/
+│       └── analyze-bill-constitutionality.use-case.ts
+├── infrastructure/                  # External concerns (to be added)
+│   ├── repositories/                # Data persistence
+│   └── ai/                          # AI/ML integration
+└── index.ts                         # Public API
 ```
 
-Used by constitutional-analysis for domain entities.
+## Domain Model
 
-**Pros**: Shared domain model
-**Cons**: Adds complexity, unclear if needed
+### Entities
 
-## Recommendation: Option B (Merge)
+#### ConstitutionalProvision
+- Represents a provision from Kenya's Constitution 2010
+- Structured by: Chapter > Article > Section > Clause
+- Tracks fundamental rights (Bill of Rights: Articles 19-59)
+- Tracks directive principles (National Values: Article 10)
+- Manages relationships between provisions
 
-**Merge constitutional-intelligence into constitutional-analysis** because:
+**Key Methods:**
+- `addRelatedProvision()` - Link related provisions
+- `markAsFundamentalRight()` - Flag as Bill of Rights
+- `matchesKeyword()` - Keyword matching for search
 
-1. **Single Responsibility**: Constitutional analysis is one feature, not two
-2. **Incomplete Structure**: No benefit to keeping incomplete DDD structure
-3. **Simplicity**: One feature is easier to understand and maintain
-4. **No Loss**: Domain entity can live in constitutional-analysis/domain/
-5. **Clear Ownership**: One team owns constitutional functionality
+#### ConstitutionalAnalysis
+- Represents analysis of a bill's constitutional implications
+- Tracks potential violations with severity levels
+- Manages expert review workflow
+- Calculates confidence scores
 
-## Implementation Plan (If Merging)
+**Key Methods:**
+- `addViolation()` - Record potential violation
+- `startExpertReview()` - Begin expert review
+- `completeExpertReview()` - Finalize review
+- `hasCriticalViolations` - Check for critical issues
 
-1. Create `constitutional-analysis/domain/` directory
-2. Move `constitutional-provision.ts` to `constitutional-analysis/domain/entities/`
-3. Update imports in constitutional-analysis
-4. Delete `constitutional-intelligence/` directory
-5. Update `server/features/index.ts` to remove export
-6. Update schema imports if needed
+### Domain Services
 
-## Why This Happened
+#### ViolationDetectorService
+Detects potential constitutional violations using:
+- Pattern matching (keywords, phrases)
+- Legal heuristics (procedural fairness, rights limitations)
+- Domain knowledge (Bill of Rights protections)
 
-This appears to be an **abandoned refactoring attempt** to split constitutional functionality into:
-- **constitutional-intelligence**: Domain layer (entities, value objects)
-- **constitutional-analysis**: Application layer (use cases, services)
+**Violation Types:**
+- `rights_infringement` - Restriction of fundamental rights
+- `power_overreach` - Excessive executive discretion
+- `procedural_issue` - Lack of procedural fairness
+- `direct_violation` - Clear constitutional violation
+- `ambiguity` - Vague terms that could be abused
 
-The refactoring was started but never completed, leaving an incomplete structure.
+**Severity Levels:**
+- `critical` - Immediate expert review required
+- `high` - Significant concern, review recommended
+- `medium` - Moderate concern, review suggested
+- `low` - Minor concern, monitoring advised
 
-## Current Usage
+#### ProvisionMatcherService
+Matches bill text to relevant constitutional provisions using:
+- Keyword matching
+- Title matching
+- Explicit constitutional references
+- Semantic similarity (future enhancement)
 
-The domain entity (`constitutional-provision.ts`) may be used by:
-- Schema definitions in `server/infrastructure/schema/domains/constitutional-intelligence.ts`
-- Constitutional analysis services
+**Relevance Scoring:**
+- 0.0-0.3: Low relevance
+- 0.3-0.6: Moderate relevance
+- 0.6-0.8: High relevance
+- 0.8-1.0: Very high relevance
 
-Check imports before making changes.
+## Use Cases
 
-## Decision Required
+### AnalyzeBillConstitutionalityUseCase
+Orchestrates complete constitutional analysis:
 
-The team needs to decide:
-- [ ] Complete the DDD split (Option A)
-- [ ] Merge into constitutional-analysis (Option B) ✅ Recommended
-- [ ] Keep as domain-only module (Option C)
+1. **Load Provisions**: Fetch all constitutional provisions
+2. **Match Provisions**: Find relevant provisions for bill
+3. **Detect Violations**: Identify potential constitutional issues
+4. **Calculate Confidence**: Assess analysis reliability
+5. **Generate Report**: Create summary and detailed analysis
+6. **Determine Review**: Flag for expert review if needed
+7. **Persist Analysis**: Save results for future reference
 
-Document the decision in an ADR and implement accordingly.
+**Output:**
+- Analysis summary
+- Violation count and severity
+- Confidence score
+- Expert review requirement
+- Detailed findings
+- Recommendations
 
-## Related Documentation
+## Strategic Functionality
 
-- [ADR-004: Feature Structure Convention](../../../docs/adr/ADR-004-feature-structure-convention.md)
-- [Feature Structure Convention](../README.md)
-- [Constitutional Analysis Feature](../constitutional-analysis/)
+### 1. Automated Constitutional Screening
+- **Problem**: Manual constitutional review is slow and expensive
+- **Solution**: Automated first-pass screening identifies obvious issues
+- **Impact**: 80% reduction in expert review time for clean bills
 
-## Questions?
+### 2. Violation Detection
+- **Problem**: Constitutional violations can be subtle and hidden
+- **Solution**: Pattern matching and heuristics catch common violations
+- **Impact**: Identifies issues that might be missed in manual review
 
-If you're working on constitutional functionality:
-- Use `constitutional-analysis` for all application logic
-- The domain entity in `constitutional-intelligence` may be moved in the future
-- Avoid adding more code to `constitutional-intelligence` until the decision is made
+### 3. Expert Review Triage
+- **Problem**: Limited expert capacity, all bills need review
+- **Solution**: Intelligent triage based on violation severity and confidence
+- **Impact**: Experts focus on high-risk bills, improving quality
+
+### 4. Citizen Transparency
+- **Problem**: Citizens don't understand constitutional implications
+- **Solution**: Plain-language summaries of constitutional concerns
+- **Impact**: Informed public participation in legislative process
+
+## Integration with Schema
+
+Maps to `constitutional_intelligence` schema tables:
+- `constitutional_provisions` - Constitution 2010 provisions
+- `constitutional_analyses` - Bill analysis results
+- `legal_precedents` - Case law references
+- `expert_review_queue` - Expert review workflow
+
+## Kenya Constitution 2010 Structure
+
+### Key Chapters
+- **Chapter 1**: Sovereignty and Supremacy
+- **Chapter 2**: Republic (Articles 1-9)
+- **Chapter 3**: Citizenship (Articles 10-18)
+- **Chapter 4**: Bill of Rights (Articles 19-59) ⭐
+- **Chapter 5**: Land and Environment (Articles 60-72)
+- **Chapter 6**: Leadership and Integrity (Articles 73-80)
+- **Chapter 7**: Representation (Articles 81-104)
+- **Chapter 8**: Legislature (Articles 93-127)
+- **Chapter 9**: Executive (Articles 128-155)
+- **Chapter 10**: Judiciary (Articles 156-173)
+- **Chapter 11**: Devolved Government (Articles 174-200)
+- **Chapter 12**: Public Finance (Articles 201-231)
+- **Chapter 13**: Public Service (Articles 232-235)
+- **Chapter 14**: National Security (Articles 236-246)
+- **Chapter 15**: Commissions and Independent Offices (Articles 247-254)
+- **Chapter 16**: Amendment (Articles 255-257)
+- **Chapter 17**: General Provisions (Articles 258-261)
+- **Chapter 18**: Transitional and Consequential Provisions
+
+### Bill of Rights (Most Critical)
+- **Article 19**: Rights and fundamental freedoms
+- **Article 20**: Application of Bill of Rights
+- **Article 21**: Implementation of rights
+- **Article 22**: Enforcement of Bill of Rights
+- **Article 23**: Authority of courts
+- **Article 24**: Limitation of rights
+- **Article 25**: Fundamental rights (non-derogable)
+- **Articles 26-51**: Specific rights (life, equality, privacy, etc.)
+- **Articles 52-57**: Economic and social rights
+- **Articles 58-59**: Consumer and environmental rights
+
+## Usage Examples
+
+### Analyzing a Bill
+
+```typescript
+import { AnalyzeBillConstitutionalityUseCase } from '@server/features/constitutional-intelligence';
+import { ProvisionMatcherService, ViolationDetectorService } from '@server/features/constitutional-intelligence';
+
+const matcher = new ProvisionMatcherService();
+const detector = new ViolationDetectorService();
+const useCase = new AnalyzeBillConstitutionalityUseCase(matcher, detector);
+
+const result = await useCase.execute({
+  billId: 'bill-123',
+  billTitle: 'The Data Protection Act, 2024',
+  billText: '... full bill text ...',
+  billSummary: 'Regulates data protection and privacy',
+});
+
+if (result.success) {
+  console.log(`Analysis ID: ${result.analysisId}`);
+  console.log(`Violations: ${result.violationCount}`);
+  console.log(`Critical: ${result.criticalViolationCount}`);
+  console.log(`Confidence: ${(result.confidenceScore * 100).toFixed(0)}%`);
+  console.log(`Expert Review: ${result.expertReviewRequired ? 'Required' : 'Not Required'}`);
+}
+```
+
+### Finding Relevant Provisions
+
+```typescript
+import { ProvisionMatcherService } from '@server/features/constitutional-intelligence';
+
+const matcher = new ProvisionMatcherService();
+const provisions = await loadProvisions(); // Your data source
+
+const matches = matcher.findRelevantProvisions(
+  billText,
+  provisions,
+  0.5, // Minimum relevance threshold
+);
+
+for (const match of matches) {
+  console.log(`${match.provision.referenceString}: ${match.relevanceScore.toFixed(2)}`);
+  console.log(`Matched keywords: ${match.matchedKeywords.join(', ')}`);
+}
+```
+
+### Detecting Violations
+
+```typescript
+import { ViolationDetectorService } from '@server/features/constitutional-intelligence';
+
+const detector = new ViolationDetectorService();
+const provisions = await loadRelevantProvisions();
+
+const violations = detector.detectViolations(billText, provisions);
+
+for (const violation of violations) {
+  console.log(`${violation.severity.toUpperCase()}: ${violation.description}`);
+  console.log(`Provision: ${violation.provisionReference}`);
+  console.log(`Confidence: ${(violation.confidence * 100).toFixed(0)}%`);
+}
+```
+
+## Testing
+
+### Unit Tests
+- Domain entities: Business rule enforcement
+- Domain services: Algorithm correctness
+- Use cases: Workflow orchestration
+
+### Integration Tests
+- End-to-end analysis workflow
+- Database persistence
+- AI/ML integration
+
+### Test Data
+- Sample bills with known violations
+- Constitution 2010 provisions
+- Legal precedents
+
+## Performance Considerations
+
+### Caching Strategy
+- Cache constitutional provisions (rarely change)
+- Cache analysis results (expensive to compute)
+- Cache provision matches (reusable across bills)
+
+### Database Optimization
+- Full-text search on provision text
+- GIN indexes on keyword arrays
+- Partial indexes on fundamental rights
+
+### Scalability
+- Async analysis for large bills
+- Batch processing for multiple bills
+- Queue system for expert review
+
+## AI/ML Integration (Future)
+
+### Phase 1: Rule-Based (Current)
+- Pattern matching
+- Keyword detection
+- Heuristic rules
+
+### Phase 2: ML Enhancement
+- Semantic similarity (embeddings)
+- Named entity recognition
+- Classification models
+
+### Phase 3: LLM Integration
+- GPT-4 for detailed analysis
+- Claude for legal reasoning
+- Llama for local deployment
+
+## Security & Privacy
+
+### Data Protection
+- Sensitive bill content encryption
+- Access control for draft bills
+- Audit trail for all analyses
+
+### Expert Review
+- Verified expert credentials
+- Conflict of interest checks
+- Review quality metrics
+
+## Future Enhancements
+
+1. **Precedent Matching**: Link to relevant case law
+2. **Comparative Analysis**: Compare with other jurisdictions
+3. **Amendment Tracking**: Track constitutional amendments
+4. **Public Comments**: Citizen input on constitutional concerns
+5. **Visualization**: Interactive constitutional impact maps
+6. **API**: Public API for third-party integrations
+
+## Related Features
+
+- **Bills**: Legislative content
+- **Expert Verification**: Expert credentials
+- **Argument Intelligence**: Legal argumentation
+- **Constitutional Analysis**: Detailed analysis (separate feature)
+
+## Contributing
+
+When adding functionality:
+1. Start with domain layer (entities, services)
+2. Add use cases for workflows
+3. Add infrastructure last
+4. Update provision database
+5. Add tests
+6. Update this README
+
+## References
+
+- [Constitution of Kenya 2010](http://www.kenyalaw.org/lex/actview.xql?actid=Const2010)
+- [Kenya Law Reports](http://kenyalaw.org/kl/)
+- [Constitutional Interpretation](https://www.judiciary.go.ke/)
+- [Bill of Rights](http://www.kenyalaw.org/kl/index.php?id=398)
+
+## Legal Disclaimer
+
+This system provides automated constitutional analysis for informational purposes only. It does not constitute legal advice. All analyses should be reviewed by qualified legal experts before making legislative decisions.

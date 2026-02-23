@@ -210,7 +210,7 @@ try {
 
 ### Error Boundary Pattern
 ```typescript
-import { UnifiedErrorBoundary } from '@client/core/error/components';
+import { UnifiedErrorBoundary } from '@client/infrastructure/error/components';
 
 export function MyComponent() {
   return (
@@ -229,7 +229,7 @@ export function MyComponent() {
 ### Try-Catch Pattern
 ```typescript
 import { LoadingError, isLoadingTimeoutError } from '@client/lib/ui/loading/errors';
-import { coreErrorHandler } from '@client/core/error';
+import { coreErrorHandler } from '@client/infrastructure/error';
 
 async function loadData() {
   try {
@@ -278,7 +278,7 @@ async function performOperation(operationId: string) {
 Errors support automatic recovery:
 
 ```typescript
-import { coreErrorHandler } from '@client/core/error';
+import { coreErrorHandler } from '@client/infrastructure/error';
 
 const error = new LoadingTimeoutError('fetchBills', 5000);
 
@@ -343,8 +343,8 @@ Errors are automatically reported to all registered reporters:
 import { 
   coreErrorHandler, 
   removeErrorReporter 
-} from '@client/core/error';
-import { ConsoleReporter } from '@client/core/error/reporters';
+} from '@client/infrastructure/error';
+import { ConsoleReporter } from '@client/infrastructure/error/reporters';
 
 // Default reporters are registered automatically
 // Console reporter logs to browser console
@@ -474,10 +474,10 @@ If migrating old code:
 
 ## Additional Resources
 
-- [Core Error System](./client/src/core/error/README.md)
-- [Error Boundaries](./client/src/core/error/components/README.md)
-- [Error Recovery](./client/src/core/error/recovery.ts)
-- [Error Reporters](./client/src/core/error/reporters/)
+- [Core Error System](./client/src/infrastructure/error/README.md)
+- [Error Boundaries](./client/src/infrastructure/error/components/README.md)
+- [Error Recovery](./client/src/infrastructure/error/recovery.ts)
+- [Error Reporters](./client/src/infrastructure/error/reporters/)
 
 ---
 

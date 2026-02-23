@@ -5,8 +5,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 
-import { DashboardConfigurationError } from '@client/core/error';
-import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/core/validation';
+import { DashboardConfigurationError } from '@client/infrastructure/error';
+import { validateDashboardConfig, safeValidateDashboardConfig } from '@client/infrastructure/validation';
 import type { DashboardAppConfig, DashboardSection } from '@client/lib/types';
 
 const DEFAULT_CONFIG: DashboardAppConfig = {

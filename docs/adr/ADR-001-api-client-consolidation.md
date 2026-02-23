@@ -243,7 +243,7 @@ From `client/src/__tests__/STRATEGIC_TEST_PLAN.md`:
 This indicates **intent to use** these clients in production.
 
 ### 3. Exported from Index
-From `client/src/core/api/index.ts`:
+From `client/src/infrastructure/api/index.ts`:
 ```typescript
 export { BaseApiClient, ... } from './base-client';
 export { AuthenticatedApiClient, ... } from './authenticated-client';
@@ -505,21 +505,21 @@ Following the analysis in this ADR, **Option B (Delete Them)** was implemented a
 ### What Was Done
 
 1. **Files Deleted**:
-   - `client/src/core/api/base-client.ts` (legacy)
-   - `client/src/core/api/authenticated-client.ts` (legacy)
-   - `client/src/core/api/safe-client.ts` (legacy)
-   - `client/src/core/api/circuit-breaker-client.ts` (legacy)
-   - `client/src/core/api/examples/` directory
+   - `client/src/infrastructure/api/base-client.ts` (legacy)
+   - `client/src/infrastructure/api/authenticated-client.ts` (legacy)
+   - `client/src/infrastructure/api/safe-client.ts` (legacy)
+   - `client/src/infrastructure/api/circuit-breaker-client.ts` (legacy)
+   - `client/src/infrastructure/api/examples/` directory
 
 2. **Files Kept**:
-   - `client/src/core/api/authentication.ts` (shared utility, production-ready)
-   - `client/src/core/api/circuit-breaker-monitor.ts` (monitoring separate from client)
-   - `client/src/core/api/client.ts` (canonical globalApiClient)
-   - `client/src/core/api/contract-client.ts` (type-safe wrapper)
-   - `client/src/core/api/retry.ts` (current retry implementation)
+   - `client/src/infrastructure/api/authentication.ts` (shared utility, production-ready)
+   - `client/src/infrastructure/api/circuit-breaker-monitor.ts` (monitoring separate from client)
+   - `client/src/infrastructure/api/client.ts` (canonical globalApiClient)
+   - `client/src/infrastructure/api/contract-client.ts` (type-safe wrapper)
+   - `client/src/infrastructure/api/retry.ts` (current retry implementation)
 
 3. **Barrel Exports Updated**:
-   - Removed exports for deleted clients from `client/src/core/api/index.ts`
+   - Removed exports for deleted clients from `client/src/infrastructure/api/index.ts`
    - Kept exports for authentication utilities and monitoring
 
 4. **Documentation Created**:

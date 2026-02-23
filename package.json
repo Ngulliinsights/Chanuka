@@ -86,6 +86,9 @@
     "fix:dynamic-properties:dry-run": "tsx scripts/fix-templates.ts --template=dynamic-properties --dry-run",
     "fix:type-assertions": "tsx scripts/fix-templates.ts --template=type-assertions",
     "fix:type-assertions:dry-run": "tsx scripts/fix-templates.ts --template=type-assertions --dry-run",
+    "// --- ACCESSIBILITY ---": "",
+    "accessibility:audit": "node scripts/accessibility-audit.js",
+    "accessibility:audit:dev": "start-server-and-test dev http://localhost:5173 accessibility:audit",
     "// --- QUALITY GATES ---": "",
     "quality:check": "node check-thresholds.js",
     "quality:check:dev": "node check-thresholds.js --config quality-config-dev.json",
@@ -218,6 +221,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
+    "@axe-core/puppeteer": "^4.11.1",
     "@faker-js/faker": "^10.1.0",
     "@jest/globals": "^30.2.0",
     "@nx/devkit": "^18.0.0",

@@ -219,7 +219,7 @@ export const EXTENSIBILITY_FRAMEWORK = {
     // Import design tokens and utilities
     import { cn } from '@client/lib/design-system/utils/cn';
     import { colorTokens, spacingTokens } from '../tokens';
-    import { A11Y_STANDARDS } from '@client/lib/infrastructure/quality-optimizer';
+    import { A11Y_STANDARDS } from '@client/infrastructure/quality-optimizer';
 
     // Component with:
     // - Design tokens for all styling

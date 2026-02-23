@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { communityApiService } from '@client/core/api/community';
+import { communityApiService } from '@client/infrastructure/api/community';
 import { useToast } from '@client/lib/hooks/use-toast';
 import type {
   CommentQueryOptions,

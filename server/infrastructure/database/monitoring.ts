@@ -1,28 +1,41 @@
-import { logger } from '@server/infrastructure/core/src/observability/logging';
-
+import { logger } from '../observability/core/logger';
+import type { PoolHealthStatus as PoolHealthStatusFromPool } from './pool';
 import { monitorPoolHealth } from './pool';
 
-// Performance monitoring is optional and loaded dynamically
-const getPerformanceMonitoring = async (): Promise<any> => {
-  // Note: Performance monitoring service is not available in shared context
-  // This would be injected from the server layer when needed
-  logger.debug('Performance monitoring not available in shared context');
-  return null;
+/**
+ * Performance monitoring integration - optional dependency
+ * Returns null if performance monitoring is not available
+ */
+const getPerformanceMonitoring = async (): Promise<{
+  recordMetric: (name: string, value: number, tags?: Record<string, string>) => void;
+} | null> => {
+  try {
+    // Attempt to load performance monitoring if available
+    const perfModule = await import('../observability/monitoring/performance-monitor');
+    const monitor = perfModule.performanceMonitor;
+    
+    // Wrap the monitor to match expected interface
+    return {
+      recordMetric: (name: string, value: number, tags?: Record<string, string>) => {
+        monitor.recordMetric({
+          name,
+          value,
+          unit: 'ms',
+          tags: tags || {},
+        });
+      },
+    };
+  } catch {
+    // Performance monitoring not available - this is acceptable
+    return null;
+  }
 };
 
 /**
  * Represents the health status of a database pool with detailed metrics
+ * Re-exported from pool.ts to avoid type duplication
  */
-interface PoolHealthStatus {
-  isHealthy: boolean;
-  totalConnections: number;
-  idleConnections: number;
-  waitingClients: number;
-  circuitBreakerState: 'CLOSED' | 'OPEN' | 'HALF_OPEN';
-  lastError?: string;
-  errorCount?: number;
-  poolName?: string;
-}
+type PoolHealthStatus = PoolHealthStatusFromPool;
 
 /**
  * Configuration options for the monitoring service
@@ -134,10 +147,10 @@ class DatabaseMonitoringService {
     this.isRunning = true;
     this.startTime = new Date();
     
-    logger.info('Starting database monitoring service', {
+    logger.info({
       config: this.config,
       timestamp: this.startTime.toISOString(),
-    });
+    }, 'Starting database monitoring service');
 
     // Perform initial health check to establish baseline
     this.performHealthCheck().catch(error => {
@@ -174,10 +187,10 @@ class DatabaseMonitoringService {
     // Calculate final uptime before stopping
     this.updateUptime();
 
-    logger.info('Database monitoring service stopped', {
+    logger.info({
       finalMetrics: this.getMetrics(),
       totalUptime: this.formatUptime(this.metrics.uptime),
-    });
+    }, 'Database monitoring service stopped');
 
     this.startTime = null;
   }
@@ -193,36 +206,10 @@ class DatabaseMonitoringService {
     try {
       const healthStatuses = await monitorPoolHealth();
 
-      // Record performance metrics
+      // Record performance metrics if available
       const pm = await getPerformanceMonitoring();
       if (pm) {
-        // Record health check duration
-        const duration = Date.now() - checkStartTime;
-        pm.recordMetric('db.health_check.duration', duration, {
-          component: 'database_monitoring'
-        });
-
-        // Record pool health metrics
-        for (const [poolName, status] of Object.entries(healthStatuses)) {
-          pm.recordMetric('db.pool.connections.total', status.totalConnections, {
-            pool: poolName,
-            component: 'database_monitoring'
-          });
-          pm.recordMetric('db.pool.connections.idle', status.idleConnections, {
-            pool: poolName,
-            component: 'database_monitoring'
-          });
-          pm.recordMetric('db.pool.connections.waiting', status.waitingClients, {
-            pool: poolName,
-            component: 'database_monitoring'
-          });
-
-          // Record health status
-          pm.recordMetric('db.pool.healthy', status.isHealthy ? 1 : 0, {
-            pool: poolName,
-            component: 'database_monitoring'
-          });
-        }
+        this.recordPerformanceMetrics(pm, healthStatuses, checkStartTime);
       }
 
       // Analyze health status and identify critical issues
@@ -245,7 +232,7 @@ class DatabaseMonitoringService {
     } catch (error) {
       this.metrics.failedHealthChecks++;
 
-      // Record error metrics
+      // Record error metrics if available
       const pm = await getPerformanceMonitoring();
       if (pm) {
         pm.recordMetric('db.health_check.error', 1, {
@@ -259,12 +246,49 @@ class DatabaseMonitoringService {
   }
 
   /**
+   * Records performance metrics for health check
+   */
+  private recordPerformanceMetrics(
+    pm: { recordMetric: (name: string, value: number, tags?: Record<string, string>) => void },
+    healthStatuses: Record<string, PoolHealthStatus>,
+    checkStartTime: number
+  ): void {
+    // Record health check duration
+    const duration = Date.now() - checkStartTime;
+    pm.recordMetric('db.health_check.duration', duration, {
+      component: 'database_monitoring'
+    });
+
+    // Record pool health metrics
+    for (const [poolName, status] of Object.entries(healthStatuses)) {
+      pm.recordMetric('db.pool.connections.total', status.totalConnections, {
+        pool: poolName,
+        component: 'database_monitoring'
+      });
+      pm.recordMetric('db.pool.connections.idle', status.idleConnections, {
+        pool: poolName,
+        component: 'database_monitoring'
+      });
+      pm.recordMetric('db.pool.connections.waiting', status.waitingClients, {
+        pool: poolName,
+        component: 'database_monitoring'
+      });
+
+      // Record health status
+      pm.recordMetric('db.pool.healthy', status.isHealthy ? 1 : 0, {
+        pool: poolName,
+        component: 'database_monitoring'
+      });
+    }
+  }
+
+  /**
    * Handles critical issues detected during health checks
    */
   private async handleCriticalIssues(criticalIssues: CriticalIssue[]): Promise<void> {
     this.metrics.issuesDetected += criticalIssues.length;
     
-    logger.error('Critical database pool issues detected:', {
+    logger.error({
       issueCount: criticalIssues.length,
       issues: criticalIssues.map(issue => ({
         pool: issue.pool,
@@ -272,7 +296,7 @@ class DatabaseMonitoringService {
         severity: issue.severity,
       })),
       timestamp: this.metrics.lastCheckTimestamp?.toISOString(),
-    });
+    }, 'Critical database pool issues detected');
 
     // Attempt automatic recovery if enabled
     if (this.config.enableAutoRecovery) {
@@ -286,10 +310,10 @@ class DatabaseMonitoringService {
   private logHealthyStatus(healthStatuses: Record<string, PoolHealthStatus>): void {
     const logMethod = this.config.enableDetailedLogging ? logger.info : logger.debug;
     
-    logMethod('All database pools are healthy', {
+    logMethod({
       poolCount: Object.keys(healthStatuses).length,
       timestamp: this.metrics.lastCheckTimestamp?.toISOString(),
-    });
+    }, 'All database pools are healthy');
   }
 
   /**
@@ -314,12 +338,13 @@ class DatabaseMonitoringService {
   private handleHealthCheckError(error: unknown, context: string): void {
     this.metrics.failedHealthChecks++;
     
-    logger.error(context, {
+    logger.error({
+      context,
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       timestamp: new Date().toISOString(),
       consecutiveFailures: this.metrics.failedHealthChecks,
-    });
+    }, 'Health check error');
   }
 
   /**
@@ -388,7 +413,7 @@ class DatabaseMonitoringService {
       status.waitingClients > status.totalConnections * this.config.connectionContentionThreshold;
     
     const tooManyErrors = 
-      (status.errorCount ?? 0) >= this.config.maxConsecutiveFailures;
+      status.circuitBreakerFailures >= this.config.maxConsecutiveFailures;
     
     return highContention || tooManyErrors;
   }
@@ -399,7 +424,7 @@ class DatabaseMonitoringService {
   private identifyIssue(status: PoolHealthStatus): string {
     // Check circuit breaker state first as it's the most critical
     if (status.circuitBreakerState === 'OPEN') {
-      return `Circuit breaker is open - too many failures (${status.errorCount ?? 0} errors)`;
+      return `Circuit breaker is open - too many failures (${status.circuitBreakerFailures} errors)`;
     }
     
     if (status.circuitBreakerState === 'HALF_OPEN') {
@@ -473,11 +498,12 @@ class DatabaseMonitoringService {
         this.metrics.successfulRecoveries++;
       }
     } catch (error) {
-      logger.error(`Recovery attempt failed for ${issue.pool}:`, {
+      logger.error({
+        pool: issue.pool,
         error: error instanceof Error ? error.message : String(error),
         issue: issue.issue,
         severity: issue.severity,
-      });
+      }, `Recovery attempt failed for ${issue.pool}`);
     }
   }
 
@@ -489,7 +515,8 @@ class DatabaseMonitoringService {
     status: PoolHealthStatus,
     severity: 'warning' | 'error' | 'critical'
   ): Promise<boolean> {
-    logger.info(`Attempting recovery for ${poolName} pool`, {
+    logger.info({
+      poolName,
       issue: this.identifyIssue(status),
       severity,
       status: {
@@ -497,7 +524,7 @@ class DatabaseMonitoringService {
         waiting: status.waitingClients,
         circuitBreaker: status.circuitBreakerState,
       },
-    });
+    }, `Attempting recovery for ${poolName} pool`);
 
     try {
       // Strategy 1: Circuit breaker management
@@ -523,9 +550,10 @@ class DatabaseMonitoringService {
       return false;
       
     } catch (error) {
-      logger.error(`Recovery process error for ${poolName}:`, {
+      logger.error({
+        poolName,
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, `Recovery process error for ${poolName}`);
       return false;
     }
   }
@@ -534,10 +562,11 @@ class DatabaseMonitoringService {
    * Handles open circuit breaker state
    */
   private handleOpenCircuitBreaker(poolName: string, status: PoolHealthStatus): void {
-    logger.info(`Circuit breaker for ${poolName} is open, waiting for automatic reset`, {
-      errorCount: status.errorCount,
+    logger.info({
+      poolName,
+      errorCount: status.circuitBreakerFailures,
       recommendation: 'Monitor for automatic recovery or investigate root cause',
-    });
+    }, `Circuit breaker for ${poolName} is open, waiting for automatic reset`);
   }
 
   /**
@@ -554,22 +583,24 @@ class DatabaseMonitoringService {
   private handleHighContention(poolName: string, status: PoolHealthStatus): void {
     const contentionRatio = this.calculateContentionRatio(status);
     
-    logger.warn(`High connection contention in ${poolName} pool`, {
+    logger.warn({
+      poolName,
       waitingClients: status.waitingClients,
       totalConnections: status.totalConnections,
       contentionRatio: contentionRatio.toFixed(2),
       recommendation: 'Consider increasing pool size or optimizing query performance',
-    });
+    }, `High connection contention in ${poolName} pool`);
   }
 
   /**
    * Handles the case where no connections are available
    */
   private handleNoConnections(poolName: string): void {
-    logger.error(`${poolName} pool has no connections`, {
+    logger.error({
+      poolName,
       recommendation: 'Check database connectivity and pool configuration',
       severity: 'critical',
-    });
+    }, `${poolName} pool has no connections`);
   }
 
   /**
@@ -594,15 +625,16 @@ class DatabaseMonitoringService {
    */
   private logHealthStateChange(poolName: string, isHealthy: boolean): void {
     const logData = {
+      poolName,
       previousState: isHealthy ? 'unhealthy' : 'healthy',
       currentState: isHealthy ? 'healthy' : 'unhealthy',
       timestamp: new Date().toISOString(),
     };
 
     if (isHealthy) {
-      logger.info(`Pool ${poolName} has recovered`, logData);
+      logger.info(logData, `Pool ${poolName} has recovered`);
     } else {
-      logger.warn(`Pool ${poolName} has become unhealthy`, logData);
+      logger.warn(logData, `Pool ${poolName} has become unhealthy`);
     }
   }
 

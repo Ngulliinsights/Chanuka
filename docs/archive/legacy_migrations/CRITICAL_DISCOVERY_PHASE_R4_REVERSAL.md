@@ -112,8 +112,8 @@ The module is currently named `shared/core` but contains mostly server infrastru
 Client has duplicate type files that should import from @shared/types/api/
 
 **Status:** Safe to execute (no server dependencies)
-- ✅ Delete client/src/core/api/types/request.ts
-- ✅ Delete client/src/core/api/types/error-response.ts
+- ✅ Delete client/src/infrastructure/api/types/request.ts
+- ✅ Delete client/src/infrastructure/api/types/error-response.ts
 - ✅ Create bridge to @shared/types/api/
 
 ### Migration #3: Dashboard Legacy (Still Valid)

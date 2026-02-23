@@ -1,12 +1,12 @@
 /**
- * Shared Module - UI Components, Design System, and Infrastructure
+ * Lib Module - Shared UI Components, Design System, and Utilities
  *
  * Centralized export for shared UI components, design system primitives,
- * reusable interface elements, and technical infrastructure.
+ * reusable interface elements, and pure utilities.
  *
- * This module now consolidates both UI concerns and infrastructure
- * following the architectural principle from SHARED_VS_CORE_ANALYSIS.md:
- * "shared/ handles UI concerns and infrastructure, core/ handles business logic"
+ * This module focuses on UI concerns and reusable utilities.
+ * For infrastructure, see the core module.
+ * For business features, see the features module.
  */
 
 // ============================================================================
@@ -49,13 +49,10 @@ export {
 } from './ui';
 
 // ============================================================================
-// Technical Infrastructure
+// Shared Hooks (UI-related only)
 // ============================================================================
 
-// Infrastructure services (performance, error handling, browser compatibility, etc.)
-export * from './infrastructure';
-
-// Shared Hooks - Export only existing hooks
+// Shared Hooks - Export only UI-related hooks
 export { useProgressiveDisclosure } from './hooks';
 
 // Shared Libraries - Export only non-conflicting items

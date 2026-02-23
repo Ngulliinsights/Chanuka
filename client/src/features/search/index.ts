@@ -13,7 +13,7 @@ export { intelligentSearch as searchService } from './services/intelligent-searc
 export { IntelligentSearchService } from './services/intelligent-search';
 
 // Core API client (direct API access)
-export { searchApiClient } from '@client/core/api/search';
+export { searchApiClient } from '@client/infrastructure/api/search';
 
 // Types
 export type * from './types';
@@ -26,4 +26,4 @@ export * from './hooks/useSearch';
 export * from './hooks/useIntelligentSearch';
 
 // For backward compatibility
-export { searchApiClient as searchApi } from '@client/core/api/search';
+export { searchApiClient as searchApi } from '@client/infrastructure/api/search';

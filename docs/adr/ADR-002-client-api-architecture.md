@@ -66,7 +66,7 @@ const authApiService: AuthApiService
 
 **Key Usage Locations**:
 - `client/src/features/users/services/user-api.ts` - All user/auth endpoints
-- `client/src/core/api/contract-client.ts` - Contract validation wrapper
+- `client/src/infrastructure/api/contract-client.ts` - Contract validation wrapper
 - Test files - Mocked for testing
 - Service layers throughout application
 
@@ -280,16 +280,16 @@ const contractApiClient = {
 
 **globalApiClient (UnifiedApiClientImpl)**:
 - `client/src/features/users/services/user-api.ts` - 40+ calls
-- `client/src/core/api/contract-client.ts` - Wrapped for validation
+- `client/src/infrastructure/api/contract-client.ts` - Wrapped for validation
 - Test files - Extensively mocked
 - Various service layers throughout app
 
 **contractApiClient**:
-- `client/src/core/api/services/bill.service.ts`
-- `client/src/core/api/services/user.service.ts`
+- `client/src/infrastructure/api/services/bill.service.ts`
+- `client/src/infrastructure/api/services/user.service.ts`
 
 **CircuitBreakerClient**:
-- `client/src/core/api/examples/circuit-breaker-usage.ts` - Examples only
+- `client/src/infrastructure/api/examples/circuit-breaker-usage.ts` - Examples only
 
 **Others**: No production usage found
 
@@ -300,13 +300,13 @@ const contractApiClient = {
 **Answer: NO - That file does not exist**
 
 Search results:
-- No file found at `client/src/core/auth/http/authenticated-client.ts`
+- No file found at `client/src/infrastructure/auth/http/authenticated-client.ts`
 - No file found at `client/src/auth/http/authenticated-client.ts`
-- Only one `authenticated-client.ts` exists: `client/src/core/api/authenticated-client.ts`
+- Only one `authenticated-client.ts` exists: `client/src/infrastructure/api/authenticated-client.ts`
 
-The authentication system is consolidated in `client/src/core/auth/` with:
-- `client/src/core/auth/index.ts` - Main auth exports
-- `client/src/core/auth/token-manager.ts` - Token management
+The authentication system is consolidated in `client/src/infrastructure/auth/` with:
+- `client/src/infrastructure/auth/index.ts` - Main auth exports
+- `client/src/infrastructure/auth/token-manager.ts` - Token management
 - Auth services integrated with globalApiClient
 
 ---

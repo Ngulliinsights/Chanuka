@@ -36,7 +36,7 @@ class UndefinedSafetyFixer {
    * Error: metrics.duration and metrics.operation are possibly undefined
    */
   private async fixCoreMonitoring(): Promise<void> {
-    const filePath = path.resolve(__dirname, '../../client/src/core/core-monitoring.ts');
+    const filePath = path.resolve(__dirname, '../../client/src/infrastructure/core-monitoring.ts');
     const sourceFile = this.project.getSourceFile(filePath);
     
     if (!sourceFile) {
@@ -97,7 +97,7 @@ class UndefinedSafetyFixer {
    * Error: metrics.duration and metrics.operation are possibly undefined
    */
   private async fixSecurityMonitoring(): Promise<void> {
-    const filePath = path.resolve(__dirname, '../../client/src/core/security/security-monitoring.ts');
+    const filePath = path.resolve(__dirname, '../../client/src/infrastructure/security/security-monitoring.ts');
     const sourceFile = this.project.getSourceFile(filePath);
     
     if (!sourceFile) {

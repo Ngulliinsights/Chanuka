@@ -53,8 +53,8 @@ All baseline files were previously captured and analyzed:
 4. **Total: 26 new aliases added**
 
 **Verification Results**:
-- ✅ client/src/core/auth/store/auth-slice.ts - No TS2307 error for @workspace/types/domains/redux
-- ✅ client/src/core/api/types/shared-imports.ts - No TS2307 errors for @workspace/types/api/*
+- ✅ client/src/infrastructure/auth/store/auth-slice.ts - No TS2307 error for @workspace/types/domains/redux
+- ✅ client/src/infrastructure/api/types/shared-imports.ts - No TS2307 errors for @workspace/types/api/*
 - ✅ All @workspace/* imports now resolve correctly
 
 **Estimated Impact**: ~50-100 TS2307 errors resolved by config changes alone
@@ -68,17 +68,17 @@ All baseline files were previously captured and analyzed:
 - ✅ Verified imports resolve to .ts files
 
 **Files Deleted**:
-- client/src/core/websocket/manager.js
-- client/src/core/websocket/manager.js.map
-- client/src/core/websocket/manager.d.ts
-- client/src/core/websocket/manager.d.ts.map
+- client/src/infrastructure/websocket/manager.js
+- client/src/infrastructure/websocket/manager.js.map
+- client/src/infrastructure/websocket/manager.d.ts
+- client/src/infrastructure/websocket/manager.d.ts.map
 - client/src/__tests__/websocket-reconnection.property.test.js
 - client/src/__tests__/websocket-reconnection.property.test.js.map
 - client/src/__tests__/websocket-reconnection.property.test.d.ts
 - client/src/__tests__/websocket-reconnection.property.test.d.ts.map
 
 #### Task 8: Duplicated Security UI Components ⏸️ DEFERRED
-- ✅ Compared client/src/core/security/ui/ vs client/src/features/security/ui/
+- ✅ Compared client/src/infrastructure/security/ui/ vs client/src/features/security/ui/
 - ✅ Found near-identical implementations (minor String() wrapper differences)
 - ✅ Verified all imports use features/security/ui/ (4 imports in 2 files)
 - ✅ Verified zero imports to core/security/ui/
@@ -96,7 +96,7 @@ All baseline files were previously captured and analyzed:
 **Finding**: This is NOT a duplicate - it's a proper backward compatibility pattern
 
 #### Task 10: Duplicated Loading Utilities ✅
-- ✅ Found both client/src/core/loading/utils/ and client/src/lib/ui/loading/utils/
+- ✅ Found both client/src/infrastructure/loading/utils/ and client/src/lib/ui/loading/utils/
 - ✅ Verified ZERO imports to either location
 - ✅ Identified camelCase loadingUtils.ts variant (red flag)
 - ✅ Classified both as dead code

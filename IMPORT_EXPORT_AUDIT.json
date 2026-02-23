@@ -775,7 +775,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/AnalyticsIntegration.tsx",
+      "filePath": "client/src/infrastructure/analytics/AnalyticsIntegration.tsx",
       "imports": [],
       "exports": [
         "useAnalyticsIntegration",
@@ -784,7 +784,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/AnalyticsProvider.tsx",
+      "filePath": "client/src/infrastructure/analytics/AnalyticsProvider.tsx",
       "imports": [
         {
           "importPath": "./comprehensive-tracker",
@@ -811,7 +811,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/comprehensive-tracker.ts",
+      "filePath": "client/src/infrastructure/analytics/comprehensive-tracker.ts",
       "imports": [],
       "exports": [
         "AnalyticsEvent",
@@ -825,7 +825,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/data-retention-service.ts",
+      "filePath": "client/src/infrastructure/analytics/data-retention-service.ts",
       "imports": [],
       "exports": [
         "DataCategory",
@@ -849,7 +849,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/index.ts",
+      "filePath": "client/src/infrastructure/analytics/index.ts",
       "imports": [
         {
           "importPath": "./comprehensive-tracker",
@@ -912,7 +912,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/analytics/service.ts",
+      "filePath": "client/src/infrastructure/analytics/service.ts",
       "imports": [],
       "exports": [
         "TrackingResult",
@@ -929,7 +929,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/analytics.ts",
+      "filePath": "client/src/infrastructure/api/analytics.ts",
       "imports": [
         {
           "importPath": "./errors",
@@ -973,7 +973,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/auth.ts",
+      "filePath": "client/src/infrastructure/api/auth.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -1024,7 +1024,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/authenticated-client.ts",
+      "filePath": "client/src/infrastructure/api/authenticated-client.ts",
       "imports": [
         {
           "importPath": "../auth",
@@ -1084,7 +1084,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/authentication.ts",
+      "filePath": "client/src/infrastructure/api/authentication.ts",
       "imports": [
         {
           "importPath": "../auth",
@@ -1130,7 +1130,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/base-client.ts",
+      "filePath": "client/src/infrastructure/api/base-client.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -1212,7 +1212,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/bills.ts",
+      "filePath": "client/src/infrastructure/api/bills.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -1248,7 +1248,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/cache-manager.ts",
+      "filePath": "client/src/infrastructure/api/cache-manager.ts",
       "imports": [
         {
           "importPath": "../storage/types",
@@ -1280,7 +1280,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/circuit-breaker-client.ts",
+      "filePath": "client/src/infrastructure/api/circuit-breaker-client.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -1384,7 +1384,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/circuit-breaker-monitor.ts",
+      "filePath": "client/src/infrastructure/api/circuit-breaker-monitor.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -1435,7 +1435,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/client.ts",
+      "filePath": "client/src/infrastructure/api/client.ts",
       "imports": [
         {
           "importPath": "../auth",
@@ -1560,7 +1560,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/community.ts",
+      "filePath": "client/src/infrastructure/api/community.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -1600,7 +1600,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/config.ts",
+      "filePath": "client/src/infrastructure/api/config.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -1635,7 +1635,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/contract-client.ts",
+      "filePath": "client/src/infrastructure/api/contract-client.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -1663,7 +1663,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/errors.ts",
+      "filePath": "client/src/infrastructure/api/errors.ts",
       "imports": [],
       "exports": [
         "APIErrorCode",
@@ -1683,7 +1683,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/examples/circuit-breaker-usage.ts",
+      "filePath": "client/src/infrastructure/api/examples/circuit-breaker-usage.ts",
       "imports": [
         {
           "importPath": "../circuit-breaker-client",
@@ -1751,7 +1751,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/index.ts",
+      "filePath": "client/src/infrastructure/api/hooks/index.ts",
       "imports": [
         {
           "importPath": "./use-api-with-fallback",
@@ -1818,7 +1818,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/use-api-with-fallback.ts",
+      "filePath": "client/src/infrastructure/api/hooks/use-api-with-fallback.ts",
       "imports": [
         {
           "importPath": "../client",
@@ -1882,7 +1882,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/use-safe-mutation.ts",
+      "filePath": "client/src/infrastructure/api/hooks/use-safe-mutation.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -1909,7 +1909,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/use-safe-query.ts",
+      "filePath": "client/src/infrastructure/api/hooks/use-safe-query.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -1936,7 +1936,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/useApiConnection.ts",
+      "filePath": "client/src/infrastructure/api/hooks/useApiConnection.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -1966,7 +1966,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/useConnectionAware.tsx",
+      "filePath": "client/src/infrastructure/api/hooks/useConnectionAware.tsx",
       "imports": [],
       "exports": [
         "ConnectionInfo",
@@ -1976,7 +1976,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/hooks/useServiceStatus.ts",
+      "filePath": "client/src/infrastructure/api/hooks/useServiceStatus.ts",
       "imports": [],
       "exports": [
         "useServiceStatus"
@@ -1984,7 +1984,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/index.ts",
+      "filePath": "client/src/infrastructure/api/index.ts",
       "imports": [
         {
           "importPath": "./base-client",
@@ -2282,7 +2282,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/interceptors.ts",
+      "filePath": "client/src/infrastructure/api/interceptors.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -2359,7 +2359,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/notifications.ts",
+      "filePath": "client/src/infrastructure/api/notifications.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -2409,7 +2409,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/performance.ts",
+      "filePath": "client/src/infrastructure/api/performance.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -2463,7 +2463,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/privacy.ts",
+      "filePath": "client/src/infrastructure/api/privacy.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -2488,7 +2488,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/registry.ts",
+      "filePath": "client/src/infrastructure/api/registry.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -2534,7 +2534,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/retry-handler.ts",
+      "filePath": "client/src/infrastructure/api/retry-handler.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -2568,7 +2568,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/retry.ts",
+      "filePath": "client/src/infrastructure/api/retry.ts",
       "imports": [
         {
           "importPath": "../error",
@@ -2606,7 +2606,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/safe-client.ts",
+      "filePath": "client/src/infrastructure/api/safe-client.ts",
       "imports": [
         {
           "importPath": "./base-client",
@@ -2649,7 +2649,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/search.ts",
+      "filePath": "client/src/infrastructure/api/search.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -2673,7 +2673,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/serialization-interceptors.ts",
+      "filePath": "client/src/infrastructure/api/serialization-interceptors.ts",
       "imports": [
         {
           "importPath": "./base-client",
@@ -2702,7 +2702,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/services/bill.service.ts",
+      "filePath": "client/src/infrastructure/api/services/bill.service.ts",
       "imports": [
         {
           "importPath": "../contract-client",
@@ -2726,7 +2726,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/services/index.ts",
+      "filePath": "client/src/infrastructure/api/services/index.ts",
       "imports": [
         {
           "importPath": "./user.service",
@@ -2759,7 +2759,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/services/user.service.ts",
+      "filePath": "client/src/infrastructure/api/services/user.service.ts",
       "imports": [
         {
           "importPath": "../contract-client",
@@ -2783,7 +2783,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/system.ts",
+      "filePath": "client/src/infrastructure/api/system.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -2853,7 +2853,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/auth.ts",
+      "filePath": "client/src/infrastructure/api/types/auth.ts",
       "imports": [],
       "exports": [
         "ExpertStatus",
@@ -2864,13 +2864,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/bill.ts",
+      "filePath": "client/src/infrastructure/api/types/bill.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/cache.ts",
+      "filePath": "client/src/infrastructure/api/types/cache.ts",
       "imports": [],
       "exports": [
         "CacheStorage",
@@ -2882,7 +2882,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/common.ts",
+      "filePath": "client/src/infrastructure/api/types/common.ts",
       "imports": [
         {
           "importPath": "../../error",
@@ -2932,13 +2932,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/community.ts",
+      "filePath": "client/src/infrastructure/api/types/community.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/config.ts",
+      "filePath": "client/src/infrastructure/api/types/config.ts",
       "imports": [
         {
           "importPath": "./cache",
@@ -2978,7 +2978,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/engagement.ts",
+      "filePath": "client/src/infrastructure/api/types/engagement.ts",
       "imports": [],
       "exports": [
         "EngagementType",
@@ -2988,7 +2988,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/error-response.ts",
+      "filePath": "client/src/infrastructure/api/types/error-response.ts",
       "imports": [],
       "exports": [
         "ErrorResponse"
@@ -2996,7 +2996,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/index.ts",
+      "filePath": "client/src/infrastructure/api/types/index.ts",
       "imports": [
         {
           "importPath": "./common",
@@ -3337,7 +3337,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/performance.ts",
+      "filePath": "client/src/infrastructure/api/types/performance.ts",
       "imports": [],
       "exports": [
         "WebVitals",
@@ -3350,7 +3350,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/preferences.ts",
+      "filePath": "client/src/infrastructure/api/types/preferences.ts",
       "imports": [],
       "exports": [
         "UpdateFrequency",
@@ -3374,7 +3374,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/request.ts",
+      "filePath": "client/src/infrastructure/api/types/request.ts",
       "imports": [
         {
           "importPath": "./common",
@@ -3401,7 +3401,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/service.ts",
+      "filePath": "client/src/infrastructure/api/types/service.ts",
       "imports": [
         {
           "importPath": "./auth",
@@ -3509,13 +3509,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/shared-imports.ts",
+      "filePath": "client/src/infrastructure/api/types/shared-imports.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/types/sponsor.ts",
+      "filePath": "client/src/infrastructure/api/types/sponsor.ts",
       "imports": [],
       "exports": [
         "Sponsor"
@@ -3523,7 +3523,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/api/user.ts",
+      "filePath": "client/src/infrastructure/api/user.ts",
       "imports": [
         {
           "importPath": "./client",
@@ -3575,7 +3575,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/config/auth-config.ts",
+      "filePath": "client/src/infrastructure/auth/config/auth-config.ts",
       "imports": [
         {
           "importPath": "../http/authentication-interceptors",
@@ -3619,7 +3619,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/config/auth-init.ts",
+      "filePath": "client/src/infrastructure/auth/config/auth-init.ts",
       "imports": [
         {
           "importPath": "../../api/types",
@@ -3743,7 +3743,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/constants/auth-constants.ts",
+      "filePath": "client/src/infrastructure/auth/constants/auth-constants.ts",
       "imports": [],
       "exports": [
         "AUTH_VALIDATION_RULES",
@@ -3773,7 +3773,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/errors/auth-errors.ts",
+      "filePath": "client/src/infrastructure/auth/errors/auth-errors.ts",
       "imports": [
         {
           "importPath": "../../error/constants",
@@ -3835,7 +3835,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/hooks/useAuth.tsx",
+      "filePath": "client/src/infrastructure/auth/hooks/useAuth.tsx",
       "imports": [
         {
           "importPath": "../services/auth-api-service",
@@ -3915,7 +3915,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/http/authenticated-client.ts",
+      "filePath": "client/src/infrastructure/auth/http/authenticated-client.ts",
       "imports": [],
       "exports": [
         "AuthenticatedApiClientConfig",
@@ -3924,7 +3924,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/http/authentication-interceptors.ts",
+      "filePath": "client/src/infrastructure/auth/http/authentication-interceptors.ts",
       "imports": [],
       "exports": [
         "AuthConfig",
@@ -3938,7 +3938,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/index.ts",
+      "filePath": "client/src/infrastructure/auth/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -4376,7 +4376,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/initialization.ts",
+      "filePath": "client/src/infrastructure/auth/initialization.ts",
       "imports": [],
       "exports": [
         "authServiceInitializer",
@@ -4385,7 +4385,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/rbac.ts",
+      "filePath": "client/src/infrastructure/auth/rbac.ts",
       "imports": [],
       "exports": [
         "PermissionAction",
@@ -4410,7 +4410,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/scripts/cleanup-old-auth.ts",
+      "filePath": "client/src/infrastructure/auth/scripts/cleanup-old-auth.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -4435,7 +4435,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/scripts/init-auth-system.ts",
+      "filePath": "client/src/infrastructure/auth/scripts/init-auth-system.ts",
       "imports": [
         {
           "importPath": "../../api/types",
@@ -4494,7 +4494,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/scripts/migration-helper.ts",
+      "filePath": "client/src/infrastructure/auth/scripts/migration-helper.ts",
       "imports": [],
       "exports": [
         "IMPORT_MAPPINGS",
@@ -4509,7 +4509,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/service.ts",
+      "filePath": "client/src/infrastructure/auth/service.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -4536,7 +4536,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/services/auth-api-service.ts",
+      "filePath": "client/src/infrastructure/auth/services/auth-api-service.ts",
       "imports": [
         {
           "importPath": "../../api/types",
@@ -4624,7 +4624,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/services/session-manager.ts",
+      "filePath": "client/src/infrastructure/auth/services/session-manager.ts",
       "imports": [
         {
           "importPath": "../../error",
@@ -4724,7 +4724,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/services/token-manager.ts",
+      "filePath": "client/src/infrastructure/auth/services/token-manager.ts",
       "imports": [
         {
           "importPath": "../../error",
@@ -4815,7 +4815,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/store/auth-middleware.ts",
+      "filePath": "client/src/infrastructure/auth/store/auth-middleware.ts",
       "imports": [
         {
           "importPath": "../services/auth-api-service",
@@ -4872,7 +4872,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/store/auth-slice.ts",
+      "filePath": "client/src/infrastructure/auth/store/auth-slice.ts",
       "imports": [
         {
           "importPath": "../services/auth-api-service",
@@ -4948,7 +4948,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/types.ts",
+      "filePath": "client/src/infrastructure/auth/types.ts",
       "imports": [],
       "exports": [
         "PrivacySettings",
@@ -4988,7 +4988,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/utils/index.ts",
+      "filePath": "client/src/infrastructure/auth/utils/index.ts",
       "imports": [
         {
           "importPath": "./storage-helpers",
@@ -5021,7 +5021,7 @@
       "isBarrel": true
     },
     {
-      "filePath": "client/src/core/auth/utils/permission-helpers.ts",
+      "filePath": "client/src/infrastructure/auth/utils/permission-helpers.ts",
       "imports": [],
       "exports": [
         "checkPermission",
@@ -5034,7 +5034,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/utils/security-helpers.ts",
+      "filePath": "client/src/infrastructure/auth/utils/security-helpers.ts",
       "imports": [],
       "exports": [
         "sanitizeInput",
@@ -5045,7 +5045,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/utils/storage-helpers.ts",
+      "filePath": "client/src/infrastructure/auth/utils/storage-helpers.ts",
       "imports": [],
       "exports": [
         "getStorageToken",
@@ -5064,7 +5064,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/auth/utils/validation.ts",
+      "filePath": "client/src/infrastructure/auth/utils/validation.ts",
       "imports": [],
       "exports": [
         "AUTH_VALIDATION_RULES",
@@ -5090,7 +5090,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/browser-detector.ts",
+      "filePath": "client/src/infrastructure/browser/browser-detector.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -5162,13 +5162,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/BrowserCompatibilityChecker.tsx",
+      "filePath": "client/src/infrastructure/browser/BrowserCompatibilityChecker.tsx",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/BrowserCompatibilityReport.tsx",
+      "filePath": "client/src/infrastructure/browser/BrowserCompatibilityReport.tsx",
       "imports": [
         {
           "importPath": "./BrowserCompatibilityTester",
@@ -5188,13 +5188,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/BrowserCompatibilityTester.tsx",
+      "filePath": "client/src/infrastructure/browser/BrowserCompatibilityTester.tsx",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/compatibility-manager.ts",
+      "filePath": "client/src/infrastructure/browser/compatibility-manager.ts",
       "imports": [
         {
           "importPath": "./browser-detector",
@@ -5266,7 +5266,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/constants.ts",
+      "filePath": "client/src/infrastructure/browser/constants.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -5292,7 +5292,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/environment.ts",
+      "filePath": "client/src/infrastructure/browser/environment.ts",
       "imports": [],
       "exports": [
         "isBrowserEnv",
@@ -5301,7 +5301,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/feature-detector.ts",
+      "filePath": "client/src/infrastructure/browser/feature-detector.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -5357,7 +5357,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/FeatureFallbacks.tsx",
+      "filePath": "client/src/infrastructure/browser/FeatureFallbacks.tsx",
       "imports": [],
       "exports": [
         "useIntersectionObserver",
@@ -5374,7 +5374,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/index.ts",
+      "filePath": "client/src/infrastructure/browser/index.ts",
       "imports": [
         {
           "importPath": "./browser-detector",
@@ -5553,7 +5553,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/polyfill-manager.ts",
+      "filePath": "client/src/infrastructure/browser/polyfill-manager.ts",
       "imports": [
         {
           "importPath": "./feature-detector",
@@ -5598,7 +5598,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/types.ts",
+      "filePath": "client/src/infrastructure/browser/types.ts",
       "imports": [],
       "exports": [
         "BrowserInfo",
@@ -5615,7 +5615,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/browser/useBrowserStatus.tsx",
+      "filePath": "client/src/infrastructure/browser/useBrowserStatus.tsx",
       "imports": [],
       "exports": [
         "useBrowserCompatibilityStatus",
@@ -5630,7 +5630,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/CommandPalette.test.tsx",
+      "filePath": "client/src/infrastructure/command-palette/CommandPalette.test.tsx",
       "imports": [
         {
           "importPath": "./CommandPalette",
@@ -5667,7 +5667,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/CommandPalette.tsx",
+      "filePath": "client/src/infrastructure/command-palette/CommandPalette.tsx",
       "imports": [
         {
           "importPath": "../../lib/design-system/interactive/Command",
@@ -5765,7 +5765,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/commands.ts",
+      "filePath": "client/src/infrastructure/command-palette/commands.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -5795,7 +5795,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/index.ts",
+      "filePath": "client/src/infrastructure/command-palette/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -5886,7 +5886,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/Modal.tsx",
+      "filePath": "client/src/infrastructure/command-palette/Modal.tsx",
       "imports": [
         {
           "importPath": "../../lib/design-system/utils/cn",
@@ -5912,7 +5912,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/types.ts",
+      "filePath": "client/src/infrastructure/command-palette/types.ts",
       "imports": [],
       "exports": [
         "Command",
@@ -5924,7 +5924,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/command-palette/useCommandPalette.ts",
+      "filePath": "client/src/infrastructure/command-palette/useCommandPalette.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -5949,7 +5949,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/hooks/useRealtime.ts",
+      "filePath": "client/src/infrastructure/community/hooks/useRealtime.ts",
       "imports": [
         {
           "importPath": "../services/websocket-manager",
@@ -5988,7 +5988,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/hooks/useUnifiedCommunity.ts",
+      "filePath": "client/src/infrastructure/community/hooks/useUnifiedCommunity.ts",
       "imports": [
         {
           "importPath": "../../api/client",
@@ -6043,7 +6043,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/hooks/useUnifiedDiscussion.ts",
+      "filePath": "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts",
       "imports": [
         {
           "importPath": "../../api/client",
@@ -6119,7 +6119,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/index.ts",
+      "filePath": "client/src/infrastructure/community/index.ts",
       "imports": [
         {
           "importPath": "./hooks/useUnifiedDiscussion",
@@ -6235,7 +6235,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/services/moderation.service.ts",
+      "filePath": "client/src/infrastructure/community/services/moderation.service.ts",
       "imports": [
         {
           "importPath": "../../api/client",
@@ -6276,7 +6276,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/services/state-sync.service.ts",
+      "filePath": "client/src/infrastructure/community/services/state-sync.service.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -6316,7 +6316,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/services/websocket-manager.ts",
+      "filePath": "client/src/infrastructure/community/services/websocket-manager.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -6340,7 +6340,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/community/types.ts",
+      "filePath": "client/src/infrastructure/community/types.ts",
       "imports": [],
       "exports": [
         "UnifiedComment",
@@ -6363,7 +6363,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/core-monitoring.ts",
+      "filePath": "client/src/infrastructure/core-monitoring.ts",
       "imports": [],
       "exports": [
         "serviceArchitectureMonitoring",
@@ -6374,7 +6374,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/context.tsx",
+      "filePath": "client/src/infrastructure/dashboard/context.tsx",
       "imports": [],
       "exports": [
         "LayoutConfig",
@@ -6386,7 +6386,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/hooks.ts",
+      "filePath": "client/src/infrastructure/dashboard/hooks.ts",
       "imports": [
         {
           "importPath": "./context",
@@ -6432,7 +6432,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/index.ts",
+      "filePath": "client/src/infrastructure/dashboard/index.ts",
       "imports": [
         {
           "importPath": "./context",
@@ -6493,7 +6493,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/reducer.ts",
+      "filePath": "client/src/infrastructure/dashboard/reducer.ts",
       "imports": [],
       "exports": [
         "DashboardAction",
@@ -6502,7 +6502,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/utils.ts",
+      "filePath": "client/src/infrastructure/dashboard/utils.ts",
       "imports": [],
       "exports": [
         "ChartData",
@@ -6521,7 +6521,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/dashboard/widgets.ts",
+      "filePath": "client/src/infrastructure/dashboard/widgets.ts",
       "imports": [],
       "exports": [
         "WidgetType",
@@ -6532,7 +6532,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/analytics.ts",
+      "filePath": "client/src/infrastructure/error/analytics.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -6581,7 +6581,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/classes.ts",
+      "filePath": "client/src/infrastructure/error/classes.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -6634,7 +6634,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/CommunityErrorBoundary.tsx",
+      "filePath": "client/src/infrastructure/error/components/CommunityErrorBoundary.tsx",
       "imports": [
         {
           "importPath": "./utils/shared-error-display",
@@ -6663,7 +6663,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/ErrorBoundary.tsx",
+      "filePath": "client/src/infrastructure/error/components/ErrorBoundary.tsx",
       "imports": [],
       "exports": [
         "RecoveryOption",
@@ -6677,7 +6677,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/ErrorFallback.tsx",
+      "filePath": "client/src/infrastructure/error/components/ErrorFallback.tsx",
       "imports": [],
       "exports": [
         "ErrorFallback",
@@ -6690,7 +6690,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/ErrorRecoveryManager.tsx",
+      "filePath": "client/src/infrastructure/error/components/ErrorRecoveryManager.tsx",
       "imports": [],
       "exports": [
         "ErrorRecoveryManagerProps",
@@ -6699,7 +6699,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/example.tsx",
+      "filePath": "client/src/infrastructure/error/components/example.tsx",
       "imports": [
         {
           "importPath": "./ErrorBoundary",
@@ -6739,7 +6739,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/index.ts",
+      "filePath": "client/src/infrastructure/error/components/index.ts",
       "imports": [
         {
           "importPath": "./ErrorBoundary",
@@ -7026,7 +7026,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/RecoveryUI.tsx",
+      "filePath": "client/src/infrastructure/error/components/RecoveryUI.tsx",
       "imports": [],
       "exports": [
         "RecoveryUI"
@@ -7034,7 +7034,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/ServiceUnavailable.tsx",
+      "filePath": "client/src/infrastructure/error/components/ServiceUnavailable.tsx",
       "imports": [],
       "exports": [
         "ServiceUnavailable"
@@ -7042,7 +7042,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/SimpleErrorBoundary.tsx",
+      "filePath": "client/src/infrastructure/error/components/SimpleErrorBoundary.tsx",
       "imports": [
         {
           "importPath": "./utils/shared-error-display",
@@ -7067,7 +7067,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/types.ts",
+      "filePath": "client/src/infrastructure/error/components/types.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -7107,7 +7107,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/UnifiedErrorBoundary.tsx",
+      "filePath": "client/src/infrastructure/error/components/UnifiedErrorBoundary.tsx",
       "imports": [],
       "exports": [
         "UnifiedErrorBoundaryProps",
@@ -7118,7 +7118,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/utils/contextual-messages.ts",
+      "filePath": "client/src/infrastructure/error/components/utils/contextual-messages.ts",
       "imports": [
         {
           "importPath": "../../classes",
@@ -7172,7 +7172,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/utils/error-icons.tsx",
+      "filePath": "client/src/infrastructure/error/components/utils/error-icons.tsx",
       "imports": [
         {
           "importPath": "../../classes",
@@ -7212,7 +7212,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/utils/error-normalizer.ts",
+      "filePath": "client/src/infrastructure/error/components/utils/error-normalizer.ts",
       "imports": [
         {
           "importPath": "../../classes",
@@ -7256,7 +7256,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/utils/error-reporter.ts",
+      "filePath": "client/src/infrastructure/error/components/utils/error-reporter.ts",
       "imports": [
         {
           "importPath": "../../classes",
@@ -7299,7 +7299,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/components/utils/shared-error-display.tsx",
+      "filePath": "client/src/infrastructure/error/components/utils/shared-error-display.tsx",
       "imports": [],
       "exports": [
         "ErrorDisplayConfig",
@@ -7311,7 +7311,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/constants.ts",
+      "filePath": "client/src/infrastructure/error/constants.ts",
       "imports": [],
       "exports": [
         "ErrorDomain",
@@ -7327,7 +7327,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/dashboard-errors.ts",
+      "filePath": "client/src/infrastructure/error/dashboard-errors.ts",
       "imports": [
         {
           "importPath": "./classes",
@@ -7371,7 +7371,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/factory.ts",
+      "filePath": "client/src/infrastructure/error/factory.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -7412,7 +7412,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/handler.ts",
+      "filePath": "client/src/infrastructure/error/handler.ts",
       "imports": [
         {
           "importPath": "./analytics",
@@ -7522,7 +7522,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/index.ts",
+      "filePath": "client/src/infrastructure/error/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -8028,7 +8028,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/error-message-formatter.ts",
+      "filePath": "client/src/infrastructure/error/messages/error-message-formatter.ts",
       "imports": [
         {
           "importPath": "../constants",
@@ -8096,7 +8096,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/error-message-templates.ts",
+      "filePath": "client/src/infrastructure/error/messages/error-message-templates.ts",
       "imports": [
         {
           "importPath": "../constants",
@@ -8130,7 +8130,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/error-recovery-suggestions.ts",
+      "filePath": "client/src/infrastructure/error/messages/error-recovery-suggestions.ts",
       "imports": [
         {
           "importPath": "../constants",
@@ -8185,7 +8185,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/index.ts",
+      "filePath": "client/src/infrastructure/error/messages/index.ts",
       "imports": [
         {
           "importPath": "./error-message-templates",
@@ -8413,7 +8413,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/use-error-messages.ts",
+      "filePath": "client/src/infrastructure/error/messages/use-error-messages.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -8461,7 +8461,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/__tests__/error-message-system.test.ts",
+      "filePath": "client/src/infrastructure/error/messages/__tests__/error-message-system.test.ts",
       "imports": [
         {
           "importPath": "../../constants",
@@ -8547,7 +8547,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/messages/__tests__/use-error-messages.test.tsx",
+      "filePath": "client/src/infrastructure/error/messages/__tests__/use-error-messages.test.tsx",
       "imports": [
         {
           "importPath": "../../constants",
@@ -8604,7 +8604,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/middleware/hooks-middleware.ts",
+      "filePath": "client/src/infrastructure/error/middleware/hooks-middleware.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -8644,7 +8644,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/middleware/index.ts",
+      "filePath": "client/src/infrastructure/error/middleware/index.ts",
       "imports": [
         {
           "importPath": "./security-middleware",
@@ -8800,7 +8800,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/middleware/library-middleware.ts",
+      "filePath": "client/src/infrastructure/error/middleware/library-middleware.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -8853,7 +8853,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/middleware/security-middleware.ts",
+      "filePath": "client/src/infrastructure/error/middleware/security-middleware.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -8889,7 +8889,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/middleware/service-middleware.ts",
+      "filePath": "client/src/infrastructure/error/middleware/service-middleware.ts",
       "imports": [
         {
           "importPath": "../index",
@@ -8941,7 +8941,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/monitoring.tsx",
+      "filePath": "client/src/infrastructure/error/monitoring.tsx",
       "imports": [],
       "exports": [
         "errorMonitoring",
@@ -8951,7 +8951,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/rate-limiter.ts",
+      "filePath": "client/src/infrastructure/error/rate-limiter.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -8976,7 +8976,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/recovery.ts",
+      "filePath": "client/src/infrastructure/error/recovery.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -9049,7 +9049,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/reporters/ApiReporter.ts",
+      "filePath": "client/src/infrastructure/error/reporters/ApiReporter.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -9075,7 +9075,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/reporters/CompositeReporter.ts",
+      "filePath": "client/src/infrastructure/error/reporters/CompositeReporter.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -9102,7 +9102,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/reporters/ConsoleReporter.ts",
+      "filePath": "client/src/infrastructure/error/reporters/ConsoleReporter.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -9129,7 +9129,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/reporters/SentryReporter.ts",
+      "filePath": "client/src/infrastructure/error/reporters/SentryReporter.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -9155,7 +9155,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/reporting.ts",
+      "filePath": "client/src/infrastructure/error/reporting.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -9180,7 +9180,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/error/types.ts",
+      "filePath": "client/src/infrastructure/error/types.ts",
       "imports": [
         {
           "importPath": "./constants",
@@ -9245,7 +9245,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/hooks/index.ts",
+      "filePath": "client/src/infrastructure/hooks/index.ts",
       "imports": [
         {
           "importPath": "../api/hooks/useConnectionAware",
@@ -9297,7 +9297,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/index.ts",
+      "filePath": "client/src/infrastructure/index.ts",
       "imports": [
         {
           "importPath": "./error",
@@ -9642,7 +9642,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/components/GlobalLoadingIndicator.tsx",
+      "filePath": "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx",
       "imports": [
         {
           "importPath": "../context",
@@ -9698,7 +9698,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/components/index.ts",
+      "filePath": "client/src/infrastructure/loading/components/index.ts",
       "imports": [
         {
           "importPath": "./LoadingSpinner",
@@ -9771,7 +9771,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/components/LoadingProgress.tsx",
+      "filePath": "client/src/infrastructure/loading/components/LoadingProgress.tsx",
       "imports": [],
       "exports": [
         "LoadingProgressProps",
@@ -9782,7 +9782,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/components/LoadingSkeleton.tsx",
+      "filePath": "client/src/infrastructure/loading/components/LoadingSkeleton.tsx",
       "imports": [],
       "exports": [
         "LoadingSkeletonProps",
@@ -9794,7 +9794,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/components/LoadingSpinner.tsx",
+      "filePath": "client/src/infrastructure/loading/components/LoadingSpinner.tsx",
       "imports": [],
       "exports": [
         "LoadingSpinnerProps",
@@ -9803,7 +9803,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/context.tsx",
+      "filePath": "client/src/infrastructure/loading/context.tsx",
       "imports": [
         {
           "importPath": "./reducer",
@@ -9830,7 +9830,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/hooks/index.ts",
+      "filePath": "client/src/infrastructure/loading/hooks/index.ts",
       "imports": [
         {
           "importPath": "./useTimeoutAwareLoading",
@@ -9869,7 +9869,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/hooks/useOnlineStatus.ts",
+      "filePath": "client/src/infrastructure/loading/hooks/useOnlineStatus.ts",
       "imports": [],
       "exports": [
         "useOnlineStatus"
@@ -9877,7 +9877,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/hooks/useTimeoutAwareLoading.ts",
+      "filePath": "client/src/infrastructure/loading/hooks/useTimeoutAwareLoading.ts",
       "imports": [],
       "exports": [
         "TimeoutConfig",
@@ -9889,7 +9889,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/index.ts",
+      "filePath": "client/src/infrastructure/loading/index.ts",
       "imports": [
         {
           "importPath": "./context",
@@ -10027,7 +10027,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/reducer.ts",
+      "filePath": "client/src/infrastructure/loading/reducer.ts",
       "imports": [],
       "exports": [
         "loadingReducer",
@@ -10054,7 +10054,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils/connection-utils.ts",
+      "filePath": "client/src/infrastructure/loading/utils/connection-utils.ts",
       "imports": [],
       "exports": [
         "getConnectionMultiplier",
@@ -10068,7 +10068,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils/index.ts",
+      "filePath": "client/src/infrastructure/loading/utils/index.ts",
       "imports": [
         {
           "importPath": "./connection-utils",
@@ -10127,7 +10127,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils/loading-utils.ts",
+      "filePath": "client/src/infrastructure/loading/utils/loading-utils.ts",
       "imports": [],
       "exports": [
         "LoadingScenario",
@@ -10145,7 +10145,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils/progress-utils.ts",
+      "filePath": "client/src/infrastructure/loading/utils/progress-utils.ts",
       "imports": [],
       "exports": [
         "ProgressTracker",
@@ -10158,7 +10158,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils/timeout-utils.ts",
+      "filePath": "client/src/infrastructure/loading/utils/timeout-utils.ts",
       "imports": [],
       "exports": [
         "TimeoutManagerOptions",
@@ -10173,7 +10173,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/utils.ts",
+      "filePath": "client/src/infrastructure/loading/utils.ts",
       "imports": [],
       "exports": [
         "calculateEstimatedTime",
@@ -10189,7 +10189,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/loading/validation.ts",
+      "filePath": "client/src/infrastructure/loading/validation.ts",
       "imports": [],
       "exports": [
         "LoadingValidationError",
@@ -10203,7 +10203,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/device-detector.ts",
+      "filePath": "client/src/infrastructure/mobile/device-detector.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -10228,7 +10228,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/error-handler.ts",
+      "filePath": "client/src/infrastructure/mobile/error-handler.ts",
       "imports": [
         {
           "importPath": "./device-detector",
@@ -10268,7 +10268,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/index.ts",
+      "filePath": "client/src/infrastructure/mobile/index.ts",
       "imports": [
         {
           "importPath": "./device-detector",
@@ -10400,7 +10400,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/performance-optimizer.ts",
+      "filePath": "client/src/infrastructure/mobile/performance-optimizer.ts",
       "imports": [
         {
           "importPath": "./device-detector",
@@ -10425,7 +10425,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/responsive-utils.ts",
+      "filePath": "client/src/infrastructure/mobile/responsive-utils.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -10450,7 +10450,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/touch-handler.ts",
+      "filePath": "client/src/infrastructure/mobile/touch-handler.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -10476,7 +10476,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/mobile/types.ts",
+      "filePath": "client/src/infrastructure/mobile/types.ts",
       "imports": [],
       "exports": [
         "ResponsiveBreakpoints",
@@ -10488,7 +10488,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/monitoring/index.ts",
+      "filePath": "client/src/infrastructure/monitoring/index.ts",
       "imports": [
         {
           "importPath": "./monitoring-init",
@@ -10515,7 +10515,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/monitoring/monitoring-init.ts",
+      "filePath": "client/src/infrastructure/monitoring/monitoring-init.ts",
       "imports": [
         {
           "importPath": "../../lib/infrastructure/monitoring/error-monitor",
@@ -10542,7 +10542,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/monitoring/sentry-config.ts",
+      "filePath": "client/src/infrastructure/monitoring/sentry-config.ts",
       "imports": [],
       "exports": [
         "SentryErrorBoundary",
@@ -10552,7 +10552,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/access-control.ts",
+      "filePath": "client/src/infrastructure/navigation/access-control.ts",
       "imports": [],
       "exports": [
         "hasRouteAccess",
@@ -10564,7 +10564,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/analytics.ts",
+      "filePath": "client/src/infrastructure/navigation/analytics.ts",
       "imports": [],
       "exports": [
         "NavigationEvent",
@@ -10576,7 +10576,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/breadcrumbs.ts",
+      "filePath": "client/src/infrastructure/navigation/breadcrumbs.ts",
       "imports": [],
       "exports": [
         "generateBreadcrumbs",
@@ -10586,7 +10586,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/context.tsx",
+      "filePath": "client/src/infrastructure/navigation/context.tsx",
       "imports": [],
       "exports": [
         "createNavigationProvider",
@@ -10595,7 +10595,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks/index.ts",
+      "filePath": "client/src/infrastructure/navigation/hooks/index.ts",
       "imports": [
         {
           "importPath": "../hooks",
@@ -10624,7 +10624,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks/use-navigation-accessibility.ts",
+      "filePath": "client/src/infrastructure/navigation/hooks/use-navigation-accessibility.ts",
       "imports": [],
       "exports": [
         "useNavigationAccessibility",
@@ -10633,7 +10633,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks/use-navigation-performance.ts",
+      "filePath": "client/src/infrastructure/navigation/hooks/use-navigation-performance.ts",
       "imports": [],
       "exports": [
         "useNavigationPerformance",
@@ -10642,7 +10642,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks/use-navigation-preferences.tsx",
+      "filePath": "client/src/infrastructure/navigation/hooks/use-navigation-preferences.tsx",
       "imports": [],
       "exports": [
         "useNavigationPreferences"
@@ -10650,7 +10650,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks/use-unified-navigation.ts",
+      "filePath": "client/src/infrastructure/navigation/hooks/use-unified-navigation.ts",
       "imports": [
         {
           "importPath": "../context",
@@ -10674,7 +10674,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/hooks.ts",
+      "filePath": "client/src/infrastructure/navigation/hooks.ts",
       "imports": [
         {
           "importPath": "./context",
@@ -10705,7 +10705,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/index.ts",
+      "filePath": "client/src/infrastructure/navigation/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -10997,7 +10997,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/lookup.ts",
+      "filePath": "client/src/infrastructure/navigation/lookup.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11030,7 +11030,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/navigation-service.ts",
+      "filePath": "client/src/infrastructure/navigation/navigation-service.ts",
       "imports": [],
       "exports": [
         "NavigationService",
@@ -11040,7 +11040,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/NavigationConsistency.test.tsx",
+      "filePath": "client/src/infrastructure/navigation/NavigationConsistency.test.tsx",
       "imports": [
         {
           "importPath": "../../lib/infrastructure/store/slices/navigationSlice",
@@ -11090,7 +11090,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/NavigationConsistency.tsx",
+      "filePath": "client/src/infrastructure/navigation/NavigationConsistency.tsx",
       "imports": [
         {
           "importPath": "./context",
@@ -11114,7 +11114,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/NavigationPerformance.test.tsx",
+      "filePath": "client/src/infrastructure/navigation/NavigationPerformance.test.tsx",
       "imports": [
         {
           "importPath": "./NavigationPerformance",
@@ -11136,7 +11136,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/NavigationPerformance.tsx",
+      "filePath": "client/src/infrastructure/navigation/NavigationPerformance.tsx",
       "imports": [
         {
           "importPath": "../../features/home/pages/home",
@@ -11236,7 +11236,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/page-relationship-service.ts",
+      "filePath": "client/src/infrastructure/navigation/page-relationship-service.ts",
       "imports": [],
       "exports": [
         "PageRelationshipService"
@@ -11244,7 +11244,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/persistence.ts",
+      "filePath": "client/src/infrastructure/navigation/persistence.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11269,7 +11269,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/preferences.ts",
+      "filePath": "client/src/infrastructure/navigation/preferences.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11299,7 +11299,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/route-preloading.ts",
+      "filePath": "client/src/infrastructure/navigation/route-preloading.ts",
       "imports": [],
       "exports": [
         "RoutePreloadConfig",
@@ -11309,7 +11309,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/route-validation.ts",
+      "filePath": "client/src/infrastructure/navigation/route-validation.ts",
       "imports": [],
       "exports": [
         "RouteDefinition",
@@ -11322,7 +11322,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/search.ts",
+      "filePath": "client/src/infrastructure/navigation/search.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11347,7 +11347,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/test-navigation.ts",
+      "filePath": "client/src/infrastructure/navigation/test-navigation.ts",
       "imports": [
         {
           "importPath": "./index",
@@ -11373,13 +11373,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/types.ts",
+      "filePath": "client/src/infrastructure/navigation/types.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/utils.ts",
+      "filePath": "client/src/infrastructure/navigation/utils.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11426,7 +11426,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/navigation/validation.ts",
+      "filePath": "client/src/infrastructure/navigation/validation.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11452,7 +11452,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/alerts.ts",
+      "filePath": "client/src/infrastructure/performance/alerts.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11478,7 +11478,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/architecture-performance-monitor.ts",
+      "filePath": "client/src/infrastructure/performance/architecture-performance-monitor.ts",
       "imports": [],
       "exports": [
         "ArchitectureMetrics",
@@ -11495,7 +11495,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/budgets.ts",
+      "filePath": "client/src/infrastructure/performance/budgets.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11521,7 +11521,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/index.ts",
+      "filePath": "client/src/infrastructure/performance/index.ts",
       "imports": [
         {
           "importPath": "./alerts",
@@ -11728,7 +11728,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/monitor.ts",
+      "filePath": "client/src/infrastructure/performance/monitor.ts",
       "imports": [
         {
           "importPath": "./alerts",
@@ -11802,7 +11802,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/types.ts",
+      "filePath": "client/src/infrastructure/performance/types.ts",
       "imports": [],
       "exports": [
         "PerformanceMetric",
@@ -11833,7 +11833,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/performance/web-vitals.ts",
+      "filePath": "client/src/infrastructure/performance/web-vitals.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11858,7 +11858,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/personalization/index.ts",
+      "filePath": "client/src/infrastructure/personalization/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -11903,7 +11903,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/personalization/persona-detector.test.tsx",
+      "filePath": "client/src/infrastructure/personalization/persona-detector.test.tsx",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -11971,7 +11971,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/personalization/persona-detector.ts",
+      "filePath": "client/src/infrastructure/personalization/persona-detector.ts",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -12033,13 +12033,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/personalization/types.ts",
+      "filePath": "client/src/infrastructure/personalization/types.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/config.ts",
+      "filePath": "client/src/infrastructure/realtime/config.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -12067,7 +12067,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hooks/types.ts",
+      "filePath": "client/src/infrastructure/realtime/hooks/types.ts",
       "imports": [],
       "exports": [
         "CommunityRealTimeHookReturn",
@@ -12077,7 +12077,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hooks/use-bill-tracking.ts",
+      "filePath": "client/src/infrastructure/realtime/hooks/use-bill-tracking.ts",
       "imports": [
         {
           "importPath": "../services/realtime-service",
@@ -12118,7 +12118,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hooks/use-community-realtime.ts",
+      "filePath": "client/src/infrastructure/realtime/hooks/use-community-realtime.ts",
       "imports": [
         {
           "importPath": "../services/realtime-service",
@@ -12159,7 +12159,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hooks/use-realtime-engagement-legacy.ts",
+      "filePath": "client/src/infrastructure/realtime/hooks/use-realtime-engagement-legacy.ts",
       "imports": [
         {
           "importPath": "../services/realtime-service",
@@ -12184,7 +12184,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hooks/use-websocket.ts",
+      "filePath": "client/src/infrastructure/realtime/hooks/use-websocket.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -12227,7 +12227,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/hub.ts",
+      "filePath": "client/src/infrastructure/realtime/hub.ts",
       "imports": [
         {
           "importPath": "./config",
@@ -12365,7 +12365,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/index.ts",
+      "filePath": "client/src/infrastructure/realtime/index.ts",
       "imports": [
         {
           "importPath": "./hub",
@@ -12601,7 +12601,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/manager.ts",
+      "filePath": "client/src/infrastructure/realtime/manager.ts",
       "imports": [
         {
           "importPath": "./utils/event-emitter",
@@ -12648,7 +12648,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/services/bill-tracking.ts",
+      "filePath": "client/src/infrastructure/realtime/services/bill-tracking.ts",
       "imports": [
         {
           "importPath": "../manager",
@@ -12690,7 +12690,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/services/community.ts",
+      "filePath": "client/src/infrastructure/realtime/services/community.ts",
       "imports": [
         {
           "importPath": "../manager",
@@ -12732,7 +12732,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/services/notifications.ts",
+      "filePath": "client/src/infrastructure/realtime/services/notifications.ts",
       "imports": [
         {
           "importPath": "../manager",
@@ -12772,7 +12772,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/services/realtime-service.ts",
+      "filePath": "client/src/infrastructure/realtime/services/realtime-service.ts",
       "imports": [
         {
           "importPath": "../config",
@@ -12877,7 +12877,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/types/index.ts",
+      "filePath": "client/src/infrastructure/realtime/types/index.ts",
       "imports": [
         {
           "importPath": "../websocket-client",
@@ -12929,7 +12929,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/types.ts",
+      "filePath": "client/src/infrastructure/realtime/types.ts",
       "imports": [],
       "exports": [
         "TypingIndicator",
@@ -12971,7 +12971,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/utils/event-emitter.ts",
+      "filePath": "client/src/infrastructure/realtime/utils/event-emitter.ts",
       "imports": [
         {
           "importPath": "../types",
@@ -12995,7 +12995,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/realtime/websocket-client.ts",
+      "filePath": "client/src/infrastructure/realtime/websocket-client.ts",
       "imports": [],
       "exports": [
         "WebSocketClientEvents",
@@ -13005,7 +13005,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/recovery/dashboard-recovery.ts",
+      "filePath": "client/src/infrastructure/recovery/dashboard-recovery.ts",
       "imports": [],
       "exports": [
         "getRecoveryStrategy",
@@ -13014,7 +13014,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/recovery/index.ts",
+      "filePath": "client/src/infrastructure/recovery/index.ts",
       "imports": [
         {
           "importPath": "./dashboard-recovery",
@@ -13034,7 +13034,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/search/index.ts",
+      "filePath": "client/src/infrastructure/search/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -13095,7 +13095,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/search/search-strategy-selector.ts",
+      "filePath": "client/src/infrastructure/search/search-strategy-selector.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -13124,7 +13124,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/search/types.ts",
+      "filePath": "client/src/infrastructure/search/types.ts",
       "imports": [
         {
           "importPath": "../../features/search/types",
@@ -13156,7 +13156,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/search/UnifiedSearchInterface.test.tsx",
+      "filePath": "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx",
       "imports": [
         {
           "importPath": "./types",
@@ -13233,7 +13233,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/search/UnifiedSearchInterface.tsx",
+      "filePath": "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "imports": [
         {
           "importPath": "../../features/search/hooks/useIntelligentSearch",
@@ -13382,7 +13382,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/config/security-config.ts",
+      "filePath": "client/src/infrastructure/security/config/security-config.ts",
       "imports": [],
       "exports": [
         "securityConfig"
@@ -13390,7 +13390,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/csp-manager.ts",
+      "filePath": "client/src/infrastructure/security/csp-manager.ts",
       "imports": [],
       "exports": [
         "CSPConfig",
@@ -13399,7 +13399,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/csp-nonce.ts",
+      "filePath": "client/src/infrastructure/security/csp-nonce.ts",
       "imports": [],
       "exports": [
         "CSPNonceManager",
@@ -13408,7 +13408,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/csrf-protection.ts",
+      "filePath": "client/src/infrastructure/security/csrf-protection.ts",
       "imports": [],
       "exports": [
         "CSRFConfig",
@@ -13419,13 +13419,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/headers/SecurityHeaders.ts",
+      "filePath": "client/src/infrastructure/security/headers/SecurityHeaders.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/index.ts",
+      "filePath": "client/src/infrastructure/security/index.ts",
       "imports": [
         {
           "importPath": "./csp-manager",
@@ -13721,7 +13721,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/input-sanitizer.ts",
+      "filePath": "client/src/infrastructure/security/input-sanitizer.ts",
       "imports": [],
       "exports": [
         "SanitizerConfig",
@@ -13734,7 +13734,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/migration/compatibility-layer.ts",
+      "filePath": "client/src/infrastructure/security/migration/compatibility-layer.ts",
       "imports": [
         {
           "importPath": "../input-sanitizer",
@@ -13929,7 +13929,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/migration/migration-utils.ts",
+      "filePath": "client/src/infrastructure/security/migration/migration-utils.ts",
       "imports": [
         {
           "importPath": "../unified/csp-config",
@@ -13987,7 +13987,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/rate-limiter.ts",
+      "filePath": "client/src/infrastructure/security/rate-limiter.ts",
       "imports": [],
       "exports": [
         "RateLimiterConfig",
@@ -13998,7 +13998,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/security-monitor.ts",
+      "filePath": "client/src/infrastructure/security/security-monitor.ts",
       "imports": [],
       "exports": [
         "SecuritySeverity",
@@ -14012,7 +14012,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/security-monitoring.ts",
+      "filePath": "client/src/infrastructure/security/security-monitoring.ts",
       "imports": [],
       "exports": [
         "securityMonitoring",
@@ -14023,7 +14023,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/security-service.ts",
+      "filePath": "client/src/infrastructure/security/security-service.ts",
       "imports": [
         {
           "importPath": "./csp-nonce",
@@ -14119,7 +14119,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/security-utils.ts",
+      "filePath": "client/src/infrastructure/security/security-utils.ts",
       "imports": [],
       "exports": [
         "CSPDirectives",
@@ -14147,13 +14147,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/types.ts",
+      "filePath": "client/src/infrastructure/security/types.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/dashboard/SecureForm.tsx",
+      "filePath": "client/src/infrastructure/security/ui/dashboard/SecureForm.tsx",
       "imports": [],
       "exports": [
         "SecureForm"
@@ -14161,7 +14161,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/dashboard/SecurityDashboard.tsx",
+      "filePath": "client/src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx",
       "imports": [],
       "exports": [
         "SecurityDashboard"
@@ -14169,7 +14169,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/dashboard/SecuritySettings.tsx",
+      "filePath": "client/src/infrastructure/security/ui/dashboard/SecuritySettings.tsx",
       "imports": [],
       "exports": [
         "SecuritySettings"
@@ -14177,7 +14177,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/icons/ChanukaIcons.tsx",
+      "filePath": "client/src/infrastructure/security/ui/icons/ChanukaIcons.tsx",
       "imports": [],
       "exports": [
         "DataPrivacy",
@@ -14189,7 +14189,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/index.ts",
+      "filePath": "client/src/infrastructure/security/ui/index.ts",
       "imports": [
         {
           "importPath": "./dashboard/SecurityDashboard",
@@ -14248,7 +14248,7 @@
       "isBarrel": true
     },
     {
-      "filePath": "client/src/core/security/ui/privacy/CookieConsentBanner.tsx",
+      "filePath": "client/src/infrastructure/security/ui/privacy/CookieConsentBanner.tsx",
       "imports": [],
       "exports": [
         "CookieConsentBanner"
@@ -14256,7 +14256,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/privacy/DataUsageReportDashboard.tsx",
+      "filePath": "client/src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx",
       "imports": [
         {
           "importPath": "../icons/ChanukaIcons",
@@ -14280,7 +14280,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/privacy/GDPRComplianceManager.tsx",
+      "filePath": "client/src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx",
       "imports": [],
       "exports": [
         "GDPRComplianceManager"
@@ -14288,7 +14288,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/privacy/index.ts",
+      "filePath": "client/src/infrastructure/security/ui/privacy/index.ts",
       "imports": [
         {
           "importPath": "./CookieConsentBanner",
@@ -14340,7 +14340,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/ui/privacy/privacy-policy.tsx",
+      "filePath": "client/src/infrastructure/security/ui/privacy/privacy-policy.tsx",
       "imports": [],
       "exports": [
         "PrivacyPolicy"
@@ -14348,7 +14348,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/csp-config.ts",
+      "filePath": "client/src/infrastructure/security/unified/csp-config.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14381,7 +14381,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/csp-manager.ts",
+      "filePath": "client/src/infrastructure/security/unified/csp-manager.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14408,7 +14408,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/error-handler.ts",
+      "filePath": "client/src/infrastructure/security/unified/error-handler.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14439,7 +14439,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/error-middleware.ts",
+      "filePath": "client/src/infrastructure/security/unified/error-middleware.ts",
       "imports": [
         {
           "importPath": "./error-handler",
@@ -14485,7 +14485,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/index.ts",
+      "filePath": "client/src/infrastructure/security/unified/index.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14692,7 +14692,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/input-sanitizer.ts",
+      "filePath": "client/src/infrastructure/security/unified/input-sanitizer.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14720,7 +14720,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/rate-limiter.ts",
+      "filePath": "client/src/infrastructure/security/unified/rate-limiter.ts",
       "imports": [
         {
           "importPath": "./security-interface",
@@ -14749,7 +14749,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/security-interface.ts",
+      "filePath": "client/src/infrastructure/security/unified/security-interface.ts",
       "imports": [],
       "exports": [
         "UnifiedSecurityConfig",
@@ -14775,7 +14775,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/unified/system.ts",
+      "filePath": "client/src/infrastructure/security/unified/system.ts",
       "imports": [
         {
           "importPath": "./csp-manager",
@@ -14896,7 +14896,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/vulnerability-scanner.ts",
+      "filePath": "client/src/infrastructure/security/vulnerability-scanner.ts",
       "imports": [],
       "exports": [
         "VulnerabilityScannerConfig",
@@ -14907,7 +14907,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/security/__tests__/unified-security.test.ts",
+      "filePath": "client/src/infrastructure/security/__tests__/unified-security.test.ts",
       "imports": [
         {
           "importPath": "../unified/csp-config",
@@ -15008,7 +15008,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/storage/cache-storage.ts",
+      "filePath": "client/src/infrastructure/storage/cache-storage.ts",
       "imports": [
         {
           "importPath": "./secure-storage",
@@ -15054,7 +15054,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/storage/index.ts",
+      "filePath": "client/src/infrastructure/storage/index.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -15227,7 +15227,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/storage/offline-data-manager.ts",
+      "filePath": "client/src/infrastructure/storage/offline-data-manager.ts",
       "imports": [],
       "exports": [
         "OfflineAction",
@@ -15238,7 +15238,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/storage/secure-storage.ts",
+      "filePath": "client/src/infrastructure/storage/secure-storage.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -15268,13 +15268,13 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/storage/types.ts",
+      "filePath": "client/src/infrastructure/storage/types.ts",
       "imports": [],
       "exports": [],
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/telemetry/index.ts",
+      "filePath": "client/src/infrastructure/telemetry/index.ts",
       "imports": [
         {
           "importPath": "./service",
@@ -15334,7 +15334,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/telemetry/service.ts",
+      "filePath": "client/src/infrastructure/telemetry/service.ts",
       "imports": [
         {
           "importPath": "./types",
@@ -15367,7 +15367,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/telemetry/types.ts",
+      "filePath": "client/src/infrastructure/telemetry/types.ts",
       "imports": [],
       "exports": [
         "SystemMetrics",
@@ -15382,7 +15382,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/validation/dashboard-validation.ts",
+      "filePath": "client/src/infrastructure/validation/dashboard-validation.ts",
       "imports": [],
       "exports": [
         "validateActionItem",
@@ -15394,7 +15394,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/validation/index.ts",
+      "filePath": "client/src/infrastructure/validation/index.ts",
       "imports": [
         {
           "importPath": "./dashboard-validation",
@@ -15414,7 +15414,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/websocket/index.ts",
+      "filePath": "client/src/infrastructure/websocket/index.ts",
       "imports": [
         {
           "importPath": "./manager",
@@ -15440,7 +15440,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/websocket/manager.js",
+      "filePath": "client/src/infrastructure/websocket/manager.js",
       "imports": [],
       "exports": [
         "WebSocketManagerImpl",
@@ -15449,7 +15449,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "client/src/core/websocket/manager.ts",
+      "filePath": "client/src/infrastructure/websocket/manager.ts",
       "imports": [],
       "exports": [
         "WebSocketManager",
@@ -46972,7 +46972,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770439250540/src/core/personalization/persona-detector.ts",
+      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770439250540/src/infrastructure/personalization/persona-detector.ts",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -47034,7 +47034,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770506229485/src/core/personalization/persona-detector.ts",
+      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770506229485/src/infrastructure/personalization/persona-detector.ts",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -47096,7 +47096,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770547108334/src/core/personalization/persona-detector.ts",
+      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770547108334/src/infrastructure/personalization/persona-detector.ts",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -47158,7 +47158,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770554734162/src/core/personalization/persona-detector.ts",
+      "filePath": "scripts/error-remediation/tests/reports/backups/backup-1770554734162/src/infrastructure/personalization/persona-detector.ts",
       "imports": [
         {
           "importPath": "../../lib/types/analytics",
@@ -48901,7 +48901,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/typescript-fixer/src/core/error-extractor.ts",
+      "filePath": "scripts/typescript-fixer/src/infrastructure/error-extractor.ts",
       "imports": [
         {
           "importPath": "../types/core",
@@ -48928,7 +48928,7 @@
       "isBarrel": false
     },
     {
-      "filePath": "scripts/typescript-fixer/src/core/typescript-program-loader.ts",
+      "filePath": "scripts/typescript-fixer/src/infrastructure/typescript-program-loader.ts",
       "imports": [],
       "exports": [
         "ProgramLoadResult",
@@ -92077,7 +92077,7 @@
       "filePath": "tests/properties/analytics-service-contracts.property.test.ts",
       "imports": [
         {
-          "importPath": "../../client/src/core/analytics/service",
+          "importPath": "../../client/src/infrastructure/analytics/service",
           "kind": "static",
           "line": 18,
           "col": 1,
@@ -92459,7 +92459,7 @@
       "filePath": "tests/properties/telemetry-service-contracts.property.test.ts",
       "imports": [
         {
-          "importPath": "../../client/src/core/telemetry/service",
+          "importPath": "../../client/src/infrastructure/telemetry/service",
           "kind": "static",
           "line": 17,
           "col": 1,
@@ -92474,7 +92474,7 @@
           "ultimateConcrete": "C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\client\\src\\core\\telemetry\\service.ts"
         },
         {
-          "importPath": "../../client/src/core/telemetry/types",
+          "importPath": "../../client/src/infrastructure/telemetry/types",
           "kind": "static",
           "line": 18,
           "col": 1,
@@ -93623,7 +93623,7 @@
           "ultimateConcrete": null
         },
         {
-          "importPath": "../../../client/src/core/error",
+          "importPath": "../../../client/src/infrastructure/error",
           "kind": "require",
           "line": 276,
           "col": 39,
@@ -93636,7 +93636,7 @@
           "ultimateConcrete": null
         },
         {
-          "importPath": "../../../client/src/core/error",
+          "importPath": "../../../client/src/infrastructure/error",
           "kind": "require",
           "line": 293,
           "col": 57,
@@ -93727,7 +93727,7 @@
           "ultimateConcrete": null
         },
         {
-          "importPath": "../../../client/src/core/error",
+          "importPath": "../../../client/src/infrastructure/error",
           "kind": "require",
           "line": 422,
           "col": 57,
@@ -93740,7 +93740,7 @@
           "ultimateConcrete": null
         },
         {
-          "importPath": "../../../client/src/core/api/registry",
+          "importPath": "../../../client/src/infrastructure/api/registry",
           "kind": "require",
           "line": 569,
           "col": 40,
@@ -94431,16 +94431,16 @@
       "client/src/app/shell/index.ts",
       "client/src/app/shell/index.ts"
     ],
-    "client/src/core/analytics/AnalyticsIntegration.tsx": [
+    "client/src/infrastructure/analytics/AnalyticsIntegration.tsx": [
       "client/src/app/shell/AppShell.tsx"
     ],
-    "client/src/core/navigation/NavigationConsistency.tsx": [
+    "client/src/infrastructure/navigation/NavigationConsistency.tsx": [
       "client/src/app/shell/AppShell.tsx",
-      "client/src/core/navigation/NavigationConsistency.test.tsx"
+      "client/src/infrastructure/navigation/NavigationConsistency.test.tsx"
     ],
-    "client/src/core/navigation/NavigationPerformance.tsx": [
+    "client/src/infrastructure/navigation/NavigationPerformance.tsx": [
       "client/src/app/shell/AppShell.tsx",
-      "client/src/core/navigation/NavigationPerformance.test.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.test.tsx"
     ],
     "client/src/app/shell/AppRouter.tsx": [
       "client/src/app/shell/AppShell.tsx",
@@ -94463,44 +94463,44 @@
       "client/src/app/shell/index.ts",
       "client/src/app/shell/index.ts"
     ],
-    "client/src/core/auth/index.ts": [
+    "client/src/infrastructure/auth/index.ts": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/api/authenticated-client.ts",
-      "client/src/core/api/authentication.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/auth/scripts/cleanup-old-auth.ts",
-      "client/src/core/auth/scripts/init-auth-system.ts",
-      "client/src/core/index.ts"
+      "client/src/infrastructure/api/authenticated-client.ts",
+      "client/src/infrastructure/api/authentication.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/auth/scripts/cleanup-old-auth.ts",
+      "client/src/infrastructure/auth/scripts/init-auth-system.ts",
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/command-palette/CommandPalette.tsx": [
+    "client/src/infrastructure/command-palette/CommandPalette.tsx": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/command-palette/CommandPalette.test.tsx",
-      "client/src/core/command-palette/index.ts"
+      "client/src/infrastructure/command-palette/CommandPalette.test.tsx",
+      "client/src/infrastructure/command-palette/index.ts"
     ],
-    "client/src/core/command-palette/useCommandPalette.ts": [
+    "client/src/infrastructure/command-palette/useCommandPalette.ts": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/command-palette/index.ts"
+      "client/src/infrastructure/command-palette/index.ts"
     ],
-    "client/src/core/navigation/context.tsx": [
+    "client/src/infrastructure/navigation/context.tsx": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/navigation/hooks/use-unified-navigation.ts",
-      "client/src/core/navigation/hooks.ts",
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/NavigationConsistency.test.tsx",
-      "client/src/core/navigation/NavigationConsistency.tsx"
+      "client/src/infrastructure/navigation/hooks/use-unified-navigation.ts",
+      "client/src/infrastructure/navigation/hooks.ts",
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/NavigationConsistency.test.tsx",
+      "client/src/infrastructure/navigation/NavigationConsistency.tsx"
     ],
-    "client/src/core/search/types.ts": [
+    "client/src/infrastructure/search/types.ts": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/search/index.ts",
-      "client/src/core/search/search-strategy-selector.ts",
-      "client/src/core/search/UnifiedSearchInterface.test.tsx",
-      "client/src/core/search/UnifiedSearchInterface.tsx"
+      "client/src/infrastructure/search/index.ts",
+      "client/src/infrastructure/search/search-strategy-selector.ts",
+      "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx"
     ],
-    "client/src/core/search/UnifiedSearchInterface.tsx": [
+    "client/src/infrastructure/search/UnifiedSearchInterface.tsx": [
       "client/src/app/shell/NavigationBar.tsx",
-      "client/src/core/search/index.ts",
-      "client/src/core/search/UnifiedSearchInterface.test.tsx"
+      "client/src/infrastructure/search/index.ts",
+      "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx"
     ],
     "client/src/lib/design-system/index.ts": [
       "client/src/app/shell/NavigationBar.tsx",
@@ -94525,966 +94525,966 @@
       "client/src/app/shell/NavigationBar.tsx",
       "client/src/lib/ui/i18n/index.ts"
     ],
-    "client/src/core/analytics/comprehensive-tracker.ts": [
-      "client/src/core/analytics/AnalyticsProvider.tsx",
-      "client/src/core/analytics/index.ts",
-      "client/src/core/analytics/index.ts"
+    "client/src/infrastructure/analytics/comprehensive-tracker.ts": [
+      "client/src/infrastructure/analytics/AnalyticsProvider.tsx",
+      "client/src/infrastructure/analytics/index.ts",
+      "client/src/infrastructure/analytics/index.ts"
     ],
-    "client/src/core/analytics/AnalyticsProvider.tsx": [
-      "client/src/core/analytics/index.ts"
+    "client/src/infrastructure/analytics/AnalyticsProvider.tsx": [
+      "client/src/infrastructure/analytics/index.ts"
     ],
-    "client/src/core/api/errors.ts": [
-      "client/src/core/api/analytics.ts",
-      "client/src/core/api/community.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/notifications.ts",
-      "client/src/core/api/system.ts",
-      "client/src/core/api/user.ts"
+    "client/src/infrastructure/api/errors.ts": [
+      "client/src/infrastructure/api/analytics.ts",
+      "client/src/infrastructure/api/community.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/notifications.ts",
+      "client/src/infrastructure/api/system.ts",
+      "client/src/infrastructure/api/user.ts"
     ],
-    "client/src/core/api/types/index.ts": [
-      "client/src/core/api/analytics.ts",
-      "client/src/core/api/auth.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/config.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/registry.ts",
-      "client/src/core/api/system.ts",
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/scripts/init-auth-system.ts",
-      "client/src/core/auth/services/auth-api-service.ts"
+    "client/src/infrastructure/api/types/index.ts": [
+      "client/src/infrastructure/api/analytics.ts",
+      "client/src/infrastructure/api/auth.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/config.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/registry.ts",
+      "client/src/infrastructure/api/system.ts",
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/scripts/init-auth-system.ts",
+      "client/src/infrastructure/auth/services/auth-api-service.ts"
     ],
-    "client/src/core/api/authentication.ts": [
-      "client/src/core/api/authenticated-client.ts",
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/authentication.ts": [
+      "client/src/infrastructure/api/authenticated-client.ts",
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/base-client.ts": [
-      "client/src/core/api/authenticated-client.ts",
-      "client/src/core/api/authentication.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/safe-client.ts",
-      "client/src/core/api/safe-client.ts",
-      "client/src/core/api/serialization-interceptors.ts"
+    "client/src/infrastructure/api/base-client.ts": [
+      "client/src/infrastructure/api/authenticated-client.ts",
+      "client/src/infrastructure/api/authentication.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/safe-client.ts",
+      "client/src/infrastructure/api/safe-client.ts",
+      "client/src/infrastructure/api/serialization-interceptors.ts"
     ],
-    "client/src/core/error/index.ts": [
-      "client/src/core/api/base-client.ts",
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/circuit-breaker-monitor.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/interceptors.ts",
-      "client/src/core/api/performance.ts",
-      "client/src/core/api/registry.ts",
-      "client/src/core/api/retry-handler.ts",
-      "client/src/core/api/retry.ts",
-      "client/src/core/api/types/common.ts",
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/services/auth-api-service.ts",
-      "client/src/core/auth/services/session-manager.ts",
-      "client/src/core/auth/services/token-manager.ts",
-      "client/src/core/error/middleware/hooks-middleware.ts",
-      "client/src/core/error/middleware/library-middleware.ts",
-      "client/src/core/error/middleware/security-middleware.ts",
-      "client/src/core/error/middleware/service-middleware.ts",
-      "client/src/core/index.ts"
+    "client/src/infrastructure/error/index.ts": [
+      "client/src/infrastructure/api/base-client.ts",
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/circuit-breaker-monitor.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/interceptors.ts",
+      "client/src/infrastructure/api/performance.ts",
+      "client/src/infrastructure/api/registry.ts",
+      "client/src/infrastructure/api/retry-handler.ts",
+      "client/src/infrastructure/api/retry.ts",
+      "client/src/infrastructure/api/types/common.ts",
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/services/auth-api-service.ts",
+      "client/src/infrastructure/auth/services/session-manager.ts",
+      "client/src/infrastructure/auth/services/token-manager.ts",
+      "client/src/infrastructure/error/middleware/hooks-middleware.ts",
+      "client/src/infrastructure/error/middleware/library-middleware.ts",
+      "client/src/infrastructure/error/middleware/security-middleware.ts",
+      "client/src/infrastructure/error/middleware/service-middleware.ts",
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/api/cache-manager.ts": [
-      "client/src/core/api/base-client.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/cache-manager.ts": [
+      "client/src/infrastructure/api/base-client.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/retry.ts": [
-      "client/src/core/api/base-client.ts",
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/retry.ts": [
+      "client/src/infrastructure/api/base-client.ts",
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/serialization-interceptors.ts": [
-      "client/src/core/api/base-client.ts"
+    "client/src/infrastructure/api/serialization-interceptors.ts": [
+      "client/src/infrastructure/api/base-client.ts"
     ],
-    "client/src/core/api/client.ts": [
-      "client/src/core/api/bills.ts",
-      "client/src/core/api/community.ts",
-      "client/src/core/api/contract-client.ts",
-      "client/src/core/api/hooks/use-api-with-fallback.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/notifications.ts",
-      "client/src/core/api/performance.ts",
-      "client/src/core/api/privacy.ts",
-      "client/src/core/api/search.ts",
-      "client/src/core/api/system.ts",
-      "client/src/core/api/user.ts",
-      "client/src/core/community/hooks/useUnifiedCommunity.ts",
-      "client/src/core/community/hooks/useUnifiedDiscussion.ts",
-      "client/src/core/community/services/moderation.service.ts"
+    "client/src/infrastructure/api/client.ts": [
+      "client/src/infrastructure/api/bills.ts",
+      "client/src/infrastructure/api/community.ts",
+      "client/src/infrastructure/api/contract-client.ts",
+      "client/src/infrastructure/api/hooks/use-api-with-fallback.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/notifications.ts",
+      "client/src/infrastructure/api/performance.ts",
+      "client/src/infrastructure/api/privacy.ts",
+      "client/src/infrastructure/api/search.ts",
+      "client/src/infrastructure/api/system.ts",
+      "client/src/infrastructure/api/user.ts",
+      "client/src/infrastructure/community/hooks/useUnifiedCommunity.ts",
+      "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts",
+      "client/src/infrastructure/community/services/moderation.service.ts"
     ],
-    "client/src/core/storage/types.ts": [
-      "client/src/core/api/cache-manager.ts",
-      "client/src/core/storage/cache-storage.ts",
-      "client/src/core/storage/index.ts",
-      "client/src/core/storage/secure-storage.ts"
+    "client/src/infrastructure/storage/types.ts": [
+      "client/src/infrastructure/api/cache-manager.ts",
+      "client/src/infrastructure/storage/cache-storage.ts",
+      "client/src/infrastructure/storage/index.ts",
+      "client/src/infrastructure/storage/secure-storage.ts"
     ],
-    "client/src/core/api/interceptors.ts": [
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/circuit-breaker-monitor.ts"
+    "client/src/infrastructure/api/interceptors.ts": [
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/circuit-breaker-monitor.ts"
     ],
-    "client/src/core/api/retry-handler.ts": [
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/examples/circuit-breaker-usage.ts",
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/retry-handler.ts": [
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/examples/circuit-breaker-usage.ts",
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/types/common.ts": [
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/client.ts",
-      "client/src/core/api/hooks/use-api-with-fallback.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/request.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/common.ts": [
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/client.ts",
+      "client/src/infrastructure/api/hooks/use-api-with-fallback.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/request.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/circuit-breaker-monitor.ts": [
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/circuit-breaker-client.ts",
-      "client/src/core/api/examples/circuit-breaker-usage.ts",
-      "client/src/core/api/index.ts",
-      "client/src/core/api/interceptors.ts",
-      "client/src/core/api/interceptors.ts"
+    "client/src/infrastructure/api/circuit-breaker-monitor.ts": [
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/circuit-breaker-client.ts",
+      "client/src/infrastructure/api/examples/circuit-breaker-usage.ts",
+      "client/src/infrastructure/api/index.ts",
+      "client/src/infrastructure/api/interceptors.ts",
+      "client/src/infrastructure/api/interceptors.ts"
     ],
-    "client/src/core/api/config.ts": [
-      "client/src/core/api/client.ts"
+    "client/src/infrastructure/api/config.ts": [
+      "client/src/infrastructure/api/client.ts"
     ],
-    "client/src/core/api/circuit-breaker-client.ts": [
-      "client/src/core/api/examples/circuit-breaker-usage.ts",
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/circuit-breaker-client.ts": [
+      "client/src/infrastructure/api/examples/circuit-breaker-usage.ts",
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/hooks/use-api-with-fallback.ts": [
-      "client/src/core/api/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/use-api-with-fallback.ts": [
+      "client/src/infrastructure/api/hooks/index.ts"
     ],
-    "client/src/core/api/hooks/use-safe-mutation.ts": [
-      "client/src/core/api/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/use-safe-mutation.ts": [
+      "client/src/infrastructure/api/hooks/index.ts"
     ],
-    "client/src/core/api/hooks/use-safe-query.ts": [
-      "client/src/core/api/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/use-safe-query.ts": [
+      "client/src/infrastructure/api/hooks/index.ts"
     ],
-    "client/src/core/api/hooks/useApiConnection.ts": [
-      "client/src/core/api/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/useApiConnection.ts": [
+      "client/src/infrastructure/api/hooks/index.ts"
     ],
-    "client/src/core/api/types/request.ts": [
-      "client/src/core/api/hooks/use-api-with-fallback.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/request.ts": [
+      "client/src/infrastructure/api/hooks/use-api-with-fallback.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/index.ts": [
-      "client/src/core/api/hooks/use-safe-mutation.ts",
-      "client/src/core/api/hooks/use-safe-query.ts",
-      "client/src/core/api/hooks/useApiConnection.ts",
-      "client/src/core/index.ts"
+    "client/src/infrastructure/api/index.ts": [
+      "client/src/infrastructure/api/hooks/use-safe-mutation.ts",
+      "client/src/infrastructure/api/hooks/use-safe-query.ts",
+      "client/src/infrastructure/api/hooks/useApiConnection.ts",
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/api/authenticated-client.ts": [
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/authenticated-client.ts": [
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/safe-client.ts": [
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/safe-client.ts": [
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/analytics.ts": [
-      "client/src/core/api/index.ts"
+    "client/src/infrastructure/api/analytics.ts": [
+      "client/src/infrastructure/api/index.ts"
     ],
-    "client/src/core/api/contract-client.ts": [
-      "client/src/core/api/services/bill.service.ts",
-      "client/src/core/api/services/user.service.ts"
+    "client/src/infrastructure/api/contract-client.ts": [
+      "client/src/infrastructure/api/services/bill.service.ts",
+      "client/src/infrastructure/api/services/user.service.ts"
     ],
-    "client/src/core/api/services/user.service.ts": [
-      "client/src/core/api/services/index.ts"
+    "client/src/infrastructure/api/services/user.service.ts": [
+      "client/src/infrastructure/api/services/index.ts"
     ],
-    "client/src/core/api/services/bill.service.ts": [
-      "client/src/core/api/services/index.ts"
+    "client/src/infrastructure/api/services/bill.service.ts": [
+      "client/src/infrastructure/api/services/index.ts"
     ],
-    "client/src/core/api/types/cache.ts": [
-      "client/src/core/api/types/config.ts",
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/types/cache.ts": [
+      "client/src/infrastructure/api/types/config.ts",
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/api/types/config.ts": [
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/types/config.ts": [
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/api/auth.ts": [
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/auth.ts": [
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/api/types/preferences.ts": [
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/types/preferences.ts": [
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/api/types/performance.ts": [
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/types/performance.ts": [
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/api/types/auth.ts": [
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/auth.ts": [
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/types/bill.ts": [
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/bill.ts": [
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/types/community.ts": [
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/community.ts": [
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/types/engagement.ts": [
-      "client/src/core/api/types/index.ts",
-      "client/src/core/api/types/service.ts"
+    "client/src/infrastructure/api/types/engagement.ts": [
+      "client/src/infrastructure/api/types/index.ts",
+      "client/src/infrastructure/api/types/service.ts"
     ],
-    "client/src/core/api/types/service.ts": [
-      "client/src/core/api/types/index.ts"
+    "client/src/infrastructure/api/types/service.ts": [
+      "client/src/infrastructure/api/types/index.ts"
     ],
-    "client/src/core/auth/http/authentication-interceptors.ts": [
-      "client/src/core/auth/config/auth-config.ts",
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/http/authentication-interceptors.ts": [
+      "client/src/infrastructure/auth/config/auth-config.ts",
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/store/auth-middleware.ts": [
-      "client/src/core/auth/config/auth-config.ts",
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/store/auth-middleware.ts": [
+      "client/src/infrastructure/auth/config/auth-config.ts",
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/error/constants.ts": [
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/errors/auth-errors.ts",
-      "client/src/core/auth/services/auth-api-service.ts",
-      "client/src/core/auth/services/session-manager.ts",
-      "client/src/core/auth/services/token-manager.ts",
-      "client/src/core/error/classes.ts",
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/utils/contextual-messages.ts",
-      "client/src/core/error/components/utils/error-icons.tsx",
-      "client/src/core/error/components/utils/error-normalizer.ts",
-      "client/src/core/error/components/utils/error-reporter.ts",
-      "client/src/core/error/dashboard-errors.ts",
-      "client/src/core/error/factory.ts",
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/messages/error-message-formatter.ts",
-      "client/src/core/error/messages/error-message-templates.ts",
-      "client/src/core/error/messages/error-recovery-suggestions.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/__tests__/error-message-system.test.ts",
-      "client/src/core/error/messages/__tests__/use-error-messages.test.tsx",
-      "client/src/core/error/recovery.ts",
-      "client/src/core/error/types.ts",
-      "client/src/core/error/types.ts",
+    "client/src/infrastructure/error/constants.ts": [
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/errors/auth-errors.ts",
+      "client/src/infrastructure/auth/services/auth-api-service.ts",
+      "client/src/infrastructure/auth/services/session-manager.ts",
+      "client/src/infrastructure/auth/services/token-manager.ts",
+      "client/src/infrastructure/error/classes.ts",
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/utils/contextual-messages.ts",
+      "client/src/infrastructure/error/components/utils/error-icons.tsx",
+      "client/src/infrastructure/error/components/utils/error-normalizer.ts",
+      "client/src/infrastructure/error/components/utils/error-reporter.ts",
+      "client/src/infrastructure/error/dashboard-errors.ts",
+      "client/src/infrastructure/error/factory.ts",
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/messages/error-message-formatter.ts",
+      "client/src/infrastructure/error/messages/error-message-templates.ts",
+      "client/src/infrastructure/error/messages/error-recovery-suggestions.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/__tests__/error-message-system.test.ts",
+      "client/src/infrastructure/error/messages/__tests__/use-error-messages.test.tsx",
+      "client/src/infrastructure/error/recovery.ts",
+      "client/src/infrastructure/error/types.ts",
+      "client/src/infrastructure/error/types.ts",
       "client/src/lib/infrastructure/monitoring/unified-error-monitoring-interface.ts"
     ],
-    "client/src/core/auth/services/auth-api-service.ts": [
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/hooks/useAuth.tsx",
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/store/auth-middleware.ts",
-      "client/src/core/auth/store/auth-slice.ts"
+    "client/src/infrastructure/auth/services/auth-api-service.ts": [
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/hooks/useAuth.tsx",
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/store/auth-middleware.ts",
+      "client/src/infrastructure/auth/store/auth-slice.ts"
     ],
-    "client/src/core/auth/services/session-manager.ts": [
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/hooks/useAuth.tsx",
-      "client/src/core/auth/index.ts",
-      "client/src/core/storage/index.ts",
-      "client/src/core/storage/index.ts"
+    "client/src/infrastructure/auth/services/session-manager.ts": [
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/hooks/useAuth.tsx",
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/storage/index.ts",
+      "client/src/infrastructure/storage/index.ts"
     ],
-    "client/src/core/auth/services/token-manager.ts": [
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/store/auth-middleware.ts",
-      "client/src/core/storage/index.ts",
-      "client/src/core/storage/index.ts"
+    "client/src/infrastructure/auth/services/token-manager.ts": [
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/store/auth-middleware.ts",
+      "client/src/infrastructure/storage/index.ts",
+      "client/src/infrastructure/storage/index.ts"
     ],
-    "client/src/core/auth/config/auth-config.ts": [
-      "client/src/core/auth/config/auth-init.ts",
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/config/auth-config.ts": [
+      "client/src/infrastructure/auth/config/auth-init.ts",
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/store/auth-slice.ts": [
-      "client/src/core/auth/hooks/useAuth.tsx",
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/store/auth-middleware.ts"
+    "client/src/infrastructure/auth/store/auth-slice.ts": [
+      "client/src/infrastructure/auth/hooks/useAuth.tsx",
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/store/auth-middleware.ts"
     ],
-    "client/src/core/auth/types.ts": [
-      "client/src/core/auth/hooks/useAuth.tsx",
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/service.ts",
-      "client/src/core/auth/services/auth-api-service.ts",
-      "client/src/core/auth/services/session-manager.ts",
-      "client/src/core/auth/services/token-manager.ts",
-      "client/src/core/auth/store/auth-slice.ts",
-      "client/src/core/personalization/persona-detector.test.tsx",
-      "client/src/core/personalization/persona-detector.ts"
+    "client/src/infrastructure/auth/types.ts": [
+      "client/src/infrastructure/auth/hooks/useAuth.tsx",
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/service.ts",
+      "client/src/infrastructure/auth/services/auth-api-service.ts",
+      "client/src/infrastructure/auth/services/session-manager.ts",
+      "client/src/infrastructure/auth/services/token-manager.ts",
+      "client/src/infrastructure/auth/store/auth-slice.ts",
+      "client/src/infrastructure/personalization/persona-detector.test.tsx",
+      "client/src/infrastructure/personalization/persona-detector.ts"
     ],
-    "client/src/core/auth/service.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/service.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/utils/validation.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/utils/validation.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/hooks/useAuth.tsx": [
-      "client/src/core/auth/index.ts",
+    "client/src/infrastructure/auth/hooks/useAuth.tsx": [
+      "client/src/infrastructure/auth/index.ts",
       "client/src/__tests__/strategic/authentication/auth-hook.test.tsx"
     ],
-    "client/src/core/auth/http/authenticated-client.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/http/authenticated-client.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/utils/storage-helpers.ts": [
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/utils/index.ts"
+    "client/src/infrastructure/auth/utils/storage-helpers.ts": [
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/utils/index.ts"
     ],
-    "client/src/core/auth/utils/permission-helpers.ts": [
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/utils/index.ts"
+    "client/src/infrastructure/auth/utils/permission-helpers.ts": [
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/utils/index.ts"
     ],
-    "client/src/core/auth/utils/security-helpers.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/utils/security-helpers.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/config/auth-init.ts": [
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/scripts/init-auth-system.ts"
+    "client/src/infrastructure/auth/config/auth-init.ts": [
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/scripts/init-auth-system.ts"
     ],
-    "client/src/core/auth/constants/auth-constants.ts": [
-      "client/src/core/auth/index.ts",
-      "client/src/core/auth/services/session-manager.ts",
-      "client/src/core/auth/services/token-manager.ts"
+    "client/src/infrastructure/auth/constants/auth-constants.ts": [
+      "client/src/infrastructure/auth/index.ts",
+      "client/src/infrastructure/auth/services/session-manager.ts",
+      "client/src/infrastructure/auth/services/token-manager.ts"
     ],
-    "client/src/core/auth/errors/auth-errors.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/errors/auth-errors.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/scripts/migration-helper.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/scripts/migration-helper.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/scripts/cleanup-old-auth.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/scripts/cleanup-old-auth.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/auth/scripts/init-auth-system.ts": [
-      "client/src/core/auth/index.ts"
+    "client/src/infrastructure/auth/scripts/init-auth-system.ts": [
+      "client/src/infrastructure/auth/index.ts"
     ],
-    "client/src/core/storage/secure-storage.ts": [
-      "client/src/core/auth/services/session-manager.ts",
-      "client/src/core/auth/services/token-manager.ts",
-      "client/src/core/storage/cache-storage.ts",
-      "client/src/core/storage/index.ts",
-      "client/src/core/storage/index.ts"
+    "client/src/infrastructure/storage/secure-storage.ts": [
+      "client/src/infrastructure/auth/services/session-manager.ts",
+      "client/src/infrastructure/auth/services/token-manager.ts",
+      "client/src/infrastructure/storage/cache-storage.ts",
+      "client/src/infrastructure/storage/index.ts",
+      "client/src/infrastructure/storage/index.ts"
     ],
-    "client/src/core/browser/constants.ts": [
-      "client/src/core/browser/browser-detector.ts",
-      "client/src/core/browser/compatibility-manager.ts",
-      "client/src/core/browser/feature-detector.ts",
-      "client/src/core/browser/index.ts"
+    "client/src/infrastructure/browser/constants.ts": [
+      "client/src/infrastructure/browser/browser-detector.ts",
+      "client/src/infrastructure/browser/compatibility-manager.ts",
+      "client/src/infrastructure/browser/feature-detector.ts",
+      "client/src/infrastructure/browser/index.ts"
     ],
-    "client/src/core/browser/environment.ts": [
-      "client/src/core/browser/browser-detector.ts",
-      "client/src/core/browser/feature-detector.ts",
-      "client/src/core/browser/index.ts",
-      "client/src/core/browser/index.ts"
+    "client/src/infrastructure/browser/environment.ts": [
+      "client/src/infrastructure/browser/browser-detector.ts",
+      "client/src/infrastructure/browser/feature-detector.ts",
+      "client/src/infrastructure/browser/index.ts",
+      "client/src/infrastructure/browser/index.ts"
     ],
-    "client/src/core/browser/feature-detector.ts": [
-      "client/src/core/browser/browser-detector.ts",
-      "client/src/core/browser/index.ts",
-      "client/src/core/browser/polyfill-manager.ts"
+    "client/src/infrastructure/browser/feature-detector.ts": [
+      "client/src/infrastructure/browser/browser-detector.ts",
+      "client/src/infrastructure/browser/index.ts",
+      "client/src/infrastructure/browser/polyfill-manager.ts"
     ],
-    "client/src/core/browser/types.ts": [
-      "client/src/core/browser/browser-detector.ts",
-      "client/src/core/browser/compatibility-manager.ts",
-      "client/src/core/browser/constants.ts",
-      "client/src/core/browser/feature-detector.ts",
-      "client/src/core/browser/index.ts",
-      "client/src/core/browser/index.ts",
-      "client/src/core/browser/polyfill-manager.ts"
+    "client/src/infrastructure/browser/types.ts": [
+      "client/src/infrastructure/browser/browser-detector.ts",
+      "client/src/infrastructure/browser/compatibility-manager.ts",
+      "client/src/infrastructure/browser/constants.ts",
+      "client/src/infrastructure/browser/feature-detector.ts",
+      "client/src/infrastructure/browser/index.ts",
+      "client/src/infrastructure/browser/index.ts",
+      "client/src/infrastructure/browser/polyfill-manager.ts"
     ],
-    "client/src/core/browser/BrowserCompatibilityTester.tsx": [
-      "client/src/core/browser/BrowserCompatibilityReport.tsx"
+    "client/src/infrastructure/browser/BrowserCompatibilityTester.tsx": [
+      "client/src/infrastructure/browser/BrowserCompatibilityReport.tsx"
     ],
-    "client/src/core/browser/browser-detector.ts": [
-      "client/src/core/browser/compatibility-manager.ts",
-      "client/src/core/browser/index.ts"
+    "client/src/infrastructure/browser/browser-detector.ts": [
+      "client/src/infrastructure/browser/compatibility-manager.ts",
+      "client/src/infrastructure/browser/index.ts"
     ],
-    "client/src/core/browser/polyfill-manager.ts": [
-      "client/src/core/browser/compatibility-manager.ts",
-      "client/src/core/browser/index.ts"
+    "client/src/infrastructure/browser/polyfill-manager.ts": [
+      "client/src/infrastructure/browser/compatibility-manager.ts",
+      "client/src/infrastructure/browser/index.ts"
     ],
-    "client/src/core/browser/compatibility-manager.ts": [
-      "client/src/core/browser/index.ts"
+    "client/src/infrastructure/browser/compatibility-manager.ts": [
+      "client/src/infrastructure/browser/index.ts"
     ],
-    "client/src/core/command-palette/types.ts": [
-      "client/src/core/command-palette/CommandPalette.test.tsx",
-      "client/src/core/command-palette/CommandPalette.tsx",
-      "client/src/core/command-palette/commands.ts",
-      "client/src/core/command-palette/index.ts",
-      "client/src/core/command-palette/useCommandPalette.ts"
+    "client/src/infrastructure/command-palette/types.ts": [
+      "client/src/infrastructure/command-palette/CommandPalette.test.tsx",
+      "client/src/infrastructure/command-palette/CommandPalette.tsx",
+      "client/src/infrastructure/command-palette/commands.ts",
+      "client/src/infrastructure/command-palette/index.ts",
+      "client/src/infrastructure/command-palette/useCommandPalette.ts"
     ],
     "client/src/lib/design-system/interactive/Command.tsx": [
-      "client/src/core/command-palette/CommandPalette.tsx",
+      "client/src/infrastructure/command-palette/CommandPalette.tsx",
       "client/src/lib/design-system/interactive/index.ts"
     ],
     "client/src/lib/design-system/utils/cn.ts": [
-      "client/src/core/command-palette/CommandPalette.tsx",
-      "client/src/core/command-palette/Modal.tsx",
-      "client/src/core/search/UnifiedSearchInterface.tsx",
+      "client/src/infrastructure/command-palette/CommandPalette.tsx",
+      "client/src/infrastructure/command-palette/Modal.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "client/src/lib/design-system/index.ts",
       "client/src/lib/design-system/interactive/Button.tsx",
       "client/src/lib/design-system/interactive/Input.tsx",
       "client/src/lib/design-system/utils/index.ts",
       "client/src/lib/ui/layout/AppLayout.tsx"
     ],
-    "client/src/core/command-palette/commands.ts": [
-      "client/src/core/command-palette/CommandPalette.tsx",
-      "client/src/core/command-palette/index.ts"
+    "client/src/infrastructure/command-palette/commands.ts": [
+      "client/src/infrastructure/command-palette/CommandPalette.tsx",
+      "client/src/infrastructure/command-palette/index.ts"
     ],
-    "client/src/core/command-palette/Modal.tsx": [
-      "client/src/core/command-palette/CommandPalette.tsx",
-      "client/src/core/command-palette/index.ts"
+    "client/src/infrastructure/command-palette/Modal.tsx": [
+      "client/src/infrastructure/command-palette/CommandPalette.tsx",
+      "client/src/infrastructure/command-palette/index.ts"
     ],
-    "client/src/core/community/services/websocket-manager.ts": [
-      "client/src/core/community/hooks/useRealtime.ts",
-      "client/src/core/community/hooks/useUnifiedDiscussion.ts",
-      "client/src/core/community/index.ts",
-      "client/src/core/community/services/state-sync.service.ts"
+    "client/src/infrastructure/community/services/websocket-manager.ts": [
+      "client/src/infrastructure/community/hooks/useRealtime.ts",
+      "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts",
+      "client/src/infrastructure/community/index.ts",
+      "client/src/infrastructure/community/services/state-sync.service.ts"
     ],
-    "client/src/core/community/types.ts": [
-      "client/src/core/community/hooks/useRealtime.ts",
-      "client/src/core/community/hooks/useUnifiedCommunity.ts",
-      "client/src/core/community/hooks/useUnifiedDiscussion.ts",
-      "client/src/core/community/index.ts",
-      "client/src/core/community/services/moderation.service.ts",
-      "client/src/core/community/services/state-sync.service.ts",
-      "client/src/core/community/services/websocket-manager.ts"
+    "client/src/infrastructure/community/types.ts": [
+      "client/src/infrastructure/community/hooks/useRealtime.ts",
+      "client/src/infrastructure/community/hooks/useUnifiedCommunity.ts",
+      "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts",
+      "client/src/infrastructure/community/index.ts",
+      "client/src/infrastructure/community/services/moderation.service.ts",
+      "client/src/infrastructure/community/services/state-sync.service.ts",
+      "client/src/infrastructure/community/services/websocket-manager.ts"
     ],
-    "client/src/core/community/hooks/useUnifiedDiscussion.ts": [
-      "client/src/core/community/hooks/useUnifiedCommunity.ts",
-      "client/src/core/community/index.ts"
+    "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts": [
+      "client/src/infrastructure/community/hooks/useUnifiedCommunity.ts",
+      "client/src/infrastructure/community/index.ts"
     ],
-    "client/src/core/community/services/state-sync.service.ts": [
-      "client/src/core/community/hooks/useUnifiedDiscussion.ts",
-      "client/src/core/community/index.ts"
+    "client/src/infrastructure/community/services/state-sync.service.ts": [
+      "client/src/infrastructure/community/hooks/useUnifiedDiscussion.ts",
+      "client/src/infrastructure/community/index.ts"
     ],
-    "client/src/core/community/hooks/useUnifiedCommunity.ts": [
-      "client/src/core/community/index.ts"
+    "client/src/infrastructure/community/hooks/useUnifiedCommunity.ts": [
+      "client/src/infrastructure/community/index.ts"
     ],
-    "client/src/core/community/hooks/useRealtime.ts": [
-      "client/src/core/community/index.ts"
+    "client/src/infrastructure/community/hooks/useRealtime.ts": [
+      "client/src/infrastructure/community/index.ts"
     ],
-    "client/src/core/community/services/moderation.service.ts": [
-      "client/src/core/community/index.ts"
+    "client/src/infrastructure/community/services/moderation.service.ts": [
+      "client/src/infrastructure/community/index.ts"
     ],
-    "client/src/core/dashboard/context.tsx": [
-      "client/src/core/dashboard/hooks.ts",
-      "client/src/core/dashboard/hooks.ts",
-      "client/src/core/dashboard/index.ts"
+    "client/src/infrastructure/dashboard/context.tsx": [
+      "client/src/infrastructure/dashboard/hooks.ts",
+      "client/src/infrastructure/dashboard/hooks.ts",
+      "client/src/infrastructure/dashboard/index.ts"
     ],
-    "client/src/core/dashboard/hooks.ts": [
-      "client/src/core/dashboard/index.ts"
+    "client/src/infrastructure/dashboard/hooks.ts": [
+      "client/src/infrastructure/dashboard/index.ts"
     ],
-    "client/src/core/dashboard/widgets.ts": [
-      "client/src/core/dashboard/index.ts"
+    "client/src/infrastructure/dashboard/widgets.ts": [
+      "client/src/infrastructure/dashboard/index.ts"
     ],
-    "client/src/core/dashboard/utils.ts": [
-      "client/src/core/dashboard/index.ts"
+    "client/src/infrastructure/dashboard/utils.ts": [
+      "client/src/infrastructure/dashboard/index.ts"
     ],
-    "client/src/core/error/types.ts": [
-      "client/src/core/error/analytics.ts",
-      "client/src/core/error/classes.ts",
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/types.ts",
-      "client/src/core/error/components/utils/contextual-messages.ts",
-      "client/src/core/error/factory.ts",
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/messages/error-message-formatter.ts",
-      "client/src/core/error/messages/error-recovery-suggestions.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/use-error-messages.ts",
-      "client/src/core/error/messages/__tests__/error-message-system.test.ts",
-      "client/src/core/error/messages/__tests__/use-error-messages.test.tsx",
-      "client/src/core/error/middleware/library-middleware.ts",
-      "client/src/core/error/middleware/service-middleware.ts",
-      "client/src/core/error/rate-limiter.ts",
-      "client/src/core/error/recovery.ts",
-      "client/src/core/error/reporters/ApiReporter.ts",
-      "client/src/core/error/reporters/CompositeReporter.ts",
-      "client/src/core/error/reporters/ConsoleReporter.ts",
-      "client/src/core/error/reporters/SentryReporter.ts",
-      "client/src/core/error/reporting.ts"
+    "client/src/infrastructure/error/types.ts": [
+      "client/src/infrastructure/error/analytics.ts",
+      "client/src/infrastructure/error/classes.ts",
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/types.ts",
+      "client/src/infrastructure/error/components/utils/contextual-messages.ts",
+      "client/src/infrastructure/error/factory.ts",
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/messages/error-message-formatter.ts",
+      "client/src/infrastructure/error/messages/error-recovery-suggestions.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/use-error-messages.ts",
+      "client/src/infrastructure/error/messages/__tests__/error-message-system.test.ts",
+      "client/src/infrastructure/error/messages/__tests__/use-error-messages.test.tsx",
+      "client/src/infrastructure/error/middleware/library-middleware.ts",
+      "client/src/infrastructure/error/middleware/service-middleware.ts",
+      "client/src/infrastructure/error/rate-limiter.ts",
+      "client/src/infrastructure/error/recovery.ts",
+      "client/src/infrastructure/error/reporters/ApiReporter.ts",
+      "client/src/infrastructure/error/reporters/CompositeReporter.ts",
+      "client/src/infrastructure/error/reporters/ConsoleReporter.ts",
+      "client/src/infrastructure/error/reporters/SentryReporter.ts",
+      "client/src/infrastructure/error/reporting.ts"
     ],
-    "client/src/core/error/components/utils/shared-error-display.tsx": [
-      "client/src/core/error/components/CommunityErrorBoundary.tsx",
-      "client/src/core/error/components/SimpleErrorBoundary.tsx"
+    "client/src/infrastructure/error/components/utils/shared-error-display.tsx": [
+      "client/src/infrastructure/error/components/CommunityErrorBoundary.tsx",
+      "client/src/infrastructure/error/components/SimpleErrorBoundary.tsx"
     ],
-    "client/src/core/error/components/ErrorBoundary.tsx": [
-      "client/src/core/error/components/example.tsx",
-      "client/src/core/error/components/example.tsx",
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/index.ts",
+    "client/src/infrastructure/error/components/ErrorBoundary.tsx": [
+      "client/src/infrastructure/error/components/example.tsx",
+      "client/src/infrastructure/error/components/example.tsx",
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/index.ts",
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx"
     ],
-    "client/src/core/error/components/SimpleErrorBoundary.tsx": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/SimpleErrorBoundary.tsx": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/CommunityErrorBoundary.tsx": [
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/CommunityErrorBoundary.tsx": [
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/ErrorFallback.tsx": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/ErrorFallback.tsx": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/ServiceUnavailable.tsx": [
-      "client/src/core/error/components/index.ts",
+    "client/src/infrastructure/error/components/ServiceUnavailable.tsx": [
+      "client/src/infrastructure/error/components/index.ts",
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx"
     ],
-    "client/src/core/error/components/RecoveryUI.tsx": [
-      "client/src/core/error/components/index.ts",
+    "client/src/infrastructure/error/components/RecoveryUI.tsx": [
+      "client/src/infrastructure/error/components/index.ts",
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx"
     ],
-    "client/src/core/error/components/ErrorRecoveryManager.tsx": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/ErrorRecoveryManager.tsx": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/classes.ts": [
-      "client/src/core/error/components/index.ts",
-      "client/src/core/error/components/utils/contextual-messages.ts",
-      "client/src/core/error/components/utils/error-icons.tsx",
-      "client/src/core/error/components/utils/error-normalizer.ts",
-      "client/src/core/error/components/utils/error-reporter.ts",
-      "client/src/core/error/dashboard-errors.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/classes.ts": [
+      "client/src/infrastructure/error/components/index.ts",
+      "client/src/infrastructure/error/components/utils/contextual-messages.ts",
+      "client/src/infrastructure/error/components/utils/error-icons.tsx",
+      "client/src/infrastructure/error/components/utils/error-normalizer.ts",
+      "client/src/infrastructure/error/components/utils/error-reporter.ts",
+      "client/src/infrastructure/error/dashboard-errors.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/components/utils/error-reporter.ts": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/utils/error-reporter.ts": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/utils/error-normalizer.ts": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/utils/error-normalizer.ts": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/utils/contextual-messages.ts": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/utils/contextual-messages.ts": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/components/utils/error-icons.tsx": [
-      "client/src/core/error/components/index.ts"
+    "client/src/infrastructure/error/components/utils/error-icons.tsx": [
+      "client/src/infrastructure/error/components/index.ts"
     ],
-    "client/src/core/error/analytics.ts": [
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/analytics.ts": [
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/rate-limiter.ts": [
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/rate-limiter.ts": [
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/reporting.ts": [
-      "client/src/core/error/handler.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/reporting.ts": [
+      "client/src/infrastructure/error/handler.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/components/types.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/components/types.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/dashboard-errors.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/dashboard-errors.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/handler.ts": [
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/recovery.ts",
+    "client/src/infrastructure/error/handler.ts": [
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/recovery.ts",
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx",
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx"
     ],
-    "client/src/core/error/reporters/ConsoleReporter.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/reporters/ConsoleReporter.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/reporters/SentryReporter.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/reporters/SentryReporter.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/reporters/ApiReporter.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/reporters/ApiReporter.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/reporters/CompositeReporter.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/reporters/CompositeReporter.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/factory.ts": [
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/factory.ts": [
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/components/index.ts": [
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/components/index.ts": [
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/messages/index.ts": [
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts",
-      "client/src/core/error/messages/use-error-messages.ts",
-      "client/src/core/error/messages/__tests__/error-message-system.test.ts"
+    "client/src/infrastructure/error/messages/index.ts": [
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/messages/use-error-messages.ts",
+      "client/src/infrastructure/error/messages/__tests__/error-message-system.test.ts"
     ],
-    "client/src/core/error/recovery.ts": [
-      "client/src/core/error/index.ts",
-      "client/src/core/error/index.ts"
+    "client/src/infrastructure/error/recovery.ts": [
+      "client/src/infrastructure/error/index.ts",
+      "client/src/infrastructure/error/index.ts"
     ],
-    "client/src/core/error/messages/error-message-templates.ts": [
-      "client/src/core/error/messages/error-message-formatter.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts"
+    "client/src/infrastructure/error/messages/error-message-templates.ts": [
+      "client/src/infrastructure/error/messages/error-message-formatter.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts"
     ],
-    "client/src/core/error/messages/error-message-formatter.ts": [
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts"
+    "client/src/infrastructure/error/messages/error-message-formatter.ts": [
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts"
     ],
-    "client/src/core/error/messages/error-recovery-suggestions.ts": [
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/index.ts"
+    "client/src/infrastructure/error/messages/error-recovery-suggestions.ts": [
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/index.ts"
     ],
-    "client/src/core/error/messages/use-error-messages.ts": [
-      "client/src/core/error/messages/index.ts",
-      "client/src/core/error/messages/__tests__/use-error-messages.test.tsx"
+    "client/src/infrastructure/error/messages/use-error-messages.ts": [
+      "client/src/infrastructure/error/messages/index.ts",
+      "client/src/infrastructure/error/messages/__tests__/use-error-messages.test.tsx"
     ],
-    "client/src/core/error/middleware/security-middleware.ts": [
-      "client/src/core/error/middleware/index.ts",
-      "client/src/core/error/middleware/index.ts"
+    "client/src/infrastructure/error/middleware/security-middleware.ts": [
+      "client/src/infrastructure/error/middleware/index.ts",
+      "client/src/infrastructure/error/middleware/index.ts"
     ],
-    "client/src/core/error/middleware/hooks-middleware.ts": [
-      "client/src/core/error/middleware/index.ts",
-      "client/src/core/error/middleware/index.ts"
+    "client/src/infrastructure/error/middleware/hooks-middleware.ts": [
+      "client/src/infrastructure/error/middleware/index.ts",
+      "client/src/infrastructure/error/middleware/index.ts"
     ],
-    "client/src/core/error/middleware/library-middleware.ts": [
-      "client/src/core/error/middleware/index.ts",
-      "client/src/core/error/middleware/index.ts"
+    "client/src/infrastructure/error/middleware/library-middleware.ts": [
+      "client/src/infrastructure/error/middleware/index.ts",
+      "client/src/infrastructure/error/middleware/index.ts"
     ],
-    "client/src/core/error/middleware/service-middleware.ts": [
-      "client/src/core/error/middleware/index.ts",
-      "client/src/core/error/middleware/index.ts"
+    "client/src/infrastructure/error/middleware/service-middleware.ts": [
+      "client/src/infrastructure/error/middleware/index.ts",
+      "client/src/infrastructure/error/middleware/index.ts"
     ],
-    "client/src/core/api/hooks/useConnectionAware.tsx": [
-      "client/src/core/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/useConnectionAware.tsx": [
+      "client/src/infrastructure/hooks/index.ts"
     ],
-    "client/src/core/api/hooks/useServiceStatus.ts": [
-      "client/src/core/hooks/index.ts"
+    "client/src/infrastructure/api/hooks/useServiceStatus.ts": [
+      "client/src/infrastructure/hooks/index.ts"
     ],
-    "client/src/core/loading/hooks/index.ts": [
-      "client/src/core/hooks/index.ts",
-      "client/src/core/loading/index.ts"
+    "client/src/infrastructure/loading/hooks/index.ts": [
+      "client/src/infrastructure/hooks/index.ts",
+      "client/src/infrastructure/loading/index.ts"
     ],
-    "client/src/core/browser/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/browser/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/performance/index.ts": [
-      "client/src/core/index.ts",
-      "client/src/core/index.ts"
+    "client/src/infrastructure/performance/index.ts": [
+      "client/src/infrastructure/index.ts",
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/loading/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/loading/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/storage/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/storage/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/mobile/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/mobile/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/community/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/community/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/dashboard/index.ts": [
-      "client/src/core/index.ts"
+    "client/src/infrastructure/dashboard/index.ts": [
+      "client/src/infrastructure/index.ts"
     ],
-    "client/src/core/navigation/index.ts": [
-      "client/src/core/index.ts",
-      "client/src/core/navigation/test-navigation.ts"
+    "client/src/infrastructure/navigation/index.ts": [
+      "client/src/infrastructure/index.ts",
+      "client/src/infrastructure/navigation/test-navigation.ts"
     ],
     "client/src/lib/types/index.ts": [
-      "client/src/core/index.ts",
+      "client/src/infrastructure/index.ts",
       "client/src/lib/ui/loading/constants.ts"
     ],
     "client/src/features/users/types.ts": [
-      "client/src/core/index.ts",
+      "client/src/infrastructure/index.ts",
       "client/src/features/users/hooks/useUsers.ts",
       "client/src/features/users/index.ts",
       "client/src/features/users/services/user-api.ts"
     ],
     "client/src/features/search/types.ts": [
-      "client/src/core/index.ts",
-      "client/src/core/search/types.ts",
+      "client/src/infrastructure/index.ts",
+      "client/src/infrastructure/search/types.ts",
       "client/src/features/search/index.ts"
     ],
-    "client/src/core/loading/context.tsx": [
-      "client/src/core/loading/components/GlobalLoadingIndicator.tsx",
-      "client/src/core/loading/index.ts",
-      "client/src/core/loading/index.ts",
-      "client/src/core/loading/index.ts"
+    "client/src/infrastructure/loading/context.tsx": [
+      "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx",
+      "client/src/infrastructure/loading/index.ts",
+      "client/src/infrastructure/loading/index.ts",
+      "client/src/infrastructure/loading/index.ts"
     ],
-    "client/src/core/loading/components/LoadingProgress.tsx": [
-      "client/src/core/loading/components/GlobalLoadingIndicator.tsx",
-      "client/src/core/loading/components/index.ts"
+    "client/src/infrastructure/loading/components/LoadingProgress.tsx": [
+      "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx",
+      "client/src/infrastructure/loading/components/index.ts"
     ],
-    "client/src/core/loading/components/LoadingSpinner.tsx": [
-      "client/src/core/loading/components/GlobalLoadingIndicator.tsx",
-      "client/src/core/loading/components/index.ts"
+    "client/src/infrastructure/loading/components/LoadingSpinner.tsx": [
+      "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx",
+      "client/src/infrastructure/loading/components/index.ts"
     ],
-    "client/src/core/loading/components/LoadingSkeleton.tsx": [
-      "client/src/core/loading/components/index.ts"
+    "client/src/infrastructure/loading/components/LoadingSkeleton.tsx": [
+      "client/src/infrastructure/loading/components/index.ts"
     ],
-    "client/src/core/loading/components/GlobalLoadingIndicator.tsx": [
-      "client/src/core/loading/components/index.ts"
+    "client/src/infrastructure/loading/components/GlobalLoadingIndicator.tsx": [
+      "client/src/infrastructure/loading/components/index.ts"
     ],
-    "client/src/core/loading/reducer.ts": [
-      "client/src/core/loading/context.tsx",
-      "client/src/core/loading/index.ts"
+    "client/src/infrastructure/loading/reducer.ts": [
+      "client/src/infrastructure/loading/context.tsx",
+      "client/src/infrastructure/loading/index.ts"
     ],
-    "client/src/core/loading/hooks/useTimeoutAwareLoading.ts": [
-      "client/src/core/loading/hooks/index.ts"
+    "client/src/infrastructure/loading/hooks/useTimeoutAwareLoading.ts": [
+      "client/src/infrastructure/loading/hooks/index.ts"
     ],
-    "client/src/core/loading/hooks/useOnlineStatus.ts": [
-      "client/src/core/loading/hooks/index.ts"
+    "client/src/infrastructure/loading/hooks/useOnlineStatus.ts": [
+      "client/src/infrastructure/loading/hooks/index.ts"
     ],
-    "client/src/core/loading/utils.ts": [
-      "client/src/core/loading/index.ts"
+    "client/src/infrastructure/loading/utils.ts": [
+      "client/src/infrastructure/loading/index.ts"
     ],
-    "client/src/core/loading/utils/connection-utils.ts": [
-      "client/src/core/loading/index.ts",
-      "client/src/core/loading/utils/index.ts"
+    "client/src/infrastructure/loading/utils/connection-utils.ts": [
+      "client/src/infrastructure/loading/index.ts",
+      "client/src/infrastructure/loading/utils/index.ts"
     ],
-    "client/src/core/loading/utils/loading-utils.ts": [
-      "client/src/core/loading/index.ts",
-      "client/src/core/loading/index.ts",
-      "client/src/core/loading/utils/index.ts"
+    "client/src/infrastructure/loading/utils/loading-utils.ts": [
+      "client/src/infrastructure/loading/index.ts",
+      "client/src/infrastructure/loading/index.ts",
+      "client/src/infrastructure/loading/utils/index.ts"
     ],
-    "client/src/core/loading/utils/progress-utils.ts": [
-      "client/src/core/loading/utils/index.ts"
+    "client/src/infrastructure/loading/utils/progress-utils.ts": [
+      "client/src/infrastructure/loading/utils/index.ts"
     ],
-    "client/src/core/loading/utils/timeout-utils.ts": [
-      "client/src/core/loading/utils/index.ts"
+    "client/src/infrastructure/loading/utils/timeout-utils.ts": [
+      "client/src/infrastructure/loading/utils/index.ts"
     ],
-    "client/src/core/mobile/types.ts": [
-      "client/src/core/mobile/device-detector.ts",
-      "client/src/core/mobile/error-handler.ts",
-      "client/src/core/mobile/index.ts",
-      "client/src/core/mobile/index.ts",
-      "client/src/core/mobile/responsive-utils.ts",
-      "client/src/core/mobile/touch-handler.ts"
+    "client/src/infrastructure/mobile/types.ts": [
+      "client/src/infrastructure/mobile/device-detector.ts",
+      "client/src/infrastructure/mobile/error-handler.ts",
+      "client/src/infrastructure/mobile/index.ts",
+      "client/src/infrastructure/mobile/index.ts",
+      "client/src/infrastructure/mobile/responsive-utils.ts",
+      "client/src/infrastructure/mobile/touch-handler.ts"
     ],
-    "client/src/core/mobile/device-detector.ts": [
-      "client/src/core/mobile/error-handler.ts",
-      "client/src/core/mobile/index.ts",
-      "client/src/core/mobile/performance-optimizer.ts"
+    "client/src/infrastructure/mobile/device-detector.ts": [
+      "client/src/infrastructure/mobile/error-handler.ts",
+      "client/src/infrastructure/mobile/index.ts",
+      "client/src/infrastructure/mobile/performance-optimizer.ts"
     ],
-    "client/src/core/mobile/error-handler.ts": [
-      "client/src/core/mobile/index.ts"
+    "client/src/infrastructure/mobile/error-handler.ts": [
+      "client/src/infrastructure/mobile/index.ts"
     ],
-    "client/src/core/mobile/performance-optimizer.ts": [
-      "client/src/core/mobile/index.ts"
+    "client/src/infrastructure/mobile/performance-optimizer.ts": [
+      "client/src/infrastructure/mobile/index.ts"
     ],
-    "client/src/core/mobile/responsive-utils.ts": [
-      "client/src/core/mobile/index.ts"
+    "client/src/infrastructure/mobile/responsive-utils.ts": [
+      "client/src/infrastructure/mobile/index.ts"
     ],
-    "client/src/core/monitoring/monitoring-init.ts": [
-      "client/src/core/monitoring/index.ts"
+    "client/src/infrastructure/monitoring/monitoring-init.ts": [
+      "client/src/infrastructure/monitoring/index.ts"
     ],
     "client/src/lib/infrastructure/monitoring/error-monitor.ts": [
-      "client/src/core/monitoring/monitoring-init.ts",
+      "client/src/infrastructure/monitoring/monitoring-init.ts",
       "client/src/lib/infrastructure/monitoring/index.ts"
     ],
-    "client/src/core/navigation/hooks.ts": [
-      "client/src/core/navigation/hooks/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/hooks.ts": [
+      "client/src/infrastructure/navigation/hooks/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/types.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/lookup.ts",
-      "client/src/core/navigation/persistence.ts",
-      "client/src/core/navigation/preferences.ts",
-      "client/src/core/navigation/search.ts",
-      "client/src/core/navigation/utils.ts",
-      "client/src/core/navigation/validation.ts"
+    "client/src/infrastructure/navigation/types.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/lookup.ts",
+      "client/src/infrastructure/navigation/persistence.ts",
+      "client/src/infrastructure/navigation/preferences.ts",
+      "client/src/infrastructure/navigation/search.ts",
+      "client/src/infrastructure/navigation/utils.ts",
+      "client/src/infrastructure/navigation/validation.ts"
     ],
-    "client/src/core/navigation/validation.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/validation.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/route-validation.ts": [
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/route-validation.ts": [
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/access-control.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/access-control.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/breadcrumbs.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/breadcrumbs.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/search.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/search.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/analytics.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/analytics.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/route-preloading.ts": [
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/route-preloading.ts": [
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/preferences.ts": [
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/preferences.ts": [
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/lookup.ts": [
-      "client/src/core/navigation/index.ts",
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/lookup.ts": [
+      "client/src/infrastructure/navigation/index.ts",
+      "client/src/infrastructure/navigation/index.ts"
     ],
-    "client/src/core/navigation/persistence.ts": [
-      "client/src/core/navigation/index.ts"
+    "client/src/infrastructure/navigation/persistence.ts": [
+      "client/src/infrastructure/navigation/index.ts"
     ],
     "client/src/lib/infrastructure/store/slices/navigationSlice.ts": [
-      "client/src/core/navigation/NavigationConsistency.test.tsx",
+      "client/src/infrastructure/navigation/NavigationConsistency.test.tsx",
       "client/src/lib/hooks/useNavigationSlice.ts",
       "client/src/lib/infrastructure/store/index.ts"
     ],
     "client/src/features/home/pages/home.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
     "client/src/features/bills/pages/BillsPortalPage.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
     "client/src/features/search/pages/UniversalSearchPage.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
     "client/src/features/users/pages/UserAccountPage.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx",
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx",
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
     "client/src/features/community/pages/community-input.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
     "client/src/features/auth/pages/LoginPage.tsx": [
-      "client/src/core/navigation/NavigationPerformance.tsx"
+      "client/src/infrastructure/navigation/NavigationPerformance.tsx"
     ],
-    "client/src/core/performance/types.ts": [
-      "client/src/core/performance/alerts.ts",
-      "client/src/core/performance/budgets.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/monitor.ts",
-      "client/src/core/performance/web-vitals.ts"
+    "client/src/infrastructure/performance/types.ts": [
+      "client/src/infrastructure/performance/alerts.ts",
+      "client/src/infrastructure/performance/budgets.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/monitor.ts",
+      "client/src/infrastructure/performance/web-vitals.ts"
     ],
-    "client/src/core/performance/alerts.ts": [
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/monitor.ts"
+    "client/src/infrastructure/performance/alerts.ts": [
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/monitor.ts"
     ],
-    "client/src/core/performance/budgets.ts": [
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/monitor.ts"
+    "client/src/infrastructure/performance/budgets.ts": [
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/monitor.ts"
     ],
-    "client/src/core/performance/monitor.ts": [
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts"
+    "client/src/infrastructure/performance/monitor.ts": [
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts"
     ],
-    "client/src/core/performance/web-vitals.ts": [
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/index.ts",
-      "client/src/core/performance/monitor.ts"
+    "client/src/infrastructure/performance/web-vitals.ts": [
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/index.ts",
+      "client/src/infrastructure/performance/monitor.ts"
     ],
-    "client/src/core/personalization/types.ts": [
-      "client/src/core/personalization/index.ts",
-      "client/src/core/personalization/persona-detector.test.tsx",
-      "client/src/core/personalization/persona-detector.ts"
+    "client/src/infrastructure/personalization/types.ts": [
+      "client/src/infrastructure/personalization/index.ts",
+      "client/src/infrastructure/personalization/persona-detector.test.tsx",
+      "client/src/infrastructure/personalization/persona-detector.ts"
     ],
-    "client/src/core/personalization/persona-detector.ts": [
-      "client/src/core/personalization/index.ts",
-      "client/src/core/personalization/persona-detector.test.tsx"
+    "client/src/infrastructure/personalization/persona-detector.ts": [
+      "client/src/infrastructure/personalization/index.ts",
+      "client/src/infrastructure/personalization/persona-detector.test.tsx"
     ],
     "client/src/lib/types/analytics.ts": [
-      "client/src/core/personalization/persona-detector.test.tsx",
-      "client/src/core/personalization/persona-detector.ts",
+      "client/src/infrastructure/personalization/persona-detector.test.tsx",
+      "client/src/infrastructure/personalization/persona-detector.ts",
       "client/src/lib/types/index.ts",
       "tests/properties/analytics-service-contracts.property.test.ts"
     ],
-    "client/src/core/realtime/types.ts": [
-      "client/src/core/realtime/config.ts",
-      "client/src/core/realtime/hooks/use-bill-tracking.ts",
-      "client/src/core/realtime/hooks/use-community-realtime.ts",
-      "client/src/core/realtime/hooks/use-websocket.ts",
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/manager.ts",
-      "client/src/core/realtime/services/bill-tracking.ts",
-      "client/src/core/realtime/services/community.ts",
-      "client/src/core/realtime/services/notifications.ts",
-      "client/src/core/realtime/services/realtime-service.ts",
-      "client/src/core/realtime/utils/event-emitter.ts"
+    "client/src/infrastructure/realtime/types.ts": [
+      "client/src/infrastructure/realtime/config.ts",
+      "client/src/infrastructure/realtime/hooks/use-bill-tracking.ts",
+      "client/src/infrastructure/realtime/hooks/use-community-realtime.ts",
+      "client/src/infrastructure/realtime/hooks/use-websocket.ts",
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/manager.ts",
+      "client/src/infrastructure/realtime/services/bill-tracking.ts",
+      "client/src/infrastructure/realtime/services/community.ts",
+      "client/src/infrastructure/realtime/services/notifications.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts",
+      "client/src/infrastructure/realtime/utils/event-emitter.ts"
     ],
-    "client/src/core/realtime/services/realtime-service.ts": [
-      "client/src/core/realtime/hooks/use-bill-tracking.ts",
-      "client/src/core/realtime/hooks/use-community-realtime.ts",
-      "client/src/core/realtime/hooks/use-realtime-engagement-legacy.ts",
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/services/realtime-service.ts": [
+      "client/src/infrastructure/realtime/hooks/use-bill-tracking.ts",
+      "client/src/infrastructure/realtime/hooks/use-community-realtime.ts",
+      "client/src/infrastructure/realtime/hooks/use-realtime-engagement-legacy.ts",
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/realtime/websocket-client.ts": [
-      "client/src/core/realtime/hooks/use-websocket.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/types/index.ts"
+    "client/src/infrastructure/realtime/websocket-client.ts": [
+      "client/src/infrastructure/realtime/hooks/use-websocket.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/types/index.ts"
     ],
-    "client/src/core/realtime/config.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/services/realtime-service.ts"
+    "client/src/infrastructure/realtime/config.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts"
     ],
-    "client/src/core/realtime/manager.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/services/bill-tracking.ts",
-      "client/src/core/realtime/services/community.ts",
-      "client/src/core/realtime/services/notifications.ts",
-      "client/src/core/realtime/services/realtime-service.ts"
+    "client/src/infrastructure/realtime/manager.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/services/bill-tracking.ts",
+      "client/src/infrastructure/realtime/services/community.ts",
+      "client/src/infrastructure/realtime/services/notifications.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts"
     ],
-    "client/src/core/realtime/services/bill-tracking.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/services/realtime-service.ts"
+    "client/src/infrastructure/realtime/services/bill-tracking.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts"
     ],
-    "client/src/core/realtime/services/community.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/services/realtime-service.ts"
+    "client/src/infrastructure/realtime/services/community.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts"
     ],
-    "client/src/core/realtime/services/notifications.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/services/realtime-service.ts"
+    "client/src/infrastructure/realtime/services/notifications.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/services/realtime-service.ts"
     ],
-    "client/src/core/realtime/utils/event-emitter.ts": [
-      "client/src/core/realtime/hub.ts",
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/manager.ts"
+    "client/src/infrastructure/realtime/utils/event-emitter.ts": [
+      "client/src/infrastructure/realtime/hub.ts",
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/manager.ts"
     ],
-    "client/src/core/realtime/hub.ts": [
-      "client/src/core/realtime/index.ts",
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/hub.ts": [
+      "client/src/infrastructure/realtime/index.ts",
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/realtime/hooks/use-websocket.ts": [
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/hooks/use-websocket.ts": [
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/realtime/hooks/use-bill-tracking.ts": [
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/hooks/use-bill-tracking.ts": [
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/realtime/hooks/use-community-realtime.ts": [
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/hooks/use-community-realtime.ts": [
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/realtime/hooks/use-realtime-engagement-legacy.ts": [
-      "client/src/core/realtime/index.ts"
+    "client/src/infrastructure/realtime/hooks/use-realtime-engagement-legacy.ts": [
+      "client/src/infrastructure/realtime/index.ts"
     ],
-    "client/src/core/recovery/dashboard-recovery.ts": [
-      "client/src/core/recovery/index.ts"
+    "client/src/infrastructure/recovery/dashboard-recovery.ts": [
+      "client/src/infrastructure/recovery/index.ts"
     ],
-    "client/src/core/search/search-strategy-selector.ts": [
-      "client/src/core/search/index.ts",
-      "client/src/core/search/UnifiedSearchInterface.tsx"
+    "client/src/infrastructure/search/search-strategy-selector.ts": [
+      "client/src/infrastructure/search/index.ts",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx"
     ],
     "client/src/features/search/services/intelligent-search.ts": [
-      "client/src/core/search/UnifiedSearchInterface.test.tsx",
-      "client/src/core/search/UnifiedSearchInterface.test.tsx",
-      "client/src/core/search/UnifiedSearchInterface.test.tsx",
-      "client/src/core/search/UnifiedSearchInterface.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.test.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "client/src/features/search/hooks/useIntelligentSearch.ts",
       "client/src/features/search/hooks/useIntelligentSearch.ts",
       "client/src/features/search/index.ts",
@@ -95493,178 +95493,178 @@
       "client/src/features/search/ui/interface/IntelligentAutocomplete.tsx"
     ],
     "client/src/features/search/hooks/useIntelligentSearch.ts": [
-      "client/src/core/search/UnifiedSearchInterface.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "client/src/features/search/index.ts"
     ],
     "client/src/features/search/hooks/useStreamingSearch.ts": [
-      "client/src/core/search/UnifiedSearchInterface.tsx"
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx"
     ],
     "client/src/features/search/services/streaming-search.ts": [
-      "client/src/core/search/UnifiedSearchInterface.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "client/src/features/search/hooks/useStreamingSearch.ts",
       "client/src/features/search/hooks/useStreamingSearch.ts"
     ],
     "client/src/features/search/ui/interface/IntelligentAutocomplete.tsx": [
-      "client/src/core/search/UnifiedSearchInterface.tsx",
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx",
       "client/src/features/search/ui/index.ts"
     ],
-    "client/src/core/api/search.ts": [
-      "client/src/core/search/UnifiedSearchInterface.tsx"
+    "client/src/infrastructure/api/search.ts": [
+      "client/src/infrastructure/search/UnifiedSearchInterface.tsx"
     ],
-    "client/src/core/security/csp-manager.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts"
+    "client/src/infrastructure/security/csp-manager.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts"
     ],
-    "client/src/core/security/csrf-protection.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/security-service.ts"
+    "client/src/infrastructure/security/csrf-protection.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/security-service.ts"
     ],
-    "client/src/core/security/input-sanitizer.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/security-service.ts"
+    "client/src/infrastructure/security/input-sanitizer.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/security-service.ts"
     ],
-    "client/src/core/security/rate-limiter.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/security-service.ts"
+    "client/src/infrastructure/security/rate-limiter.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/security-service.ts"
     ],
-    "client/src/core/security/security-monitor.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts"
+    "client/src/infrastructure/security/security-monitor.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts"
     ],
-    "client/src/core/security/vulnerability-scanner.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/security-service.ts"
+    "client/src/infrastructure/security/vulnerability-scanner.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/security-service.ts"
     ],
-    "client/src/core/security/unified/index.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/migration/compatibility-layer.ts"
+    "client/src/infrastructure/security/unified/index.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/migration/compatibility-layer.ts"
     ],
-    "client/src/core/security/migration/compatibility-layer.ts": [
-      "client/src/core/security/index.ts"
+    "client/src/infrastructure/security/migration/compatibility-layer.ts": [
+      "client/src/infrastructure/security/index.ts"
     ],
-    "client/src/core/security/types.ts": [
-      "client/src/core/security/index.ts"
+    "client/src/infrastructure/security/types.ts": [
+      "client/src/infrastructure/security/index.ts"
     ],
-    "client/src/core/security/security-utils.ts": [
-      "client/src/core/security/index.ts",
-      "client/src/core/security/index.ts",
-      "client/src/core/security/migration/compatibility-layer.ts"
+    "client/src/infrastructure/security/security-utils.ts": [
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/index.ts",
+      "client/src/infrastructure/security/migration/compatibility-layer.ts"
     ],
-    "client/src/core/security/security-service.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts"
+    "client/src/infrastructure/security/security-service.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts"
     ],
-    "client/src/core/security/unified/csp-config.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/migration/migration-utils.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/csp-config.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/migration/migration-utils.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/unified/csp-manager.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/csp-manager.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/unified/error-handler.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/migration/migration-utils.ts",
-      "client/src/core/security/unified/error-middleware.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/error-handler.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/migration/migration-utils.ts",
+      "client/src/infrastructure/security/unified/error-middleware.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/unified/error-middleware.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/error-middleware.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/unified/input-sanitizer.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/input-sanitizer.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/unified/rate-limiter.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/system.ts"
+    "client/src/infrastructure/security/unified/rate-limiter.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/system.ts"
     ],
-    "client/src/core/security/unified/security-interface.ts": [
-      "client/src/core/security/migration/compatibility-layer.ts",
-      "client/src/core/security/migration/migration-utils.ts",
-      "client/src/core/security/unified/csp-config.ts",
-      "client/src/core/security/unified/csp-manager.ts",
-      "client/src/core/security/unified/error-handler.ts",
-      "client/src/core/security/unified/error-middleware.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/input-sanitizer.ts",
-      "client/src/core/security/unified/rate-limiter.ts",
-      "client/src/core/security/unified/system.ts",
-      "client/src/core/security/__tests__/unified-security.test.ts"
+    "client/src/infrastructure/security/unified/security-interface.ts": [
+      "client/src/infrastructure/security/migration/compatibility-layer.ts",
+      "client/src/infrastructure/security/migration/migration-utils.ts",
+      "client/src/infrastructure/security/unified/csp-config.ts",
+      "client/src/infrastructure/security/unified/csp-manager.ts",
+      "client/src/infrastructure/security/unified/error-handler.ts",
+      "client/src/infrastructure/security/unified/error-middleware.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/input-sanitizer.ts",
+      "client/src/infrastructure/security/unified/rate-limiter.ts",
+      "client/src/infrastructure/security/unified/system.ts",
+      "client/src/infrastructure/security/__tests__/unified-security.test.ts"
     ],
-    "client/src/core/security/csp-nonce.ts": [
-      "client/src/core/security/security-service.ts"
+    "client/src/infrastructure/security/csp-nonce.ts": [
+      "client/src/infrastructure/security/security-service.ts"
     ],
-    "client/src/core/security/ui/dashboard/SecurityDashboard.tsx": [
-      "client/src/core/security/ui/index.ts"
+    "client/src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx": [
+      "client/src/infrastructure/security/ui/index.ts"
     ],
-    "client/src/core/security/ui/dashboard/SecureForm.tsx": [
-      "client/src/core/security/ui/index.ts"
+    "client/src/infrastructure/security/ui/dashboard/SecureForm.tsx": [
+      "client/src/infrastructure/security/ui/index.ts"
     ],
-    "client/src/core/security/ui/dashboard/SecuritySettings.tsx": [
-      "client/src/core/security/ui/index.ts"
+    "client/src/infrastructure/security/ui/dashboard/SecuritySettings.tsx": [
+      "client/src/infrastructure/security/ui/index.ts"
     ],
-    "client/src/core/security/ui/privacy/index.ts": [
-      "client/src/core/security/ui/index.ts"
+    "client/src/infrastructure/security/ui/privacy/index.ts": [
+      "client/src/infrastructure/security/ui/index.ts"
     ],
-    "client/src/core/security/ui/icons/ChanukaIcons.tsx": [
-      "client/src/core/security/ui/privacy/DataUsageReportDashboard.tsx"
+    "client/src/infrastructure/security/ui/icons/ChanukaIcons.tsx": [
+      "client/src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx"
     ],
-    "client/src/core/security/ui/privacy/CookieConsentBanner.tsx": [
-      "client/src/core/security/ui/privacy/index.ts"
+    "client/src/infrastructure/security/ui/privacy/CookieConsentBanner.tsx": [
+      "client/src/infrastructure/security/ui/privacy/index.ts"
     ],
-    "client/src/core/security/ui/privacy/DataUsageReportDashboard.tsx": [
-      "client/src/core/security/ui/privacy/index.ts"
+    "client/src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx": [
+      "client/src/infrastructure/security/ui/privacy/index.ts"
     ],
-    "client/src/core/security/ui/privacy/GDPRComplianceManager.tsx": [
-      "client/src/core/security/ui/privacy/index.ts"
+    "client/src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx": [
+      "client/src/infrastructure/security/ui/privacy/index.ts"
     ],
-    "client/src/core/security/migration/migration-utils.ts": [
-      "client/src/core/security/unified/index.ts"
+    "client/src/infrastructure/security/migration/migration-utils.ts": [
+      "client/src/infrastructure/security/unified/index.ts"
     ],
-    "client/src/core/security/unified/system.ts": [
-      "client/src/core/security/unified/index.ts",
-      "client/src/core/security/unified/index.ts"
+    "client/src/infrastructure/security/unified/system.ts": [
+      "client/src/infrastructure/security/unified/index.ts",
+      "client/src/infrastructure/security/unified/index.ts"
     ],
-    "client/src/core/storage/cache-storage.ts": [
-      "client/src/core/storage/index.ts",
-      "client/src/core/storage/index.ts"
+    "client/src/infrastructure/storage/cache-storage.ts": [
+      "client/src/infrastructure/storage/index.ts",
+      "client/src/infrastructure/storage/index.ts"
     ],
-    "client/src/core/telemetry/service.ts": [
-      "client/src/core/telemetry/index.ts",
-      "client/src/core/telemetry/index.ts",
+    "client/src/infrastructure/telemetry/service.ts": [
+      "client/src/infrastructure/telemetry/index.ts",
+      "client/src/infrastructure/telemetry/index.ts",
       "tests/properties/telemetry-service-contracts.property.test.ts"
     ],
-    "client/src/core/telemetry/types.ts": [
-      "client/src/core/telemetry/index.ts",
-      "client/src/core/telemetry/service.ts",
+    "client/src/infrastructure/telemetry/types.ts": [
+      "client/src/infrastructure/telemetry/index.ts",
+      "client/src/infrastructure/telemetry/service.ts",
       "tests/properties/telemetry-service-contracts.property.test.ts"
     ],
-    "client/src/core/validation/dashboard-validation.ts": [
-      "client/src/core/validation/index.ts"
+    "client/src/infrastructure/validation/dashboard-validation.ts": [
+      "client/src/infrastructure/validation/index.ts"
     ],
-    "client/src/core/websocket/manager.ts": [
-      "client/src/core/websocket/index.ts",
+    "client/src/infrastructure/websocket/manager.ts": [
+      "client/src/infrastructure/websocket/index.ts",
       "client/src/__tests__/websocket-reconnection.property.test.js",
       "client/src/__tests__/websocket-reconnection.property.test.ts"
     ],
@@ -97154,7 +97154,7 @@
     "client/src/lib/types/search.ts": [
       "client/src/lib/types/index.ts"
     ],
-    "client/src/core/personalization/index.ts": [
+    "client/src/infrastructure/personalization/index.ts": [
       "client/src/lib/types/index.ts"
     ],
     "client/src/lib/types/utils/common.ts": [
@@ -97931,7 +97931,7 @@
     "shared/dist/core/observability/logging/logger.js": [
       "client/src/scripts/fsd-migration.ts"
     ],
-    "client/src/core/error/components/UnifiedErrorBoundary.tsx": [
+    "client/src/infrastructure/error/components/UnifiedErrorBoundary.tsx": [
       "client/src/__tests__/strategic/error-handling/error-boundary.test.tsx"
     ],
     "scripts/generate-bundle-report.js": [
@@ -98146,7 +98146,7 @@
     "scripts/typescript-fixer/src/types/core.ts": [
       "scripts/typescript-fixer/src/analyzers/drizzle-pattern-detector.ts",
       "scripts/typescript-fixer/src/cli.ts",
-      "scripts/typescript-fixer/src/core/error-extractor.ts",
+      "scripts/typescript-fixer/src/infrastructure/error-extractor.ts",
       "scripts/typescript-fixer/src/fixers/api-response-fixer.ts",
       "scripts/typescript-fixer/src/fixers/exact-optional-property-fixer.ts",
       "scripts/typescript-fixer/src/index.ts"
@@ -101009,7 +101009,7 @@
     "scripts/database/migrate-with-verification.ts": [
       "tests/migration-integration.test.ts"
     ],
-    "client/src/core/analytics/service.ts": [
+    "client/src/infrastructure/analytics/service.ts": [
       "tests/properties/analytics-service-contracts.property.test.ts"
     ],
     "shared/validation/errors.ts": [
@@ -101688,7 +101688,7 @@
       "ultimateConcrete": null
     },
     {
-      "importPath": "../../../client/src/core/error",
+      "importPath": "../../../client/src/infrastructure/error",
       "kind": "require",
       "line": 276,
       "col": 39,
@@ -101701,7 +101701,7 @@
       "ultimateConcrete": null
     },
     {
-      "importPath": "../../../client/src/core/error",
+      "importPath": "../../../client/src/infrastructure/error",
       "kind": "require",
       "line": 293,
       "col": 57,
@@ -101714,7 +101714,7 @@
       "ultimateConcrete": null
     },
     {
-      "importPath": "../../../client/src/core/error",
+      "importPath": "../../../client/src/infrastructure/error",
       "kind": "require",
       "line": 422,
       "col": 57,

@@ -130,7 +130,7 @@ describe('FixGenerator', () => {
             segment: 'config'
           }],
           ['@client/config/navigation', {
-            path: 'client/src/core/navigation/config.ts',
+            path: 'client/src/infrastructure/navigation/config.ts',
             layer: 'core',
             segment: 'navigation'
           }]
@@ -173,7 +173,7 @@ describe('FixGenerator', () => {
       const relocations: ModuleRelocationMap = {
         relocations: new Map<string, FSDLocation>([
           ['@client/utils/security', {
-            path: 'client/src/core/security/index.ts',
+            path: 'client/src/infrastructure/security/index.ts',
             layer: 'core',
             segment: 'security'
           }]
@@ -228,7 +228,7 @@ describe('FixGenerator', () => {
       const duplicateTypes = new Map<string, string[]>([
         ['DashboardPreferences', [
           'client/src/features/dashboard/types.ts',
-          'client/src/core/dashboard/types.ts',
+          'client/src/infrastructure/dashboard/types.ts',
           'shared/types/dashboard/index.ts'
         ]]
       ]);
@@ -255,7 +255,7 @@ describe('FixGenerator', () => {
       // Arrange - testConfig has preference: ['shared', 'lib', 'core']
       const duplicateTypes = new Map<string, string[]>([
         ['UserPreferences', [
-          'client/src/core/user/types.ts',
+          'client/src/infrastructure/user/types.ts',
           'client/src/lib/types/user.ts',
           'path/to/shared/types/user/index.ts'
         ]]
@@ -309,7 +309,7 @@ describe('FixGenerator', () => {
           'shared/types/bills/index.ts'
         ]],
         ['PerformanceMetrics', [
-          'client/src/core/monitoring/types.ts',
+          'client/src/infrastructure/monitoring/types.ts',
           'shared/types/monitoring/index.ts'
         ]]
       ]);
@@ -478,7 +478,7 @@ describe('FixGenerator', () => {
         {
           code: 'TS2353',
           message: "Object literal may only specify known properties, and 'zodError' does not exist in type 'ErrorOptions'",
-          file: 'client/src/core/errors/ServiceError.ts',
+          file: 'client/src/infrastructure/errors/ServiceError.ts',
           line: 34,
           column: 5,
           severity: Severity.HIGH,

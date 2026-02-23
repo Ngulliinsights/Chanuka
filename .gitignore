@@ -66,7 +66,7 @@ shared/**/*.d.ts.map
 
 # Exception: Allow legitimate ambient type declarations
 !client/src/vite-env.d.ts
-!client/src/core/security/window.d.ts
+!client/src/infrastructure/security/window.d.ts
 !client/src/lib/types/lucide-react.d.ts
 !**/@types/**/*.d.ts
 

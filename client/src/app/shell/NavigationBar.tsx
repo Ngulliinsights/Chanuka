@@ -7,12 +7,12 @@ import { cn } from '@lib/utils';
 import { logger } from '@client/lib/utils/logger';
 import type { UserProfile } from '@shared/validation/schemas/user.schema';
 
-import { useAuth } from '../../core/auth';
-import { CommandPalette } from '../../core/command-palette/CommandPalette';
-import { useCommandPalette } from '../../core/command-palette/useCommandPalette';
-import { useNavigation } from '../../core/navigation/context';
-import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../core/search/types';
-import { UnifiedSearchInterface } from '../../core/search/UnifiedSearchInterface';
+import { useAuth } from '../../infrastructure/auth';
+import { CommandPalette } from '../../infrastructure/command-palette/CommandPalette';
+import { useCommandPalette } from '../../infrastructure/command-palette/useCommandPalette';
+import { useNavigation } from '../../infrastructure/navigation/context';
+import type { UnifiedSearchQuery, UnifiedSearchResult } from '../../infrastructure/search/types';
+import { UnifiedSearchInterface } from '../../infrastructure/search/UnifiedSearchInterface';
 import {
   Avatar,
   AvatarFallback,

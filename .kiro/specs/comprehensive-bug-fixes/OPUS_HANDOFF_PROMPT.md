@@ -304,7 +304,7 @@ Create: `.kiro/specs/comprehensive-bug-fixes/OPUS_TASK_23.1_SUMMARY.md`
 ## QUESTIONS?
 
 ### Where to find answers:
-1. **Patterns**: Check `client/src/core/` for examples of fixes already done
+1. **Patterns**: Check `client/src/infrastructure/` for examples of fixes already done
 2. **Requirements**: See `.kiro/specs/comprehensive-bug-fixes/design.md`
 3. **Type guards**: See `shared/utils/type-guards.ts`
 4. **Task details**: See `.kiro/specs/comprehensive-bug-fixes/tasks.md` (Task 23.1)

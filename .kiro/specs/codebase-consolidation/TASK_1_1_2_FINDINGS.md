@@ -12,12 +12,12 @@
 **Status**: ✅ ACTIVELY USED - EXTRACTION REQUIRED
 
 **Usage Locations**:
-- `client/src/core/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
+- `client/src/infrastructure/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
   - Line 154: `private requestInterceptors: RequestInterceptor[] = [];`
   - Line 840: `addRequestInterceptor(interceptor: RequestInterceptor): void`
   - Line 920: `createAuthRequestInterceptor` function return type
   
-- `client/src/core/api/interceptors.ts` - Multiple interceptor implementations
+- `client/src/infrastructure/api/interceptors.ts` - Multiple interceptor implementations
   - Line 20: Local type definition (duplicate)
   - Line 308: `headerInterceptor: RequestInterceptor`
   - Line 349: `loggingInterceptor: RequestInterceptor`
@@ -29,20 +29,20 @@
   - Line 840: `addRequestInterceptor` function parameter
   - Line 868: `removeRequestInterceptor` function parameter
 
-- `client/src/core/api/circuit-breaker-client.ts`
+- `client/src/infrastructure/api/circuit-breaker-client.ts`
   - Line 12: Imports `processRequestInterceptors` which uses the type
 
-- `client/src/core/api/serialization-interceptors.ts`
+- `client/src/infrastructure/api/serialization-interceptors.ts`
   - Line 36: Imports from base-client
   - Line 43: `serializationRequestInterceptor: RequestInterceptor`
 
-- `client/src/core/api/types/common.ts`
+- `client/src/infrastructure/api/types/common.ts`
   - Line 172: Has its own definition (duplicate)
 
-- `client/src/core/api/types/config.ts`
+- `client/src/infrastructure/api/types/config.ts`
   - Line 136: Used in `ClientInterceptors` interface
 
-**Recommendation**: Extract to `client/src/core/api/types/interceptors.ts`
+**Recommendation**: Extract to `client/src/infrastructure/api/types/interceptors.ts`
 
 ---
 
@@ -50,11 +50,11 @@
 **Status**: ✅ ACTIVELY USED - EXTRACTION REQUIRED
 
 **Usage Locations**:
-- `client/src/core/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
+- `client/src/infrastructure/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
   - Line 156: `private responseInterceptors: ResponseInterceptor[] = [];`
   - Imported from types/common
 
-- `client/src/core/api/interceptors.ts` - Multiple interceptor implementations
+- `client/src/infrastructure/api/interceptors.ts` - Multiple interceptor implementations
   - Line 23: Local type definition (duplicate)
   - Line 483: `responseLoggingInterceptor: ResponseInterceptor`
   - Line 505: `errorResponseInterceptor: ResponseInterceptor`
@@ -67,18 +67,18 @@
   - Line 855: `addResponseInterceptor` function parameter
   - Line 880: `removeResponseInterceptor` function parameter
 
-- `client/src/core/api/serialization-interceptors.ts`
+- `client/src/infrastructure/api/serialization-interceptors.ts`
   - Line 36: Imports from base-client
   - Line 74: `deserializationResponseInterceptor: ResponseInterceptor`
   - Line 165: `installSerializationInterceptors` function parameter
 
-- `client/src/core/api/types/common.ts`
+- `client/src/infrastructure/api/types/common.ts`
   - Line 173: Has its own definition (duplicate)
 
-- `client/src/core/api/types/config.ts`
+- `client/src/infrastructure/api/types/config.ts`
   - Line 137: Used in `ClientInterceptors` interface
 
-**Recommendation**: Extract to `client/src/core/api/types/interceptors.ts`
+**Recommendation**: Extract to `client/src/infrastructure/api/types/interceptors.ts`
 
 ---
 
@@ -86,19 +86,19 @@
 **Status**: ✅ ACTIVELY USED - EXTRACTION REQUIRED
 
 **Usage Locations**:
-- `client/src/core/api/base-client.ts`
+- `client/src/infrastructure/api/base-client.ts`
   - Line 80: Type definition
   - Line 122: `protected errorInterceptors: ErrorInterceptor[] = [];`
   - Line 161: `addErrorInterceptor(interceptor: ErrorInterceptor): void`
   - Line 253: Used in error handling loop
 
-- `client/src/core/api/authenticated-client.ts`
+- `client/src/infrastructure/api/authenticated-client.ts`
   - Line 70: `this.addErrorInterceptor(...)` - Uses the type indirectly
 
-- `client/src/core/api/index.ts`
+- `client/src/infrastructure/api/index.ts`
   - Line 21: Exported from barrel
 
-**Recommendation**: Extract to `client/src/core/api/types/interceptors.ts`
+**Recommendation**: Extract to `client/src/infrastructure/api/types/interceptors.ts`
 
 ---
 
@@ -106,20 +106,20 @@
 **Status**: ✅ ACTIVELY USED - EXTRACTION REQUIRED
 
 **Usage Locations**:
-- `client/src/core/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
+- `client/src/infrastructure/api/client.ts` - Used by UnifiedApiClientImpl (globalApiClient)
   - Line 13: Imported as `BaseApiRequest` (alias)
   - Line 315: Used in `applyRequestInterceptors` function
   - Line 922: Used in `createAuthRequestInterceptor` function
 
-- `client/src/core/api/authenticated-client.ts`
+- `client/src/infrastructure/api/authenticated-client.ts`
   - Line 17: Imported
   - Line 105: `authenticatedRequest<T>(request: BaseClientRequest)` method parameter
 
-- `client/src/core/api/authentication.ts`
+- `client/src/infrastructure/api/authentication.ts`
   - Line 12: Imported
   - Line 28: `intercept(request: BaseClientRequest): Promise<BaseClientRequest>` method
 
-- `client/src/core/api/safe-client.ts`
+- `client/src/infrastructure/api/safe-client.ts`
   - Line 10: Imported
   - Line 34: `safeRequest<T>(request: BaseClientRequest)` method parameter
   - Line 113: `deduplicatedRequest<T>(request: BaseClientRequest)` method parameter
@@ -131,11 +131,11 @@
   - Line 256: `retryRequest<T>(request: BaseClientRequest, ...)` method parameter
   - Line 335: `getRequestKey(request: BaseClientRequest)` method parameter
 
-- `client/src/core/api/serialization-interceptors.ts`
+- `client/src/infrastructure/api/serialization-interceptors.ts`
   - Line 36: Imported
   - Line 43: `serializationRequestInterceptor` function parameter
 
-**Recommendation**: Extract to `client/src/core/api/types/request.ts` or `types/common.ts`
+**Recommendation**: Extract to `client/src/infrastructure/api/types/request.ts` or `types/common.ts`
 
 ---
 
@@ -143,17 +143,17 @@
 **Status**: ✅ ACTIVELY USED - EXTRACTION REQUIRED
 
 **Usage Locations**:
-- `client/src/core/api/safe-client.ts`
+- `client/src/infrastructure/api/safe-client.ts`
   - Line 10: Imported
   - Line 17: Used in `SafeApiResult<T>` type definition
   - Line 113: `deduplicatedRequest<T>` return type
   - Line 125: Used in request queue type
 
-- `client/src/core/api/serialization-interceptors.ts`
+- `client/src/infrastructure/api/serialization-interceptors.ts`
   - Line 36: Imported
   - Line 75: `deserializationResponseInterceptor` function parameter and return type
 
-**Recommendation**: Extract to `client/src/core/api/types/response.ts` or `types/common.ts`
+**Recommendation**: Extract to `client/src/infrastructure/api/types/response.ts` or `types/common.ts`
 
 ---
 
@@ -178,10 +178,10 @@
 ## Extraction Strategy
 
 ### Step 1: Create Shared Type Files
-Create `client/src/core/api/types/interceptors.ts` with all interceptor types:
+Create `client/src/infrastructure/api/types/interceptors.ts` with all interceptor types:
 
 ```typescript
-// client/src/core/api/types/interceptors.ts
+// client/src/infrastructure/api/types/interceptors.ts
 
 /**
  * Request interceptor interface
@@ -209,10 +209,10 @@ export interface ErrorInterceptor {
 ```
 
 ### Step 2: Create Request/Response Type Files
-Move `BaseClientRequest` and `BaseClientResponse` to `client/src/core/api/types/common.ts` (already exists, consolidate):
+Move `BaseClientRequest` and `BaseClientResponse` to `client/src/infrastructure/api/types/common.ts` (already exists, consolidate):
 
 ```typescript
-// client/src/core/api/types/common.ts
+// client/src/infrastructure/api/types/common.ts
 
 /**
  * API request configuration
@@ -240,7 +240,7 @@ export interface BaseClientResponse<T = unknown> {
 ```
 
 ### Step 3: Update Barrel Exports
-Update `client/src/core/api/types/index.ts`:
+Update `client/src/infrastructure/api/types/index.ts`:
 
 ```typescript
 export * from './interceptors';
@@ -278,12 +278,12 @@ Remove local type definitions in:
 **Action Required**: Before proceeding with Task 1.1.6 (Delete unused client files), Task 1.1.5 (Extract shared types) MUST be completed.
 
 **Files to Create**:
-- `client/src/core/api/types/interceptors.ts` (new)
+- `client/src/infrastructure/api/types/interceptors.ts` (new)
 
 **Files to Update**:
-- `client/src/core/api/types/common.ts` (consolidate request/response types)
-- `client/src/core/api/types/index.ts` (add exports)
+- `client/src/infrastructure/api/types/common.ts` (consolidate request/response types)
+- `client/src/infrastructure/api/types/index.ts` (add exports)
 - All files importing from `base-client.ts` (update imports)
 
 **Files to Clean**:
-- `client/src/core/api/interceptors.ts` (remove duplicate type definitions)
+- `client/src/infrastructure/api/interceptors.ts` (remove duplicate type definitions)

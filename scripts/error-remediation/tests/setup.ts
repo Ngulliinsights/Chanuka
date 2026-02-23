@@ -15,7 +15,7 @@ export const testConfig: RemediationConfig = {
   fsdLayers: {
     app: path.join(projectRoot, 'client/src/app'),
     features: path.join(projectRoot, 'client/src/features'),
-    core: path.join(projectRoot, 'client/src/core'),
+    core: path.join(projectRoot, 'client/src/infrastructure'),
     lib: path.join(projectRoot, 'client/src/lib'),
     shared: path.join(projectRoot, 'shared')
   },

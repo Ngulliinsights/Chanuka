@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { PrivacySettings } from '@client/core/auth';
+import { PrivacySettings } from '@client/infrastructure/auth';
 
 import { CompactInterface } from './CompactInterface';
 import { FullInterface } from './FullInterface';

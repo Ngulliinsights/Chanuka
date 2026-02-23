@@ -173,12 +173,12 @@ describe('Phase 6: Import Cleanup and Validation - Integration Test', () => {
     console.log(`  Total type definitions: ${typeLocationAnalysis.totalTypes}`);
     console.log(`  Types in shared/types: ${typeLocationAnalysis.sharedTypes}`);
     console.log(`  Types in client/src/lib/types: ${typeLocationAnalysis.libTypes}`);
-    console.log(`  Types in client/src/core: ${typeLocationAnalysis.coreTypes}`);
+    console.log(`  Types in client/src/infrastructure: ${typeLocationAnalysis.coreTypes}`);
     console.log(`  Types in features: ${typeLocationAnalysis.featureTypes}`);
     console.log(`  Types in suboptimal locations: ${typeLocationAnalysis.suboptimalTypes.length}`);
 
     // Requirement 15.5, 17.6: All types should be in optimal FSD locations
-    // Preferred order: shared/types > client/src/lib/types > client/src/core
+    // Preferred order: shared/types > client/src/lib/types > client/src/infrastructure
     if (typeLocationAnalysis.totalTypes > 0) {
       const optimalPercentage = (
         (typeLocationAnalysis.sharedTypes + typeLocationAnalysis.libTypes + typeLocationAnalysis.coreTypes) /
@@ -552,7 +552,7 @@ function analyzeTypeLocations(project: Project, config: any): {
         result.sharedTypes++;
       } else if (normalizedPath.includes('/client/src/lib/types/')) {
         result.libTypes++;
-      } else if (normalizedPath.includes('/client/src/core/')) {
+      } else if (normalizedPath.includes('/client/src/infrastructure/')) {
         result.coreTypes++;
       } else if (normalizedPath.includes('/client/src/features/')) {
         result.featureTypes++;
@@ -574,7 +574,7 @@ function analyzeTypeLocations(project: Project, config: any): {
         result.sharedTypes++;
       } else if (normalizedPath.includes('/client/src/lib/types/')) {
         result.libTypes++;
-      } else if (normalizedPath.includes('/client/src/core/')) {
+      } else if (normalizedPath.includes('/client/src/infrastructure/')) {
         result.coreTypes++;
       } else if (normalizedPath.includes('/client/src/features/')) {
         result.featureTypes++;

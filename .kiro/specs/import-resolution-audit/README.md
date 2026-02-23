@@ -114,7 +114,7 @@ Every broken import falls into one of these categories:
 
 ### Category A: Stale Path (Incomplete Migration)
 - **Symptom**: File moved, import not updated
-- **Example**: `import { useAuth } from '@/core/auth/hooks/useAuth'` but file is now at `features/users/hooks/useAuth`
+- **Example**: `import { useAuth } from '/auth/hooks/useAuth'` but file is now at `features/users/hooks/useAuth`
 - **Fix**: Update import path
 
 ### Category B: Deleted, Superseded by Better Implementation

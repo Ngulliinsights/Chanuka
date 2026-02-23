@@ -31,7 +31,7 @@ describe('TypeValidator', () => {
       fsdLayers: {
         app: 'client/src/app',
         features: 'client/src/features',
-        core: 'client/src/core',
+        core: 'client/src/infrastructure',
         lib: 'client/src/lib',
         shared: 'shared'
       },
@@ -44,7 +44,7 @@ describe('TypeValidator', () => {
         preferredLocations: [
           'shared/types',
           'client/src/lib/types',
-          'client/src/core'
+          'client/src/infrastructure'
         ],
         minDuplicates: 2
       },

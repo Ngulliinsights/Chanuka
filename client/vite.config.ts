@@ -189,7 +189,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       alias: {
         '@': path.resolve(rootDir, './src'),
         '@client': path.resolve(rootDir, './src'),
-        '@core': path.resolve(rootDir, './src/core'),
+        '@core': path.resolve(rootDir, './src/infrastructure'),
         '@lib': path.resolve(rootDir, './src/lib'),
         '@features': path.resolve(rootDir, './src/features'),
         '@app': path.resolve(rootDir, './src/app'),
@@ -351,7 +351,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
             if (id.includes('src/')) {
               // Core infrastructure is needed everywhere, so load it upfront
               if (id.includes('src/app/') || 
-                  id.includes('src/core/') ||
+                  id.includes('src/infrastructure/') ||
                   id.includes('src/lib/design-system/') ||
                   id.includes('src/lib/utils/') ||
                   id.includes('src/lib/hooks/')) {
@@ -359,7 +359,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
               }
 
               // Infrastructure layer
-              if (id.includes('src/lib/infrastructure/')) {
+              if (id.includes('src/infrastructure/')) {
                 return 'infrastructure'
               }
 

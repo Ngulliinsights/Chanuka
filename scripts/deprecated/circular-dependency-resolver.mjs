@@ -62,11 +62,11 @@ const CONFIG = {
         // API types - major refactoring needed
         {
             files: [
-                'client/src/core/api/types/common.ts',
-                'client/src/core/api/types/config.ts',
-                'client/src/core/api/types/request.ts',
-                'client/src/core/api/types/bill.ts',
-                'client/src/core/api/types/websocket.ts'
+                'client/src/infrastructure/api/types/common.ts',
+                'client/src/infrastructure/api/types/config.ts',
+                'client/src/infrastructure/api/types/request.ts',
+                'client/src/infrastructure/api/types/bill.ts',
+                'client/src/infrastructure/api/types/websocket.ts'
             ],
             strategy: 'extract_base_types'
         }

@@ -19,19 +19,19 @@ const MIGRATION_TASKS: MigrationTask[] = [
   // Move existing WebSocket services to core/realtime/services
   {
     source: 'client/src/services/webSocketService.ts',
-    target: 'client/src/core/realtime/services/legacy-websocket-service.ts',
+    target: 'client/src/infrastructure/realtime/services/legacy-websocket-service.ts',
     action: 'move',
     description: 'Move legacy WebSocket service to core/realtime (will be deprecated)',
   },
   {
     source: 'client/src/services/CommunityWebSocketManager.ts',
-    target: 'client/src/core/realtime/services/legacy-community-websocket.ts',
+    target: 'client/src/infrastructure/realtime/services/legacy-community-websocket.ts',
     action: 'move',
     description: 'Move legacy community WebSocket manager to core/realtime (will be deprecated)',
   },
   {
     source: 'client/src/services/community-websocket-extension.ts',
-    target: 'client/src/core/realtime/services/legacy-community-extension.ts',
+    target: 'client/src/infrastructure/realtime/services/legacy-community-extension.ts',
     action: 'move',
     description: 'Move legacy community WebSocket extension to core/realtime (will be deprecated)',
   },
@@ -39,13 +39,13 @@ const MIGRATION_TASKS: MigrationTask[] = [
   // Move WebSocket hooks to core/realtime/hooks
   {
     source: 'client/src/hooks/use-websocket.ts',
-    target: 'client/src/core/realtime/hooks/use-websocket-legacy.ts',
+    target: 'client/src/infrastructure/realtime/hooks/use-websocket-legacy.ts',
     action: 'move',
     description: 'Move legacy WebSocket hook (will be replaced by new implementation)',
   },
   {
     source: 'client/src/hooks/useRealTimeEngagement.ts',
-    target: 'client/src/core/realtime/hooks/use-realtime-engagement-legacy.ts',
+    target: 'client/src/infrastructure/realtime/hooks/use-realtime-engagement-legacy.ts',
     action: 'move',
     description: 'Move legacy real-time engagement hook to core/realtime',
   },
@@ -53,7 +53,7 @@ const MIGRATION_TASKS: MigrationTask[] = [
   // Move WebSocket utilities to core/realtime/utils
   {
     source: 'client/src/utils/realtime-optimizer.ts',
-    target: 'client/src/core/realtime/utils/optimizer.ts',
+    target: 'client/src/infrastructure/realtime/utils/optimizer.ts',
     action: 'move',
     description: 'Move real-time optimizer to core/realtime',
   },
@@ -61,7 +61,7 @@ const MIGRATION_TASKS: MigrationTask[] = [
   // Move WebSocket examples to core/realtime/examples
   {
     source: 'client/src/examples/WebSocketIntegrationExample.tsx',
-    target: 'client/src/core/realtime/examples/integration-example.tsx',
+    target: 'client/src/infrastructure/realtime/examples/integration-example.tsx',
     action: 'move',
     description: 'Move WebSocket integration example to core/realtime',
   },
@@ -84,8 +84,8 @@ const MIGRATION_TASKS: MigrationTask[] = [
 
   // Update existing WebSocket usage in core API
   {
-    source: 'client/src/core/api/websocket.ts',
-    target: 'client/src/core/api/websocket-legacy.ts',
+    source: 'client/src/infrastructure/api/websocket.ts',
+    target: 'client/src/infrastructure/api/websocket-legacy.ts',
     action: 'move',
     description: 'Move existing WebSocket implementation to legacy (will be replaced)',
   },
@@ -134,13 +134,13 @@ class WebSocketConsolidationMigrator {
 
   private async createDirectories(): Promise<void> {
     const directories = [
-      'client/src/core/realtime',
-      'client/src/core/realtime/websocket',
-      'client/src/core/realtime/services',
-      'client/src/core/realtime/hooks',
-      'client/src/core/realtime/utils',
-      'client/src/core/realtime/examples',
-      'client/src/core/realtime/types',
+      'client/src/infrastructure/realtime',
+      'client/src/infrastructure/realtime/websocket',
+      'client/src/infrastructure/realtime/services',
+      'client/src/infrastructure/realtime/hooks',
+      'client/src/infrastructure/realtime/utils',
+      'client/src/infrastructure/realtime/examples',
+      'client/src/infrastructure/realtime/types',
     ];
 
     for (const dir of directories) {
@@ -269,43 +269,43 @@ class WebSocketConsolidationMigrator {
       // WebSocket service imports - update to use new consolidated services
       {
         from: /from ['"]@client\/services\/webSocketService['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
       {
         from: /from ['"]@client\/services\/CommunityWebSocketManager['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
       {
         from: /from ['"]@client\/services\/community-websocket-extension['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
 
       // Hook imports - update to use new consolidated hooks
       {
         from: /from ['"]@client\/hooks\/use-websocket['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
       {
         from: /from ['"]@client\/hooks\/useRealTimeEngagement['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
 
       // Utility imports
       {
         from: /from ['"]@client\/utils\/realtime-optimizer['"];?/g,
-        to: "from '@client/core/realtime/utils/optimizer';",
+        to: "from '@client/infrastructure/realtime/utils/optimizer';",
       },
 
       // Core API WebSocket imports
       {
         from: /from ['"]@client\/core\/api\/websocket['"];?/g,
-        to: "from '@client/core/realtime';",
+        to: "from '@client/infrastructure/realtime';",
       },
 
       // Type imports - update to use consolidated types
       {
         from: /from ['"]@client\/types\/realtime['"];?/g,
-        to: "from '@client/core/realtime/types';",
+        to: "from '@client/infrastructure/realtime/types';",
       },
 
       // Store slice imports
@@ -384,7 +384,7 @@ class WebSocketConsolidationMigrator {
 
     const indexFiles = [
       {
-        path: 'client/src/core/realtime/services/index.ts',
+        path: 'client/src/infrastructure/realtime/services/index.ts',
         content: `/**
  * Real-time Services
  */
@@ -399,7 +399,7 @@ export { WebSocketService } from './websocket-service';
 export { CommunityWebSocketManager } from './community-websocket';`,
       },
       {
-        path: 'client/src/core/realtime/hooks/index.ts',
+        path: 'client/src/infrastructure/realtime/hooks/index.ts',
         content: `/**
  * Real-time Hooks
  */
@@ -410,7 +410,7 @@ export { useBillTracking } from './use-bill-tracking';
 export { useCommunityRealTime } from './use-community-realtime';`,
       },
       {
-        path: 'client/src/core/realtime/utils/index.ts',
+        path: 'client/src/infrastructure/realtime/utils/index.ts',
         content: `/**
  * Real-time Utilities
  */
@@ -434,7 +434,7 @@ export { WebSocketOptimizer } from './optimizer';`,
   private async updateMainExports(): Promise<void> {
     console.log('🔧 Updating main core exports...');
 
-    const coreIndexPath = 'client/src/core/index.ts';
+    const coreIndexPath = 'client/src/infrastructure/index.ts';
 
     if (!fs.existsSync(coreIndexPath)) {
       console.log('   ⚠️  Core index file not found, skipping...');

@@ -10,7 +10,7 @@ import {
   loadingSlice,
   startLoadingOperation,
   completeLoadingOperation,
-} from '../lib/infrastructure/store/slices/loadingSlice';
+} from '../infrastructure/store/slices/loadingSlice';
 
 // Mock logger to prevent console spam during tests
 vi.mock('../utils/logger', () => ({

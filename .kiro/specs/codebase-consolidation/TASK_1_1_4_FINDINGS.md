@@ -11,11 +11,11 @@ grep -r "LegacyRetryHandler\|createRetryHandler\|retryHandlers" client/src/ --in
 ```
 
 ### Usages Found
-1. **client/src/core/api/circuit-breaker-client.ts**
+1. **client/src/infrastructure/api/circuit-breaker-client.ts**
    - Imports: `RetryHandler`, `createRetryHandler`, `RetryConfig`
    - Usage: `this.retryHandler = createRetryHandler(this.config.serviceName, this.config.retryConfig);`
 
-2. **client/src/core/api/examples/circuit-breaker-usage.ts**
+2. **client/src/infrastructure/api/examples/circuit-breaker-usage.ts**
    - Imports: `retryOperation`, `createRetryHandler`
    - Usage: `const retryHandler = createRetryHandler('payment-service', {...});`
 
@@ -39,7 +39,7 @@ export {
 This confirms it's the **legacy implementation**.
 
 ### Canonical Implementation
-The canonical retry implementation is in `client/src/core/api/retry.ts`:
+The canonical retry implementation is in `client/src/infrastructure/api/retry.ts`:
 - Exported as `RetryHandler` (without "Legacy" prefix)
 - Has modern API with `retryOperation`, `safeRetryOperation`
 - Has service-specific configurations
@@ -57,15 +57,15 @@ The canonical retry implementation is in `client/src/core/api/retry.ts`:
 5. ✅ Removing it aligns with the goal of removing dead API clients
 
 ### Files to Delete (Updated List)
-- `client/src/core/api/base-client.ts`
-- `client/src/core/api/authenticated-client.ts`
-- `client/src/core/api/safe-client.ts`
-- `client/src/core/api/circuit-breaker-client.ts`
-- `client/src/core/api/examples/` (entire directory)
-- **`client/src/core/api/retry-handler.ts`** ← ADD THIS
+- `client/src/infrastructure/api/base-client.ts`
+- `client/src/infrastructure/api/authenticated-client.ts`
+- `client/src/infrastructure/api/safe-client.ts`
+- `client/src/infrastructure/api/circuit-breaker-client.ts`
+- `client/src/infrastructure/api/examples/` (entire directory)
+- **`client/src/infrastructure/api/retry-handler.ts`** ← ADD THIS
 
 ### Index.ts Exports to Remove
-When updating `client/src/core/api/index.ts`, also remove:
+When updating `client/src/infrastructure/api/index.ts`, also remove:
 ```typescript
 export {
   RetryHandler as LegacyRetryHandler,

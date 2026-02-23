@@ -14,7 +14,7 @@ Based on comprehensive codebase analysis:
 ### Core Consolidation Achievements
 
 1. **✅ Removed Duplicate Types File**
-   - Deleted `client/src/core/api/types/websocket.ts` (complete duplicate)
+   - Deleted `client/src/infrastructure/api/types/websocket.ts` (complete duplicate)
    - Eliminated ~100% duplication of core WebSocket types
 
 2. **✅ Unified Import Sources**

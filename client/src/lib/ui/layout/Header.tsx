@@ -6,6 +6,8 @@ import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { ChanukaWordmark } from '@client/lib/design-system/media/ChanukaWordmark';
 import { cn } from '@client/lib/design-system/utils/cn';
+import { LanguageSwitcher } from '@client/lib/ui/i18n/LanguageSwitcher';
+import { useI18n } from '@client/lib/hooks/use-i18n';
 
 export interface HeaderProps {
   className?: string;
@@ -54,6 +56,7 @@ export const Header = React.memo<HeaderProps>(({
   transparentOnTop = false,
 }) => {
   const navigate = useNavigate();
+  const { language, changeLanguage } = useI18n();
   const [isScrolled, setIsScrolled] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
   const [isMobileSearchOpen, setIsMobileSearchOpen] = React.useState(false);
@@ -227,6 +230,11 @@ export const Header = React.memo<HeaderProps>(({
             <Search className="h-5 w-5" />
           </Button>
         )}
+
+        {/* Language Switcher */}
+        <div className="hidden sm:block">
+          <LanguageSwitcher variant="compact" />
+        </div>
 
         {/* Notifications */}
         {showNotifications && (

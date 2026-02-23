@@ -6,8 +6,8 @@
 import { Shield, AlertTriangle } from 'lucide-react';
 import React, { useState, useCallback, Suspense } from 'react';
 
-import { useAuth } from '@client/core/auth';
-import { PrivacySettings, ConsentRecord } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
+import { PrivacySettings, ConsentRecord } from '@client/infrastructure/auth';
 
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
 import { Badge } from '@client/lib/design-system/feedback/Badge';

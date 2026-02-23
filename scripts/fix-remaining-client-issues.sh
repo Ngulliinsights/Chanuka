@@ -63,7 +63,7 @@ print_phase "Phase 1: Adding React imports to remaining TSX files..."
 
 # List of specific files that need React imports
 react_import_files=(
-    "client/src/core/error/components/utils/error-icons.tsx"
+    "client/src/infrastructure/error/components/utils/error-icons.tsx"
     "client/src/features/admin/ui/migration/MigrationManager.tsx"
     "client/src/features/users/ui/verification/CredibilityScoring.tsx"
     "client/src/features/users/ui/verification/ExpertBadge.tsx"
@@ -174,10 +174,10 @@ if [ -f "client/src/main.tsx" ]; then
 fi
 
 # Fix common error-icons.tsx issue
-if [ -f "client/src/core/error/components/utils/error-icons.tsx" ]; then
-    if ! grep -q 'import React' "client/src/core/error/components/utils/error-icons.tsx"; then
-        backup_file "client/src/core/error/components/utils/error-icons.tsx"
-        sed -i '1i import React from '\''react'\'';' "client/src/core/error/components/utils/error-icons.tsx"
+if [ -f "client/src/infrastructure/error/components/utils/error-icons.tsx" ]; then
+    if ! grep -q 'import React' "client/src/infrastructure/error/components/utils/error-icons.tsx"; then
+        backup_file "client/src/infrastructure/error/components/utils/error-icons.tsx"
+        sed -i '1i import React from '\''react'\'';' "client/src/infrastructure/error/components/utils/error-icons.tsx"
         print_success "Added React import to error-icons.tsx"
     fi
 fi
@@ -192,7 +192,7 @@ find client/src/features -name "*.ts" -o -name "*.tsx" | while read -r file; do
         
         # Convert feature-specific relative imports
         sed -i "s|from ['\"]../../shared|from '@client/lib|g" "$file"
-        sed -i "s|from ['\"]../../core|from '@client/core|g" "$file"
+        sed -i "s|from ['\"]../../core|from '@client/infrastructure|g" "$file"
         sed -i "s|from ['\"]../../types|from '@client/types|g" "$file"
         sed -i "s|from ['\"]../../utils|from '@client/utils|g" "$file"
         sed -i "s|from ['\"]../../lib|from '@client/lib|g" "$file"

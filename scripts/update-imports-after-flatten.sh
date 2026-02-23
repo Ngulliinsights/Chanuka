@@ -37,27 +37,27 @@ echo "👉 Updating Client Auth imports..."
 
 # Update useAuth hook imports
 update_imports \
-    "from ['\"]@client/core/auth/hooks/useAuth['\"]" \
-    "from '@client/core/auth/useAuth'" \
+    "from ['\"]@client/infrastructure/auth/hooks/useAuth['\"]" \
+    "from '@client/infrastructure/auth/useAuth'" \
     "Updating useAuth hook imports" \
     "*.ts"
 
 update_imports \
-    "from ['\"]@client/core/auth/hooks/useAuth['\"]" \
-    "from '@client/core/auth/useAuth'" \
+    "from ['\"]@client/infrastructure/auth/hooks/useAuth['\"]" \
+    "from '@client/infrastructure/auth/useAuth'" \
     "Updating useAuth hook imports in TSX files" \
     "*.tsx"
 
 # Update auth types imports
 update_imports \
-    "from ['\"]@client/core/auth/types['\"]" \
-    "from '@client/core/auth/types'" \
+    "from ['\"]@client/infrastructure/auth/types['\"]" \
+    "from '@client/infrastructure/auth/types'" \
     "Updating auth types imports" \
     "*.ts"
 
 update_imports \
-    "from ['\"]@client/core/auth/types['\"]" \
-    "from '@client/core/auth/types'" \
+    "from ['\"]@client/infrastructure/auth/types['\"]" \
+    "from '@client/infrastructure/auth/types'" \
     "Updating auth types imports in TSX files" \
     "*.tsx"
 

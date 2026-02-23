@@ -259,7 +259,7 @@ class ProjectAnalyzer {
 
     // Check for scattered auth implementations
     const authLocations = [
-      'client/src/core/auth',
+      'client/src/infrastructure/auth',
       'server/core/auth',
       'server/features/users/application',
       'shared/core/services',

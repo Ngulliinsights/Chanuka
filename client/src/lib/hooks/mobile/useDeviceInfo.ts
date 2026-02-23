@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { deviceDetector } from '@client/core/mobile/device-detector';
+import { deviceDetector } from '@client/infrastructure/mobile/device-detector';
 
 /**
  * React hook for accessing device detection information.

@@ -78,7 +78,7 @@ for file in "${remaining_import_files[@]}"; do
         
         # Fix specific patterns
         sed -i "s|from ['\"]../../../shared|from '@client/lib|g" "$file"
-        sed -i "s|from ['\"]../../../core|from '@client/core|g" "$file"
+        sed -i "s|from ['\"]../../../core|from '@client/infrastructure|g" "$file"
         sed -i "s|from ['\"]../../../types|from '@client/types|g" "$file"
         sed -i "s|from ['\"]../../../utils|from '@client/utils|g" "$file"
         sed -i "s|from ['\"]../../../lib|from '@client/lib|g" "$file"
@@ -90,7 +90,7 @@ done
 
 # Fix specific accessibility issues
 accessibility_files=(
-    "client/src/core/browser/FeatureFallbacks.tsx"
+    "client/src/infrastructure/browser/FeatureFallbacks.tsx"
     "client/src/examples/render-tracking-usage.tsx"
     "client/src/features/security/ui/dashboard/SecureForm.tsx"
     "client/src/lib/form-builder.tsx"

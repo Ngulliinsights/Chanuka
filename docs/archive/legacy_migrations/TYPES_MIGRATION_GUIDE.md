@@ -223,10 +223,10 @@ find . -name "*.ts" -not -path "./node_modules/*" -exec sed -i \
 
 **Pattern 12: Remove client duplicate imports**
 ```bash
-# client/src/core/api/types/request.ts → DELETE
-# client/src/core/api/types/error-response.ts → DELETE
+# client/src/infrastructure/api/types/request.ts → DELETE
+# client/src/infrastructure/api/types/error-response.ts → DELETE
 
-# Update client/src/core/api/types/index.ts to remove these exports and import from shared instead
+# Update client/src/infrastructure/api/types/index.ts to remove these exports and import from shared instead
 find . -name "*.ts" -not -path "./node_modules/*" -exec sed -i \
   "s|from './request'|from '@shared/types/api'|g" {} +
 
@@ -280,9 +280,9 @@ rm -f @types/server/middleware.d.ts
 rm -f @types/server/services.d.ts
 
 # Client duplicates
-rm -f client/src/core/api/types/request.ts
-rm -f client/src/core/api/types/error-response.ts
-rm -f client/src/core/api/types/shared-imports.ts  # If it existed
+rm -f client/src/infrastructure/api/types/request.ts
+rm -f client/src/infrastructure/api/types/error-response.ts
+rm -f client/src/infrastructure/api/types/shared-imports.ts  # If it existed
 
 # Consolidated files (now in canonical locations)
 rm -f shared/core/types/validation-types.ts  # Merged into shared/types/core/validation.ts
@@ -408,7 +408,7 @@ Create migration documentation:
 - Infrastructure: `@shared/types/core/{health-check,circuit-breaker,rate-limit,cache}`
 - Domains: `@shared/types/domains/{domain}`
 - Server adapters: `@server/types`
-- Client UI: `@client/core/api/types`
+- Client UI: `@client/infrastructure/api/types`
 
 See TYPES_SYSTEM_GOVERNANCE.md for ongoing rules.
 ```

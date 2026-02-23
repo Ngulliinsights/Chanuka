@@ -49,8 +49,8 @@ import {
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useAuth } from '@client/core/auth';
-import type { User } from '@client/core/auth/types';
+import { useAuth } from '@client/infrastructure/auth';
+import type { User } from '@client/infrastructure/auth/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { copySystem } from '@client/lib/content/copy-system';
 import {

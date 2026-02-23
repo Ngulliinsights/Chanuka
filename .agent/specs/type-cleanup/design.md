@@ -145,7 +145,7 @@ export type {
 ```
 
 **Benefits:**
-- Consumers import from module (`@client/core/storage`)
+- Consumers import from module (`@client/infrastructure/storage`)
 - Definitions centralized in `lib/types/`
 - Module API stability during migration
 

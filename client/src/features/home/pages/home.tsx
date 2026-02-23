@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from 'react';
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { logger } from '@client/lib/utils/logger';
 import BrandedLoadingScreen from '@client/lib/ui/loading/BrandedLoadingScreen';
 

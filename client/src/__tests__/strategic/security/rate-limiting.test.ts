@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock rate limiting services
-vi.mock('@client/core/security/rate-limiter', () => ({
+vi.mock('@client/infrastructure/security/rate-limiter', () => ({
   rateLimiter: {
     checkLimit: vi.fn(),
     increment: vi.fn(),
@@ -29,7 +29,7 @@ describe('Rate Limiting', () => {
 
   describe('API Protection', () => {
     it('should limit API requests appropriately', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const limits = {
         requestsPerMinute: 60,
@@ -58,7 +58,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should handle burst requests', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const burstRequests = [
         { endpoint: 'api/search', user: 'user-1', timestamp: Date.now() },
@@ -82,7 +82,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should respect rate limits', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const limitConfig = {
         endpoint: 'api/heavy-operation',
@@ -108,7 +108,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should provide rate limit feedback', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const feedback = {
         currentUsage: 45,
@@ -131,7 +131,7 @@ describe('Rate Limiting', () => {
 
   describe('User Behavior Limits', () => {
     it('should prevent abuse patterns', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const abusePatterns = [
         { type: 'rapid_requests', count: 100, window: 10000 },
@@ -156,7 +156,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should handle concurrent requests', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const concurrentRequests = Array.from({ length: 10 }, (_, i) => ({
         id: `req-${i}`,
@@ -184,7 +184,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should manage user session limits', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const sessionLimits = {
         maxSessions: 3,
@@ -208,7 +208,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should detect suspicious activity', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const suspiciousActivity = {
         user: 'suspicious-user',
@@ -237,7 +237,7 @@ describe('Rate Limiting', () => {
 
   describe('Performance Protection', () => {
     it('should protect against performance attacks', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const performanceAttack = {
         type: 'ddos',
@@ -261,7 +261,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should handle resource exhaustion', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const resourceExhaustion = {
         memoryUsage: '90%',
@@ -285,7 +285,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should maintain system responsiveness', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const responsiveness = {
         responseTime: 200, // ms
@@ -305,7 +305,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should optimize resource usage', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       const optimization = {
         memoryOptimized: true,
@@ -331,7 +331,7 @@ describe('Rate Limiting', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete rate limiting workflow', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       // Complete workflow: check limit -> increment -> monitor usage -> enforce limits
       const workflow = {
@@ -371,7 +371,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should handle rate limiting recovery scenarios', async () => {
-      const { rateLimiter } = await import('@client/core/security/rate-limiter');
+      const { rateLimiter } = await import('@client/infrastructure/security/rate-limiter');
 
       // Recovery scenario: user blocked -> cooling off period -> gradual restoration
       const recoveryScenario = {

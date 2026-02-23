@@ -80,18 +80,18 @@ export { useCleanup as useCleanupLegacy } from './use-cleanup';
 // FSD Integration Exports - For Feature-Sliced Design integration
 // These will be implemented as features are migrated to FSD structure
 // TODO: Uncomment when modules are created
-// export { useApiWithFallback } from '../core/api/hooks';
-// export { useSafeMutation } from '../core/api/hooks';
-// export { useSafeQuery as useSafeQueryFSD } from '../core/api/hooks';
-export { useNavigationSystem } from '@client/core/navigation/hooks';
-export { useKeyboardNavigation as useKeyboardNavigationFSD } from '@client/core/navigation/hooks';
-export { useBreadcrumbs as useBreadcrumbsFSD } from '@client/core/navigation/hooks';
-export { useRelatedPages as useRelatedPagesFSD } from '@client/core/navigation/hooks';
-export { useNavigationPreferences as useNavigationPreferencesFSD } from '@client/core/navigation/hooks';
-export { useSidebar as useSidebarFSD } from '@client/core/navigation/hooks';
-export { useMobileMenu as useMobileMenuFSD } from '@client/core/navigation/hooks';
+// export { useApiWithFallback } from '../../infrastructure/api/hooks';
+// export { useSafeMutation } from '../../infrastructure/api/hooks';
+// export { useSafeQuery as useSafeQueryFSD } from '../../infrastructure/api/hooks';
+export { useNavigationSystem } from '@client/infrastructure/navigation/hooks';
+export { useKeyboardNavigation as useKeyboardNavigationFSD } from '@client/infrastructure/navigation/hooks';
+export { useBreadcrumbs as useBreadcrumbsFSD } from '@client/infrastructure/navigation/hooks';
+export { useRelatedPages as useRelatedPagesFSD } from '@client/infrastructure/navigation/hooks';
+export { useNavigationPreferences as useNavigationPreferencesFSD } from '@client/infrastructure/navigation/hooks';
+export { useSidebar as useSidebarFSD } from '@client/infrastructure/navigation/hooks';
+export { useMobileMenu as useMobileMenuFSD } from '@client/infrastructure/navigation/hooks';
 // TODO: Uncomment when modules are created
-// export { useOnlineStatus as useOnlineStatusFSD } from '../core/loading/hooks';
+// export { useOnlineStatus as useOnlineStatusFSD } from '../../infrastructure/loading/hooks';
 // export { useJourneyTracker } from '../features/analytics/hooks';
 // export { useErrorAnalytics } from '../features/analytics/hooks';
 // export { useWebVitals } from '../features/analytics/hooks';

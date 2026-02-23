@@ -184,7 +184,7 @@ export * from './config';
 
 This refactoring follows the same organizational principles used successfully in other parts of the codebase:
 - `server/infrastructure/observability/` (core/, monitoring/, security/, database/, http/)
-- `client/src/core/security/` (unified/, migration/)
+- `client/src/infrastructure/security/` (unified/, migration/)
 - `shared/validation/` (schemas/, validators/)
 
 The structured approach has proven effective for managing complexity and improving maintainability.

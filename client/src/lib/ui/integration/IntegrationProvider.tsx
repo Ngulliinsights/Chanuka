@@ -9,7 +9,7 @@ import { PrivacyAnalyticsService } from '@client/lib/services/privacyAnalyticsSe
 import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/lib/utils/security';
 import React, { useEffect, useState, useCallback } from 'react';
 
-import { DeviceDetector } from '@client/core/mobile';
+import { DeviceDetector } from '@client/infrastructure/mobile';
 import { logger } from '@client/lib/utils/logger';
 
 // TouchHandler is deprecated - using SwipeGestures instead

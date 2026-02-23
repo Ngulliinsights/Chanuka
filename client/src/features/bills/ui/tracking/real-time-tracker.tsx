@@ -2,8 +2,8 @@ import { Bell, Network, Settings, Clock, AlertCircle } from 'lucide-react';
 import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
-import type { BillTrackingPreferences } from '@client/core/api/types';
-import { useWebSocket } from '@client/core/realtime/hooks/use-websocket';
+import type { BillTrackingPreferences } from '@client/infrastructure/api/types';
+import { useWebSocket } from '@client/infrastructure/realtime/hooks/use-websocket';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import {

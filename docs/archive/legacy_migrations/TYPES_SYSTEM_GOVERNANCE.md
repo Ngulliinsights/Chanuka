@@ -28,7 +28,7 @@ There is exactly ONE canonical location for each type. All code imports from tha
 | **Authentication** | `shared/types/core/auth.ts` | `@shared/types/core/auth` | Auth contracts shared |
 | **Domain Types** | `shared/types/domains/{domain}/` | `@shared/types/domains/{domain}` | Business domain schemas |
 | **Server Adapters** | `server/types/` | `@server/types` | Extend shared types, never duplicate |
-| **Client UI Types** | `client/src/core/api/types/` | `@client/core/api/types` | React-specific, UI state |
+| **Client UI Types** | `client/src/infrastructure/api/types/` | `@client/infrastructure/api/types` | React-specific, UI state |
 
 ---
 
@@ -58,7 +58,7 @@ There is exactly ONE canonical location for each type. All code imports from tha
 // server/features/bills/routes.ts
 import { ApiRequest, ApiResponse, ApiBadRequestError } from '@shared/types/api';
 
-// client/src/core/api/base-client.ts
+// client/src/infrastructure/api/base-client.ts
 import { ApiRequest, ApiResponse, ApiErrorFactory } from '@shared/types/api';
 ```
 
@@ -131,10 +131,10 @@ import { AppError, RateLimitError } from '@shared/types/core/errors';
 // server/features/*/service.ts
 import { HealthStatus, HealthCheckResult } from '@shared/types/core/health-check';
 
-// client/src/core/api/retry.ts
+// client/src/infrastructure/api/retry.ts
 import { RateLimitError } from '@shared/types/core/errors';
 
-// client/src/core/api/circuit-breaker.ts
+// client/src/infrastructure/api/circuit-breaker.ts
 import { CircuitBreakerState } from '@shared/types/core/circuit-breaker';
 ```
 
@@ -235,7 +235,7 @@ export interface GetBillsResponse extends ApiResponse<Bill[]> {}
 
 ---
 
-### `client/src/core/api/types/` - Client-Specific API Types (UI Concerns)
+### `client/src/infrastructure/api/types/` - Client-Specific API Types (UI Concerns)
 
 **Purpose:** React-specific, UI state, client configuration
 
@@ -257,7 +257,7 @@ export interface GetBillsResponse extends ApiResponse<Bill[]> {}
 
 **Example (What's RIGHT):**
 ```typescript
-// client/src/core/api/types/preferences.ts
+// client/src/infrastructure/api/types/preferences.ts
 import { ApiResponse } from '@shared/types/api';  // ← Reuses shared type
 import { User } from '@shared/types/domains/authentication';
 
@@ -276,7 +276,7 @@ export interface ClientBillView extends Bill {
 
 **Example (What's WRONG):**
 ```typescript
-// client/src/core/api/types/request.ts - DON'T DO THIS
+// client/src/infrastructure/api/types/request.ts - DON'T DO THIS
 export interface ApiRequest<T = unknown> { ... }  // ❌ Already in @shared/types/api/
 export interface ApiResponse<T = unknown> { ... } // ❌ Already in @shared/types/api/
 ```
@@ -354,7 +354,7 @@ export interface ApiError { ... }               // ❌ Should be in @shared/type
 │  └─ NO (client-side) → Continue...
 │
 ├─ Is this a client UI concern (React preferences, component state)?
-│  └─ YES → client/src/core/api/types/ or client/src/lib/types/
+│  └─ YES → client/src/infrastructure/api/types/ or client/src/lib/types/
 │  └─ NO  → Is it a component/hook/context type?
 │           ├─ YES → client/src/lib/types/{components,hooks,context}/
 │           └─ NO  → Reconsider location
@@ -386,7 +386,7 @@ export interface ApiError { ... }               // ❌ Should be in @shared/type
 // Answer: NO (UI state only)
 // Question: Client UI concern?
 // Answer: YES (React preferences)
-// Location: client/src/core/api/types/preferences.ts
+// Location: client/src/infrastructure/api/types/preferences.ts
 
 // ✅ CORRECT LOCATION: ExpressContext
 // Question: Shared between server and client?
@@ -395,8 +395,8 @@ export interface ApiError { ... }               // ❌ Should be in @shared/type
 // Answer: YES (Middleware)
 // Location: server/types/middleware/index.ts
 
-// ❌ WRONG: ApiRequest in client/src/core/api/types/request.ts
-// Should be: client/src/core/api/types/index.ts imports from @shared/types/api/
+// ❌ WRONG: ApiRequest in client/src/infrastructure/api/types/request.ts
+// Should be: client/src/infrastructure/api/types/index.ts imports from @shared/types/api/
 
 // ❌ WRONG: ValidationError in server/types/validation.ts
 // Should be: @shared/types/core/validation.ts (shared location)
@@ -427,7 +427,7 @@ Before creating a new type file, ask these questions:
    - [ ] `shared/types/domains/{domain}/` → Business domain type
    - [ ] `server/types/{layer}/` → Server layer adapter
    - [ ] `server/features/{feature}/types/` → Feature-specific
-   - [ ] `client/src/core/api/types/` → Client API or UI state
+   - [ ] `client/src/infrastructure/api/types/` → Client API or UI state
    - [ ] `client/src/lib/types/` → Client shared UI types
    - [ ] `@types/global/` → Ambient augmentation ONLY
 

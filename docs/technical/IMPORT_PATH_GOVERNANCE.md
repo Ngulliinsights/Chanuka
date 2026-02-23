@@ -14,13 +14,13 @@ Add the following configuration to your `.eslintrc.js` or `.eslintrc.json`:
     "import/no-restricted-paths": ["error", {
       "zones": [
         {
-          "target": "./client/src/core",
+          "target": "./client/src/infrastructure",
           "from": "./client/src/features",
           "message": "Core cannot import from features - violates architectural boundaries"
         },
         {
           "target": "./client/src/lib",
-          "from": "./client/src/core",
+          "from": "./client/src/infrastructure",
           "message": "Shared cannot import from core - creates circular dependencies"
         },
         {
@@ -51,7 +51,7 @@ Add the following configuration to your `.eslintrc.js` or `.eslintrc.json`:
           "position": "before"
         },
         {
-          "pattern": "@/core/**",
+          "pattern": "@/infrastructure/**",
           "group": "internal",
           "position": "before"
         },
@@ -85,7 +85,7 @@ Configure path aliases in your `tsconfig.json`:
     "paths": {
       "@/*": ["client/src/*"],
       "@/shared/*": ["client/src/lib/*"],
-      "@/core/*": ["client/src/core/*"],
+      "@/infrastructure/*": ["client/src/infrastructure/*"],
       "@/features/*": ["client/src/features/*"]
     }
   }
@@ -112,8 +112,8 @@ import { logger } from '@/shared/utils/logger';
 ### 3. Core Services
 ```typescript
 // ✅ CORRECT
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
-import { AuthService } from '@/core/auth';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
+import { AuthService } from '@/infrastructure/auth';
 ```
 
 ### 4. Feature Dependencies
@@ -134,7 +134,7 @@ import { useBillData } from '../hooks/useBillData';
 ### 1. Core → Features (Layer Violation)
 ```typescript
 // ❌ FORBIDDEN
-// client/src/core/analytics/data-retention-service.ts
+// client/src/infrastructure/analytics/data-retention-service.ts
 import { BillService } from '@/features/bills/services/bill-service';
 ```
 
@@ -142,7 +142,7 @@ import { BillService } from '@/features/bills/services/bill-service';
 ```typescript
 // ❌ FORBIDDEN
 // client/src/lib/services/navigation.ts
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
 ```
 
 ### 3. Shared → Features (Layer Violation)
@@ -173,14 +173,14 @@ import { NavigationService } from '@/shared/services/navigation';
 ```typescript
 // ✅ ALLOWED
 // client/src/features/bills/components/BillList.tsx
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
-import { AuthService } from '@/core/auth';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
+import { AuthService } from '@/infrastructure/auth';
 ```
 
 ### 3. Core → Shared (Infrastructure)
 ```typescript
 // ✅ ALLOWED
-// client/src/core/analytics/data-retention-service.ts
+// client/src/infrastructure/analytics/data-retention-service.ts
 import { logger } from '@/shared/utils/logger';
 import { NavigationService } from '@/shared/services/navigation';
 ```
@@ -202,7 +202,7 @@ import { useState } from 'react';
 import { BillService } from '@/features/bills/services/bill-service';
 import React from 'react';
 import { NavigationService } from '@/shared/services/navigation';
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
 import { Button } from './components/Button';
 import axios from 'axios';
 ```
@@ -216,7 +216,7 @@ import axios from 'axios';
 
 import { NavigationService } from '@/shared/services/navigation';
 
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
 
 import { BillService } from '@/features/bills/services/bill-service';
 

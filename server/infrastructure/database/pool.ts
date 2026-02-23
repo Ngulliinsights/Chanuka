@@ -506,6 +506,16 @@ export const db      = drizzle<FullDatabaseSchema>(rawGeneralPool, { schema: dri
 export const readDb  = drizzle<FullDatabaseSchema>(rawReadPool,    { schema: drizzleSchema });
 export const writeDb = drizzle<FullDatabaseSchema>(rawWritePool,   { schema: drizzleSchema });
 
+// Initialize connection.ts exports to avoid circular dependency issues
+// This must happen after drizzle instances are created
+import { initializeDatabaseConnections } from './connection';
+initializeDatabaseConnections(
+  db as unknown as import('./connection').DatabaseConnection,
+  readDb as unknown as import('./connection').DatabaseConnection,
+  writeDb as unknown as import('./connection').DatabaseConnection,
+  rawGeneralPool
+);
+
 // ============================================================================
 // QUERY EXECUTION
 // ============================================================================

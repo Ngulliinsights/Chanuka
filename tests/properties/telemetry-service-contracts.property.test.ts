@@ -14,12 +14,12 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fc from 'fast-check';
-import { TelemetryServiceImpl } from '../../client/src/core/telemetry/service';
+import { TelemetryServiceImpl } from '../../client/src/infrastructure/telemetry/service';
 import type {
   MetricsData,
   ExportConfig,
   SystemMetrics,
-} from '../../client/src/core/telemetry/types';
+} from '../../client/src/infrastructure/telemetry/types';
 import { logger } from '../../client/src/lib/utils/logger';
 
 // Mock the logger to prevent console spam during tests

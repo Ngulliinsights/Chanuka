@@ -3,13 +3,13 @@
     "import/no-restricted-paths": ["error", {
       "zones": [
         {
-          "target": "./client/src/core",
+          "target": "./client/src/infrastructure",
           "from": "./client/src/features",
           "message": "Core cannot import from features - violates architectural boundaries"
         },
         {
           "target": "./client/src/lib",
-          "from": "./client/src/core",
+          "from": "./client/src/infrastructure",
           "message": "Shared cannot import from core - creates circular dependencies"
         },
         {

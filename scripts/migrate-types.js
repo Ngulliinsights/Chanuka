@@ -59,14 +59,14 @@ const IMPORT_MAPPINGS = [
   // Core auth types
   {
     pattern: /from\s+['"](\.\.?\/)*types\/auth['"];/g,
-    replacement: "from '@client/core/auth';",
+    replacement: "from '@client/infrastructure/auth';",
     description: 'Auth types'
   },
 
   // Core realtime types
   {
     pattern: /from\s+['"](\.\.?\/)*types\/realtime['"];/g,
-    replacement: "from '@client/core/realtime/types';",
+    replacement: "from '@client/infrastructure/realtime/types';",
     description: 'Realtime types'
   },
 
@@ -110,12 +110,12 @@ const IMPORT_MAPPINGS = [
   },
   {
     pattern: /from\s+['"]@client\/types\/auth['"];/g,
-    replacement: "from '@client/core/auth';",
+    replacement: "from '@client/infrastructure/auth';",
     description: '@client/types/auth alias'
   },
   {
     pattern: /from\s+['"]@client\/types\/realtime['"];/g,
-    replacement: "from '@client/core/realtime/types';",
+    replacement: "from '@client/infrastructure/realtime/types';",
     description: '@client/types/realtime alias'
   },
   {

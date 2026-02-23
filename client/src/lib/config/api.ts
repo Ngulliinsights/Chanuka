@@ -1,12 +1,12 @@
 // API Configuration - Redirected to unified configuration system
 // This file now serves as a compatibility layer for the unified core/api/config.ts
 
-import { globalConfig } from '@client/core/api/config';
-import type { ServiceConfig } from '@client/core/api/types';
+import { globalConfig } from '@client/infrastructure/api/config';
+import type { ServiceConfig } from '@client/infrastructure/api/types';
 
 // Re-export types and configuration from the unified system
 export type ApiConfig = ServiceConfig;
-export { globalConfig } from '@client/core/api/config';
+export { globalConfig } from '@client/infrastructure/api/config';
 
 // Backward compatibility: provide defaultApiConfig that maps to globalConfig
 export const defaultApiConfig = {

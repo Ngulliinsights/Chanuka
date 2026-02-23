@@ -156,7 +156,7 @@ export interface Feature {
 ### Error Handling
 ```typescript
 // ✅ All features use unified error handling
-import { ErrorFactory } from '@client/core/error';
+import { ErrorFactory } from '@client/infrastructure/error';
 const error = ErrorFactory.createAPIError('msg');
 ```
 

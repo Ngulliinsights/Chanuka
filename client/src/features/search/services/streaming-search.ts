@@ -5,7 +5,7 @@
  * or progressive loading with proper session management and cancellation.
  */
 
-import { streamSearch, cancelSearch } from '@client/core/api/search';
+import { streamSearch, cancelSearch } from '@client/infrastructure/api/search';
 import { logger } from '@client/lib/utils/logger';
 import type { SearchResult, SearchRequest as SearchQuery, SearchProgress } from '@client/lib/types/search';
 

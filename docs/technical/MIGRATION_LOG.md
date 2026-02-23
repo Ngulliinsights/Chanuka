@@ -35,7 +35,7 @@ This document serves as the **Single Source of Truth** for architectural changes
 - **Decision:**
     1. **Single Source of Truth:** All domain and shared types live in `client/src/lib/types` (or `shared` for server-common).
     2. **Module Bridges:** Core modules (`core/storage`, `core/security`) MUST maintain their own `types.ts` or `index.ts` that re-exports from `lib/types`.
-    3. **No Direct Deep Imports:** Consumers should import from the Module (e.g., `@client/core/storage`), NOT deeply into `lib/types` if possible, to respect module boundaries.
+    3. **No Direct Deep Imports:** Consumers should import from the Module (e.g., `@client/infrastructure/storage`), NOT deeply into `lib/types` if possible, to respect module boundaries.
 - **Consequences:**
     - `core/*/types.ts` files are converted to proxies (re-exports).
     - Local type definitions in `core` are moved to `lib/types`.
@@ -67,10 +67,10 @@ This document serves as the **Single Source of Truth** for architectural changes
 *Add items here when you find a recurring regression or mistake.*
 
 - **DO NOT** import server-only code (e.g., `shared/core/observability`) into client components.
-- **DO** use the unified `API` client in `client/src/core/api` instead of direct `fetch` calls.
+- **DO** use the unified `API` client in `client/src/infrastructure/api` instead of direct `fetch` calls.
 - **DO NOT** create ad-hoc types; check `lib/types` or `shared/types` first.
 - **DO NOT** export enums using `export type`; export them as values if used at runtime.
-- **DO** import from module entry points (`@client/core/storage`), not deeply into `lib/types`.
+- **DO** import from module entry points (`@client/infrastructure/storage`), not deeply into `lib/types`.
 
 ---
 

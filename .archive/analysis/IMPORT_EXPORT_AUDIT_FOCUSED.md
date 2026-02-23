@@ -123,22 +123,22 @@ export type {
 #### Issue: Circular dependency risk in API clients
 **Current State (from CLIENT_API_ARCHITECTURE_ANALYSIS.md):**
 ```typescript
-// client/src/core/api/client.ts
+// client/src/infrastructure/api/client.ts
 import { AuthenticatedClient } from './authenticated-client';
 import { CircuitBreakerClient } from './circuit-breaker-client';
 
-// client/src/core/api/authenticated-client.ts
+// client/src/infrastructure/api/authenticated-client.ts
 import { BaseClient } from './base-client';
 import { authService } from '../auth/service';
 
-// client/src/core/api/circuit-breaker-client.ts
+// client/src/infrastructure/api/circuit-breaker-client.ts
 import { BaseClient } from './base-client';
 import { performanceMonitor } from '../performance/monitor';
 ```
 
 **Actual Structure:**
 ```
-client/src/core/api/
+client/src/infrastructure/api/
 ├── base-client.ts ✅ EXISTS
 ├── authenticated-client.ts ✅ EXISTS
 ├── circuit-breaker-client.ts ✅ EXISTS (OPEN FILE)
@@ -156,7 +156,7 @@ client/src/core/api/
 
 **Recommended Architecture:**
 ```
-client/src/core/api/
+client/src/infrastructure/api/
 ├── types/           # Pure types, no imports
 ├── base/            # Base implementations
 │   ├── base-client.ts
@@ -248,9 +248,9 @@ export * from './utils/branded-types';
 #### Issue: Missing module exports
 **Current Imports (from open files):**
 ```typescript
-// client/src/core/analytics/service.ts ✅ EXISTS (OPEN)
-// client/src/core/analytics/data-retention-service.ts ✅ EXISTS (OPEN)
-// client/src/core/analytics/comprehensive-tracker.ts ✅ EXISTS (OPEN)
+// client/src/infrastructure/analytics/service.ts ✅ EXISTS (OPEN)
+// client/src/infrastructure/analytics/data-retention-service.ts ✅ EXISTS (OPEN)
+// client/src/infrastructure/analytics/comprehensive-tracker.ts ✅ EXISTS (OPEN)
 
 // But imports fail:
 import { AnalyticsService } from '@/core/analytics';
@@ -259,7 +259,7 @@ import { ComprehensiveTracker } from '@/core/analytics';
 
 **Actual Structure:**
 ```
-client/src/core/analytics/
+client/src/infrastructure/analytics/
 ├── service.ts ✅ EXISTS
 ├── data-retention-service.ts ✅ EXISTS
 ├── comprehensive-tracker.ts ✅ EXISTS
@@ -270,7 +270,7 @@ client/src/core/analytics/
 
 **Recommended Fix:**
 ```typescript
-// client/src/core/analytics/index.ts (CREATE/UPDATE)
+// client/src/infrastructure/analytics/index.ts (CREATE/UPDATE)
 export { AnalyticsService } from './service';
 export { DataRetentionService } from './data-retention-service';
 export { ComprehensiveTracker } from './comprehensive-tracker';
@@ -337,7 +337,7 @@ server/features/users/application/users.ts
 |--------------|-----------------|---------------------|
 | `@shared/types/user` | `shared/types/domains/authentication/user.ts` | Create barrel export at `shared/types/index.ts` |
 | `@shared/validation` | `shared/validation/schemas/*.ts` | Create `shared/validation/index.ts` |
-| `@/core/analytics` | `client/src/core/analytics/*.ts` | Create `client/src/core/analytics/index.ts` |
+| `@/core/analytics` | `client/src/infrastructure/analytics/*.ts` | Create `client/src/infrastructure/analytics/index.ts` |
 | `server/utils/api-utils` | `server/utils/api-utils.ts` ✅ | No change needed |
 | `server/utils/cache-utils` | `server/utils/cache-utils.ts` ✅ | No change needed |
 
@@ -378,7 +378,7 @@ auth/service.ts → api/authenticated-client.ts → auth/service.ts
 2. ✅ Create `shared/validation/index.ts` barrel export
 3. ✅ Complete `server/infrastructure/error-handling/index.ts`
 4. ✅ Complete `server/infrastructure/observability/index.ts`
-5. ✅ Create `client/src/core/analytics/index.ts`
+5. ✅ Create `client/src/infrastructure/analytics/index.ts`
 
 ### Phase 2: Structural Improvements (Week 1)
 1. Refactor client API clients to decorator pattern

@@ -9,9 +9,9 @@
  * - ErrorContext, ErrorSeverity, ErrorType (as separate modules)
  * 
  * These types/services are actually in:
- * - client/src/core/error/types.ts (for types)
- * - client/src/core/error/handler.ts (for error handling)
- * - client/src/core/error/middleware/ (for middleware handlers)
+ * - client/src/infrastructure/error/types.ts (for types)
+ * - client/src/infrastructure/error/handler.ts (for error handling)
+ * - client/src/infrastructure/error/middleware/ (for middleware handlers)
  * 
  * TODO: Either implement these modules or rewrite this test to use actual error handling modules
  */
@@ -20,15 +20,15 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-import { ErrorBoundary } from '../../../core/error/ErrorBoundary';
-import { ErrorPropagationService } from '../../../core/error/ErrorPropagationService';
-import { HookErrorHandler } from '../../../core/error/hooks/HookErrorHandler';
-import { LibraryErrorHandler } from '../../../core/error/library/LibraryErrorHandler';
-import { SecurityErrorHandler } from '../../../core/error/security/SecurityErrorHandler';
-import { ServiceErrorHandler } from '../../../core/error/services/ServiceErrorHandler';
-import { ErrorContext } from '../../../core/error/types/ErrorContext';
-import { ErrorSeverity } from '../../../core/error/types/ErrorSeverity';
-import { ErrorType } from '../../../core/error/types/ErrorType';
+import { ErrorBoundary } from '../../../infrastructure/error/ErrorBoundary';
+import { ErrorPropagationService } from '../../../infrastructure/error/ErrorPropagationService';
+import { HookErrorHandler } from '../../../infrastructure/error/hooks/HookErrorHandler';
+import { LibraryErrorHandler } from '../../../infrastructure/error/library/LibraryErrorHandler';
+import { SecurityErrorHandler } from '../../../infrastructure/error/security/SecurityErrorHandler';
+import { ServiceErrorHandler } from '../../../infrastructure/error/services/ServiceErrorHandler';
+import { ErrorContext } from '../../../infrastructure/error/types/ErrorContext';
+import { ErrorSeverity } from '../../../infrastructure/error/types/ErrorSeverity';
+import { ErrorType } from '../../../infrastructure/error/types/ErrorType';
 
 // Mock external dependencies
 vi.mock('../../../core/error/security/SecurityErrorHandler');

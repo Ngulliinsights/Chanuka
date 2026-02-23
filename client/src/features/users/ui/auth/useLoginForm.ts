@@ -6,7 +6,7 @@
 import { validatePassword } from '@client/lib/utils/input-validation';
 import { useState, useCallback, useRef, useEffect } from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { validateEmail } from '@client/lib/utils/input-validation';
 import { logger } from '@client/lib/utils/logger';
 

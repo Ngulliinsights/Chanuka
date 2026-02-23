@@ -104,7 +104,7 @@ These ESLint suppressions are intentional and documented. They should be kept.
 ### Location
 - \`client/src/lib/ui/offline/offline-manager.tsx:479\`
 - \`client/src/features/analytics/hooks/useErrorAnalytics.ts:324\`
-- \`client/src/core/navigation/hooks/use-navigation-preferences.tsx:105\`
+- \`client/src/infrastructure/navigation/hooks/use-navigation-preferences.tsx:105\`
 
 ### Justification
 Intentionally omitting dependencies to run effect only once on mount. This is a common React pattern for initialization logic that should not re-run.
@@ -139,7 +139,7 @@ function scanSchemaFiles(dir: string): { tables: TableDef[]; enums: EnumDef[] } 
 ## 3. This Alias (1 suppression)
 
 ### Location
-- \`client/src/core/security/csrf-protection.ts:261\`
+- \`client/src/infrastructure/security/csrf-protection.ts:261\`
 
 ### Justification
 this-alias required for closure context preservation in XMLHttpRequest override. This is necessary for maintaining the correct context in the closure.
@@ -154,7 +154,7 @@ const self = this;
 ## 4. No Unused Vars (1 suppression)
 
 ### Location
-- \`client/src/core/analytics/comprehensive-tracker.ts:965\`
+- \`client/src/infrastructure/analytics/comprehensive-tracker.ts:965\`
 
 ### Justification
 Reserved for future use when batch sending is implemented. The method is part of the public API and will be used in a future feature.

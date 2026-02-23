@@ -9,7 +9,7 @@ import type {
   PersonaType,
   PersonaClassification,
   PersonaPreferences,
-} from '@client/core/personalization/types';
+} from '@client/infrastructure/personalization/types';
 import {
   BarChart3,
   Shield,

@@ -25,7 +25,7 @@ vi.mock('@client/lib/utils/logger', () => ({
   },
 }));
 
-vi.mock('@client/core/error', () => ({
+vi.mock('@client/infrastructure/error', () => ({
   ErrorFactory: {
     createNetworkError: vi.fn((message: string, options?: any) => {
       const error = new Error(message);
@@ -37,7 +37,7 @@ vi.mock('@client/core/error', () => ({
   ErrorSeverity: {},
 }));
 
-import { withRetry, type SimpleRetryConfig } from '@client/core/api/retry';
+import { withRetry, type SimpleRetryConfig } from '@client/infrastructure/api/retry';
 
 // Mock error types
 class NetworkError extends Error {

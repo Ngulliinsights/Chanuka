@@ -110,10 +110,10 @@ Task 27 has been completed with significant progress toward the target of <10 ES
 - `server/features/coverage/coverage-routes.ts`
 
 #### Files with Justifications Added
-- `client/src/core/security/csrf-protection.ts`
+- `client/src/infrastructure/security/csrf-protection.ts`
 - `client/src/lib/ui/offline/offline-manager.tsx`
 - `client/src/features/analytics/hooks/useErrorAnalytics.ts`
-- `client/src/core/navigation/hooks/use-navigation-preferences.tsx`
+- `client/src/infrastructure/navigation/hooks/use-navigation-preferences.tsx`
 - `server/infrastructure/schema/validate-static.ts`
 - `server/infrastructure/schema/base-types.ts`
 - `server/infrastructure/websocket/monitoring/metrics-reporter.ts`

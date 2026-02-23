@@ -8,8 +8,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logger } from '../utils/logger';
-import { PerformanceMonitor } from '@client/core/performance/monitor';
-import { PerformanceMetric } from '@client/core/performance/types';
+import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
+import { PerformanceMetric } from '@client/infrastructure/performance/types';
 
 const monitor = PerformanceMonitor.getInstance();
 

@@ -3,7 +3,7 @@
 ## ✅ Completed Tasks
 
 ### Core Type Consolidation
-- [x] **Removed duplicate WebSocket types file** (`client/src/core/api/types/websocket.ts`)
+- [x] **Removed duplicate WebSocket types file** (`client/src/infrastructure/api/types/websocket.ts`)
 - [x] **Updated WebSocket client imports** to use shared schema (`@server/infrastructure/schema/websocket`)
 - [x] **Fixed Node.js timer dependencies** in WebSocket client (browser-compatible)
 - [x] **Updated real-time types** to use shared schema

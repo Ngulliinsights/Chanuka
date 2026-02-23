@@ -130,7 +130,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
 
 - [x] 4. Implement Missing Modules (33 Commented Imports)
   - [x] 4.1 Create Analytics Service implementation
-    - Create `client/src/core/analytics/service.ts`
+    - Create `client/src/infrastructure/analytics/service.ts`
     - Implement `AnalyticsService` interface with all methods
     - Integrate with `analyticsApiService` from `@/core/api`
     - Add error handling (log and return failure result, don't throw)
@@ -142,8 +142,8 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
     - **Validates: Requirements 3.3, 6.3**
 
   - [x] 4.3 Create Telemetry Service implementation
-    - Create `client/src/core/telemetry/` directory
-    - Create `client/src/core/telemetry/service.ts`
+    - Create `client/src/infrastructure/telemetry/` directory
+    - Create `client/src/infrastructure/telemetry/service.ts`
     - Implement `TelemetryService` interface with all methods
     - Collect browser performance metrics (LCP, FID, CLS)
     - _Requirements: 3.2, 3.4, 18.2, 18.3_
@@ -375,7 +375,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
     - _Requirements: 3.7, 11.1, 17.4_
 
   - [x] 14.2 Complete telemetry type definitions
-    - Create `client/src/core/telemetry/types.ts`
+    - Create `client/src/infrastructure/telemetry/types.ts`
     - Add all type definitions
     - Remove TODO comments
     - _Requirements: 11.2, 17.4_
@@ -441,7 +441,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
 
 - [-] 17. Implement Client-Side Enhancements
   - [x] 17.1 Create WebSocket manager with reconnection
-    - Create `client/src/core/websocket/manager.ts`
+    - Create `client/src/infrastructure/websocket/manager.ts`
     - Implement `WebSocketManager` interface
     - Add exponential backoff reconnection (1s, 2s, 4s, 8s, 16s, max 30s)
     - Add connection state tracking and error logging
@@ -452,7 +452,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
     - **Validates: Requirements 7.2, 13.1**
 
   - [x] 17.3 Create API retry utility
-    - Create `client/src/core/api/retry.ts`
+    - Create `client/src/infrastructure/api/retry.ts`
     - Implement `withRetry` function with configurable retry logic
     - Retry network errors up to 3 times
     - Retry 5xx errors with exponential backoff
@@ -514,7 +514,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
     - **Validates: Requirements 5.2, 5.3**
 
   - [x] 18.5 Update API endpoints to validate before processing
-    - Audit all API endpoints in `server/` and `client/src/core/api/`
+    - Audit all API endpoints in `server/` and `client/src/infrastructure/api/`
     - Ensure Zod validation occurs before any processing
     - Add validation error handling
     - _Requirements: 5.6_
@@ -590,9 +590,9 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
       - Use proper types throughout
       - _Requirements: 16.2, 16.3_
 
-  - [-] 22.3 Fix type safety in client/src/core/ (Week 6)
+  - [-] 22.3 Fix type safety in client/src/infrastructure/ (Week 6)
     - [x] 22.3.1 Fix API client type safety
-      - Replace all `as any` in `client/src/core/api/`
+      - Replace all `as any` in `client/src/infrastructure/api/`
       - Use Zod validation for all API responses
       - _Requirements: 16.2, 16.3_
 
@@ -602,7 +602,7 @@ This implementation plan addresses **1,114+ identified bugs** across the codebas
       - _Requirements: 16.2, 16.3_
 
     - [x] 22.3.3 Fix utilities type safety
-      - Replace all `as any` in `client/src/core/utils/`
+      - Replace all `as any` in `client/src/infrastructure/utils/`
       - Use proper type guards and validation
       - _Requirements: 16.2, 16.3_
 

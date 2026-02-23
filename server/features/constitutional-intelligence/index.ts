@@ -1,14 +1,17 @@
 /**
  * Constitutional Intelligence Feature
  * 
- * NOTE: This feature has an incomplete DDD structure.
- * See README.md for details and architectural decision needed.
- * 
- * Current exports are minimal until the structure is completed or merged.
+ * Main entry point for constitutional analysis functionality.
+ * Provides tools for analyzing bills against Kenya's Constitution 2010.
  */
 
-// Export domain entities
-export * from './domain/entities/constitutional-provision';
+// Domain Layer
+export * from './domain';
 
-// TODO: Complete implementation or merge into constitutional-analysis
-// See README.md for options and recommendation
+// Application Layer
+export * from './application';
+
+// Feature metadata
+export const FEATURE_NAME = 'constitutional-intelligence';
+export const FEATURE_VERSION = '1.0.0';
+export const FEATURE_DESCRIPTION = 'Constitutional analysis and violation detection for legislative bills';

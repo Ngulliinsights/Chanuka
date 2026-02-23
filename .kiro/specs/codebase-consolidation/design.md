@@ -106,7 +106,7 @@ Complex migrations (validation) are broken into phases with clear checkpoints. E
 
 #### Current Architecture
 ```
-client/src/core/security/
+client/src/infrastructure/security/
 ├── csp-manager.ts                    # Legacy (dev only)
 ├── unified/
 │   ├── csp-manager.ts               # Production
@@ -118,7 +118,7 @@ client/src/core/security/
 
 #### Target Architecture
 ```
-client/src/core/security/
+client/src/infrastructure/security/
 ├── unified/
 │   ├── csp-manager.ts               # Only implementation
 │   └── system.ts                    # Initialization
@@ -155,12 +155,12 @@ client/src/core/security/
    ```
 
 4. **Delete Legacy Files**
-   - `client/src/core/security/csp-manager.ts`
-   - `client/src/core/security/migration/` (entire directory)
+   - `client/src/infrastructure/security/csp-manager.ts`
+   - `client/src/infrastructure/security/migration/` (entire directory)
 
 5. **Update Barrel Exports**
    ```typescript
-   // client/src/core/security/index.ts
+   // client/src/infrastructure/security/index.ts
    export { UnifiedCSPManager as CSPManager } from './unified/csp-manager';
    export { initializeSecuritySystem } from './unified/system';
    ```
@@ -177,7 +177,7 @@ If issues arise in dev:
 
 #### Current Architecture
 ```
-client/src/core/api/
+client/src/infrastructure/api/
 ├── base-client.ts                   # 0 usages (extended by AuthenticatedApiClient)
 ├── authenticated-client.ts          # 0 usages
 ├── safe-client.ts                   # 0 usages
@@ -190,7 +190,7 @@ client/src/core/api/
 
 #### Target Architecture
 ```
-client/src/core/api/
+client/src/infrastructure/api/
 ├── client.ts                        # Canonical (UnifiedApiClientImpl)
 ├── contract-client.ts               # Type-safe wrapper
 ├── cache-manager.ts                 # Shared utilities
@@ -215,22 +215,22 @@ client/src/core/api/
    // Example: interceptor types, error normalization helpers
    
    // If found, extract to shared location:
-   // client/src/core/api/utils/interceptors.ts
-   // client/src/core/api/utils/error-handling.ts
+   // client/src/infrastructure/api/utils/interceptors.ts
+   // client/src/infrastructure/api/utils/error-handling.ts
    ```
 
 3. **Delete Files**
    ```bash
-   rm client/src/core/api/base-client.ts
-   rm client/src/core/api/authenticated-client.ts
-   rm client/src/core/api/safe-client.ts
-   rm client/src/core/api/circuit-breaker-client.ts
-   rm -r client/src/core/api/examples/
+   rm client/src/infrastructure/api/base-client.ts
+   rm client/src/infrastructure/api/authenticated-client.ts
+   rm client/src/infrastructure/api/safe-client.ts
+   rm client/src/infrastructure/api/circuit-breaker-client.ts
+   rm -r client/src/infrastructure/api/examples/
    ```
 
 4. **Update Barrel Exports**
    ```typescript
-   // client/src/core/api/index.ts
+   // client/src/infrastructure/api/index.ts
    // Remove these exports:
    // export { BaseApiClient, ... } from './base-client';
    // export { AuthenticatedApiClient, ... } from './authenticated-client';
@@ -250,7 +250,7 @@ client/src/core/api/
    Use `globalApiClient` for all API requests:
    
    ```typescript
-   import { globalApiClient } from '@client/core/api';
+   import { globalApiClient } from '@client/infrastructure/api';
    
    const response = await globalApiClient.get('/api/bills');
    ```
@@ -259,7 +259,7 @@ client/src/core/api/
    Use `contractApiClient` for endpoints with defined contracts:
    
    ```typescript
-   import { contractApiClient } from '@client/core/api';
+   import { contractApiClient } from '@client/infrastructure/api';
    import { GetBillEndpoint } from '@shared/types/api/contracts';
    
    const result = await contractApiClient.call(GetBillEndpoint, { id: '123' });
@@ -922,11 +922,11 @@ export USE_UNIFIED_SECURITY=false
 **API Client Removal:**
 ```bash
 # Restore deleted files
-git checkout <commit-before-deletion> -- client/src/core/api/safe-client.ts
-git checkout <commit-before-deletion> -- client/src/core/api/authenticated-client.ts
+git checkout <commit-before-deletion> -- client/src/infrastructure/api/safe-client.ts
+git checkout <commit-before-deletion> -- client/src/infrastructure/api/authenticated-client.ts
 
 # Restore barrel exports
-git checkout <commit-before-deletion> -- client/src/core/api/index.ts
+git checkout <commit-before-deletion> -- client/src/infrastructure/api/index.ts
 ```
 
 **Validation Migration:**

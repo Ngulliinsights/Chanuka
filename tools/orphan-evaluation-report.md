@@ -90,9 +90,9 @@ Raw scores summed (max 35), converted to 0-25 scale.
 **Rationale**: Valuable privacy analytics service but needs refactoring for better modularity and testing before integration.
 **Next Actions**: Break into smaller modules, add tests, integrate with privacy dashboard.
 
-### 4. client/src/core/api/websocket.ts (1211 LOC)
+### 4. client/src/infrastructure/api/websocket.ts (1211 LOC)
 **File Metadata**:
-- Path: client/src/core/api/websocket.ts
+- Path: client/src/infrastructure/api/websocket.ts
 - Lines of Code: 1211
 - Exports: 9 (BillsWebSocketConfig, BillStatusUpdate, BillEngagementUpdate, BillAmendmentUpdate, BillVotingUpdate, BillRealTimeUpdate, UnifiedWebSocketManager, WebSocketConnectionPool, globalWebSocketPool)
 - Tests: None
@@ -182,9 +182,9 @@ Raw scores summed (max 35), converted to 0-25 scale.
 **Rationale**: Useful community backend service but needs testing and API standardization.
 **Next Actions**: Add API tests, refactor error handling, integrate with community features.
 
-### 8. client/src/core/api/notifications.ts (891 LOC)
+### 8. client/src/infrastructure/api/notifications.ts (891 LOC)
 **File Metadata**:
-- Path: client/src/core/api/notifications.ts
+- Path: client/src/infrastructure/api/notifications.ts
 - Lines of Code: 891
 - Exports: 12 (NotificationPriority, BulkAction, VapidKeyResponse, PushSubscriptionPayload, GetNotificationsOptions, SendNotificationPayload, NotificationStats, BulkOperationResult, NotificationApiService, notificationApiService)
 - Tests: None
@@ -274,9 +274,9 @@ Raw scores summed (max 35), converted to 0-25 scale.
 **Rationale**: Useful development utilities but primarily for development. Archive for future debugging needs.
 **Next Actions**: Archive in dev-tools folder, integrate if needed for debugging.
 
-### 12. client/src/core/api/bills.ts (831 LOC)
+### 12. client/src/infrastructure/api/bills.ts (831 LOC)
 **File Metadata**:
-- Path: client/src/core/api/bills.ts
+- Path: client/src/infrastructure/api/bills.ts
 - Lines of Code: 831
 - Exports: 13 (BillsSearchParams, PaginatedBillsResponse, BillEngagementData, BillComment, BillsStats, BillsApiService, billsApiService, SystemHealth, SystemStats, SystemActivity, SystemSchema, SystemEnvironment, SystemApiService, systemApiService)
 - Tests: None
@@ -412,9 +412,9 @@ Raw scores summed (max 35), converted to 0-25 scale.
 **Rationale**: Excellent mobile form components with some test coverage but needs more testing and accessibility.
 **Next Actions**: Expand test coverage, add accessibility features, integrate with form system.
 
-### 18. client/src/core/api/user.ts (771 LOC)
+### 18. client/src/infrastructure/api/user.ts (771 LOC)
 **File Metadata**:
-- Path: client/src/core/api/user.ts
+- Path: client/src/infrastructure/api/user.ts
 - Lines of Code: 771
 - Exports: 12 (SavedBillsFilters, SavedBillsResponse, EngagementHistoryFilters, EngagementHistoryResponse, EngagementAction, DashboardData, UserApiService, userApiService)
 - Tests: None

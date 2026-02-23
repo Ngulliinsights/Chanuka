@@ -3,7 +3,7 @@
  * Aggregates all context providers and hooks
  */
 
-export { AuthProvider, useAuth } from '@client/core/auth';
+export { AuthProvider, useAuth } from '@client/infrastructure/auth';
 
 // Re-export analytics hooks (useAnalytics is not exported, use the specific hooks instead)
 export {

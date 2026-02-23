@@ -10,14 +10,14 @@ import {
   DashboardDataFetchError,
   DashboardActionError,
   DashboardTopicError,
-} from '@client/core/error';
-import { getRecoveryStrategy, executeRecovery } from '@client/core/recovery';
+} from '@client/infrastructure/error';
+import { getRecoveryStrategy, executeRecovery } from '@client/infrastructure/recovery';
 import {
   validateDashboardData,
   validateActionItem,
   validateTrackedTopic,
   safeValidateDashboardConfig,
-} from '@client/core/validation';
+} from '@client/infrastructure/validation';
 import { useBills } from '@client/features/bills';
 import type {
   DashboardData,

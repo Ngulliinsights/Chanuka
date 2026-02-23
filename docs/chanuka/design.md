@@ -197,7 +197,7 @@ This pattern provides the database abstraction that your analysis correctly iden
 The client module consolidates around feature-sliced design with clear boundaries between features and shared infrastructure.
 
 ```typescript
-// client/src/core/services/index.ts
+// client/src/infrastructure/services/index.ts
 export interface IClientCore {
   api: IApiClient;
   state: IStateManagement;

@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock analytics services
-vi.mock('@client/core/analytics/service', () => ({
+vi.mock('@client/infrastructure/analytics/service', () => ({
   analyticsService: {
     trackEvent: vi.fn(),
     trackPageView: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock('@client/core/analytics/service', () => ({
 }));
 
 // Mock telemetry services
-vi.mock('@client/core/telemetry/service', () => ({
+vi.mock('@client/infrastructure/telemetry/service', () => ({
   telemetryService: {
     collectMetrics: vi.fn(),
     sendMetrics: vi.fn(),
@@ -41,7 +41,7 @@ describe('Analytics & Telemetry', () => {
 
   describe('User Behavior Tracking', () => {
     it('should track user events accurately', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const userEvents = [
         { event: 'page_view', page: '/dashboard', timestamp: Date.now() },
@@ -66,7 +66,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track page views with context', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const pageViews = [
         {
@@ -100,7 +100,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track user actions with metadata', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const userActions = [
         {
@@ -137,7 +137,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track performance metrics', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const performanceMetrics = {
         pageLoadTime: 1500,
@@ -163,7 +163,7 @@ describe('Analytics & Telemetry', () => {
 
   describe('Business Intelligence', () => {
     it('should track conversion funnels', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const funnelSteps = [
         { step: 'landing_page', users: 1000 },
@@ -192,7 +192,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track revenue metrics', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const revenueData = {
         totalRevenue: 50000,
@@ -219,7 +219,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track user engagement metrics', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const engagementMetrics = {
         dailyActiveUsers: 1000,
@@ -246,7 +246,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should track feature usage analytics', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
 
       const featureUsage = [
         { feature: 'search', usageCount: 1000, uniqueUsers: 800 },
@@ -277,7 +277,7 @@ describe('Analytics & Telemetry', () => {
 
   describe('Telemetry Data Quality', () => {
     it('should collect system metrics accurately', async () => {
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       const systemMetrics = {
         cpuUsage: 45,
@@ -302,7 +302,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should validate telemetry data integrity', async () => {
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       const telemetryData = {
         timestamp: Date.now(),
@@ -326,7 +326,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should aggregate telemetry data efficiently', async () => {
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       const rawData = [
         { timestamp: Date.now() - 1000, metric: 'cpu', value: 50 },
@@ -353,7 +353,7 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should export telemetry data correctly', async () => {
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       const exportConfig = {
         format: 'json',
@@ -381,8 +381,8 @@ describe('Analytics & Telemetry', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete analytics workflow', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       // Complete workflow: user interaction -> event tracking -> telemetry collection -> data export
       const workflow = {
@@ -427,8 +427,8 @@ describe('Analytics & Telemetry', () => {
     });
 
     it('should handle analytics data recovery scenarios', async () => {
-      const { analyticsService } = await import('@client/core/analytics/service');
-      const { telemetryService } = await import('@client/core/telemetry/service');
+      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
 
       const recoveryScenario = {
         lostData: { events: 100, metrics: 50 },

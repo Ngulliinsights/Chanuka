@@ -7,7 +7,7 @@
  * Requirements: 7.4, 7.5
  */
 
-import type { PersonaType } from '@client/core/personalization/types';
+import type { PersonaType } from '@client/infrastructure/personalization/types';
 import React, { useState } from 'react';
 
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';

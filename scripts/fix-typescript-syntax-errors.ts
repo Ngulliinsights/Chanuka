@@ -41,7 +41,7 @@ class TypeScriptSyntaxFixer {
         fix: this.fixAnalysisServiceFile.bind(this)
       },
       {
-        file: 'scripts/typescript-fixer/src/core/error-extractor.ts',
+        file: 'scripts/typescript-fixer/src/infrastructure/error-extractor.ts',
         description: 'Fix minor syntax issues',
         fix: this.fixErrorExtractorFile.bind(this)
       },

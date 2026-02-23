@@ -8,8 +8,8 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { useCallback, useEffect } from 'react';
 
-import { useAuth } from '@client/core/auth';
-import { useUserDashboardStore } from '@client/lib/infrastructure/store/slices/userDashboardSlice';
+import { useAuth } from '@client/infrastructure/auth';
+import { useUserDashboardStore } from '@client/infrastructure/store/slices/userDashboardSlice';
 import { userService as userBackendService } from '@client/lib/services/userService';
 import type { UserProfile, NotificationPreferences } from '@client/lib/services/userService';
 import type {

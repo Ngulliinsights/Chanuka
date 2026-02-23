@@ -113,10 +113,10 @@ Multiple large-scale migrations have left the codebase with:
 
 ### TR-3: Structural Hotspot Investigation (Phase 2)
 Investigate these known high-risk areas:
-- `client/src/core/websocket/` - compiled output artifacts (`.js`, `.d.ts`) alongside `.ts`
-- `client/src/core/security/ui/` vs `client/src/features/security/ui/` - duplicated components
-- `client/src/core/auth/hooks/useAuth.tsx` vs `client/src/features/users/hooks/useAuth.tsx` - duplicated hooks
-- `client/src/core/loading/utils/` vs `client/src/lib/ui/loading/utils/` - duplicated utilities
+- `client/src/infrastructure/websocket/` - compiled output artifacts (`.js`, `.d.ts`) alongside `.ts`
+- `client/src/infrastructure/security/ui/` vs `client/src/features/security/ui/` - duplicated components
+- `client/src/infrastructure/auth/hooks/useAuth.tsx` vs `client/src/features/users/hooks/useAuth.tsx` - duplicated hooks
+- `client/src/infrastructure/loading/utils/` vs `client/src/lib/ui/loading/utils/` - duplicated utilities
 - `server/infrastructure/errors/` - empty directory
 - `client/src/lib/` vs `client/src/features/` - FSD migration boundary
 

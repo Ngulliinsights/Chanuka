@@ -171,7 +171,7 @@ export interface DashboardActionType {
 }
 
 // ============================================================================
-// Application-Specific Dashboard Types (from client/src/core/dashboard/types.ts)
+// Application-Specific Dashboard Types (from client/src/infrastructure/dashboard/types.ts)
 // ============================================================================
 
 export type WidgetType =

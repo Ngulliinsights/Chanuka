@@ -157,7 +157,7 @@ export const dataLoaders = mockDataLoaders;
 }
 
 // Add missing exports to realtime types
-if (updateFile('client/src/core/realtime/types.ts', c => {
+if (updateFile('client/src/infrastructure/realtime/types.ts', c => {
   if (c.includes('export interface PollingFallbackConfig')) return c;
   return c + `\n
 export interface PollingFallbackConfig {

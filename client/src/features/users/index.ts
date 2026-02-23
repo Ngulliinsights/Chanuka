@@ -7,7 +7,7 @@
 export * from './types';
 
 // Authentication (re-exported from core for convenience)
-export { useAuth, AuthProvider } from '@client/core/auth';
+export { useAuth, AuthProvider } from '@client/infrastructure/auth';
 
 // User API and hooks
 export * from './services/user-api';

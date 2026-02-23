@@ -12,7 +12,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock mobile detection services
-vi.mock('@client/core/mobile/detection', () => ({
+vi.mock('@client/infrastructure/mobile/detection', () => ({
   mobileDetector: {
     isMobile: vi.fn(),
     isTablet: vi.fn(),
@@ -39,7 +39,7 @@ describe('Mobile Responsiveness', () => {
 
   describe('Responsive Design', () => {
     it('should adapt layout for mobile devices', async () => {
-      const { mobileDetector } = await import('@client/core/mobile/detection');
+      const { mobileDetector } = await import('@client/infrastructure/mobile/detection');
       const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       // Mock mobile device detection
@@ -82,7 +82,7 @@ describe('Mobile Responsiveness', () => {
     });
 
     it('should handle tablet breakpoints correctly', async () => {
-      const { mobileDetector } = await import('@client/core/mobile/detection');
+      const { mobileDetector } = await import('@client/infrastructure/mobile/detection');
       const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       mobileDetector.isTablet.mockReturnValue(true);
@@ -123,7 +123,7 @@ describe('Mobile Responsiveness', () => {
     });
 
     it('should handle desktop breakpoints correctly', async () => {
-      const { mobileDetector } = await import('@client/core/mobile/detection');
+      const { mobileDetector } = await import('@client/infrastructure/mobile/detection');
       const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       mobileDetector.isDesktop.mockReturnValue(true);
@@ -432,7 +432,7 @@ describe('Mobile Responsiveness', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete mobile responsive workflow', async () => {
-      const { mobileDetector } = await import('@client/core/mobile/detection');
+      const { mobileDetector } = await import('@client/infrastructure/mobile/detection');
       const { responsiveUtils } = await import('@client/lib/utils/responsive');
 
       // Complete mobile workflow: device detection -> responsive layout -> touch handling -> performance optimization

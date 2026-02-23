@@ -24,7 +24,7 @@ This document establishes the architectural governance framework for the Chanuka
 - ❌ **Forbidden**: Business logic, feature-specific implementations
 - 🔄 **Migration**: Move business logic to core, feature logic to features
 
-### 2. Core Directory (`client/src/core/`)
+### 2. Core Directory (`client/src/infrastructure/`)
 
 **Purpose**: Business logic, domain services, and enterprise-grade utilities
 
@@ -64,11 +64,11 @@ This document establishes the architectural governance framework for the Chanuka
 
 **Current State**:
 - `client/src/lib/services/data-retention.ts` (553 lines) - Basic implementation
-- `client/src/core/analytics/data-retention-service.ts` (960 lines) - Enterprise implementation
+- `client/src/infrastructure/analytics/data-retention-service.ts` (960 lines) - Enterprise implementation
 
 **Consolidation Plan**:
 1. **Remove**: `client/src/lib/services/data-retention.ts`
-2. **Keep**: `client/src/core/analytics/data-retention-service.ts` as primary
+2. **Keep**: `client/src/infrastructure/analytics/data-retention-service.ts` as primary
 3. **Update**: All imports to use core version
 4. **Document**: Migration path for existing usage
 
@@ -78,12 +78,12 @@ This document establishes the architectural governance framework for the Chanuka
 
 **Current State**:
 - `client/src/lib/services/navigation.ts` (506 lines) - Comprehensive navigation
-- `client/src/core/navigation/navigation-service.ts` (82 lines) - Testing abstraction
+- `client/src/infrastructure/navigation/navigation-service.ts` (82 lines) - Testing abstraction
 - `client/src/config/navigation.ts` (117 lines) - Static configuration
 
 **Consolidation Plan**:
 1. **Keep**: `client/src/lib/services/navigation.ts` as primary navigation service
-2. **Keep**: `client/src/core/navigation/navigation-service.ts` for testing abstraction
+2. **Keep**: `client/src/infrastructure/navigation/navigation-service.ts` for testing abstraction
 3. **Move**: `client/src/config/navigation.ts` to `client/src/lib/config/navigation.ts`
 4. **Update**: Import paths and dependencies
 
@@ -92,7 +92,7 @@ This document establishes the architectural governance framework for the Chanuka
 ### 3. Storage Management
 
 **Current State**:
-- `client/src/core/storage/` - Comprehensive storage management
+- `client/src/infrastructure/storage/` - Comprehensive storage management
 - `client/src/lib/` - Some storage utilities
 
 **Consolidation Plan**:
@@ -143,11 +143,11 @@ shared → features (breaks layer boundaries)
 ```typescript
 // ✅ Good
 import { Button } from '@client/lib/ui';
-import { AuthService } from '@client/core/auth';
+import { AuthService } from '@client/infrastructure/auth';
 import { UserProfile } from '@client/features/users';
 
 // ❌ Bad
-import { Button } from '@client/core/ui'; // Wrong layer
+import { Button } from '@client/infrastructure/ui'; // Wrong layer
 import { UserProfile } from '@client/lib/features'; // Wrong layer
 ```
 
@@ -160,7 +160,7 @@ import { UserProfile } from '@client/lib/features'; // Wrong layer
 
 **File Organization**:
 - Shared: `client/src/lib/[category]/[service].ts`
-- Core: `client/src/core/[domain]/[service].ts`
+- Core: `client/src/infrastructure/[domain]/[service].ts`
 - Features: `client/src/features/[feature]/[service].ts`
 
 ### 4. Dependency Management

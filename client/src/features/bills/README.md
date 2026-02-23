@@ -28,13 +28,13 @@ client/src/features/bills/
 ### ✅ Flattened Structure
 
 - Eliminated `model/hooks/` nesting - hooks are now in `hooks.ts`
-- Eliminated `api/` directory - API stays centralized in `client/src/core/api/bills.ts`
+- Eliminated `api/` directory - API stays centralized in `client/src/infrastructure/api/bills.ts`
 - Main UI components moved to feature root
 - Types consolidated into single `types.ts` file
 
 ### ✅ Centralized API
 
-- All API logic remains in `client/src/core/api/bills.ts`
+- All API logic remains in `client/src/infrastructure/api/bills.ts`
 - No duplication between core and feature API
 - Single source of truth for data access
 - Better reusability across features
@@ -64,7 +64,7 @@ import { BillCard } from '@client/features/bills/ui';
 import { useBills } from '@client/features/bills';
 
 // API remains centralized
-import { billsApiService } from '@client/core/api/bills';
+import { billsApiService } from '@client/infrastructure/api/bills';
 ```
 
 ## Migration Notes

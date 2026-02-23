@@ -3,9 +3,9 @@
  * Implements unified error monitoring for the Hooks system
  */
 
-import { createError } from '@client/core/error';
-import { CrossSystemErrorAnalytics } from '@client/lib/infrastructure/monitoring/cross-system-error-analytics';
-import { ErrorAggregationService } from '@client/lib/infrastructure/monitoring/error-aggregation-service';
+import { createError } from '@client/infrastructure/error';
+import { CrossSystemErrorAnalytics } from '@client/infrastructure/monitoring/cross-system-error-analytics';
+import { ErrorAggregationService } from '@client/infrastructure/monitoring/error-aggregation-service';
 import {
   UnifiedErrorMonitoring,
   ErrorMonitoringMiddleware,
@@ -17,7 +17,7 @@ import {
   AppError,
   ErrorDomain,
   ErrorSeverity
-} from '@client/lib/infrastructure/monitoring/unified-error-monitoring-interface';
+} from '@client/infrastructure/monitoring/unified-error-monitoring-interface';
 
 class HooksMonitoring implements UnifiedErrorMonitoring {
   private static instance: HooksMonitoring;

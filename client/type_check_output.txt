@@ -2,7 +2,7 @@
 > @chanuka/client@1.0.0 type-check
 > tsc --noEmit
 
-src/core/navigation/NavigationPerformance.tsx(64,21): error TS2307: Cannot find module '../../features/home/pages/StrategicHomePage' or its corresponding type declarations.
+src/infrastructure/navigation/NavigationPerformance.tsx(64,21): error TS2307: Cannot find module '../../features/home/pages/StrategicHomePage' or its corresponding type declarations.
 src/lib/design-system/media/Logo.tsx(21,22): error TS2322: Type '"sm" | "md" | "lg" | "xl"' is not assignable to type 'number | undefined'.
   Type 'string' is not assignable to type 'number'.
 src/lib/utils/safe-lazy-loading.tsx(85,3): error TS2322: Type 'LazyExoticComponent<ComponentType<{}>>' is not assignable to type 'LazyExoticComponent<ComponentType<P>>'.

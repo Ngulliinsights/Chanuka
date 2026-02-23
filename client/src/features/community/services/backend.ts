@@ -6,8 +6,8 @@
  * for discussion threads, expert verification, and community analytics.
  */
 
-import { communityApiService } from '@client/core/api/community';
-import { realTimeService } from '@client/core/realtime';
+import { communityApiService } from '@client/infrastructure/api/community';
+import { realTimeService } from '@client/infrastructure/realtime';
 import type { CommentFormData } from '@client/lib/types/community';
 import type { Comment } from '@client/lib/types/community';
 import type { DiscussionThreadMetadata } from '@client/lib/types/community';

@@ -74,26 +74,27 @@ export interface DatabaseHealthStatus {
 // ============================================================================
 
 /**
+ * Database connection instances - initialized during application startup.
+ * These are exported as mutable to allow proper initialization from pool.ts
+ */
+
+/**
  * Primary database connection for general operations.
  * Use when read/write distinction isn't performance-critical.
- * 
- * Note: This is initialized as null and must be set during application startup.
- * TypeScript's type assertion here is intentional—we guarantee initialization
- * happens before any database operations.
  */
-export const database: DatabaseConnection = null as unknown as DatabaseConnection;
+export let database: DatabaseConnection;
 
 /**
  * Read-optimized connection routing to replicas in production.
  * Improves scalability by distributing query load across read replicas.
  */
-export const readDatabase: DatabaseConnection = null as unknown as DatabaseConnection;
+export let readDatabase: DatabaseConnection;
 
 /**
  * Write-optimized connection always routing to primary database.
  * Ensures data consistency for all mutation operations.
  */
-export const writeDatabase: DatabaseConnection = null as unknown as DatabaseConnection;
+export let writeDatabase: DatabaseConnection;
 
 /**
  * Specialized connections for multi-tenant architecture.
@@ -102,20 +103,56 @@ export const writeDatabase: DatabaseConnection = null as unknown as DatabaseConn
  * Phase Two (Future): Each connection will target a dedicated database
  * optimized for its specific workload characteristics.
  */
-export const operationalDb: DatabaseConnection = null as unknown as DatabaseConnection;
-export const analyticsDb: DatabaseConnection = null as unknown as DatabaseConnection;
-export const securityDb: DatabaseConnection = null as unknown as DatabaseConnection;
+export let operationalDb: DatabaseConnection;
+export let analyticsDb: DatabaseConnection;
+export let securityDb: DatabaseConnection;
 
 /**
  * Raw PostgreSQL pool for direct SQL when ORM abstraction is limiting.
  * Use sparingly and prefer Drizzle ORM for type safety.
  */
-export const pool: Pool = null as unknown as Pool;
+export let pool: Pool;
 
 /**
- * Re-export all schema definitions for convenient access.
+ * Initialize database connections from pool instances.
+ * This must be called during application startup before any database operations.
+ * 
+ * @internal - Called automatically by pool.ts initialization
  */
-export * from '../schema';
+export function initializeDatabaseConnections(
+  generalDb: DatabaseConnection,
+  readDb: DatabaseConnection,
+  writeDb: DatabaseConnection,
+  rawPool: Pool
+): void {
+  database = generalDb;
+  readDatabase = readDb;
+  writeDatabase = writeDb;
+  
+  // Phase One: All specialized connections use the same database
+  operationalDb = generalDb;
+  analyticsDb = generalDb;
+  securityDb = generalDb;
+  
+  pool = rawPool;
+  
+  logger.info('Database connections initialized', {
+    component: 'DatabaseConnection',
+    timestamp: new Date().toISOString(),
+  });
+}
+
+/**
+ * Re-export schema definitions for convenient access.
+ * 
+ * NOTE: This creates a convenience for importing both database connections
+ * and schema in the same file, but be aware of potential circular dependencies.
+ * 
+ * Recommended: Import schema directly from @server/infrastructure/schema
+ * import { users, bills } from '@server/infrastructure/schema';
+ */
+// Removed to prevent circular dependencies - import schema directly instead
+// export * from '../schema';
 
 // ============================================================================
 // CONNECTION ROUTING

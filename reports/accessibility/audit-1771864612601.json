@@ -1,0 +1,52 @@
+{
+  "summary": {
+    "totalPages": 7,
+    "totalViolations": 0,
+    "totalPasses": 0,
+    "timestamp": "2026-02-23T16:36:52.601Z"
+  },
+  "results": [
+    {
+      "page": "Home",
+      "url": "http://localhost:5173/",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:46.052Z"
+    },
+    {
+      "page": "Bills",
+      "url": "http://localhost:5173/bills",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:47.237Z"
+    },
+    {
+      "page": "Dashboard",
+      "url": "http://localhost:5173/dashboard",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:48.237Z"
+    },
+    {
+      "page": "Login",
+      "url": "http://localhost:5173/login",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:49.295Z"
+    },
+    {
+      "page": "Bill Detail",
+      "url": "http://localhost:5173/bills/1",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:50.264Z"
+    },
+    {
+      "page": "Profile",
+      "url": "http://localhost:5173/profile",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:51.287Z"
+    },
+    {
+      "page": "Settings",
+      "url": "http://localhost:5173/settings",
+      "error": "Cannot find module 'axe-core'\nRequire stack:\n- C:\\Users\\Access%20Granted\\Downloads\\projects\\SimpleTool\\node_modules\\.pnpm\\@axe-core+puppeteer@4.11.1_puppeteer@24.29.0\\node_modules\\@axe-core\\puppeteer\\dist\\index.mjs",
+      "timestamp": "2026-02-23T16:36:52.297Z"
+    }
+  ]
+}

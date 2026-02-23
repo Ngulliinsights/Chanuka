@@ -48,18 +48,18 @@ echo "👉 Flattening Client Auth Core..."
 
 # Move useAuth hook up
 for ext in ts tsx; do
-    if safe_move "client/src/core/auth/hooks/useAuth.$ext" "client/src/core/auth/useAuth.$ext" "Moved useAuth.$ext to core/auth root"; then
+    if safe_move "client/src/infrastructure/auth/hooks/useAuth.$ext" "client/src/infrastructure/auth/useAuth.$ext" "Moved useAuth.$ext to core/auth root"; then
         break
     fi
 done
 
 # Remove hooks directory if empty
-safe_rmdir "client/src/core/auth/hooks" "auth hooks directory"
+safe_rmdir "client/src/infrastructure/auth/hooks" "auth hooks directory"
 
 # Move types up (if it exists as a folder)
-if [ -d "client/src/core/auth/types" ]; then
-    if safe_move "client/src/core/auth/types/index.ts" "client/src/core/auth/types.ts" "Flattened auth types"; then
-        safe_rmdir "client/src/core/auth/types" "auth types directory"
+if [ -d "client/src/infrastructure/auth/types" ]; then
+    if safe_move "client/src/infrastructure/auth/types/index.ts" "client/src/infrastructure/auth/types.ts" "Flattened auth types"; then
+        safe_rmdir "client/src/infrastructure/auth/types" "auth types directory"
     fi
 fi
 

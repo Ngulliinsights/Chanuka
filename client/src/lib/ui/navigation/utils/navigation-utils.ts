@@ -1,4 +1,4 @@
-import { InvalidNavigationPathError } from '@client/core/error';
+import { InvalidNavigationPathError } from '@client/infrastructure/error';
 import { validateNavigationPath } from '../validation';
 import type { NavigationItem, UserRole } from '@client/lib/types/navigation';
 

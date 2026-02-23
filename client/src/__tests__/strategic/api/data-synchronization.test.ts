@@ -12,7 +12,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock data synchronization services
-vi.mock('@client/core/data-sync/service', () => ({
+vi.mock('@client/infrastructure/data-sync/service', () => ({
   dataSyncService: {
     syncData: vi.fn(),
     queueOperation: vi.fn(),
@@ -23,7 +23,7 @@ vi.mock('@client/core/data-sync/service', () => ({
 }));
 
 // Mock cache manager
-vi.mock('@client/core/cache/manager', () => ({
+vi.mock('@client/infrastructure/cache/manager', () => ({
   cacheManager: {
     get: vi.fn(),
     set: vi.fn(),
@@ -51,8 +51,8 @@ describe('Data Synchronization', () => {
 
   describe('Offline/Online Sync', () => {
     it('should sync data when coming online', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       // Mock offline operations
       const offlineOperations = [
@@ -73,8 +73,8 @@ describe('Data Synchronization', () => {
     });
 
     it('should queue operations during offline', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       const operation = { type: 'create', data: { id: '1', name: 'Test Item' } };
 
@@ -88,7 +88,7 @@ describe('Data Synchronization', () => {
     });
 
     it('should handle sync conflicts', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
 
       const conflictData = {
         local: { id: '1', name: 'Local Item', version: 2 },
@@ -110,8 +110,8 @@ describe('Data Synchronization', () => {
     });
 
     it('should maintain data integrity', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       dataSyncService.syncData.mockResolvedValue({ success: true, integrity: true });
       cacheManager.set.mockResolvedValue(true);
@@ -125,7 +125,7 @@ describe('Data Synchronization', () => {
 
   describe('Cache Management', () => {
     it('should cache API responses appropriately', async () => {
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       const cacheKey = 'api_data_1';
       const testData = { id: '1', name: 'Test Item' };
@@ -139,7 +139,7 @@ describe('Data Synchronization', () => {
     });
 
     it('should invalidate stale cache', async () => {
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       const cacheKey = 'api_data_1';
 
@@ -152,7 +152,7 @@ describe('Data Synchronization', () => {
     });
 
     it('should handle cache conflicts', async () => {
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       const localData = { id: '1', name: 'Local Item' };
       const remoteData = { id: '1', name: 'Remote Item' };
@@ -172,7 +172,7 @@ describe('Data Synchronization', () => {
     });
 
     it('should optimize cache usage', async () => {
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       // Mock cache statistics
       const cacheStats = {
@@ -194,8 +194,8 @@ describe('Data Synchronization', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete offline workflow', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       // Simulate offline operations
       const offlineOperations = [
@@ -243,7 +243,7 @@ describe('Data Synchronization', () => {
     });
 
     it('should handle network recovery scenarios', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
 
       // Simulate network failure followed by recovery
       dataSyncService.syncData
@@ -261,8 +261,8 @@ describe('Data Synchronization', () => {
     });
 
     it('should handle data corruption scenarios', async () => {
-      const { dataSyncService } = await import('@client/core/data-sync/service');
-      const { cacheManager } = await import('@client/core/cache/manager');
+      const { dataSyncService } = await import('@client/infrastructure/data-sync/service');
+      const { cacheManager } = await import('@client/infrastructure/cache/manager');
 
       // Mock corrupted data
       const corruptedData = { id: '1', name: null, version: 'invalid' };

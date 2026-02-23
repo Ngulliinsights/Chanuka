@@ -51,7 +51,7 @@ This document tracks the implementation of the Tier 1 integration plan, which fo
 
 **Files Integrated:**
 - `client/src/services/privacyAnalyticsService.ts` (1,353 LOC)
-- `client/src/core/api/privacy.ts` (new API service)
+- `client/src/infrastructure/api/privacy.ts` (new API service)
 - `client/src/utils/privacy-compliance.ts` (new compliance utilities)
 
 **Services Activated:**

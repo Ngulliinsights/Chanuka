@@ -211,7 +211,7 @@ This plan systematically remediates 360 TypeScript errors across 122 files by co
   
   - [x] 12.4 Consolidate fragmented types
     - Identify duplicate type definitions (DashboardPreferences vs UserDashboardPreferences, BillAnalytics, DashboardData, PerformanceMetrics, ApiResponse, ValidationResult, QueryParams)
-    - Determine canonical location for each type (prefer shared/types, then client/src/lib/types, then client/src/core)
+    - Determine canonical location for each type (prefer shared/types, then client/src/lib/types, then client/src/infrastructure)
     - Generate type consolidation fixes with import updates for all affected files
     - _Requirements: 9.1-9.7, 13.1-13.3_
   
@@ -413,7 +413,7 @@ This plan systematically remediates 360 TypeScript errors across 122 files by co
 - Integration tests validate end-to-end phase workflows
 - **Critical Design Principle**: No stubs, adapters, or compatibility layers will be created
 - All fixes use actual relocated modules in their new FSD locations
-- Type consolidation prefers locations in this order: shared/types > client/src/lib/types > client/src/core
+- Type consolidation prefers locations in this order: shared/types > client/src/lib/types > client/src/infrastructure
 - **Current Progress**: Phases 1-2 and infrastructure (tasks 1-11) are complete
 - **Current Focus**: Phase 3 (Type Standardization) - Task 12
 - Each phase must complete successfully before proceeding to the next phase

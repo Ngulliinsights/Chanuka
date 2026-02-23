@@ -69,9 +69,9 @@ This document identifies duplicate utility implementations across the codebase a
 4. `server/infrastructure/core/validation/validation-utils.ts` - `sanitizeHtml()`, `sanitizeString()`
 5. `server/features/search/application/search-service.ts` - `sanitizeSearchQuery()`
 6. `client/src/lib/utils/input-validation.ts` - `sanitizeInput()`
-7. `client/src/core/security/security-utils.ts` - `sanitizeInput()`, `sanitizeHTML()`, `sanitizeUrl()`
-8. `client/src/core/auth/utils/security-helpers.ts` - `sanitizeInput()`
-9. `client/src/core/auth/utils/validation.ts` - `sanitizeInput()`
+7. `client/src/infrastructure/security/security-utils.ts` - `sanitizeInput()`, `sanitizeHTML()`, `sanitizeUrl()`
+8. `client/src/infrastructure/auth/utils/security-helpers.ts` - `sanitizeInput()`
+9. `client/src/infrastructure/auth/utils/validation.ts` - `sanitizeInput()`
 
 **Recommendation**:
 - **Canonical Location**: `shared/core/utils/security-utils.ts`
@@ -92,7 +92,7 @@ This document identifies duplicate utility implementations across the codebase a
 **Duplicates Found**:
 1. `server/utils/validation.ts` - `validateEmail()`
 2. `server/infrastructure/core/validation/validation-utils.ts` - `validateEmail()`, `validatePhone()`, `validateURL()`
-3. `client/src/core/auth/utils/validation.ts` - Email, phone, password validation
+3. `client/src/infrastructure/auth/utils/validation.ts` - Email, phone, password validation
 
 **Recommendation**:
 - **Canonical Location**: `shared/validation/schemas/` (using Zod)

@@ -71,11 +71,11 @@ This folder contains comprehensive documentation for the client error system con
 - `client/src/lib/design-system/interactive/errors.ts` - UI component errors
 
 ### Reference (Canonical System)
-- `client/src/core/error/` - Core error framework (unchanged)
+- `client/src/infrastructure/error/` - Core error framework (unchanged)
 
 ### To Be Deleted (Future Cleanup)
 - `client/src/lib/services/errors.ts` - Legacy (no longer needed)
-- `client/src/core/api/errors.ts` - Deprecated (no longer needed)
+- `client/src/infrastructure/api/errors.ts` - Deprecated (no longer needed)
 
 ---
 
@@ -154,7 +154,7 @@ throw new UIDateError('DatePicker', 'Invalid date', new Date(), {
 
 **Developer - Using Errors**
 - Start: [CLIENT_ERROR_USAGE_GUIDE.md](CLIENT_ERROR_USAGE_GUIDE.md)
-- Reference: `client/src/core/error/` source code
+- Reference: `client/src/infrastructure/error/` source code
 - When stuck: Troubleshooting section in usage guide
 
 **Developer - Migrating Old Code**
@@ -177,7 +177,7 @@ throw new UIDateError('DatePicker', 'Invalid date', new Date(), {
 **Using the System**
 1. [CLIENT_ERROR_USAGE_GUIDE.md](CLIENT_ERROR_USAGE_GUIDE.md) - How to use
 2. Code examples in the guide
-3. Source code in `client/src/core/error/`
+3. Source code in `client/src/infrastructure/error/`
 
 **Best Practices**
 1. [CLIENT_ERROR_USAGE_GUIDE.md](CLIENT_ERROR_USAGE_GUIDE.md) - DO's and DON'Ts
@@ -203,7 +203,7 @@ throw new UIDateError('DatePicker', 'Invalid date', new Date(), {
 - Read: [CLIENT_ERROR_MIGRATION_REPORT.md](CLIENT_ERROR_MIGRATION_REPORT.md) (15 min)
 
 ### Level 4: Deep Dive
-- Study: `client/src/core/error/` source code
+- Study: `client/src/infrastructure/error/` source code
 - Review: Error handler implementation
 - Understand: Recovery strategies
 
@@ -277,9 +277,9 @@ Before considering the project complete:
 ## 🔗 Related Documentation
 
 ### In Codebase
-- `client/src/core/error/README.md` - Core error system docs
-- `client/src/core/error/components/` - UI components
-- `client/src/core/error/reporters/` - Error reporters
+- `client/src/infrastructure/error/README.md` - Core error system docs
+- `client/src/infrastructure/error/components/` - UI components
+- `client/src/infrastructure/error/reporters/` - Error reporters
 
 ### Previous Sessions
 - Error handling strategy docs
@@ -326,7 +326,7 @@ A: See "Error Properties" reference in usage guide.
 - **Project status**: See [ERROR_CONSOLIDATION_SUMMARY.md](ERROR_CONSOLIDATION_SUMMARY.md)
 
 ### Source Code Reference
-- Core error system: `client/src/core/error/`
+- Core error system: `client/src/infrastructure/error/`
 - Loading errors: `client/src/lib/ui/loading/errors.ts`
 - Dashboard errors: `client/src/lib/ui/dashboard/errors.ts`
 - UI component errors: `client/src/lib/design-system/interactive/errors.ts`

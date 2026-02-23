@@ -4,8 +4,8 @@
  * Tracks errors as analytics events
  */
 
-import { analyticsService } from '@/core/analytics/service';
-import type { ErrorData } from '@/core/analytics/service';
+import { analyticsService } from '@/infrastructure/analytics/service';
+import type { ErrorData } from '@/infrastructure/analytics/service';
 import { logger } from '@client/lib/utils/logger';
 
 /**

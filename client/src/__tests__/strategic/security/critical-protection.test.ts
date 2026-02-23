@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock security services
-vi.mock('@client/core/security/service', () => ({
+vi.mock('@client/infrastructure/security/service', () => ({
   securityService: {
     sanitizeInput: vi.fn(),
     validateInput: vi.fn(),
@@ -31,7 +31,7 @@ describe('Security Critical Protection', () => {
 
   describe('XSS Prevention', () => {
     it('should prevent XSS attacks', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const maliciousInputs = [
         '<script>alert("XSS")</script>',
@@ -57,7 +57,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should sanitize user inputs', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const testInputs = [
         { input: 'Normal text', expected: 'Normal text' },
@@ -81,7 +81,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should escape HTML content', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const htmlContent = '<div>Hello & Welcome</div>';
       const escapedContent = '<div>Hello & Welcome</div>';
@@ -100,7 +100,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should handle script injection attempts', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const injectionAttempts = [
         '"><script>alert("injection")</script>',
@@ -133,7 +133,7 @@ describe('Security Critical Protection', () => {
 
   describe('Input Validation', () => {
     it('should validate all user inputs', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const validationTests = [
         { input: 'valid-email@example.com', type: 'email', valid: true },
@@ -159,7 +159,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should handle malicious payloads', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const maliciousPayloads = [
         { payload: 'SELECT * FROM users', type: 'sql_injection' },
@@ -185,7 +185,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should enforce input constraints', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const constraints = {
         maxLength: 100,
@@ -227,7 +227,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should provide validation feedback', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const feedback = {
         valid: false,
@@ -249,7 +249,7 @@ describe('Security Critical Protection', () => {
 
   describe('Authentication Security', () => {
     it('should secure authentication flows', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const authData = {
         username: 'user@example.com',
@@ -273,7 +273,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should handle session management', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const sessionData = {
         sessionId: 'session-123',
@@ -296,7 +296,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should prevent session hijacking', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const hijackingAttempts = [
         { sessionId: 'stolen-session', ip: '192.168.1.100', userAgent: 'different-browser' },
@@ -321,7 +321,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should manage authentication state', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       const authState = {
         authenticated: true,
@@ -348,7 +348,7 @@ describe('Security Critical Protection', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete security workflow', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       // Complete workflow: input validation -> sanitization -> authentication
       const workflow = {
@@ -396,7 +396,7 @@ describe('Security Critical Protection', () => {
     });
 
     it('should handle security breach scenarios', async () => {
-      const { securityService } = await import('@client/core/security/service');
+      const { securityService } = await import('@client/infrastructure/security/service');
 
       // Security breach scenario: multiple attack vectors
       const breachScenario = {

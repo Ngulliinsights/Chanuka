@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { useNavigation } from '@client/core/navigation/context';
+import { useNavigation } from '@client/infrastructure/navigation/context';
 import {
   userJourneyTracker,
   JourneyAnalytics,

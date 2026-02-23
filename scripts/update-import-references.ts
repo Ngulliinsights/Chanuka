@@ -66,27 +66,27 @@ class ImportReferencesUpdater {
     // Browser compatibility moved to core/browser
     {
       oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityChecker',
-      newPath: '@client/core/browser/BrowserCompatibilityChecker',
+      newPath: '@client/infrastructure/browser/BrowserCompatibilityChecker',
       reason: 'Consolidated to core/browser'
     },
     {
       oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityReport',
-      newPath: '@client/core/browser/BrowserCompatibilityReport',
+      newPath: '@client/infrastructure/browser/BrowserCompatibilityReport',
       reason: 'Consolidated to core/browser'
     },
     {
       oldPath: '@client/lib/infrastructure/compatibility/BrowserCompatibilityTester',
-      newPath: '@client/core/browser/BrowserCompatibilityTester',
+      newPath: '@client/infrastructure/browser/BrowserCompatibilityTester',
       reason: 'Consolidated to core/browser'
     },
     {
       oldPath: '@client/lib/infrastructure/compatibility/FeatureFallbacks',
-      newPath: '@client/core/browser/FeatureFallbacks',
+      newPath: '@client/infrastructure/browser/FeatureFallbacks',
       reason: 'Consolidated to core/browser'
     },
     {
       oldPath: '@client/lib/infrastructure/compatibility/useBrowserStatus',
-      newPath: '@client/core/browser/useBrowserStatus',
+      newPath: '@client/infrastructure/browser/useBrowserStatus',
       reason: 'Consolidated to core/browser'
     },
     

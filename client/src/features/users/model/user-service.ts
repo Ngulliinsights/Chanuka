@@ -12,8 +12,8 @@
  * This service replaces: authService.ts, user-backend-service.ts, userProfileService.ts
  */
 
-import { EngagementHistoryFilters } from '@client/core/api/user';
-import { authService } from '@client/core/auth';
+import { EngagementHistoryFilters } from '@client/infrastructure/api/user';
+import { authService } from '@client/infrastructure/auth';
 import { userApi } from '@client/features/users/services/user-api';
 import { logger } from '@client/lib/utils/logger';
 

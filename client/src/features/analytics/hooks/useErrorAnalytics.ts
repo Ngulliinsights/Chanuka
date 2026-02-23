@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import type { AppDispatch } from '@client/lib/infrastructure/store';
+import type { AppDispatch } from '@client/infrastructure/store';
 import {
   fetchOverviewMetrics,
   fetchPatterns,
@@ -31,7 +31,7 @@ import {
   setActiveTab,
   updateFilters,
   type DashboardFilters,
-} from '@client/lib/infrastructure/store/slices/errorAnalyticsSlice';
+} from '@client/infrastructure/store/slices/errorAnalyticsSlice';
 import type { ErrorPattern } from '@client/lib/services';
 
 type ActiveTab = 'overview' | 'trends' | 'patterns' | 'recovery' | 'realtime';

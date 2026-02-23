@@ -7,7 +7,7 @@
  * @module config/mobile
  */
 
-import { DeviceDetector } from '@client/core/mobile';
+import { DeviceDetector } from '@client/infrastructure/mobile';
 
 /**
  * Mobile device breakpoints

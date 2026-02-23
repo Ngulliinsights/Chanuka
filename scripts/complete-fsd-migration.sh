@@ -51,7 +51,7 @@ echo "--------------------------------------"
 # Create infrastructure directories if they don't exist
 mkdir -p client/src/lib/infrastructure/{system,compatibility,asset-loading}
 mkdir -p client/src/app/shell
-mkdir -p client/src/core/error/components
+mkdir -p client/src/infrastructure/error/components
 
 # Move system components
 if [ -d "client/src/components/system" ]; then
@@ -84,7 +84,7 @@ fi
 # Move error handling components (merge with existing)
 if [ -d "client/src/components/error-handling" ]; then
     print_status "Moving error-handling components to core/error/components/"
-    cp -r client/src/components/error-handling/* client/src/core/error/components/ 2>/dev/null || true
+    cp -r client/src/components/error-handling/* client/src/infrastructure/error/components/ 2>/dev/null || true
     print_success "Error handling components moved"
 fi
 
@@ -327,7 +327,7 @@ find client/src -name "*.tsx" -o -name "*.ts" | xargs sed -i 's|@client/componen
 find client/src -name "*.tsx" -o -name "*.ts" | xargs sed -i 's|@client/components/shell/|@client/app/shell/|g' 2>/dev/null || true
 
 # Update error handling imports
-find client/src -name "*.tsx" -o -name "*.ts" | xargs sed -i 's|@client/components/error-handling/|@client/core/error/components/|g' 2>/dev/null || true
+find client/src -name "*.tsx" -o -name "*.ts" | xargs sed -i 's|@client/components/error-handling/|@client/infrastructure/error/components/|g' 2>/dev/null || true
 
 # Update shared UI imports
 find client/src -name "*.tsx" -o -name "*.ts" | xargs sed -i 's|@client/components/loading/|@client/lib/ui/loading/|g' 2>/dev/null || true

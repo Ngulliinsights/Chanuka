@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import type { DataExportRequest } from '@client/lib/types/user-dashboard';
 import { logger } from '@client/lib/utils/logger';
 

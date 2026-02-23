@@ -110,7 +110,7 @@ core/{loading, navigation, dashboard, browser, mobile, performance}/
 ### The Left Hand Knows What the Right Hand Is Doing ✓
 
 1. **Error System** acts as the central nervous system
-   - All modules import from `@client/core/error`
+   - All modules import from `@client/infrastructure/error`
    - Single source of truth for error handling
    - Properly exported from main core index
 
@@ -141,14 +141,14 @@ core/{loading, navigation, dashboard, browser, mobile, performance}/
 ### Pattern 1: Error Handling
 ```typescript
 // ✅ Correct
-import { ErrorFactory } from '@client/core/error';
+import { ErrorFactory } from '@client/infrastructure/error';
 const error = ErrorFactory.createNetworkError('msg');
 ```
 
 ### Pattern 2: Authentication
 ```typescript
 // ✅ Correct  
-import { tokenManager } from '@client/core/auth';
+import { tokenManager } from '@client/infrastructure/auth';
 const token = tokenManager.getToken();
 ```
 
@@ -161,8 +161,8 @@ export { TokenManager } from '../auth/services/token-manager';
 ### Pattern 4: API Client
 ```typescript
 // ✅ Correct
-import { ErrorFactory } from '@client/core/error';
-import { tokenManager } from '@client/core/auth';
+import { ErrorFactory } from '@client/infrastructure/error';
+import { tokenManager } from '@client/infrastructure/auth';
 ```
 
 ---

@@ -13,7 +13,7 @@ import type {
   BillEngagementMetrics as EngagementMetrics,
   BillEngagement
 } from '@client/lib/types/bill';
-import type { BillTrackingPreferences } from '@client/core/api/types/preferences';
+import type { BillTrackingPreferences } from '@client/infrastructure/api/types/preferences';
 import { logger } from '@client/lib/utils/logger';
 
 

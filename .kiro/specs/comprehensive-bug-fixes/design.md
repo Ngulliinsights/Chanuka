@@ -255,7 +255,7 @@ interface UserProfile {
 ### 3. Analytics Service
 
 ```typescript
-// client/src/core/analytics/service.ts
+// client/src/infrastructure/analytics/service.ts
 
 interface AnalyticsService {
   trackEvent(event: AnalyticsEvent): Promise<TrackingResult>;
@@ -289,7 +289,7 @@ interface UpdateResult {
 ### 4. Telemetry Service
 
 ```typescript
-// client/src/core/telemetry/service.ts
+// client/src/infrastructure/telemetry/service.ts
 
 interface TelemetryService {
   collectMetrics(): Promise<MetricsResult>;
@@ -436,7 +436,7 @@ class ErrorContextBuilder {
 ### 7. WebSocket Manager with Reconnection
 
 ```typescript
-// client/src/core/websocket/manager.ts
+// client/src/infrastructure/websocket/manager.ts
 
 interface WebSocketManager {
   connect(url: string): Promise<void>;
@@ -500,7 +500,7 @@ class WebSocketManagerImpl implements WebSocketManager {
 ### 8. API Retry Logic
 
 ```typescript
-// client/src/core/api/retry.ts
+// client/src/infrastructure/api/retry.ts
 
 interface RetryConfig {
   maxRetries: number;
@@ -1042,7 +1042,7 @@ interface AnalyticsAlert {
 ### Telemetry Types
 
 ```typescript
-// client/src/core/telemetry/types.ts
+// client/src/infrastructure/telemetry/types.ts
 
 interface SystemMetrics {
   cpu?: {

@@ -9,7 +9,7 @@ import { Activity, MessageSquare, Users, TrendingUp, AlertCircle, Clock, Eye } f
 import React from 'react';
 import { useEffect, useState } from 'react';
 
-import { BillRealTimeUpdate } from '@client/core/realtime/types';
+import { BillRealTimeUpdate } from '@client/infrastructure/realtime/types';
 import { Badge } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 

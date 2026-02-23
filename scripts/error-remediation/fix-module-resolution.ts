@@ -62,7 +62,7 @@ if (updateFile(
   'Fix lib/config/api.ts import path',
   'client/src/lib/config/api.ts',
   (content) => content.replace(
-    "import { globalConfig } from '@client/core/api/config';",
+    "import { globalConfig } from '@client/infrastructure/api/config';",
     "import { globalConfig } from '../../core/api/config';"
   ).replace(
     "export { globalConfig } from '../core/api/config';",
@@ -138,7 +138,7 @@ export default useSafeQuery;
 totalFixes++;
 if (updateFile(
   'Add CommunityRealTimeHookReturn export',
-  'client/src/core/realtime/hooks/types.ts',
+  'client/src/infrastructure/realtime/hooks/types.ts',
   (content) => {
     if (content.includes('CommunityRealTimeHookReturn')) {
       return content;

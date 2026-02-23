@@ -186,7 +186,7 @@ security-utils.ts     (Node crypto - incompatible with browser)
 - ~~client/src/lib/utils/logger.ts (390 lines)~~ **SPECIALIZED (React tracking)**
 - ~~client/src/lib/utils/security.ts (114 lines)~~ **SPECIALIZED & BETTER (browser-safe vs Node crypto)**
 - ~~client/src/lib/utils/i18n.ts (600+ lines)~~ **DOMAIN-SPECIFIC (Kenya-specific)**
-- client/src/core/error/types.ts (417 lines) - Consider sharing once error-management is finalized
+- client/src/infrastructure/error/types.ts (417 lines) - Consider sharing once error-management is finalized
 - Various client types (150+ lines) - Can share after audit
 
 **Revised Total Shareable**: ~150-200 lines (types + primitives), NOT 1,257 lines

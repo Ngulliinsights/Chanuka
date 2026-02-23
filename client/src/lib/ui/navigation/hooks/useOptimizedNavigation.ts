@@ -12,7 +12,7 @@ import { useMemo, useCallback, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { useAppSelector } from '@client/lib/hooks/store';
-import { selectNavigationUIState } from '@client/lib/infrastructure/store/slices/navigationSlice';
+import { selectNavigationUIState } from '@client/infrastructure/store/slices/navigationSlice';
 import { navigationService } from '@client/lib/services/navigation';
 import { logger } from '@client/lib/utils/logger';
 

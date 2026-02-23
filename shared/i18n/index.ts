@@ -6,11 +6,12 @@
 
 // Import language files
 import en from './en';
+import sw from './sw';
 
 // Language registry
 export const languages = {
   en,
-  // sw: {} // Swahili - to be added
+  sw,
 } as const;
 
 export type SupportedLanguage = keyof typeof languages;
@@ -55,5 +56,5 @@ export const detectLanguage = (): SupportedLanguage => {
 };
 
 // Export language data
-export { en };
+export { en, sw };
 export default { languages, createTranslator, t, detectLanguage };

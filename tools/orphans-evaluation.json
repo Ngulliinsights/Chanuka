@@ -151,7 +151,7 @@
       "category": "Keep/Archive"
     },
     {
-      "file": "client/src/core/api/websocket.ts",
+      "file": "client/src/infrastructure/api/websocket.ts",
       "loc": 1211,
       "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
       "exports": [
@@ -171,7 +171,7 @@
       "category": "Keep/Archive"
     },
     {
-      "file": "client/src/core/api/bills.ts",
+      "file": "client/src/infrastructure/api/bills.ts",
       "loc": 831,
       "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
       "exports": [
@@ -226,7 +226,7 @@
       "category": "Keep/Archive"
     },
     {
-      "file": "client/src/core/api/notifications.ts",
+      "file": "client/src/infrastructure/api/notifications.ts",
       "loc": 891,
       "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
       "exports": [
@@ -247,7 +247,7 @@
       "category": "Delete"
     },
     {
-      "file": "client/src/core/api/user.ts",
+      "file": "client/src/infrastructure/api/user.ts",
       "loc": 771,
       "gitHistory": "0498ea76 Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts",
       "exports": [

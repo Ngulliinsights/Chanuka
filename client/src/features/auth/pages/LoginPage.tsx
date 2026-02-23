@@ -47,7 +47,7 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Consolidated Login Form - placeholder (LoginForm not exported from @client/core/auth) */}
+        {/* Consolidated Login Form - placeholder (LoginForm not exported from @client/infrastructure/auth) */}
         <div className="w-full max-w-md mx-auto">
           <div className="bg-white shadow rounded-lg p-6 text-center text-muted-foreground">
             <p>

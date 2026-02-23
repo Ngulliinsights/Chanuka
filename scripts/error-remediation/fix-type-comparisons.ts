@@ -37,7 +37,7 @@ class TypeComparisonFixer {
    * Error: comparing '"page" | "user" | "comment" | "bill"' with '"analytics"'
    */
   private async fixPersonaDetector(): Promise<void> {
-    const filePath = path.resolve(__dirname, '../../client/src/core/personalization/persona-detector.ts');
+    const filePath = path.resolve(__dirname, '../../client/src/infrastructure/personalization/persona-detector.ts');
     const sourceFile = this.project.getSourceFile(filePath);
     
     if (!sourceFile) {

@@ -7,8 +7,8 @@
 
 import { useEffect, useState } from 'react';
 
-import { globalServiceLocator } from '@client/core/api/registry';
-import type { ApiService } from '@client/core/api/types/service';
+import { globalServiceLocator } from '@client/infrastructure/api/registry';
+import type { ApiService } from '@client/infrastructure/api/types/service';
 import { logger } from '@client/lib/utils/logger';
 
 /**

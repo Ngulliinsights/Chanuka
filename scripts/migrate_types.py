@@ -18,8 +18,8 @@ REPLACEMENTS = {
     r"from\s+['\"]@client/types/expert['\"]": "from '@client/features/users/types'",
     r"from\s+['\"]@client/types/community['\"]": "from '@client/features/community/types'",
     r"from\s+['\"]@client/types/conflict-of-interest['\"]": "from '@client/features/analysis/types'",
-    r"from\s+['\"]@client/types/auth['\"]": "from '@client/core/auth'",
-    r"from\s+['\"]@client/types/realtime['\"]": "from '@client/core/realtime/types'",
+    r"from\s+['\"]@client/types/auth['\"]": "from '@client/infrastructure/auth'",
+    r"from\s+['\"]@client/types/realtime['\"]": "from '@client/infrastructure/realtime/types'",
 }
 
 def process_file(filepath):

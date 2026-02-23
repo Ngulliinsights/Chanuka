@@ -58,7 +58,7 @@ Based on the requirements (21.5, 16.4), we need to identify ~200 most dangerous 
 **Action:** Filter enum_conversion category for server/ files and fix top 60
 
 #### Priority 3: API Response Handling (17 violations)
-**Location:** API boundaries in `server/` and `client/src/core/api/`  
+**Location:** API boundaries in `server/` and `client/src/infrastructure/api/`  
 **Risk:** Unvalidated data, type mismatches  
 
 **Action:** Fix all 17 API response violations

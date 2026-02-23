@@ -37,7 +37,7 @@ import {
   ReactNode,
 } from 'react';
 
-import { communityApiService } from '@client/core/api/community';
+import { communityApiService } from '@client/infrastructure/api/community';
 import type {
   ActivityItem,
   TrendingTopic,

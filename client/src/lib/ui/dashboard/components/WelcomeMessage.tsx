@@ -8,7 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { X, TrendingUp, MessageSquare, Award, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import React from 'react';
 
-import { User } from '@client/core/auth/types';
+import { User } from '@client/infrastructure/auth/types';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Card, CardContent } from '@client/lib/design-system/typography/Card';

@@ -1,8 +1,8 @@
-import { backgroundSyncManager } from '@client/lib/infrastructure/sync/background-sync-manager';
-import { cacheInvalidationManager as cacheInvalidation } from '@client/lib/infrastructure/cache/cache-invalidation';
+import { backgroundSyncManager } from '@client/infrastructure/sync/background-sync-manager';
+import { cacheInvalidationManager as cacheInvalidation } from '@client/infrastructure/cache/cache-invalidation';
 import { offlineAnalyticsManager as offlineAnalytics } from '@client/features/analytics/model/offline-analytics';
-import { offlineDataManager } from '@client/core/storage/offline-data-manager';
-import { onNetworkStatusChange, getNetworkStatus } from '@client/lib/infrastructure/workers/service-worker';
+import { offlineDataManager } from '@client/infrastructure/storage/offline-data-manager';
+import { onNetworkStatusChange, getNetworkStatus } from '@client/infrastructure/workers/service-worker';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useCallback, useRef } from 'react';
 

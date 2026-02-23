@@ -776,7 +776,7 @@ const bill = bills.find(b => b.id === Number(billId));`,
 
   /**
    * Determine canonical location for a type based on FSD preferences
-   * Preference order: shared/types > client/src/lib/types > client/src/core
+   * Preference order: shared/types > client/src/lib/types > client/src/infrastructure
    */
   determineCanonicalLocation(
     typeName: string,

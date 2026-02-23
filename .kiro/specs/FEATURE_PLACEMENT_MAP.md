@@ -429,7 +429,7 @@ export function useFeatureData() {
 
 **Error Handling**
 - Backend: `server/infrastructure/error-handling/`
-- Frontend: `client/src/core/error/`
+- Frontend: `client/src/infrastructure/error/`
 - Shared: `shared/types/errors/`
 
 **Caching**
@@ -438,7 +438,7 @@ export function useFeatureData() {
 
 **Logging/Monitoring**
 - Backend: `server/infrastructure/observability/`
-- Frontend: `client/src/core/analytics/`
+- Frontend: `client/src/infrastructure/analytics/`
 
 ---
 

@@ -254,9 +254,9 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
 - [ ] 1.1.3: Extract reusable types if used elsewhere
   - If types are used by `globalApiClient` or other code:
-    - Create `client/src/core/api/types/interceptors.ts`
+    - Create `client/src/infrastructure/api/types/interceptors.ts`
     - Move `RequestInterceptor`, `ResponseInterceptor`, `ErrorInterceptor` types
-    - Create `client/src/core/api/types/client.ts`
+    - Create `client/src/infrastructure/api/types/client.ts`
     - Move `BaseClientRequest`, `BaseClientResponse`, `ApiError` types
   - Update imports in files that use these types
 
@@ -278,21 +278,21 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
 - [ ] 1.1.6: Delete unused client files
   ```bash
-  rm client/src/core/api/base-client.ts
-  rm client/src/core/api/authenticated-client.ts
-  rm client/src/core/api/safe-client.ts
-  rm client/src/core/api/circuit-breaker-client.ts
-  rm -r client/src/core/api/examples/
+  rm client/src/infrastructure/api/base-client.ts
+  rm client/src/infrastructure/api/authenticated-client.ts
+  rm client/src/infrastructure/api/safe-client.ts
+  rm client/src/infrastructure/api/circuit-breaker-client.ts
+  rm -r client/src/infrastructure/api/examples/
   
   # If retry-handler.ts is unused:
-  # rm client/src/core/api/retry-handler.ts
+  # rm client/src/infrastructure/api/retry-handler.ts
   
   # If authentication.ts is only used by deleted clients:
-  # rm client/src/core/api/authentication.ts
+  # rm client/src/infrastructure/api/authentication.ts
   ```
 
 - [ ] 1.1.7: Update barrel exports
-  - Edit `client/src/core/api/index.ts`
+  - Edit `client/src/infrastructure/api/index.ts`
   - Remove these exports:
     ```typescript
     // DELETE:

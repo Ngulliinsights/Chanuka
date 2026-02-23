@@ -147,9 +147,9 @@ Fixed validation functions to use correct type aliases:
 - `client/src/lib/types/dashboard/index.ts` (333 lines)
 
 ### Modified Files
-- `client/src/core/dashboard/utils.ts` (refactored 4 functions)
-- `client/src/core/dashboard/widgets.ts` (updated imports)
-- `client/src/core/validation/dashboard-validation.ts` (type alias fixes)
+- `client/src/infrastructure/dashboard/utils.ts` (refactored 4 functions)
+- `client/src/infrastructure/dashboard/widgets.ts` (updated imports)
+- `client/src/infrastructure/validation/dashboard-validation.ts` (type alias fixes)
 - `client/tsconfig.json` (added path mappings)
 - 8+ dashboard component files (import updates)
 

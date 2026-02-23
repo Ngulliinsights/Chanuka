@@ -380,7 +380,7 @@ import { API_BASE_URL } from '@shared/constants';
 
 // Client code importing from client
 import { Button } from '@client/lib/ui/Button';
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 
 // Server code importing shared
 import { User } from '@shared/types/user';

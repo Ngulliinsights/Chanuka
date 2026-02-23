@@ -4,7 +4,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { OnboardingService } from '../services/onboarding-service';
 
 export function useOnboardingRedirect() {

@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock WebSocket services
-vi.mock('@client/core/realtime/websocket', () => ({
+vi.mock('@client/infrastructure/realtime/websocket', () => ({
   websocketService: {
     connect: vi.fn(),
     disconnect: vi.fn(),
@@ -30,7 +30,7 @@ describe('Real-time Critical Features', () => {
 
   describe('Connection Reliability', () => {
     it('should establish WebSocket connection successfully', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const connectionConfig = {
         url: 'ws://localhost:8080',
@@ -53,7 +53,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle connection failures gracefully', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const connectionError = new Error('Connection failed: Network unreachable');
 
@@ -65,7 +65,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should reconnect on network interruption', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       // Simulate connection loss and reconnection
       websocketService.connect
@@ -90,7 +90,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle rapid connection attempts', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const rapidAttempts = [
         { url: 'ws://localhost:8080' },
@@ -118,7 +118,7 @@ describe('Real-time Critical Features', () => {
 
   describe('Message Delivery', () => {
     it('should deliver messages without loss', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const messages = [
         { id: 'msg-1', type: 'chat', content: 'Hello' },
@@ -142,7 +142,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle malformed messages gracefully', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const malformedMessages = [
         { id: 'invalid-1', type: null, content: undefined },
@@ -165,7 +165,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle high message throughput', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const throughputTest = {
         messageCount: 1000,
@@ -198,7 +198,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should queue messages during offline state', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const queuedMessages = [
         { id: 'queued-1', type: 'chat', content: 'Offline message 1' },
@@ -224,7 +224,7 @@ describe('Real-time Critical Features', () => {
 
   describe('Error Recovery', () => {
     it('should recover from network failures', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       // Simulate network failure and recovery
       websocketService.connect
@@ -254,7 +254,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle server errors appropriately', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const serverErrors = [
         { code: 500, message: 'Internal server error' },
@@ -272,7 +272,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should prevent error cascading', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       // Simulate error cascading scenario
       websocketService.connect.mockRejectedValue(new Error('Connection failed'));
@@ -286,7 +286,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should maintain connection state consistency', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       const connectionStates = ['connecting', 'connected', 'disconnecting', 'disconnected'];
 
@@ -312,7 +312,7 @@ describe('Real-time Critical Features', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete real-time workflow', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       // Complete workflow: connect -> send messages -> handle errors -> disconnect
       const workflow = {
@@ -355,7 +355,7 @@ describe('Real-time Critical Features', () => {
     });
 
     it('should handle real-time recovery scenarios', async () => {
-      const { websocketService } = await import('@client/core/realtime/websocket');
+      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
 
       // Recovery scenario: connection lost during message sending
       const recoveryScenario = {

@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock state management services
-vi.mock('@client/core/state/store', () => ({
+vi.mock('@client/infrastructure/state/store', () => ({
   globalStore: {
     getState: vi.fn(),
     setState: vi.fn(),
@@ -22,7 +22,7 @@ vi.mock('@client/core/state/store', () => ({
 }));
 
 // Mock state synchronization
-vi.mock('@client/core/state/sync', () => ({
+vi.mock('@client/infrastructure/state/sync', () => ({
   stateSync: {
     syncState: vi.fn(),
     mergeState: vi.fn(),
@@ -38,7 +38,7 @@ describe('State Management', () => {
 
   describe('Global State Consistency', () => {
     it('should maintain state consistency across components', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const stateUpdates = [
         { user: { id: '1', name: 'John' } },
@@ -62,7 +62,7 @@ describe('State Management', () => {
     });
 
     it('should handle state subscriptions correctly', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const subscribers = [
         { id: 'component-1', callback: vi.fn() },
@@ -85,7 +85,7 @@ describe('State Management', () => {
     });
 
     it('should handle state updates with validation', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const validState = { user: { id: '1', email: 'test@example.com' } };
       const invalidState = { user: { id: '', email: 'invalid' } };
@@ -113,7 +113,7 @@ describe('State Management', () => {
     });
 
     it('should handle state reset correctly', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const initialState = { user: null, settings: {}, notifications: { count: 0 } };
 
@@ -133,7 +133,7 @@ describe('State Management', () => {
 
   describe('State Synchronization', () => {
     it('should sync state across multiple instances', async () => {
-      const { stateSync } = await import('@client/core/state/sync');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       const syncData = {
         instanceId: 'instance-1',
@@ -157,7 +157,7 @@ describe('State Management', () => {
     });
 
     it('should merge state changes correctly', async () => {
-      const { stateSync } = await import('@client/core/state/sync');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       const localState = { user: { id: '1', name: 'John' }, settings: { theme: 'light' } };
       const remoteState = {
@@ -185,7 +185,7 @@ describe('State Management', () => {
     });
 
     it('should resolve state conflicts appropriately', async () => {
-      const { stateSync } = await import('@client/core/state/sync');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       const conflictData = {
         local: { user: { id: '1', name: 'John' }, settings: { theme: 'light' } },
@@ -208,7 +208,7 @@ describe('State Management', () => {
     });
 
     it('should broadcast state changes', async () => {
-      const { stateSync } = await import('@client/core/state/sync');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       const broadcastData = {
         state: { user: { id: '1' }, notifications: { count: 1 } },
@@ -233,7 +233,7 @@ describe('State Management', () => {
 
   describe('State Persistence', () => {
     it('should persist state to storage', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const stateToPersist = {
         user: { id: '1', preferences: { theme: 'dark', language: 'en' } },
@@ -256,7 +256,7 @@ describe('State Management', () => {
     });
 
     it('should restore state from storage', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const persistedState = {
         user: { id: '1', name: 'John Doe' },
@@ -279,7 +279,7 @@ describe('State Management', () => {
     });
 
     it('should handle state migration', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const oldState = {
         user: { id: '1', profile: { name: 'John' } },
@@ -307,7 +307,7 @@ describe('State Management', () => {
     });
 
     it('should handle state backup and restore', async () => {
-      const { globalStore } = await import('@client/core/state/store');
+      const { globalStore } = await import('@client/infrastructure/state/store');
 
       const backupData = {
         state: { user: { id: '1' }, settings: {} },
@@ -331,8 +331,8 @@ describe('State Management', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete state management workflow', async () => {
-      const { globalStore } = await import('@client/core/state/store');
-      const { stateSync } = await import('@client/core/state/sync');
+      const { globalStore } = await import('@client/infrastructure/state/store');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       // Complete workflow: state update -> sync -> persistence -> restore
       const workflow = {
@@ -374,8 +374,8 @@ describe('State Management', () => {
     });
 
     it('should handle state recovery scenarios', async () => {
-      const { globalStore } = await import('@client/core/state/store');
-      const { stateSync } = await import('@client/core/state/sync');
+      const { globalStore } = await import('@client/infrastructure/state/store');
+      const { stateSync } = await import('@client/infrastructure/state/sync');
 
       const recoveryScenario = {
         corruptedState: { user: null, settings: {} },

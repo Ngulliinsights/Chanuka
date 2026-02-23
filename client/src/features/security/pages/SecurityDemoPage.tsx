@@ -8,8 +8,8 @@ import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Activity } from 'lucide-
 import React from 'react';
 import { useState, useEffect } from 'react';
 
-import { SecurityDashboard } from '@client/core/security/ui/dashboard/SecurityDashboard';
-import { SecuritySettings } from '@client/core/security/ui/dashboard/SecuritySettings';
+import { SecurityDashboard } from '@client/infrastructure/security/ui/dashboard/SecurityDashboard';
+import { SecuritySettings } from '@client/infrastructure/security/ui/dashboard/SecuritySettings';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';

@@ -125,9 +125,9 @@ import { AppConfig } from './index';
 - `ServiceErrorHandler`
 
 **Actual modules available:**
-- `client/src/core/error/types.ts` (for error types)
-- `client/src/core/error/handler.ts` (for error handling)
-- `client/src/core/error/middleware/` (for middleware handlers)
+- `client/src/infrastructure/error/types.ts` (for error types)
+- `client/src/infrastructure/error/handler.ts` (for error handling)
+- `client/src/infrastructure/error/middleware/` (for middleware handlers)
 
 **TODO:** Either implement the missing modules or rewrite test to use actual error handling
 

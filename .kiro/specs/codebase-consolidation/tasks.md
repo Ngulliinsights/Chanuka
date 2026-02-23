@@ -83,31 +83,31 @@ _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7_
 
 - [x] 1.1.5: Extract shared types if needed (based on 1.1.2 findings)
   - If types are used by globalApiClient or other code:
-    - Create `client/src/core/api/types/interceptors.ts`
+    - Create `client/src/infrastructure/api/types/interceptors.ts`
     - Move `RequestInterceptor`, `ResponseInterceptor`, `ErrorInterceptor` types
-    - Update `client/src/core/api/types/index.ts` to export these types
+    - Update `client/src/infrastructure/api/types/index.ts` to export these types
     - Update imports in files that use these types
   - If types are only used by deleted clients: Skip extraction
 
 - [x] 1.1.6: Delete unused client files
   ```bash
   # Core deletions (confirmed dead)
-  rm client/src/core/api/base-client.ts
-  rm client/src/core/api/authenticated-client.ts
-  rm client/src/core/api/safe-client.ts
-  rm client/src/core/api/circuit-breaker-client.ts
-  rm -r client/src/core/api/examples/
+  rm client/src/infrastructure/api/base-client.ts
+  rm client/src/infrastructure/api/authenticated-client.ts
+  rm client/src/infrastructure/api/safe-client.ts
+  rm client/src/infrastructure/api/circuit-breaker-client.ts
+  rm -r client/src/infrastructure/api/examples/
   
   # KEEP authentication.ts (per design document and investigation)
-  # DO NOT DELETE: client/src/core/api/authentication.ts
+  # DO NOT DELETE: client/src/infrastructure/api/authentication.ts
   
   # Conditional deletions (based on investigation)
   # If retry-handler.ts has 0 usages:
-  # rm client/src/core/api/retry-handler.ts
+  # rm client/src/infrastructure/api/retry-handler.ts
   ```
 
 - [x] 1.1.7: Update barrel exports in index.ts
-  - Edit `client/src/core/api/index.ts`
+  - Edit `client/src/infrastructure/api/index.ts`
   - Remove these exports:
     ```typescript
     // DELETE - Dead clients
@@ -278,7 +278,7 @@ _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
 - [x] 1.3.2: Update compatibility layer
   ```typescript
-  // client/src/core/security/migration/compatibility-layer.ts
+  // client/src/infrastructure/security/migration/compatibility-layer.ts
   // Replace conditional export with direct export
   export { UnifiedCSPManager as CSPManager } from '../unified/csp-manager';
   ```
@@ -300,13 +300,13 @@ _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6_
 
 - [x] 1.3.5: Delete legacy files
   ```bash
-  rm client/src/core/security/csp-manager.ts
-  rm -r client/src/core/security/migration/
+  rm client/src/infrastructure/security/csp-manager.ts
+  rm -r client/src/infrastructure/security/migration/
   ```
 
 - [x] 1.3.6: Update barrel exports
   ```typescript
-  // client/src/core/security/index.ts
+  // client/src/infrastructure/security/index.ts
   export { UnifiedCSPManager as CSPManager } from './unified/csp-manager';
   export { initializeSecuritySystem } from './unified/system';
   ```
@@ -1014,8 +1014,8 @@ npm run dev
 
 **API Client Removal:**
 ```bash
-git checkout <commit-before-deletion> -- client/src/core/api/safe-client.ts
-git checkout <commit-before-deletion> -- client/src/core/api/index.ts
+git checkout <commit-before-deletion> -- client/src/infrastructure/api/safe-client.ts
+git checkout <commit-before-deletion> -- client/src/infrastructure/api/index.ts
 npm run build
 ```
 

@@ -8,7 +8,7 @@
  */
 
 import { errorTracker } from '../monitoring/error-tracker';
-import { logger } from '../core/logger';
+import { logger, logBuffer } from '../core/logger';
 import {
   DB_SLOW_QUERY_MS,
   DB_VERY_SLOW_QUERY_MS,
@@ -20,6 +20,19 @@ import type {
 } from '../core/types';
 
 const COMPONENT = 'database';
+
+/**
+ * Database operation log entry for structured logging
+ */
+interface DatabaseLogEntry {
+  component: string;
+  operation: string;
+  table: string;
+  duration?: number;
+  success?: boolean;
+  error?: string;
+  [key: string]: unknown;
+}
 
 // ─── Main class ───────────────────────────────────────────────────────────────
 
@@ -45,10 +58,16 @@ export class DatabaseLogger {
     const startTime   = performance.now();
     const operationId = generateId('db_op');
 
-    logger.debug(
-      { component: COMPONENT, ...context, operationId, ...additionalMetadata },
-      'Database operation started',
-    );
+    const logEntry: DatabaseLogEntry = {
+      component: COMPONENT,
+      operation: context.operation,
+      table: context.table,
+      operationId,
+      ...context,
+      ...additionalMetadata,
+    };
+
+    logger.debug(logEntry, 'Database operation started');
 
     try {
       const result   = await operation();
@@ -82,6 +101,29 @@ export class DatabaseLogger {
       errorTracker.trackError(err as Error, errCtx, 'medium', 'database');
       throw err;
     }
+  }
+
+  /**
+   * Query recent database operation logs from the log buffer
+   * @param limit - Maximum number of logs to return
+   * @param filters - Optional filters for operation type, table, etc.
+   */
+  queryRecentOperations(
+    limit = 100,
+    filters?: {
+      operation?: string;
+      table?: string;
+      slowQueriesOnly?: boolean;
+      errorsOnly?: boolean;
+    }
+  ): DatabaseLogEntry[] {
+    const logs = logBuffer.query({
+      component: COMPONENT,
+      limit,
+      ...filters,
+    });
+
+    return logs as DatabaseLogEntry[];
   }
 
   /**

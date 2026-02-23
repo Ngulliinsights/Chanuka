@@ -246,7 +246,10 @@ export const LanguageToggle: React.FC<{ className?: string }> = ({ className = '
   const toggleLanguage = () => {
     const currentIndex = availableLanguages.indexOf(language);
     const nextIndex = (currentIndex + 1) % availableLanguages.length;
-    changeLanguage(availableLanguages[nextIndex]);
+    const nextLanguage = availableLanguages[nextIndex];
+    if (nextLanguage) {
+      changeLanguage(nextLanguage);
+    }
   };
 
   const currentLanguageInfo = LANGUAGE_INFO[language];

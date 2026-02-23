@@ -20,8 +20,8 @@ export {
 export type { LoggingConfig } from './config/logging-config';
 
 // ─── Core logger (most-imported export in the codebase) ──────────────────────
-export { logger, logBuffer } from './core/logger';
-export type { Logger } from './core/logger';
+export { logger, logBuffer } from './core';
+export type { Logger } from './core';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export type {
@@ -42,7 +42,7 @@ export type {
   LogAggregationResult,
   AlertRule,
   AlertCondition,
-} from './core/types';
+} from './core';
 
 // ─── HTTP middleware ──────────────────────────────────────────────────────────
 export { auditMiddleware, logSensitiveOperation } from './http/audit-middleware';
@@ -67,15 +67,17 @@ export {
 } from './database/database-logger';
 
 // ─── Monitoring ───────────────────────────────────────────────────────────────
-export * from './monitoring/monitoring-policy';
-export { monitoringScheduler, MonitoringScheduler } from './monitoring/monitoring-scheduler';
+export * from './monitoring';
 export {
   performanceMonitor,
   PerformanceMonitor,
   monitorOperation,
-} from './monitoring/performance-monitor';
-export { logAggregator, LogAggregator } from './monitoring/log-aggregator';
-export { errorTracker } from './monitoring/error-tracker';
+  logAggregator,
+  LogAggregator,
+  monitoringScheduler,
+  MonitoringScheduler,
+  errorTracker,
+} from './monitoring';
 
 // ─── Express middleware factories ─────────────────────────────────────────────
 import type { NextFunction, Request, Response } from 'express';

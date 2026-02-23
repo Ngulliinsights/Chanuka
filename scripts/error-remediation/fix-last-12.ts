@@ -121,8 +121,8 @@ export default ConflictAnalysisResult;
   fixed++;
 }
 
-// Add measureAsync and recordMetric exports to @client/core
-if (updateFile('client/src/core/index.ts', c => {
+// Add measureAsync and recordMetric exports to @client/infrastructure
+if (updateFile('client/src/infrastructure/index.ts', c => {
   if (c.includes('measureAsync') && c.includes('recordMetric')) return c;
   return c + `\n
 export const measureAsync = async <T>(fn: () => Promise<T>): Promise<T> => {

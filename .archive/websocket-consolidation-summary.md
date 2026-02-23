@@ -3,7 +3,7 @@
 ## 📊 Final Validation Results
 
 ### ✅ **WebSocket Core Consolidation: SUCCESS**
-- **✅ Duplicate types file removed**: `client/src/core/api/types/websocket.ts` 
+- **✅ Duplicate types file removed**: `client/src/infrastructure/api/types/websocket.ts` 
 - **✅ Unified import source**: All WebSocket types now use `@server/infrastructure/schema/websocket`
 - **✅ Browser compatibility**: Fixed Node.js timer types in WebSocket client
 - **✅ Consistent field naming**: Standardized on `data` field (1,162 vs 76 usage ratio)

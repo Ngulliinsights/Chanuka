@@ -8,7 +8,7 @@ import { useState } from 'react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {

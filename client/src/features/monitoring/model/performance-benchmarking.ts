@@ -10,7 +10,7 @@
  * Requirements: 9.1, 9.2
  */
 
-import { PerformanceMonitor } from '@client/core/performance/monitor';
+import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
 import { logger } from '@client/lib/utils/logger';
 
 export interface PerformanceThresholds {

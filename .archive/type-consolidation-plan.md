@@ -9,7 +9,7 @@
 - **Active usage** - 50+ files still importing from legacy location
 
 ### Current Type Organization
-1. **`client/src/core/api/types/`** - API-related types (well organized)
+1. **`client/src/infrastructure/api/types/`** - API-related types (well organized)
 2. **`client/src/lib/types/`** - Shared types (minimal, mostly re-exports)
 3. **`client/src/types/`** - Legacy location (deprecated but active)
 
@@ -19,11 +19,11 @@
 **Files with active legacy imports (50+ files):**
 
 #### High Priority - Dashboard Types
-- `@client/types/user-dashboard` → `@client/core/api/types/preferences` + new dashboard types
+- `@client/types/user-dashboard` → `@client/infrastructure/api/types/preferences` + new dashboard types
 - Used in: UserDashboard.tsx, useDashboardData.ts, dashboard sections, modals
 
 #### High Priority - Auth Types  
-- `@client/types/auth` → `@client/core/auth/types`
+- `@client/types/auth` → `@client/infrastructure/auth/types`
 - Used in: Privacy components, auth forms
 
 #### Medium Priority - Navigation Types
@@ -35,7 +35,7 @@
 - Used in: Mobile UI components
 
 #### Low Priority - Core Types
-- `@client/types/core` → `@client/core/api/types/common`
+- `@client/types/core` → `@client/infrastructure/api/types/common`
 - Used in: Bill components, community features
 
 ### Phase 2: Create Missing Type Locations
@@ -56,7 +56,7 @@ export type SwipeGestureData = { ... }
 export type BottomSheetConfig = { ... }
 ```
 
-#### Extend `client/src/core/api/types/preferences.ts`
+#### Extend `client/src/infrastructure/api/types/preferences.ts`
 ```typescript
 // Add dashboard-specific preference types
 export type DashboardPreferences = { ... }

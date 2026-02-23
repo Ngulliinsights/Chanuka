@@ -430,7 +430,7 @@ const COMMON_RELOCATIONS: Record<string, FSDLocation> = {
     segment: 'config'
   },
   '@client/config/navigation': {
-    path: 'client/src/core/navigation/config.ts',
+    path: 'client/src/infrastructure/navigation/config.ts',
     layer: 'core',
     segment: 'navigation'
   },
@@ -445,7 +445,7 @@ const COMMON_RELOCATIONS: Record<string, FSDLocation> = {
     segment: 'services'
   },
   '@client/utils/security': {
-    path: 'client/src/core/security/index.ts',
+    path: 'client/src/infrastructure/security/index.ts',
     layer: 'core',
     segment: 'security'
   }
@@ -460,7 +460,7 @@ const COMMON_RELOCATIONS: Record<string, FSDLocation> = {
 // Example: Dashboard preferences
 // OLD (fragmented):
 //   - client/src/features/dashboard/types.ts: DashboardPreferences
-//   - client/src/core/dashboard/types.ts: UserDashboardPreferences
+//   - client/src/infrastructure/dashboard/types.ts: UserDashboardPreferences
 // NEW (consolidated):
 //   - shared/types/dashboard/index.ts: DashboardPreferences
 
@@ -502,7 +502,7 @@ const TYPE_CONSOLIDATIONS: TypeConsolidation[] = [
         shouldRemove: true
       },
       {
-        path: 'client/src/core/dashboard/types.ts',
+        path: 'client/src/infrastructure/dashboard/types.ts',
         name: 'UserDashboardPreferences',
         shouldRemove: true
       }
@@ -898,7 +898,7 @@ describe('Type Consolidation', () => {
     const duplicates = new Map([
       ['DashboardPreferences', [
         'client/src/features/dashboard/types.ts',
-        'client/src/core/dashboard/types.ts'
+        'client/src/infrastructure/dashboard/types.ts'
       ]]
     ]);
     
@@ -1082,7 +1082,7 @@ export const remediationConfig = {
   fsdLayers: {
     app: 'client/src/app',
     features: 'client/src/features',
-    core: 'client/src/core',
+    core: 'client/src/infrastructure',
     lib: 'client/src/lib',
     shared: 'shared'
   },
@@ -1105,7 +1105,7 @@ export const remediationConfig = {
     preferredLocations: [
       'shared/types',
       'client/src/lib/types',
-      'client/src/core'
+      'client/src/infrastructure'
     ],
     
     // Minimum number of duplicates to trigger consolidation

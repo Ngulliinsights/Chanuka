@@ -5,8 +5,8 @@
  * Features improved type safety, caching, efficient data processing, and comprehensive analytics.
  */
 
-import { coreErrorHandler } from '@client/core/error/handler';
-import { ErrorDomain, ErrorSeverity } from '@client/core/error/types';
+import { coreErrorHandler } from '@client/infrastructure/error/handler';
+import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error/types';
 
 // ============================================================================
 // Core Types
@@ -31,13 +31,6 @@ interface CoreError {
     url?: string;
     [key: string]: unknown;
   };
-}
-
-interface TimeSeriesPoint {
-  timestamp: number;
-  value: number;
-  category?: string;
-  metadata?: Record<string, unknown>;
 }
 
 interface TimeRange {
@@ -254,7 +247,7 @@ class StatisticsUtils {
     if (values.length === 0) return 0;
     const sorted = [...values].sort((a, b) => a - b);
     const index = Math.floor((percentile / 100) * sorted.length);
-    return sorted[Math.min(index, sorted.length - 1)];
+    return sorted[Math.min(index, sorted.length - 1)] ?? 0;
   }
 
   static calculateMovingAverage(values: number[], windowSize: number): number[] {
@@ -698,8 +691,8 @@ class ErrorAnalyticsBridge {
     const threshold = overallMean + stdDev;
 
     const peakHours = Array.from(hourlyValues.keys())
-      .filter(hour => hourlyAverages[hour.toString()] > threshold)
-      .sort((a, b) => hourlyAverages[b.toString()] - hourlyAverages[a.toString()]);
+      .filter(hour => (hourlyAverages[hour.toString()] ?? 0) > threshold)
+      .sort((a, b) => (hourlyAverages[b.toString()] ?? 0) - (hourlyAverages[a.toString()] ?? 0));
 
     const detected = peakHours.length > 0 && stdDev > overallMean * 0.2;
     const confidence = detected ? Math.min(stdDev / overallMean, 1) : 0;
@@ -770,17 +763,17 @@ class ErrorAnalyticsBridge {
 
     for (let i = 0; i < n; i++) {
       const xDiff = i - xMean;
-      const yDiff = values[i] - yMean;
+      const yDiff = (values[i] ?? 0) - yMean;
       numerator += xDiff * yDiff;
       denominator += xDiff * xDiff;
     }
 
     const slope = denominator !== 0 ? numerator / denominator : 0;
-    const lastValue = values[values.length - 1];
+    const lastValue = values[values.length - 1] ?? 0;
 
     // Calculate confidence based on R-squared
     const predictions = values.map((_, i) => yMean + slope * (i - xMean));
-    const ssRes = values.reduce((sum, val, i) => sum + Math.pow(val - predictions[i], 2), 0);
+    const ssRes = values.reduce((sum, val, i) => sum + Math.pow(val - (predictions[i] ?? 0), 2), 0);
     const ssTot = values.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
     const rSquared = ssTot !== 0 ? 1 - ssRes / ssTot : 0;
     const confidence = Math.max(0, Math.min(1, rSquared));
@@ -789,9 +782,9 @@ class ErrorAnalyticsBridge {
     const trend = Math.abs(slope) < yMean * 0.05 ? 'stable' : slope > 0 ? 'up' : 'down';
 
     return {
-      nextHour: Math.max(0, lastValue + slope),
-      nextDay: Math.max(0, lastValue + slope * 24),
-      nextWeek: Math.max(0, lastValue + slope * 168),
+      nextHour: Math.max(0, (lastValue ?? 0) + slope),
+      nextDay: Math.max(0, (lastValue ?? 0) + slope * 24),
+      nextWeek: Math.max(0, (lastValue ?? 0) + slope * 168),
       confidence,
       trend,
     };
@@ -820,6 +813,8 @@ class ErrorAnalyticsBridge {
       if (patternErrors.length < 2) continue;
 
       const firstError = patternErrors[0];
+      if (!firstError) continue;
+      
       const timestamps = patternErrors.map(e => e.timestamp);
       const affectedUserIds = new Set(
         patternErrors.map(e => e.context?.userId).filter((id): id is string => Boolean(id))
@@ -849,6 +844,9 @@ class ErrorAnalyticsBridge {
 
   private buildErrorCluster(errors: CoreError[]): ErrorCluster {
     const firstError = errors[0];
+    if (!firstError) {
+      throw new Error('Cannot build error cluster from empty array');
+    }
 
     return {
       centroid: {
@@ -872,6 +870,15 @@ class ErrorAnalyticsBridge {
 
   private calculatePatternImpact(errors: CoreError[]): ErrorPattern['impact'] {
     const firstError = errors[0];
+    if (!firstError) {
+      return {
+        userExperience: 'low',
+        businessImpact: 'low',
+        frequency: 'occasional',
+        scope: 'isolated',
+      };
+    }
+    
     const frequency = errors.length;
 
     const userExperience =

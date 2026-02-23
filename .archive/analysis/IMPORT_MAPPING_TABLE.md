@@ -104,13 +104,13 @@ export * from './validation';
 
 | Current Import Path | Actual File Location | Status | Replacement | Rationale | Cascading Files |
 |---------------------|---------------------|--------|-------------|-----------|-----------------|
-| `@/core/api/client` | `client/src/core/api/client.ts` | ✅ Valid | No change | Main API client | 156 files |
-| `@/core/api/authenticated-client` | `client/src/core/api/authenticated-client.ts` | ✅ Valid | No change | Auth wrapper | 45 files |
-| `@/core/api/circuit-breaker-client` | `client/src/core/api/circuit-breaker-client.ts` | ✅ Valid | No change | Resilience wrapper | 23 files |
-| `@/core/api/safe-client` | `client/src/core/api/safe-client.ts` | ✅ Valid | No change | Error-safe wrapper | 34 files |
-| `@/core/api/types/common` | `client/src/core/api/types/common.ts` | ✅ Valid | No change | Common API types | 89 files |
-| `@/core/api/types` | `client/src/core/api/types/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize type exports | 67 files |
-| `@/core/api` | `client/src/core/api/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize API exports | 123 files |
+| `@/core/api/client` | `client/src/infrastructure/api/client.ts` | ✅ Valid | No change | Main API client | 156 files |
+| `@/core/api/authenticated-client` | `client/src/infrastructure/api/authenticated-client.ts` | ✅ Valid | No change | Auth wrapper | 45 files |
+| `@/core/api/circuit-breaker-client` | `client/src/infrastructure/api/circuit-breaker-client.ts` | ✅ Valid | No change | Resilience wrapper | 23 files |
+| `@/core/api/safe-client` | `client/src/infrastructure/api/safe-client.ts` | ✅ Valid | No change | Error-safe wrapper | 34 files |
+| `@/core/api/types/common` | `client/src/infrastructure/api/types/common.ts` | ✅ Valid | No change | Common API types | 89 files |
+| `@/core/api/types` | `client/src/infrastructure/api/types/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize type exports | 67 files |
+| `@/core/api` | `client/src/infrastructure/api/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize API exports | 123 files |
 
 **Circular Dependency Risk:**
 ```
@@ -119,7 +119,7 @@ client.ts → authenticated-client.ts → auth/service.ts → api/client.ts
 
 **Recommended Refactoring:**
 ```typescript
-// client/src/core/api/index.ts
+// client/src/infrastructure/api/index.ts
 // Export types first (no circular deps)
 export * from './types';
 
@@ -141,15 +141,15 @@ export { createApiClient } from './factory';
 
 | Current Import Path | Actual File Location | Status | Replacement | Rationale | Cascading Files |
 |---------------------|---------------------|--------|-------------|-----------|-----------------|
-| `@/core/analytics/service` | `client/src/core/analytics/service.ts` | ✅ Valid | No change | Main analytics service | 45 files |
-| `@/core/analytics/comprehensive-tracker` | `client/src/core/analytics/comprehensive-tracker.ts` | ✅ Valid | No change | Tracking implementation | 23 files |
-| `@/core/analytics/data-retention-service` | `client/src/core/analytics/data-retention-service.ts` | ✅ Valid | No change | Data retention logic | 12 files |
-| `@/core/analytics/AnalyticsProvider` | `client/src/core/analytics/AnalyticsProvider.tsx` | ✅ Valid | No change | React provider | 34 files |
-| `@/core/analytics` | `client/src/core/analytics/index.ts` | ❌ Missing | Create barrel export | Centralize analytics imports | 89 files |
+| `@/core/analytics/service` | `client/src/infrastructure/analytics/service.ts` | ✅ Valid | No change | Main analytics service | 45 files |
+| `@/core/analytics/comprehensive-tracker` | `client/src/infrastructure/analytics/comprehensive-tracker.ts` | ✅ Valid | No change | Tracking implementation | 23 files |
+| `@/core/analytics/data-retention-service` | `client/src/infrastructure/analytics/data-retention-service.ts` | ✅ Valid | No change | Data retention logic | 12 files |
+| `@/core/analytics/AnalyticsProvider` | `client/src/infrastructure/analytics/AnalyticsProvider.tsx` | ✅ Valid | No change | React provider | 34 files |
+| `@/core/analytics` | `client/src/infrastructure/analytics/index.ts` | ❌ Missing | Create barrel export | Centralize analytics imports | 89 files |
 
 **Recommended Barrel Export:**
 ```typescript
-// client/src/core/analytics/index.ts
+// client/src/infrastructure/analytics/index.ts
 export { AnalyticsService } from './service';
 export { ComprehensiveTracker } from './comprehensive-tracker';
 export { DataRetentionService } from './data-retention-service';
@@ -169,11 +169,11 @@ export type {
 
 | Current Import Path | Actual File Location | Status | Replacement | Rationale | Cascading Files |
 |---------------------|---------------------|--------|-------------|-----------|-----------------|
-| `@/core/auth/service` | `client/src/core/auth/service.ts` | ✅ Valid | No change | Auth service | 78 files |
-| `@/core/auth/types` | `client/src/core/auth/types.ts` | ✅ Valid | No change | Auth types | 56 files |
-| `@/core/auth/hooks/useAuth` | `client/src/core/auth/hooks/useAuth.tsx` | ✅ Valid | No change | Auth hook | 123 files |
-| `@/core/auth/store/auth-slice` | `client/src/core/auth/store/auth-slice.ts` | ✅ Valid | No change | Redux slice | 34 files |
-| `@/core/auth` | `client/src/core/auth/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize auth exports | 156 files |
+| `@/core/auth/service` | `client/src/infrastructure/auth/service.ts` | ✅ Valid | No change | Auth service | 78 files |
+| `@/core/auth/types` | `client/src/infrastructure/auth/types.ts` | ✅ Valid | No change | Auth types | 56 files |
+| `@/core/auth/hooks/useAuth` | `client/src/infrastructure/auth/hooks/useAuth.tsx` | ✅ Valid | No change | Auth hook | 123 files |
+| `@/core/auth/store/auth-slice` | `client/src/infrastructure/auth/store/auth-slice.ts` | ✅ Valid | No change | Redux slice | 34 files |
+| `@/core/auth` | `client/src/infrastructure/auth/index.ts` | ⚠️ Incomplete | Use barrel export | Centralize auth exports | 156 files |
 
 **Circular Dependency Risk:**
 ```
@@ -387,7 +387,7 @@ Concrete: User type
 ### P0 - Critical (Blocks Development)
 1. ✅ Create `shared/types/index.ts` barrel export
 2. ✅ Create `shared/validation/index.ts` barrel export
-3. ✅ Create `client/src/core/analytics/index.ts` barrel export
+3. ✅ Create `client/src/infrastructure/analytics/index.ts` barrel export
 4. ✅ Fix circular dependency in client API/auth modules
 
 ### P1 - High (Causes Frequent Issues)

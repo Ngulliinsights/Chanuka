@@ -75,7 +75,7 @@ This document tracks the status of API endpoint validation migration. All endpoi
 
 ## Client API Endpoints
 
-### Client API Services (`client/src/core/api/`)
+### Client API Services (`client/src/infrastructure/api/`)
 
 Client-side API calls should also validate request data before sending. This is tracked separately.
 

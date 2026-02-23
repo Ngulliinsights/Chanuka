@@ -42,7 +42,7 @@ import {
   selectMostVisitedPages,
   selectIsAnyMenuOpen,
   selectNavigationUIState,
-} from '../infrastructure/store/slices/navigationSlice';
+} from '../../infrastructure/store/slices/navigationSlice';
 import type {
   BreadcrumbItem,
   RelatedPage,

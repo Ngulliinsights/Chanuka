@@ -4,12 +4,12 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Provider as ReduxProvider } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { AnalyticsProvider } from '@client/core/analytics/AnalyticsProvider';
-import { useConnectionAware } from '@client/core/api/hooks/useConnectionAware';
-import { useAuth } from '@client/core/auth';
-import { SimpleErrorBoundary } from '@client/core/error/components/SimpleErrorBoundary';
-import { LoadingProvider } from '@client/core/loading';
-import { createNavigationProvider } from '@client/core/navigation/context';
+import { AnalyticsProvider } from '@client/infrastructure/analytics/AnalyticsProvider';
+import { useConnectionAware } from '@client/infrastructure/api/hooks/useConnectionAware';
+import { useAuth } from '@client/infrastructure/auth';
+import { SimpleErrorBoundary } from '@client/infrastructure/error/components/SimpleErrorBoundary';
+import { LoadingProvider } from '@client/infrastructure/loading';
+import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
 import { AuthProvider } from '@client/features/users/hooks';
 import { KenyanContextProvider } from '@client/lib/context/KenyanContextProvider';
@@ -18,7 +18,7 @@ import { ChanukaProviders } from '@client/lib/design-system';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { I18nProvider } from '@client/lib/hooks/use-i18n';
 import { useOfflineDetection } from '@client/lib/hooks/useOfflineDetection';
-import { initializeStore } from '@client/lib/infrastructure/store';
+import { initializeStore } from '@client/infrastructure/store';
 import { AccessibilityProvider } from '@client/lib/ui/accessibility/accessibility-manager';
 import { OfflineProvider } from '@client/lib/ui/offline/offline-manager';
 import { assetLoadingManager } from '@client/lib/utils/assets';

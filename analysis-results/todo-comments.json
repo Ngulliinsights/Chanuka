@@ -256,7 +256,7 @@
       "column": 4,
       "keyword": "TODO",
       "message": "Uncomment when modules are created",
-      "context": "export { useSidebar as useSidebarFSD } from '@client/core/navigation/hooks';\nexport { useMobileMenu as useMobileMenuFSD } from '@client/core/navigation/hooks';\n// TODO: Uncomment when modules are created\n// export { useOnlineStatus as useOnlineStatusFSD } from '../core/loading/hooks';\n// export { useJourneyTracker } from '../features/analytics/hooks';",
+      "context": "export { useSidebar as useSidebarFSD } from '@client/infrastructure/navigation/hooks';\nexport { useMobileMenu as useMobileMenuFSD } from '@client/infrastructure/navigation/hooks';\n// TODO: Uncomment when modules are created\n// export { useOnlineStatus as useOnlineStatusFSD } from '../core/loading/hooks';\n// export { useJourneyTracker } from '../features/analytics/hooks';",
       "type": "missing_feature",
       "priority": "medium"
     },

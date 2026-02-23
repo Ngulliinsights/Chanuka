@@ -1,6 +1,8 @@
 # Chanuka Platform
 
-A modern full-stack application built with React, Express, and PostgreSQL in a professional monorepo structure.
+A modern civic engagement platform built with React, Express, and PostgreSQL in a professional monorepo structure.
+
+**Status**: 🚧 Pre-launch development phase
 
 ## 🚀 Quick Start
 
@@ -19,10 +21,55 @@ Visit:
 - **Frontend**: http://localhost:5173
 - **Backend**: http://localhost:4200
 
+## 🎯 Platform Status
+
+**Current Phase**: Pre-launch development  
+**Target Launch**: Q2 2026
+
+### What's Working Today
+- ✅ Bill tracking and search
+- ✅ User authentication and profiles
+- ✅ Community comments and voting
+- ✅ Constitutional analysis
+- ✅ Multi-language support (English & Swahili)
+- ✅ Real-time notifications
+
+### In Active Development
+- 🟡 WCAG AA accessibility compliance (6-week plan)
+- 🟡 Advanced argument intelligence
+- 🟡 Electoral accountability features
+- 🟡 TypeScript error remediation (~5,000 errors)
+
+### Planned Features
+- 📋 Weighted representation system
+- 📋 Media integration
+- 📋 Coalition builder UI
+- 📋 Mobile optimization
+
+See [CURRENT_CAPABILITIES.md](./CURRENT_CAPABILITIES.md) for detailed feature status.
+
+## 🌍 Language Support
+
+- ✅ **English** - Full support
+- ✅ **Kiswahili** - Full support (200+ strings translated)
+- 🟡 Native speaker validation in progress
+
+## ♿ Accessibility
+
+- 🟡 **WCAG AA Compliance** - In progress (6-week implementation plan)
+- Target: April 2026
+- See [WCAG_ACCESSIBILITY_AUDIT.md](./WCAG_ACCESSIBILITY_AUDIT.md) for details
+
 ## 📚 Documentation
 
+**Start Here**:
+- [📋 Documentation Index](./DOCUMENTATION_INDEX.md) ← **Complete guide to all docs**
+- [🏗️ Architecture Overview](./ARCHITECTURE.md) ← **Module organization**
+- [✅ Current Capabilities](./CURRENT_CAPABILITIES.md) ← **What actually works today**
+- [⚠️ Contradictions Reconciliation](./CONTRADICTIONS_RECONCILIATION.md) ← **Addressing gaps**
+
+**Detailed Guides**:
 - [📖 Full Documentation](./docs/README.md)
-- [🏗️ Architecture Overview](./ARCHITECTURE.md) ← **Start here for module organization**
 - [🏗️ Setup Guide](./docs/setup.md)
 - [🔧 Monorepo Guide](./docs/monorepo.md)
 - [🏛️ Architecture](./docs/architecture.md)
@@ -30,6 +77,11 @@ Visit:
   - [API Service Unification](./docs/migrations/api-service-unification.md)
   - [Logger Consolidation](./docs/migrations/logger-consolidation.md)
   - [Offline Detection Resolution](./docs/migrations/offline-detection-resolution.md)
+
+**Strategic Analysis**:
+- [📊 Strategic Documentation Analysis](./STRATEGIC_DOCUMENTATION_ANALYSIS.md)
+- [🔍 Comprehensive Codebase Audit](./COMPREHENSIVE_CODEBASE_AUDIT.md)
+- [⚖️ Ambition vs Reality Audit](./CODEBASE_AMBITION_VS_REALITY_AUDIT.md)
 
 ## 🏗️ Structure
 

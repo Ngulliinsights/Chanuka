@@ -21,8 +21,8 @@ This document establishes the baseline count of bugs in the codebase before impl
 ### High Priority Bugs (Fix Soon): 13 bugs
 
 **Location: client/** (6 bugs)
-6. ❌ Missing Analytics Service implementation - `client/src/core/analytics/service.ts`
-7. ❌ Missing Telemetry Service implementation - `client/src/core/telemetry/service.ts`
+6. ❌ Missing Analytics Service implementation - `client/src/infrastructure/analytics/service.ts`
+7. ❌ Missing Telemetry Service implementation - `client/src/infrastructure/telemetry/service.ts`
 8. ❌ Incorrect API Service Import (analyticsApiService from @/core/api doesn't resolve) - `client/src/features/analytics/services/analytics.ts`
 9. ❌ Missing Type Definitions (9 types missing) - `client/src/features/analytics/types.ts`
 16. ❌ WebSocket management lacks robust error handling - `client/src/features/bills/ui/tracking/real-time-tracker.tsx`
@@ -52,7 +52,7 @@ This document establishes the baseline count of bugs in the codebase before impl
 24. ❌ errorAnalyticsBridge.ts file not found (referenced but missing) - `client/src/services/errorAnalyticsBridge.ts`
 25. ❌ Performance issues with large datasets in ActivityFeed (no virtualization) - `client/src/features/community/ui/activity/ActivityFeed.tsx`
 26. ❌ Performance issues with large datasets in bills-dashboard (no virtualization) - `client/src/features/bills/ui/bills-dashboard.tsx`
-27. ❌ No API retry logic for network/5xx errors - `client/src/core/api/*`
+27. ❌ No API retry logic for network/5xx errors - `client/src/infrastructure/api/*`
 28. ❌ No error boundaries for component error recovery - `client/src/lib/ui/*`
 
 ### Property Test Failures: 5 tests failing
@@ -73,8 +73,8 @@ This document establishes the baseline count of bugs in the codebase before impl
 
 ### Missing Implementations: 3 modules
 **Location: client/**
-35. ❌ `client/src/core/analytics/service.ts` (entire module missing)
-36. ❌ `client/src/core/telemetry/service.ts` (entire module missing)
+35. ❌ `client/src/infrastructure/analytics/service.ts` (entire module missing)
+36. ❌ `client/src/infrastructure/telemetry/service.ts` (entire module missing)
 37. ❌ `client/src/services/errorAnalyticsBridge.ts` (entire module missing)
 
 ### Validation Gaps: 4 issues

@@ -2,13 +2,13 @@ import type {
   PersonaType,
   PersonaClassification,
   PersonaPreferences,
-} from '@client/core/personalization/types';
+} from '@client/infrastructure/personalization/types';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 import React from 'react';
 import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import {
   Button,

@@ -8,7 +8,7 @@ import { useState } from 'react';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import {
   Card,
@@ -114,7 +114,7 @@ export default function RegisterPage() {
           </div>
         </div>
 
-        {/* Registration Form (RegisterForm not exported from @client/core/auth) */}
+        {/* Registration Form (RegisterForm not exported from @client/infrastructure/auth) */}
         <Card>
           <CardHeader>
             <CardTitle>Create Account</CardTitle>

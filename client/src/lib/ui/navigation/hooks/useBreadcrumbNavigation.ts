@@ -10,12 +10,12 @@ import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 
-import { generateBreadcrumbs } from '@client/core/navigation/breadcrumbs';
+import { generateBreadcrumbs } from '@client/infrastructure/navigation/breadcrumbs';
 import {
   updateBreadcrumbs,
   selectBreadcrumbs,
   selectNavigationPreferences,
-} from '@client/lib/infrastructure/store/slices/navigationSlice';
+} from '@client/infrastructure/store/slices/navigationSlice';
 import type { BreadcrumbItem } from '@client/lib/types/navigation';
 
 interface UseBreadcrumbNavigationOptions {

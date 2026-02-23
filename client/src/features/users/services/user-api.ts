@@ -1,4 +1,4 @@
-import { globalApiClient } from '@client/core/api/client';
+import { globalApiClient } from '@client/infrastructure/api/client';
 import { logger } from '@client/lib/utils/logger';
 import type { User } from '@client/lib/types';
 import type {

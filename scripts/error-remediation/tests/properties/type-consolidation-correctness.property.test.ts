@@ -35,7 +35,7 @@ describe('Property 3: Type Consolidation Correctness', () => {
               path: fc.constantFrom(
                 'shared/types/dashboard/index.ts',
                 'client/src/features/dashboard/types.ts',
-                'client/src/core/dashboard/types.ts',
+                'client/src/infrastructure/dashboard/types.ts',
                 'client/src/lib/types/dashboard.ts'
               ),
               properties: fc.array(
@@ -356,7 +356,7 @@ describe('Property 3: Type Consolidation Correctness', () => {
           // Create duplicate type definitions
           const duplicatePaths = [
             'client/src/features/test/types.ts',
-            'client/src/core/test/types.ts'
+            'client/src/infrastructure/test/types.ts'
           ];
 
           for (const path of duplicatePaths) {

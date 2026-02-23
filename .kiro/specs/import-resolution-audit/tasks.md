@@ -118,7 +118,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 ### Phase 2: Structural Hotspot Investigation
 
 - [x] 7. Investigate compiled output in source tree
-  - [x] 7.1 Audit client/src/core/websocket/ for compiled artifacts
+  - [x] 7.1 Audit client/src/infrastructure/websocket/ for compiled artifacts
     - List all .js, .js.map, .d.ts, .d.ts.map files in src/ directories
     - Verify these are committed artifacts (not gitignored)
     - _Requirements: TR-3, US-3_
@@ -135,7 +135,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
     - _Requirements: TR-3, US-3_
 
 - [x] 8. Investigate duplicated security UI components
-  - [x] 8.1 Compare client/src/core/security/ui/ vs client/src/features/security/ui/
+  - [x] 8.1 Compare client/src/infrastructure/security/ui/ vs client/src/features/security/ui/
     - Use project-structure-reference.md to identify exact duplicate files
     - Compare file contents to determine if identical or diverged
     - _Requirements: TR-3, US-3, US-7_
@@ -155,7 +155,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 
 - [x] 9. Investigate duplicated useAuth hook
   - [x] 9.1 Compare useAuth implementations
-    - Execute: `diff client/src/core/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
+    - Execute: `diff client/src/infrastructure/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
     - Determine if identical or diverged
     - _Requirements: TR-3, US-3, US-7_
   
@@ -172,7 +172,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 
 - [x] 10. Investigate duplicated loading utilities
   - [x] 10.1 Compare loading utils in both locations
-    - Compare client/src/core/loading/utils/ vs client/src/lib/ui/loading/utils/
+    - Compare client/src/infrastructure/loading/utils/ vs client/src/lib/ui/loading/utils/
     - Check for re-export relationships
     - Note camelCase loadingUtils.ts variant (red flag)
     - _Requirements: TR-3, US-3, US-7_
@@ -200,7 +200,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
     - _Requirements: TR-3, US-3, US-7_
 
 - [-] 12. Investigate FSD migration boundary
-  - [ ] 7.1 Audit client/src/core/websocket/ for compiled artifacts
+  - [ ] 7.1 Audit client/src/infrastructure/websocket/ for compiled artifacts
     - List all .js, .js.map, .d.ts, .d.ts.map files in src/ directories
     - Verify these are committed artifacts (not gitignored)
     - _Requirements: TR-3, US-3_
@@ -217,7 +217,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
     - _Requirements: TR-3, US-3_
 
 - [ ] 8. Investigate duplicated security UI components
-  - [ ] 8.1 Compare client/src/core/security/ui/ vs client/src/features/security/ui/
+  - [ ] 8.1 Compare client/src/infrastructure/security/ui/ vs client/src/features/security/ui/
     - Use project-structure-reference.md to identify exact duplicate files
     - Compare file contents to determine if identical or diverged
     - _Requirements: TR-3, US-3, US-7_
@@ -237,7 +237,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 
 - [ ] 9. Investigate duplicated useAuth hook
   - [ ] 9.1 Compare useAuth implementations
-    - Execute: `diff client/src/core/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
+    - Execute: `diff client/src/infrastructure/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
     - Determine if identical or diverged
     - _Requirements: TR-3, US-3, US-7_
   
@@ -254,7 +254,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 
 - [ ] 10. Investigate duplicated loading utilities
   - [ ] 10.1 Compare loading utils in both locations
-    - Compare client/src/core/loading/utils/ vs client/src/lib/ui/loading/utils/
+    - Compare client/src/infrastructure/loading/utils/ vs client/src/lib/ui/loading/utils/
     - Check for re-export relationships
     - Note camelCase loadingUtils.ts variant (red flag)
     - _Requirements: TR-3, US-3, US-7_
@@ -284,7 +284,7 @@ This plan implements a systematic 5-phase audit to resolve ~1,200 module resolut
 - [x] 12. Investigate FSD migration boundary
   - [x] 12.1 Find potential duplicates between lib/ and features/
     - Compare client/src/lib/services/ vs client/src/features/*/services/
-    - Compare client/src/lib/hooks/ vs client/src/core/*/hooks/
+    - Compare client/src/lib/hooks/ vs client/src/infrastructure/*/hooks/
     - Use project-structure-reference.md to identify patterns
     - _Requirements: TR-3, US-3, US-7_
   

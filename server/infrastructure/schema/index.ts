@@ -12,9 +12,11 @@
 // ============================================================================
 // CORE INFRASTRUCTURE - Database connections and utilities
 // ============================================================================
-// Re-export from database module now at server/infrastructure/database
-// These exports maintain backward compatibility
-export * from "@server/infrastructure/database";
+// NOTE: Database module should be imported directly to avoid circular dependencies
+// import { db, pool, getDatabase } from '@server/infrastructure/database';
+//
+// This re-export has been removed to prevent circular dependency issues
+// between schema and database modules.
 
 // ============================================================================
 // BASE TYPES - Centralized shared type patterns

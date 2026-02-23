@@ -27,15 +27,15 @@ const fixes: ImportFix[] = [];
 // Define import mapping rules
 const importMappings: Record<string, string> = {
   // Config imports
-  '../core/api/config': '@client/core/api/config',
+  '../core/api/config': '@client/infrastructure/api/config',
   '../lib/config/navigation': './navigation',
-  '../../core/api/config': '@client/core/api/config',
+  '../../core/api/config': '@client/infrastructure/api/config',
   
   // Navigation imports
-  '../core/navigation/context': '@client/core/navigation/context',
-  '../core/navigation/types': '@client/core/navigation/types',
-  '../../core/navigation/context': '@client/core/navigation/context',
-  '../../core/navigation/types': '@client/core/navigation/types',
+  '../core/navigation/context': '@client/infrastructure/navigation/context',
+  '../core/navigation/types': '@client/infrastructure/navigation/types',
+  '../../core/navigation/context': '@client/infrastructure/navigation/context',
+  '../../core/navigation/types': '@client/infrastructure/navigation/types',
   
   // Type imports - fix cross-boundary violations
   '@/types/domains/arguments': '@shared/types/domains/arguments',
@@ -44,7 +44,7 @@ const importMappings: Record<string, string> = {
   // Utility imports
   '@client/lib/utils/password-validation': '@client/lib/utils/input-validation',
   '../features/analytics/hooks/use-render-tracker': '@client/features/analytics/hooks/use-render-tracker',
-  '@client/lib/hooks/use-websocket': '@client/core/websocket/manager',
+  '@client/lib/hooks/use-websocket': '@client/infrastructure/websocket/manager',
   '@client/config/gestures': '@client/lib/config/gestures',
   '@client/data/mock/loaders': '@client/lib/data/mock/loaders',
   '@client/utils/security': '@client/lib/utils/security',
@@ -71,8 +71,8 @@ const specialCases: Record<string, (content: string) => string> = {
  * Re-exports from core navigation system
  */
 
-export { createNavigationProvider, useNavigation } from '@client/core/navigation/context';
-export type { NavigationContextValue } from '@client/core/navigation/types';
+export { createNavigationProvider, useNavigation } from '@client/infrastructure/navigation/context';
+export type { NavigationContextValue } from '@client/infrastructure/navigation/types';
 `;
   },
 };

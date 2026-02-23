@@ -14,7 +14,7 @@ The `globalApiClient` is the canonical implementation for making HTTP requests. 
 ### Basic Usage
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // GET request
 const response = await globalApiClient.get('/api/bills');
@@ -44,7 +44,7 @@ const deleteResponse = await globalApiClient.delete('/api/bills/123');
 #### Request Options
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 const response = await globalApiClient.get('/api/bills', {
   // Query parameters
@@ -161,7 +161,7 @@ const response = await globalApiClient.get('/api/bills', {
 Add custom request and response interceptors:
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // Request interceptor (e.g., add authentication)
 globalApiClient.addRequestInterceptor(async (request) => {
@@ -211,7 +211,7 @@ The `contractApiClient` provides type-safe API calls using endpoint contracts de
 ### Basic Usage
 
 ```typescript
-import { contractApiClient } from '@client/core/api';
+import { contractApiClient } from '@client/infrastructure/api';
 import { GetBillsEndpoint } from '@shared/types/api/contracts';
 
 // Type-safe API call with automatic validation
@@ -232,7 +232,7 @@ if (result.success) {
 ### With Path Parameters
 
 ```typescript
-import { contractApiClient } from '@client/core/api';
+import { contractApiClient } from '@client/infrastructure/api';
 import { GetBillEndpoint } from '@shared/types/api/contracts';
 
 const result = await contractApiClient.callWithParams(
@@ -245,7 +245,7 @@ const result = await contractApiClient.callWithParams(
 ### With Query Parameters
 
 ```typescript
-import { contractApiClient } from '@client/core/api';
+import { contractApiClient } from '@client/infrastructure/api';
 import { SearchBillsEndpoint } from '@shared/types/api/contracts';
 
 const result = await contractApiClient.callWithQuery(
@@ -257,7 +257,7 @@ const result = await contractApiClient.callWithQuery(
 ### With Both Path and Query Parameters
 
 ```typescript
-import { contractApiClient } from '@client/core/api';
+import { contractApiClient } from '@client/infrastructure/api';
 import { GetUserBillsEndpoint } from '@shared/types/api/contracts';
 
 const result = await contractApiClient.callWithParamsAndQuery(
@@ -298,7 +298,7 @@ The `CircuitBreakerMonitor` provides observability into API health and error pat
 ### Basic Monitoring
 
 ```typescript
-import { circuitBreakerMonitor } from '@client/core/api';
+import { circuitBreakerMonitor } from '@client/infrastructure/api';
 
 // Get service health status
 const health = circuitBreakerMonitor.getServiceHealth();
@@ -316,7 +316,7 @@ console.log('Circuit breaker stats:', stats);
 ### Event Listeners
 
 ```typescript
-import { circuitBreakerMonitor } from '@client/core/api';
+import { circuitBreakerMonitor } from '@client/infrastructure/api';
 
 // Listen to all circuit breaker events
 circuitBreakerMonitor.addEventListener('*', (event) => {
@@ -336,7 +336,7 @@ circuitBreakerMonitor.addEventListener('api-service', (event) => {
 Track related errors across multiple requests:
 
 ```typescript
-import { circuitBreakerMonitor } from '@client/core/api';
+import { circuitBreakerMonitor } from '@client/infrastructure/api';
 
 // Get active error correlations
 const activeErrors = circuitBreakerMonitor.getErrorCorrelations(false);
@@ -365,7 +365,7 @@ const response = await globalApiClient.get('/api/protected-resource');
 
 ### Future Integration
 
-The application includes a production-ready authentication interceptor implementation in `client/src/core/api/authentication.ts` that is available for future integration. This implementation provides:
+The application includes a production-ready authentication interceptor implementation in `client/src/infrastructure/api/authentication.ts` that is available for future integration. This implementation provides:
 
 - Integration with the `tokenManager` service
 - Complete token refresh implementation
@@ -380,7 +380,7 @@ For details on the authentication consolidation analysis, see `.kiro/specs/codeb
 ### Global Configuration
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // Get current configuration
 const config = globalApiClient.getConfig();
@@ -431,7 +431,7 @@ The client is initialized with these defaults:
 ### Initialization
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // Initialize the client (called automatically on import)
 await globalApiClient.initialize();
@@ -440,7 +440,7 @@ await globalApiClient.initialize();
 ### Cleanup
 
 ```typescript
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // Clean up resources (cancel active requests, clear interceptors)
 await globalApiClient.cleanup();
@@ -509,7 +509,7 @@ console.log('Circuit breaker state:', health.circuitBreakerState);
 
 ```typescript
 // ✅ Good
-import { globalApiClient } from '@client/core/api';
+import { globalApiClient } from '@client/infrastructure/api';
 const response = await globalApiClient.get('/api/bills');
 
 // ❌ Avoid creating new client instances
@@ -520,7 +520,7 @@ const client = new UnifiedApiClientImpl(config);
 
 ```typescript
 // ✅ Good - Type-safe with validation
-import { contractApiClient } from '@client/core/api';
+import { contractApiClient } from '@client/infrastructure/api';
 import { GetBillsEndpoint } from '@shared/types/api/contracts';
 const result = await contractApiClient.call(GetBillsEndpoint, request);
 
@@ -561,7 +561,7 @@ const response = await globalApiClient.get('/api/categories', {
 
 ```typescript
 // ✅ Good - Monitor and respond to circuit breaker state
-import { circuitBreakerMonitor } from '@client/core/api';
+import { circuitBreakerMonitor } from '@client/infrastructure/api';
 
 circuitBreakerMonitor.addEventListener('api-service', (event) => {
   if (event.state === 'open') {
@@ -609,14 +609,14 @@ const health = globalApiClient.getHealthStatus();
 console.log('Failure rate:', health.circuitBreakerMetrics.failureRate);
 
 // Adjust circuit breaker thresholds (requires code change)
-// See client/src/core/api/client.ts - CircuitBreaker constructor
+// See client/src/infrastructure/api/client.ts - CircuitBreaker constructor
 ```
 
 ### Cache Issues
 
 ```typescript
 // Clear cache for specific endpoint
-import { globalCache } from '@client/core/api/cache-manager';
+import { globalCache } from '@client/infrastructure/api/cache-manager';
 await globalCache.clear();
 
 // Skip cache for specific request
@@ -644,14 +644,14 @@ if (authService && authService.refreshTokens) {
 
 - [Authentication Consolidation Analysis](.kiro/specs/codebase-consolidation/AUTHENTICATION_CONSOLIDATION_ANALYSIS.md)
 - [API Contracts](../shared/types/api/contracts/README.md)
-- [Error Handling](../client/src/core/error/README.md)
-- [Caching Strategy](../client/src/core/api/cache-manager.ts)
+- [Error Handling](../client/src/infrastructure/error/README.md)
+- [Caching Strategy](../client/src/infrastructure/api/cache-manager.ts)
 
 ## Support
 
 For questions or issues with the API client:
 
 1. Check this guide for common patterns
-2. Review the source code in `client/src/core/api/`
+2. Review the source code in `client/src/infrastructure/api/`
 3. Check circuit breaker monitoring for service health issues
 4. Consult the team's architecture documentation

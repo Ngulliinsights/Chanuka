@@ -19,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/lib/design-system';
-import PerformanceMonitoring from '@client/lib/infrastructure/monitoring/performance-monitor';
+import PerformanceMonitoring from '@client/infrastructure/monitoring/performance-monitor';
 import { logger } from '@client/lib/utils/logger';
 
 // Temporarily unused - TODO: Implement performance benchmarking

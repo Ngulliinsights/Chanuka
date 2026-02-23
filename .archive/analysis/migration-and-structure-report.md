@@ -24,8 +24,8 @@ Five confirmed incomplete migrations were identified through codebase investigat
 
 The security system has two CSP implementations running simultaneously, toggled by environment and feature flags:
 
-- **Production:** `UnifiedCSPManager` (`client/src/core/security/unified/csp-manager.ts`)
-- **Development:** Legacy `CSPManager` (`client/src/core/security/csp-manager.ts`) unless `USE_UNIFIED_SECURITY=true`
+- **Production:** `UnifiedCSPManager` (`client/src/infrastructure/security/unified/csp-manager.ts`)
+- **Development:** Legacy `CSPManager` (`client/src/infrastructure/security/csp-manager.ts`) unless `USE_UNIFIED_SECURITY=true`
 - A compatibility layer (`security/migration/`) switches between the two at runtime
 
 The unified implementation is a strict superset — it adds `generateCSPHeader()`, `getHealthStatus()`, `getMetrics()`, `shutdown()`, and configurable directives. The legacy version has hardcoded directives.
@@ -37,7 +37,7 @@ The unified implementation is a strict superset — it adds `generateCSPHeader()
 2. Update the compatibility layer to unconditionally export `UnifiedCSPManager`:
 
 ```ts
-// client/src/core/security/migration/compatibility-layer.ts
+// client/src/infrastructure/security/migration/compatibility-layer.ts
 export { UnifiedCSPManager as CSPManager } from '../unified/csp-manager';
 ```
 
@@ -54,17 +54,17 @@ export { UnifiedCSPManager as CSPManager } from '../unified/csp-manager';
 
 | Action | Path | Reason |
 |--------|------|--------|
-| DELETE | `client/src/core/security/csp-manager.ts` | Legacy — superseded by `unified/` |
-| DELETE | `client/src/core/security/migration/compatibility-layer.ts` | No longer needed |
-| DELETE | `client/src/core/security/migration/migration-utils.ts` | No longer needed |
-| DELETE | `client/src/core/security/migration/` | Entire directory |
-| KEEP | `client/src/core/security/unified/csp-manager.ts` | Canonical implementation |
-| KEEP | `client/src/core/security/unified/system.ts` | Initialization entry point |
+| DELETE | `client/src/infrastructure/security/csp-manager.ts` | Legacy — superseded by `unified/` |
+| DELETE | `client/src/infrastructure/security/migration/compatibility-layer.ts` | No longer needed |
+| DELETE | `client/src/infrastructure/security/migration/migration-utils.ts` | No longer needed |
+| DELETE | `client/src/infrastructure/security/migration/` | Entire directory |
+| KEEP | `client/src/infrastructure/security/unified/csp-manager.ts` | Canonical implementation |
+| KEEP | `client/src/infrastructure/security/unified/system.ts` | Initialization entry point |
 
 6. Update barrel exports:
 
 ```ts
-// client/src/core/security/index.ts
+// client/src/infrastructure/security/index.ts
 export { UnifiedCSPManager as CSPManager } from './unified/csp-manager';
 ```
 
@@ -84,7 +84,7 @@ grep -r "from.*security/csp-manager" client/src/
 
 ### Current State
 
-Investigation confirmed six HTTP client implementations in `client/src/core/api/`, with wildly different usage:
+Investigation confirmed six HTTP client implementations in `client/src/infrastructure/api/`, with wildly different usage:
 
 | Client | Production Usages | Verdict |
 |--------|-------------------|---------|
@@ -109,16 +109,16 @@ grep -r "CircuitBreakerClient" client/src/ --include='*.ts' --include='*.tsx'
 
 | Action | Path | Reason |
 |--------|------|--------|
-| DELETE | `client/src/core/api/safe-client.ts` | 0 production usages |
-| DELETE | `client/src/core/api/authenticated-client.ts` | 0 usages — auth handled elsewhere |
-| DELETE | `client/src/core/api/base-client.ts` | Only extended dead `AuthenticatedApiClient` |
-| DELETE | `client/src/core/api/circuit-breaker-client.ts` | Example-only, not production |
-| DELETE | `client/src/core/api/examples/` | Entire examples directory |
-| KEEP | `client/src/core/api/client.ts` | Hosts `globalApiClient` — canonical |
-| KEEP | `client/src/core/api/contract-client.ts` | Active, growing usage |
-| KEEP | `client/src/core/api/circuit-breaker-monitor.ts` | Monitoring is separate from the dead client |
+| DELETE | `client/src/infrastructure/api/safe-client.ts` | 0 production usages |
+| DELETE | `client/src/infrastructure/api/authenticated-client.ts` | 0 usages — auth handled elsewhere |
+| DELETE | `client/src/infrastructure/api/base-client.ts` | Only extended dead `AuthenticatedApiClient` |
+| DELETE | `client/src/infrastructure/api/circuit-breaker-client.ts` | Example-only, not production |
+| DELETE | `client/src/infrastructure/api/examples/` | Entire examples directory |
+| KEEP | `client/src/infrastructure/api/client.ts` | Hosts `globalApiClient` — canonical |
+| KEEP | `client/src/infrastructure/api/contract-client.ts` | Active, growing usage |
+| KEEP | `client/src/infrastructure/api/circuit-breaker-monitor.ts` | Monitoring is separate from the dead client |
 
-3. Update `client/src/core/api/index.ts` to remove exports of deleted clients.
+3. Update `client/src/infrastructure/api/index.ts` to remove exports of deleted clients.
 
 4. If `BaseApiClient` exported any reusable utilities (type helpers, interceptor logic), extract them into a shared utils file before deleting.
 
@@ -408,8 +408,8 @@ git commit -m 'chore: remove committed backup directories'
 2. Remove committed merge artifacts:
 
 ```bash
-git rm client/src/core/types/community/community-base.ts.orig
-git rm client/src/core/types/community/community-base.ts.rej
+git rm client/src/infrastructure/types/community/community-base.ts.orig
+git rm client/src/infrastructure/types/community/community-base.ts.rej
 echo '*.orig' >> .gitignore
 echo '*.rej' >> .gitignore
 ```

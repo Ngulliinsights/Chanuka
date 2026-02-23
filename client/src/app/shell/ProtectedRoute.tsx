@@ -2,7 +2,7 @@ import * as LucideIcons from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { Alert, AlertDescription, Button } from '@client/lib/design-system';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { logger } from '@client/lib/utils/logger';

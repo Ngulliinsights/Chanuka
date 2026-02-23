@@ -144,7 +144,7 @@ class ClientImplementationValidator {
     if (content.includes('useSelector') || content.includes('useDispatch')) deps.push('redux');
     
     // Core services
-    if (content.includes('@client/core/')) deps.push('core-services');
+    if (content.includes('@client/infrastructure/')) deps.push('core-services');
     if (content.includes('@client/lib/')) deps.push('shared-services');
     if (content.includes('@client/features/')) deps.push('feature-services');
     
@@ -276,7 +276,7 @@ class ClientImplementationValidator {
             type: 'deprecated',
             severity: 'warning',
             description: 'Using deprecated useAuth import',
-            suggestion: 'Replace with: import { useAuth } from \'@client/core/auth\'',
+            suggestion: 'Replace with: import { useAuth } from \'@client/infrastructure/auth\'',
             autoFixable: true
           });
         }
@@ -431,7 +431,7 @@ class ClientImplementationValidator {
           type: 'deprecated',
           severity: 'info',
           description: 'Direct fetch usage instead of core API services',
-          suggestion: 'Consider using @client/core/api services for consistency',
+          suggestion: 'Consider using @client/infrastructure/api services for consistency',
           autoFixable: true
         });
       }
@@ -505,7 +505,7 @@ class ClientImplementationValidator {
           type: 'outdated-call',
           severity: 'warning',
           description: 'Using old auth import path',
-          suggestion: 'Update to use @client/core/auth',
+          suggestion: 'Update to use @client/infrastructure/auth',
           autoFixable: true
         });
       }
@@ -517,7 +517,7 @@ class ClientImplementationValidator {
           type: 'outdated-call',
           severity: 'info',
           description: 'Using globalApiClient without proper import',
-          suggestion: 'Import from @client/core/api',
+          suggestion: 'Import from @client/infrastructure/api',
           autoFixable: true
         });
       }
@@ -640,7 +640,7 @@ class ClientImplementationValidator {
         if (issue.description.includes('useAuth import')) {
           updatedContent = content.replace(
             /@\/features\/users\/hooks\/useAuth/g,
-            '@client/core/auth'
+            '@client/infrastructure/auth'
           );
         } else if (issue.description.includes('React import pattern')) {
           updatedContent = content.replace(
@@ -654,7 +654,7 @@ class ClientImplementationValidator {
         if (issue.description.includes('auth import path')) {
           updatedContent = content.replace(
             /from ['"`].*\/features\/users.*['"`]/g,
-            'from \'@client/core/auth\''
+            'from \'@client/infrastructure/auth\''
           );
         }
         break;

@@ -39,8 +39,8 @@ This document specifies requirements for systematically remediating 360 TypeScri
 #### Acceptance Criteria
 
 1. WHEN code imports ServiceError from the factory module THEN the Type_System SHALL resolve the export successfully
-2. WHEN code imports measureAsync from @client/core THEN the Type_System SHALL resolve the export successfully
-3. WHEN code imports recordMetric from @client/core THEN the Type_System SHALL resolve the export successfully
+2. WHEN code imports measureAsync from @client/infrastructure THEN the Type_System SHALL resolve the export successfully
+3. WHEN code imports recordMetric from @client/infrastructure THEN the Type_System SHALL resolve the export successfully
 4. WHEN code imports navigationUtils THEN the Type_System SHALL resolve the export successfully
 5. WHEN all export path fixes are applied THEN the Error_Remediation_System SHALL eliminate all 35 TS2305, TS2724, and TS2614 errors
 

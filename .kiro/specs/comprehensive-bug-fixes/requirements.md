@@ -69,8 +69,8 @@ The goal is to achieve a production-ready, type-safe, robust codebase with compr
 
 #### Acceptance Criteria
 
-1. WHEN the application starts, THEN THE Analytics_Service SHALL be available at client/src/core/analytics/service.ts
-2. WHEN the application starts, THEN THE Telemetry_Service SHALL be available at client/src/core/telemetry/service.ts
+1. WHEN the application starts, THEN THE Analytics_Service SHALL be available at client/src/infrastructure/analytics/service.ts
+2. WHEN the application starts, THEN THE Telemetry_Service SHALL be available at client/src/infrastructure/telemetry/service.ts
 3. WHEN trackEvent is called, THEN THE Analytics_Service SHALL return tracked status, eventId, and timestamp
 4. WHEN collectMetrics is called, THEN THE Telemetry_Service SHALL return collected metrics with timestamp and source
 5. WHEN analytics tests run, THEN THE System SHALL successfully import and mock both services
@@ -137,7 +137,7 @@ The goal is to achieve a production-ready, type-safe, robust codebase with compr
 
 1. WHEN errorAnalyticsBridge is imported, THEN THE System SHALL find the file at client/src/services/errorAnalyticsBridge.ts
 2. WHEN the analytics service imports API utilities, THEN THE System SHALL resolve analyticsApiService from @/core/api
-3. WHEN tests reference telemetry service, THEN THE System SHALL find the implementation at client/src/core/telemetry/service.ts
+3. WHEN tests reference telemetry service, THEN THE System SHALL find the implementation at client/src/infrastructure/telemetry/service.ts
 4. WHEN any module is imported, THEN THE System SHALL resolve the import without build errors
 5. WHEN the application builds, THEN THE System SHALL complete without missing module errors
 

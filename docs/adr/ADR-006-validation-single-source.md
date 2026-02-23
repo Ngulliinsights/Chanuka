@@ -114,7 +114,7 @@ export function validateBatch<T>(schema, items, fieldName)
 
 **Examples**:
 
-1. **Navigation Validation** (`client/src/core/navigation/validation.ts`)
+1. **Navigation Validation** (`client/src/infrastructure/navigation/validation.ts`)
    - **Type**: Runtime validation + type guards
    - **Purpose**: Validate navigation items and structures
    - **Approach**: Manual validation logic (NOT Zod)
@@ -127,7 +127,7 @@ export function validateBatch<T>(schema, items, fieldName)
    - **Schemas**: `ActionItemSchema`, `ActivitySummarySchema`, `DashboardConfigSchema`, etc.
    - **Functions**: `validateActionItem`, `validateDashboardConfig`, `safeValidateActionItem`
 
-3. **Loading Validation** (`client/src/core/loading/validation.ts`)
+3. **Loading Validation** (`client/src/infrastructure/loading/validation.ts`)
    - **Type**: Runtime validation
    - **Purpose**: Validate loading states and configurations
 
@@ -347,7 +347,7 @@ export const ActionItemSchema = z.object({ ... });
 
 2. **Navigation validation uses manual runtime checks**:
    ```typescript
-   // client/src/core/navigation/validation.ts
+   // client/src/infrastructure/navigation/validation.ts
    export function validateNavigationItem(item: NavigationItem): boolean {
      if (!item.id || typeof item.id !== 'string') {  // Runtime check
        logger.warn('Navigation item missing or invalid id', { item });

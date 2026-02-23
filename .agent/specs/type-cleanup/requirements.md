@@ -22,8 +22,8 @@ The Chanuka client codebase has type inconsistencies causing ~1000+ TypeScript e
 
 #### Acceptance Criteria
 
-1. WHEN importing storage types THEN I SHALL import from `@client/core/storage`
-2. WHEN importing security types THEN I SHALL import from `@client/core/security`
+1. WHEN importing storage types THEN I SHALL import from `@client/infrastructure/storage`
+2. WHEN importing security types THEN I SHALL import from `@client/infrastructure/security`
 3. WHEN core modules have `types.ts` THEN it SHALL re-export from `lib/types`
 
 ### Requirement 3: Mock Data Type Alignment

@@ -62,7 +62,7 @@ This document identifies duplicated modules between `client/src/lib/` and `clien
 
 ### 3. useAuth Hook
 
-**Old Location (Stale)**: `client/src/core/auth/hooks/useAuth.tsx`
+**Old Location (Stale)**: `client/src/infrastructure/auth/hooks/useAuth.tsx`
 **New Location (Canonical)**: `client/src/features/users/hooks/useAuth.tsx`
 
 **Status**: Duplicate implementations (documented in HOTSPOT-3)
@@ -88,7 +88,7 @@ This document identifies duplicated modules between `client/src/lib/` and `clien
 
 ### 4. Security UI Components
 
-**Old Location (Stale)**: `client/src/core/security/ui/`
+**Old Location (Stale)**: `client/src/infrastructure/security/ui/`
 **New Location (Canonical)**: `client/src/features/security/ui/`
 
 **Status**: Complete duplication (documented in HOTSPOT-2)
@@ -114,7 +114,7 @@ This document identifies duplicated modules between `client/src/lib/` and `clien
 
 ### 5. Loading Utilities
 
-**Old Location (Stale)**: `client/src/core/loading/utils/`
+**Old Location (Stale)**: `client/src/infrastructure/loading/utils/`
 **New Location (Canonical)**: `client/src/lib/ui/loading/utils/`
 
 **Status**: Duplication with naming inconsistency (documented in HOTSPOT-4)

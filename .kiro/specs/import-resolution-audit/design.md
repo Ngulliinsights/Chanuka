@@ -139,7 +139,7 @@ Ensure all TypeScript path aliases resolve correctly in all tools.
 ### Known Hotspots
 
 #### 1. Compiled Output in Source Tree
-**Location**: `client/src/core/websocket/`
+**Location**: `client/src/infrastructure/websocket/`
 
 **From project-structure.md**:
 ```
@@ -169,7 +169,7 @@ grep -r "from.*websocket/manager" client/src/
 
 **From project-structure.md**, we can see BOTH locations exist:
 
-**Old Location**: `client/src/core/security/ui/`
+**Old Location**: `client/src/infrastructure/security/ui/`
 ```
 ├── ui/
 │   ├── dashboard/
@@ -219,13 +219,13 @@ grep -r "from.*features/security/ui" client/src/
 
 #### 3. Duplicated useAuth Hook
 **Locations**:
-- `client/src/core/auth/hooks/useAuth.tsx`
+- `client/src/infrastructure/auth/hooks/useAuth.tsx`
 - `client/src/features/users/hooks/useAuth.tsx`
 
 **Investigation**:
 ```bash
 # Compare implementations
-diff client/src/core/auth/hooks/useAuth.tsx \
+diff client/src/infrastructure/auth/hooks/useAuth.tsx \
      client/src/features/users/hooks/useAuth.tsx
 
 # Find all imports
@@ -239,7 +239,7 @@ grep -r "from.*useAuth" client/src/
 
 #### 4. Duplicated Loading Utilities
 **Locations**:
-- `client/src/core/loading/utils/` - `connection-utils.ts`, `loading-utils.ts`, `progress-utils.ts`, `timeout-utils.ts`
+- `client/src/infrastructure/loading/utils/` - `connection-utils.ts`, `loading-utils.ts`, `progress-utils.ts`, `timeout-utils.ts`
 - `client/src/lib/ui/loading/utils/` - same files + `loadingUtils.ts` (camelCase variant)
 
 **Investigation**:
@@ -281,7 +281,7 @@ grep -r "from.*infrastructure/errors" server/
 **High-Risk Files**:
 - `client/src/lib/services/userService.ts` vs `client/src/features/users/services/user-service-legacy.ts`
 - `client/src/lib/services/notification-service.ts` vs `client/src/features/notifications/model/notification-service.ts`
-- `client/src/lib/hooks/` - check for duplicates in `client/src/core/*/hooks/`
+- `client/src/lib/hooks/` - check for duplicates in `client/src/infrastructure/*/hooks/`
 
 **Investigation**:
 ```bash
@@ -311,7 +311,7 @@ done
 **Example**:
 ```typescript
 // Import
-import { useAuth } from '@/core/auth/hooks/useAuth';
+import { useAuth } from '@/infrastructure/auth/hooks/useAuth';
 
 // File actually at
 client/src/features/users/hooks/useAuth.tsx
@@ -326,9 +326,9 @@ client/src/features/users/hooks/useAuth.tsx
 
 **Examples**:
 - `scripts/deprecated/` paths
-- Old `auth.ts` superseded by `client/src/core/auth/`
+- Old `auth.ts` superseded by `client/src/infrastructure/auth/`
 - Old websocket implementations superseded by `server/infrastructure/websocket/`
-- Old error handling superseded by `client/src/core/error/` or `server/infrastructure/error-handling/`
+- Old error handling superseded by `client/src/infrastructure/error/` or `server/infrastructure/error-handling/`
 
 **Fix**: Identify canonical replacement, verify API compatibility, update import AND call sites if API changed
 
@@ -368,7 +368,7 @@ import { SecurityDashboard } from '@/features/security/ui';  // ← fails
 
 **Examples**:
 - Types consolidated from `shared/types/` sub-paths into different index
-- Auth types moved from `client/src/core/api/types/auth.ts` to `shared/types/domains/authentication/`
+- Auth types moved from `client/src/infrastructure/api/types/auth.ts` to `shared/types/domains/authentication/`
 - Error types moved during error handling consolidation
 
 **Fix**: Find new export location, update both import path and named binding
@@ -496,7 +496,7 @@ In specific cases, bulk changes are permitted with strict safeguards:
 **Example**:
 ```typescript
 // 50 files import from old location
-import { useAuth } from '@/core/auth/hooks/useAuth';
+import { useAuth } from '@/infrastructure/auth/hooks/useAuth';
 
 // All should import from new location
 import { useAuth } from '@/features/users/hooks/useAuth';

@@ -177,14 +177,14 @@ import { logger } from '@server/infrastructure/observability';
 
 ### Incorrect Path Aliases (26 files)
 
-Files using `@/core/observability` instead of `@server/infrastructure/observability`:
+Files using `@/infrastructure/observability` instead of `@server/infrastructure/observability`:
 - All files in `infrastructure/database/graph/`
 - Some files in `features/analytics/`
 
 **Fix:** Search and replace:
 ```bash
-# Replace @/core/observability with @server/infrastructure/observability
-# Replace @/core/errors with @server/infrastructure/error-handling
+# Replace @/infrastructure/observability with @server/infrastructure/observability
+# Replace @/infrastructure/errors with @server/infrastructure/error-handling
 # Replace @/infrastructure/ with @server/infrastructure/
 # Replace @/utils/ with @server/utils/
 ```
@@ -240,7 +240,7 @@ Files using `@/core/observability` instead of `@server/infrastructure/observabil
 ## Recommended Fix Order
 
 ### Phase 1: Fix Path Aliases (Quick Win - 30 minutes)
-1. Replace all `@/core/observability` with `@server/infrastructure/observability` (26 files)
+1. Replace all `@/infrastructure/observability` with `@server/infrastructure/observability` (26 files)
 2. Replace all `@/infrastructure/` with `@server/infrastructure/`
 3. Replace all `@/utils/` with `@server/utils/`
 4. Replace all `@/shared/` with `@shared/`
@@ -248,7 +248,7 @@ Files using `@/core/observability` instead of `@server/infrastructure/observabil
 **Command:**
 ```bash
 # In server directory
-find . -name "*.ts" -type f -exec sed -i "s|@/core/observability|@server/infrastructure/observability|g" {} +
+find . -name "*.ts" -type f -exec sed -i "s|@/infrastructure/observability|@server/infrastructure/observability|g" {} +
 find . -name "*.ts" -type f -exec sed -i "s|@/infrastructure/|@server/infrastructure/|g" {} +
 find . -name "*.ts" -type f -exec sed -i "s|@/utils/|@server/utils/|g" {} +
 find . -name "*.ts" -type f -exec sed -i "s|@/shared/|@shared/|g" {} +

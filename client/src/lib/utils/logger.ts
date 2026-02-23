@@ -12,10 +12,10 @@
  */
 
 // Import error types from our local error system to avoid circular dependencies
-import { ErrorSeverity, ErrorDomain, BaseError } from '@client/core/error';
-import { PerformanceAlertsManager } from '@client/core/performance/alerts';
-import { PerformanceMonitor } from '@client/core/performance/monitor';
-import { PerformanceMetric } from '@client/core/performance/types';
+import { ErrorSeverity, ErrorDomain, BaseError } from '@client/infrastructure/error';
+import { PerformanceAlertsManager } from '@client/infrastructure/performance/alerts';
+import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
+import { PerformanceMetric } from '@client/infrastructure/performance/types';
 
 // Re-export error types for backward compatibility
 export { ErrorSeverity, ErrorDomain, BaseError };

@@ -131,7 +131,7 @@ export * from './analytics';
 // - API types (network/REST types)
 
 // Re-export persona detector from core
-export { personaDetector, PersonaDetector, createPersonaDetector } from '../../core/personalization';
+export { personaDetector, PersonaDetector, createPersonaDetector } from '../../infrastructure/personalization';
 
 // Re-export UserRole from navigation for consistency
 export type { UserRole } from './navigation';

@@ -7,7 +7,7 @@ import { Shield, User, BarChart3, Eye } from 'lucide-react';
 import { useState } from 'react';
 import React from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Card, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';

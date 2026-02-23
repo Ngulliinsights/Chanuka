@@ -12,126 +12,126 @@ src/app/providers/AppProviders.tsx(194,7): error TS2322: Type 'AssetLoadingManag
             Types of property 'status' are incompatible.
               Type '"success" | "error" | "loading" | "idle"' is not assignable to type 'AssetLoadingStatus'.
                 Type '"success"' is not assignable to type 'AssetLoadingStatus'.
-src/core/api/community.ts(49,3): error TS2724: '"@client/lib/types/community"' has no exported member named 'Expert'. Did you mean 'isExpert'?
-src/core/api/community.ts(59,3): error TS2305: Module '"@client/lib/types/community"' has no exported member 'ExpertVerificationResponse'.
-src/core/api/community.ts(84,3): error TS2724: '"@client/lib/types/community"' has no exported member named 'Expert'. Did you mean 'isExpert'?
-src/core/api/hooks/use-api-with-fallback.ts(14,50): error TS2307: Cannot find module '../types/request' or its corresponding type declarations.
-src/core/api/privacy.ts(4,63): error TS2307: Cannot find module './types/error-response' or its corresponding type declarations.
-src/core/api/types/service.ts(12,37): error TS2307: Cannot find module './request' or its corresponding type declarations.
-src/core/auth/service.ts(56,7): error TS2353: Object literal may only specify known properties, and 'preferences' does not exist in type 'UserProfile'.
-src/core/community/services/moderation.service.ts(177,5): error TS2739: Type '{ spam: string; harassment: string; inappropriate_language: string; misinformation: string; off_topic: string; personal_attack: string; copyright_violation: string; hate_speech: string; duplicate_content: string; }' is missing the following properties from type 'Record<ViolationType, string>': other, offensive
-src/core/community/services/moderation.service.ts(194,11): error TS2739: Type '{ spam: "low"; off_topic: "low"; duplicate_content: "low"; inappropriate_language: "medium"; misinformation: "medium"; personal_attack: "high"; harassment: "high"; hate_speech: "critical"; copyright_violation: "high"; }' is missing the following properties from type 'Record<ViolationType, "low" | "medium" | "high" | "critical">': other, offensive
-src/core/monitoring/monitoring-init.ts(493,58): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(494,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(514,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(515,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(628,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(629,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(634,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(635,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(644,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/monitoring/monitoring-init.ts(645,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
-src/core/personalization/persona-detector.ts(122,9): error TS2367: This comparison appears to be unintentional because the types '"bill" | "comment" | "user" | "page"' and '"analytics"' have no overlap.
-src/core/personalization/persona-detector.ts(146,52): error TS2367: This comparison appears to be unintentional because the types '"bill" | "comment" | "user" | "page"' and '"analytics"' have no overlap.
-src/core/realtime/hooks/use-bill-tracking.ts(163,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
-src/core/realtime/hooks/use-bill-tracking.ts(165,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
-src/core/realtime/hooks/use-bill-tracking.ts(181,68): error TS2345: Argument of type '(update: BillUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+src/infrastructure/api/community.ts(49,3): error TS2724: '"@client/lib/types/community"' has no exported member named 'Expert'. Did you mean 'isExpert'?
+src/infrastructure/api/community.ts(59,3): error TS2305: Module '"@client/lib/types/community"' has no exported member 'ExpertVerificationResponse'.
+src/infrastructure/api/community.ts(84,3): error TS2724: '"@client/lib/types/community"' has no exported member named 'Expert'. Did you mean 'isExpert'?
+src/infrastructure/api/hooks/use-api-with-fallback.ts(14,50): error TS2307: Cannot find module '../types/request' or its corresponding type declarations.
+src/infrastructure/api/privacy.ts(4,63): error TS2307: Cannot find module './types/error-response' or its corresponding type declarations.
+src/infrastructure/api/types/service.ts(12,37): error TS2307: Cannot find module './request' or its corresponding type declarations.
+src/infrastructure/auth/service.ts(56,7): error TS2353: Object literal may only specify known properties, and 'preferences' does not exist in type 'UserProfile'.
+src/infrastructure/community/services/moderation.service.ts(177,5): error TS2739: Type '{ spam: string; harassment: string; inappropriate_language: string; misinformation: string; off_topic: string; personal_attack: string; copyright_violation: string; hate_speech: string; duplicate_content: string; }' is missing the following properties from type 'Record<ViolationType, string>': other, offensive
+src/infrastructure/community/services/moderation.service.ts(194,11): error TS2739: Type '{ spam: "low"; off_topic: "low"; duplicate_content: "low"; inappropriate_language: "medium"; misinformation: "medium"; personal_attack: "high"; harassment: "high"; hate_speech: "critical"; copyright_violation: "high"; }' is missing the following properties from type 'Record<ViolationType, "low" | "medium" | "high" | "critical">': other, offensive
+src/infrastructure/monitoring/monitoring-init.ts(493,58): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(494,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(514,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(515,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(628,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(629,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(634,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(635,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(644,16): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/monitoring/monitoring-init.ts(645,14): error TS2339: Property 'DD_RUM' does not exist on type 'Window & typeof globalThis'.
+src/infrastructure/personalization/persona-detector.ts(122,9): error TS2367: This comparison appears to be unintentional because the types '"bill" | "comment" | "user" | "page"' and '"analytics"' have no overlap.
+src/infrastructure/personalization/persona-detector.ts(146,52): error TS2367: This comparison appears to be unintentional because the types '"bill" | "comment" | "user" | "page"' and '"analytics"' have no overlap.
+src/infrastructure/realtime/hooks/use-bill-tracking.ts(163,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
+src/infrastructure/realtime/hooks/use-bill-tracking.ts(165,20): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'number'.
+src/infrastructure/realtime/hooks/use-bill-tracking.ts(181,68): error TS2345: Argument of type '(update: BillUpdate) => void' is not assignable to parameter of type 'EventCallback'.
   Types of parameters 'update' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'BillRealTimeUpdate'.
-src/core/realtime/hooks/use-bill-tracking.ts(184,7): error TS2345: Argument of type '(metrics: BillEngagementUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+src/infrastructure/realtime/hooks/use-bill-tracking.ts(184,7): error TS2345: Argument of type '(metrics: BillEngagementUpdate) => void' is not assignable to parameter of type 'EventCallback'.
   Types of parameters 'metrics' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'EngagementMetricsUpdate'.
-src/core/realtime/hooks/use-bill-tracking.ts(268,5): error TS2353: Object literal may only specify known properties, and 'billUpdates' does not exist in type 'BillTrackingHookReturn'.
-src/core/realtime/hooks/use-community-realtime.ts(13,10): error TS2305: Module '"../types"' has no exported member 'CommunityRealTimeHookReturn'.
-src/core/realtime/hooks/use-community-realtime.ts(273,69): error TS2345: Argument of type '(indicator: TypingIndicator) => void' is not assignable to parameter of type 'EventCallback'.
+src/infrastructure/realtime/hooks/use-bill-tracking.ts(268,5): error TS2353: Object literal may only specify known properties, and 'billUpdates' does not exist in type 'BillTrackingHookReturn'.
+src/infrastructure/realtime/hooks/use-community-realtime.ts(13,10): error TS2305: Module '"../types"' has no exported member 'CommunityRealTimeHookReturn'.
+src/infrastructure/realtime/hooks/use-community-realtime.ts(273,69): error TS2345: Argument of type '(indicator: TypingIndicator) => void' is not assignable to parameter of type 'EventCallback'.
   Types of parameters 'indicator' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'TypingIndicator'.
-src/core/realtime/hooks/use-community-realtime.ts(274,68): error TS2345: Argument of type '(update: CommentUpdate) => void' is not assignable to parameter of type 'EventCallback'.
+src/infrastructure/realtime/hooks/use-community-realtime.ts(274,68): error TS2345: Argument of type '(update: CommentUpdate) => void' is not assignable to parameter of type 'EventCallback'.
   Types of parameters 'update' and 'data' are incompatible.
     Type 'unknown' is not assignable to type 'CommentUpdate'.
-src/core/realtime/hooks/use-websocket.ts(16,8): error TS2307: Cannot find module '../api/types/websocket' or its corresponding type declarations.
-src/core/realtime/hooks/use-websocket.ts(18,56): error TS2307: Cannot find module './websocket-client' or its corresponding type declarations.
-src/core/realtime/hooks/use-websocket.ts(92,45): error TS7006: Parameter 'code' implicitly has an 'any' type.
-src/core/realtime/hooks/use-websocket.ts(92,51): error TS7006: Parameter 'reason' implicitly has an 'any' type.
-src/core/realtime/hooks/use-websocket.ts(222,42): error TS7006: Parameter 'err' implicitly has an 'any' type.
-src/core/realtime/index.ts(14,27): error TS2724: '"./websocket-client"' has no exported member named 'createWebSocketClient'. Did you mean 'WebSocketClient'?
-src/core/realtime/manager.ts(10,30): error TS2307: Cannot find module '../utils/event-emitter' or its corresponding type declarations.
-src/core/realtime/manager.ts(257,9): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(262,9): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(286,30): error TS2352: Conversion of type 'WebSocketMessage<unknown>' to type 'HeartbeatMessage' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/infrastructure/realtime/hooks/use-websocket.ts(16,8): error TS2307: Cannot find module '../api/types/websocket' or its corresponding type declarations.
+src/infrastructure/realtime/hooks/use-websocket.ts(18,56): error TS2307: Cannot find module './websocket-client' or its corresponding type declarations.
+src/infrastructure/realtime/hooks/use-websocket.ts(92,45): error TS7006: Parameter 'code' implicitly has an 'any' type.
+src/infrastructure/realtime/hooks/use-websocket.ts(92,51): error TS7006: Parameter 'reason' implicitly has an 'any' type.
+src/infrastructure/realtime/hooks/use-websocket.ts(222,42): error TS7006: Parameter 'err' implicitly has an 'any' type.
+src/infrastructure/realtime/index.ts(14,27): error TS2724: '"./websocket-client"' has no exported member named 'createWebSocketClient'. Did you mean 'WebSocketClient'?
+src/infrastructure/realtime/manager.ts(10,30): error TS2307: Cannot find module '../utils/event-emitter' or its corresponding type declarations.
+src/infrastructure/realtime/manager.ts(257,9): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(262,9): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(286,30): error TS2352: Conversion of type 'WebSocketMessage<unknown>' to type 'HeartbeatMessage' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   Types of property 'timestamp' are incompatible.
     Type 'number | undefined' is not comparable to type 'string'.
       Type 'number' is not comparable to type 'string'.
-src/core/realtime/manager.ts(314,7): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(317,32): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(320,42): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(359,9): error TS2722: Cannot invoke an object which is possibly 'undefined'.
-src/core/realtime/manager.ts(378,40): error TS2339: Property 'topic' does not exist on type 'WebSocketMessage<unknown>'.
-src/core/realtime/manager.ts(392,27): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'WebSocketMessage<unknown>'.
+src/infrastructure/realtime/manager.ts(314,7): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(317,32): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(320,42): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(359,9): error TS2722: Cannot invoke an object which is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(378,40): error TS2339: Property 'topic' does not exist on type 'WebSocketMessage<unknown>'.
+src/infrastructure/realtime/manager.ts(392,27): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'WebSocketMessage<unknown>'.
   No index signature with a parameter of type 'string' was found on type 'WebSocketMessage<unknown>'.
-src/core/realtime/manager.ts(410,7): error TS2353: Object literal may only specify known properties, and 'filters' does not exist in type 'SubscriptionMessage'.
-src/core/realtime/manager.ts(413,15): error TS2345: Argument of type 'SubscriptionMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
+src/infrastructure/realtime/manager.ts(410,7): error TS2353: Object literal may only specify known properties, and 'filters' does not exist in type 'SubscriptionMessage'.
+src/infrastructure/realtime/manager.ts(413,15): error TS2345: Argument of type 'SubscriptionMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
   Types of property 'timestamp' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/core/realtime/manager.ts(420,7): error TS2561: Object literal may only specify known properties, but 'subscriptionId' does not exist in type 'SubscriptionMessage'. Did you mean to write 'subscriptions'?
-src/core/realtime/manager.ts(422,15): error TS2345: Argument of type 'SubscriptionMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
+src/infrastructure/realtime/manager.ts(420,7): error TS2561: Object literal may only specify known properties, but 'subscriptionId' does not exist in type 'SubscriptionMessage'. Did you mean to write 'subscriptions'?
+src/infrastructure/realtime/manager.ts(422,15): error TS2345: Argument of type 'SubscriptionMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
   Types of property 'timestamp' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/core/realtime/manager.ts(487,42): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(497,8): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(516,8): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(527,47): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(533,9): error TS2322: Type 'number' is not assignable to type 'string'.
-src/core/realtime/manager.ts(535,17): error TS2345: Argument of type 'BatchMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
+src/infrastructure/realtime/manager.ts(487,42): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(497,8): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(516,8): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(527,47): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(533,9): error TS2322: Type 'number' is not assignable to type 'string'.
+src/infrastructure/realtime/manager.ts(535,17): error TS2345: Argument of type 'BatchMessage' is not assignable to parameter of type 'WebSocketMessage<unknown>'.
   Types of property 'timestamp' are incompatible.
     Type 'string' is not assignable to type 'number'.
-src/core/realtime/manager.ts(546,7): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(547,11): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/manager.ts(548,11): error TS2532: Object is possibly 'undefined'.
-src/core/realtime/services/bill-tracking.ts(351,11): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
-src/core/realtime/services/bill-tracking.ts(396,9): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
-src/core/realtime/services/bill-tracking.ts(439,9): error TS2353: Object literal may only specify known properties, and 'viewCount' does not exist in type 'EngagementMetricsUpdate'.
-src/core/realtime/services/bill-tracking.ts(482,13): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
-src/core/realtime/services/bill-tracking.ts(595,11): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
-src/core/realtime/services/community.ts(332,9): error TS2322: Type 'string' is not assignable to type '"expert_joined" | "comment_added" | "new_discussion" | "consensus_change" | "moderation_action" | "trending_topic"'.
-src/core/realtime/services/community.ts(361,9): error TS2561: Object literal may only specify known properties, but 'discussionId' does not exist in type 'CommunityRealTimeUpdate'. Did you mean to write 'discussion_id'?
-src/core/realtime/services/community.ts(369,30): error TS2551: Property 'discussionId' does not exist on type 'CommunityRealTimeUpdate'. Did you mean 'discussion_id'?
-src/core/realtime/services/notifications.ts(157,9): error TS2353: Object literal may only specify known properties, and 'data' does not exist in type 'RealTimeNotification'.
-src/core/realtime/services/realtime-service.ts(238,31): error TS2345: Argument of type 'Error' is not assignable to parameter of type 'string'.
-src/core/realtime/utils/event-emitter.ts(46,22): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
-src/core/realtime/utils/event-emitter.ts(56,41): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
-src/core/search/UnifiedSearchInterface.tsx(202,15): error TS2322: Type 'SearchResult[]' is not assignable to type 'import("C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/lib/types/search").SearchResult[]'.
+src/infrastructure/realtime/manager.ts(546,7): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(547,11): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/manager.ts(548,11): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/realtime/services/bill-tracking.ts(351,11): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
+src/infrastructure/realtime/services/bill-tracking.ts(396,9): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
+src/infrastructure/realtime/services/bill-tracking.ts(439,9): error TS2353: Object literal may only specify known properties, and 'viewCount' does not exist in type 'EngagementMetricsUpdate'.
+src/infrastructure/realtime/services/bill-tracking.ts(482,13): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
+src/infrastructure/realtime/services/bill-tracking.ts(595,11): error TS2322: Type 'string' is not assignable to type '"amendment" | "new_comment" | "expert_analysis" | "status_change" | "voting_scheduled" | "engagement_change" | "constitutional_flag"'.
+src/infrastructure/realtime/services/community.ts(332,9): error TS2322: Type 'string' is not assignable to type '"expert_joined" | "comment_added" | "new_discussion" | "consensus_change" | "moderation_action" | "trending_topic"'.
+src/infrastructure/realtime/services/community.ts(361,9): error TS2561: Object literal may only specify known properties, but 'discussionId' does not exist in type 'CommunityRealTimeUpdate'. Did you mean to write 'discussion_id'?
+src/infrastructure/realtime/services/community.ts(369,30): error TS2551: Property 'discussionId' does not exist on type 'CommunityRealTimeUpdate'. Did you mean 'discussion_id'?
+src/infrastructure/realtime/services/notifications.ts(157,9): error TS2353: Object literal may only specify known properties, and 'data' does not exist in type 'RealTimeNotification'.
+src/infrastructure/realtime/services/realtime-service.ts(238,31): error TS2345: Argument of type 'Error' is not assignable to parameter of type 'string'.
+src/infrastructure/realtime/utils/event-emitter.ts(46,22): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+src/infrastructure/realtime/utils/event-emitter.ts(56,41): error TS2556: A spread argument must either have a tuple type or be passed to a rest parameter.
+src/infrastructure/search/UnifiedSearchInterface.tsx(202,15): error TS2322: Type 'SearchResult[]' is not assignable to type 'import("C:/Users/Access Granted/Downloads/projects/SimpleTool/client/src/lib/types/search").SearchResult[]'.
   Type 'SearchResult' is missing the following properties from type 'SearchResult': relevanceScore, metadata
-src/core/search/UnifiedSearchInterface.tsx(391,13): error TS2322: Type '{ query: string; onSelect: (suggestion: string | { term?: string | undefined; text?: string | undefined; }) => void; onSearch: (searchQuery?: string | undefined) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & IntelligentAutocompleteProps'.
+src/infrastructure/search/UnifiedSearchInterface.tsx(391,13): error TS2322: Type '{ query: string; onSelect: (suggestion: string | { term?: string | undefined; text?: string | undefined; }) => void; onSearch: (searchQuery?: string | undefined) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & IntelligentAutocompleteProps'.
   Property 'query' does not exist on type 'IntrinsicAttributes & IntelligentAutocompleteProps'.
-src/core/security/headers/SecurityHeaders.ts(8,1): error TS2304: Cannot find name 'impo'.
-src/core/security/security-monitor.ts(510,7): error TS2353: Object literal may only specify known properties, and 'totalIncidents' does not exist in type 'ExtendedSecurityMetrics'.
-src/core/security/security-monitoring.ts(51,13): error TS2322: Type 'ErrorContext' is not assignable to type 'Partial<ErrorContext>'.
+src/infrastructure/security/headers/SecurityHeaders.ts(8,1): error TS2304: Cannot find name 'impo'.
+src/infrastructure/security/security-monitor.ts(510,7): error TS2353: Object literal may only specify known properties, and 'totalIncidents' does not exist in type 'ExtendedSecurityMetrics'.
+src/infrastructure/security/security-monitoring.ts(51,13): error TS2322: Type 'ErrorContext' is not assignable to type 'Partial<ErrorContext>'.
   Index signature for type 'string' is missing in type 'ErrorContext'.
-src/core/security/security-monitoring.ts(89,11): error TS2322: Type 'PerformanceMetrics' is not assignable to type 'Record<string, unknown>'.
+src/infrastructure/security/security-monitoring.ts(89,11): error TS2322: Type 'PerformanceMetrics' is not assignable to type 'Record<string, unknown>'.
   Index signature for type 'string' is missing in type 'PerformanceMetrics'.
-src/core/security/security-monitoring.ts(125,21): error TS2339: Property 'recoverySuccess' does not exist on type 'AppError'.
-src/core/security/security-monitoring.ts(319,12): error TS7053: Element implicitly has an 'any' type because expression of type 'ErrorSeverity' can't be used to index type '{ low: number; medium: number; high: number; critical: number; }'.
+src/infrastructure/security/security-monitoring.ts(125,21): error TS2339: Property 'recoverySuccess' does not exist on type 'AppError'.
+src/infrastructure/security/security-monitoring.ts(319,12): error TS7053: Element implicitly has an 'any' type because expression of type 'ErrorSeverity' can't be used to index type '{ low: number; medium: number; high: number; critical: number; }'.
   Property '[ErrorSeverity.BLOCKER]' does not exist on type '{ low: number; medium: number; high: number; critical: number; }'.
-src/core/security/security-monitoring.ts(351,18): error TS2352: Conversion of type 'Promise<any>' to type 'T' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/infrastructure/security/security-monitoring.ts(351,18): error TS2352: Conversion of type 'Promise<any>' to type 'T' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
   'T' could be instantiated with an arbitrary type which could be unrelated to 'Promise<any>'.
-src/core/security/security-monitoring.ts(399,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AppError | Error'.
-src/core/security/ui/dashboard/SecureForm.tsx(6,63): error TS2307: Cannot find module '@client/lib/hooks/useSecurity' or its corresponding type declarations.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(11,8): error TS2307: Cannot find module '@client/features/analytics/types.ts' or its corresponding type declarations.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(24,10): error TS2459: Module '"@client/features/security/ui/dashboard/SecurityDashboard.tsx"' declares 'getSecuritySystem' locally, but it is not exported.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(85,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(148,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(160,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(389,58): error TS7006: Parameter 'rec' implicitly has an 'any' type.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(389,63): error TS7006: Parameter 'index' implicitly has an 'any' type.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(415,57): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/core/security/ui/dashboard/SecurityDashboard.tsx(435,57): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
-src/core/security/ui/dashboard/SecuritySettings.tsx(10,10): error TS2459: Module '"@client/features/security/ui/dashboard/SecurityDashboard.tsx"' declares 'getSecuritySystem' locally, but it is not exported.
-src/core/security/ui/index.ts(2,15): error TS2307: Cannot find module './components' or its corresponding type declarations.
-src/core/security/ui/privacy/DataUsageReportDashboard.tsx(35,10): error TS2724: '"@client/lib/services/privacyAnalyticsService"' has no exported member named 'privacyAnalyticsService'. Did you mean 'PrivacyAnalyticsService'?
-src/core/security/ui/privacy/DataUsageReportDashboard.tsx(100,25): error TS2339: Property 'generatePrivacyPolicySummary' does not exist on type 'PrivacyComplianceManager'.
-src/core/validation/dashboard-validation.ts(137,53): error TS2304: Cannot find name 'DashboardConfig'.
-src/core/validation/dashboard-validation.ts(139,9): error TS2304: Cannot find name 'DashboardConfig'.
+src/infrastructure/security/security-monitoring.ts(399,37): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'AppError | Error'.
+src/infrastructure/security/ui/dashboard/SecureForm.tsx(6,63): error TS2307: Cannot find module '@client/lib/hooks/useSecurity' or its corresponding type declarations.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(11,8): error TS2307: Cannot find module '@client/features/analytics/types.ts' or its corresponding type declarations.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(24,10): error TS2459: Module '"@client/features/security/ui/dashboard/SecurityDashboard.tsx"' declares 'getSecuritySystem' locally, but it is not exported.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(85,65): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(148,51): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(160,56): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'LogContext | undefined'.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(389,58): error TS7006: Parameter 'rec' implicitly has an 'any' type.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(389,63): error TS7006: Parameter 'index' implicitly has an 'any' type.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(415,57): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/infrastructure/security/ui/dashboard/SecurityDashboard.tsx(435,57): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+src/infrastructure/security/ui/dashboard/SecuritySettings.tsx(10,10): error TS2459: Module '"@client/features/security/ui/dashboard/SecurityDashboard.tsx"' declares 'getSecuritySystem' locally, but it is not exported.
+src/infrastructure/security/ui/index.ts(2,15): error TS2307: Cannot find module './components' or its corresponding type declarations.
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(35,10): error TS2724: '"@client/lib/services/privacyAnalyticsService"' has no exported member named 'privacyAnalyticsService'. Did you mean 'PrivacyAnalyticsService'?
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(100,25): error TS2339: Property 'generatePrivacyPolicySummary' does not exist on type 'PrivacyComplianceManager'.
+src/infrastructure/validation/dashboard-validation.ts(137,53): error TS2304: Cannot find name 'DashboardConfig'.
+src/infrastructure/validation/dashboard-validation.ts(139,9): error TS2304: Cannot find name 'DashboardConfig'.
 src/features/admin/pages/admin.tsx(747,33): error TS2322: Type '{ showDetails: boolean; }' is not assignable to type 'IntrinsicAttributes & ConnectionStatusProps'.
   Property 'showDetails' does not exist on type 'IntrinsicAttributes & ConnectionStatusProps'.
 src/features/admin/pages/admin.tsx(753,16): error TS2559: Type '{ data: any; isLoading: boolean; error: Error | null; refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<any, Error>>; }' has no properties in common with type 'IntrinsicAttributes & DatabaseStatusProps'.
@@ -620,8 +620,8 @@ src/lib/data/mock/analytics.ts(19,3): error TS2305: Module '"@client/lib/types"'
 src/lib/data/mock/analytics.ts(20,3): error TS2305: Module '"@client/lib/types"' has no exported member 'ContributionQualityMetrics'.
 src/lib/data/mock/analytics.ts(21,3): error TS2305: Module '"@client/lib/types"' has no exported member 'CommunityImpactMetrics'.
 src/lib/data/mock/analytics.ts(22,3): error TS2305: Module '"@client/lib/types"' has no exported member 'EngagementTrend'.
-src/lib/data/mock/bills.ts(14,8): error TS2305: Module '"@client/core/api/types/bill"' has no exported member 'ConstitutionalFlag'.
-src/lib/data/mock/bills.ts(15,8): error TS2305: Module '"@client/core/api/types/bill"' has no exported member 'Severity'.
+src/lib/data/mock/bills.ts(14,8): error TS2305: Module '"@client/infrastructure/api/types/bill"' has no exported member 'ConstitutionalFlag'.
+src/lib/data/mock/bills.ts(15,8): error TS2305: Module '"@client/infrastructure/api/types/bill"' has no exported member 'Severity'.
 src/lib/data/mock/bills.ts(125,4): error TS2304: Cannot find name 'ReadonlyBill'.
 src/lib/data/mock/bills.ts(128,8): error TS1362: 'UrgencyLevel' cannot be used as a value because it was exported using 'export type'.
 src/lib/data/mock/bills.ts(128,26): error TS1362: 'UrgencyLevel' cannot be used as a value because it was exported using 'export type'.
@@ -927,8 +927,8 @@ src/lib/types/utils/index.ts(12,1): error TS2308: Module './types' has already e
 src/lib/types/utils/index.ts(13,1): error TS2308: Module './types' has already exported a member named 'ValidationResult'. Consider explicitly re-exporting to resolve the ambiguity.
 src/lib/types/utils/index.ts(16,1): error TS2308: Module './types' has already exported a member named 'QueryParams'. Consider explicitly re-exporting to resolve the ambiguity.
 src/lib/ui/dashboard/action-items.tsx(13,70): error TS2345: Argument of type 'unknown' is not assignable to parameter of type 'Partial<DashboardConfig> | undefined'.
-src/lib/ui/dashboard/activity-summary.tsx(4,23): error TS2614: Module '"@client/core"' has no exported member 'measureAsync'. Did you mean to use 'import measureAsync from "@client/core"' instead?
-src/lib/ui/dashboard/activity-summary.tsx(4,37): error TS2614: Module '"@client/core"' has no exported member 'recordMetric'. Did you mean to use 'import recordMetric from "@client/core"' instead?
+src/lib/ui/dashboard/activity-summary.tsx(4,23): error TS2614: Module '"@client/infrastructure"' has no exported member 'measureAsync'. Did you mean to use 'import measureAsync from "@client/infrastructure"' instead?
+src/lib/ui/dashboard/activity-summary.tsx(4,37): error TS2614: Module '"@client/infrastructure"' has no exported member 'recordMetric'. Did you mean to use 'import recordMetric from "@client/infrastructure"' instead?
 src/lib/ui/dashboard/AdaptiveDashboard.tsx(24,10): error TS2305: Module '"@client/lib/types"' has no exported member 'personaDetector'.
 src/lib/ui/dashboard/DashboardFramework.tsx(291,26): error TS2353: Object literal may only specify known properties, and 'theme' does not exist in type 'Partial<DashboardConfig>'.
 src/lib/ui/dashboard/DashboardFramework.tsx(337,42): error TS2339: Property 'title' does not exist on type 'ExtendedDashboardConfig'.
@@ -1199,29 +1199,29 @@ src/lib/ui/navigation/hooks/useBreadcrumbNavigation.ts(218,33): error TS2561: Ob
 src/lib/ui/navigation/hooks/useBreadcrumbNavigation.ts(219,48): error TS2561: Object literal may only specify known properties, but 'is_active' does not exist in type 'BreadcrumbItem'. Did you mean to write 'isActive'?
 src/lib/ui/navigation/hooks/useNav.ts(10,11): error TS2339: Property 'user_role' does not exist on type '{ currentPath: string; previousPath: string; breadcrumbs: BreadcrumbItem[]; relatedPages: RelatedPage[]; currentSection: NavigationSection; ... 15 more ...; getFocusClasses: (baseClasses?: string) => string; }'.
 src/lib/ui/navigation/hooks/useOptimizedNavigation.ts(16,10): error TS2305: Module '"@client/lib/services/navigation"' has no exported member 'navigationUtils'.
-src/lib/ui/navigation/hooks/useRelatedPages.ts(4,10): error TS2305: Module '"@client/core/recovery"' has no exported member 'getRecoverySuggestions'.
-src/lib/ui/navigation/hooks/useRelatedPages.ts(6,3): error TS2305: Module '"@client/core/validation"' has no exported member 'validateNavigationPath'.
-src/lib/ui/navigation/hooks/useRelatedPages.ts(7,3): error TS2305: Module '"@client/core/validation"' has no exported member 'validateUserRole'.
-src/lib/ui/navigation/hooks/useRelatedPages.ts(8,3): error TS2305: Module '"@client/core/validation"' has no exported member 'validateUseRelatedPagesOptions'.
+src/lib/ui/navigation/hooks/useRelatedPages.ts(4,10): error TS2305: Module '"@client/infrastructure/recovery"' has no exported member 'getRecoverySuggestions'.
+src/lib/ui/navigation/hooks/useRelatedPages.ts(6,3): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateNavigationPath'.
+src/lib/ui/navigation/hooks/useRelatedPages.ts(7,3): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateUserRole'.
+src/lib/ui/navigation/hooks/useRelatedPages.ts(8,3): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateUseRelatedPagesOptions'.
 src/lib/ui/navigation/hooks/useRelatedPages.ts(41,13): error TS2339: Property 'user_role' does not exist on type '{ currentPath: string; previousPath: string; breadcrumbs: BreadcrumbItem[]; relatedPages: RelatedPage[]; currentSection: NavigationSection; ... 15 more ...; getFocusClasses: (baseClasses?: string) => string; }'.
-src/lib/ui/navigation/hooks/useRouteAccess.ts(4,10): error TS2305: Module '"@client/core/recovery"' has no exported member 'getRecoverySuggestions'.
-src/lib/ui/navigation/hooks/useRouteAccess.ts(5,10): error TS2305: Module '"@client/core/validation"' has no exported member 'validateNavigationPath'.
-src/lib/ui/navigation/hooks/useRouteAccess.ts(5,34): error TS2305: Module '"@client/core/validation"' has no exported member 'validateUserRole'.
+src/lib/ui/navigation/hooks/useRouteAccess.ts(4,10): error TS2305: Module '"@client/infrastructure/recovery"' has no exported member 'getRecoverySuggestions'.
+src/lib/ui/navigation/hooks/useRouteAccess.ts(5,10): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateNavigationPath'.
+src/lib/ui/navigation/hooks/useRouteAccess.ts(5,34): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateUserRole'.
 src/lib/ui/navigation/hooks/useRouteAccess.ts(8,15): error TS2305: Module '"../types"' has no exported member 'AccessDenialReason'.
 src/lib/ui/navigation/hooks/useRouteAccess.ts(25,11): error TS2339: Property 'user_role' does not exist on type '{ currentPath: string; previousPath: string; breadcrumbs: BreadcrumbItem[]; relatedPages: RelatedPage[]; currentSection: NavigationSection; ... 15 more ...; getFocusClasses: (baseClasses?: string) => string; }'.
 src/lib/ui/navigation/NavigationSliceDemo.tsx(220,40): error TS2551: Property 'is_active' does not exist on type 'BreadcrumbItem'. Did you mean 'isActive'?
-src/lib/ui/navigation/utils/navigation-utils.ts(2,10): error TS2305: Module '"@client/core/validation"' has no exported member 'validateNavigationPath'.
+src/lib/ui/navigation/utils/navigation-utils.ts(2,10): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateNavigationPath'.
 src/lib/ui/navigation/utils/navigation-utils.ts(21,9): error TS2741: Property 'user' is missing in type '{ public: "public"; citizen: "citizen"; expert: "expert"; admin: "admin"; journalist: "journalist"; advocate: "advocate"; official: "citizen"; moderator: "admin"; }' but required in type 'Record<UserRole, UserRole>'.
-src/lib/ui/navigation/utils/page-relationships.ts(1,10): error TS2305: Module '"@client/core/validation"' has no exported member 'validateNavigationPath'.
-src/lib/ui/navigation/utils/page-relationships.ts(1,34): error TS2305: Module '"@client/core/validation"' has no exported member 'validateUserRole'.
-src/lib/ui/navigation/utils/page-relationships.ts(1,52): error TS2305: Module '"@client/core/validation"' has no exported member 'validateRelatedPage'.
+src/lib/ui/navigation/utils/page-relationships.ts(1,10): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateNavigationPath'.
+src/lib/ui/navigation/utils/page-relationships.ts(1,34): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateUserRole'.
+src/lib/ui/navigation/utils/page-relationships.ts(1,52): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateRelatedPage'.
 src/lib/ui/navigation/utils/page-relationships.ts(14,9): error TS2741: Property 'user' is missing in type '{ public: "public"; citizen: "citizen"; expert: "expert"; admin: "admin"; journalist: "journalist"; advocate: "advocate"; official: "citizen"; moderator: "admin"; }' but required in type 'Record<UserRole, UserRole>'.
 src/lib/ui/navigation/utils/page-relationships.ts(154,11): error TS2322: Type 'NavigationSection' is not assignable to type 'PageCategory'.
   Type '"system"' is not assignable to type 'PageCategory'.
 src/lib/ui/navigation/utils/page-relationships.ts(241,13): error TS2322: Type 'NavigationSection | undefined' is not assignable to type 'PageCategory'.
   Type 'undefined' is not assignable to type 'PageCategory'.
-src/lib/ui/navigation/utils/route-access.ts(2,10): error TS2305: Module '"@client/core/validation"' has no exported member 'validateNavigationPath'.
-src/lib/ui/navigation/utils/route-access.ts(2,34): error TS2305: Module '"@client/core/validation"' has no exported member 'validateUserRole'.
+src/lib/ui/navigation/utils/route-access.ts(2,10): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateNavigationPath'.
+src/lib/ui/navigation/utils/route-access.ts(2,34): error TS2305: Module '"@client/infrastructure/validation"' has no exported member 'validateUserRole'.
 src/lib/ui/navigation/utils/route-access.ts(37,11): error TS2430: Interface 'NavigationItemWithAccess' incorrectly extends interface 'NavigationItem'.
   Types of property 'condition' are incompatible.
     Type '((userRole: UserRole, user: User | null) => boolean) | undefined' is not assignable to type '((userRole: UserRole, user: unknown) => boolean) | undefined'.

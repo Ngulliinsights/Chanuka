@@ -34,14 +34,14 @@
 export {
   dataRetentionService,
   retentionUtils,
-} from '@client/core/analytics/data-retention-service';
+} from '@client/infrastructure/analytics/data-retention-service';
 export {
   navigationService,
   BrowserNavigationService,
   type NavigationService,
-} from '@client/core/navigation/navigation-service';
+} from '@client/infrastructure/navigation/navigation-service';
 export { userService } from '@client/features/users/model/user-service';
-export { PageRelationshipService } from '@client/core/navigation/page-relationship-service';
+export { PageRelationshipService } from '@client/infrastructure/navigation/page-relationship-service';
 
 // ============================================================================
 // REMAINING LEGACY SERVICES (Kept for compatibility)

@@ -38,11 +38,11 @@ class WebSocketConsolidationValidator {
     console.log('📁 Validating core realtime structure...');
 
     const requiredDirectories = [
-      'client/src/core/realtime',
-      'client/src/core/realtime/websocket',
-      'client/src/core/realtime/services',
-      'client/src/core/realtime/hooks',
-      'client/src/core/realtime/utils',
+      'client/src/infrastructure/realtime',
+      'client/src/infrastructure/realtime/websocket',
+      'client/src/infrastructure/realtime/services',
+      'client/src/infrastructure/realtime/hooks',
+      'client/src/infrastructure/realtime/utils',
     ];
 
     for (const dir of requiredDirectories) {
@@ -58,19 +58,19 @@ class WebSocketConsolidationValidator {
     console.log('\n📄 Validating required files...');
 
     const requiredFiles = [
-      'client/src/core/realtime/index.ts',
-      'client/src/core/realtime/types.ts',
-      'client/src/core/realtime/config.ts',
-      'client/src/core/realtime/websocket/manager.ts',
-      'client/src/core/realtime/services/realtime-service.ts',
-      'client/src/core/realtime/services/bill-tracking.ts',
-      'client/src/core/realtime/services/community.ts',
-      'client/src/core/realtime/services/notifications.ts',
-      'client/src/core/realtime/hooks/use-websocket.ts',
-      'client/src/core/realtime/hooks/use-bill-tracking.ts',
-      'client/src/core/realtime/hooks/use-community-realtime.ts',
-      'client/src/core/realtime/utils/event-emitter.ts',
-      'client/src/core/realtime/README.md',
+      'client/src/infrastructure/realtime/index.ts',
+      'client/src/infrastructure/realtime/types.ts',
+      'client/src/infrastructure/realtime/config.ts',
+      'client/src/infrastructure/realtime/websocket/manager.ts',
+      'client/src/infrastructure/realtime/services/realtime-service.ts',
+      'client/src/infrastructure/realtime/services/bill-tracking.ts',
+      'client/src/infrastructure/realtime/services/community.ts',
+      'client/src/infrastructure/realtime/services/notifications.ts',
+      'client/src/infrastructure/realtime/hooks/use-websocket.ts',
+      'client/src/infrastructure/realtime/hooks/use-bill-tracking.ts',
+      'client/src/infrastructure/realtime/hooks/use-community-realtime.ts',
+      'client/src/infrastructure/realtime/utils/event-emitter.ts',
+      'client/src/infrastructure/realtime/README.md',
     ];
 
     for (const file of requiredFiles) {
@@ -86,9 +86,9 @@ class WebSocketConsolidationValidator {
     console.log('\n🔗 Validating imports...');
 
     const filesToCheck = [
-      'client/src/core/realtime/index.ts',
-      'client/src/core/realtime/services/realtime-service.ts',
-      'client/src/core/realtime/hooks/use-websocket.ts',
+      'client/src/infrastructure/realtime/index.ts',
+      'client/src/infrastructure/realtime/services/realtime-service.ts',
+      'client/src/infrastructure/realtime/hooks/use-websocket.ts',
     ];
 
     for (const file of filesToCheck) {
@@ -127,7 +127,7 @@ class WebSocketConsolidationValidator {
   private async validateExports(): Promise<void> {
     console.log('\n📤 Validating exports...');
 
-    const indexFile = 'client/src/core/realtime/index.ts';
+    const indexFile = 'client/src/infrastructure/realtime/index.ts';
 
     if (fs.existsSync(indexFile)) {
       const content = fs.readFileSync(indexFile, 'utf-8');
@@ -159,7 +159,7 @@ class WebSocketConsolidationValidator {
   private async validateTypes(): Promise<void> {
     console.log('\n🏷️  Validating types...');
 
-    const typesFile = 'client/src/core/realtime/types.ts';
+    const typesFile = 'client/src/infrastructure/realtime/types.ts';
 
     if (fs.existsSync(typesFile)) {
       const content = fs.readFileSync(typesFile, 'utf-8');
@@ -227,7 +227,7 @@ class WebSocketConsolidationValidator {
 
     console.log('\n🚀 Usage Examples:');
     console.log('  // Import the consolidated real-time service');
-    console.log("  import { realTimeService, useWebSocket } from '@client/core/realtime';");
+    console.log("  import { realTimeService, useWebSocket } from '@client/infrastructure/realtime';");
     console.log('');
     console.log('  // Initialize the service');
     console.log('  await realTimeService.initialize(token);');

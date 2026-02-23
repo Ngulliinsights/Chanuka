@@ -22,11 +22,11 @@ const fixes: Fix[] = [];
 
 // TS2724 Fixes - Export name mismatches (rename imports to match exports)
 fixes.push({
-  file: 'client/src/core/api/types/bill.ts',
+  file: 'client/src/infrastructure/api/types/bill.ts',
   type: 'TS2724',
   description: 'Rename BillStatusType to BillStatus, UrgencyLevelType to UrgencyLevel, ComplexityLevelType to ComplexityLevel',
   apply: () => {
-    const filePath = 'client/src/core/api/types/bill.ts';
+    const filePath = 'client/src/infrastructure/api/types/bill.ts';
     let content = fs.readFileSync(filePath, 'utf-8');
     
     content = content.replace(/BillStatusType/g, 'BillStatus');
@@ -38,11 +38,11 @@ fixes.push({
 });
 
 fixes.push({
-  file: 'client/src/core/security/ui/privacy/DataUsageReportDashboard.tsx',
+  file: 'client/src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx',
   type: 'TS2724',
   description: 'Rename privacyAnalyticsService to PrivacyAnalyticsService',
   apply: () => {
-    const filePath = 'client/src/core/security/ui/privacy/DataUsageReportDashboard.tsx';
+    const filePath = 'client/src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx';
     let content = fs.readFileSync(filePath, 'utf-8');
     
     content = content.replace(/privacyAnalyticsService/g, 'PrivacyAnalyticsService');
@@ -246,7 +246,7 @@ fixes.push({
     // This might need to be split into separate imports or check the actual export
     content = content.replace(
       /import\s*{\s*measureAsync,\s*recordMetric\s*}\s*from\s*['"]@client\/core['"]/g,
-      "import measureAsync from '@client/core/measureAsync';\nimport recordMetric from '@client/core/recordMetric'"
+      "import measureAsync from '@client/infrastructure/measureAsync';\nimport recordMetric from '@client/infrastructure/recordMetric'"
     );
     
     fs.writeFileSync(filePath, content, 'utf-8');

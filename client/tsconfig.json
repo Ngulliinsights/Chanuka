@@ -53,7 +53,7 @@
       "@client/test-utils/*": ["./test-utils/*"],
       
       // ===== CLIENT-SIDE MODULES (all in ./src) =====
-      "@core": ["./src/core"],
+      "@core": ["./src/infrastructure"],
       
       // ===== SHARED MODULES (root-level shared/) =====
       "@shared": ["../shared"],
@@ -80,15 +80,13 @@
       "@workspace/validation/*": ["../shared/validation/*"],
       "@workspace/constants": ["../shared/constants"],
       "@workspace/constants/*": ["../shared/constants/*"],
-      "@core/*": ["./src/core/*"],
+      "@core/*": ["./src/infrastructure/*"],
       "@lib": ["./src/lib"],
       "@lib/*": ["./src/lib/*"],
       "@lib/types": ["./src/lib/types"],
       "@lib/types/*": ["./src/lib/types/*"],
       "@lib/services": ["./src/lib/services"],
       "@lib/services/*": ["./src/lib/services/*"],
-      "@lib/infrastructure": ["./src/lib/infrastructure"],
-      "@lib/infrastructure/*": ["./src/lib/infrastructure/*"],
       "@lib/ui": ["./src/lib/ui"],
       "@lib/ui/*": ["./src/lib/ui/*"],
       "@lib/hooks": ["./src/lib/hooks"],

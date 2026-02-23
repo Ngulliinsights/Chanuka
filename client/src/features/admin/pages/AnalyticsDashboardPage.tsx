@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-import { useComprehensiveAnalytics } from '@client/core/analytics/comprehensive-tracker';
+import { useComprehensiveAnalytics } from '@client/infrastructure/analytics/comprehensive-tracker';
 import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
 import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
 import {

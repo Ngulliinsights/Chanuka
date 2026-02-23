@@ -104,13 +104,13 @@ These canary files are in areas likely to be affected by import fixes and should
 client/src/app/providers/AppProviders.tsx
 client/src/app/shell/AppRouter.tsx
 client/src/app/shell/ProtectedRoute.tsx
-client/src/core/analytics/AnalyticsProvider.tsx
-client/src/core/api/authentication.ts
-client/src/core/api/bills.ts
-client/src/core/api/cache-manager.ts
-client/src/core/api/circuit-breaker/core.ts
-client/src/core/api/config.ts
-client/src/core/error/ErrorBoundary.tsx
+client/src/infrastructure/analytics/AnalyticsProvider.tsx
+client/src/infrastructure/api/authentication.ts
+client/src/infrastructure/api/bills.ts
+client/src/infrastructure/api/cache-manager.ts
+client/src/infrastructure/api/circuit-breaker/core.ts
+client/src/infrastructure/api/config.ts
+client/src/infrastructure/error/ErrorBoundary.tsx
 client/src/features/bills/components/BillCard.tsx
 client/src/features/bills/hooks/useBills.ts
 client/src/features/users/components/UserProfile.tsx
@@ -191,9 +191,9 @@ shared/utils/validation.ts
 5. TS18048 (possibly undefined): 106 errors
 
 **Affected Areas** (based on error file paths):
-- `client/src/core/api/` - API client type mismatches (skipCache property, ApiRequest types)
-- `client/src/core/auth/` - Auth types and RBAC (User type not exported, UserRole not found)
-- `client/src/core/analytics/` - AnalyticsEvent type issues
+- `client/src/infrastructure/api/` - API client type mismatches (skipCache property, ApiRequest types)
+- `client/src/infrastructure/auth/` - Auth types and RBAC (User type not exported, UserRole not found)
+- `client/src/infrastructure/analytics/` - AnalyticsEvent type issues
 - `client/src/features/` - Various feature-specific type issues
 
 ### Server Package (5,167 errors)
@@ -265,15 +265,15 @@ Based on the design document's structural hotspot investigation, the following a
 ### Confirmed Hotspots
 
 1. **Compiled Output in Source Tree** ✅
-   - `client/src/core/websocket/` has `.js`, `.d.ts` files alongside `.ts`
+   - `client/src/infrastructure/websocket/` has `.js`, `.d.ts` files alongside `.ts`
    - Risk: Imports may resolve to stale compiled artifacts
 
 2. **Duplicated Security UI Components** ✅
-   - `client/src/core/security/ui/` vs `client/src/features/security/ui/`
+   - `client/src/infrastructure/security/ui/` vs `client/src/features/security/ui/`
    - Both locations exist with similar file structures
 
 3. **Duplicated useAuth Hook** ✅
-   - `client/src/core/auth/hooks/useAuth.tsx` vs `client/src/features/users/hooks/useAuth.tsx`
+   - `client/src/infrastructure/auth/hooks/useAuth.tsx` vs `client/src/features/users/hooks/useAuth.tsx`
    - Both have errors related to User type not being exported
 
 4. **Empty server/infrastructure/errors/** ✅

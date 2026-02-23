@@ -16,7 +16,7 @@ class MockErrorMonitor {
 }
 
 // Mock the ErrorMonitor import
-vi.mock('../../lib/infrastructure/monitoring/error-monitor', () => ({
+vi.mock('../../infrastructure/monitoring/error-monitor', () => ({
   ErrorMonitor: MockErrorMonitor,
 }));
 
@@ -59,7 +59,7 @@ import {
   getMonitoringInstance,
   destroyMonitoring,
   autoInitializeMonitoring,
-} from '@client/core/monitoring/monitoring-init';
+} from '@client/infrastructure/monitoring/monitoring-init';
 
 describe('Monitoring Initialization', () => {
   beforeEach(() => {

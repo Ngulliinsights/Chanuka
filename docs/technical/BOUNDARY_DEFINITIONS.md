@@ -21,7 +21,7 @@ This document defines the clear architectural boundaries between the `shared`, `
 **Boundary Rules**:
 - ✅ **CAN** contain generic, reusable code
 - ✅ **CAN** import from `@types/` and external dependencies
-- ❌ **CANNOT** import from `client/src/core/`
+- ❌ **CANNOT** import from `client/src/infrastructure/`
 - ❌ **CANNOT** import from `client/src/features/`
 - ❌ **CANNOT** contain feature-specific business logic
 
@@ -37,7 +37,7 @@ export const Button = styled.button`...`;
 export class BillNavigationService { ... }
 ```
 
-### 2. Core Directory (`client/src/core/`)
+### 2. Core Directory (`client/src/infrastructure/`)
 
 **Purpose**: Business logic, domain services, and enterprise utilities that implement the core functionality of the application.
 
@@ -81,7 +81,7 @@ export const Dashboard = () => { ... };
 
 **Boundary Rules**:
 - ✅ **CAN** import from `client/src/lib/`
-- ✅ **CAN** import from `client/src/core/`
+- ✅ **CAN** import from `client/src/infrastructure/`
 - ✅ **CAN** import from `@types/` and external dependencies
 - ❌ **CANNOT** import from other features
 - ❌ **CANNOT** contain cross-cutting concerns
@@ -93,7 +93,7 @@ export const Dashboard = () => { ... };
 export const BillDetailPage = () => { ... };
 
 // ✅ ALLOWED: Feature using core service
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
 
 // ❌ FORBIDDEN: Importing from another feature
 import { UserProfile } from '@/features/users';
@@ -111,7 +111,7 @@ import { NavigationService } from '@/shared/services/navigation';
 import { Button } from '@/shared/ui/button';
 
 // ✅ Features → Core (business services)
-import { DataRetentionService } from '@/core/analytics/data-retention-service';
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service';
 
 // ✅ Core → Shared (infrastructure)
 import { logger } from '@/shared/utils/logger';
@@ -146,7 +146,7 @@ Use `client/src/lib/services/` for:
 
 ### When to Use Core Services
 
-Use `client/src/core/` for:
+Use `client/src/infrastructure/` for:
 - **Business Logic**: Domain-specific business rules and processes
 - **Authentication**: User authentication and authorization
 - **Analytics**: Platform analytics and telemetry
@@ -227,13 +227,13 @@ Add to `.eslintrc.js`:
     "import/no-restricted-paths": ["error", {
       "zones": [
         {
-          "target": "./client/src/core",
+          "target": "./client/src/infrastructure",
           "from": "./client/src/features",
           "message": "Core cannot import from features"
         },
         {
           "target": "./client/src/lib",
-          "from": "./client/src/core",
+          "from": "./client/src/infrastructure",
           "message": "Shared cannot import from core"
         },
         {
@@ -266,7 +266,7 @@ Add to CI pipeline:
 
 ### Before (Violations)
 ```typescript
-// ❌ client/src/core/analytics/data-retention-service.ts
+// ❌ client/src/infrastructure/analytics/data-retention-service.ts
 import { Button } from '@/shared/ui/button'; // Core importing UI
 
 // ❌ client/src/lib/services/navigation.ts
@@ -278,7 +278,7 @@ import { UserProfile } from '@/features/users'; // Feature importing feature
 
 ### After (Compliant)
 ```typescript
-// ✅ client/src/core/analytics/data-retention-service.ts
+// ✅ client/src/infrastructure/analytics/data-retention-service.ts
 import { logger } from '@/shared/utils/logger'; // Core using shared infrastructure
 
 // ✅ client/src/lib/services/navigation.ts
@@ -286,7 +286,7 @@ export class NavigationService { /* generic navigation logic */ } // Shared prov
 
 // ✅ client/src/features/bills/components/BillList.tsx
 import { Button } from '@/shared/ui/button'; // Feature using shared UI
-import { DataRetentionService } from '@/core/analytics/data-retention-service'; // Feature using core service
+import { DataRetentionService } from '@/infrastructure/analytics/data-retention-service'; // Feature using core service
 ```
 
 ## Benefits

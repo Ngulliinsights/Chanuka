@@ -188,7 +188,7 @@ import {
   optimizeLayout,
   calculateLayoutHeight,
   generateResponsiveLayout,
-} from '@client/core/dashboard/utils';
+} from '@client/infrastructure/dashboard/utils';
 
 // Get dimensions for a widget
 const dims = getWidgetDimensions(widget.size);

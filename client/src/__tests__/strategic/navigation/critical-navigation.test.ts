@@ -11,7 +11,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock navigation services
-vi.mock('@client/core/navigation/service', () => ({
+vi.mock('@client/infrastructure/navigation/service', () => ({
   navigationService: {
     navigate: vi.fn(),
     goBack: vi.fn(),
@@ -24,7 +24,7 @@ vi.mock('@client/core/navigation/service', () => ({
 }));
 
 // Mock route guards
-vi.mock('@client/core/navigation/guards', () => ({
+vi.mock('@client/infrastructure/navigation/guards', () => ({
   routeGuards: {
     checkGuard: vi.fn(),
     addGuard: vi.fn(),
@@ -39,7 +39,7 @@ describe('Navigation Critical Features', () => {
 
   describe('Route Transitions', () => {
     it('should handle route transitions smoothly', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const fromRoute = '/dashboard';
       const toRoute = '/settings';
@@ -60,7 +60,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should support deep linking', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const deepLink = '/dashboard/settings/profile';
       const expectedRoute = { path: '/dashboard/settings/profile', params: {} };
@@ -78,8 +78,8 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle route guards', async () => {
-      const { routeGuards } = await import('@client/core/navigation/guards');
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { routeGuards } = await import('@client/infrastructure/navigation/guards');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const guardResult = { allowed: true, reason: 'User authenticated' };
       const route = '/protected-route';
@@ -97,7 +97,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should manage loading states', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const route = '/heavy-page';
       const loadingStates = ['loading', 'transitioning', 'loaded'];
@@ -121,7 +121,7 @@ describe('Navigation Critical Features', () => {
 
   describe('State Management', () => {
     it('should preserve navigation state', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const state = { userId: '123', filters: { active: true } };
       const route = '/dashboard';
@@ -140,7 +140,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle browser navigation', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       // Mock browser history API
       const mockHistory = {
@@ -170,7 +170,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should sync state across tabs', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       // Mock broadcast channel for cross-tab communication
       const mockBroadcastChannel = {
@@ -196,7 +196,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should manage navigation history', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const history = [
         { route: '/home', timestamp: Date.now() - 1000 },
@@ -217,7 +217,7 @@ describe('Navigation Critical Features', () => {
 
   describe('Error Handling', () => {
     it('should handle navigation errors gracefully', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const invalidRoute = '/non-existent-route';
       const error = new Error('Route not found');
@@ -228,7 +228,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle guard failures', async () => {
-      const { routeGuards } = await import('@client/core/navigation/guards');
+      const { routeGuards } = await import('@client/infrastructure/navigation/guards');
 
       const guardResult = {
         allowed: false,
@@ -246,7 +246,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle loading timeouts', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       const route = '/slow-loading-page';
       const timeoutError = new Error('Navigation timeout');
@@ -261,7 +261,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle circular navigation', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       // Simulate circular navigation detection
       const circularRoutes = ['/a', '/b', '/c', '/a', '/b', '/c'];
@@ -287,8 +287,8 @@ describe('Navigation Critical Features', () => {
 
   describe('Integration Scenarios', () => {
     it('should handle complete navigation workflow', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
-      const { routeGuards } = await import('@client/core/navigation/guards');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
+      const { routeGuards } = await import('@client/infrastructure/navigation/guards');
 
       // Mock complete workflow
       const workflow = {
@@ -322,7 +322,7 @@ describe('Navigation Critical Features', () => {
     });
 
     it('should handle navigation recovery scenarios', async () => {
-      const { navigationService } = await import('@client/core/navigation/service');
+      const { navigationService } = await import('@client/infrastructure/navigation/service');
 
       // Simulate navigation failure and recovery
       const recoveryScenario = {

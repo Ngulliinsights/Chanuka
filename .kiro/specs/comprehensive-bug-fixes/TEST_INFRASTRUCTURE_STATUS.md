@@ -70,7 +70,7 @@ When running `npx vitest run --config client/vitest.config.ts`:
     - Historical data retrieval
     - Statistics reset
 
-11. **client/src/core/error/messages/__tests__/error-message-system.test.ts** - 3 failures
+11. **client/src/infrastructure/error/messages/__tests__/error-message-system.test.ts** - 3 failures
     - Message formatting with context
     - HTML escaping
     - Best recovery suggestion

@@ -8,7 +8,7 @@ import { Shield, User, Settings, Lock } from 'lucide-react';
 import { useState } from 'react';
 import React from 'react';
 
-import { useAuth } from '@client/core/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { Button } from '@client/lib/design-system';
 import {
   Card,

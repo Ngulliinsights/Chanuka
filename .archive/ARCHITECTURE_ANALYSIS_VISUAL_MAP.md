@@ -115,7 +115,7 @@ Recommended Fix:
 ### Issue #3: 🟠 HIGH - Service Layer Chaos
 ```
 Current State:
-  client/src/core/auth/
+  client/src/infrastructure/auth/
   server/core/auth/
   server/features/users/
   shared/core/services/
