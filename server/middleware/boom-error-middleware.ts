@@ -112,6 +112,7 @@ export function boomErrorMiddleware(
       },
       metadata: {
         service: 'legislative-platform',
+        operation: 'error-handler',
         requestId: req.headers['x-request-id'] as string
       }
     };
@@ -137,6 +138,7 @@ function createErrorResponse(boomError: Boom.Boom, req: Request): ErrorResponse 
     },
     metadata: {
       service: 'legislative-platform',
+      operation: 'error-handler',
       requestId: authReq.requestId || req.headers['x-request-id'] as string
     }
   };

@@ -14,7 +14,7 @@ class ServiceAvailabilityManager {
     consecutiveFailures: 0
   };
 
-  private readonly maxFailures = 3;
+  private readonly _maxFailures = 3;
   private readonly checkInterval = 30000; // 30 seconds
 
   constructor() {
@@ -56,10 +56,10 @@ class ServiceAvailabilityManager {
       // Only mark as unhealthy after more failures (5 instead of 3)
       if (this.serviceStatus.consecutiveFailures >= 5) {
         this.serviceStatus.isHealthy = false;
-        logger.error('Service marked as unhealthy', {
+        logger.error({
           error: error instanceof Error ? error.message : String(error),
           consecutiveFailures: this.serviceStatus.consecutiveFailures
-        });
+        }, 'Service marked as unhealthy');
       }
     }
   }
@@ -100,10 +100,10 @@ export const serviceAvailabilityMiddleware = (req: Request, res: Response, next:
     // If it's been less than 60 seconds since startup, don't block requests
     const timeSinceLastCheck = Date.now() - status.lastCheck.getTime();
     if (timeSinceLastCheck < 60000) {
-      logger.warn('Service health check failed but allowing request during startup period', {
+      logger.warn({
         consecutiveFailures: status.consecutiveFailures,
         timeSinceLastCheck
-      });
+      }, 'Service health check failed but allowing request during startup period');
       return next();
     }
 

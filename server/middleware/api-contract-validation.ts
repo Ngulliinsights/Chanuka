@@ -4,7 +4,6 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { ZodError, ZodSchema } from 'zod';
 import {
   ApiEndpoint,
   ApiEndpointWithParams,
@@ -82,12 +81,12 @@ export function validateApiContract<TRequest, TResponse>(
         const requestValidation = validateRequest(endpoint, req.body);
 
         if (!requestValidation.valid) {
-          logger.warn('Request validation failed', {
+          logger.warn({
             correlationId,
             endpoint: endpoint.path,
             method: endpoint.method,
             errors: requestValidation.errors,
-          });
+          }, 'Request validation failed');
 
           res.status(400).json(
             createValidationErrorResponse(requestValidation.errors || [], correlationId)
@@ -102,12 +101,12 @@ export function validateApiContract<TRequest, TResponse>(
       // Continue to next middleware
       next();
     } catch (error) {
-      logger.error('API contract validation error', {
+      logger.error({
         correlationId,
         endpoint: endpoint.path,
         method: endpoint.method,
         error,
-      });
+      }, 'API contract validation error');
 
       next(error);
     }
@@ -128,12 +127,12 @@ export function validateApiContractWithParams<TRequest, TResponse, TParams>(
       const paramsValidation = validateParams(endpoint, req.params);
 
       if (!paramsValidation.valid) {
-        logger.warn('Path parameters validation failed', {
+        logger.warn({
           correlationId,
           endpoint: endpoint.path,
           method: endpoint.method,
           errors: paramsValidation.errors,
-        });
+        }, 'Path parameters validation failed');
 
         res.status(400).json(
           createValidationErrorResponse(paramsValidation.errors || [], correlationId)
@@ -149,12 +148,12 @@ export function validateApiContractWithParams<TRequest, TResponse, TParams>(
         const requestValidation = validateRequest(endpoint, req.body);
 
         if (!requestValidation.valid) {
-          logger.warn('Request validation failed', {
+          logger.warn({
             correlationId,
             endpoint: endpoint.path,
             method: endpoint.method,
             errors: requestValidation.errors,
-          });
+          }, 'Request validation failed');
 
           res.status(400).json(
             createValidationErrorResponse(requestValidation.errors || [], correlationId)
@@ -169,12 +168,12 @@ export function validateApiContractWithParams<TRequest, TResponse, TParams>(
       // Continue to next middleware
       next();
     } catch (error) {
-      logger.error('API contract validation error', {
+      logger.error({
         correlationId,
         endpoint: endpoint.path,
         method: endpoint.method,
         error,
-      });
+      }, 'API contract validation error');
 
       next(error);
     }
@@ -195,12 +194,12 @@ export function validateApiContractWithQuery<TRequest, TResponse, TQuery>(
       const queryValidation = validateQuery(endpoint, req.query);
 
       if (!queryValidation.valid) {
-        logger.warn('Query parameters validation failed', {
+        logger.warn({
           correlationId,
           endpoint: endpoint.path,
           method: endpoint.method,
           errors: queryValidation.errors,
-        });
+        }, 'Query parameters validation failed');
 
         res.status(400).json(
           createValidationErrorResponse(queryValidation.errors || [], correlationId)
@@ -209,17 +208,17 @@ export function validateApiContractWithQuery<TRequest, TResponse, TQuery>(
       }
 
       // Attach validated query to request
-      req.query = queryValidation.data as Record<string, unknown>;
+      req.query = queryValidation.data as unknown as typeof req.query;
 
       // Continue to next middleware
       next();
     } catch (error) {
-      logger.error('API contract validation error', {
+      logger.error({
         correlationId,
         endpoint: endpoint.path,
         method: endpoint.method,
         error,
-      });
+      }, 'API contract validation error');
 
       next(error);
     }
@@ -240,12 +239,12 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       const paramsValidation = validateParams(endpoint, req.params);
 
       if (!paramsValidation.valid) {
-        logger.warn('Path parameters validation failed', {
+        logger.warn({
           correlationId,
           endpoint: endpoint.path,
           method: endpoint.method,
           errors: paramsValidation.errors,
-        });
+        }, 'Path parameters validation failed');
 
         res.status(400).json(
           createValidationErrorResponse(paramsValidation.errors || [], correlationId)
@@ -260,12 +259,12 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       const queryValidation = validateQuery(endpoint, req.query);
 
       if (!queryValidation.valid) {
-        logger.warn('Query parameters validation failed', {
+        logger.warn({
           correlationId,
           endpoint: endpoint.path,
           method: endpoint.method,
           errors: queryValidation.errors,
-        });
+        }, 'Query parameters validation failed');
 
         res.status(400).json(
           createValidationErrorResponse(queryValidation.errors || [], correlationId)
@@ -274,19 +273,19 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       }
 
       // Attach validated query to request
-      req.query = queryValidation.data as Record<string, unknown>;
+      req.query = queryValidation.data as unknown as typeof req.query;
 
       // Validate request body if not GET/DELETE
       if (req.method !== 'GET' && req.method !== 'DELETE') {
         const requestValidation = validateRequest(endpoint, req.body);
 
         if (!requestValidation.valid) {
-          logger.warn('Request validation failed', {
+          logger.warn({
             correlationId,
             endpoint: endpoint.path,
             method: endpoint.method,
             errors: requestValidation.errors,
-          });
+          }, 'Request validation failed');
 
           res.status(400).json(
             createValidationErrorResponse(requestValidation.errors || [], correlationId)
@@ -301,12 +300,12 @@ export function validateApiContractWithParamsAndQuery<TRequest, TResponse, TPara
       // Continue to next middleware
       next();
     } catch (error) {
-      logger.error('API contract validation error', {
+      logger.error({
         correlationId,
         endpoint: endpoint.path,
         method: endpoint.method,
         error,
-      });
+      }, 'API contract validation error');
 
       next(error);
     }
@@ -338,13 +337,13 @@ export function validateApiResponse<TRequest, TResponse>(
         const responseValidation = validateResponse(endpoint, body);
 
         if (!responseValidation.valid) {
-          logger.error('Response validation failed', {
+          logger.error({
             correlationId,
             endpoint: endpoint.path,
             method: endpoint.method,
             errors: responseValidation.errors,
             responseData: body,
-          });
+          }, 'Response validation failed');
 
           // In development, return validation error
           return originalJson({
@@ -363,12 +362,12 @@ export function validateApiResponse<TRequest, TResponse>(
         // Response is valid, send it
         return originalJson(body);
       } catch (error) {
-        logger.error('Response validation error', {
+        logger.error({
           correlationId,
           endpoint: endpoint.path,
           method: endpoint.method,
           error,
-        });
+        }, 'Response validation error');
 
         // In case of error, send original response
         return originalJson(body);

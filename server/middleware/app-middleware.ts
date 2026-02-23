@@ -25,13 +25,13 @@ const requestLogger = (req: Request, res: Response, next: NextFunction): void =>
 
   res.on('finish', () => {
     const duration = timer.end();
-    logger.info('Request completed', {
+    logger.info({
       method: req.method,
       url: req.url,
       statusCode: res.statusCode,
       duration,
       component: 'Chanuka'
-    } as LogContext);
+    } as LogContext, 'Request completed');
   });
 
   next();
@@ -57,13 +57,13 @@ const performanceMiddleware = (req: Request, res: Response, next: NextFunction) 
 // Security monitoring middleware
 const securityMonitoringMiddleware = {
   initializeAll: () => (req: Request, res: Response, next: NextFunction): void => {
-    logger.debug('Security monitoring', {
+    logger.debug({
       ip: req.ip,
       user_agent: req.get('User-Agent'),
       path: req.path,
       method: req.method,
       component: 'Chanuka'
-    } as LogContext);
+    } as LogContext, 'Security monitoring');
     next();
   }
 };

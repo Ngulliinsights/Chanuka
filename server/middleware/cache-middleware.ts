@@ -21,7 +21,7 @@ export function createCacheMiddleware(options: CacheOptions = {}) {
   const {
     ttl = 300, // 5 minutes default
     keyGenerator = (req) => `${req.method}:${req.originalUrl}`,
-    condition = (req, res) => res.statusCode === 200,
+    condition = (_req, res) => res.statusCode === 200,
     skipCache = (req) => req.method !== 'GET'
   } = options;
 
@@ -88,7 +88,7 @@ export const cacheMiddleware = {
   userSpecific: (ttl: number = 300) => createCacheMiddleware({
     ttl,
     keyGenerator: (req) => {
-      const user_id = req.user?.id || 'anonymous';
+      const user_id = (req as any).user?.id || 'anonymous';
       return `user:${ user_id }:${req.method}:${req.originalUrl}`;
     }
   }),
@@ -105,11 +105,11 @@ export const cacheMiddleware = {
  * Cache invalidation middleware
  */
 export function createCacheInvalidationMiddleware(patterns: string[]) {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (_req: Request, res: Response, next: NextFunction) => {
     // Store original end function
     const originalEnd = res.end;
     
-    res.end = function(chunk?: unknown, encoding?: unknown) {
+    (res as any).end = function(this: Response, ...args: unknown[]) {
       // Invalidate cache patterns after successful response
       if (res.statusCode >= 200 && res.statusCode < 300) {
         Promise.all(
@@ -120,7 +120,7 @@ export function createCacheInvalidationMiddleware(patterns: string[]) {
       }
       
       // Call original end
-      return originalEnd.call(this, chunk, encoding);
+      return (originalEnd as Function).apply(this, args);
     };
 
     next();

@@ -116,7 +116,6 @@ export function validateRequest<T>(
 ): (req: Request, res: Response, next: NextFunction) => void {
   const {
     target = 'body',
-    stripUnknown = true,
     logFailures = true,
   } = options;
 
@@ -134,13 +133,13 @@ export function validateRequest<T>(
         const validationErrors = transformZodErrors(result.error);
 
         if (logFailures) {
-          logger.warn('Request validation failed', {
+          logger.warn({
             correlationId,
             path: req.path,
             method: req.method,
             target,
             errors: validationErrors,
-          });
+          }, 'Request validation failed');
         }
 
         res.status(400).json(
@@ -151,17 +150,17 @@ export function validateRequest<T>(
 
       // Replace request data with validated data
       // This ensures type safety and strips unknown fields if configured
-      (req as Record<string, unknown>)[target] = result.data;
+      (req as unknown as Record<string, unknown>)[target] = result.data;
 
       next();
     } catch (error) {
-      logger.error('Validation middleware error', {
+      logger.error({
         correlationId,
         path: req.path,
         method: req.method,
         target,
         error,
-      });
+      }, 'Validation middleware error');
 
       next(error);
     }
@@ -260,12 +259,12 @@ export function validateMultiple(schemas: {
 
       // If any validation failed, return error
       if (allErrors.length > 0) {
-        logger.warn('Request validation failed', {
+        logger.warn({
           correlationId,
           path: req.path,
           method: req.method,
           errors: allErrors,
-        });
+        }, 'Request validation failed');
 
         res.status(400).json(
           createValidationErrorResponse(allErrors, correlationId)
@@ -275,12 +274,12 @@ export function validateMultiple(schemas: {
 
       next();
     } catch (error) {
-      logger.error('Validation middleware error', {
+      logger.error({
         correlationId,
         path: req.path,
         method: req.method,
         error,
-      });
+      }, 'Validation middleware error');
 
       next(error);
     }

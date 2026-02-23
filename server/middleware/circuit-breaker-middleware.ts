@@ -3,7 +3,6 @@
  * Integrates the comprehensive circuit breaker pattern with server-side API calls
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@server/infrastructure/error-handling';
 import { CircuitBreaker } from '@server/infrastructure/error-handling';
 import { logger } from '@server/infrastructure/observability';
 
@@ -56,19 +55,7 @@ export async function circuitBreakerFetch(
     
     // Consider 5xx responses as failures for circuit breaker
     if (response.status >= 500) {
-      throw new BaseError(`HTTP ${response.status}: ${response.statusText}`, {
-        statusCode: response.status,
-        code: 'HTTP_SERVER_ERROR',
-        domain: ErrorDomain.EXTERNAL_SERVICE,
-        severity: ErrorSeverity.HIGH,
-        context: {
-          url,
-          method: options.method || 'GET',
-          status: response.status,
-          statusText: response.statusText,
-        },
-        retryable: true,
-      });
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
     
     return response;
@@ -112,19 +99,7 @@ export async function circuitBreakerRequest<T = any>(
       }
       
       if (!response.ok) {
-        throw new BaseError(`HTTP ${response.status}: ${response.statusText}`, {
-          statusCode: response.status,
-          code: response.status >= 500 ? 'HTTP_SERVER_ERROR' : 'HTTP_CLIENT_ERROR',
-          domain: ErrorDomain.EXTERNAL_SERVICE,
-          severity: response.status >= 500 ? ErrorSeverity.HIGH : ErrorSeverity.MEDIUM,
-          context: {
-            url: config.url,
-            method: config.method || 'GET',
-            status: response.status,
-            statusText: response.statusText,
-          },
-          retryable: response.status >= 500,
-        });
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
       const contentType = response.headers.get('content-type');
@@ -138,26 +113,10 @@ export async function circuitBreakerRequest<T = any>(
         clearTimeout(timeoutId);
       }
       
-      if (error instanceof BaseError) {
-        throw error;
+      if (!(error instanceof Error)) {
+        throw new Error('Request failed');
       }
-      
-      // Handle fetch errors (network issues, timeouts, etc.)
-      throw new BaseError(
-        error instanceof Error ? error.message : 'Request failed',
-        {
-          statusCode: 503,
-          code: 'NETWORK_ERROR',
-          domain: ErrorDomain.NETWORK,
-          severity: ErrorSeverity.HIGH,
-          cause: error instanceof Error ? error : undefined,
-          context: {
-            url: config.url,
-            method: config.method || 'GET',
-          },
-          retryable: true,
-        }
-      );
+      throw error;
     }
   });
 }
@@ -181,7 +140,7 @@ export async function retryWithCircuitBreaker<T>(
       lastError = error instanceof Error ? error : new Error('Unknown error');
       
       // Don't retry if circuit breaker is open
-      if (error instanceof BaseError && error.code === 'CIRCUIT_BREAKER_OPEN') {
+      if (error instanceof Error && error.message.includes('CIRCUIT_BREAKER_OPEN')) {
         throw error;
       }
       
@@ -190,42 +149,25 @@ export async function retryWithCircuitBreaker<T>(
         break;
       }
       
-      // Don't retry non-retryable errors
-      if (error instanceof BaseError && !error.metadata.retryable) {
-        throw error;
-      }
-      
       // Exponential backoff with jitter
       const delay = baseDelay * Math.pow(2, attempt - 1);
       const jitter = Math.random() * 0.1 * delay;
       const totalDelay = delay + jitter;
       
-      logger.warn('Retrying operation after failure', {
+      logger.warn({
         component: 'CircuitBreakerMiddleware',
         serviceName,
         attempt,
         maxAttempts,
         delay: totalDelay,
         error: lastError.message,
-      });
+      }, 'Retrying operation after failure');
       
       await new Promise(resolve => setTimeout(resolve, totalDelay));
     }
   }
   
-  throw new BaseError(`Operation failed after ${maxAttempts} attempts`, {
-    statusCode: 503,
-    code: 'MAX_RETRIES_EXCEEDED',
-    domain: ErrorDomain.SYSTEM,
-    severity: ErrorSeverity.HIGH,
-    cause: lastError,
-    context: {
-      serviceName,
-      maxAttempts,
-      finalError: lastError.message,
-    },
-    retryable: false,
-  });
+  throw new Error(`Operation failed after ${maxAttempts} attempts: ${lastError.message}`);
 }
 
 /**

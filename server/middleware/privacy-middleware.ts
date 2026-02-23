@@ -33,20 +33,15 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyConsent
 
       // Check if user has given consent for the required processing
       if (!preferences.dataProcessing[requiredConsent]) { // Log the consent violation
-        await auditLogger.log({
+        logger.warn({
           user_id,
           action: 'consent.violation.detected',
           resource: 'data_processing',
-          details: {
-            requiredConsent,
-            userConsent: preferences.dataProcessing,
-            endpoint: req.originalUrl,
-            method: req.method
-           },
+          requiredConsent,
+          endpoint: req.originalUrl,
+          method: req.method,
           ip_address: req.ip || 'unknown',
-          user_agent: req.headers['user-agent'] || 'unknown',
-          severity: 'medium'
-        });
+        }, 'Data processing consent violation');
 
         return res.status(403).json({
           error: 'Data processing consent required',
@@ -59,7 +54,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyConsent
 
       next();
     } catch (error) {
-      logger.error('Error checking data processing consent:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error checking data processing consent');
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -93,7 +88,7 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
 
       next();
     } catch (error) {
-      logger.error('Error checking data sharing consent:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error checking data sharing consent');
       // Allow request to continue on error to avoid breaking functionality
       next();
     }
@@ -109,21 +104,15 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
       const startTime = Date.now();
 
       // Log the data access
-      await auditLogger.log({
+      logger.info({
         user_id,
         action: 'data.accessed',
         resource: dataType,
-        details: {
-          endpoint: req.originalUrl,
-          method: req.method,
-          sensitivityLevel,
-          query: req.query,
-          params: req.params
-         },
+        endpoint: req.originalUrl,
+        method: req.method,
+        sensitivityLevel,
         ip_address: req.ip || 'unknown',
-        user_agent: req.headers['user-agent'] || 'unknown',
-        severity: sensitivityLevel
-      });
+      }, 'Data access logged');
 
       // Add response time logging
       const originalSend = res.send;
@@ -131,20 +120,16 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
 
         // Log response details for high sensitivity data
         if (sensitivityLevel === 'high') {
-          auditLogger.log({
+          logger.info({
             user_id,
             action: 'data.response.sent',
             resource: dataType,
-            details: {
-              endpoint: req.originalUrl,
-              responseTime,
-              statusCode: res.statusCode,
-              dataSize: typeof data === 'string' ? data.length : JSON.stringify(data).length
-             },
+            endpoint: req.originalUrl,
+            responseTime,
+            statusCode: res.statusCode,
+            dataSize: typeof data === 'string' ? data.length : JSON.stringify(data).length,
             ip_address: req.ip || 'unknown',
-            user_agent: req.headers['user-agent'] || 'unknown',
-            severity: 'high'
-          }).catch(console.error);
+          }, 'High sensitivity data response sent');
         }
 
         return originalSend.call(this, data);
@@ -152,7 +137,7 @@ export const logDataAccess = (dataType: string, sensitivityLevel: 'low' | 'mediu
 
       next();
     } catch (error) {
-      logger.error('Error logging data access:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error logging data access');
       // Allow request to continue on error
       next();
     }
@@ -195,7 +180,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
 
       next();
     } catch (error) {
-      logger.error('Error enforcing cookie consent:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error enforcing cookie consent');
       // Allow request to continue on error
       next();
     }
@@ -242,7 +227,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
 
     next();
   } catch (error) {
-    logger.error('Error validating data retention:', { component: 'Chanuka' }, error);
+    logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error validating data retention');
     next();
   }
 };
@@ -280,48 +265,3 @@ export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => 
 
   next();
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

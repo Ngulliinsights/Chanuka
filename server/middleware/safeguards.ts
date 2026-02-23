@@ -1,4 +1,4 @@
-import { type AnomalyEventContext, cibDetectionService } from '@server/features/safeguards/application/cib-detection-service';
+import { type SuspiciousActivityContext, cibDetectionService } from '@server/features/safeguards/application/cib-detection-service';
 import { type ModerationContext, moderationService } from '@server/features/safeguards/application/moderation-service';
 import { type RateLimitContext, rateLimitService } from '@server/features/safeguards/application/rate-limit-service';
 import { logger } from '@server/infrastructure/observability';
@@ -69,12 +69,12 @@ export const safeguardsMiddleware = async (
     const rateLimitResult = await rateLimitService.checkAndRecordRateLimit(rateLimitContext);
 
     if (!rateLimitResult.allowed) {
-      logger.warn('Rate limit exceeded', {
+      logger.warn({
         userId: userId ?? 'anonymous',
         ip: clientIp,
         action: actionType,
         blockReason: rateLimitResult.blockReason
-      });
+      }, 'Rate limit exceeded');
 
       res.status(429).json({
         success: false,
@@ -95,27 +95,27 @@ export const safeguardsMiddleware = async (
       const contentId = generateContentId(req);
       const automatedSignals = await analyzeContent(req);
 
-      const moderationContext: ModerationContext = {
-        contentType,
+      const moderationContext = {
+        contentType: contentType as ModerationContext['contentType'],
         contentId,
         authorId: userId ?? 'anonymous',
-        triggerType: 'automated_check',
+        triggerType: 'automated_flag' as const,
         triggerConfidence: 0.5,
-        automatedSignals,
-        flagReasons: [],
-        priority: 'medium',
+        automatedSignals: automatedSignals as unknown as Readonly<Record<string, unknown>>,
+        flagReasons: [] as string[],
+        priority: 3 as const,
         ...(billId && { billId })
-      };
+      } as unknown as ModerationContext;
 
       // Use atomic moderation queue operation to prevent duplicates
-      const moderationResult = await moderationService.queueForModerationAtomic(moderationContext);
+      const moderationResult = await moderationService.queueForModeration(moderationContext);
 
       if (!moderationResult.success) {
-        logger.warn('Content moderation queue failed', {
+        logger.warn({
           userId: userId ?? 'anonymous',
           contentType,
           error: moderationResult.error
-        });
+        }, 'Content moderation queue failed');
       } else if (moderationResult.queueItemId) {
         // Add moderation queue ID to request for tracking
         req.moderationQueueId = moderationResult.queueItemId;
@@ -126,38 +126,36 @@ export const safeguardsMiddleware = async (
     const isSuspicious = isSuspiciousBehavior(req, userId);
 
     if (isSuspicious) {
-      const anomalyContext: AnomalyEventContext = {
+      const anomalyContext: SuspiciousActivityContext = {
         userId: userId ?? 'anonymous',
-        sessionId: sessionId ?? 'no-session',
-        anomalyType: 'request_pattern',
-        anomalyDescription: `Suspicious request to ${req.path} from ${clientIp}`,
-        severity: 'medium',
-        confidenceScore: 0.7,
-        expectedBehavior: {
+        ipAddress: clientIp,
+        activityType: 'request_pattern',
+        suspicionReason: `Suspicious request to ${req.path} from ${clientIp}`,
+        severityLevel: 3,
+        relatedEntities: {
+          sessionId: sessionId ?? 'no-session',
           typicalLocation: geoLocation?.county,
-          typicalDevice: extractDeviceType(req)
-        },
-        actualBehavior: {
+          typicalDevice: extractDeviceType(req),
           observedLocation: geoLocation?.county,
           observedDevice: extractDeviceType(req),
           requestPath: req.path,
           requestMethod: req.method
         },
-        actionRequired: true
+        requiresManualReview: true
       };
 
-      await cibDetectionService.logAnomalyEvent(anomalyContext);
+      await cibDetectionService.logSuspiciousActivity(anomalyContext);
     }
 
     // Continue to next middleware
     next();
 
   } catch (error) {
-    logger.error('Safeguards middleware error', {
+    logger.error({
       error,
       path: req.path,
       ip: req.ip
-    });
+    }, 'Safeguards middleware error');
     // Fail open - allow request to continue
     next();
   }
@@ -328,7 +326,7 @@ async function analyzeContent(req: Request): Promise<ContentAnalysis> {
       wordCount: textContent.split(/\s+/).filter(word => word.length > 0).length
     };
   } catch (error) {
-    logger.error('Content analysis error', { error });
+    logger.error({ error }, 'Content analysis error');
     return {
       contentLength: 0,
       hasUrls: false,
