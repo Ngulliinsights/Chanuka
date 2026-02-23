@@ -28,79 +28,38 @@ export const authenticateToken = async (req: AuthenticatedRequest, res: Response
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-      return res.status(401).json({ error: 'Access token required' });
+      res.status(401).json({ error: 'Access token required' });
+      return;
     }
 
     // Use the auth service to verify the token
     const result = await authService.verifyToken(token);
 
     if (!result.success || !result.user) {
-      return res.status(401).json({ error: result.error || 'Invalid token' });
+      res.status(401).json({ error: result.error || 'Invalid token' });
+      return;
     }
 
     req.user = result.user;
     next();
   } catch (error) {
     logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Auth middleware error');
-    return res.status(403).json({ error: 'Invalid token' });
+    res.status(403).json({ error: 'Invalid token' });
   }
 };
 
 export const requireRole = (roles: string[]) => {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ error: 'Authentication required' });
+      res.status(401).json({ error: 'Authentication required' });
+      return;
     }
 
     if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ error: 'Insufficient permissions' });
+      res.status(403).json({ error: 'Insufficient permissions' });
+      return;
     }
 
     next();
   };
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

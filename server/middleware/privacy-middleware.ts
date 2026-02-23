@@ -213,7 +213,7 @@ export const addPrivacyHeaders = (req: Request, res: Response, next: NextFunctio
 /**
  * Middleware to validate data retention compliance
  */
-export const validateDataRetention = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+export const validateDataRetention = async (req: AuthenticatedRequest, _res: Response, next: NextFunction) => {
   try {
     if (!req.user) {
       return next();
@@ -223,7 +223,12 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
     const preferences = await privacyService.getPrivacyPreferences(user_id);
 
     // Add retention preferences to request for use by other middleware/routes
-    (req as PrivacyRequest).dataRetentionPrefs = preferences.dataRetention;
+    (req as PrivacyRequest).dataRetentionPrefs = {
+      retainActivityLogs: preferences.dataRetention?.keepComments ?? true,
+      retainSearchHistory: true,
+      retainEngagementData: preferences.dataRetention?.keepEngagementHistory ?? true,
+      retentionPeriodDays: (preferences.dataRetention?.retentionPeriodMonths ?? 12) * 30,
+    };
 
     next();
   } catch (error) {
@@ -235,7 +240,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, res: Resp
 /**
  * Middleware to anonymize IP addresses for privacy
  */
-export const anonymizeIP = (req: Request, res: Response, next: NextFunction) => {
+export const anonymizeIP = (req: Request, _res: Response, next: NextFunction) => {
   const originalIP = req.ip || (req.connection as { remoteAddress?: string } | undefined)?.remoteAddress || '';
 
   // Anonymize IPv4 addresses (remove last octet)

@@ -72,7 +72,7 @@ export function createUnifiedErrorMiddleware() {
     }
 
     try {
-      const _context = createErrorContext(req);
+      createErrorContext(req);
 
       // Transform error to StandardError format
       const standardError: StandardError = toStandardError(error);

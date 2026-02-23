@@ -56,7 +56,7 @@ const performanceMiddleware = (req: Request, res: Response, next: NextFunction) 
 
 // Security monitoring middleware
 const securityMonitoringMiddleware = {
-  initializeAll: () => (req: Request, res: Response, next: NextFunction): void => {
+  initializeAll: () => (req: Request, _res: Response, next: NextFunction): void => {
     logger.debug({
       ip: req.ip,
       user_agent: req.get('User-Agent'),
@@ -124,7 +124,7 @@ export function configureAppMiddleware(app: Express): void {
   // Body parsing middleware with robust error handling
   app.use(express.json({
     limit: '10mb',
-    verify: (req, res, buf) => {
+    verify: (_req, res, buf) => {
       try {
         JSON.parse(buf.toString());
       } catch (e) {
@@ -139,7 +139,7 @@ export function configureAppMiddleware(app: Express): void {
   app.use(express.urlencoded({
     extended: true,
     limit: '10mb',
-    verify: (req, res, buf) => {
+    verify: (_req, res, buf) => {
       if (buf.length === 0) return;
       const str = buf.toString();
       if (str.length > 10 * 1024 * 1024) {

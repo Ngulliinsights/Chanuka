@@ -131,7 +131,7 @@ export async function retryWithCircuitBreaker<T>(
   baseDelay: number = 1000
 ): Promise<T> {
   const circuitBreaker = getCircuitBreaker(serviceName);
-  let lastError: Error;
+  let lastError: Error = new Error('Unknown error');
   
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
