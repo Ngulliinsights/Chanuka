@@ -6,13 +6,13 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache } from '@shared/core/caching/index';
+import { getDefaultCache } from '@server/infrastructure/cache/index';
 import { database as db } from '@server/infrastructure/database';
 import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
 import {
 type Bill,
-bill_sponsorships,   bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors, type SponsorTransparency, sponsorTransparency} from '@shared/schema';
+bill_sponsorships,   bills,   type Sponsor, type SponsorAffiliation, sponsorAffiliations, sponsors, type SponsorTransparency, sponsorTransparency} from '@server/infrastructure/schema';
 
 import {
   ConflictDetectionConfig,

@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Integrity Operations Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { content_reports, moderation_queue } from '@shared/schema/domains/integrity-operations'
+// Usage: import { content_reports, moderation_queue } from '@server/infrastructure/schema/domains/integrity-operations'
 
 export {
   content_reports,

@@ -198,6 +198,13 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
         // Workspace-level modules
         '@shared': path.resolve(rootDir, '../shared'),
+        '@shared/types': path.resolve(rootDir, '../shared/types'),
+        '@shared/validation': path.resolve(rootDir, '../shared/validation'),
+        '@shared/constants': path.resolve(rootDir, '../shared/constants'),
+        '@shared/utils': path.resolve(rootDir, '../shared/utils'),
+        '@shared/core': path.resolve(rootDir, '../shared/core'),
+        '@shared/platform': path.resolve(rootDir, '../shared/platform'),
+        '@shared/i18n': path.resolve(rootDir, '../shared/i18n'),
         '@workspace': path.resolve(rootDir, '../shared'),
         '@workspace/types': path.resolve(rootDir, '../shared/types'),
         '@workspace/core': path.resolve(rootDir, '../shared/core'),

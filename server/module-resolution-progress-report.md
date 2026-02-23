@@ -36,7 +36,7 @@ Migrated old `@chanuka/*` namespace to current `@shared/*` namespace.
 
 **Examples:**
 - `@chanuka/shared/database` → `@shared/database`
-- `@chanuka/shared/schema/accountability_ledger` → `@shared/schema/accountability_ledger`
+- `@chanuka/shared/schema/accountability_ledger` → `@server/infrastructure/schema/accountability_ledger`
 
 #### 3. Shared Core Import Fixes (242 fixes)
 Fixed imports from `@shared/core` that have been moved to server infrastructure layer.

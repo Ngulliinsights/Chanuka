@@ -16,7 +16,7 @@
     "inversify",
     "inversify-express-utils",
     "@shared/database",
-    "@shared/schema/accountability_ledger",
+    "@server/infrastructure/schema/accountability_ledger",
     "@server/features/security/security-audit-service",
     "@server/infrastructure/security/input-validation-service",
     "@server/infrastructure/security/secure-query-builder",
@@ -724,7 +724,7 @@
         "line": 2,
         "column": 39,
         "code": "TS2307",
-        "message": "Cannot find module '@shared/schema/accountability_ledger' or its corresponding type declarations."
+        "message": "Cannot find module '@server/infrastructure/schema/accountability_ledger' or its corresponding type declarations."
       },
       {
         "line": 4,
@@ -9224,7 +9224,7 @@
         "line": 1,
         "column": 24,
         "code": "TS2307",
-        "message": "Cannot find module '@shared/core/observability/logging' or its corresponding type declarations."
+        "message": "Cannot find module '@server/infrastructure/observability/logger' or its corresponding type declarations."
       },
       {
         "line": 2,

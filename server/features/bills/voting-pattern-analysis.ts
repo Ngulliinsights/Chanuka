@@ -2,7 +2,7 @@ import { NextFunction,Request, Response, Router } from 'express';
 
 import { VotingPatternAnalysisService } from '@server/features/bills/services/voting-pattern-analysis-service';
 import { logger } from '@server/infrastructure/observability';
-import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
+import { UnifiedApiResponse  } from '@shared/types/api';
 import { securityAuditService } from '@server/security/security-audit-service';
 
 /**

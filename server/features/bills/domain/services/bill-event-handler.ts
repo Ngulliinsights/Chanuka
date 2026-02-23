@@ -1,5 +1,5 @@
 import { logger } from '@shared/core/index';
-import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
+import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@server/features/bills/domain/events/bill-events';
 
 import { BillNotificationService } from './bill-notification-service';
 

@@ -12,7 +12,7 @@
  */
 
 import { WebSocketPerformanceValidator } from '@server/scripts/websocket-performance-validation';
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 
 import { FinalMigrationValidator } from '../../final-migration-validation';
 import { LegacyWebSocketCleanup } from '../../legacy-websocket-cleanup';

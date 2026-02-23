@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { ApiError } from '@shared/core/utils/api-utils';
+import { ApiError } from '@shared/types/api';
 import { commonSchemas,inputValidationService } from '@shared/infrastructure/security/input-validation-service';
 import { NextFunction,Request, Response } from 'express';
 import multer from 'multer';

@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { authenticateToken as requireAuth } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
 import { asyncHandler } from '@/middleware/error-management';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
-import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { createErrorContext } from '@server/infrastructure/observability';
 import { notificationService } from './notification-service';
 
 // ============================================================================

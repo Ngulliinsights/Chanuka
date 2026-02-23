@@ -8,7 +8,7 @@ import type {
   RelationshipMapping,
   SponsorAffiliation
 } from '@server/types/index';
-import { FinancialDisclosureConfig } from '@shared/config';
+import { FinancialDisclosureConfig } from '@server/config';
 import { DatabaseError } from '@shared/core';
 import { cache } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';

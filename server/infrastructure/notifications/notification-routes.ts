@@ -4,7 +4,7 @@ import { notificationService } from '@server/infrastructure/notifications/notifi
 import { smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter';
 import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { Request, Response,Router } from 'express';
 import { z } from 'zod';
 

@@ -11,7 +11,7 @@ import { comments,
   content_report, 
   moderation_action,
   users
- } from '@shared/shared/schema';
+ } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 import { 

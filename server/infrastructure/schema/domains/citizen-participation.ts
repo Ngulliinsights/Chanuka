@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Citizen Participation Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { comments, bills_votes } from '@shared/schema/domains/citizen-participation'
+// Usage: import { comments, bills_votes } from '@server/infrastructure/schema/domains/citizen-participation'
 
 export {
   user_interests,

@@ -131,7 +131,7 @@ class TypeScriptSyntaxFixer {
       'import {',
       '  AsyncServiceResult,',
       '  withResultHandling',
-      '} from "../../../infrastructure/errors/result-adapter.js";',
+      '} from "../../../infrastructure/error-handling/result-adapter.js";',
       'import { QueryCache, CacheHelpers } from "../../../infrastructure/query-cache";',
       'import { serverCache } from "../../../infrastructure/cache/cache-service";',
       '',

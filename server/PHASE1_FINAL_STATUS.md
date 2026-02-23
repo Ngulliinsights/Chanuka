@@ -50,7 +50,7 @@
 - @server/infrastructure/observability: 211
 - @server/infrastructure/database: 78
 - @shared/core/utils/api-utils: 19
-- @shared/core/observability/logging: 16
+- @server/infrastructure/observability/logger: 16
 
 ## Why Module Resolution Still Failing
 

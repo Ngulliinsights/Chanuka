@@ -1,14 +1,14 @@
 // Security Services
 import { dataPrivacyService } from '@server/infrastructure/security/data-privacy-service';
 import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
-import { bill_engagement,comments as comments_cp } from '@shared/citizen_participation';
+import { bill_engagement,comments as comments_cp } from '@server/infrastructure/schema';
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache  } from '@shared/core/caching';
-import { cacheKeys  } from '@shared/core/caching/key-generator';
+import { getDefaultCache  } from '@server/infrastructure/cache';
+import { cacheKeys  } from '@server/infrastructure/cache/key-generator';
 import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { database, getDatabase,withTransaction } from '@server/infrastructure/database';
-import { bills,comments, user_profiles, users } from '@shared/foundation';
+import { bills,comments, user_profiles, users } from '@server/infrastructure/schema';
 import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';

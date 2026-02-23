@@ -5,7 +5,7 @@
  * Handles complex relationships and data validation.
  */
 
-import { EntityMapping } from '@shared/drizzle-adapter';
+import { EntityMapping } from '@server/infrastructure/adapters/drizzle-adapter';
 import { comments } from '@server/infrastructure/schema';
 // CommentWithUser type moved to direct service layer
 type CommentWithUser = any; // TODO: Define proper type in service layer

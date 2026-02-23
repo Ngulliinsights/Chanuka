@@ -8,7 +8,7 @@ type InsertBill, type InsertBillComment, type InsertSponsor, type InsertUser,
 type InsertUserProfile,
 type Notification,   notification as notifications,   type Sponsor, sponsor as sponsors, type SponsorAffiliation, 
 sponsorAffiliation as sponsorAffiliations,
-  type SponsorTransparency, sponsorTransparency, type User, user_profiles as user_profiles, type UserProfile, users as users } from '@shared/shared/schema';
+  type SponsorTransparency, sponsorTransparency, type User, user_profiles as user_profiles, type UserProfile, users as users } from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, like, or, sql } from "drizzle-orm";
 
 // Enhanced engagement statistics interface with more detailed metrics

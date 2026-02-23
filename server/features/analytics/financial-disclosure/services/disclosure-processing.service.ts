@@ -5,7 +5,7 @@ import type {
   FinancialDisclosure,
   SponsorAffiliation,
   SponsorInfo} from '@server/types/index';
-import { FinancialDisclosureConfig } from '@shared/config';
+import { FinancialDisclosureConfig } from '@server/config';
 import { DatabaseError, NotFoundError } from '@shared/core';
 import { cache } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';

@@ -12,7 +12,7 @@ import { logger } from '@server/infrastructure/observability';
 import { 
   AsyncServiceResult, 
   withResultHandling 
-} from '@shared/errors/result-adapter';
+} from '@server/infrastructure/error-handling';
 
 // Types for feature flags
 export interface FeatureFlag {

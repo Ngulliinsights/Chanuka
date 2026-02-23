@@ -10,14 +10,14 @@ import { conflictResolutionRecommendationService } from '@server/features/analyt
 import { conflictSeverityAnalyzerService } from '@server/features/analytics/conflict-detection/conflict-severity-analyzer.service';
 import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service';
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache } from '@shared/core/caching/index';
+import { getDefaultCache } from '@server/infrastructure/cache/index';
 import { database as db } from '@server/infrastructure/database';
 import { eq } from 'drizzle-orm';
 
 import {
 type Bill,
 bills,
-  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@shared/schema';
+  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@server/infrastructure/schema';
 
 import {
   ConflictAnalysis,

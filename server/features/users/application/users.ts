@@ -1,9 +1,13 @@
 import { withTransaction } from '@server/infrastructure/database';
 import {
   AsyncServiceResult,
-  withResultHandling,
-  ResultAdapter,
-} from '@server/infrastructure/errors';
+  safeAsync,
+  err,
+  createValidationError,
+  createBusinessLogicError,
+  createNotFoundError,
+  boomFromStandardized,
+} from '@server/infrastructure/error-handling';
 
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';

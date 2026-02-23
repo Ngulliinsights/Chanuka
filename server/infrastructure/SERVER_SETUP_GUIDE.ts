@@ -52,7 +52,7 @@ import {
   ValidationError,
   AuthenticationError,
   AuthorizationError,
-} from '@shared/core/observability/error-management';
+} from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 

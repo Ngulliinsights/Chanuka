@@ -1,1716 +1,558 @@
-# Chanuka Import Resolution & Migration Audit - Implementation Plan
+# Implementation Plan: Import Resolution & Migration Audit
 
 ## Overview
 
-This implementation plan systematically resolves all import path errors and module resolution failures across the Chanuka monorepo using a 5-phase approach:
+This plan implements a systematic 5-phase audit to resolve ~1,200 module resolution errors and structural inconsistencies across the Chanuka monorepo resulting from incomplete migrations. The approach prioritizes baseline capture, root cause fixes, structural investigation, categorization, and manual verification to prevent regressions.
 
-1. **Phase 0: Baseline Capture** - Establish ground truth before any changes
-2. **Phase 1: Fix Alias Resolution Root Cause** - Fix config before fixing imports
-3. **Phase 2: Structural Hotspot Investigation** - Identify duplicates and stale paths
-4. **Phase 3: Full Import Scan & Categorization** - Classify every broken import
-5. **Phase 4: Manual Fix Protocol** - Fix imports with verification
-6. **Phase 5: Validation & Error Delta Report** - Verify success and document changes
+## Tasks
 
-**Key Principles:**
-- Fix root causes (config) before symptoms (imports)
-- Leverage industry-standard tools (madge, depcheck, ts-unused-exports)
-- Manual verification at each step prevents regressions
-- Dependency order: shared → server → client, leaf → root
-- Safe bulk changes allowed for identical patterns with strict safeguards
+### Phase 0: Baseline Capture
 
----
-
-## CRITICAL RULES
-
-### Hard Constraints
-- ❌ NO automated scripts, codemods, sed, awk, or regex replacements (see safe exceptions below)
-- ❌ NO bulk changes without verification (see safe exceptions below)
-- ❌ NO file moves - update imports, not file locations
-- ❌ NO guessing - flag unclear cases for human review
-- ❌ NO using backup files from scripts/error-remediation/tests/reports/backups/
-- ❌ NO assuming TODO comments mean imports are intentionally broken
-
-### Required Practices
-- ✅ Manual fixes with verification (or safe bulk with strict protocols)
-- ✅ Verify after every fix with `tsc --noEmit`
-- ✅ One file per commit (or one batch per commit with all files listed)
-- ✅ Stop and investigate if error count increases unexpectedly
-- ✅ Monitor regression canaries (zero-error files)
-- ✅ Use industry-standard tools (madge, depcheck, ts-unused-exports)
-
----
-
-## SAFE BULK CHANGE EXCEPTIONS
-
-See design.md Section "Safe Bulk Change Exceptions" for complete protocols.
-
-### Exception 1: Identical Category A (Stale Path)
-**When**: 10+ files import from exact same old path → exact same new path
-**Max**: 50 files per batch
-**Safety**: Verify first 3-5 files, IDE tools only, full diff review, `tsc --noEmit` verification
-
-### Exception 2: Identical Category C (Alias Fix)
-**When**: Config fix already applied, imports now resolve without source changes
-**Max**: Unlimited (no source changes needed)
-**Safety**: Config fix committed and verified
-
-### Exception 3: Identical Category E (Named Export Rename)
-**When**: 10+ files import exact same old export → exact same new export
-**Max**: 30 files per batch
-**Safety**: Verify first 5 files, signature compatibility check, IDE tools only
-
-### Exception 4: Barrel File Fix (Category D)
-**When**: Single barrel file fix resolves multiple downstream imports
-**Max**: 1 barrel file (affects unlimited downstream)
-**Safety**: Single root cause identified, downstream imports verified
-
-### Bulk Change Prohibitions
-**NEVER** use bulk changes for:
-- Category B (replacement varies by context)
-- Mixed categories (each needs different strategy)
-- API changes (each call site needs review)
-- Cross-package changes (different packages may need different fixes)
-- Unclear patterns (if first 3-5 manual fixes show variation)
-
----
-
-## Phase 0: Baseline Capture (Before Touching Anything)
-
-**Objective**: Establish ground truth before making any changes. Capture comprehensive baseline using TypeScript compiler and industry-standard analysis tools.
-
-**Key Deliverables**:
-- Baseline TypeScript error reports for all packages
-- Baseline analysis with error counts and regression canaries
-- Tool-generated dependency graphs and circular dependency reports
-- Annotated project structure reference with hotspots marked
-
----
-
-### Task 0.0: Review Project Structure Snapshot
-**Requirements**: US-1, TR-1
-**Validates**: Requirements 1.1, 1.2
-
-- [x] 0.0.1 Read docs/project-structure.md
-  - Understand package structure (client/, server/, shared/, tests/)
-  - Identify known duplicate directories from snapshot
-  - Note FSD migration boundary (lib/ vs features/)
-  - Map out dependency relationships
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.0.2 Create annotated project structure reference
-  - Copy project-structure.md to project-structure-reference.md
-  - Mark known hotspots with annotations:
-    - `[HOTSPOT-1]` - Compiled output in websocket/
-    - `[HOTSPOT-2]` - Duplicated security UI
-    - `[HOTSPOT-3]` - Duplicated useAuth hooks
-    - `[HOTSPOT-4]` - Duplicated loading utilities
-    - `[HOTSPOT-5]` - Empty errors directory
-    - `[HOTSPOT-6]` - FSD migration boundary
-  - _Requirements: US-3 (Identify Structural Inconsistencies)_
-
-- [x] 0.0.3 Extract key metrics from snapshot
-  - Count total files in client/src/core/
-  - Count total files in client/src/features/
-  - Count total files in client/src/lib/
-  - Document in baseline_analysis.md
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-**Acceptance**: Project structure understood, hotspots pre-identified from snapshot, baseline_analysis.md started
-
-### Task 0.0.5: Install Import Analysis Tools
-**Requirements**: US-1, TR-1
-**Validates**: Requirements 1.1
-
-- [x] 0.0.5.1 Install dependency analysis tools (if not already installed)
-  ```bash
-  npm install --save-dev depcheck madge ts-unused-exports eslint-plugin-import
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.0.5.2 Verify tool installations
-  ```bash
-  npx depcheck --version
-  npx madge --version
-  npx ts-unused-exports --version
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-**Tools Purpose**:
-- **depcheck**: Finds unused dependencies and missing imports
-- **madge**: Generates dependency graphs, detects circular dependencies
-- **ts-unused-exports**: Finds unused exports across the codebase
-- **eslint-plugin-import**: Validates import/export statements
-
-**Acceptance**: All analysis tools installed and verified, ready for baseline capture
-
----
-
-### Task 0.1: Capture TypeScript Error Baseline
-**Requirements**: US-1, TR-1
-**Validates**: Requirements 1.1, 1.4
-
-- [x] 0.1.1 Run tsc on root package
-  ```bash
-  npx tsc --noEmit -p tsconfig.json 2>&1 | tee baseline_tsc_root.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.1.2 Run tsc on client package
-  ```bash
-  npx tsc --noEmit -p client/tsconfig.json 2>&1 | tee baseline_tsc_client.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.1.3 Run tsc on server package
-  ```bash
-  npx tsc --noEmit -p server/tsconfig.json 2>&1 | tee baseline_tsc_server.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.1.4 Run tsc on shared package
-  ```bash
-  npx tsc --noEmit -p shared/tsconfig.json 2>&1 | tee baseline_tsc_shared.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.1.5 Capture Vitest module resolution errors
-  ```bash
-  npx vitest --reporter=verbose --run 2>&1 | head -200 | tee baseline_vitest.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-**Acceptance**: All baseline files created (baseline_tsc_*.txt, baseline_vitest.txt), no changes made to source code
-
----
-
-### Task 0.2: Analyze Baseline Errors
-**Requirements**: US-1, TR-1
-**Validates**: Requirements 1.2, 1.3
-
-- [x] 0.2.1 Count errors by category in each baseline file
-  - Count TS2307 (Cannot find module)
-  - Count TS2305 (Module has no exported member)
-  - Count TS2614 (Module not found or not a module)
-  - Count TS2724 (Module has no default export)
-  - Count TS7006 (Parameter implicitly has 'any')
-  - Count TS18046 (Possibly undefined)
-  - Count TS6133 (Variable declared but never used)
-  - Count other error codes
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.2.2 Identify zero-error files (regression canaries)
-  ```bash
-  # Find files with no errors in baseline
-  # These are canaries - if they gain errors, it's a regression
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.2.3 Run dependency analysis tools
-  ```bash
-  # Check for unused dependencies and missing imports
-  npx depcheck --json > baseline_depcheck.json
+- [x] 1. Capture TypeScript error baselines for all packages
+  - [x] 1.1 Run tsc on root package and save baseline
+    - Execute: `npx tsc --noEmit -p tsconfig.json 2>&1 | tee baseline_tsc_root.txt`
+    - _Requirements: TR-1_
   
-  # Generate dependency graph for each package
-  npx madge --circular --extensions ts,tsx client/src/ > baseline_circular_client.txt
-  npx madge --circular --extensions ts,tsx server/ > baseline_circular_server.txt
-  npx madge --circular --extensions ts,tsx shared/ > baseline_circular_shared.txt
+  - [x] 1.2 Run tsc on client package and save baseline
+    - Execute: `npx tsc --noEmit -p client/tsconfig.json 2>&1 | tee baseline_tsc_client.txt`
+    - _Requirements: TR-1_
   
-  # Find unused exports
-  npx ts-unused-exports tsconfig.json --excludePathsFromReport=".*\.test\.ts;.*\.spec\.ts" > baseline_unused_exports.txt
-  ```
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-- [x] 0.2.4 Create baseline analysis document
-  - Document total error count per package
-  - Document error distribution by category
-  - List regression canary files
-  - Document circular dependencies found by madge
-  - Document unused exports found by ts-unused-exports
-  - Document missing/unused dependencies from depcheck
-  - Save as `baseline_analysis.md`
-  - _Requirements: US-1 (Establish Error Baseline)_
-
-**Acceptance**: Baseline analysis document created with error counts, canary list, circular dependencies, unused exports, and dependency issues documented
-
----
-
-### Checkpoint 0.3: Baseline Complete
-**Requirements**: US-1
-
-- [x] 0.3.1 Verify all baseline artifacts exist
-  - baseline_tsc_root.txt
-  - baseline_tsc_client.txt
-  - baseline_tsc_server.txt
-  - baseline_tsc_shared.txt
-  - baseline_vitest.txt
-  - baseline_depcheck.json
-  - baseline_circular_*.txt (3 files)
-  - baseline_unused_exports.txt
-  - baseline_analysis.md
-  - project-structure-reference.md
-
-- [x] 0.3.2 Verify no source code changes made
-  ```bash
-  git status
-  # Should show only new baseline files, no modified source files
-  ```
-
-- [-] 0.3.3 Commit baseline artifacts
-  ```bash
-  git add baseline_*.txt baseline_*.json baseline_analysis.md project-structure-reference.md
-  git commit -m "chore: capture baseline for import resolution audit
-
-  - TypeScript error baselines for all packages
-  - Dependency analysis (depcheck, madge, ts-unused-exports)
-  - Regression canaries identified
-  - Project structure annotated with hotspots
+  - [x] 1.3 Run tsc on server package and save baseline
+    - Execute: `npx tsc --noEmit -p server/tsconfig.json 2>&1 | tee baseline_tsc_server.txt`
+    - _Requirements: TR-1_
   
-  Total errors: [count from baseline_analysis.md]
-  Module resolution errors: [count from baseline_analysis.md]"
-  ```
-
-**Acceptance**: All baseline artifacts committed, ready to proceed to Phase 1
-
----
-
-## Phase 1: Fix Alias Resolution Root Cause
-
-**Objective**: Ensure all TypeScript path aliases resolve correctly in all tools (tsc, Vite, Vitest, ESLint) before fixing any imports. Fix config, not source code.
-
-**Key Deliverables**:
-- Complete config inventory with alias declarations documented
-- Alias resolution hypothesis with proof of mismatch
-- Minimal config fixes with verification
-- fix-root-cause.md document with diffs and proof
-
----
-
-### Task 1.1: Audit Module Resolution Configs
-**Requirements**: US-2, TR-2
-**Validates**: Requirements 2.1
-
-- [~] 1.1.1 Read root tsconfig.json
-  - Document `compilerOptions.baseUrl`
-  - Document `compilerOptions.paths` (all aliases)
-  - Document `references` array
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [~] 1.1.2 Read client/tsconfig.json
-  - Document whether it extends root
-  - Document `compilerOptions.baseUrl`
-  - Document `compilerOptions.paths`
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [~] 1.1.3 Read server/tsconfig.json
-  - Document whether it extends root
-  - Document `compilerOptions.baseUrl`
-  - Document `compilerOptions.paths`
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [~] 1.1.4 Read shared/tsconfig.json
-  - Document whether it extends root
-  - Document `compilerOptions.baseUrl`
-  - Document `compilerOptions.paths`
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.1.5 Read client/vite.config.ts
-  - Document `resolve.alias` object
-  - Compare to tsconfig paths
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.1.6 Read vitest.workspace.ts
-  - Document per-project `resolve.alias`
-  - Document `moduleNameMapper` if present
-  - Compare to tsconfig paths
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.1.7 Read nx.json
-  - Document `npmScope`
-  - Document project graph settings
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.1.8 Read pnpm-workspace.yaml
-  - Document workspace members
-  - Verify all packages are listed
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-**Acceptance**: Complete inventory of all configs with alias declarations documented in fix-root-cause.md
-
----
-
-### Task 1.2: Verify Expected Alias Inventory
-**Requirements**: US-2, TR-2
-**Validates**: Requirements 2.1
-
-- [ ] 1.2.1 Create alias inventory table in fix-root-cause.md
-  | Alias | Expected Target | Root tsconfig | Client tsconfig | Server tsconfig | Vite | Vitest |
-  |-------|----------------|---------------|-----------------|-----------------|------|--------|
-  | `@/` | `client/src/` | ? | ? | N/A | ? | ? |
-  | `@shared/` | `shared/` | ? | ? | ? | ? | ? |
-  | `@server/` | `server/` | N/A | N/A | ? | N/A | ? |
-  | `@client/` | `client/src/` | ? | ? | N/A | ? | ? |
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.2.2 Fill in table with actual declarations
-  - Mark ✅ if alias is declared correctly
-  - Mark ❌ if alias is missing
-  - Mark ⚠️ if alias target is incorrect
-  - Note any incorrect target paths
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.2.3 Document missing aliases
-  - List which tools are missing which aliases
-  - Prioritize by impact (how many imports affected)
-  - Cross-reference with baseline errors
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-**Acceptance**: Alias inventory table complete in fix-root-cause.md with gaps identified and prioritized
-
----
-
-### Task 1.3: Confirm Alias Resolution Hypothesis
-**Requirements**: US-2, TR-2
-**Validates**: Requirements 2.2
-
-- [ ] 1.3.1 Pick one broken absolute import from baseline
-  - Choose from baseline_tsc_*.txt errors
-  - Example: `import { something } from '@shared/types'`
-  - Document in fix-root-cause.md
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.3.2 Trace what path each resolver constructs
-  - TypeScript: `baseUrl` + `paths['@shared/*']` → ?
-  - Vite: `resolve.alias['@shared']` → ?
-  - Vitest: `resolve.alias['@shared']` → ?
-  - Document each resolution path
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.3.3 Compare to actual file location
-  - Where does the file actually exist?
-  - Document the mismatch
-  - Example: "TypeScript resolves to `shared/types` but file is at `shared/src/types`"
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.3.4 Write down proof in fix-root-cause.md
-  - "TypeScript resolves to X, but file is at Y"
-  - This proves config fix is needed
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-**Acceptance**: Hypothesis documented in fix-root-cause.md with proof of mismatch
-
----
-
-### Task 1.4: Apply Minimal Config Fix
-**Requirements**: US-2, TR-2
-**Validates**: Requirements 2.2, 2.3
-
-- [ ] 1.4.1 Identify minimal config changes needed
-  - List exact changes to each config file
-  - Example: "Add `'@shared/*': ['shared/*']` to root tsconfig paths"
-  - Document in fix-root-cause.md
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.2 Apply config changes
-  - Edit config files manually
-  - Do NOT change any source files yet
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.3 Create test import file
-  ```typescript
-  // test-import.ts
-  import { something } from '@shared/types';
-  import { other } from '@/core/api';
-  ```
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.4 Verify fix with test file
-  ```bash
-  npx tsc --noEmit test-import.ts
-  ```
-  - Should resolve successfully
-  - If fails, adjust config and retry
-  - Document verification in fix-root-cause.md
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.5 Delete test file
-  ```bash
-  rm test-import.ts
-  ```
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.6 Document config changes in fix-root-cause.md
-  - Include exact diffs for each config file
-  - Include proof of fix (test-import.ts verification)
-  - Include before/after tsc output
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
-
-- [ ] 1.4.7 Commit config changes
-  ```bash
-  git add tsconfig.json client/vite.config.ts vitest.workspace.ts fix-root-cause.md
-  git commit -m "fix(config): add missing path aliases
-
-  - Add @shared/* to Vitest config
-  - Fix @/ alias target in Vite config
+  - [x] 1.4 Run tsc on shared package and save baseline
+    - Execute: `npx tsc --noEmit -p shared/tsconfig.json 2>&1 | tee baseline_tsc_shared.txt`
+    - _Requirements: TR-1_
   
-  Proof: test-import.ts now resolves successfully
-  See fix-root-cause.md for complete documentation"
-  ```
-  - _Requirements: US-2 (Fix Alias Resolution Root Cause)_
+  - [x] 1.5 Capture Vitest baseline errors
+    - Execute: `npx vitest --reporter=verbose --run 2>&1 | head -200 | tee baseline_vitest.txt`
+    - _Requirements: TR-1_
 
-**Acceptance**: Config changes committed with proof of fix in fix-root-cause.md, no source files changed
-
----
-
-### Checkpoint 1.5: Config Fixes Complete
-**Requirements**: US-2
-
-- [ ] 1.5.1 Verify fix-root-cause.md is complete
-  - Config inventory table filled
-  - Alias resolution hypothesis documented
-  - Config diffs included
-  - Proof of fix included
-
-- [ ] 1.5.2 Verify no source code changes made
-  ```bash
-  git diff --name-only HEAD~1 HEAD
-  # Should show only config files and fix-root-cause.md
-  ```
-
-- [ ] 1.5.3 Run quick verification
-  ```bash
-  # Check if config fixes reduced errors
-  npx tsc --noEmit -p tsconfig.json 2>&1 | grep -E "TS2307|TS2305" | wc -l
-  # Compare to baseline count
-  ```
-
-**Acceptance**: Config fixes committed and verified, ready to proceed to Phase 2
-
----
-
-## Phase 2: Structural Hotspot Investigation
-
-### Task 2.1: Investigate Compiled Output in Source Tree
-**Requirements**: US-3, TR-3
-
-- [ ] 2.1.1 List files in client/src/core/websocket/
-  ```bash
-  ls -la client/src/core/websocket/
-  ```
-  - Identify `.js`, `.js.map`, `.d.ts`, `.d.ts.map` files
-
-- [ ] 2.1.2 Find imports to websocket/manager
-  ```bash
-  grep -r "from.*websocket/manager" client/src/ --include='*.ts' --include='*.tsx'
-  ```
-
-- [ ] 2.1.3 Determine if compiled files are stale
-  - Check git history: when were they committed?
-  - Are they build artifacts that shouldn't be in source control?
-
-- [ ] 2.1.4 Document resolution
-  - If stale artifacts: delete them, add to .gitignore
-  - If intentional: document why and verify imports resolve to .ts
-
-**Acceptance**: Compiled output issue documented and resolved
-
-### Task 2.2: Investigate Security Module Triple Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-2
-
-- [ ] 2.2.1 Use project-structure.md to verify three locations
-  - `core/security/` - Infrastructure + UI
-  - `features/security/` - Minimal feature + duplicate UI
-  - `lib/ui/privacy/` - Privacy-specific UI
-  - Document file counts and structure from snapshot
-
-- [ ] 2.2.2 Verify best implementation (already identified)
-  - **Best**: `core/security/` - Most comprehensive infrastructure
-  - **Issue**: Architectural misplacement (infrastructure in core instead of lib)
-  - **Duplicate**: `features/security/` has minimal content + duplicate UI
-
-- [ ] 2.2.3 Find imports to each location
-  ```bash
-  grep -r "from.*core/security" client/src/ --include='*.ts' --include='*.tsx' > security_core_imports.txt
-  grep -r "from.*features/security" client/src/ --include='*.ts' --include='*.tsx' > security_features_imports.txt
-  grep -r "from.*lib/ui/privacy" client/src/ --include='*.ts' --include='*.tsx' > security_privacy_imports.txt
-  ```
-
-- [ ] 2.2.4 Document recommended resolution in structural-ambiguities.md
-  - **Action 1**: MOVE `core/security/` infrastructure → `lib/infrastructure/security/`
-  - **Action 2**: MOVE `core/security/ui/` → `lib/ui/security/`
-  - **Action 3**: DELETE `features/security/` (consolidate into lib)
-  - **Action 4**: KEEP `lib/ui/privacy/` for privacy-specific UI
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: HIGH - Triple overlap with clear resolution
-  - Importers: (list from import files)
-
-**Acceptance**: Security triple overlap documented with architectural resolution plan
-
-### Task 2.3: Investigate Authentication Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-3
-
-- [ ] 2.3.1 Verify three locations from analysis
-  - `core/auth/` - Complete infrastructure (TokenManager, SessionManager, AuthApiService, etc.)
-  - `features/auth/pages/` - Auth UI pages only
-  - `features/users/hooks/useAuth.tsx` - Single auth hook
-  - **Best**: `core/auth/` - Most complete infrastructure
-
-- [ ] 2.3.2 Compare useAuth implementations
-  ```bash
-  diff client/src/core/auth/hooks/useAuth.tsx \
-       client/src/features/users/hooks/useAuth.tsx
-  ```
-
-- [ ] 2.3.3 Find all useAuth imports
-  ```bash
-  grep -r "from.*useAuth" client/src/ --include='*.ts' --include='*.tsx' > useauth_imports.txt
-  ```
-
-- [ ] 2.3.4 Document resolution in structural-ambiguities.md
-  - **Assessment**: `core/auth/` is correctly placed (it's infrastructure)
-  - **Action 1**: KEEP `core/auth/` infrastructure
-  - **Action 2**: KEEP `features/auth/pages/` for UI
-  - **Action 3**: CONSOLIDATE `features/users/hooks/useAuth.tsx` to use `core/auth/hooks/useAuth.tsx`
-  - Classification: Category A (Stale Path) - Hook duplication
-  - Priority: MEDIUM - Clear infrastructure vs UI separation
-  - Importers: (list from useauth_imports.txt)
-
-**Acceptance**: Auth overlap documented with consolidation plan for hook duplication
-
-### Task 2.4: Investigate Loading Module Triple Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-4
-
-- [ ] 2.4.1 Verify three locations from analysis
-  - `core/loading/` - Loading context, hooks (useOnlineStatus, useTimeoutAwareLoading), utils (connection, loading, progress, timeout), validation
-  - `lib/ui/loading/` - Extensive loading UI (AssetLoadingIndicator, BrandedLoadingScreen, GlobalLoadingIndicator, hooks, UI components, skeletons, spinners, fallbacks)
-  - `lib/design-system/feedback/LoadingSpinner.tsx` - Basic design system spinner primitive
-  - **Best**: `lib/ui/loading/` - Most comprehensive
-
-- [ ] 2.4.2 Compare utility files
-  ```bash
-  diff client/src/core/loading/utils/connection-utils.ts \
-       client/src/lib/ui/loading/utils/connection-utils.ts
-  # Repeat for loading-utils.ts, progress-utils.ts, timeout-utils.ts
-  ```
-
-- [ ] 2.4.3 Find imports to each location
-  ```bash
-  grep -r "from.*core/loading" client/src/ --include='*.ts' --include='*.tsx' > loading_core_imports.txt
-  grep -r "from.*lib/ui/loading" client/src/ --include='*.ts' --include='*.tsx' > loading_lib_imports.txt
-  grep -r "from.*design-system/feedback/LoadingSpinner" client/src/ --include='*.ts' --include='*.tsx' > loading_spinner_imports.txt
-  ```
-
-- [ ] 2.4.4 Document resolution in structural-ambiguities.md
-  - **Assessment**: Loading is primarily a UI concern, not business logic
-  - **Action 1**: KEEP `lib/ui/loading/` as primary (most comprehensive)
-  - **Action 2**: MOVE `core/loading/` hooks → `lib/ui/loading/hooks/`
-  - **Action 3**: MOVE `core/loading/` utils → `lib/ui/loading/utils/`
-  - **Action 4**: DELETE `core/loading/` after migration
-  - **Action 5**: KEEP `lib/design-system/feedback/LoadingSpinner.tsx` as primitive
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: HIGH - Triple overlap with clear best implementation
-  - Importers: (list from import files)
-
-**Acceptance**: Loading triple overlap documented with architectural resolution plan
-
-### Task 2.5: Investigate Empty server/infrastructure/errors/ Directory
-**Requirements**: US-3, TR-3
-
-- [ ] 2.5.1 Verify directory is empty
-  ```bash
-  ls -la server/infrastructure/errors/
-  ```
-
-- [ ] 2.5.2 Find imports to this path
-  ```bash
-  grep -r "from.*infrastructure/errors" server/ --include='*.ts' > errors_dir_imports.txt
-  ```
-
-- [ ] 2.5.3 Identify replacement location
-  - Check `server/infrastructure/error-handling/`
-  - Verify it exports error handling functionality
-
-- [ ] 2.5.4 Document in structural-ambiguities.md
-  - Old path: `server/infrastructure/errors/` (empty, deleted)
-  - New path: `server/infrastructure/error-handling/`
-  - Classification: Category B (deleted/superseded)
-  - Importers: (list from errors_dir_imports.txt)
-
-**Acceptance**: Empty errors directory documented with replacement identified
-
-### Task 2.6: Investigate FSD Migration Boundary
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-6
-
-- [ ] 2.6.1 Find potential duplicates in services
-  ```bash
-  # Compare userService files
-  diff client/src/lib/services/userService.ts \
-       client/src/features/users/services/user-service-legacy.ts
+- [x] 2. Analyze baseline errors and identify regression canaries
+  - [x] 2.1 Count errors by category for each package
+    - Parse baseline files for TS2307, TS2305, TS2614, TS2724, TS7006, TS18046, etc.
+    - Create error distribution table by package
+    - _Requirements: TR-1, US-1_
   
-  # Compare notification services
-  diff client/src/lib/services/notification-service.ts \
-       client/src/features/notifications/model/notification-service.ts
-  ```
-
-- [ ] 2.6.2 Find potential duplicates in hooks
-  ```bash
-  # Find hooks in lib/
-  find client/src/lib/hooks -name "*.ts" -o -name "*.tsx"
+  - [x] 2.2 Identify zero-error files as regression canaries
+    - Extract files with no errors from baseline
+    - Document canary list in baseline_analysis.md
+    - _Requirements: TR-1, US-1_
   
-  # Check if they exist in core/*/hooks/
-  # (manual comparison needed)
-  ```
-
-- [ ] 2.6.3 Classify each file using architectural principles
-  - Feature code (belongs in `features/`) vs
-  - Shared infrastructure (belongs in `lib/`)
-  - Reference `docs/architecture/CLIENT_LIB_CORE_FEATURES_ANALYSIS.md` for decision matrix
-
-- [ ] 2.6.4 Document in structural-ambiguities.md
-  - For each duplicate pair:
-    - Canonical version
-    - Stale version
-    - Rationale (feature vs infrastructure, reference architectural principles)
-    - Importers
-  - Note: Many overlaps already documented in CLIENT_OVERLAP_ANALYSIS.md
-
-**Acceptance**: FSD migration boundary issues documented with canonical versions identified and architectural rationale
-
----
-
-### Task 2.7: Investigate Monitoring Module Triple Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.7.1 Verify three locations from analysis
-  - `core/monitoring/` - Basic (monitoring-init, sentry-config)
-  - `features/monitoring/model/` - Performance monitoring models
-  - `lib/infrastructure/monitoring/` - **BEST** - Comprehensive infrastructure
-  - Document file counts and structure
-
-- [ ] 2.7.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/monitoring" client/src/ --include='*.ts' --include='*.tsx' > monitoring_core_imports.txt
-  grep -r "from.*features/monitoring" client/src/ --include='*.ts' --include='*.tsx' > monitoring_features_imports.txt
-  grep -r "from.*lib/infrastructure/monitoring" client/src/ --include='*.ts' --include='*.tsx' > monitoring_lib_imports.txt
-  ```
-
-- [ ] 2.7.3 Document resolution in structural-ambiguities.md
-  - **Action 1**: KEEP `lib/infrastructure/monitoring/` as primary infrastructure
-  - **Action 2**: MOVE `core/monitoring/` → `lib/infrastructure/monitoring/` (consolidate)
-  - **Action 3**: KEEP `features/monitoring/` for feature-specific performance testing
-  - **Action 4**: DELETE `core/monitoring/` after migration
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: HIGH - Triple overlap with clear best implementation
-  - Importers: (list from import files)
-
-**Acceptance**: Monitoring triple overlap documented with architectural resolution plan
-
----
-
-### Task 2.8: Investigate Navigation Module Triple Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.8.1 Verify three locations from analysis
-  - `core/navigation/` - **BEST** - Complete business logic (services, hooks, analytics, breadcrumbs)
-  - `features/navigation/model/` - Empty (only index.ts)
-  - `lib/ui/navigation/` - Navigation UI components
-  - Document structure
-
-- [ ] 2.8.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/navigation" client/src/ --include='*.ts' --include='*.tsx' > navigation_core_imports.txt
-  grep -r "from.*features/navigation" client/src/ --include='*.ts' --include='*.tsx' > navigation_features_imports.txt
-  grep -r "from.*lib/ui/navigation" client/src/ --include='*.ts' --include='*.tsx' > navigation_lib_imports.txt
-  ```
-
-- [ ] 2.8.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Navigation business logic should be in features, not core
-  - **Action 1**: MOVE `core/navigation/` → `features/navigation/services/` (it's business logic)
-  - **Action 2**: KEEP `lib/ui/navigation/` for UI
-  - **Action 3**: KEEP `lib/contexts/NavigationContext.tsx`
-  - **Action 4**: DELETE empty `features/navigation/model/`
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: HIGH - Triple overlap with clear resolution
-  - Importers: (list from import files)
-
-**Acceptance**: Navigation triple overlap documented with architectural resolution plan
-
----
-
-### Task 2.9: Investigate Validation Module Triple Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.9.1 Verify three locations from analysis
-  - `core/validation/` - Dashboard validation (minimal)
-  - `lib/validation/` - **BEST** - Base validation, consolidated
-  - `features/dashboard/validation/` - Feature-specific with tests
-  - Document structure
-
-- [ ] 2.9.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/validation" client/src/ --include='*.ts' --include='*.tsx' > validation_core_imports.txt
-  grep -r "from.*lib/validation" client/src/ --include='*.ts' --include='*.tsx' > validation_lib_imports.txt
-  grep -r "from.*features/dashboard/validation" client/src/ --include='*.ts' --include='*.tsx' > validation_dashboard_imports.txt
-  ```
-
-- [ ] 2.9.3 Document resolution in structural-ambiguities.md
-  - **Action 1**: KEEP `lib/validation/` for shared validation
-  - **Action 2**: KEEP `features/dashboard/validation/` for feature-specific
-  - **Action 3**: DELETE `core/validation/` (consolidate into lib or features)
-  - Classification: Category A (Stale Path)
-  - Priority: HIGH - Triple overlap with clear resolution
-  - Importers: (list from import files)
-
-**Acceptance**: Validation triple overlap documented with architectural resolution plan
-
----
-
-### Task 2.10: Investigate Realtime/WebSocket Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.10.1 Verify locations from analysis
-  - `core/realtime/` - **BEST** - Recently consolidated, complete system
-  - `core/websocket/` - **DELETE** - Old implementation (compiled .js files)
-  - `features/realtime/model/` - Feature-specific optimizer
-  - Document structure
-
-- [ ] 2.10.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/realtime" client/src/ --include='*.ts' --include='*.tsx' > realtime_core_imports.txt
-  grep -r "from.*core/websocket" client/src/ --include='*.ts' --include='*.tsx' > websocket_core_imports.txt
-  grep -r "from.*features/realtime" client/src/ --include='*.ts' --include='*.tsx' > realtime_features_imports.txt
-  ```
-
-- [ ] 2.10.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Realtime is infrastructure, recently consolidated
-  - **Action 1**: MOVE `core/realtime/` → `lib/infrastructure/realtime/` (it's infrastructure)
-  - **Action 2**: DELETE `core/websocket/` (superseded by core/realtime)
-  - **Action 3**: KEEP `features/realtime/model/` for feature-specific optimizations
-  - Classification: Category A (Stale Path) + Category B (Deleted/Superseded for websocket)
-  - Priority: HIGH - Old websocket implementation must be removed
-  - Importers: (list from import files)
-
-**Acceptance**: Realtime/WebSocket overlap documented with architectural resolution plan
-
----
-
-### Task 2.11: Investigate Error Handling Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.11.1 Verify four locations from analysis
-  - `core/error/` - **BEST** - Complete error handling system
-  - `lib/infrastructure/monitoring/` - Error monitoring
-  - `lib/design-system/interactive/errors.ts` - UI components
-  - `lib/ui/error-boundary/` - Error boundary components
-  - Document structure
-
-- [ ] 2.11.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/error" client/src/ --include='*.ts' --include='*.tsx' > error_core_imports.txt
-  grep -r "from.*lib/infrastructure/monitoring" client/src/ --include='*.ts' --include='*.tsx' > error_monitoring_imports.txt
-  grep -r "from.*lib/design-system/interactive/errors" client/src/ --include='*.ts' --include='*.tsx' > error_ui_imports.txt
-  grep -r "from.*lib/ui/error-boundary" client/src/ --include='*.ts' --include='*.tsx' > error_boundary_imports.txt
-  ```
-
-- [ ] 2.11.3 Document resolution in structural-ambiguities.md
-  - **Action 1**: MOVE `core/error/` → `lib/infrastructure/error/` (it's infrastructure)
-  - **Action 2**: KEEP `lib/infrastructure/monitoring/` for monitoring
-  - **Action 3**: KEEP `lib/ui/error-boundary/` for UI
-  - **Action 4**: CONSOLIDATE: Single error handling system
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: MEDIUM - Four locations need consolidation
-  - Importers: (list from import files)
-
-**Acceptance**: Error handling overlap documented with architectural resolution plan
-
----
-
-### Task 2.12: Investigate Community Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.12.1 Verify two locations from analysis
-  - `core/community/` - Real-time infrastructure
-  - `features/community/` - **BEST** - Complete feature
-  - Document structure
-
-- [ ] 2.12.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/community" client/src/ --include='*.ts' --include='*.tsx' > community_core_imports.txt
-  grep -r "from.*features/community" client/src/ --include='*.ts' --include='*.tsx' > community_features_imports.txt
-  ```
-
-- [ ] 2.12.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Community is business logic, belongs in features
-  - **Action 1**: KEEP `features/community/` as primary
-  - **Action 2**: MOVE `core/community/services/` → `features/community/services/`
-  - **Action 3**: MOVE `core/community/hooks/` → `features/community/hooks/`
-  - **Action 4**: DELETE `core/community/` after migration
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: MEDIUM - Business logic misplaced in core
-  - Importers: (list from import files)
-
-**Acceptance**: Community overlap documented with architectural resolution plan
-
----
-
-### Task 2.13: Investigate Search Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.13.1 Verify two locations from analysis
-  - `core/search/` - Minimal infrastructure
-  - `features/search/` - **BEST** - Complete feature
-  - Document structure
-
-- [ ] 2.13.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/search" client/src/ --include='*.ts' --include='*.tsx' > search_core_imports.txt
-  grep -r "from.*features/search" client/src/ --include='*.ts' --include='*.tsx' > search_features_imports.txt
-  ```
-
-- [ ] 2.13.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Search is business logic, belongs in features
-  - **Action 1**: KEEP `features/search/` as primary
-  - **Action 2**: MOVE `core/search/` → `features/search/services/` (consolidate)
-  - **Action 3**: DELETE `core/search/` after migration
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: MEDIUM - Business logic misplaced in core
-  - Importers: (list from import files)
-
-**Acceptance**: Search overlap documented with architectural resolution plan
-
----
-
-### Task 2.14: Investigate Analytics Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.14.1 Verify two locations from analysis
-  - `core/analytics/` - Analytics infrastructure (provider, tracker, service)
-  - `features/analytics/` - **BEST** - Complete feature with UI
-  - Document structure
-
-- [ ] 2.14.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/analytics" client/src/ --include='*.ts' --include='*.tsx' > analytics_core_imports.txt
-  grep -r "from.*features/analytics" client/src/ --include='*.ts' --include='*.tsx' > analytics_features_imports.txt
-  ```
-
-- [ ] 2.14.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Separate infrastructure from business logic
-  - **Action 1**: KEEP `features/analytics/` as primary
-  - **Action 2**: MOVE infrastructure from `core/analytics/` → `lib/infrastructure/analytics/`
-  - **Action 3**: DELETE `core/analytics/` business logic (consolidate into features)
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: MEDIUM - Infrastructure vs business logic separation needed
-  - Importers: (list from import files)
-
-**Acceptance**: Analytics overlap documented with architectural resolution plan
-
----
-
-### Task 2.15: Investigate Dashboard Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.15.1 Verify three locations from analysis
-  - `core/dashboard/` - Basic (context, hooks, reducer, utils)
-  - `features/dashboard/pages/` - Dashboard page
-  - `lib/ui/dashboard/` - **BEST** - Extensive UI components
-  - Document structure
-
-- [ ] 2.15.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/dashboard" client/src/ --include='*.ts' --include='*.tsx' > dashboard_core_imports.txt
-  grep -r "from.*features/dashboard" client/src/ --include='*.ts' --include='*.tsx' > dashboard_features_imports.txt
-  grep -r "from.*lib/ui/dashboard" client/src/ --include='*.ts' --include='*.tsx' > dashboard_lib_imports.txt
-  ```
-
-- [ ] 2.15.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Separate UI from business logic
-  - **Action 1**: KEEP `lib/ui/dashboard/` for UI components
-  - **Action 2**: MOVE `core/dashboard/` business logic → `features/dashboard/services/`
-  - **Action 3**: KEEP `features/dashboard/pages/` for pages
-  - **Action 4**: CONSOLIDATE: Use lib UI components in feature pages
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: MEDIUM - UI vs business logic separation needed
-  - Importers: (list from import files)
-
-**Acceptance**: Dashboard overlap documented with architectural resolution plan
-
----
-
-### Task 2.16: Investigate Storage Module Overlap
-**Requirements**: US-3, TR-3
-
-**Analysis Source**: `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md`, `baseline_analysis.md` HOTSPOT-7
-
-- [ ] 2.16.1 Verify two locations from analysis
-  - `core/storage/` - Storage infrastructure (cache, offline, secure storage)
-  - `lib/infrastructure/store/` - Redux store infrastructure
-  - Document structure
-
-- [ ] 2.16.2 Find imports to each location
-  ```bash
-  grep -r "from.*core/storage" client/src/ --include='*.ts' --include='*.tsx' > storage_core_imports.txt
-  grep -r "from.*lib/infrastructure/store" client/src/ --include='*.ts' --include='*.tsx' > storage_lib_imports.txt
-  ```
-
-- [ ] 2.16.3 Document resolution in structural-ambiguities.md
-  - **Assessment**: Both are infrastructure, different purposes
-  - **Action 1**: MOVE `core/storage/` → `lib/infrastructure/storage/` (it's infrastructure)
-  - **Action 2**: KEEP `lib/infrastructure/store/` for Redux
-  - Classification: Category A (Stale Path) + Architectural Misplacement
-  - Priority: LOW - Clear separation, just needs relocation
-  - Importers: (list from import files)
-
-**Acceptance**: Storage overlap documented with architectural resolution plan
-
----
-
-### Checkpoint 2.17: Structural Hotspot Investigation Complete
-**Requirements**: US-3
-
-- [ ] 2.17.1 Verify all hotspots investigated
-  - HOTSPOT-1: Compiled Output (Task 2.1)
-  - HOTSPOT-2: Security Triple Overlap (Task 2.2)
-  - HOTSPOT-3: Auth Overlap (Task 2.3)
-  - HOTSPOT-4: Loading Triple Overlap (Task 2.4)
-  - HOTSPOT-5: Empty Errors Directory (Task 2.5)
-  - HOTSPOT-6: FSD Migration Boundary (Task 2.6)
-  - HOTSPOT-7: Critical Overlaps (Tasks 2.7-2.16)
-
-- [ ] 2.17.2 Verify structural-ambiguities.md is complete
-  - All overlaps documented
-  - Best implementations identified
-  - Architectural rationale provided
-  - Migration actions specified
-  - Importers listed
-
-- [ ] 2.17.3 Commit structural-ambiguities.md
-  ```bash
-  git add structural-ambiguities.md
-  git commit -m "docs: complete structural hotspot investigation
-
-  - Investigated 16 critical overlaps
-  - Identified best implementations using architectural principles
-  - Documented migration actions for each overlap
-  - Referenced CLIENT_OVERLAP_ANALYSIS.md and CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
+  - [x] 2.3 Create baseline_analysis.md document
+    - Document total error counts per package
+    - Document error distribution by category
+    - Document regression canary list
+    - Cross-reference with docs/project-structure.md for affected areas
+    - _Requirements: TR-1, US-1_
   
-  Hotspots covered:
-  - Compiled output in websocket/
-  - Security, Auth, Loading triple overlaps
-  - Empty errors directory
-  - FSD migration boundary
-  - 10 additional critical overlaps (Monitoring, Navigation, Validation, etc.)
+  - [x] 2.4 Create annotated project structure reference
+    - Copy docs/project-structure.md to project-structure-reference.md
+    - Mark known hotspot areas identified in baseline
+    - This will be used in Phase 2 for efficient investigation
+    - _Requirements: TR-1, US-1_
+
+- [-] 3. Checkpoint - Review baseline before proceeding
+  - Verify all baseline files captured successfully
+  - Confirm error counts match expected magnitude (~5,762 total, ~1,200 module resolution)
+  - Ensure no changes made to source code during baseline capture
+
+### Phase 1: Fix Alias Resolution Root Cause
+
+- [x] 4. Audit all module resolution configs
+  - [x] 4.1 Document current state of all tsconfig files
+    - Read /tsconfig.json, /client/tsconfig.json, /server/tsconfig.json, /shared/tsconfig.json
+    - List all path aliases declared in each
+    - Identify missing alias declarations
+    - _Requirements: TR-2, US-2_
   
-  See structural-ambiguities.md for complete analysis"
-  ```
-
-**Acceptance**: All structural hotspots investigated and documented with architectural rationale, ready to proceed to Phase 3 and architectural rationale
-
----
-
-## Phase 3: Full Import Scan & Categorization
-
-### Task 3.1: Extract Module Resolution Errors
-**Requirements**: US-4, TR-4
-
-- [ ] 3.1.1 Extract all module resolution errors using TypeScript
-  ```bash
-  npx tsc --noEmit -p tsconfig.json 2>&1 | \
-    grep -E "TS2307|TS2305|TS2614|TS2724" > module_errors.txt
-  ```
-
-- [ ] 3.1.2 Use madge to analyze import relationships
-  ```bash
-  # Generate detailed dependency tree for each package
-  npx madge --json client/src/ > client_dependencies.json
-  npx madge --json server/ > server_dependencies.json
-  npx madge --json shared/ > shared_dependencies.json
+  - [x] 4.2 Document Vite and Vitest configs
+    - Read /client/vite.config.ts and /vitest.workspace.ts
+    - List all path aliases declared
+    - Compare to tsconfig aliases
+    - _Requirements: TR-2, US-2_
   
-  # Find orphaned modules (no imports)
-  npx madge --orphans --extensions ts,tsx client/src/ > client_orphans.txt
-  npx madge --orphans --extensions ts,tsx server/ > server_orphans.txt
-  npx madge --orphans --extensions ts,tsx shared/ > shared_orphans.txt
-  ```
-
-- [ ] 3.1.3 Use depcheck to find import issues
-  ```bash
-  # Analyze each package separately
-  cd client && npx depcheck --json > ../client_import_issues.json && cd ..
-  cd server && npx depcheck --json > ../server_import_issues.json && cd ..
-  cd shared && npx depcheck --json > ../shared_import_issues.json && cd ..
-  ```
-
-- [ ] 3.1.4 Parse errors into structured format
-  - File path
-  - Line number
-  - Error code
-  - Import statement
-  - Target module
-  - Cross-reference with madge dependency data
-
-- [ ] 3.1.5 Group errors by file
-  - Count errors per file
-  - Prioritize files with most errors
-  - Use madge data to identify high-impact files (many dependents)
-
-- [ ] 3.1.6 Cross-reference with project-structure.md
-  - For each broken import, check if target exists in snapshot
-  - If target exists elsewhere in snapshot, mark as Category A candidate
-  - If target doesn't exist anywhere, mark as Category B candidate
-  - Use madge orphans list to identify Category B candidates
-  - Document findings in module_errors_annotated.txt
-
-**Acceptance**: All module resolution errors extracted, grouped, and pre-categorized using tools and project snapshot
-
-### Task 3.2: Categorize Each Broken Import
-**Requirements**: US-4, TR-4
-
-For each broken import, determine category using tools and architectural analysis:
-
-- [ ] 3.2.1 Use madge to check if target file exists at different path (Category A)
-  ```bash
-  # For import: from '@/core/auth/hooks/useAuth'
-  # Check madge dependency graph to find if useAuth exists elsewhere
-  # Example: grep -r "useAuth" client_dependencies.json
-  ```
-  - Cross-reference with structural-ambiguities.md to identify if it's an architectural misplacement
-  - Check if module is in one of the 16 critical overlaps documented in Phase 2
-  - If overlap exists, use recommended location from architectural analysis
-
-- [ ] 3.2.2 Use madge orphans list to identify deleted files (Category B)
-  ```bash
-  # Check if target module is in orphans list
-  # If yes, it's likely Category B (deleted/superseded)
-  # Cross-reference with git history if needed
-  git log --all --full-history -- "path/to/deleted/file.ts"
-  ```
-  - Check structural-ambiguities.md for documented superseded modules
-  - Example: `core/websocket/` superseded by `core/realtime/`
-
-- [ ] 3.2.3 Check if alias is missing from tool config (Category C)
-  - Refer to alias inventory from Task 1.2
-  - If alias is missing from specific tool, it's Category C
-  - Use depcheck output to identify missing alias configurations
-
-- [ ] 3.2.4 Use madge to identify broken barrel files (Category D)
-  ```bash
-  # Check if it's a barrel file with broken internal import
-  # Madge will show the dependency chain
-  npx madge --image barrel-deps.svg client/src/features/security/ui/index.ts
-  ```
-
-- [ ] 3.2.5 Use ts-unused-exports to check if member exists (Category E)
-  ```bash
-  # Check if module exists but member doesn't
-  # ts-unused-exports will show what's actually exported
-  npx ts-unused-exports tsconfig.json --findCompletelyUnusedFiles
-  ```
-
-- [ ] 3.2.6 Apply architectural principles for categorization
-  - Reference `docs/architecture/CLIENT_LIB_CORE_FEATURES_ANALYSIS.md` decision matrix
-  - Reference `docs/architecture/CLIENT_OVERLAP_ANALYSIS.md` for best implementations
-  - Reference `baseline_analysis.md` Section 7 for architectural principles
-  - Determine if import is:
-    - Stale path (Category A) - file moved during architectural refactor
-    - Architectural misplacement - importing from wrong layer (core vs lib vs features)
-    - Deleted/superseded (Category B) - old implementation removed
-
-- [ ] 3.2.7 Document in discrepancy-inventory.md
-  - Create table with columns:
-    - File
-    - Line
-    - Import String
-    - Category (A/B/C/D/E)
-    - Root Cause Hypothesis
-    - Proposed Fix
-    - Architectural Rationale (reference to overlap analysis if applicable)
-    - Priority (based on dependency order)
-    - Tool Evidence (madge/depcheck/ts-unused-exports findings)
-
-**Acceptance**: Every broken import categorized using industry-standard tools and architectural principles in discrepancy-inventory.md
-
-### Task 3.3: Prioritize Fixes by Dependency Order
-**Requirements**: US-5, TR-4
-
-- [ ] 3.3.1 Use madge to generate dependency graph
-  ```bash
-  # Generate visual dependency graph
-  npx madge --image dependency-graph.svg --extensions ts,tsx client/src/
-  npx madge --image dependency-graph-server.svg --extensions ts,tsx server/
-  npx madge --image dependency-graph-shared.svg --extensions ts,tsx shared/
+  - [x] 4.3 Document Nx and pnpm workspace configs
+    - Read /nx.json and /pnpm-workspace.yaml
+    - Document workspace structure and package relationships
+    - _Requirements: TR-2_
   
-  # Get dependency depth for each file
-  npx madge --json --extensions ts,tsx client/src/ > client_dep_depth.json
-  ```
+  - [x] 4.4 Create config inventory table
+    - Create table showing which aliases are declared in which tools
+    - Identify gaps (alias missing from specific tool)
+    - Document in fix-root-cause.md
+    - _Requirements: TR-2, US-2_
 
-- [ ] 3.3.2 Group files by package using madge data
-  - shared/ files (analyze from shared_dependencies.json)
-  - server/ files (analyze from server_dependencies.json)
-  - client/ files (analyze from client_dependencies.json)
-
-- [ ] 3.3.3 Within each package, use madge to identify dependency order
-  - Leaf files (no imports from same package) - madge shows 0 dependencies
-  - Intermediate files - madge shows moderate dependencies
-  - Root files (imported by many others) - madge shows high dependent count
-
-- [ ] 3.3.4 Create fix order list using madge insights
-  1. shared/ leaf files (from madge: files with 0 internal dependencies)
-  2. shared/ intermediate files
-  3. shared/ root files (from madge: files with most dependents)
-  4. server/ leaf files
-  5. server/ intermediate files
-  6. server/ root files
-  7. client/ leaf files
-  8. client/ intermediate files
-  9. client/ root files
-
-- [ ] 3.3.5 Update discrepancy-inventory.md with fix order
-  - Add "Fix Order" column
-  - Number files in dependency order based on madge analysis
-  - Add "Dependent Count" column from madge data
-  - Prioritize high-impact files (many dependents) within each group
-
-**Acceptance**: Fix order established using madge dependency analysis in discrepancy-inventory.md
-
-### Task 3.4: Identify Bulk Change Opportunities
-**Requirements**: US-5, TR-4
-
-- [ ] 3.4.1 Use madge to scan for identical Category A patterns
-  ```bash
-  # Use madge to find all files importing from old path
-  npx madge --depends '@/core/auth/hooks/useAuth' client/src/ > useauth_importers.txt
+- [x] 5. Verify and fix alias resolution
+  - [x] 5.1 Pick one broken absolute import and trace resolution
+    - Select a TS2307 error with absolute import (e.g., @shared/types)
+    - Trace what path each resolver constructs
+    - Compare to actual file location
+    - Document the mismatch hypothesis
+    - _Requirements: TR-2, US-2_
   
-  # Count occurrences
-  wc -l useauth_importers.txt
-  ```
-  - List patterns with 10+ identical occurrences
-  - Verify new path exists and exports match using ts-unused-exports
-  - Mark as "BULK CANDIDATE" in discrepancy-inventory.md
-
-- [ ] 3.4.2 Use ts-unused-exports to scan for identical Category E patterns
-  ```bash
-  # Find all files importing a renamed export
-  # ts-unused-exports will show what's actually exported vs what's imported
-  npx ts-unused-exports tsconfig.json --showLineNumber > export_mismatches.txt
-  ```
-  - List patterns with 10+ identical occurrences
-  - Verify new export exists and signature matches
-  - Mark as "BULK CANDIDATE" in discrepancy-inventory.md
-
-- [ ] 3.4.3 Use madge to identify barrel file fixes (Category D)
-  ```bash
-  # Find barrel files with broken internal imports
-  # Madge will show dependency chains through barrel files
-  npx madge --circular --extensions ts,tsx client/src/ | grep "index.ts"
+  - [x] 5.2 Apply minimal config fixes
+    - Add missing alias declarations to configs
+    - Change ONLY config files, no source files
+    - _Requirements: TR-2, US-2_
   
-  # Count downstream files for each barrel
-  npx madge --depends 'client/src/features/security/ui/index.ts' client/src/ | wc -l
-  ```
-  - Find barrel files with broken internal imports
-  - Count how many downstream files import from each barrel
-  - Mark barrel file as "BARREL FIX" in discrepancy-inventory.md
-
-- [ ] 3.4.4 Document bulk change plan using tool data
-  - For each bulk candidate:
-    - Pattern description
-    - Number of affected files (from madge/grep counts)
-    - Safety verification steps
-    - Maximum batch size
-    - Tool evidence (madge dependency count, ts-unused-exports findings)
-  - Save as section in discrepancy-inventory.md
-
-**Acceptance**: All bulk change opportunities identified using madge and ts-unused-exports, documented with safety protocols
-
----
-
-## Phase 4: Manual Fix Protocol
-
-**NOTE**: This phase allows safe bulk changes for identical patterns. See design.md for full safety protocols.
-
-### Task 4.0: Execute Bulk Change Opportunities (If Identified)
-**Requirements**: US-5, TR-5
-
-For each bulk change candidate identified in Task 3.4:
-
-- [ ] 4.0.1 Select bulk change candidate
-  - Choose from "BULK CANDIDATE" or "BARREL FIX" items in discrepancy-inventory.md
-  - Verify it meets exception criteria (see design.md)
-
-- [ ] 4.0.2 Manual verification phase
-  - Manually fix first 3-5 files following the pattern
-  - Verify each fix with `tsc --noEmit`
-  - Confirm pattern is truly identical across all files
-  - If variation found, STOP and mark as manual-only
-
-- [ ] 4.0.3 Document the pattern
-  - Old import/export: (exact string)
-  - New import/export: (exact string)
-  - Number of affected files: (count)
-  - Verification: (what was checked)
-
-- [ ] 4.0.4 Apply bulk change using IDE
-  - Use IDE "Find and Replace" with whole word match
-  - OR use IDE refactoring tools (e.g., "Rename Symbol")
-  - NEVER use sed, awk, or regex scripts
-  - Review full diff before proceeding
-
-- [ ] 4.0.5 Verify bulk change
-  ```bash
-  # Run type check on affected package
-  npx tsc --noEmit -p package/tsconfig.json
+  - [x] 5.3 Verify config fix with test import
+    - Create test-import.ts with import using fixed alias
+    - Run `tsc --noEmit test-import.ts`
+    - Verify import resolves correctly
+    - Delete test file after verification
+    - _Requirements: TR-2, US-2_
   
-  # Count errors before and after
-  # Should show reduction, never increase
-  ```
+  - [x] 5.4 Commit config changes with proof
+    - Commit config files with detailed message
+    - Include before/after diffs in fix-root-cause.md
+    - Document which errors are now resolved by config alone
+    - _Requirements: TR-2, US-2_
 
-- [ ] 4.0.6 Check regression canaries
-  - Verify no previously clean files gained errors
-  - If any canary fails, REVERT immediately
+- [x] 6. Checkpoint - Verify config fixes before structural investigation
+  - Re-run tsc on one package to verify error count decreased
+  - Confirm no source file changes made
+  - Ensure config changes are committed
 
-- [ ] 4.0.7 Commit batch with detailed message
-  ```bash
-  git add [all affected files]
-  git commit -m "fix(package): resolve [Category] in [N] files
+### Phase 2: Structural Hotspot Investigation
 
-  Pattern: [old] → [new]
+- [x] 7. Investigate compiled output in source tree
+  - [x] 7.1 Audit client/src/core/websocket/ for compiled artifacts
+    - List all .js, .js.map, .d.ts, .d.ts.map files in src/ directories
+    - Verify these are committed artifacts (not gitignored)
+    - _Requirements: TR-3, US-3_
   
-  Files affected:
-  - file1.ts
-  - file2.ts
-  ... (list all)
+  - [x] 7.2 Find imports to websocket/manager
+    - Execute: `grep -r "from.*websocket/manager" client/src/`
+    - Document which imports might resolve to stale .js/.d.ts
+    - _Requirements: TR-3, US-3_
   
-  Verified:
-  - Manual verification: first 5 files
-  - tsc errors: [before] → [after]
-  - Canaries: all clean"
-  ```
+  - [x] 7.3 Remove compiled artifacts and update .gitignore
+    - Delete .js, .js.map, .d.ts, .d.ts.map files from src/ directories
+    - Add patterns to .gitignore: `src/**/*.js`, `src/**/*.d.ts`, etc.
+    - Verify imports now resolve to .ts files
+    - _Requirements: TR-3, US-3_
 
-- [ ] 4.0.8 Update discrepancy-inventory.md
-  - Mark all affected files as "Fixed (Batch)"
-  - Document batch commit hash
-
-- [ ] 4.0.9 Repeat for remaining bulk candidates
-  - Process one bulk candidate at a time
-  - Verify after each batch
-  - Stop if any batch causes issues
-
-**Acceptance**: All safe bulk change opportunities executed with verification, or marked as manual-only
-
-### Task 4.1: Fix shared/ Package Imports
-**Requirements**: US-5, TR-5
-
-For each file in shared/ (in dependency order):
-
-- [ ] 4.1.1 State the filename
-  - Example: "Fixing: shared/types/api/contracts/user.schemas.ts"
-
-- [ ] 4.1.2 List broken imports with categories
-  - Example:
-    ```
-    Line 5: import { BaseError } from '../error-handling'
-    Category: E (named export removed)
-    ```
-
-- [ ] 4.1.3 State corrected import with justification
-  - Example:
-    ```
-    Line 5: import { createValidationError } from '../error-handling'
-    Justification: Error handling migration replaced classes with factory functions
-    ```
-  - Reference architectural principles if applicable
-  - Reference structural-ambiguities.md for documented migrations
-
-- [ ] 4.1.4 Make the edit manually
-  - Open file in editor
-  - Change import statements
-  - Update call sites if API changed
-  - Save file
-
-- [ ] 4.1.5 Verify fix
-  ```bash
-  npx tsc --noEmit -p shared/tsconfig.json | grep "filename.ts"
-  ```
-
-- [ ] 4.1.6 Check for cascade effects
-  ```bash
-  # Count total errors before and after
-  npx tsc --noEmit -p shared/tsconfig.json 2>&1 | grep "error TS" | wc -l
-  ```
-
-- [ ] 4.1.7 Commit
-  ```bash
-  git add shared/path/to/file.ts
-  git commit -m "fix(shared): resolve imports in filename.ts
-
-  - [Category] Fix description
-  - Architectural rationale: [if applicable]
+- [x] 8. Investigate duplicated security UI components
+  - [x] 8.1 Compare client/src/core/security/ui/ vs client/src/features/security/ui/
+    - Use project-structure-reference.md to identify exact duplicate files
+    - Compare file contents to determine if identical or diverged
+    - _Requirements: TR-3, US-3, US-7_
   
-  Errors reduced: X → Y in this file"
-  ```
-
-- [ ] 4.1.8 Repeat for all shared/ files
-
-**Acceptance**: All shared/ package imports fixed and committed with architectural rationale where applicable
-
-### Task 4.2: Fix server/ Package Imports
-**Requirements**: US-5, TR-5
-
-For each file in server/ (in dependency order):
-
-- [ ] 4.2.1 State the filename
-- [ ] 4.2.2 List broken imports with categories
-- [ ] 4.2.3 State corrected import with justification
-  - Reference architectural principles if applicable
-  - Reference structural-ambiguities.md for documented migrations
-- [ ] 4.2.4 Make the edit manually
-- [ ] 4.2.5 Verify fix
-  ```bash
-  npx tsc --noEmit -p server/tsconfig.json | grep "filename.ts"
-  ```
-- [ ] 4.2.6 Check for cascade effects
-- [ ] 4.2.7 Commit with architectural rationale if applicable
-- [ ] 4.2.8 Repeat for all server/ files
-
-**Acceptance**: All server/ package imports fixed and committed with architectural rationale where applicable
-
-### Task 4.3: Fix client/ Package Imports
-**Requirements**: US-5, TR-5
-
-For each file in client/ (in dependency order):
-
-- [ ] 4.3.1 State the filename
-- [ ] 4.3.2 List broken imports with categories
-- [ ] 4.3.3 State corrected import with justification
-  - Reference architectural principles if applicable
-  - Reference structural-ambiguities.md for documented migrations
-  - Apply architectural decision matrix from CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
-  - Use best implementation from CLIENT_OVERLAP_ANALYSIS.md
-- [ ] 4.3.4 Make the edit manually
-- [ ] 4.3.5 Verify fix
-  ```bash
-  npx tsc --noEmit -p client/tsconfig.json | grep "filename.ts"
-  ```
-- [ ] 4.3.6 Check for cascade effects
-- [ ] 4.3.7 Commit with architectural rationale if applicable
-- [ ] 4.3.8 Repeat for all client/ files
-
-**Acceptance**: All client/ package imports fixed and committed with architectural rationale where applicable
-
-### Task 4.4: Handle Edge Cases
-**Requirements**: US-5, TR-5
-
-- [ ] 4.4.1 Flag unclear Category B replacements for human review
-  - Document in discrepancy-inventory.md
-  - Mark as "NEEDS REVIEW"
-  - Provide context and options
-
-- [ ] 4.4.2 Flag unclear Category E replacements for human review
-  - Document in discrepancy-inventory.md
-  - Mark as "NEEDS REVIEW"
-  - Provide context and options
-
-- [ ] 4.4.3 Break circular dependencies
-  - Identify circular dependency chains
-  - Extract shared interfaces to common modules
-  - Refactor to remove circular references
-  - Document in structural-ambiguities.md
-
-**Acceptance**: All edge cases documented and resolved or flagged for review
-
----
-
-## Phase 5: Validation & Error Delta Report
-
-### Task 5.1: Capture Post-Fix Baseline
-**Requirements**: US-6, TR-6
-
-- [ ] 5.1.1 Run tsc on root package
-  ```bash
-  npx tsc --noEmit -p tsconfig.json 2>&1 | tee postfix_tsc_root.txt
-  ```
-
-- [ ] 5.1.2 Run tsc on client package
-  ```bash
-  npx tsc --noEmit -p client/tsconfig.json 2>&1 | tee postfix_tsc_client.txt
-  ```
-
-- [ ] 5.1.3 Run tsc on server package
-  ```bash
-  npx tsc --noEmit -p server/tsconfig.json 2>&1 | tee postfix_tsc_server.txt
-  ```
-
-- [ ] 5.1.4 Run tsc on shared package
-  ```bash
-  npx tsc --noEmit -p shared/tsconfig.json 2>&1 | tee postfix_tsc_shared.txt
-  ```
-
-**Acceptance**: All post-fix baseline files created
-
-### Task 5.2: Analyze Error Delta
-**Requirements**: US-6, TR-6
-
-- [ ] 5.2.1 Count errors by category in post-fix files
-  - Same categories as baseline analysis
-
-- [ ] 5.2.2 Calculate delta for each category
-  - Baseline count - Post-fix count = Delta
-
-- [ ] 5.2.3 Re-run dependency analysis tools
-  ```bash
-  # Compare with baseline
-  npx depcheck --json > postfix_depcheck.json
-  npx madge --circular --extensions ts,tsx client/src/ > postfix_circular_client.txt
-  npx madge --circular --extensions ts,tsx server/ > postfix_circular_server.txt
-  npx madge --circular --extensions ts,tsx shared/ > postfix_circular_shared.txt
-  npx ts-unused-exports tsconfig.json --excludePathsFromReport=".*\.test\.ts;.*\.spec\.ts" > postfix_unused_exports.txt
+  - [x] 8.2 Find all imports to both locations
+    - Execute: `grep -r "from.*core/security/ui" client/src/`
+    - Execute: `grep -r "from.*features/security/ui" client/src/`
+    - Count imports to each location
+    - _Requirements: TR-3, US-3_
   
-  # Generate diff reports
-  diff baseline_circular_client.txt postfix_circular_client.txt > circular_deps_delta.txt
-  diff baseline_unused_exports.txt postfix_unused_exports.txt > unused_exports_delta.txt
-  ```
+  - [x] 8.3 Determine canonical location
+    - Based on FSD principles, features/security/ui/ is likely canonical
+    - Document decision in structural-ambiguities.md
+    - Classify imports to core/security/ui/ as Category A (stale path)
+    - List all files that need import updates
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.2.4 Identify files that gained errors
-  ```bash
-  # Compare baseline and post-fix for each file
-  # List files where error count increased
-  ```
+- [x] 9. Investigate duplicated useAuth hook
+  - [x] 9.1 Compare useAuth implementations
+    - Execute: `diff client/src/core/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
+    - Determine if identical or diverged
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [x] 9.2 Find all useAuth imports
+    - Execute: `grep -r "from.*useAuth" client/src/`
+    - Document import distribution
+    - _Requirements: TR-3, US-3_
+  
+  - [x] 9.3 Determine canonical version
+    - Based on FSD, features/users/hooks/useAuth.tsx is likely canonical
+    - Document decision and divergence in structural-ambiguities.md
+    - Classify imports to core/auth/hooks/ as Category A
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.2.5 Classify each error count change
-  - Error disappears → Fix worked ✅
-  - Error moves to another file → Transitive dependency exposed
-  - Error count spikes in module → Newly visible pre-existing bugs
-  - Zero-error file gains errors → **REGRESSION** (investigate)
-  - Circular dependencies reduced (from madge diff)
-  - Unused exports reduced (from ts-unused-exports diff)
+- [x] 10. Investigate duplicated loading utilities
+  - [x] 10.1 Compare loading utils in both locations
+    - Compare client/src/core/loading/utils/ vs client/src/lib/ui/loading/utils/
+    - Check for re-export relationships
+    - Note camelCase loadingUtils.ts variant (red flag)
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [x] 10.2 Find imports to both locations
+    - Execute: `grep -r "from.*core/loading/utils" client/src/`
+    - Execute: `grep -r "from.*lib/ui/loading/utils" client/src/`
+    - _Requirements: TR-3, US-3_
+  
+  - [x] 10.3 Determine canonical location
+    - Document which is canonical in structural-ambiguities.md
+    - Classify stale imports as Category A
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.2.6 Validate architectural improvements
-  - Check if imports now follow architectural principles
-  - Verify overlaps are resolved (reference structural-ambiguities.md)
-  - Confirm best implementations are being used
-  - Validate separation of concerns (infrastructure vs business logic vs UI)
-  - Document architectural compliance improvements
+- [x] 11. Investigate empty server/infrastructure/errors/ directory
+  - [x] 11.1 Find imports to infrastructure/errors
+    - Execute: `grep -r "from.*infrastructure/errors" server/`
+    - Document all broken imports
+    - _Requirements: TR-3, US-3_
+  
+  - [x] 11.2 Map to new location
+    - Verify functionality moved to server/infrastructure/error-handling/
+    - Document mapping in structural-ambiguities.md
+    - Classify as Category B (deleted/superseded)
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.2.7 Create error-delta.md
-  - Summary table (baseline vs post-fix by package)
-  - Regressions table (files that gained errors)
-  - Newly visible bugs table (files now reachable by type checker)
-  - Fixes applied table (by category)
-  - Circular dependencies delta (from madge)
-  - Unused exports delta (from ts-unused-exports)
-  - Dependency health improvements (from depcheck)
-  - Architectural improvements section:
-    - Overlaps resolved
-    - Architectural principles applied
-    - Best implementations adopted
-    - Separation of concerns improved
+- [-] 12. Investigate FSD migration boundary
+  - [ ] 7.1 Audit client/src/core/websocket/ for compiled artifacts
+    - List all .js, .js.map, .d.ts, .d.ts.map files in src/ directories
+    - Verify these are committed artifacts (not gitignored)
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 7.2 Find imports to websocket/manager
+    - Execute: `grep -r "from.*websocket/manager" client/src/`
+    - Document which imports might resolve to stale .js/.d.ts
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 7.3 Remove compiled artifacts and update .gitignore
+    - Delete .js, .js.map, .d.ts, .d.ts.map files from src/ directories
+    - Add patterns to .gitignore: `src/**/*.js`, `src/**/*.d.ts`, etc.
+    - Verify imports now resolve to .ts files
+    - _Requirements: TR-3, US-3_
 
-**Acceptance**: error-delta.md created with complete analysis including tool-generated metrics and architectural validation
+- [ ] 8. Investigate duplicated security UI components
+  - [ ] 8.1 Compare client/src/core/security/ui/ vs client/src/features/security/ui/
+    - Use project-structure-reference.md to identify exact duplicate files
+    - Compare file contents to determine if identical or diverged
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [ ] 8.2 Find all imports to both locations
+    - Execute: `grep -r "from.*core/security/ui" client/src/`
+    - Execute: `grep -r "from.*features/security/ui" client/src/`
+    - Count imports to each location
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 8.3 Determine canonical location
+    - Based on FSD principles, features/security/ui/ stale path
+    - Document decision in structural-ambiguities.md
+    - Classify imports to core/security/ui/ as canonical 
+    - List all files that need import updates
+    - _Requirements: TR-3, US-3, US-7_
 
-### Task 5.3: Investigate Regressions
-**Requirements**: US-6, TR-6
+- [ ] 9. Investigate duplicated useAuth hook
+  - [ ] 9.1 Compare useAuth implementations
+    - Execute: `diff client/src/core/auth/hooks/useAuth.tsx client/src/features/users/hooks/useAuth.tsx`
+    - Determine if identical or diverged
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [ ] 9.2 Find all useAuth imports
+    - Execute: `grep -r "from.*useAuth" client/src/`
+    - Document import distribution
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 9.3 Determine canonical version
+    - Based on FSD, features/users/hooks/useAuth.tsx is likely canonical
+    - Document decision and divergence in structural-ambiguities.md
+    - Classify imports to core/auth/hooks/ as Category A
+    - _Requirements: TR-3, US-3, US-7_
 
-For each file that gained errors:
+- [ ] 10. Investigate duplicated loading utilities
+  - [ ] 10.1 Compare loading utils in both locations
+    - Compare client/src/core/loading/utils/ vs client/src/lib/ui/loading/utils/
+    - Check for re-export relationships
+    - Note camelCase loadingUtils.ts variant (red flag)
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [ ] 10.2 Find imports to both locations
+    - Execute: `grep -r "from.*core/loading/utils" client/src/`
+    - Execute: `grep -r "from.*lib/ui/loading/utils" client/src/`
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 10.3 Determine canonical location
+    - Document which is canonical in structural-ambiguities.md
+    - Classify stale imports as Category A
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.3.1 Determine if it's a regression or newly visible bug
-  - Regression: Fix introduced new error
-  - Newly visible: File was unreachable, now reachable, had pre-existing bugs
+- [ ] 11. Investigate empty server/infrastructure/errors/ directory
+  - [ ] 11.1 Find imports to infrastructure/errors
+    - Execute: `grep -r "from.*infrastructure/errors" server/`
+    - Document all broken imports
+    - _Requirements: TR-3, US-3_
+  
+  - [ ] 11.2 Map to new location
+    - Verify functionality moved to server/infrastructure/error-handling/
+    - Document mapping in structural-ambiguities.md
+    - Classify as Category B (deleted/superseded)
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.3.2 If regression, diagnose and fix
-  - Identify which fix caused the regression
-  - Determine correct fix
-  - Apply fix and verify
+- [x] 12. Investigate FSD migration boundary
+  - [x] 12.1 Find potential duplicates between lib/ and features/
+    - Compare client/src/lib/services/ vs client/src/features/*/services/
+    - Compare client/src/lib/hooks/ vs client/src/core/*/hooks/
+    - Use project-structure-reference.md to identify patterns
+    - _Requirements: TR-3, US-3, US-7_
+  
+  - [ ] 12.2 Document canonical versions for each duplicate pair
+    - For each duplicate, determine if feature code (→ features/) or shared infrastructure (→ lib/)
+    - Document decisions in structural-ambiguities.md
+    - _Requirements: TR-3, US-3, US-7_
 
-- [ ] 5.3.3 If newly visible bug, document
-  - Add to "Newly Visible Pre-existing Bugs" section of error-delta.md
-  - Do NOT revert the fix that made it visible
-  - These bugs should be fixed in a separate effort
+- [x] 13. Checkpoint - Review structural findings
+  - Verify structural-ambiguities.md documents all duplicate pairs
+  - Confirm canonical versions identified for each
+  - Ensure migration rationale documented
 
-**Acceptance**: All regressions fixed, newly visible bugs documented
+### Phase 3: Full Import Scan & Categorization
 
-### Task 5.4: Verify Regression Canaries
-**Requirements**: US-6, TR-6
+**Note**: Skipping Phase 3 full scan and proceeding directly to Phase 4 with targeted fixes based on baseline analysis and Phase 2 findings.
 
-- [ ] 5.4.1 Check each canary file from baseline
-  - Compare baseline error count (0) to post-fix error count
-  - If post-fix > 0, it's a regression
+### Phase 4: Manual Fix Protocol
 
-- [ ] 5.4.2 Investigate any canary regressions
-  - Determine which fix caused the regression
-  - Diagnose and fix
+- [ ] 19. Fix imports in shared/ package (foundation)
+  - [ ] 14.1 Extract module resolution errors from baseline
+    - Execute: `npx tsc --noEmit -p tsconfig.json 2>&1 | grep -E "TS2307|TS2305|TS2614|TS2724" > module_errors.txt`
+    - Parse errors to extract file paths and import strings
+    - _Requirements: TR-4, US-4_
+  
+  - [ ] 14.2 Create discrepancy-inventory.md template
+    - Create table with columns: File, Import String, Category, Root Cause, Fix Applied, Verified
+    - _Requirements: TR-4, US-4_
 
-- [ ] 5.4.3 Update error-delta.md with canary status
-  - List all canaries
-  - Mark status (clean / regression)
+- [ ] 15. Categorize errors in shared/ package
+  - [ ] 15.1 Process each broken import in shared/
+    - For each error, determine category (A/B/C/D/E)
+    - Check if target file exists (A vs B)
+    - Check if alias in all configs (C)
+    - Check if barrel file (D)
+    - Check if module exists but member doesn't (E)
+    - Document in discrepancy-inventory.md
+    - _Requirements: TR-4, US-4_
 
-**Acceptance**: All canary regressions investigated and fixed
+- [ ] 16. Categorize errors in server/ package
+  - [ ] 16.1 Process each broken import in server/
+    - Apply same categorization process as shared/
+    - Document in discrepancy-inventory.md
+    - _Requirements: TR-4, US-4_
 
-### Task 5.5: Run Integration Tests
-**Requirements**: US-6, TR-6
+- [ ] 17. Categorize errors in client/ package
+  - [ ] 17.1 Process each broken import in client/
+    - Apply same categorization process
+    - Document in discrepancy-inventory.md
+    - _Requirements: TR-4, US-4_
 
-- [ ] 5.5.1 Run full type check
-  ```bash
-  npm run type-check
-  ```
+- [ ] 18. Checkpoint - Review categorization completeness
+  - Verify all ~1,200 module resolution errors categorized
+  - Confirm each has category (A/B/C/D/E) assigned
+  - Ensure fix strategy defined for each category
 
-- [ ] 5.5.2 Build all packages
-  ```bash
-  npm run build
-  ```
+### Phase 4: Manual Fix Protocol
 
-- [ ] 5.5.3 Run test suite
-  ```bash
-  npm run test
-  ```
+- [ ] 19. Fix imports in shared/ package (foundation)
+  - [ ] 19.1 Fix Category C errors in shared/ (config-only fixes)
+    - Verify these are resolved by Phase 1 config changes
+    - No source file changes needed
+    - Document in discrepancy-inventory.md
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 19.2 Fix Category D errors in shared/ (barrel files)
+    - Fix broken re-export chains from bottom up
+    - Each barrel file fix may resolve multiple downstream imports
+    - Verify each barrel file fix with `tsc --noEmit -p shared/tsconfig.json`
+    - Document downstream imports resolved by each barrel fix
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 19.3 Fix Category A errors in shared/ (stale paths)
+    - Default: Fix one file at a time
+    - State filename, list broken imports with categories, state corrected imports
+    - Verify with `tsc --noEmit -p shared/tsconfig.json` after each file
+    - Commit each file individually
+    - **Bulk Exception**: If 10+ files have identical old→new path pattern:
+      - Manually verify first 3-5 files to confirm pattern
+      - Document pattern in discrepancy-inventory.md
+      - Use IDE refactoring tools only (not regex/scripts)
+      - Review full diff before committing
+      - Run tsc verification after bulk change
+      - Monitor regression canaries
+      - Maximum 50 files per batch
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 19.4 Fix Category E errors in shared/ (renamed exports)
+    - Update import statements to use new export names
+    - Verify type signatures match
+    - Default: One file at a time with verification
+    - **Bulk Exception**: If 10+ files have identical old→new export name:
+      - Manually verify first 5 files
+      - Check signature compatibility
+      - Use IDE refactoring tools only
+      - Maximum 30 files per batch
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 19.5 Fix Category B errors in shared/ (deleted/superseded)
+    - Identify canonical replacement for each
+    - Verify API compatibility
+    - Update imports and call sites if API changed
+    - **Never use bulk changes** - replacement may vary by context
+    - _Requirements: TR-5, US-5_
 
-- [ ] 5.5.4 Run integration tests
-  ```bash
-  npm run test:integration
-  ```
+- [ ] 20. Checkpoint - Verify shared/ package clean
+  - Run `tsc --noEmit -p shared/tsconfig.json`
+  - Verify module resolution errors (TS2307, TS2305, TS2614, TS2724) eliminated
+  - Check regression canaries - ensure no previously clean files gained errors
+  - Compare error count to baseline - document reduction
+  - If error count increased or canaries affected, investigate before proceeding
 
-- [ ] 5.5.5 Document any failures
-  - Add to error-delta.md
-  - Classify as regression or pre-existing
+- [ ] 21. Fix imports in server/ package (depends on shared/)
+  - [ ] 21.1 Fix Category C errors in server/
+    - Verify config-only fixes from Phase 1
+    - No source file changes needed
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 21.2 Fix Category D errors in server/
+    - Fix barrel files bottom-up
+    - Document downstream imports resolved by each barrel fix
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 21.3 Fix Category A errors in server/
+    - Default: One file at a time with verification
+    - Focus on infrastructure/ before features/ (dependency order)
+    - **Bulk Exception**: Apply same criteria as shared/ (10+ identical patterns, max 50 files)
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 21.4 Fix Category E errors in server/
+    - Update to new export names
+    - **Bulk Exception**: Apply same criteria as shared/ (10+ identical, max 30 files)
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 21.5 Fix Category B errors in server/
+    - Map to canonical replacements (e.g., infrastructure/errors → infrastructure/error-handling)
+    - Update call sites if API changed
+    - **Never use bulk changes** - replacement varies by context
+    - _Requirements: TR-5, US-5_
 
-**Acceptance**: All integration tests pass or failures documented
+- [ ] 22. Checkpoint - Verify server/ package clean
+  - Run `tsc --noEmit -p server/tsconfig.json`
+  - Verify module resolution errors (TS2307, TS2305, TS2614, TS2724) eliminated
+  - Check regression canaries - ensure no previously clean files gained errors
+  - Compare error count to baseline - document reduction
+  - If error count increased or canaries affected, investigate before proceeding
 
----
+- [ ] 23. Fix imports in client/ package (depends on shared/)
+  - [ ] 23.1 Fix Category C errors in client/
+    - Verify config-only fixes from Phase 1
+    - No source file changes needed
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 23.2 Fix Category D errors in client/
+    - Fix barrel files bottom-up
+    - Document downstream imports resolved by each barrel fix
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 23.3 Fix Category A errors in client/ (high volume - expect 400+ files)
+    - Default: One file at a time with verification
+    - Fix order: core/ → features/ → lib/ (dependency order)
+    - **Bulk Exception Criteria** (use judiciously given high volume):
+      - Pattern must be identical across 10+ files (same old→new path)
+      - Manually verify first 3-5 files confirm pattern holds
+      - Document pattern in discrepancy-inventory.md before bulk change
+      - Use IDE refactoring tools only (Find & Replace with whole word match)
+      - Review full diff before committing
+      - Run `tsc --noEmit -p client/tsconfig.json` after bulk change
+      - Monitor regression canaries immediately after
+      - If error count increases, revert immediately and investigate
+      - Maximum 50 files per batch
+    - **When NOT to use bulk**: Mixed categories, API changes, unclear patterns, cross-package changes
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 23.4 Fix Category E errors in client/
+    - Update to new export names
+    - **Bulk Exception**: Apply same criteria (10+ identical, max 30 files)
+    - _Requirements: TR-5, US-5_
+  
+  - [ ] 23.5 Fix Category B errors in client/
+    - Map to canonical replacements
+    - Update call sites if API changed
+    - **Never use bulk changes** - replacement varies by context
+    - _Requirements: TR-5, US-5_
 
-## Final Deliverables
+- [ ] 24. Checkpoint - Verify client/ package clean
+  - Run `tsc --noEmit -p client/tsconfig.json`
+  - Verify module resolution errors (TS2307, TS2305, TS2614, TS2724) eliminated
+  - Check regression canaries - ensure no previously clean files gained errors
+  - Compare error count to baseline - document reduction
+  - If error count increased or canaries affected, investigate before proceeding
 
-### Task 6.1: Create fix-root-cause.md
-**Requirements**: US-2, TR-2
+### Phase 5: Validation & Error Delta Report
 
-- [ ] 6.1.1 Document all config changes
-  - Exact diff of each config file
-  - Justification for each change
+- [ ] 25. Capture post-fix baselines
+  - [ ] 25.1 Run tsc on all packages post-fix
+    - Execute: `npx tsc --noEmit -p tsconfig.json 2>&1 | tee postfix_tsc_root.txt`
+    - Execute: `npx tsc --noEmit -p client/tsconfig.json 2>&1 | tee postfix_tsc_client.txt`
+    - Execute: `npx tsc --noEmit -p server/tsconfig.json 2>&1 | tee postfix_tsc_server.txt`
+    - Execute: `npx tsc --noEmit -p shared/tsconfig.json 2>&1 | tee postfix_tsc_shared.txt`
+    - _Requirements: TR-6, US-6_
 
-- [ ] 6.1.2 Document proof of fix
-  - Test import that failed before, passes after
-  - Before/after tsc output
+- [ ] 26. Analyze error deltas
+  - [ ] 26.1 Calculate error count changes per package
+    - Compare baseline vs post-fix for each package
+    - Calculate total reduction
+    - _Requirements: TR-6, US-6_
+  
+  - [ ] 26.2 Identify and classify regressions
+    - Find files that gained errors (regression canaries)
+    - Classify each: fix exposed transitive bug vs true regression
+    - _Requirements: TR-6, US-6_
+  
+  - [ ] 26.3 Document newly visible pre-existing bugs
+    - Identify modules that were unreachable before fixes
+    - Document errors that are now visible but were always present
+    - Separate from true regressions
+    - _Requirements: TR-6, US-6_
+  
+  - [ ] 26.4 Create error-delta.md report
+    - Summary table with before/after counts
+    - Regressions table with explanations
+    - Newly visible bugs table
+    - Fixes applied table by category
+    - _Requirements: TR-6, US-6_
 
-- [ ] 6.1.3 Save as fix-root-cause.md
+- [ ] 27. Run integration tests
+  - [ ] 27.1 Run full type check
+    - Execute: `npm run type-check`
+    - Verify no module resolution errors remain
+    - _Requirements: US-6_
+  
+  - [ ] 27.2 Build all packages
+    - Execute: `npm run build`
+    - Verify builds succeed
+    - _Requirements: US-6_
+  
+  - [ ] 27.3 Run test suite
+    - Execute: `npm run test`
+    - Document any test failures
+    - _Requirements: US-6_
 
-**Acceptance**: fix-root-cause.md created with config diffs and proof
-
-### Task 6.2: Finalize discrepancy-inventory.md
-**Requirements**: US-4, TR-4
-
-- [ ] 6.2.1 Ensure all broken imports are listed
-- [ ] 6.2.2 Ensure all have categories assigned
-- [ ] 6.2.3 Ensure all have fixes documented
-- [ ] 6.2.4 Mark all as "Verified Clean"
-
-**Acceptance**: discrepancy-inventory.md complete with all imports fixed
-
-### Task 6.3: Finalize structural-ambiguities.md
-**Requirements**: US-3, US-7, TR-3
-
-- [ ] 6.3.1 Ensure all duplicate pairs documented
-- [ ] 6.3.2 Ensure canonical versions identified
-- [ ] 6.3.3 Ensure migration rationale documented with architectural principles
-  - Reference CLIENT_LIB_CORE_FEATURES_ANALYSIS.md decision matrix
-  - Reference CLIENT_OVERLAP_ANALYSIS.md best implementations
-  - Document architectural layer (infrastructure vs business logic vs UI)
-- [ ] 6.3.4 Ensure importers updated
-- [ ] 6.3.5 Document architectural improvements achieved
-  - Overlaps resolved
-  - Architectural principles applied
-  - Separation of concerns improved
-  - Best implementations adopted
-
-**Acceptance**: structural-ambiguities.md complete with all duplicates resolved and architectural rationale documented
-
-### Task 6.4: Finalize error-delta.md
-**Requirements**: US-6, TR-6
-
-- [ ] 6.4.1 Ensure summary tables complete
-- [ ] 6.4.2 Ensure all error count changes classified
-- [ ] 6.4.3 Ensure regressions investigated
-- [ ] 6.4.4 Ensure newly visible bugs documented
-- [ ] 6.4.5 Ensure architectural improvements documented
-  - Overlaps resolved
-  - Architectural principles applied
-  - Best implementations adopted
-  - Separation of concerns improved
-
-**Acceptance**: error-delta.md complete with full analysis including architectural validation
-
----
-
-### Task 6.5: Create Architectural Migration Summary
-**Requirements**: US-3, US-7, TR-3
-
-- [ ] 6.5.1 Create architectural-migration-summary.md
-  - Document all architectural improvements made
-  - List overlaps resolved (reference 16 critical overlaps from Phase 2)
-  - Document architectural principles applied
-  - List best implementations adopted
-  - Document separation of concerns improvements
-  - Reference CLIENT_LIB_CORE_FEATURES_ANALYSIS.md and CLIENT_OVERLAP_ANALYSIS.md
-
-- [ ] 6.5.2 Create migration metrics
-  - Number of overlaps resolved
-  - Number of architectural misplacements corrected
-  - Number of imports updated to follow architectural principles
-  - Improvement in separation of concerns
-
-- [ ] 6.5.3 Document remaining architectural debt
-  - Overlaps not yet resolved
-  - Architectural misplacements still present
-  - Recommended next steps for full architectural compliance
-
-**Acceptance**: architectural-migration-summary.md created with complete architectural analysis
-
----
-
-## Success Criteria
-
-- [ ] Module resolution errors reduced from ~1,200 to 0
-- [ ] Total TypeScript errors reduced from 5,762 to <4,500
-- [ ] Zero regressions in canary files
-- [ ] All broken imports categorized with architectural rationale
-- [ ] All duplicate modules documented with best implementations identified
-- [ ] All 16 critical overlaps investigated and documented
-- [ ] Architectural principles applied to import resolution
-- [ ] Separation of concerns improved (infrastructure vs business logic vs UI)
-- [ ] All fixes committed individually with architectural rationale where applicable
-- [ ] All deliverables created (including architectural-migration-summary.md)
-- [ ] Integration tests pass
+- [ ] 28. Final checkpoint - Review all deliverables
+  - Verify fix-root-cause.md complete with config diffs
+  - Verify discrepancy-inventory.md documents all ~1,200 errors
+  - Verify structural-ambiguities.md documents all duplicates
+  - Verify error-delta.md explains all changes
+  - Confirm module resolution errors reduced to 0
+  - Confirm no regressions in canary files
 
 ## Notes
 
-- **CRITICAL**: No automated scripts, codemods, or bulk replacements (except safe exceptions)
-- Fix one file at a time, verify after each
-- Respect dependency order (shared → server → client)
-- Stop and investigate if error count increases unexpectedly
-- Flag unclear cases for human review, don't guess
-- Document everything in deliverables
-- Apply architectural principles from CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
-- Use best implementations from CLIENT_OVERLAP_ANALYSIS.md
-- Reference structural-ambiguities.md for documented migrations
-- Validate architectural improvements in error-delta.md
+- **Default Protocol**: Fix one file at a time, verify with tsc, commit individually
+- **Bulk Change Exceptions**: Only for Categories A, C, E with strict criteria (see Phase 4 tasks)
+  - Category A: 10+ files, identical old→new path, max 50 files/batch
+  - Category C: Config-only fixes, unlimited (no source changes)
+  - Category E: 10+ files, identical old→new export name, max 30 files/batch
+  - Category D: Single barrel file fix (affects unlimited downstream)
+- **Never Bulk**: Category B (replacement varies), mixed categories, API changes, unclear patterns
+- **Bulk Safety**: IDE tools only, manual verification of first 3-5 files, full diff review, tsc verification, canary monitoring, immediate revert if errors increase
+- Each fix must be verified with `tsc --noEmit` before proceeding
+- Regression canaries (zero-error files) must be monitored throughout
+- No automated scripts, codemods, or regex replacements except for approved bulk change patterns
+- Dependency order: shared → server → client (foundation first)
+- Within packages: leaf files before root files, utilities before features
+- Stop immediately if error count increases unexpectedly or canary gains errors
+- Each phase builds on previous phase - do not skip ahead
+- Commit frequently with detailed messages including category and justification
+- Document every structural decision in structural-ambiguities.md
+- Flag unclear Category B/E replacements for human review rather than guessing
+- Use project-structure-reference.md for efficient investigation in Phase 2

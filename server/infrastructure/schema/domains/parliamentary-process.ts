@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Parliamentary Process Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { bill_amendments, parliamentary_votes } from '@shared/schema/domains/parliamentary-process'
+// Usage: import { bill_amendments, parliamentary_votes } from '@server/infrastructure/schema/domains/parliamentary-process'
 
 export {
   bill_committee_assignments,

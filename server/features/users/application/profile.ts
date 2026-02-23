@@ -8,9 +8,9 @@ import {
   authenticateToken
 } from '../../../../AuthAlert';
 import { asyncHandler } from '@/middleware/error-management';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
-import { createErrorContext } from '@shared/core/observability/distributed-tracing';
+import { createErrorContext } from '@server/infrastructure/observability';
 import { userDomainToApi } from '@shared/utils/transformers';
 
 export const router = Router();

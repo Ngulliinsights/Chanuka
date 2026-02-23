@@ -5,8 +5,8 @@
 // Reduces build time, memory usage, and decouples domain consumption
 //
 // USAGE PATTERNS:
-// ❌ OLD (Monolithic): import { users, bills, comments } from '@shared/schema'
-// ✅ NEW (Granular): import { users, bills } from '@shared/schema/domains/foundation'
+// ❌ OLD (Monolithic): import { users, bills, comments } from '@server/infrastructure/schema'
+// ✅ NEW (Granular): import { users, bills } from '@server/infrastructure/schema/domains/foundation'
 //
 // BENEFITS:
 // - Faster builds: Only import what you need

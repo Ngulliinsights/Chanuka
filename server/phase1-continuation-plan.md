@@ -26,7 +26,7 @@ The TypeScript compiler is failing to resolve module paths even though the modul
 | `@server/infrastructure/database` | 78 | ✅ Module exists |
 | `@/core/observability` | 26 | ❌ Invalid path alias |
 | `@shared/core/utils/api-utils` | 19 | ❓ Need to verify |
-| `@shared/core/observability/logging` | 16 | ❓ Need to verify |
+| `@server/infrastructure/observability/logger` | 16 | ❓ Need to verify |
 
 ## Recommended Approach
 

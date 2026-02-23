@@ -6,7 +6,7 @@ import {
   ApiNotFound, 
   ApiSuccess, 
   ApiValidationError 
-} from '@shared/core/utils/api-utils';
+} from '@shared/types/api';
 import type {
   BillUpdate,
   ConnectionMetrics,

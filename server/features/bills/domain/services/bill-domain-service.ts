@@ -1,6 +1,6 @@
 import { Bill, BillNumber, BillSummary,BillTitle } from '@shared/entities/bill';
-import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@shared/events/bill-events';
-import { DomainEventPublisher } from '@shared/events/bill-events';
+import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@server/features/bills/domain/events/bill-events';
+import { DomainEventPublisher } from '@server/features/bills/domain/events/bill-events';
 import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
 import { bill_engagement, bills, sponsors, users } from '@server/infrastructure/schema';
 import { bill_trackers,bill_votes } from '@server/infrastructure/schema';

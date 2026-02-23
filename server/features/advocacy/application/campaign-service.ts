@@ -5,7 +5,7 @@
 import { CampaignFilters, CampaignMetrics,PaginationOptions } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
 import { Campaign, NewCampaign } from '@shared/domain/entities/campaign';
-import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors';
+import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 // Repository interface removed - using direct service calls
 import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service';
 

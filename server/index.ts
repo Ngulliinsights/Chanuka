@@ -27,7 +27,7 @@ import { sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
 import { router as usersRouter } from '@server/features/users/application/profile';
 import { router as verificationRouter } from '@server/features/users/application/verification';
 import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
-import { cacheCoordinator } from '@shared/core/caching';
+import { cacheCoordinator } from '@server/infrastructure/cache';
 import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
 import { notificationSchedulerService } from '@server/infrastructure/notifications/notification-scheduler';
 import { router as notificationsRouter } from '@server/infrastructure/notifications/notifications';

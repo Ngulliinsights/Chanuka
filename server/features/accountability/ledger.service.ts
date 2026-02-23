@@ -1,5 +1,5 @@
-import { db } from '@shared/database';
-import { shadow_ledger_entries } from '@shared/schema/accountability_ledger';
+import { db } from '@server/infrastructure/database';
+import { shadow_ledger_entries } from '@server/infrastructure/schema/accountability_ledger';
 import { and, desc, eq, gte, lte, sql } from 'drizzle-orm';
 import { injectable } from 'inversify';
 

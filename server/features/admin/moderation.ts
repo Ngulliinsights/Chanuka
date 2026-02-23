@@ -1,7 +1,7 @@
 import { contentModerationService } from "@server/features/admin/content-moderation";
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { Request, Response,Router } from "express";
 import { z } from "zod";
 

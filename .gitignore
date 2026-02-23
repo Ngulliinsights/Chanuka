@@ -50,6 +50,26 @@ jspm_packages/
 # TypeScript cache
 *.tsbuildinfo
 
+# Compiled artifacts in source directories (should only be in dist/)
+client/src/**/*.js
+client/src/**/*.js.map
+client/src/**/*.d.ts
+client/src/**/*.d.ts.map
+server/**/*.js
+server/**/*.js.map
+server/**/*.d.ts
+server/**/*.d.ts.map
+shared/**/*.js
+shared/**/*.js.map
+shared/**/*.d.ts
+shared/**/*.d.ts.map
+
+# Exception: Allow legitimate ambient type declarations
+!client/src/vite-env.d.ts
+!client/src/core/security/window.d.ts
+!client/src/lib/types/lucide-react.d.ts
+!**/@types/**/*.d.ts
+
 # Optional npm cache directory
 .npm
 

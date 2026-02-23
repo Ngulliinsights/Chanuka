@@ -2,7 +2,7 @@
  * Bills Router - Complete Migration to New Error System
  * 
  * This is a fully migrated version using:
- * - BaseError, ValidationError from @shared/core/observability/error-management
+ * - BaseError, ValidationError from @shared/types/core/errors
  * - ERROR_CODES from @shared/constants
  * - Unified error middleware for handling all errors
  * - asyncHandler() for automatic error propagation
@@ -16,7 +16,7 @@ import { authenticateToken } from '../../../../AuthAlert';
 import { securityAuditService } from '../../../../security-audit-service';
 import { billService } from '@shared/application/bills';
 import { ERROR_CODES } from '@shared/constants';
-import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 
 const logger = {

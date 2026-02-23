@@ -15,10 +15,10 @@ export {
   createApiResponse,
   createSuccessResponse,
   createErrorResponse,
-} from '@shared/core/utils/api-utils';
+} from '@shared/types/api';
 
 export type {
   ApiResponseType,
   ApiErrorType,
   ApiValidationErrorType,
-} from '@shared/core/utils/api-utils';
+} from '@shared/types/api';

@@ -3,7 +3,7 @@ import { votingPatternAnalysisService } from '@server/features/bills/voting-patt
 import type { AuthenticatedRequest } from '@server/middleware/auth';
 import { authenticateToken } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { UnifiedApiResponse  } from '@shared/core/utils/api-utils';
+import { UnifiedApiResponse  } from '@shared/types/api';
 import { NextFunction,Request, Response, Router } from 'express';
 
 const router = Router();

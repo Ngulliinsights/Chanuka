@@ -1,7 +1,7 @@
 // Import the *combined* preference type, NOT the global one directly
 import type { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types';
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache  } from '@shared/core/caching';
+import { getDefaultCache  } from '@server/infrastructure/cache';
 import { database as db, readDatabase } from '@server/infrastructure/database';
 import { bill_cosponsors,bill_engagement, bills, comments, sponsors, user_interests, users } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';

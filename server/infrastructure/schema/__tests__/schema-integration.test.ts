@@ -17,7 +17,7 @@ import {
   committeeRelations,
   governors,
   governorRelations,
-} from '@shared/schema/domains/foundation';
+} from '@server/infrastructure/schema/domains/foundation';
 import {
   // Type exports
   User,
@@ -36,7 +36,7 @@ import {
   SponsorId,
   CommitteeId,
   LegislatorId,
-} from '@shared/schema/domains/foundation';
+} from '@server/infrastructure/schema/domains/foundation';
 import {
   // Validation
   UserSchema,
@@ -45,7 +45,7 @@ import {
   ValidatedUserType,
   ValidatedBillType,
   ValidatedSponsorType,
-} from '@shared/schema/domains/foundation';
+} from '@server/infrastructure/schema/domains/foundation';
 import {
   // Type guards
   isUser,
@@ -54,13 +54,13 @@ import {
   isSponsor,
   isGovernor,
   isCommittee,
-} from '@shared/schema/domains/foundation';
+} from '@server/infrastructure/schema/domains/foundation';
 import {
   // Generators
   createUserId,
   createBillId,
   createSessionId,
-} from '@shared/schema/domains/foundation';
+} from '@server/infrastructure/schema/domains/foundation';
 import {
   // Validation utilities
   DatabaseValidationRegistry,
@@ -71,14 +71,14 @@ import {
   validateBrandedIds,
   validateDatabaseConstraints,
   validateDatabaseTransaction,
-} from '@shared/schema/validation-integration';
+} from '@server/infrastructure/schema/validation-integration';
 import {
   // Schema generators
   BrandedIdGenerator,
   TypeSchemaRegistry,
   validateWithContext,
   introspectSchema,
-} from '@shared/schema/schema-generators';
+} from '@server/infrastructure/schema/schema-generators';
 
 describe('Schema Integration - Standardized Type System', () => {
   // ========================================================================

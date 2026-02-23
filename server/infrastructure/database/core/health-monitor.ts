@@ -9,7 +9,7 @@
 
 import { UnifiedConnectionManager } from '@server/infrastructure/database/core/connection-manager';
 
-import { logger } from '@shared/core/observability';
+import { logger } from '@server/infrastructure/observability';
 
 
 // ============================================================================

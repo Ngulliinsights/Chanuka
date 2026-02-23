@@ -3,5 +3,8 @@
  * Feature-Sliced Design exports
  */
 
-// UI Components
-export * from './ui';
+// Hooks
+export * from './hooks/useSecurity';
+
+// Pages
+export { default as SecurityDemoPage } from './pages/SecurityDemoPage';

@@ -5,8 +5,8 @@ import { ErrorCode, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';
 import { authenticateToken, requireAuth } from '../../../../AuthAlert';
 import express, { Response } from 'express';
-import { asyncHandler } from '@shared/middleware/async-handler';
-import { createErrorContext } from '@shared/middleware/error-context';
+import { asyncHandler } from '@server/middleware';
+import { createErrorContext } from '@server/infrastructure/error-handling';
 
 const router = express.Router();
 

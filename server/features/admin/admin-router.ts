@@ -16,7 +16,7 @@ import { commonSchemas, inputValidationService } from '@server/infrastructure/se
 import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 import { NextFunction, Request, Response, Router } from 'express';

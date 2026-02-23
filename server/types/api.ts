@@ -44,7 +44,7 @@ export type { BillAnalysis, SponsorshipAnalysis } from '../utils/missing-modules
 import type { ApiResponse, ErrorResponse, ResponseMetadata } from '../../common-utils';
 
 /**
- * @deprecated Use ApiResponseWrapper from '@shared/core/utils/api-utils.ts instead.
+ * @deprecated Use ApiResponseWrapper from '@shared/types/api.ts instead.
  * This function is kept for backward compatibility but will be removed in a future version.
  */
 export function createApiResponse<T>(
@@ -68,7 +68,7 @@ export function createApiResponse<T>(
 }
 
 /**
- * @deprecated Use ApiResponseWrapper from '@shared/core/utils/api-utils.ts instead.
+ * @deprecated Use ApiResponseWrapper from '@shared/types/api.ts instead.
  * This function is kept for backward compatibility but will be removed in a future version.
  */
 export function createErrorResponse(error: string, code?: string, details?: Record<string, unknown>): ErrorResponse {

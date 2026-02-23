@@ -6,7 +6,7 @@
 // For development environment with immediate switch
 
 import { validateMigrationDeployment, validateSocketIOAuthentication, validateSocketIOInitialization, validateSubscriptionManagement, validateZeroDowntimeMigration } from '@server/scripts/validate-connection-migration';
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { createServer } from 'http';
 
 import { WebSocketMigrationDeployer } from '../../deploy-websocket-migration';

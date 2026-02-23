@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database/pool';
 import {
   type Argument,

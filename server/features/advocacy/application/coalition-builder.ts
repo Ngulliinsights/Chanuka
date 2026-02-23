@@ -5,7 +5,7 @@
 // Repository interfaces removed - using direct service calls
 import { CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-import { AdvocacyErrors } from '@shared/domain/errors/advocacy-errors';
+import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 import { AdvocacyEventPublisher, CoalitionFormedEvent,CoalitionOpportunityIdentifiedEvent } from '@shared/domain/events/advocacy-events';
 
 export interface CoalitionProposal {

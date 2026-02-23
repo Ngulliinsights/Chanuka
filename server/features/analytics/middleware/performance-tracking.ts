@@ -1,4 +1,4 @@
-import { analyticsConfig } from '@shared/config/analytics.config';
+import { analyticsConfig } from '@server/config/analytics.config';
 import { logger } from '@server/infrastructure/observability';
 import { performanceMonitor } from '@shared/core/performance/index';
 import { NextFunction,Request, Response } from 'express';

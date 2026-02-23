@@ -62,7 +62,7 @@ Still detected by dependency-cruiser:
 - `@server/infrastructure/observability`: 235 instances (UNCHANGED)
 - `@server/infrastructure/database`: 76 instances
 - `@shared/core/utils/api-utils`: 19 instances
-- `@shared/core/observability/logging`: 16 instances
+- `@server/infrastructure/observability/logger`: 16 instances
 - `@server/types/index`: 15 instances
 
 **Root Cause:** The circular dependency fixes didn't resolve the module resolution issues because:

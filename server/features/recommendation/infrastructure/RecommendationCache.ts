@@ -1,4 +1,4 @@
- import { cacheService } from '@shared/core/caching';
+ import { cacheService } from '@server/infrastructure/cache';
 import { CACHE_TTL } from '@server/infrastructure/cache';
 
 const hash = (obj: unknown): string => Buffer.from(JSON.stringify(obj)).toString('base64url');

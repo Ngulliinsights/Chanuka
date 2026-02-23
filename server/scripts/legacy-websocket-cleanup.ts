@@ -7,7 +7,7 @@
  * Performs systematic cleanup with proper archiving and safety checks
  */
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { promises as fs } from 'fs';
 import { dirname,join } from 'path';
 import { fileURLToPath } from 'url';

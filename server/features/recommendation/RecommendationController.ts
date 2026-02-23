@@ -5,7 +5,7 @@ import {
   getSimilarBills,
   getTrendingBills,
 } from '@shared/application/RecommendationService';
-import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/types/api';
  import { Router } from 'express';
 
 const router = Router();

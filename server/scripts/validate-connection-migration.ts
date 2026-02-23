@@ -7,7 +7,7 @@
  * and tests zero downtime migration.
  */
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { createServer } from 'http';
 import * as jwt from 'jsonwebtoken';
 import { io as SocketIOClient } from 'socket.io-client';

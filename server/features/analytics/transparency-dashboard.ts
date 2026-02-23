@@ -1,5 +1,5 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
-import { cacheService } from '@shared/core/caching';
+import { cacheService } from '@server/infrastructure/cache';
 import { financialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database/connection';
@@ -7,7 +7,7 @@ import { and, count,desc, eq, gte, lte } from "drizzle-orm";
 
 import { 
 sponsorAffiliations,
-  sponsors, sponsorTransparency} from '@shared/schema';
+  sponsors, sponsorTransparency} from '@server/infrastructure/schema';
 
 export interface TransparencyScoreResult {
   overallScore: number;

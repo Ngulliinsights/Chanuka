@@ -12,7 +12,7 @@
  */
 
 import { Request, Response, Router } from 'express';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 import { asyncHandler } from '@server/middleware/error-management';

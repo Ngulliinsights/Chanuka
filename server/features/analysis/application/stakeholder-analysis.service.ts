@@ -4,7 +4,7 @@ import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { eq } from 'drizzle-orm';
 
-import * as schema from '@shared/schema';
+import * as schema from '@server/infrastructure/schema';
 
 // --- Interface Definitions ---
 export interface StakeholderGroup {

@@ -12,8 +12,8 @@ import { Shield, FileText, Settings, Download, Eye, Lock } from 'lucide-react';
 import React, { useState } from 'react';
 
 import { ErrorBoundary } from '@client/core/error/components/ErrorBoundary';
-import { DataUsageReportDashboard } from '@client/features/security/ui/privacy/DataUsageReportDashboard';
-import GDPRComplianceManager from '@client/features/security/ui/privacy/GDPRComplianceManager';
+import { DataUsageReportDashboard } from '@client/core/security/ui/privacy/DataUsageReportDashboard';
+import GDPRComplianceManager from '@client/core/security/ui/privacy/GDPRComplianceManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import {
   Card,

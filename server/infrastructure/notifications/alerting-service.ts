@@ -1,6 +1,6 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { logger } from '@server/infrastructure/observability';
-import { createObservabilityStack  } from '@shared/core/observability';
+import { createObservabilityStack  } from '@server/infrastructure/observability';
 import { apmService } from '@shared/monitoring';
 
 export interface AlertRule {

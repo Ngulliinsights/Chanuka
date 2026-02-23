@@ -2,10 +2,10 @@ import { sponsorConflictAnalysisService } from '@shared/application/sponsor-conf
 import { SponsorAffiliationInput, sponsorService, SponsorTransparencyInput } from '@shared/application/sponsor-service-direct';
 import { BaseError, ValidationError } from '@shared/core/errors';
 import { ErrorCode, ErrorDomain, ErrorSeverity  } from '@shared/core';
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import express, { Response } from 'express';
-import { asyncHandler } from '@shared/middleware/async-handler';
-import { createErrorContext } from '@shared/middleware/error-context';
+import { asyncHandler } from '@server/middleware';
+import { createErrorContext } from '@server/infrastructure/error-handling';
 
 const router = express.Router();
 

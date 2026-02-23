@@ -11,7 +11,7 @@
 import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 import { logger } from '@server/infrastructure/observability';
-import { webSocketService } from '@shared/infrastructure/websocket';
+import { webSocketService } from '@server/infrastructure/websocket';
 import express from 'express';
 import { createServer } from 'http';
 

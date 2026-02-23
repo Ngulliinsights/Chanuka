@@ -5,7 +5,7 @@
 // Implements immediate switch deployment for development environment
 // Migrates from custom WebSocket service to Socket.IO with zero downtime
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { users } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';

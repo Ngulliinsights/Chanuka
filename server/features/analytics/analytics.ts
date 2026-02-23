@@ -5,7 +5,7 @@ import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth'
 import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
 import { controllerWrapper } from '@server/utils/analytics-controller-wrapper';
 import { logger } from '@server/infrastructure/observability';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { Router } from 'express';
 import { z } from 'zod';
 

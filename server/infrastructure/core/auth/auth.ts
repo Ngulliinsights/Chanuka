@@ -13,7 +13,7 @@ import { authService } from '@server/infrastructure/core/auth/auth-service';
 import { errorTracker } from '@server/errors/error-tracker';
 import { securityAuditService } from '@server/features/security/security-audit-service';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter';
-import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 import { NextFunction, Request, Response, Router } from "express";

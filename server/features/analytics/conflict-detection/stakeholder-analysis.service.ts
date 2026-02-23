@@ -7,7 +7,7 @@
 
 import { Stakeholder, StakeholderInterest } from '@server/features/analytics/conflict-detection/types';
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache } from '@shared/core/caching/index';
+import { getDefaultCache } from '@server/infrastructure/cache/index';
 import { database as db } from '@server/infrastructure/database';
 import {
 type Bill,

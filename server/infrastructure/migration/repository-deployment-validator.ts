@@ -1,7 +1,7 @@
 import {
   AsyncServiceResult,
   ResultAdapter,
-  withResultHandling} from '@shared/errors/result-adapter';
+  withResultHandling} from '@server/infrastructure/error-handling';
 import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index';
 import { and, avg, count, desc,eq, sql } from "drizzle-orm";
 

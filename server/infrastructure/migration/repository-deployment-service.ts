@@ -14,7 +14,7 @@ import { logger } from '@server/infrastructure/observability';
 import { 
   AsyncServiceResult, 
   ResultAdapter, 
-  withResultHandling} from '@shared/errors/result-adapter';
+  withResultHandling} from '@server/infrastructure/error-handling';
 import { monitorOperation,performanceMonitor } from '@shared/monitoring/performance-monitor';
 
 // Types for deployment and validation

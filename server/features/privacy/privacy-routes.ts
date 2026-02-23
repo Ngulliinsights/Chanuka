@@ -1,7 +1,7 @@
 import { PrivacyPreferences,privacyService } from '@server/features/privacy/privacy-service';
 import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/core/utils/api-utils';
+import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { Router } from 'express';
 import { z } from 'zod';
 

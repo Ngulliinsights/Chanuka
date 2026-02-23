@@ -23,7 +23,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { BaseError, ValidationError } from '@shared/core/observability/error-management';
+import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext, withRetry } from '@server/infrastructure/error-handling';
 

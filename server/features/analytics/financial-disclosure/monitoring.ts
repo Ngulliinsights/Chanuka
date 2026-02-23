@@ -3,7 +3,7 @@
 // Handles automated monitoring cycles, alert generation, and operational data access
 
 import { FinancialDisclosureConfig } from '@server/features/analytics/financial-disclosure/config';
-import { logger } from '@shared/core/observability/logging/logger';
+import { logger } from '@server/infrastructure/observability/logger';
 import {
   notifications,
   sponsors,

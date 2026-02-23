@@ -8,9 +8,9 @@
  * Tests instant rollback capability via load balancer with connection preservation
  */
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { BatchingService } from '@shared/infrastructure/batching-service';
-import { webSocketService } from '@shared/infrastructure/websocket';
+import { webSocketService } from '@server/infrastructure/websocket';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
 import { io as SocketIOClient, Socket as ClientSocket } from 'socket.io-client';

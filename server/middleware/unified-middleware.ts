@@ -16,7 +16,7 @@ import { Request, Response, NextFunction, Application } from 'express';
 import { getDefaultCache } from '../cache';
 // import { setupGlobalErrorHandlers } from '../observability/error-management'; // TODO: Module not found
 // Removed - module deleted by design during development
-import { logger } from '@shared/core/observability';
+import { logger } from '@server/infrastructure/observability';
 import { ValidationService } from '../validation';
 
 export interface UnifiedMiddlewareConfig {

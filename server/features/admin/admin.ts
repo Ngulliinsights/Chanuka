@@ -3,7 +3,7 @@ import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { and, count, desc, eq, gte,sql } from 'drizzle-orm';
 
-import { analysis, bill, comments, notification,users  } from '@shared/schema';
+import { analysis, bill, comments, notification,users  } from '@server/infrastructure/schema';
 
 export interface AdminStats {
   users: {

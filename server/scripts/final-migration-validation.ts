@@ -7,10 +7,10 @@
  * Validates cross-system compatibility and data consistency
  */
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { BatchingService } from '@shared/infrastructure/batching-service';
-import { webSocketService } from '@shared/infrastructure/websocket';
+import { webSocketService } from '@server/infrastructure/websocket';
 
 interface ValidationResult {
   phase: string;

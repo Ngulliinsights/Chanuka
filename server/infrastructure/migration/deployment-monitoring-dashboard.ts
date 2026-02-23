@@ -3,7 +3,7 @@ import { CrossPhaseValidationResult,StatisticalAnalysisResult, ValidationResult 
 import {
   AsyncServiceResult,
   withResultHandling
-} from '@shared/errors/result-adapter';
+} from '@server/infrastructure/error-handling';
 
 import { logger } from '@shared/core';
 

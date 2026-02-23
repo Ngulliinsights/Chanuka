@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Safeguards Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { rate_limits, contentFlags } from '@shared/schema/domains/safeguards'
+// Usage: import { rate_limits, contentFlags } from '@server/infrastructure/schema/domains/safeguards'
 //
 // CRITICAL: This domain handles security & platform protection:
 // - Rate limiting (immediate protection)

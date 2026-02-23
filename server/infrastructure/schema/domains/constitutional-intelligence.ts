@@ -2,7 +2,7 @@
 // DOMAIN EXPORTS - Constitutional Intelligence Schema
 // ============================================================================
 // Granular import path to avoid loading entire schema
-// Usage: import { constitutional_provisions, legal_precedents } from '@shared/schema/domains/constitutional-intelligence'
+// Usage: import { constitutional_provisions, legal_precedents } from '@server/infrastructure/schema/domains/constitutional-intelligence'
 
 export {
   constitutional_provisions,

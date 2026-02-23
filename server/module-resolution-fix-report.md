@@ -47,7 +47,7 @@
   - To: `@shared/database`
 - **features\accountability\ledger.service.ts**
   - From: `@chanuka/shared/schema/accountability_ledger`
-  - To: `@shared/schema/accountability_ledger`
+  - To: `@server/infrastructure/schema/accountability_ledger`
 
 ## Files Requiring Manual Review
 

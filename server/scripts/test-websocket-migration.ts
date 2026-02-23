@@ -4,7 +4,7 @@
 // ============================================================================
 // Simple test to validate Socket.IO migration without full database setup
 
-import { logger } from '@shared/core/observability/logging';
+import { logger } from '@server/infrastructure/observability';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 

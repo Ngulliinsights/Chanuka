@@ -1,13 +1,13 @@
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
-import { cacheService } from '@shared/core/caching';
+import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import plural table names and correct type references
-import { bills, comment_votes,comments, user_profiles, users } from '@shared/citizen_participation';
-import { bill_engagement } from '@shared/citizen_participation';
+import { bills, comment_votes,comments, user_profiles, users } from '@server/infrastructure/schema';
+import { bill_engagement } from '@server/infrastructure/schema';
 // FIXED: Import cacheKeys from the correct location
 import { cache, cacheKeys } from '@server/infrastructure/cache';
 import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse   } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';
-import { ApiResponseWrapper  } from '@shared/core/utils/api-utils';
+import { ApiResponseWrapper  } from '@shared/types/api';
 import { database as db } from '@server/infrastructure/database';
 import type {
   BillEngagementMetrics,

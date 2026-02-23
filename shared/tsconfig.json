@@ -19,7 +19,9 @@
       "@shared/constants": ["./constants"],
       "@shared/constants/*": ["./constants/*"],
       "@shared/utils": ["./utils"],
-      "@shared/utils/*": ["./utils/*"]
+      "@shared/utils/*": ["./utils/*"],
+      "@shared/platform": ["./platform"],
+      "@shared/i18n": ["./i18n"]
     }
   },
   "include": ["**/*.ts", "**/*.d.ts"],

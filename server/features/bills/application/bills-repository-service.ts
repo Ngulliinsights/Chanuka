@@ -8,7 +8,7 @@
 import { Err,Ok, Result } from '@shared/core';
 import { Bill, BillNumber, BillSummary,BillTitle } from '@shared/domain/entities/bill';
 import { BillServiceError } from '@shared/domain/errors/bill-errors';
-import { DomainEventPublisher } from '@shared/domain/events/bill-events';
+import { DomainEventPublisher } from '@server/features/bills/domain/events/bill-events';
 import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
 import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
