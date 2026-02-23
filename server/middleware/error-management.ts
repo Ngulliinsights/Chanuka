@@ -10,7 +10,6 @@ import { logger } from '@server/infrastructure/observability';
 import {
   ErrorClassification,
   getHttpStatusFromClassification,
-  isStandardError,
   type StandardError,
 } from '@shared/types';
 import type { Request, Response, NextFunction } from 'express';
@@ -23,9 +22,9 @@ import {
   generateCorrelationId,
   getCurrentCorrelationId,
   setCurrentCorrelationId,
-  toStandardError,
-} from '@shared/utils/errors';
-import { NextFunction, Request, Response } from 'express';
+} from '@shared/utils/correlation-id';
+import { toStandardError } from '@shared/utils/errors';
+
 
 /**
  * Middleware to set correlation ID for each request
@@ -73,7 +72,7 @@ export function createUnifiedErrorMiddleware() {
     }
 
     try {
-      const context = createErrorContext(req);
+      const _context = createErrorContext(req);
 
       // Transform error to StandardError format
       const standardError: StandardError = toStandardError(error);
@@ -83,10 +82,9 @@ export function createUnifiedErrorMiddleware() {
                         getHttpStatusFromClassification(standardError.classification);
 
       // Log error with structured logging
-      logger.error('Request failed', {
+      logger.error({
         correlationId: standardError.correlationId,
         code: standardError.code,
-        message: standardError.message,
         classification: standardError.classification,
         statusCode,
         path: req.path,
@@ -94,7 +92,7 @@ export function createUnifiedErrorMiddleware() {
         ip: req.ip,
         details: standardError.details,
         stack: standardError.stack,
-      });
+      }, 'Request failed');
 
       // Build response
       const errorResponse: any = {
@@ -117,7 +115,7 @@ export function createUnifiedErrorMiddleware() {
       res.status(statusCode).json(errorResponse);
     } catch (handlerError) {
       // Fallback error response if middleware fails
-      logger.error('Error middleware failed', { error: handlerError });
+      logger.error({ error: handlerError }, 'Error middleware failed');
 
       if (!res.headersSent) {
         res.status(500).json({
@@ -150,10 +148,6 @@ export function asyncHandler(fn: (req: Request, res: Response, next: NextFunctio
  * Can be used before route handlers to validate request body/params/query
  */
 export function validationErrorHandler(error: unknown, _req: Request, _res: Response, next: NextFunction) {
-  if (error.status === 400 || error.errors) {
-    // JOI or other validation error
-    next(error);
-  } else {
-    next(error);
-  }
+  // Pass all errors through — downstream error middleware handles classification
+  next(error);
 }

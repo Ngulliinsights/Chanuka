@@ -1,52 +1,101 @@
-import { logger } from '@server/infrastructure/observability';
-import compression from 'compression';
-import cors from 'cors';
-import { Express, NextFunction,Request, Response } from 'express';
-import helmet from 'helmet';
+/**
+ * Middleware Barrel
+ *
+ * Re-exports all live middleware for convenient imports.
+ */
 
-// 3. Core Logic wrappers
-import { boomErrorMiddleware } from './boom-error-middleware';
-import { requestLogger } from './logging-middleware'; // We will create this
+// Auth
+export { authenticateToken, requireRole } from './auth';
+export type { AuthenticatedRequest } from './auth';
+export {
+  isAuthenticatedRequest,
+  hasRole,
+  getUserId,
+  type AuthenticatedUser,
+  type PrivacyRequest,
+} from './auth-types';
 
-// API Contract Validation
-export * from './api-contract-validation';
+// Rate limiting
+export { standardRateLimits } from './rate-limiter';
 
-// Validation Middleware
-export * from './validation-middleware';
-// 2. Security & Intelligence// From previous step (Helmet/Firewall)
-import { privacyMiddleware } from './privacy-middleware';
-import { standardRateLimits } from './rate-limiter';
-// 1. Critical Infrastructure (Fail fast)
-import { checkServiceAvailability } from './service-availability';
+// Validation (Zod-based request validation)
+export {
+  validateRequest,
+  validateBody,
+  validateQuery,
+  validateParams,
+  validateMultiple,
+  type ValidationTarget,
+  type ValidationOptions,
+  type ValidationErrorDetail,
+  type ValidationErrorResponse,
+} from './validation-middleware';
 
-export const configureMiddleware = (app: Express) => {
-  logger.info('🔧 Initializing middleware pipeline...', { component: 'Middleware' });
+// API contract validation
+export {
+  validateApiContract,
+  validateApiContractWithParams,
+  validateApiContractWithQuery,
+  validateApiContractWithParamsAndQuery,
+  validateApiResponse,
+  createValidationMiddleware,
+  createValidationMiddlewareWithParams,
+  createValidationMiddlewareWithQuery,
+  createValidationMiddlewareWithParamsAndQuery,
+} from './api-contract-validation';
 
-  // A. Panic Switch (If server is dying, stop here)
-  app.use(checkServiceAvailability);
+// Error handling
+export {
+  boomErrorMiddleware,
+  asyncErrorHandler,
+  errorContextMiddleware,
+} from './boom-error-middleware';
 
-  // B. Basic Hygiene
-  app.use(compression());
-  app.use(requestLogger); // Async structured logging
-  
-  // C. Security Layer (The Firewall)
-  // This includes Helmet, CORS, and Intrusion Detection
-  app.use(securityMiddleware);
+export {
+  correlationIdMiddleware,
+  createUnifiedErrorMiddleware,
+  asyncHandler,
+  validationErrorHandler,
+} from './error-management';
 
-  // D. Privacy Layer (Anonymization)
-  // MUST come after Intrusion Detection so we can log threats with real IPs before anonymizing
-  app.use(privacyMiddleware);
+// Privacy
+export {
+  checkDataProcessingConsent,
+  checkDataSharingConsent,
+  logDataAccess,
+  enforceCookieConsent,
+  addPrivacyHeaders,
+  validateDataRetention,
+  anonymizeIP,
+} from './privacy-middleware';
 
-  // E. Flood Protection (Rate Limiting)
-  // We apply different limits to different paths
-  app.use('/api/auth', standardRateLimits.auth);
-  app.use('/api/search', standardRateLimits.search);
-  app.use('/api', standardRateLimits.api); // Fallback for other API routes
+// Caching
+export {
+  createCacheMiddleware,
+  cacheMiddleware,
+  createCacheInvalidationMiddleware,
+  type CacheOptions,
+} from './cache-middleware';
 
-  // F. Body Parsing (Only after security checks pass)
-  // Large payloads are blocked by Intrusion Detection before parsing
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Circuit breaker
+export {
+  circuitBreakerFetch,
+  circuitBreakerRequest,
+  retryWithCircuitBreaker,
+  getCircuitBreakerMetrics,
+  resetCircuitBreaker,
+  forceCircuitBreakerState,
+  getCircuitBreakerHealth,
+} from './circuit-breaker-middleware';
 
-  logger.info('✅ Middleware pipeline configured', { component: 'Middleware' });
-};
+// Service availability (health gate)
+export {
+  serviceAvailabilityMiddleware,
+  serviceManager,
+} from './service-availability';
+
+// Safeguards (moderation + behavioral analytics)
+export { safeguardsMiddleware } from './safeguards';
+
+// App-level middleware composition
+export { configureAppMiddleware } from './app-middleware';

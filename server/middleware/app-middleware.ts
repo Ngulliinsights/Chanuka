@@ -1,6 +1,6 @@
 import { config } from '@server/config/index';
 import { correlationIdMiddleware } from '@server/middleware/error-management';
-import { migratedApiRateLimit } from '@server/middleware/migration-wrapper';
+import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
 import { performanceMonitor } from '@server/utils/missing-modules-fallback';
 import { Performance } from '@server/utils/shared-core-fallback';
@@ -38,7 +38,7 @@ const requestLogger = (req: Request, res: Response, next: NextFunction): void =>
 };
 
 // Create performance middleware from performanceMonitor
-const performanceMiddleware = (req: unknown, res: unknown, next: unknown) => {
+const performanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
   const operationId = performanceMonitor.startOperation?.('http', `${req.method} ${req.path}`, {
     method: req.method,
     path: req.path,
@@ -48,7 +48,6 @@ const performanceMiddleware = (req: unknown, res: unknown, next: unknown) => {
   res.on('finish', () => {
     performanceMonitor.endOperation?.(operationId, res.statusCode < 400, undefined, {
       statusCode: res.statusCode,
-      responseTime: Date.now() - req.startTime
     });
   });
 
@@ -158,7 +157,7 @@ export function configureAppMiddleware(app: Express): void {
   // Request monitoring and logging pipeline
   app.use(requestLogger);
   app.use(performanceMiddleware);
-  app.use(migratedApiRateLimit);
+  app.use(standardRateLimits.api);
   app.use(auditMiddleware);
   app.use(securityMonitoringMiddleware.initializeAll());
 

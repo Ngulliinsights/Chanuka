@@ -3,9 +3,9 @@
  * Integrates the comprehensive circuit breaker pattern with server-side API calls
  */
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '@shared/core/src/observability/error-management/errors/base-error';
-import { CircuitBreaker, CircuitBreakerOptions } from '@shared/core/src/observability/error-management/patterns/circuit-breaker';
-import { logger } from '@shared/core/src/observability/logging';
+import { BaseError, ErrorDomain, ErrorSeverity } from '@server/infrastructure/error-handling';
+import { CircuitBreaker } from '@server/infrastructure/error-handling';
+import { logger } from '@server/infrastructure/observability';
 
 // Circuit breaker instances for different services
 const circuitBreakers = new Map<string, CircuitBreaker>();
@@ -13,45 +13,18 @@ const circuitBreakers = new Map<string, CircuitBreaker>();
 /**
  * Configuration for different external services
  */
-const SERVICE_CONFIGS: Record<string, CircuitBreakerOptions> = {
+const SERVICE_CONFIGS: Record<string, { failureThreshold?: number; resetTimeoutMs?: number }> = {
   'government-data': {
-    name: 'government-data-api',
     failureThreshold: 5,
-    successThreshold: 3,
-    timeout: 60000, // 1 minute
-    halfOpenRetries: 2,
-    windowSize: 50,
-    slowCallDurationThreshold: 5000, // 5 seconds
-    slowCallRateThreshold: 30, // 30%
-    minimumThreshold: 3,
-    maximumThreshold: 15,
-    thresholdAdjustmentFactor: 1.5,
+    resetTimeoutMs: 60000, // 1 minute
   },
   'social-media': {
-    name: 'social-media-api',
     failureThreshold: 3,
-    successThreshold: 2,
-    timeout: 30000, // 30 seconds
-    halfOpenRetries: 1,
-    windowSize: 20,
-    slowCallDurationThreshold: 3000, // 3 seconds
-    slowCallRateThreshold: 40, // 40%
-    minimumThreshold: 2,
-    maximumThreshold: 10,
-    thresholdAdjustmentFactor: 1.3,
+    resetTimeoutMs: 30000, // 30 seconds
   },
   'external-api': {
-    name: 'external-api-default',
     failureThreshold: 4,
-    successThreshold: 2,
-    timeout: 45000, // 45 seconds
-    halfOpenRetries: 2,
-    windowSize: 30,
-    slowCallDurationThreshold: 4000, // 4 seconds
-    slowCallRateThreshold: 35, // 35%
-    minimumThreshold: 2,
-    maximumThreshold: 12,
-    thresholdAdjustmentFactor: 1.4,
+    resetTimeoutMs: 45000, // 45 seconds
   },
 };
 
@@ -61,33 +34,7 @@ const SERVICE_CONFIGS: Record<string, CircuitBreakerOptions> = {
 function getCircuitBreaker(serviceName: string): CircuitBreaker {
   if (!circuitBreakers.has(serviceName)) {
     const config = SERVICE_CONFIGS[serviceName] || SERVICE_CONFIGS['external-api'];
-    const circuitBreaker = new CircuitBreaker(config);
-    
-    // Set up event listeners for monitoring
-    circuitBreaker.on('open', (data) => {
-      logger.error('Circuit breaker opened', {
-        component: 'CircuitBreakerMiddleware',
-        serviceName,
-        metrics: data.metrics,
-      });
-    });
-    
-    circuitBreaker.on('half-open', (data) => {
-      logger.warn('Circuit breaker half-open', {
-        component: 'CircuitBreakerMiddleware',
-        serviceName,
-        metrics: data.metrics,
-      });
-    });
-    
-    circuitBreaker.on('close', (data) => {
-      logger.info('Circuit breaker closed', {
-        component: 'CircuitBreakerMiddleware',
-        serviceName,
-        metrics: data.metrics,
-      });
-    });
-    
+    const circuitBreaker = new CircuitBreaker(serviceName, config);
     circuitBreakers.set(serviceName, circuitBreaker);
   }
   
@@ -288,10 +235,7 @@ export function getCircuitBreakerMetrics(): Record<string, unknown> {
   const metrics: Record<string, unknown> = {};
   
   for (const [serviceName, circuitBreaker] of circuitBreakers.entries()) {
-    metrics[serviceName] = {
-      ...circuitBreaker.getMetrics(),
-      healthStatus: circuitBreaker.getHealthStatus(),
-    };
+    metrics[serviceName] = circuitBreaker.getStats();
   }
   
   return metrics;
@@ -303,11 +247,8 @@ export function getCircuitBreakerMetrics(): Record<string, unknown> {
 export function resetCircuitBreaker(serviceName: string): void {
   const circuitBreaker = circuitBreakers.get(serviceName);
   if (circuitBreaker) {
-    circuitBreaker.resetMetrics();
-    logger.info('Circuit breaker reset', {
-      component: 'CircuitBreakerMiddleware',
-      serviceName,
-    });
+    circuitBreaker.reset();
+    logger.info({ component: 'CircuitBreakerMiddleware', serviceName }, 'Circuit breaker reset');
   }
 }
 
@@ -316,17 +257,18 @@ export function resetCircuitBreaker(serviceName: string): void {
  */
 export function forceCircuitBreakerState(
   serviceName: string,
-  state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
+  _state: 'CLOSED' | 'OPEN' | 'HALF_OPEN'
 ): void {
   const circuitBreaker = circuitBreakers.get(serviceName);
   if (circuitBreaker) {
-    // Type-safe state forcing - the CircuitBreaker class accepts these string literals
-    circuitBreaker.forceState(state);
-    logger.warn('Circuit breaker state forced', {
-      component: 'CircuitBreakerMiddleware',
-      serviceName,
-      forcedState: state,
-    });
+    // Only CLOSED state is supported via reset(); OPEN/HALF_OPEN require natural transitions
+    if (_state === 'CLOSED') {
+      circuitBreaker.reset();
+    }
+    logger.warn(
+      { component: 'CircuitBreakerMiddleware', serviceName, requestedState: _state },
+      'Circuit breaker state force requested'
+    );
   }
 }
 
@@ -341,10 +283,14 @@ export function getCircuitBreakerHealth(): {
   let overallHealthy = true;
   
   for (const [serviceName, circuitBreaker] of circuitBreakers.entries()) {
-    const health = circuitBreaker.getHealthStatus();
-    services[serviceName] = health;
+    const stats = circuitBreaker.getStats();
+    const isHealthy = stats.state === 'CLOSED';
+    services[serviceName] = {
+      healthy: isHealthy,
+      reason: isHealthy ? undefined : `Circuit is ${stats.state} (${stats.consecutiveFails} consecutive failures)`,
+    };
     
-    if (!health.healthy) {
+    if (!isHealthy) {
       overallHealthy = false;
     }
   }

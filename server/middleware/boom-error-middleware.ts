@@ -7,10 +7,9 @@
 
 import * as Boom from '@hapi/boom';
 import { logger } from '@server/infrastructure/observability';
-import { standardizedFromBoom, toErrorResponse } from '@server/infrastructure/error-handling';
 import type { ErrorResponse } from '@server/infrastructure/error-handling';
 import { AuthenticatedRequest, getUserId } from '@server/middleware/auth-types';
-import { NextFunction,Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 
 /**
@@ -30,161 +29,41 @@ export function boomErrorMiddleware(
 
   try {
     let boomError: Boom.Boom;
-    let errorResponse: ErrorResponse;
 
     // Handle different error types
     if (Boom.isBoom(error)) {
       // Already a Boom error - use directly
       boomError = error;
-      errorResponse = errorAdapter.toErrorResponse(boomError);
     } else if (error instanceof ZodError) {
       // Validation error from Zod
-      const validationErrors = error.errors.map(err => ({
+      const validationDetails = error.errors.map(err => ({
         field: err.path.join('.'),
         message: err.message,
-        value: err.input
       }));
-
-      const validationResult = errorAdapter.createValidationError(
-        validationErrors,
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (validationResult.isErr()) {
-        boomError = Boom.badRequest(validationResult.error.message);
-        boomError.data = validationResult.error;
-        errorResponse = {
-          success: false,
-          error: {
-            id: validationResult.error.id,
-            code: validationResult.error.code,
-            message: validationResult.error.userMessage,
-            category: validationResult.error.category,
-            retryable: validationResult.error.retryable,
-            timestamp: validationResult.error.context.timestamp.toISOString()
-          },
-          metadata: {
-            service: validationResult.error.context.service,
-            requestId: validationResult.error.context.requestId
-          }
-        };
-      } else {
-        // Fallback - should not happen
-        boomError = Boom.badRequest('Validation failed');
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.badRequest('Validation failed');
+      boomError.output.payload.message = 'Validation failed';
+      boomError.data = { validationErrors: validationDetails };
     } else if (error.name === 'ValidationError') {
       // Handle other validation errors
-      const validationResult = errorAdapter.createValidationError(
-        [{ field: 'input', message: error.message }],
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (validationResult.isErr()) {
-        boomError = Boom.badRequest(validationResult.error.message);
-        boomError.data = validationResult.error;
-        errorResponse = errorAdapter.toErrorResponse(boomError);
-      } else {
-        boomError = Boom.badRequest(error.message);
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.badRequest(error.message || 'Validation failed');
     } else if (error.code === 'UNAUTHORIZED' || error.status === 401) {
       // Authentication errors
-      const authResult = errorAdapter.createAuthenticationError(
-        'invalid_token',
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (authResult.isErr()) {
-        boomError = Boom.unauthorized(authResult.error.message);
-        boomError.data = authResult.error;
-        errorResponse = errorAdapter.toErrorResponse(boomError);
-      } else {
-        boomError = Boom.unauthorized(error.message || 'Authentication required');
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.unauthorized(error.message || 'Authentication required');
     } else if (error.code === 'FORBIDDEN' || error.status === 403) {
       // Authorization errors
-      const authzResult = errorAdapter.createAuthorizationError(
-        req.path,
-        req.method,
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (authzResult.isErr()) {
-        boomError = errorAdapter.toBoom(authzResult.error);
-        errorResponse = errorAdapter.toErrorResponse(boomError);
-      } else {
-        boomError = Boom.forbidden(error.message || 'Access denied');
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.forbidden(error.message || 'Access denied');
     } else if (error.code === 'NOT_FOUND' || error.status === 404) {
       // Not found errors
-      const notFoundResult = errorAdapter.createNotFoundError(
-        'Resource',
-        req.path,
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (notFoundResult.isErr()) {
-        boomError = errorAdapter.toBoom(notFoundResult.error);
-        errorResponse = errorAdapter.toErrorResponse(boomError);
-      } else {
-        boomError = Boom.notFound(error.message || 'Resource not found');
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.notFound(error.message || 'Resource not found');
     } else if (error.type === 'entity.parse.failed') {
       // JSON parsing errors
-      const validationResult = errorAdapter.createValidationError(
-        [{ field: 'body', message: 'Invalid JSON in request body' }],
-        {
-          service: 'api-middleware',
-          operation: req.method + ' ' + req.path,
-          requestId: req.headers['x-request-id'] as string,
-          user_id: getUserId(req) || undefined
-        }
-      );
-
-      if (validationResult.isErr()) {
-        boomError = errorAdapter.toBoom(validationResult.error);
-        errorResponse = errorAdapter.toErrorResponse(boomError);
-      } else {
-        boomError = Boom.badRequest('Invalid JSON in request body');
-        errorResponse = createFallbackErrorResponse(boomError, req);
-      }
+      boomError = Boom.badRequest('Invalid JSON in request body');
     } else if (error.type === 'entity.too.large') {
       // Request size errors
       boomError = Boom.entityTooLarge('Request entity too large');
-      errorResponse = createFallbackErrorResponse(boomError, req);
     } else if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
       // Timeout errors
       boomError = Boom.clientTimeout('Request timeout');
-      errorResponse = createFallbackErrorResponse(boomError, req);
     } else {
       // Generic server errors
       const statusCode = error.status || error.statusCode || 500;
@@ -197,36 +76,28 @@ export function boomErrorMiddleware(
       } else {
         boomError = Boom.internal(message);
       }
-
-      errorResponse = createFallbackErrorResponse(boomError, req);
     }
+
+    // Build unified error response
+    const errorResponse = createErrorResponse(boomError, req);
 
     // Log the error with appropriate level
     logError(boomError, req, error);
-
-    // Check if we should alert on this error
-    if (errorAdapter.shouldAlert(boomError)) {
-      logger.error('High-frequency or critical error detected', {
-        errorId: errorResponse.error.id,
-        code: errorResponse.error.code,
-        path: req.path,
-        method: req.method,
-        user_id: getUserId(req) || undefined,
-        requestId: req.headers['x-request-id']
-      });
-    }
 
     // Send the error response
     res.status(boomError.output.statusCode).json(errorResponse);
 
   } catch (middlewareError) {
     // Fallback error handling if middleware itself fails
-    logger.error('Error in Boom error middleware', {
-      originalError: error?.message,
-      middlewareError: middlewareError instanceof Error ? middlewareError.message : String(middlewareError),
-      path: req.path,
-      method: req.method
-    });
+    logger.error(
+      {
+        originalError: error?.message,
+        middlewareError: middlewareError instanceof Error ? middlewareError.message : String(middlewareError),
+        path: req.path,
+        method: req.method
+      },
+      'Error in Boom error middleware'
+    );
 
     // Send basic error response
     const fallbackResponse = {
@@ -250,9 +121,9 @@ export function boomErrorMiddleware(
 }
 
 /**
- * Create fallback error response when adapter methods fail
+ * Create standardized error response from Boom error
  */
-function createFallbackErrorResponse(boomError: Boom.Boom, req: Request): ErrorResponse {
+function createErrorResponse(boomError: Boom.Boom, req: Request): ErrorResponse {
   const authReq = req as AuthenticatedRequest;
   return {
     success: false,
@@ -305,16 +176,16 @@ function logError(boomError: Boom.Boom, req: Request, originalError: unknown): v
     requestId: req.headers['x-request-id'],
     userAgent: req.headers['user-agent'],
     ip: req.ip,
-    originalErrorType: originalError?.constructor?.name,
-    originalErrorMessage: originalError?.message
+    originalErrorType: (originalError as Error)?.constructor?.name,
+    originalErrorMessage: (originalError as Error)?.message,
   };
 
   if (statusCode >= 500) {
-    logger.error(boomError.message, logData, originalError);
+    logger.error(logData, boomError.message);
   } else if (statusCode >= 400) {
-    logger.warn(boomError.message, logData);
+    logger.warn(logData, boomError.message);
   } else {
-    logger.info(boomError.message, logData);
+    logger.info(logData, boomError.message);
   }
 }
 
@@ -334,7 +205,7 @@ export function asyncErrorHandler(
  */
 export function errorContextMiddleware(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   const authReq = req as AuthenticatedRequest;
