@@ -10,10 +10,16 @@
 
 // Services
 export * from './services';
+export { communityApiService } from './services/api';
 
-// Hooks
+// Hooks - Business logic hooks
 export * from './hooks/useCommunity';
 export * from './hooks';
+
+// Unified hooks (migrated from infrastructure)
+export { useUnifiedCommunity } from './hooks/useUnifiedCommunity';
+export { useUnifiedDiscussion } from './hooks/useUnifiedDiscussion';
+export { useRealtime } from './hooks/useRealtime';
 
 // Argument Intelligence Integration Hooks
 export { useArgumentsForBill } from './hooks/useArgumentsForBill';

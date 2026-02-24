@@ -554,3 +554,33 @@ export const RED_FLAG_SEVERITY = {
   procedural_irregularities: 'medium',
   conflicts_of_interest: 'high'
 } as const;
+
+// ============================================================================
+// RELATIONS - Drizzle ORM Relations (moved from foundation.ts)
+// ============================================================================
+// These relations are defined here to avoid circular dependencies between
+// foundation.ts and participation_oversight.ts
+
+// Relations for participation_quality_audits
+export const participationQualityAuditsRelations = relations(participation_quality_audits, ({ one }) => ({
+  bill: one(bills, {
+    fields: [participation_quality_audits.bill_id],
+    references: [bills.id],
+  }),
+  auditor: one(users, {
+    fields: [participation_quality_audits.auditor_id],
+    references: [users.id],
+  }),
+}));
+
+// Reverse relations for users (audits)
+export const usersAuditsRelations = relations(users, ({ many }) => ({
+  audits: many(participation_quality_audits, { relationName: "auditor" }),
+  createdAudits: many(participation_quality_audits, { relationName: "audit_creator" }),
+  updatedAudits: many(participation_quality_audits, { relationName: "audit_updater" }),
+}));
+
+// Reverse relations for bills (audits)
+export const billsAuditsRelations = relations(bills, ({ many }) => ({
+  audits: many(participation_quality_audits),
+}));

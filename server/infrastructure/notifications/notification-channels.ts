@@ -1,9 +1,22 @@
-import { Notification } from '@server/features/notifications/domain/entities/notification';
+// Notification data interface (avoiding import from features)
+export interface NotificationEntityData {
+  id: string;
+  user_id: string;
+  type: string;
+  title: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high';
+  read: boolean;
+  created_at: Date;
+  metadata?: Record<string, unknown>;
+}
+
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { notifications, user_profiles,users } from '@server/infrastructure/schema';
 import { webSocketService } from '@shared/websocket';
 import { eq } from 'drizzle-orm';
+import crypto from 'crypto';
 
 import { getEmailService } from './email-service';
 
@@ -210,41 +223,30 @@ export class NotificationChannelService {
    */
   private async sendInApp(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
-      // Create notification entity
-      const notification = Notification.create({
-        id: crypto.randomUUID(),
+      // Create notification data directly (no entity dependency)
+      const notificationId = crypto.randomUUID();
+      const notificationData = {
+        id: notificationId,
         user_id: request.user_id,
         notification_type: (request.metadata?.category as any) || 'bill_update',
         title: request.content.title,
         message: request.content.message,
         related_bill_id: request.metadata?.relatedBillId?.toString() ?? undefined,
+        related_comment_id: undefined,
+        related_user_id: undefined,
         is_read: false,
-        delivery_method: 'in_app',
-        delivery_status: 'pending',
-        created_at: new Date()
-      });
+        read_at: undefined,
+        is_dismissed: false,
+        delivery_method: 'in_app' as const,
+        delivery_status: 'pending' as const,
+        action_taken: undefined,
+        action_type: undefined,
+        created_at: new Date(),
+        updated_at: undefined
+      };
 
       // Store in database using direct Drizzle
-      const notificationData = notification.toJSON();
-      await db.insert(notifications).values({
-        id: notificationData.id,
-        user_id: notificationData.user_id,
-        notification_type: notificationData.notification_type,
-        title: notificationData.title,
-        message: notificationData.message,
-        related_bill_id: notificationData.related_bill_id || undefined,
-        related_comment_id: notificationData.related_comment_id || undefined,
-        related_user_id: notificationData.related_user_id || undefined,
-        is_read: notificationData.is_read,
-        read_at: notificationData.read_at || undefined,
-        is_dismissed: notificationData.is_dismissed,
-        delivery_method: notificationData.delivery_method,
-        delivery_status: notificationData.delivery_status,
-        action_taken: notificationData.action_taken || undefined,
-        action_type: notificationData.action_type || undefined,
-        created_at: notificationData.created_at,
-        updated_at: notificationData.updated_at || undefined
-      });
+      await db.insert(notifications).values(notificationData);
 
       // Send real-time via WebSocket (non-blocking)
       try {
@@ -253,7 +255,7 @@ export class NotificationChannelService {
           title: request.content.title,
           message: request.content.message,
           data: {
-            id: notification.id,
+            id: notificationId,
             ...request.metadata
           }
         });
@@ -267,7 +269,7 @@ export class NotificationChannelService {
       return {
         success: true,
         channel: 'inApp',
-        messageId: notification.id,
+        messageId: notificationId,
         deliveredAt: new Date()
       };
 

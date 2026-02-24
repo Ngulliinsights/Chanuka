@@ -1,5 +1,4 @@
-import { encryptionService } from '@server/features/security/encryption-service';
-import { securityAuditService } from '@server/features/security/security-audit-service';
+import { encryptionService, securityAuditService } from '@server/features/security';
 import { logger } from '@server/infrastructure/observability';
 import { getLegacyDatabase } from '@server/infrastructure/database';
 import { sessions, users } from '@server/infrastructure/schema';

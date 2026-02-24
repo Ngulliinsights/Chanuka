@@ -1,4 +1,4 @@
-import { privacyService } from '@server/features/privacy/privacy-service';
+import { privacyFacade } from '@server/infrastructure/privacy';
 import { logger } from '@server/infrastructure/observability';
 import { AuthenticatedRequest, PrivacyRequest } from '@server/middleware/auth-types';
 import { NextFunction,Request, Response } from 'express';
@@ -26,7 +26,7 @@ export const checkDataProcessingConsent = (requiredConsent: keyof PrivacyConsent
       }
 
       const user_id = req.user.id;
-      const preferences = await privacyService.getPrivacyPreferences(user_id);
+      const preferences = await privacyFacade.getPrivacyPreferences(user_id);
 
       // Attach privacy consent to request
       req.privacyConsent = preferences.dataProcessing;
@@ -73,7 +73,7 @@ export const checkDataSharingConsent = (requiredSharing: 'publicProfile' | 'shar
       }
 
       const user_id = req.user.id;
-      const preferences = await privacyService.getPrivacyPreferences(user_id);
+      const preferences = await privacyFacade.getPrivacyPreferences(user_id);
 
       // Check if user has given consent for the required sharing
       if (!preferences.dataSharing[requiredSharing]) {
@@ -165,7 +165,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
         }
       } else if (req.user) { // Check user's privacy preferences for authenticated users
         const user_id = req.user.id;
-        const preferences = await privacyService.getPrivacyPreferences(user_id);
+        const preferences = await privacyFacade.getPrivacyPreferences(user_id);
 
         if (!preferences.cookies[cookieType]) {
           return res.status(403).json({
@@ -220,7 +220,7 @@ export const validateDataRetention = async (req: AuthenticatedRequest, _res: Res
     }
 
     const user_id = req.user.id;
-    const preferences = await privacyService.getPrivacyPreferences(user_id);
+    const preferences = await privacyFacade.getPrivacyPreferences(user_id);
 
     // Add retention preferences to request for use by other middleware/routes
     (req as PrivacyRequest).dataRetentionPrefs = {

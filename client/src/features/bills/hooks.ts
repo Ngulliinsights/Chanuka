@@ -11,8 +11,8 @@ import type {
   CommentPayload,
   EngagementPayload,
   CreatePollPayload,
-} from '@client/infrastructure/api/bills';
-import { billsApiService } from '@client/infrastructure/api/bills';
+} from '@client/features/bills/services/api';
+import { billsApiService } from '@client/features/bills/services/api';
 import { useToast } from '@client/lib/hooks/use-toast';
 
 import { BillsQueryParams } from './types';

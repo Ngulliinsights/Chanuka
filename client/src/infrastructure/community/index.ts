@@ -1,18 +1,14 @@
 /**
- * Core Community Module
+ * Core Community Infrastructure
  *
- * Unified community and discussion system consolidating:
- * - features/community/hooks/useDiscussion.ts
- * - features/community/hooks/useCommunity.ts
- * - Resolving type conflicts and state management inconsistencies
+ * DEPRECATED: This module is being migrated to features/community
+ * Community is a business domain, not infrastructure
+ * 
+ * For WebSocket functionality, use @client/infrastructure/realtime
+ * For community business logic, use @client/features/community
  */
 
-// Unified hooks
-export { useUnifiedDiscussion } from './hooks/useUnifiedDiscussion';
-export { useUnifiedCommunity } from './hooks/useUnifiedCommunity';
-export { useRealtime } from './hooks/useRealtime';
-
-// Unified types (single source of truth)
+// Shared types only - these can stay in infrastructure as they're used across layers
 export type {
   UnifiedComment,
   UnifiedThread,
@@ -21,7 +17,12 @@ export type {
   DiscussionState,
 } from './types';
 
-// Services
-export { WebSocketManager } from './services/websocket-manager';
+// Services - these should be moved to features/community
 export { ModerationService } from './services/moderation.service';
 export { StateSyncService } from './services/state-sync.service';
+
+// NOTE: Community hooks have been moved to @client/features/community
+// Import from features layer instead:
+// - useUnifiedDiscussion
+// - useUnifiedCommunity  
+// - useRealtime

@@ -27,72 +27,13 @@ export {
 } from './AnalyticsProvider';
 
 // Re-export existing analytics infrastructure
-export { analyticsApiService } from '@client/infrastructure/api/analytics';
+export { analyticsApiService } from '@client/features/analytics/services/api';
 export { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
 export { ErrorAnalyticsService } from '@client/infrastructure/error/analytics';
 
-// Re-export analytics hooks
-export {
-  useComprehensiveAnalytics,
-  useInteractionTracking,
-  useFormTracking,
-  useSearchTracking,
-} from '@client/features/analytics/hooks/use-comprehensive-analytics';
-
-export {
-  useAnalyticsDashboard,
-  useAnalyticsSummary,
-  useBillAnalytics,
-  useEngagementReport,
-  useConflictReport,
-  useTopBills,
-  useUserActivity,
-  useAnalyticsAlerts,
-  useTrendingTopics,
-  useStakeholderAnalysis,
-  useRealtimeAnalytics,
-  useAnalyticsExport,
-} from '@client/features/analytics/hooks/useAnalytics';
-
-export {
-  useJourneyTracker,
-  useJourneyAnalytics,
-} from '@client/features/analytics/hooks/use-journey-tracker';
-
-export {
-  useWebVitals,
-  getPerformanceRating,
-  usePerformanceBudget,
-} from '@client/features/analytics/hooks/use-web-vitals';
-
-// Analytics UI components
-export { default as AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
-
-// Analytics types
-export type {
-  BillAnalytics,
-  AnalyticsFilters,
-  AnalyticsSummary,
-  DashboardData,
-  EngagementReport,
-  ConflictReport,
-  UserActivity,
-  AnalyticsAlert,
-} from '@client/lib/types/analytics';
-
-export type {
-  JourneyStep,
-  UserJourney,
-  JourneyAnalytics,
-  PathAnalytics,
-  DropOffPoint,
-  ConversionFunnel,
-} from '@client/features/analytics/model/user-journey-tracker';
-
-export type {
-  WebVitalsMetrics,
-  WebVitalsHookOptions,
-} from '@client/features/analytics/hooks/use-web-vitals';
+// NOTE: Analytics hooks, UI components, and business logic types are available
+// from @client/features/analytics - import directly from features layer
+// This infrastructure module only exports the core tracking engine and provider
 
 export type {
   PerformanceMetric,

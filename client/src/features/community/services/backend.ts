@@ -6,7 +6,7 @@
  * for discussion threads, expert verification, and community analytics.
  */
 
-import { communityApiService } from '@client/infrastructure/api/community';
+import { communityApiService } from '@client/features/community/services/api';
 import { realTimeService } from '@client/infrastructure/realtime';
 import type { CommentFormData } from '@client/lib/types/community';
 import type { Comment } from '@client/lib/types/community';

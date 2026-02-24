@@ -40,3 +40,12 @@ export {
 
 // Utilities
 export { EventEmitter } from './utils/event-emitter';
+
+// Optional: Message optimization utilities
+export { realtimeOptimizer } from './optimization';
+export type {
+  ConnectionMetrics,
+  OptimizationConfig,
+  MessageBatch,
+  DeltaState,
+} from './optimization';

@@ -15,7 +15,7 @@ import { intelligentSearch } from '../../features/search/services/intelligent-se
 import { streamingSearchService } from '../../features/search/services/streaming-search';
 import IntelligentAutocomplete from '../../features/search/ui/interface/IntelligentAutocomplete';
 import { cn } from '../../lib/design-system/utils/cn';
-import { searchApiClient } from '../api/search';
+import { searchApiClient } from '../../features/search/services/api';
 
 import { SearchStrategySelector, DEFAULT_SEARCH_STRATEGY_CONFIG } from './search-strategy-selector';
 import type {

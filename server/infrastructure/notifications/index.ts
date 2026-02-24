@@ -32,7 +32,7 @@ export {
   type NotificationBatch,
   type NotificationResult,
   type BulkNotificationResult
-} from './notification-orchestrator';
+} from '../../features/notifications/application/notification-orchestrator';
 
 // ===== SPECIALIZED SERVICES (Domain-specific Features) =====
 
@@ -49,7 +49,7 @@ export {
   notificationSchedulerService,
   type ScheduledDigest,
   type DigestContent
-} from './notification-scheduler';
+} from '../../features/notifications/application/notification-scheduler';
 
 // Smart notification filtering with AI/ML-based decisions
 export {

@@ -1,6 +1,9 @@
-import { type SuspiciousActivityContext, cibDetectionService } from '@server/features/safeguards/application/cib-detection-service';
-import { type ModerationContext, moderationService } from '@server/features/safeguards/application/moderation-service';
-import { type RateLimitContext, rateLimitService } from '@server/features/safeguards/application/rate-limit-service';
+import { 
+  safeguardsFacade,
+  type SuspiciousActivityContext,
+  type ModerationContext,
+  type RateLimitContext 
+} from '@server/infrastructure/safeguards';
 import { logger } from '@server/infrastructure/observability';
 import { NextFunction, Request, Response } from 'express';
 
@@ -66,7 +69,7 @@ export const safeguardsMiddleware = async (
     };
 
     // Use atomic rate limit check that prevents race conditions
-    const rateLimitResult = await rateLimitService.checkAndRecordRateLimit(rateLimitContext);
+    const rateLimitResult = await safeguardsFacade.checkRateLimit(rateLimitContext);
 
     if (!rateLimitResult.allowed) {
       logger.warn({
@@ -108,7 +111,7 @@ export const safeguardsMiddleware = async (
       } as unknown as ModerationContext;
 
       // Use atomic moderation queue operation to prevent duplicates
-      const moderationResult = await moderationService.queueForModeration(moderationContext);
+      const moderationResult = await safeguardsFacade.queueForModeration(moderationContext);
 
       if (!moderationResult.success) {
         logger.warn({
@@ -144,7 +147,7 @@ export const safeguardsMiddleware = async (
         requiresManualReview: true
       };
 
-      await cibDetectionService.logSuspiciousActivity(anomalyContext);
+      await safeguardsFacade.logSuspiciousActivity(anomalyContext);
     }
 
     // Continue to next middleware

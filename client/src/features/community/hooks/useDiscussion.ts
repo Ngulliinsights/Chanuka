@@ -13,7 +13,7 @@
 
 import { useMemo } from 'react';
 
-import { useUnifiedDiscussion } from '@client/infrastructure/community/hooks/useUnifiedDiscussion';
+import { useUnifiedDiscussion } from '@client/features/community/hooks/useUnifiedDiscussion';
 import type {
   Comment,
   DiscussionThread,

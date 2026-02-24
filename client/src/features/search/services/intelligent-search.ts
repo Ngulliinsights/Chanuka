@@ -14,7 +14,7 @@
 
 import Fuse, { type IFuseOptions } from 'fuse';
 
-import { searchApiClient } from '@client/infrastructure/api/search';
+import { searchApiClient } from '@client/features/search/services/api';
 import { logger } from '@client/lib/utils/logger';
 
 import type {

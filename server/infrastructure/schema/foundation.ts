@@ -26,9 +26,6 @@ import {
   userRoleEnum,
   anonymityLevelEnum,
 } from "./enum";
-import { participation_quality_audits } from "./participation_oversight";
-import { political_appointments } from "./political_economy";
-import { trojan_bill_analysis } from "./trojan_bill_detection";
 
 // ============================================================================
 // CORE USER TABLES - Kenya-Optimized Authentication & Profiles
@@ -1080,9 +1077,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
   }),
   sessions: many(user_sessions),
   oauthTokens: many(oauth_tokens),
-  audits: many(participation_quality_audits, { relationName: "auditor" }),
-  createdAudits: many(participation_quality_audits, { relationName: "audit_creator" }),
-  updatedAudits: many(participation_quality_audits, { relationName: "audit_updater" }),
+  // Note: audits relations moved to participation_oversight.ts to avoid circular dependency
 }));
 
 export const userProfilesRelations = relations(user_profiles, ({ one }) => ({
@@ -1097,13 +1092,13 @@ export const sponsorsRelations = relations(sponsors, ({ many }) => ({
   committeeMemberships: many(committee_members),
   chairedCommittees: many(committees, { relationName: "chair" }),
   viceChairedCommittees: many(committees, { relationName: "viceChair" }),
-  appointments: many(political_appointments),
+  // Note: appointments relation moved to political_economy.ts to avoid circular dependency
 }));
 
 export const governorsRelations = relations(governors, ({ many }) => ({
-  appointments: many(political_appointments),
   countyBills: many(bills, { relationName: "governor_assent" }),
   billAssents: many(county_bill_assents),
+  // Note: appointments relation moved to political_economy.ts to avoid circular dependency
 }));
 
 export const committeesRelations = relations(committees, ({ many, one }) => ({
@@ -1141,12 +1136,8 @@ export const billsRelations = relations(bills, ({ one, many }) => ({
     references: [governors.id],
     relationName: "governor_assent",
   }),
-  audits: many(participation_quality_audits),
   assents: many(county_bill_assents),
-  trojanAnalysis: one(trojan_bill_analysis, {
-    fields: [bills.id],
-    references: [trojan_bill_analysis.bill_id],
-  }),
+  // Note: audits and trojanAnalysis relations moved to respective files to avoid circular dependencies
 }));
 
 export const parliamentarySessionsRelations = relations(parliamentary_sessions, ({ many }) => ({

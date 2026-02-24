@@ -13,7 +13,7 @@ import {
 
 import { primaryKeyUuid, auditFields } from "./base-types";
 import { kenyanCountyEnum, partyEnum } from "./enum";
-import { sponsors } from "./foundation";
+import { sponsors, governors } from "./foundation";
 // ============================================================================
 // POLITICAL APPOINTMENTS - Patronage vs Competence Analysis
 // ============================================================================
@@ -581,3 +581,27 @@ export type NewEthnicAdvantageScore = typeof ethnic_advantage_scores.$inferInser
 
 export type StrategicInfrastructureProject = typeof strategic_infrastructure_projects.$inferSelect;
 export type NewStrategicInfrastructureProject = typeof strategic_infrastructure_projects.$inferInsert;
+
+// ============================================================================
+// RELATIONS - Drizzle ORM Relations (moved from foundation.ts)
+// ============================================================================
+// These relations are defined here to avoid circular dependencies between
+// foundation.ts and political_economy.ts
+
+// Relations for political_appointments
+export const politicalAppointmentsRelations = relations(political_appointments, ({ one }) => ({
+  sponsor: one(sponsors, {
+    fields: [political_appointments.sponsor_id],
+    references: [sponsors.id],
+  }),
+}));
+
+// Reverse relations for sponsors (appointments)
+export const sponsorsAppointmentsRelations = relations(sponsors, ({ many }) => ({
+  appointments: many(political_appointments),
+}));
+
+// Reverse relations for governors (appointments)
+export const governorsAppointmentsRelations = relations(governors, ({ many }) => ({
+  appointments: many(political_appointments),
+}));

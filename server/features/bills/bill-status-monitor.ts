@@ -1,5 +1,5 @@
 import { cacheService } from '@server/infrastructure/cache';
-import { notificationOrchestratorService, NotificationRequest } from '@server/infrastructure/notifications/notification-orchestrator';
+import { notificationOrchestratorService, NotificationRequest } from '@server/features/notifications/application/notification-orchestrator';
 import { webSocketService } from '@server/infrastructure/websocket';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';

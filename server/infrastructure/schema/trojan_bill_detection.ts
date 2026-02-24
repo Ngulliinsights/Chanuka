@@ -531,3 +531,25 @@ export const getAlertPriority = (riskScore: number): string => {
   if (riskScore >= TROJAN_RISK_THRESHOLDS.MEDIUM) return 'high';
   return 'normal';
 };
+
+// ============================================================================
+// RELATIONS - Drizzle ORM Relations (moved from foundation.ts)
+// ============================================================================
+// These relations are defined here to avoid circular dependencies between
+// foundation.ts and trojan_bill_detection.ts
+
+// Relations for trojan_bill_analysis
+export const trojanBillAnalysisRelations = relations(trojan_bill_analysis, ({ one }) => ({
+  bill: one(bills, {
+    fields: [trojan_bill_analysis.bill_id],
+    references: [bills.id],
+  }),
+}));
+
+// Reverse relations for bills (trojanAnalysis)
+export const billsTrojanAnalysisRelations = relations(bills, ({ one }) => ({
+  trojanAnalysis: one(trojan_bill_analysis, {
+    fields: [bills.id],
+    references: [trojan_bill_analysis.bill_id],
+  }),
+}));

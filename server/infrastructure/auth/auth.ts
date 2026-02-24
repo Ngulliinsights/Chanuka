@@ -11,7 +11,7 @@
 
 import { authService } from '@server/infrastructure/auth/auth-service';
 import { errorTracker } from '@server/errors/error-tracker';
-import { securityAuditService } from '@server/features/security/security-audit-service';
+import { securityAuditService } from '@server/features/security';
 import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';

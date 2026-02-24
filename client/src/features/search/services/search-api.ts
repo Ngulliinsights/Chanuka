@@ -8,4 +8,4 @@
  */
 
 // Re-export from the new location for backward compatibility
-export { searchApiClient as searchApi } from '@client/infrastructure/api/search';
+export { searchApiClient as searchApi } from '@client/features/search/services/api';

@@ -11,7 +11,7 @@
  * - Request batching and optimization
  */
 
-import { APICostMonitoringService, apiCostMonitoringService } from '@server/features/monitoring/application/api-cost-monitoring.service';
+import { APICostMonitoringService, apiCostMonitoringService } from '@server/infrastructure/observability/api-cost-monitoring.service
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
 import { ErrorSeverity, ExternalAPIErrorHandler } from '@server/services/external-api-error-handler';
 import { logger } from '@server/infrastructure/observability';

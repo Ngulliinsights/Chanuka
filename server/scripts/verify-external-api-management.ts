@@ -8,7 +8,7 @@
  * 4. API usage analytics and cost monitoring
  */
 
-import { APICostMonitoringService, apiCostMonitoringService } from '@server/features/monitoring/application/api-cost-monitoring.service';
+import { APICostMonitoringService, apiCostMonitoringService } from '@server/infrastructure/observability/api-cost-monitoring.service';
 import { logger } from '@server/infrastructure/observability';
 import { UnifiedExternalAPIManagementService as ExternalAPIManagementService } from '@shared/infrastructure/external-data/external-api-manager';
 

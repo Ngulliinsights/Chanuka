@@ -7,6 +7,14 @@
  * - Safe API wrapper for error handling
  * - Request deduplication and batching
  * - Circuit breaker and monitoring
+ * 
+ * MIGRATION NOTE:
+ * Domain-specific API services have been moved to their respective feature modules:
+ * - Bills API → @client/features/bills/services/api
+ * - Community API → @client/features/community/services/api
+ * - Analytics API → @client/features/analytics/services/api
+ * - User API → @client/features/users/services/api
+ * - Search API → @client/features/search/services/api
  */
 
 // Core API clients
@@ -65,7 +73,7 @@ export {
   type ErrorCorrelation,
 } from './circuit-breaker-monitor';
 
-// Service APIs - Auth now comes from consolidated system
+// Service APIs - Auth is cross-cutting and stays in infrastructure
 export {
   AuthApiService,
   createAuthApiService,
@@ -77,7 +85,12 @@ export {
   type AuthTokens,
 } from '../auth'; // Use consolidated auth system
 
-export { AnalyticsApiService, createAnalyticsApiService, analyticsApiService } from './analytics';
+// NOTE: Domain-specific API services have been moved to features:
+// - analyticsApiService → @client/features/analytics/services/api
+// - billsApiService → @client/features/bills/services/api
+// - communityApiService → @client/features/community/services/api
+// - userApiService → @client/features/users/services/api
+// - searchApiService → @client/features/search/services/api
 
 // Global clients
 export { globalApiClient } from './client';
