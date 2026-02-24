@@ -5,7 +5,7 @@
 - [x] 1. Set up core project structure and interfaces
   - Create directory structure for analysis engine, classifiers, and utilities
   - Define TypeScript interfaces for AnalysisEngine, IssueClassifier, and core data models
-  - Set up testing framework with Jest and create sample test files with known issues
+  - Set up testing framework with vitest and create sample test files with known issues
   - _Requirements: 1.1, 3.1_
 
 - [-] 2. Implement TypeScript AST parsing foundation

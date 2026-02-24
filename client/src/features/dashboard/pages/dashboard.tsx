@@ -14,6 +14,7 @@ import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { AdaptiveDashboard } from '@client/lib/ui/dashboard';
 import { RealTimeDashboard } from '@client/lib/ui/realtime';
+import { PersonalizedRecommendationsWidget, TrendingBillsWidget } from '@client/features/recommendation';
 import { logger } from '@client/lib/utils/logger';
 
 export default function Dashboard() {
@@ -92,6 +93,12 @@ export default function Dashboard() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Recommendation Widgets Section */}
+        <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+          <PersonalizedRecommendationsWidget limit={5} />
+          <TrendingBillsWidget days={7} limit={5} />
         </div>
       </div>
     </div>

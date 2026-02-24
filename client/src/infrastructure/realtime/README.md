@@ -187,13 +187,13 @@ The module includes comprehensive error handling:
 
 ```typescript
 // Mock the real-time service for testing
-jest.mock('@client/infrastructure/realtime', () => ({
+vitest.mock('@client/infrastructure/realtime', () => ({
   realTimeService: {
-    isConnected: jest.fn(() => true),
-    getBillTrackingService: jest.fn(() => ({
-      subscribeToBill: jest.fn(),
-      unsubscribeFromBill: jest.fn(),
-      getBillUpdates: jest.fn(() => []),
+    isConnected: vitest.fn(() => true),
+    getBillTrackingService: vitest.fn(() => ({
+      subscribeToBill: vitest.fn(),
+      unsubscribeFromBill: vitest.fn(),
+      getBillUpdates: vitest.fn(() => []),
     })),
   },
 }));

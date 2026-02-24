@@ -13,7 +13,7 @@
  * These tests ensure types flow correctly through the entire system.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from '@vitest/globals';
 import type { Result, AsyncResult } from '@shared/types/core';
 import type { User, Bill, Community } from '@shared/types/domains';
 import type { UserId, BillId, CommunityId } from '@shared/types/core';

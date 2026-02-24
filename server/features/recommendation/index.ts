@@ -1,4 +1,3 @@
- 
 export { RecommendationService } from './application/RecommendationService';
 
 export {
@@ -16,6 +15,9 @@ export type {
   CollaborativeRecommendationsDto,
   EngagementTrackingDto,
 } from './domain/recommendation.dto';
+
+// Export new routes
+export { default as recommendationRouter } from './application/recommendation.routes';
 
 
 

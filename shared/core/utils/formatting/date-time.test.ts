@@ -84,12 +84,12 @@ describe('Date and Time Formatting Utilities', () => {
   describe('formatRelativeTime', () => {
     beforeEach(() => {
       // Mock Date.now() for consistent testing
-      jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-01-15T12:00:00.000Z'));
+      vitest.useFakeTimers();
+      vitest.setSystemTime(new Date('2024-01-15T12:00:00.000Z'));
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vitest.useRealTimers();
     });
 
     it('should return "just now" for very recent times', () => {

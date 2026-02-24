@@ -19,9 +19,12 @@ import { actionPromptsRouter } from '@server/features/bills/action-prompts-route
 import { router as communityRouter } from '@server/features/community/community';
 import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/constitutional-analysis-router';
 import coverageRouter from '@server/features/coverage/coverage-routes';
+import { default as pretextDetectionRouter } from '@server/features/pretext-detection/application/pretext-detection.routes';
 import { router as privacyRouter } from '@server/features/privacy/application/privacy.routes';
 import { privacySchedulerService } from '@server/features/privacy/application/privacy-scheduler';
+import featureFlagRouter from '@server/features/feature-flags/application/routes';
 import { router as recommendationRouter } from '@server/features/recommendation/RecommendationController';
+import { recommendationRouter as newRecommendationRouter } from '@server/features/recommendation';
 import { router as searchRouter } from '@server/features/search/SearchController';
 import { sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
 import { router as usersRouter } from '@server/features/users/application/profile';
@@ -339,7 +342,9 @@ app.use('/api/admin/external-api', externalApiDashboardRouter);
 app.use('/api/coverage', coverageRouter);
 app.use('/api/constitutional-analysis', constitutionalAnalysisRouter);
 app.use('/api/argument-intelligence', argumentIntelligenceRouter);
-app.use('/api/recommendation', recommendationRouter);
+app.use('/api/recommendation', newRecommendationRouter);
+app.use('/api/pretext-detection', pretextDetectionRouter);
+app.use('/api/feature-flags', featureFlagRouter);
 
 // Unified error handling middleware (MUST BE LAST!)
 // This integrates @shared/core error management with server configuration

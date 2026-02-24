@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 24, 2026 at 10:40 AM
+**Generated:** February 24, 2026 at 03:41 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,466
+**Total Items:** 3,574
 
 ```
 .
@@ -128,6 +128,7 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── analysis.ts
 │   │   │   │   │   ├── analytics.ts
+│   │   │   │   │   ├── api.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── dashboard/
@@ -159,6 +160,7 @@
 │   │   │   │   │   ├── bills-dashboard-page.tsx
 │   │   │   │   │   └── BillsPortalPage.tsx
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── cache.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── pagination.ts
@@ -244,11 +246,15 @@
 │   │   │   │   │   ├── useCommunity.ts
 │   │   │   │   │   ├── useCommunityIntegration.ts
 │   │   │   │   │   ├── useDiscussion.ts
-│   │   │   │   │   └── useLegislativeBrief.ts
+│   │   │   │   │   ├── useLegislativeBrief.ts
+│   │   │   │   │   ├── useRealtime.ts
+│   │   │   │   │   ├── useUnifiedCommunity.ts
+│   │   │   │   │   └── useUnifiedDiscussion.ts
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── comments.tsx
 │   │   │   │   │   └── community-input.tsx
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── backend.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── store/
@@ -342,9 +348,14 @@
 │   │   │   │   └── pages/
 │   │   │   │       └── onboarding.tsx
 │   │   │   ├── pretext-detection/
+│   │   │   │   ├── api/
+│   │   │   │   │   └── pretext-detection-api.ts
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── use-safe-query.ts
-│   │   │   │   │   └── usePretextAnalysis.ts
+│   │   │   │   │   ├── usePretextAnalysis.ts
+│   │   │   │   │   └── usePretextDetectionApi.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── PretextDetectionPage.tsx
 │   │   │   │   ├── services/
 │   │   │   │   │   └── PretextAnalysisService.ts
 │   │   │   │   ├── ui/
@@ -360,9 +371,22 @@
 │   │   │   │       └── privacy-center.tsx
 │   │   │   ├── realtime/
 │   │   │   │   ├── model/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── realtime-optimizer.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── recommendation/
+│   │   │   │   ├── api/
+│   │   │   │   │   └── recommendation-api.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useRecommendations.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── PersonalizedRecommendationsWidget.tsx
+│   │   │   │   │   ├── RecommendationCard.tsx
+│   │   │   │   │   ├── RecommendationList.tsx
+│   │   │   │   │   ├── RecommendationWidget.tsx
+│   │   │   │   │   ├── SimilarBillsWidget.tsx
+│   │   │   │   │   └── TrendingBillsWidget.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── search/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── useIntelligentSearch.ts
@@ -371,6 +395,7 @@
 │   │   │   │   ├── pages/
 │   │   │   │   │   └── UniversalSearchPage.tsx
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── intelligent-search.ts
 │   │   │   │   │   ├── search-api.ts
 │   │   │   │   │   └── streaming-search.ts
@@ -426,6 +451,7 @@
 │   │   │   │   │   └── UserProfilePage.tsx
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── achievements-service.ts
+│   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── auth-service.ts
 │   │   │   │   │   ├── dashboard-service.ts
 │   │   │   │   │   ├── engagement-service.ts
@@ -508,14 +534,11 @@
 │   │   │   │   │   ├── service.ts
 │   │   │   │   │   ├── shared-imports.ts
 │   │   │   │   │   └── sponsor.ts
-│   │   │   │   ├── analytics.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── authentication.ts
-│   │   │   │   ├── bills.ts
 │   │   │   │   ├── cache-manager.ts
 │   │   │   │   ├── circuit-breaker-monitor.ts
 │   │   │   │   ├── client.ts
-│   │   │   │   ├── community.ts
 │   │   │   │   ├── config.ts
 │   │   │   │   ├── contract-client.ts
 │   │   │   │   ├── errors.ts
@@ -526,10 +549,8 @@
 │   │   │   │   ├── privacy.ts
 │   │   │   │   ├── registry.ts
 │   │   │   │   ├── retry.ts
-│   │   │   │   ├── search.ts
 │   │   │   │   ├── serialization-interceptors.ts
 │   │   │   │   ├── system.ts
-│   │   │   │   ├── user.ts
 │   │   │   │   └── WEBSOCKET_API_README.md
 │   │   │   ├── asset-loading/
 │   │   │   │   ├── AssetLoadingProvider.tsx
@@ -597,13 +618,9 @@
 │   │   │   │   └── useCommandPalette.ts
 │   │   │   ├── community/
 │   │   │   │   ├── hooks/
-│   │   │   │   │   ├── useRealtime.ts
-│   │   │   │   │   ├── useUnifiedCommunity.ts
-│   │   │   │   │   └── useUnifiedDiscussion.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── moderation.service.ts
-│   │   │   │   │   ├── state-sync.service.ts
-│   │   │   │   │   └── websocket-manager.ts
+│   │   │   │   │   └── state-sync.service.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── dashboard/
@@ -778,6 +795,7 @@
 │   │   │   │   ├── hub.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── manager.ts
+│   │   │   │   ├── optimization.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── types.ts
 │   │   │   │   └── websocket-client.ts
@@ -1867,30 +1885,49 @@
 │   │   ├── MIGRATION_LOG.md
 │   │   ├── race-condition-analysis.md
 │   │   └── schema-domain-relationships.md
+│   ├── ADR-001-DDD-Feature-Structure.md
+│   ├── ADR-002-Facade-Pattern-For-Middleware.md
 │   ├── api-client-guide.md
+│   ├── ARCHITECTURE_100_PERCENT_COMPLETE_2026-02-24.md
+│   ├── ARCHITECTURE_FINAL_STATUS_2026-02-24.md
+│   ├── ARCHITECTURE_MIGRATION_2026-02-24.md
+│   ├── ARCHITECTURE_MIGRATION_COMPLETE_2026-02-24.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
 │   ├── CLEANUP_EXECUTIVE_SUMMARY.md
+│   ├── CLEANUP_SUMMARY_2026-02-24.md
 │   ├── cleanup-verification-checklist.md
+│   ├── client-src-consistency-analysis.md
 │   ├── CONSOLIDATION_VISUAL_MAP.md
 │   ├── deprecated-cleanup-summary.md
 │   ├── deprecated-directories-cleanup.md
+│   ├── DEVELOPER_GUIDE_Feature_Creation.md
+│   ├── FINAL_CLEANUP_2026-02-24.md
+│   ├── FSD_IMPORT_GUIDE.md
+│   ├── INTERNAL_CONSISTENCY_ANALYSIS_2026-02-24.md
+│   ├── MIGRATION_COMPLETE_2026-02-24.md
+│   ├── MIGRATION_STATUS_2026-02-24.md
 │   ├── migration-examples.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
 │   ├── PHASE_1_3_COMPLETION.md
 │   ├── project-structure-analysis.md
 │   ├── project-structure.md
+│   ├── README_ARCHITECTURE_DOCS.md
 │   ├── ROUTING_EXPLANATION.md
+│   ├── SCHEMA_CIRCULAR_DEPENDENCY_FIX.md
 │   ├── scripts-cleanup-completion.md
 │   ├── scripts-cleanup-summary.md
 │   ├── scripts-tools-cleanup-implementation.md
 │   ├── scripts-tools-strategic-analysis.md
 │   ├── scripts-tools-strategic-audit.md
-│   ├── specs-plans-action-plan.md
-│   ├── specs-plans-evaluation.md
-│   ├── specs-plans-executive-summary.md
+│   ├── SERVER_MIGRATION_2026-02-24.md
+│   ├── SERVER_PHASE2_MIGRATION_2026-02-24.md
+│   ├── server-consistency-analysis.md
+│   ├── server-strategic-implementation-audit.md
+│   ├── specs-plans-obsolete-assessment.md
 │   ├── specs-plans-relevance-assessment.md
-│   └── STRATEGIC_ARCHITECTURE_ANALYSIS.md
+│   ├── STRATEGIC_ARCHITECTURE_ANALYSIS.md
+│   └── strategic-implementation-audit.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -1927,8 +1964,10 @@
 │   ├── LEGACY_MIGRATION_ARCHIVE.md
 │   └── legacy_migration_validation.sql
 ├── plans/
-│   ├── design.md
-│   └── requirements.md
+│   └── archived/
+│       ├── design-obsolete-2026-02.md
+│       ├── OBSOLETE.md
+│       └── requirements-obsolete-2026-02.md
 ├── playwright-report/
 │   └── index.html
 ├── reports/
@@ -2082,6 +2121,14 @@
 │   │   │   ├── ledger.controller.ts
 │   │   │   └── ledger.service.ts
 │   │   ├── admin/
+│   │   │   ├── application/
+│   │   │   │   ├── admin.routes.ts
+│   │   │   │   ├── content-moderation.routes.ts
+│   │   │   │   ├── external-api-dashboard.routes.ts
+│   │   │   │   └── system.routes.ts
+│   │   │   ├── domain/
+│   │   │   │   └── moderation-service.ts
+│   │   │   ├── infrastructure/
 │   │   │   ├── moderation/
 │   │   │   │   ├── content-analysis.service.ts
 │   │   │   │   ├── index.ts
@@ -2091,12 +2138,7 @@
 │   │   │   │   ├── moderation-queue.service.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── admin-router.ts
-│   │   │   ├── admin.ts
-│   │   │   ├── content-moderation.ts
-│   │   │   ├── external-api-dashboard.ts
-│   │   │   ├── index.ts
-│   │   │   ├── moderation.ts
-│   │   │   └── system.ts
+│   │   │   └── index.ts
 │   │   ├── advocacy/
 │   │   │   ├── application/
 │   │   │   │   ├── action-coordinator.ts
@@ -2175,6 +2217,11 @@
 │   │   │   ├── analysis.routes.ts
 │   │   │   └── architecture-analysis-report.md
 │   │   ├── analytics/
+│   │   │   ├── application/
+│   │   │   │   ├── analytics.routes.ts
+│   │   │   │   ├── dashboard.routes.ts
+│   │   │   │   ├── engagement-analytics.routes.ts
+│   │   │   │   └── transparency-dashboard.routes.ts
 │   │   │   ├── config/
 │   │   │   │   ├── analytics.config.ts
 │   │   │   │   ├── ml-feature-flag.config.ts
@@ -2197,6 +2244,11 @@
 │   │   │   ├── docs/
 │   │   │   │   ├── automation-setup.md
 │   │   │   │   └── ml-service-migration-summary.md
+│   │   │   ├── domain/
+│   │   │   │   ├── conflict-detection.service.ts
+│   │   │   │   ├── legal-analysis.service.ts
+│   │   │   │   ├── ml-analysis.service.ts
+│   │   │   │   └── regulatory-change-monitoring.service.ts
 │   │   │   ├── financial-disclosure/
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── anomaly-detection.service.ts
@@ -2209,6 +2261,9 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── monitoring.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── performance-dashboard.ts
+│   │   │   │   └── swagger.ts
 │   │   │   ├── middleware/
 │   │   │   │   ├── analytics-context.ts
 │   │   │   │   └── performance-tracking.ts
@@ -2239,17 +2294,7 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── ml.ts
 │   │   │   │   └── progress-storage.d.ts
-│   │   │   ├── analytics.ts
-│   │   │   ├── conflict-detection.ts
-│   │   │   ├── dashboard.ts
-│   │   │   ├── engagement-analytics.ts
-│   │   │   ├── index.ts
-│   │   │   ├── legal-analysis.ts
-│   │   │   ├── ml-analysis.ts
-│   │   │   ├── performance-dashboard.ts
-│   │   │   ├── regulatory-change-monitoring.ts
-│   │   │   ├── swagger.ts
-│   │   │   └── transparency-dashboard.ts
+│   │   │   └── index.ts
 │   │   ├── argument-intelligence/
 │   │   │   ├── application/
 │   │   │   │   ├── argument-intelligence-service.ts
@@ -2393,6 +2438,19 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── index.ts
 │   │   │   └── README.md
+│   │   ├── feature-flags/
+│   │   │   ├── application/
+│   │   │   │   ├── controller.ts
+│   │   │   │   ├── middleware.ts
+│   │   │   │   └── routes.ts
+│   │   │   ├── domain/
+│   │   │   │   ├── service.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   └── repository.ts
+│   │   │   ├── index.ts
+│   │   │   ├── README.md
+│   │   │   └── verify-implementation.ts
 │   │   ├── government-data/
 │   │   │   ├── application/
 │   │   │   │   └── managed-integration.service.ts
@@ -2432,9 +2490,19 @@
 │   │   │   ├── index.ts
 │   │   │   └── README.md
 │   │   ├── monitoring/
-│   │   │   └── application/
-│   │   │       └── api-cost-monitoring.service.ts
+│   │   │   ├── application/
+│   │   │   │   └── monitoring.routes.ts
+│   │   │   ├── domain/
+│   │   │   │   ├── alerting.service.ts
+│   │   │   │   └── integration-monitor.service.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   └── metrics-middleware.ts
+│   │   │   ├── index.ts
+│   │   │   └── README.md
 │   │   ├── notifications/
+│   │   │   ├── application/
+│   │   │   │   ├── notification-orchestrator.ts
+│   │   │   │   └── notification-scheduler.ts
 │   │   │   ├── domain/
 │   │   │   │   └── entities/
 │   │   │   │       └── notification.ts
@@ -2442,13 +2510,37 @@
 │   │   │   ├── index.ts
 │   │   │   ├── notification-router.ts
 │   │   │   └── notification-service.ts
+│   │   ├── pretext-detection/
+│   │   │   ├── application/
+│   │   │   │   ├── pretext-detection.controller.ts
+│   │   │   │   ├── pretext-detection.routes.ts
+│   │   │   │   └── pretext-detection.service.ts
+│   │   │   ├── domain/
+│   │   │   │   ├── pretext-analysis.service.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── pretext-cache.ts
+│   │   │   │   ├── pretext-health-check.ts
+│   │   │   │   └── pretext-repository.ts
+│   │   │   ├── scripts/
+│   │   │   │   └── register-feature.ts
+│   │   │   ├── API.md
+│   │   │   ├── IMPLEMENTATION_SUMMARY.md
+│   │   │   ├── index.ts
+│   │   │   ├── INTEGRATION_COMPLETE.md
+│   │   │   └── README.md
 │   │   ├── privacy/
-│   │   │   ├── privacy-routes.ts
-│   │   │   ├── privacy-scheduler.ts
-│   │   │   └── privacy-service.ts
+│   │   │   ├── application/
+│   │   │   │   ├── privacy-scheduler.ts
+│   │   │   │   └── privacy.routes.ts
+│   │   │   ├── domain/
+│   │   │   │   └── privacy-service.ts
+│   │   │   ├── infrastructure/
+│   │   │   └── index.ts
 │   │   ├── recommendation/
 │   │   │   ├── application/
 │   │   │   │   ├── EngagementTracker.ts
+│   │   │   │   ├── recommendation.routes.ts
 │   │   │   │   └── RecommendationService.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── EngagementScorer.ts
@@ -2458,8 +2550,17 @@
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── RecommendationCache.ts
 │   │   │   │   └── RecommendationRepository.ts
+│   │   │   ├── scripts/
+│   │   │   │   └── register-monitoring.ts
+│   │   │   ├── API.md
+│   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
-│   │   │   └── RecommendationController.ts
+│   │   │   ├── README.md
+│   │   │   ├── RecommendationController.ts
+│   │   │   └── TASK-1.5-COMPLETION-SUMMARY.md
+│   │   ├── regulatory-monitoring/
+│   │   │   ├── index.ts
+│   │   │   └── regulatory-monitoring.routes.ts
 │   │   ├── safeguards/
 │   │   │   ├── application/
 │   │   │   │   ├── cib-detection-service.ts
@@ -2515,6 +2616,8 @@
 │   │   │   ├── index.ts
 │   │   │   └── SearchController.ts
 │   │   ├── security/
+│   │   │   ├── services/
+│   │   │   │   └── data-privacy-service.ts
 │   │   │   ├── encryption-service.ts
 │   │   │   ├── index.ts
 │   │   │   ├── intrusion-detection-service.ts
@@ -2682,6 +2785,8 @@
 │   │   │   ├── types.ts
 │   │   │   └── utilities.ts
 │   │   ├── database/
+│   │   │   ├── base/
+│   │   │   │   └── BaseStorage.ts
 │   │   │   ├── core/
 │   │   │   │   ├── config.ts
 │   │   │   │   ├── connection-manager.ts
@@ -2689,6 +2794,8 @@
 │   │   │   │   ├── health-monitor.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-config.ts
+│   │   │   ├── docs/
+│   │   │   │   └── schema-validation.md
 │   │   │   ├── graph/
 │   │   │   │   ├── analytics/
 │   │   │   │   │   ├── advanced-analytics.ts
@@ -2744,6 +2851,9 @@
 │   │   │   │   │   └── test-harness.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── REFACTORING_SUMMARY.md
+│   │   │   ├── migrations/
+│   │   │   │   ├── 20260224_feature_flags.sql
+│   │   │   │   └── 20260224_pretext_detection.sql
 │   │   │   ├── persistence/
 │   │   │   │   ├── drizzle/
 │   │   │   │   │   ├── drizzle-bill-repository.ts
@@ -2806,9 +2916,7 @@
 │   │   │   ├── index.ts
 │   │   │   ├── notification_integration_guide.md
 │   │   │   ├── notification-channels.ts
-│   │   │   ├── notification-orchestrator.ts
 │   │   │   ├── notification-routes.ts
-│   │   │   ├── notification-scheduler.ts
 │   │   │   ├── notification-service.ts
 │   │   │   ├── notifications.ts
 │   │   │   ├── refactored_summary.md
@@ -2834,9 +2942,16 @@
 │   │   │   ├── security/
 │   │   │   │   ├── security-event-logger.ts
 │   │   │   │   └── security-policy.ts
+│   │   │   ├── api-cost-monitoring.service.ts
 │   │   │   ├── database-logger.ts
 │   │   │   ├── index.ts
 │   │   │   └── logging-config.ts
+│   │   ├── privacy/
+│   │   │   ├── index.ts
+│   │   │   └── privacy-facade.ts
+│   │   ├── safeguards/
+│   │   │   ├── index.ts
+│   │   │   └── safeguards-facade.ts
 │   │   ├── schema/
 │   │   │   ├── domains/
 │   │   │   │   ├── citizen-participation.ts
@@ -2859,10 +2974,12 @@
 │   │   │   ├── enum.ts
 │   │   │   ├── ERROR_FIXES_GUIDE.md
 │   │   │   ├── expert_verification.ts
+│   │   │   ├── feature_flags.ts
 │   │   │   ├── foundation.ts
 │   │   │   ├── graph_sync.ts
 │   │   │   ├── impact_measurement.ts
 │   │   │   ├── index.ts
+│   │   │   ├── integration_monitoring.ts
 │   │   │   ├── integration-extended.ts
 │   │   │   ├── integration.ts
 │   │   │   ├── integrity_operations.ts
@@ -2887,7 +3004,6 @@
 │   │   │   ├── validation-integration.ts
 │   │   │   └── websocket.ts
 │   │   ├── security/
-│   │   │   ├── data-privacy-service.ts
 │   │   │   ├── input-validation-service.ts
 │   │   │   └── secure-query-builder.ts
 │   │   ├── validation/
@@ -2983,7 +3099,6 @@
 │   │   ├── service-availability.ts
 │   │   └── validation-middleware.ts
 │   ├── routes/
-│   │   └── regulatory-monitoring.ts
 │   ├── scripts/
 │   │   ├── analyze-module-errors.ts
 │   │   ├── api-race-condition-detector.ts
@@ -3009,15 +3124,7 @@
 │   │   ├── verify-external-api-management.ts
 │   │   └── websocket-performance-validation.ts
 │   ├── services/
-│   │   └── README-schema-validation.md
 │   ├── storage/
-│   │   ├── base.ts
-│   │   ├── bill-storage-with-transformers.example.ts
-│   │   ├── bill-storage.ts
-│   │   ├── index.ts
-│   │   ├── README.md
-│   │   ├── user-storage-with-transformers.example.ts
-│   │   └── user-storage.ts
 │   ├── tests/
 │   │   ├── integration/
 │   │   │   ├── websocket-backward-compatibility.test.ts
@@ -3048,7 +3155,7 @@
 │   │   ├── api.ts
 │   │   ├── common.ts
 │   │   ├── index.ts
-│   │   ├── jest-extensions.d.ts
+│   │   ├── vitest-extensions.d.ts
 │   │   └── shared-schema-short.d.ts
 │   ├── utils/
 │   │   ├── analytics-controller-wrapper.ts
@@ -3470,6 +3577,7 @@
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json
+├── tsconfig.tsbuildinfo
 ├── vitest.setup.ts
 └── vitest.workspace.ts
 ```

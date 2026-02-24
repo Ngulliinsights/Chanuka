@@ -3,7 +3,7 @@
 // Configures Vitest for React Testing Library with jsdom environment
 // =============================================================================
 
-import '@testing-library/jest-dom/vitest';
+import '@testing-library/vitest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import * as React from 'react';
 import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest';
@@ -12,10 +12,10 @@ import { expect, afterEach, beforeAll, afterAll, vi } from 'vitest';
 global.React = React;
 
 // =============================================================================
-// JEST-DOM MATCHERS
+// vitest-DOM MATCHERS
 // =============================================================================
 
-// DOM matchers are automatically extended with '@testing-library/jest-dom/vitest'
+// DOM matchers are automatically extended with '@testing-library/vitest-dom/vitest'
 
 // =============================================================================
 // GLOBAL TEST CLEANUP

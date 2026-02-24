@@ -68,7 +68,7 @@
     },
 
     // Type Definitions
-    "types": ["vite/client", "node"],
+    "types": ["vite/client", "vitest/globals", "@testing-library/vitest-dom", "node"],
     "typeRoots": ["./node_modules/@types", "../@types"]
   },
 
@@ -79,14 +79,6 @@
     "dist",
     "src/.cleanup-backup/**/*",
     "src/.design-system-backup/**/*",
-    "src/utils/archive/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "src/__tests__/**/*.test.ts",
-    "src/__tests__/**/*.test.tsx",
-    "src/__tests__/**/*.spec.ts",
-    "src/__tests__/**/*.spec.tsx"
+    "src/utils/archive/**/*"
   ]
 }

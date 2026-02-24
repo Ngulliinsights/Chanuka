@@ -53,6 +53,14 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
     section: 'tools',
   },
   {
+    id: 'pretext-detection',
+    label: 'Pretext Detection',
+    path: '/pretext-detection',
+    href: '/pretext-detection',
+    icon: 'Shield',
+    section: 'tools',
+  },
+  {
     id: 'dashboard',
     label: 'Dashboard',
     path: '/dashboard',

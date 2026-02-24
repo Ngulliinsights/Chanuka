@@ -63,7 +63,7 @@ const CONFIG = {
     exclude: [
         'node_modules', 'dist', 'build', '.git', 'coverage', '.next', 
         '__tests__', '__mocks__', '.test.', '.spec.', '.d.ts',
-        'jest.config', 'next.config', 'vite.config', 'rollup.config'
+        'vitest.config', 'next.config', 'vite.config', 'rollup.config'
     ],
     
     // Type safety thresholds

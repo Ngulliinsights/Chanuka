@@ -376,6 +376,14 @@ export class CommentService {
 
       const userInfo = await this.getUserInfo(data.user_id);
 
+      // Process comment through argument intelligence pipeline (async, non-blocking)
+      this.processCommentArguments(newComment, userInfo).catch((error) =>
+        logger.error('Error processing comment arguments', {
+          error,
+          context: { comment_id: newComment.id, bill_id: data.bill_id },
+        }),
+      );
+
       this.clearCommentCaches(data.bill_id).catch((error) =>
         logger.error('Error clearing comment caches after create', {
           error,
@@ -399,6 +407,71 @@ export class CommentService {
         context: { bill_id: data.bill_id },
       });
       return this.createFallbackComment(data);
+    }
+  }
+
+  /**
+   * Process comment through argument intelligence pipeline
+   * This runs asynchronously and doesn't block comment creation
+   */
+  private async processCommentArguments(
+    comment: typeof comments.$inferSelect,
+    userInfo: Awaited<ReturnType<typeof this.getUserInfo>>,
+  ): Promise<void> {
+    const startTime = Date.now();
+
+    try {
+      // Dynamically import to avoid circular dependencies
+      const { argumentIntelligenceService } = await import('@server/features/argument-intelligence');
+
+      // Build user demographics from profile
+      const userDemographics = userInfo.user_profiles
+        ? {
+            expertise: userInfo.user_profiles.expertise,
+            organization: userInfo.user_profiles.organization,
+            reputation_score: userInfo.user_profiles.reputation_score,
+          }
+        : undefined;
+
+      // Process the comment
+      const result = await argumentIntelligenceService.processComment({
+        text: comment.content,
+        billId: String(comment.bill_id),
+        userId: comment.user_id,
+        commentId: String(comment.id),
+        userDemographics,
+        submissionContext: {
+          commentType: comment.commentType,
+          parentId: comment.parent_id ? String(comment.parent_id) : undefined,
+          timestamp: comment.created_at,
+        },
+      });
+
+      const processingTime = Date.now() - startTime;
+
+      logger.info('Comment processed through argument intelligence', {
+        component: 'CommentService',
+        context: {
+          comment_id: comment.id,
+          bill_id: comment.bill_id,
+          processingTime,
+          claimsExtracted: result.claimsExtracted,
+          evidenceFound: result.evidenceFound,
+          position: result.position,
+        },
+      });
+    } catch (error) {
+      const processingTime = Date.now() - startTime;
+
+      // Log but don't throw - argument processing is supplementary
+      logger.error('Failed to process comment arguments', {
+        error,
+        component: 'CommentService',
+        context: {
+          comment_id: comment.id,
+          processingTime,
+        },
+      });
     }
   }
 

@@ -127,7 +127,7 @@ chanuka-platform/
 - **Backend**: Node.js, Express, TypeScript, Drizzle ORM
 - **Database**: PostgreSQL
 - **Monorepo**: PNPM Workspaces, Nx
-- **Testing**: Vitest, Playwright, Jest
+- **Testing**: Vitest, Playwright, vitest
 - **Deployment**: Docker, Kubernetes
 
 ## Development Workflow
@@ -322,7 +322,7 @@ describe('BillCard', () => {
   });
 
   it('calls onClick when clicked', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vitest.fn();
     render(<BillCard bill={mockBill} onClick={mockOnClick} />);
 
     fireEvent.click(screen.getByRole('button'));

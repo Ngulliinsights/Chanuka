@@ -4,7 +4,7 @@
 // Tests schema integration with standardized type system
 // Verifies branded types, validation, and type exports
 
-import { describe, it, expect, beforeAll } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@vitest/globals';
 import {
   // Foundation exports
   users,

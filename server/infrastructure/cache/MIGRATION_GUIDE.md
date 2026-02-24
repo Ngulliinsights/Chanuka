@@ -441,8 +441,8 @@ import { CacheService } from './core/interfaces';
 **Solution:**
 ```typescript
 // Update mocks to use new imports
-jest.mock('./factory', () => ({
-  createSimpleCacheService: jest.fn()
+vitest.mock('./factory', () => ({
+  createSimpleCacheService: vitest.fn()
 }));
 ```
 

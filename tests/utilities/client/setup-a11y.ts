@@ -1,15 +1,15 @@
 /**
  * Accessibility Testing Setup for Chanuka Client UI
  * 
- * This file configures jest-axe for automated accessibility testing
+ * This file configures vitest-axe for automated accessibility testing
  * to ensure WCAG 2.1 AA compliance as required by REQ-PA-002
  */
 
-import '@testing-library/jest-dom';
+import '@testing-library/vitest-dom';
 import { configure } from '@testing-library/react';
-import { toHaveNoViolations } from 'jest-axe';
+import { toHaveNoViolations } from 'vitest-axe';
 
-// Extend Jest matchers with accessibility assertions
+// Extend vitest matchers with accessibility assertions
 expect.extend(toHaveNoViolations);
 
 // Configure React Testing Library for accessibility

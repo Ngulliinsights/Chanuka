@@ -247,7 +247,7 @@ export const testConfig: AppConfig = {
   },
 };
 
-// Test suite for test configuration (commented out to avoid Jest type errors)
+// Test suite for test configuration (commented out to avoid vitest type errors)
 // describe('Test Config', () => {
 //   it('should export testConfig', () => {
 //     expect(testConfig).toBeDefined();

@@ -118,6 +118,10 @@ const WorkaroundAnalysisPage = createLazyComponent(
   () => import('@client/features/analysis/pages/WorkaroundAnalysisPage'),
   'Workaround Analysis'
 );
+const PretextDetectionPage = createLazyComponent(
+  () => import('@client/features/pretext-detection/pages/PretextDetectionPage'),
+  'Pretext Detection'
+);
 
 interface RouteConfig {
   path: string;
@@ -460,6 +464,13 @@ const routes: RouteConfig[] = [
     id: 'workaround-analysis',
     path: '/workarounds',
     element: <WorkaroundAnalysisPage />,
+  },
+
+  // Pretext Detection
+  {
+    id: 'pretext-detection',
+    path: '/pretext-detection',
+    element: <PretextDetectionPage />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility

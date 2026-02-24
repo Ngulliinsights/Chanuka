@@ -1199,7 +1199,7 @@ describe('${pascalName}UI Component', () => {
   });
 
   it('should call onError when error occurs', () => {
-    const onError = jest.fn();
+    const onError = vitest.fn();
     const error = ComponentTestHelper.createMockError();
     const props = ComponentTestHelper.createMockProps({ error, onError });
     
@@ -1210,7 +1210,7 @@ describe('${pascalName}UI Component', () => {
   });
 
   it('should call onSuccess when operation succeeds', () => {
-    const onSuccess = jest.fn();
+    const onSuccess = vitest.fn();
     const props = ComponentTestHelper.createMockProps({ onSuccess });
     
     render(<${pascalName}UI {...props} />);
@@ -1252,7 +1252,7 @@ describe('use${pascalName} Hook', () => {
   });
 
   it('should call onError when error occurs', async () => {
-    const onError = jest.fn();
+    const onError = vitest.fn();
     const { result } = renderHook(() => use${pascalName}({ onError }));
     
     // Trigger error condition
@@ -1265,7 +1265,7 @@ describe('use${pascalName} Hook', () => {
   });
 
   it('should call onSuccess when operation succeeds', async () => {
-    const onSuccess = jest.fn();
+    const onSuccess = vitest.fn();
     const { result } = renderHook(() => use${pascalName}({ onSuccess }));
     
     // Trigger success condition

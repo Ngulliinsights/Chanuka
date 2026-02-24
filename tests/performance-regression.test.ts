@@ -10,7 +10,7 @@
  * and validates improvements from optimization work.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, beforeAll, afterAll } from '@vitest/globals';
 import PerformanceProfiler from '@/scripts/profiling-suite';
 import QueryAnalyzer from '@/scripts/query-analyzer';
 import PerformanceValidator from '@/scripts/performance-validator';

@@ -68,8 +68,8 @@ const TestWrapper: React.FC<{ children: React.ReactNode; store?: any; initialPat
 );
 
 // Mock useLocation to return controlled pathname
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+vitest.mock('react-router-dom', () => ({
+  ...vitest.requireActual('react-router-dom'),
   useLocation: () => ({
     pathname: '/bills/123',
     search: '',
@@ -347,7 +347,7 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should use custom generator when provided', () => {
-    const customGenerator = jest.fn((pathname: string) => [
+    const customGenerator = vitest.fn((pathname: string) => [
       { label: 'Custom Home', path: '/', is_active: false },
       { label: 'Custom Page', path: pathname, is_active: true },
     ]);

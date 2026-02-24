@@ -5,7 +5,7 @@
  * that test complete user workflows and API interactions
  */
 
-import '@testing-library/jest-dom/vitest';
+import '@testing-library/vitest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';

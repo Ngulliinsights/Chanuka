@@ -1,0 +1,293 @@
+{
+  "timestamp": "2026-02-24T13:50:41.519Z",
+  "typeAlignment": {
+    "passed": true,
+    "errors": [],
+    "warnings": [
+      {
+        "type": "MISSING_TYPE",
+        "entity": "users",
+        "message": "No corresponding type definition found for table users"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "user_profiles",
+        "message": "No corresponding type definition found for table user_profiles"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "sponsors",
+        "message": "No corresponding type definition found for table sponsors"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "governors",
+        "message": "No corresponding type definition found for table governors"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "committees",
+        "message": "No corresponding type definition found for table committees"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "committee_members",
+        "message": "No corresponding type definition found for table committee_members"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "parliamentary_sessions",
+        "message": "No corresponding type definition found for table parliamentary_sessions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "parliamentary_sittings",
+        "message": "No corresponding type definition found for table parliamentary_sittings"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bills",
+        "message": "No corresponding type definition found for table bills"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "county_bill_assents",
+        "message": "No corresponding type definition found for table county_bill_assents"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "oauth_providers",
+        "message": "No corresponding type definition found for table oauth_providers"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "user_sessions",
+        "message": "No corresponding type definition found for table user_sessions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "oauth_tokens",
+        "message": "No corresponding type definition found for table oauth_tokens"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "user_interests",
+        "message": "No corresponding type definition found for table user_interests"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "sessions",
+        "message": "No corresponding type definition found for table sessions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "comments",
+        "message": "No corresponding type definition found for table comments"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "comment_votes",
+        "message": "No corresponding type definition found for table comment_votes"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_votes",
+        "message": "No corresponding type definition found for table bill_votes"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_engagement",
+        "message": "No corresponding type definition found for table bill_engagement"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_tracking_preferences",
+        "message": "No corresponding type definition found for table bill_tracking_preferences"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "notifications",
+        "message": "No corresponding type definition found for table notifications"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "alert_preferences",
+        "message": "No corresponding type definition found for table alert_preferences"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "user_contact_methods",
+        "message": "No corresponding type definition found for table user_contact_methods"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_committee_assignments",
+        "message": "No corresponding type definition found for table bill_committee_assignments"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_amendments",
+        "message": "No corresponding type definition found for table bill_amendments"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_versions",
+        "message": "No corresponding type definition found for table bill_versions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_readings",
+        "message": "No corresponding type definition found for table bill_readings"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "parliamentary_votes",
+        "message": "No corresponding type definition found for table parliamentary_votes"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "bill_cosponsors",
+        "message": "No corresponding type definition found for table bill_cosponsors"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "public_participation_events",
+        "message": "No corresponding type definition found for table public_participation_events"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "public_submissions",
+        "message": "No corresponding type definition found for table public_submissions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "public_hearings",
+        "message": "No corresponding type definition found for table public_hearings"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "rateLimits",
+        "message": "No corresponding type definition found for table rateLimits"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "rateLimitConfig",
+        "message": "No corresponding type definition found for table rateLimitConfig"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "contentFlags",
+        "message": "No corresponding type definition found for table contentFlags"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "moderationQueue",
+        "message": "No corresponding type definition found for table moderationQueue"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "moderationDecisions",
+        "message": "No corresponding type definition found for table moderationDecisions"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "moderationAppeals",
+        "message": "No corresponding type definition found for table moderationAppeals"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "expertModeratorEligibility",
+        "message": "No corresponding type definition found for table expertModeratorEligibility"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "cibDetections",
+        "message": "No corresponding type definition found for table cibDetections"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "behavioralAnomalies",
+        "message": "No corresponding type definition found for table behavioralAnomalies"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "suspiciousActivityLogs",
+        "message": "No corresponding type definition found for table suspiciousActivityLogs"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "reputationScores",
+        "message": "No corresponding type definition found for table reputationScores"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "reputationHistory",
+        "message": "No corresponding type definition found for table reputationHistory"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "identityVerification",
+        "message": "No corresponding type definition found for table identityVerification"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "deviceFingerprints",
+        "message": "No corresponding type definition found for table deviceFingerprints"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "safeguardConfigAudit",
+        "message": "No corresponding type definition found for table safeguardConfigAudit"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "emergencySafeguardMode",
+        "message": "No corresponding type definition found for table emergencySafeguardMode"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "rateLimitWhitelist",
+        "message": "No corresponding type definition found for table rateLimitWhitelist"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "rateLimitBlacklist",
+        "message": "No corresponding type definition found for table rateLimitBlacklist"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "moderationPriorityRules",
+        "message": "No corresponding type definition found for table moderationPriorityRules"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "appealReviewBoard",
+        "message": "No corresponding type definition found for table appealReviewBoard"
+      },
+      {
+        "type": "MISSING_TYPE",
+        "entity": "safeguardMetrics",
+        "message": "No corresponding type definition found for table safeguardMetrics"
+      }
+    ],
+    "timestamp": "2026-02-24T13:50:41.488Z"
+  },
+  "apiContractCompatibility": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "timestamp": "2026-02-24T13:50:41.513Z"
+  },
+  "validationSchemaConsistency": {
+    "passed": true,
+    "errors": [],
+    "warnings": [],
+    "timestamp": "2026-02-24T13:50:41.518Z"
+  },
+  "overallPassed": true,
+  "summary": {
+    "totalErrors": 0,
+    "totalWarnings": 53,
+    "criticalIssues": []
+  }
+}

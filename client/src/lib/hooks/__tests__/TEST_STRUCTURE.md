@@ -8,17 +8,17 @@ This document outlines the comprehensive test structure for all hooks in the sta
 ### Unit Tests (`__tests__/unit/`)
 - **Purpose**: Test individual hook functionality in isolation
 - **Coverage**: Each hook should have corresponding unit tests
-- **Framework**: Jest/Vitest with React Testing Library
+- **Framework**: vitest/Vitest with React Testing Library
 
 ### Integration Tests (`__tests__/integration/`)
 - **Purpose**: Test hook interactions and FSD integration
 - **Coverage**: Cross-hook communication and FSD compatibility
-- **Framework**: Jest/Vitest with React Testing Library
+- **Framework**: vitest/Vitest with React Testing Library
 
 ### Performance Tests (`__tests__/performance/`)
 - **Purpose**: Test memory leaks, render performance, and optimization
 - **Coverage**: Memory management, render optimization, memoization
-- **Framework**: Jest with performance monitoring utilities
+- **Framework**: vitest with performance monitoring utilities
 
 ## Test Coverage Requirements
 
@@ -64,7 +64,7 @@ describe('useExampleReducer', () => {
 ```typescript
 describe('useExampleCallback', () => {
   it('should memoize expensive computations', () => {
-    const expensiveFn = jest.fn();
+    const expensiveFn = vitest.fn();
     const { result } = renderHook(() => useExampleCallback({ data: [], filters: {} }));
     
     // First call
@@ -94,28 +94,28 @@ describe('useExampleCallback', () => {
 ```typescript
 describe('useExampleEffect', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    vitest.useFakeTimers();
   });
   
   afterEach(() => {
-    jest.useRealTimers();
+    vitest.useRealTimers();
   });
   
   it('should execute effect after delay', () => {
-    const mockEffect = jest.fn();
+    const mockEffect = vitest.fn();
     renderHook(() => useExampleEffect({ immediate: false }));
     
     expect(mockEffect).not.toHaveBeenCalled();
     
     act(() => {
-      jest.advanceTimersByTime(1000);
+      vitest.advanceTimersByTime(1000);
     });
     
     expect(mockEffect).toHaveBeenCalled();
   });
   
   it('should cleanup on unmount', () => {
-    const cleanupFn = jest.fn();
+    const cleanupFn = vitest.fn();
     const { unmount } = renderHook(() => useExampleEffect());
     
     unmount();
@@ -172,7 +172,7 @@ describe('useStrategyManager', () => {
 ```typescript
 describe('useErrorHandler', () => {
   it('should handle errors with retry logic', async () => {
-    const mockOperation = jest.fn()
+    const mockOperation = vitest.fn()
       .mockRejectedValueOnce(new Error('First failure'))
       .mockResolvedValue('success');
     
@@ -224,7 +224,7 @@ describe('Memory Management', () => {
 ```typescript
 describe('Render Performance', () => {
   it('should not cause excessive re-renders', () => {
-    const renderSpy = jest.fn();
+    const renderSpy = vitest.fn();
     
     function TestComponent() {
       renderSpy();

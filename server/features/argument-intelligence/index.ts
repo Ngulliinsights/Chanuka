@@ -19,6 +19,11 @@ export { argumentIntelligenceService } from './application/argument-intelligence
 export { SentenceClassifier } from './infrastructure/nlp/sentence-classifier';
 export { EntityExtractor } from './infrastructure/nlp/entity-extractor';
 export { SimilarityCalculator } from './infrastructure/nlp/similarity-calculator';
+export { SentimentAnalyzer } from './infrastructure/nlp/sentiment-analyzer';
+export { QualityMetricsCalculator } from './infrastructure/nlp/quality-metrics';
+
+// Infrastructure - Cache
+export { NLPCache, NLPCacheManager, nlpCacheManager } from './infrastructure/cache/nlp-cache';
 
 // Presentation
 export { argumentIntelligenceRouter } from './presentation/argument-intelligence-router';
@@ -101,4 +106,20 @@ export type {
   SimilarityConfig
 } from './infrastructure/nlp/similarity-calculator';
 
+export type {
+  SentimentResult,
+  SentimentConfig
+} from './infrastructure/nlp/sentiment-analyzer';
+
+export type {
+  QualityMetrics,
+  DebateQualityMetrics,
+  QualityConfig
+} from './infrastructure/nlp/quality-metrics';
+
+export type {
+  CacheConfig,
+  CacheEntry,
+  CacheStats
+} from './infrastructure/cache/nlp-cache';
 

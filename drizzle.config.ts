@@ -15,6 +15,7 @@ export default defineConfig({
     "./server/infrastructure/schema/citizen_participation.ts",
     "./server/infrastructure/schema/parliamentary_process.ts",
     "./server/infrastructure/schema/safeguards.ts",
+    "./server/infrastructure/schema/feature_flags.ts",
     "./server/infrastructure/schema/enum.ts"
   ],
   dialect: "postgresql",

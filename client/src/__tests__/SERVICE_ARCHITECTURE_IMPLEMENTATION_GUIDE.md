@@ -550,59 +550,59 @@ export function initializeServices(): void {
  */
 
 export class MockServiceFactory {
-  static createMockAuthService(): jest.Mocked<IAuthService> {
+  static createMockAuthService(): vitest.Mocked<IAuthService> {
     return {
-      login: jest.fn(),
-      logout: jest.fn(),
-      getCurrentUser: jest.fn(),
-      refreshToken: jest.fn(),
-      validateToken: jest.fn(),
+      login: vitest.fn(),
+      logout: vitest.fn(),
+      getCurrentUser: vitest.fn(),
+      refreshToken: vitest.fn(),
+      validateToken: vitest.fn(),
     };
   }
 
-  static createMockUserProfileService(): jest.Mocked<IUserProfileService> {
+  static createMockUserProfileService(): vitest.Mocked<IUserProfileService> {
     return {
-      getProfile: jest.fn(),
-      updateProfile: jest.fn(),
-      deleteProfile: jest.fn(),
-      uploadAvatar: jest.fn(),
+      getProfile: vitest.fn(),
+      updateProfile: vitest.fn(),
+      deleteProfile: vitest.fn(),
+      uploadAvatar: vitest.fn(),
     };
   }
 
-  static createMockCacheService(): jest.Mocked<ICacheService> {
+  static createMockCacheService(): vitest.Mocked<ICacheService> {
     return {
-      get: jest.fn(),
-      set: jest.fn(),
-      delete: jest.fn(),
-      clear: jest.fn(),
-      invalidate: jest.fn(),
-      getStats: jest.fn(),
+      get: vitest.fn(),
+      set: vitest.fn(),
+      delete: vitest.fn(),
+      clear: vitest.fn(),
+      invalidate: vitest.fn(),
+      getStats: vitest.fn(),
     };
   }
 
-  static createMockApiService(): jest.Mocked<IApiService> {
+  static createMockApiService(): vitest.Mocked<IApiService> {
     return {
-      get: jest.fn(),
-      post: jest.fn(),
-      put: jest.fn(),
-      delete: jest.fn(),
-      patch: jest.fn(),
+      get: vitest.fn(),
+      post: vitest.fn(),
+      put: vitest.fn(),
+      delete: vitest.fn(),
+      patch: vitest.fn(),
     };
   }
 
-  static createMockLogger(): jest.Mocked<ILogger> {
+  static createMockLogger(): vitest.Mocked<ILogger> {
     return {
-      info: jest.fn(),
-      warn: jest.fn(),
-      error: jest.fn(),
-      debug: jest.fn(),
+      info: vitest.fn(),
+      warn: vitest.fn(),
+      error: vitest.fn(),
+      debug: vitest.fn(),
     };
   }
 }
 
 export abstract class ServiceTestBase<T> {
   protected service: T;
-  protected mocks: Record<string, jest.Mocked<unknown>> = {};
+  protected mocks: Record<string, vitest.Mocked<unknown>> = {};
 
   protected abstract createService(): T;
   protected abstract setupMocks(): void;
@@ -613,7 +613,7 @@ export abstract class ServiceTestBase<T> {
   }
 
   protected afterEach(): void {
-    jest.clearAllMocks();
+    vitest.clearAllMocks();
     ServiceFactory.clearInstances();
   }
 

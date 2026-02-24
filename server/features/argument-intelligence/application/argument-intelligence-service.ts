@@ -1,4 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
+import { performanceMonitor } from '@server/infrastructure/observability/monitoring';
 import { db } from '@server/infrastructure/database/pool';
 import {
   type Argument,
@@ -667,6 +668,283 @@ export class ArgumentIntelligenceService {
       });
       return fallback;
     }
+  }
+
+  // ============================================================================
+  // COMMENT PROCESSING
+  // ============================================================================
+
+  /**
+   * Process a comment through the argument intelligence pipeline
+   * This is the main entry point for real-time comment analysis
+   */
+  async processComment(request: {
+    text: string;
+    billId: string;
+    userId: string;
+    commentId?: string;
+    userDemographics?: {
+      expertise?: string[];
+      organization?: string | null;
+      reputation_score?: number | null;
+    };
+    submissionContext?: {
+      commentType?: string;
+      parentId?: string;
+      timestamp?: Date;
+    };
+  }): Promise<{
+    argumentId: string;
+    claimsExtracted: number;
+    evidenceFound: number;
+    position: string;
+    confidence: number;
+  }> {
+    const operationId = performanceMonitor.startOperation('argument-intelligence', 'processComment', {
+      billId: request.billId,
+      userId: request.userId,
+      textLength: request.text.length,
+    });
+
+    const logContext = {
+      component: 'ArgumentIntelligenceService',
+      operation: 'processComment',
+      billId: request.billId,
+      userId: request.userId,
+    };
+
+    logger.info('Processing comment through argument intelligence', logContext);
+
+    try {
+      // Store the argument with basic extraction
+      const argument = await this.storeArgument({
+        bill_id: request.billId,
+        user_id: request.userId,
+        comment_id: request.commentId,
+        argument_text: request.text,
+        argument_type: this.detectArgumentType(request.text),
+        position: this.detectPosition(request.text),
+        strength: this.calculateStrength(request.text),
+        confidence: this.calculateConfidence(request.text),
+        metadata: JSON.stringify({
+          userDemographics: request.userDemographics,
+          submissionContext: request.submissionContext,
+          processedAt: new Date().toISOString(),
+        }),
+      });
+
+      // Extract claims from the text
+      const extractedClaims = this.extractClaims(request.text);
+      const claims = await this.storeClaims(
+        extractedClaims.map((claim) => ({
+          argument_id: argument.id,
+          claim_text: claim.text,
+          claim_type: claim.type,
+          confidence: claim.confidence,
+          supporting_evidence: JSON.stringify(claim.evidence || []),
+        }))
+      );
+
+      // Extract evidence
+      const extractedEvidence = this.extractEvidence(request.text);
+      const evidence = await this.storeEvidence(
+        extractedEvidence.map((ev) => ({
+          claim_id: claims[0]?.id || argument.id, // Link to first claim or argument
+          evidence_text: ev.text,
+          evidence_type: ev.type,
+          source: ev.source,
+          verification_status: 'unverified',
+          credibility_score: ev.credibility,
+        }))
+      );
+
+      performanceMonitor.endOperation(operationId, true, {
+        claimsExtracted: claims.length,
+        evidenceFound: evidence.length,
+      });
+
+      logger.info('Comment processed successfully', {
+        ...logContext,
+        argumentId: argument.id,
+        claimsExtracted: claims.length,
+        evidenceFound: evidence.length,
+      });
+
+      return {
+        argumentId: argument.id,
+        claimsExtracted: claims.length,
+        evidenceFound: evidence.length,
+        position: argument.position,
+        confidence: argument.confidence,
+      };
+    } catch (error) {
+      performanceMonitor.endOperation(operationId, false, error as Error);
+
+      logger.error('Failed to process comment', {
+        ...logContext,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Detect argument type from text
+   */
+  private detectArgumentType(text: string): string {
+    const lowerText = text.toLowerCase();
+
+    if (lowerText.includes('evidence') || lowerText.includes('data') || lowerText.includes('study')) {
+      return 'evidence-based';
+    }
+    if (lowerText.includes('should') || lowerText.includes('must') || lowerText.includes('ought')) {
+      return 'normative';
+    }
+    if (lowerText.includes('because') || lowerText.includes('therefore') || lowerText.includes('thus')) {
+      return 'causal';
+    }
+    if (lowerText.includes('similar') || lowerText.includes('like') || lowerText.includes('compared')) {
+      return 'comparative';
+    }
+
+    return 'general';
+  }
+
+  /**
+   * Detect position from text
+   */
+  private detectPosition(text: string): string {
+    const lowerText = text.toLowerCase();
+
+    const supportWords = ['support', 'agree', 'favor', 'approve', 'endorse', 'beneficial', 'positive'];
+    const opposeWords = ['oppose', 'disagree', 'against', 'reject', 'harmful', 'negative', 'concern'];
+
+    const supportCount = supportWords.filter((word) => lowerText.includes(word)).length;
+    const opposeCount = opposeWords.filter((word) => lowerText.includes(word)).length;
+
+    if (supportCount > opposeCount) return 'support';
+    if (opposeCount > supportCount) return 'oppose';
+
+    return 'neutral';
+  }
+
+  /**
+   * Calculate argument strength
+   */
+  private calculateStrength(text: string): number {
+    let strength = 0.5; // Base strength
+
+    // Length factor (longer arguments tend to be more detailed)
+    if (text.length > 200) strength += 0.1;
+    if (text.length > 500) strength += 0.1;
+
+    // Evidence indicators
+    if (text.includes('evidence') || text.includes('data') || text.includes('study')) {
+      strength += 0.15;
+    }
+
+    // Reasoning indicators
+    if (text.includes('because') || text.includes('therefore') || text.includes('thus')) {
+      strength += 0.1;
+    }
+
+    // Source citations
+    if (text.includes('http') || text.includes('www') || text.includes('source:')) {
+      strength += 0.15;
+    }
+
+    return Math.min(strength, 1.0);
+  }
+
+  /**
+   * Calculate confidence score
+   */
+  private calculateConfidence(text: string): number {
+    let confidence = 0.6; // Base confidence
+
+    // Clear structure
+    if (text.split('.').length > 2) confidence += 0.1;
+
+    // Specific claims
+    if (text.includes('specifically') || text.includes('particularly')) {
+      confidence += 0.1;
+    }
+
+    // Hedging reduces confidence
+    if (text.includes('maybe') || text.includes('perhaps') || text.includes('might')) {
+      confidence -= 0.1;
+    }
+
+    return Math.max(0.1, Math.min(confidence, 1.0));
+  }
+
+  /**
+   * Extract claims from text
+   */
+  private extractClaims(text: string): Array<{
+    text: string;
+    type: string;
+    confidence: number;
+    evidence?: string[];
+  }> {
+    const claims: Array<{ text: string; type: string; confidence: number; evidence?: string[] }> = [];
+
+    // Split by sentences
+    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
+
+    for (const sentence of sentences) {
+      const trimmed = sentence.trim();
+      if (trimmed.length < 20) continue; // Skip very short sentences
+
+      claims.push({
+        text: trimmed,
+        type: this.detectArgumentType(trimmed),
+        confidence: this.calculateConfidence(trimmed),
+        evidence: [],
+      });
+    }
+
+    return claims;
+  }
+
+  /**
+   * Extract evidence from text
+   */
+  private extractEvidence(text: string): Array<{
+    text: string;
+    type: string;
+    source: string;
+    credibility: number;
+  }> {
+    const evidence: Array<{ text: string; type: string; source: string; credibility: number }> = [];
+
+    // Look for URLs
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = text.match(urlRegex) || [];
+
+    for (const url of urls) {
+      evidence.push({
+        text: `Source: ${url}`,
+        type: 'external_source',
+        source: url,
+        credibility: 0.7,
+      });
+    }
+
+    // Look for statistical claims
+    const numberRegex = /\d+(\.\d+)?%|\d+(\.\d+)?\s*(million|billion|thousand)/gi;
+    const numbers = text.match(numberRegex) || [];
+
+    if (numbers.length > 0) {
+      evidence.push({
+        text: `Statistical claim: ${numbers.join(', ')}`,
+        type: 'statistical',
+        source: 'user_provided',
+        credibility: 0.5,
+      });
+    }
+
+    return evidence;
   }
 
   /**

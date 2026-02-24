@@ -591,7 +591,7 @@ This architecture provides consistent error handling application-wide while allo
 
 ### Current State Challenge
 
-Your testing infrastructure demonstrates comprehensive coverage—unit tests, integration tests, end-to-end tests, performance tests, accessibility tests, and visual regression tests. However, separate configurations for each test type create operational complexity. You have multiple Vitest configurations, multiple Playwright configurations, and Jest configurations for accessibility testing. Running the full test suite requires executing multiple commands with different configurations.
+Your testing infrastructure demonstrates comprehensive coverage—unit tests, integration tests, end-to-end tests, performance tests, accessibility tests, and visual regression tests. However, separate configurations for each test type create operational complexity. You have multiple Vitest configurations, multiple Playwright configurations, and vitest configurations for accessibility testing. Running the full test suite requires executing multiple commands with different configurations.
 
 ### Unified Testing Architecture
 

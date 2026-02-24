@@ -15,6 +15,7 @@ import { BriefViewer } from '@client/features/bills/ui/legislative-brief';
 import { ActionPromptCard } from '@client/features/bills/ui/action-prompts';
 import { PlainLanguageView } from '@client/features/bills/ui/translation';
 import { ImpactCalculator } from '@client/features/bills/ui/impact';
+import { SimilarBillsWidget } from '@client/features/recommendation';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 import { useQuery } from '@tanstack/react-query';
@@ -178,6 +179,11 @@ export default function BillDetail() {
           <BillCommunityTab bill={bill} />
         </TabsContent>
       </Tabs>
+
+      {/* Similar Bills Widget */}
+      <div className="mt-8">
+        <SimilarBillsWidget billId={bill.id} limit={5} />
+      </div>
     </div>
   );
 }

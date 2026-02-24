@@ -1022,7 +1022,7 @@ describe('BillCard', () => {
   
   it('calls onSave when save button clicked', () => {
     const bill = createMockBill();
-    const onSave = jest.fn();
+    const onSave = vitest.fn();
     const { getByRole } = render(<BillCard bill={bill} onSave={onSave} />);
     
     fireEvent.click(getByRole('button', { name: /save/i }));

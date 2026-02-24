@@ -175,16 +175,16 @@ function BillTracker({ billId }) {
 
 ```typescript
 // ❌ Old mock
-jest.mock('../hooks/use-websocket', () => ({
-  useWebSocket: jest.fn(() => ({ isConnected: true })),
+vitest.mock('../hooks/use-websocket', () => ({
+  useWebSocket: vitest.fn(() => ({ isConnected: true })),
 }));
 
 // ✅ New mock
-jest.mock('@client/infrastructure/realtime', () => ({
-  useBillTracking: jest.fn(() => ({
+vitest.mock('@client/infrastructure/realtime', () => ({
+  useBillTracking: vitest.fn(() => ({
     isConnected: true,
-    subscribeToBill: jest.fn(),
-    getBillUpdates: jest.fn(() => []),
+    subscribeToBill: vitest.fn(),
+    getBillUpdates: vitest.fn(() => []),
   })),
 }));
 ```

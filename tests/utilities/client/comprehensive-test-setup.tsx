@@ -403,7 +403,7 @@ export const VisualTestUtils = {
 
 declare global {
   namespace Vi {
-    interface JestAssertion<T = any> {
+    interface vitestAssertion<T = any> {
       toBeAccessible(): T;
       toHavePerformantRender(): T;
       toMeetCoreWebVitals(): T;

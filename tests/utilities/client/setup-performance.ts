@@ -5,7 +5,7 @@
  * including Core Web Vitals measurement and load testing
  */
 
-import '@testing-library/jest-dom/vitest';
+import '@testing-library/vitest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import * as React from 'react';
 import { expect, afterEach, beforeAll, afterAll, vi, beforeEach } from 'vitest';

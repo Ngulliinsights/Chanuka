@@ -9,7 +9,7 @@ import { useErrorRecovery } from '../../useErrorRecovery';
 
 describe('useErrorRecovery', () => {
   beforeEach(() => {
-    jest.clearAllTimers();
+    vitest.clearAllTimers();
   });
 
   it('should initialize with default recovery state', () => {

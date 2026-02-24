@@ -267,11 +267,11 @@ const result = await myFacade.doSomething(params);
 ### Testing Strategy
 ```typescript
 // Test middleware with mocked facade
-jest.mock('@server/infrastructure/safeguards', () => ({
+vitest.mock('@server/infrastructure/safeguards', () => ({
   safeguardsFacade: {
-    checkRateLimit: jest.fn(),
-    queueForModeration: jest.fn(),
-    logSuspiciousActivity: jest.fn()
+    checkRateLimit: vitest.fn(),
+    queueForModeration: vitest.fn(),
+    logSuspiciousActivity: vitest.fn()
   }
 }));
 

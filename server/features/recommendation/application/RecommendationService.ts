@@ -1,17 +1,16 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase } from '@server/infrastructure/database';
-import { RecommendationEngine } from '@shared/domain/RecommendationEngine';
-import { RecommendationValidator } from '@shared/domain/RecommendationValidator';
-import { RecommendationCache } from '@shared/infrastructure/RecommendationCache';
-import { RecommendationRepository } from '@shared/infrastructure/RecommendationRepository';
+import { readDatabase } from '@server/infrastructure/database/connection';
+import { RecommendationEngine } from '../domain/RecommendationEngine';
+import { RecommendationValidator } from '../domain/RecommendationValidator';
+import { RecommendationRepository } from '../infrastructure/RecommendationRepository';
 import {
   type Bill,
   bill_engagement,
-  bill_tags,
   bills,
   user_interests,
 } from '@server/infrastructure/schema';
-import { and, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 /**
  * Recommendation Service
@@ -21,20 +20,6 @@ import { and, desc, eq, inArray, or, SQL,sql } from 'drizzle-orm';
  * and content-based approaches to generate relevant recommendations.
  */
 export class RecommendationService {
-  // Consistent engagement scoring weights across the service
-  private readonly SCORING_WEIGHTS = {
-    VIEW: 0.1,
-    COMMENT: 0.5,
-    SHARE: 0.3,
-    // Status weights for bill prioritization
-    STATUS_INTRODUCED: 2.0,
-    STATUS_COMMITTEE: 1.5,
-    STATUS_OTHER: 1.0,
-    // Collaborative filtering weights
-    COLLABORATIVE_DECAY: 0.8, // Reduces weight for distant user similarities
-    MINIMUM_SIMILARITY: 0.3, // Minimum similarity threshold for recommendations
-  } as const;
-
   // Cache for frequently accessed data to reduce database hits
   private readonly cache = new Map<string, { data: any; timestamp: number }>();
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache lifetime
@@ -77,19 +62,20 @@ export class RecommendationService {
    * @param user_id - The ID of the user
    * @returns Promise resolving to array of interest strings
    */
-  private async getUserInterests(user_id: string): Promise<string[]> { const cacheKey = `user_interests_${user_id }`;
+  private async getUserInterests(user_id: string): Promise<string[]> {
+    const cacheKey = `user_interests_${user_id}`;
 
     return this.getCachedData(cacheKey, async () => {
-  try {
-  const database = readDatabase;
-  const interests = await database
-        .select({ interest: user_interests.interest })
-        .from(user_interests)
-        .where(eq(user_interests.user_id, user_id));
+      try {
+        const db = readDatabase as unknown as NodePgDatabase<any>;
+        const interests = await db
+          .select({ interest: user_interests.interest })
+          .from(user_interests)
+          .where(eq(user_interests.user_id, user_id));
 
         return interests.map((i: { interest: string }) => i.interest);
       } catch (error) {
-        logger.error('Error getting user interests:', { component: 'Chanuka' }, error);
+        logger.error({ error }, 'Error getting user interests');
         return [];
       }
     });
@@ -102,48 +88,23 @@ export class RecommendationService {
    * @param user_id - The ID of the user
    * @returns Promise resolving to array of bill IDs
    */
-  private async getUserEngagedBillIds(user_id: string): Promise<number[]> { const cacheKey = `user_engaged_bills_${user_id }`;
+  private async getUserEngagedBillIds(user_id: string): Promise<number[]> {
+    const cacheKey = `user_engaged_bills_${user_id}`;
 
-    return this.getCachedData(cacheKey, async () => { try {
-  const database = readDatabase;
-        const userEngagement = await database
-          .select({ bill_id: bill_engagement.bill_id  })
+    return this.getCachedData(cacheKey, async () => {
+      try {
+        const db = readDatabase as unknown as NodePgDatabase<any>;
+        const userEngagement = await db
+          .select({ bill_id: bill_engagement.bill_id })
           .from(bill_engagement)
           .where(eq(bill_engagement.user_id, user_id));
 
-        return userEngagement.map((e: { bill_id: number  }) => e.bill_id);
+        return userEngagement.map((e: { bill_id: number }) => e.bill_id);
       } catch (error) {
-        logger.error('Error getting user engagement:', { component: 'Chanuka' }, error);
+        logger.error({ error }, 'Error getting user engagement');
         return [];
       }
     });
-  }
-
-  /**
-   * Enhanced bill score calculation with more sophisticated weighting
-   * This creates a SQL expression that considers bill status, engagement metrics,
-   * and recency to compute a composite score for ranking bills.
-   * 
-   * Note: We don't use type parameters on the sql template tag as Drizzle
-   * infers types from usage context automatically.
-   * 
-   * @returns SQL expression for bill score calculation
-   */
-  private getBillScoreExpression() {
-    return sql`
-      CASE
-        WHEN ${bills.status} = 'introduced' THEN ${this.SCORING_WEIGHTS.STATUS_INTRODUCED}
-        WHEN ${bills.status} = 'committee' THEN ${this.SCORING_WEIGHTS.STATUS_COMMITTEE}
-        ELSE ${this.SCORING_WEIGHTS.STATUS_OTHER}
-      END *
-      (COALESCE(${bills.view_count}, 0) * ${this.SCORING_WEIGHTS.VIEW} +
-       COALESCE(${bills.share_count}, 0) * ${this.SCORING_WEIGHTS.SHARE} +
-       CASE
-         WHEN ${bills.created_at} > NOW() - INTERVAL '7 days' THEN 1.2
-         WHEN ${bills.created_at} > NOW() - INTERVAL '30 days' THEN 1.1
-         ELSE 1.0
-       END)
-    `;
   }
 
   /**
@@ -195,12 +156,12 @@ export class RecommendationService {
       );
 
       // Transform to expected format
-      return candidates.map(candidate => ({
+      return candidates.map((candidate: { bill: Bill; score: number }) => ({
         ...candidate.bill,
         score: candidate.score,
       }));
     } catch (error) {
-      logger.error('Error getting personalized recommendations:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting personalized recommendations');
       // Return empty array rather than throwing to prevent cascade failures
       return [];
     }
@@ -243,12 +204,12 @@ export class RecommendationService {
       );
 
       // Transform to expected format
-      return similarBills.map(item => ({
+      return similarBills.map((item: { bill: Bill; similarityScore: number }) => ({
         ...item.bill,
         similarityScore: item.similarityScore,
       }));
     } catch (error) {
-      logger.error('Error getting similar bills:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting similar bills');
       return [];
     }
   }
@@ -290,12 +251,12 @@ export class RecommendationService {
       );
 
       // Transform to expected format
-      return trendingBills.map(item => ({
+      return trendingBills.map((item: { bill: Bill; trendScore: number }) => ({
         ...item.bill,
         trendScore: item.trendScore,
       }));
     } catch (error) {
-      logger.error('Error getting trending bills:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting trending bills');
       return [];
     }
   }
@@ -344,32 +305,9 @@ export class RecommendationService {
         sanitizedEngagementType
       );
     } catch (error) {
-      logger.error('Error tracking engagement:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error tracking engagement');
       throw error; // Re-throw to allow caller to handle
     }
-  }
-
-  /**
-   * Calculate engagement score with consistent weights
-   * This provides a standardized way to compute how engaged users are with bills.
-   * 
-   * @private
-   */
-  private calculateEngagementScore(
-    view_count: number,
-    comment_count: number,
-    share_count: number,
-  ): number {
-    // Add null safety and ensure non-negative values
-    const safeViewCount = Math.max(0, view_count || 0);
-    const safeCommentCount = Math.max(0, comment_count || 0);
-    const safeShareCount = Math.max(0, share_count || 0);
-
-    return (
-      safeViewCount * this.SCORING_WEIGHTS.VIEW +
-      safeCommentCount * this.SCORING_WEIGHTS.COMMENT +
-      safeShareCount * this.SCORING_WEIGHTS.SHARE
-    );
   }
 
   /**
@@ -394,11 +332,8 @@ export class RecommendationService {
       const sanitizedUserId = RecommendationValidator.sanitizeUserId(user_id);
       const sanitizedLimit = RecommendationValidator.sanitizeLimit(limit);
 
-      // Get user's interests and engagement history
-      const [user_interests, userEngagedBillIds] = await Promise.all([
-        this.getUserInterests(sanitizedUserId),
-        this.getUserEngagedBillIds(sanitizedUserId),
-      ]);
+      // Get user's interests
+      const user_interests = await this.getUserInterests(sanitizedUserId);
 
       // Get similar users and their engagement data
       const similarUsersEngagements = await this.getSimilarUsersEngagements(
@@ -419,12 +354,12 @@ export class RecommendationService {
       );
 
       // Transform to expected format
-      return collaborativeRecommendations.map(item => ({
+      return collaborativeRecommendations.map((item: { bill: Bill; score: number }) => ({
         ...item.bill,
         score: item.score,
       }));
     } catch (error) {
-      logger.error('Error getting collaborative recommendations:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting collaborative recommendations');
       return [];
     }
   }
@@ -436,20 +371,22 @@ export class RecommendationService {
    * 
    * @private
    */
-  private async getRecentUserActivity(user_id: string): Promise<Array<{ bill_id: number;
+  private async getRecentUserActivity(user_id: string): Promise<Array<{
+    bill_id: number;
     engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
-   }>> { try {
+  }>> {
+    try {
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const database = readDatabase;
-      const activities = await database
+      const db = readDatabase as unknown as NodePgDatabase<any>;
+      const activities = await db
         .select({
           bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter - Drizzle infers types from context
           engagement_type: sql`CASE
-            WHEN ${bill_engagement.view_count } > 0 THEN 'view'
+            WHEN ${bill_engagement.view_count} > 0 THEN 'view'
             WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
             WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
@@ -466,12 +403,13 @@ export class RecommendationService {
         .orderBy(desc(bill_engagement.lastEngaged))
         .limit(50);
 
-      return activities.map(activity => ({ bill_id: activity.bill_id,
+      return activities.map((activity: any) => ({
+        bill_id: activity.bill_id,
         engagement_type: activity.engagement_type as 'view' | 'comment' | 'share',
         timestamp: activity.timestamp,
-       }));
+      }));
     } catch (error) {
-      logger.error('Error getting recent user activity:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting recent user activity');
       return [];
     }
   }
@@ -488,8 +426,8 @@ export class RecommendationService {
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-  const database = readDatabase;
-      const availableBills = await database
+      const db = readDatabase as unknown as NodePgDatabase<any>;
+      const availableBills = await db
         .select()
         .from(bills)
         .where(
@@ -501,9 +439,9 @@ export class RecommendationService {
         .orderBy(desc(bills.created_at))
         .limit(1000); // Reasonable limit for recommendation pool
 
-      return availableBills.map(bill => ({ ...bill })); // Ensure plain objects
+      return availableBills.map((bill: Bill) => ({ ...bill })); // Ensure plain objects
     } catch (error) {
-      logger.error('Error getting available bills for recommendation:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting available bills for recommendation');
       return [];
     }
   }
@@ -523,21 +461,22 @@ export class RecommendationService {
    * 
    * @private
    */
-  private async getEngagementDataForTrending(days: number): Promise<Array<{ bill_id: number;
+  private async getEngagementDataForTrending(days: number): Promise<Array<{
+    bill_id: number;
     engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
-   }>> { try {
+  }>> {
+    try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
-      // Fixed: Changed from db() to readDatabase() for consistency
-  const database = readDatabase;
-      const engagements = await database
+      const db = readDatabase as unknown as NodePgDatabase<any>;
+      const engagements = await db
         .select({
           bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter - Drizzle infers the type
           engagement_type: sql`CASE
-            WHEN ${bill_engagement.view_count } > 0 THEN 'view'
+            WHEN ${bill_engagement.view_count} > 0 THEN 'view'
             WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
             WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
@@ -549,12 +488,13 @@ export class RecommendationService {
         .orderBy(desc(bill_engagement.lastEngaged))
         .limit(5000); // Reasonable limit for trending calculation
 
-      return engagements.map(engagement => ({ bill_id: engagement.bill_id,
+      return engagements.map((engagement: any) => ({
+        bill_id: engagement.bill_id,
         engagement_type: engagement.engagement_type as 'view' | 'comment' | 'share',
         timestamp: engagement.timestamp,
-       }));
+      }));
     } catch (error) {
-      logger.error('Error getting engagement data for trending:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting engagement data for trending');
       return [];
     }
   }
@@ -572,30 +512,32 @@ export class RecommendationService {
   private async getSimilarUsersEngagements(
     user_id: string,
     interests: string[]
-  ): Promise<Array<{ user_id: string;
+  ): Promise<Array<{
+    user_id: string;
     bill_id: number;
     engagement_type: 'view' | 'comment' | 'share';
     timestamp: Date;
     similarityScore: number;
-    }>> { try {
+  }>> {
+    try {
       if (interests.length === 0) return [];
 
       const minSharedInterests = Math.max(1, Math.floor(interests.length * 0.4));
 
       // Step 1: Find similar users based on shared interests
-  const database = readDatabase;
-      const similarUsers = await database
+      const db = readDatabase as unknown as NodePgDatabase<any>;
+      const similarUsers = await db
         .select({
           user_id: user_interests.user_id,
           // Count shared interests without type parameter on sql
-          sharedInterests: sql`COUNT(DISTINCT ${user_interests.interest })`.as('shared_interests'),
+          sharedInterests: sql`COUNT(DISTINCT ${user_interests.interest})`.as('shared_interests'),
         })
         .from(user_interests)
         .where(
           and(
             // Use inArray helper instead of manual SQL join
             inArray(user_interests.interest, interests),
-            sql`${user_interests.user_id} != ${ user_id }`
+            sql`${user_interests.user_id} != ${user_id}`
           )
         )
         .groupBy(user_interests.user_id)
@@ -605,24 +547,25 @@ export class RecommendationService {
 
       if (similarUsers.length === 0) return [];
 
-      const similarUserIds = similarUsers.map(u => u.user_id);
+      const similarUserIds = similarUsers.map((u: any) => u.user_id);
       
       // Step 2: Calculate similarity scores in JavaScript (cleaner than complex SQL)
       // This maps each user ID to a score between 0 and 1 based on interest overlap
       const userSimilarityMap = new Map(
-        similarUsers.map(u => [
+        similarUsers.map((u: any) => [
           u.user_id, 
           Math.min(1.0, Number(u.sharedInterests) / interests.length)
         ])
       );
 
       // Step 3: Get engagement data for similar users
-      const engagements = await database
-        .select({ user_id: bill_engagement.user_id,
+      const engagements = await db
+        .select({
+          user_id: bill_engagement.user_id,
           bill_id: bill_engagement.bill_id,
           // Use sql template without type parameter
           engagement_type: sql`CASE
-            WHEN ${bill_engagement.view_count  } > 0 THEN 'view'
+            WHEN ${bill_engagement.view_count} > 0 THEN 'view'
             WHEN ${bill_engagement.comment_count} > 0 THEN 'comment'
             WHEN ${bill_engagement.share_count} > 0 THEN 'share'
             ELSE 'view'
@@ -634,14 +577,15 @@ export class RecommendationService {
         .limit(1000);
 
       // Step 4: Attach similarity scores to each engagement
-      return engagements.map(e => ({ user_id: e.user_id,
+      return engagements.map((e: any) => ({
+        user_id: e.user_id,
         bill_id: e.bill_id,
         engagement_type: e.engagement_type as 'view' | 'comment' | 'share',
         timestamp: e.timestamp,
         similarityScore: userSimilarityMap.get(e.user_id) || 0.5,
-        }));
+      }));
     } catch (error) {
-      logger.error('Error getting similar users engagements:', { component: 'Chanuka' }, error);
+      logger.error({ error }, 'Error getting similar users engagements');
       return [];
     }
   }
@@ -665,16 +609,18 @@ export class RecommendationService {
 export async function getPersonalizedRecommendations(
   user_id: string,
   limit: number = 10,
-): Promise<Array<Bill & { score: number }>> { const service = new RecommendationService();
+): Promise<Array<Bill & { score: number }>> {
+  const service = new RecommendationService();
   return service.getPersonalizedRecommendations(user_id, limit);
- }
+}
 
 export async function getSimilarBills(
   bill_id: number,
   limit: number = 5,
-): Promise<Array<Bill & { similarityScore: number }>> { const service = new RecommendationService();
+): Promise<Array<Bill & { similarityScore: number }>> {
+  const service = new RecommendationService();
   return service.getSimilarBills(bill_id, limit);
- }
+}
 
 export async function getTrendingBills(
   days: number = 7,
@@ -687,17 +633,19 @@ export async function getTrendingBills(
 export async function getCollaborativeRecommendations(
   user_id: string,
   limit: number = 10,
-): Promise<Array<Bill & { score: number }>> { const service = new RecommendationService();
+): Promise<Array<Bill & { score: number }>> {
+  const service = new RecommendationService();
   return service.getCollaborativeRecommendations(user_id, limit);
- }
+}
 
 export async function trackEngagement(
   user_id: string,
   bill_id: number,
   engagement_type: 'view' | 'comment' | 'share',
-): Promise<any> { const service = new RecommendationService();
+): Promise<any> {
+  const service = new RecommendationService();
   return service.trackEngagement(user_id, bill_id, engagement_type);
-  }
+}
 
 
 

@@ -647,6 +647,18 @@ export {
 } from "./integrity_operations";
 
 // ============================================================================
+// FEATURE FLAGS SCHEMA - Enhanced Feature Flag Management
+// ============================================================================
+export {
+  featureFlags,
+  featureFlagEvaluations,
+  featureFlagMetrics,
+  featureFlagsRelations,
+  featureFlagEvaluationsRelations,
+  featureFlagMetricsRelations
+} from "./feature_flags";
+
+// ============================================================================
 // SAFEGUARDS SCHEMA - Platform Protection & Integrity
 // ============================================================================
 export {
@@ -861,6 +873,24 @@ export {
 } from "./accountability_ledger";
 
 // ============================================================================
+// INTEGRATION MONITORING SCHEMA
+// ============================================================================
+export {
+  integrationFeatures,
+  featureMetrics,
+  healthChecks,
+  integrationAlerts,
+  alertRules,
+  integrationLogs,
+  integrationFeaturesRelations,
+  featureMetricsRelations,
+  healthChecksRelations,
+  integrationAlertsRelations,
+  alertRulesRelations,
+  integrationLogsRelations
+} from "./integration_monitoring";
+
+// ============================================================================
 // TYPE EXPORTS
 // ============================================================================
 
@@ -944,6 +974,16 @@ export type {
 
 // Analysis types
 export type { Analysis, NewAnalysis } from "./analysis";
+
+// Feature Flags types
+export type {
+  FeatureFlag,
+  NewFeatureFlag,
+  FeatureFlagEvaluation,
+  NewFeatureFlagEvaluation,
+  FeatureFlagMetric,
+  NewFeatureFlagMetric
+} from "./feature_flags";
 
 // Safeguards types
 export type {
@@ -1078,6 +1118,22 @@ export type {
   PromiseTracking,
   NewPromiseTracking
 } from "./accountability_ledger";
+
+// Integration Monitoring types
+export type {
+  IntegrationFeature,
+  NewIntegrationFeature,
+  FeatureMetric,
+  NewFeatureMetric,
+  HealthCheck,
+  NewHealthCheck,
+  IntegrationAlert,
+  NewIntegrationAlert,
+  AlertRule,
+  NewAlertRule,
+  IntegrationLog,
+  NewIntegrationLog
+} from "./integration_monitoring";
 
 // Trojan Bill Detection types
 export type {

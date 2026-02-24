@@ -10,7 +10,7 @@ import { useToast } from '../../use-toast';
 describe('useToast', () => {
   beforeEach(() => {
     // Clear any existing toasts
-    jest.clearAllTimers();
+    vitest.clearAllTimers();
   });
 
   it('should initialize with empty toasts array', () => {
@@ -60,7 +60,7 @@ describe('useToast', () => {
   });
 
   it('should remove toast after timeout', async () => {
-    jest.useFakeTimers();
+    vitest.useFakeTimers();
 
     const { result } = renderHook(() => useToast());
 
@@ -74,12 +74,12 @@ describe('useToast', () => {
 
     // Fast forward time
     act(() => {
-      jest.advanceTimersByTime(10000);
+      vitest.advanceTimersByTime(10000);
     });
 
     expect(result.current.toasts).toHaveLength(0);
 
-    jest.useRealTimers();
+    vitest.useRealTimers();
   });
 
   it('should update toast when update() is called', () => {

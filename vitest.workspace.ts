@@ -183,7 +183,7 @@ export default defineWorkspace([
   },
 
   // ============================================================================
-  // CLIENT ACCESSIBILITY TESTS (migrated from Jest)
+  // CLIENT ACCESSIBILITY TESTS (migrated from vitest)
   // ============================================================================
   {
     name: 'client-a11y',

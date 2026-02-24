@@ -45,7 +45,7 @@ The platform is built using modern web technologies optimized for performance, a
 - **Routing:** React Router with code splitting and lazy loading
 - **Component Library:** shadcn/ui for accessible, customizable components
 - **Real-time:** WebSocket middleware for live updates
-- **Testing:** Jest and React Testing Library with accessibility testing
+- **Testing:** vitest and React Testing Library with accessibility testing
 
 ### Development Workflow
 
@@ -244,15 +244,15 @@ describe('BillCard', () => {
   });
 
   it('displays bill title and urgency badge', () => {
-    render(<BillCard bill={mockBill} onSave={jest.fn()} onShare={jest.fn()} />);
+    render(<BillCard bill={mockBill} onSave={vitest.fn()} onShare={vitest.fn()} />);
 
     expect(screen.getByText('Test Bill')).toBeInTheDocument();
     expect(screen.getByText('high')).toBeInTheDocument();
   });
 
   it('calls onSave when save button is clicked', () => {
-    const onSave = jest.fn();
-    render(<BillCard bill={mockBill} onSave={onSave} onShare={jest.fn()} />);
+    const onSave = vitest.fn();
+    render(<BillCard bill={mockBill} onSave={onSave} onShare={vitest.fn()} />);
 
     fireEvent.click(screen.getByRole('button', { name: /save/i }));
 
@@ -261,7 +261,7 @@ describe('BillCard', () => {
 
   it('meets accessibility requirements', async () => {
     const { container } = render(
-      <BillCard bill={mockBill} onSave={jest.fn()} onShare={jest.fn()} />
+      <BillCard bill={mockBill} onSave={vitest.fn()} onShare={vitest.fn()} />
     );
 
     const results = await axe(container);

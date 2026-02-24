@@ -204,7 +204,7 @@ Task identifiers follow the pattern PHASE-COMPONENT-NUMBER (e.g., P1-AUTO-001) f
 
 **Subtasks:**
 1. **P1-AUTO-004a:** Implement test runner integration
-   - Build adapters for Jest (JavaScript), pytest (Python), JUnit (Java)
+   - Build adapters for vitest (JavaScript), pytest (Python), JUnit (Java)
    - Execute test suite and capture results
    - Parse test output into structured format
    - Identify failed tests with error messages
@@ -1162,7 +1162,7 @@ Task identifiers follow the pattern PHASE-COMPONENT-NUMBER (e.g., P1-AUTO-001) f
 - Pattern recognition algorithms
 - All data transformations and business logic
 
-**Tools:** Jest (JavaScript), pytest (Python), appropriate frameworks per language
+**Tools:** vitest (JavaScript), pytest (Python), appropriate frameworks per language
 
 ---
 
