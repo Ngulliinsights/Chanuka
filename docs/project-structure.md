@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 24, 2026 at 09:32 AM
+**Generated:** February 24, 2026 at 10:40 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,876
+**Total Items:** 3,466
 
 ```
 .
@@ -1617,7 +1617,6 @@
 │   ├── README.md
 │   ├── tailwind.config.ts
 │   ├── tsconfig.json
-│   ├── tsconfig.tsbuildinfo
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
@@ -1660,6 +1659,12 @@
 │   │   ├── CLIENT_OVERLAP_ANALYSIS.md
 │   │   └── data-flow-pipelines.md
 │   ├── archive/
+│   │   ├── orphan-analysis-2025/
+│   │   │   ├── INTEGRATION_ROADMAP.csv
+│   │   │   ├── ORPHAN_VALUE_ANALYSIS.md
+│   │   │   ├── orphan-evaluation-report.md
+│   │   │   ├── README.md
+│   │   │   └── TIER_1_INTEGRATION_STATUS.md
 │   │   ├── ACCESSIBILITY_AUDIT_STATUS.md
 │   │   ├── baseline_analysis.md
 │   │   ├── baseline_unused_exports.txt
@@ -1864,7 +1869,11 @@
 │   │   └── schema-domain-relationships.md
 │   ├── api-client-guide.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
+│   ├── CLEANUP_EXECUTIVE_SUMMARY.md
+│   ├── cleanup-verification-checklist.md
 │   ├── CONSOLIDATION_VISUAL_MAP.md
+│   ├── deprecated-cleanup-summary.md
+│   ├── deprecated-directories-cleanup.md
 │   ├── migration-examples.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
@@ -1872,6 +1881,15 @@
 │   ├── project-structure-analysis.md
 │   ├── project-structure.md
 │   ├── ROUTING_EXPLANATION.md
+│   ├── scripts-cleanup-completion.md
+│   ├── scripts-cleanup-summary.md
+│   ├── scripts-tools-cleanup-implementation.md
+│   ├── scripts-tools-strategic-analysis.md
+│   ├── scripts-tools-strategic-audit.md
+│   ├── specs-plans-action-plan.md
+│   ├── specs-plans-evaluation.md
+│   ├── specs-plans-executive-summary.md
+│   ├── specs-plans-relevance-assessment.md
 │   └── STRATEGIC_ARCHITECTURE_ANALYSIS.md
 ├── drizzle/
 │   ├── meta/
@@ -1998,409 +2016,44 @@
 │   │   ├── validate_imports.js
 │   │   ├── validator.mjs
 │   │   └── verify-exports.js
-│   ├── error-remediation/
-│   │   ├── core/
-│   │   │   ├── batch-processor.ts
-│   │   │   ├── error-analyzer.ts
-│   │   │   ├── fix-generator.ts
-│   │   │   ├── import-analyzer.ts
-│   │   │   ├── progress-tracker.ts
-│   │   │   ├── type-assertion-analyzer.ts
-│   │   │   └── type-validator.ts
-│   │   ├── docs/
-│   │   │   ├── phase-6-implementation-summary.md
-│   │   │   ├── TASK_10.2_SUMMARY.md
-│   │   │   └── task-10.2-implementation.md
-│   │   ├── reports/
-│   │   │   ├── checkpoint-3-verification.md
-│   │   │   ├── COMPLETION-REPORT.md
-│   │   │   ├── COMPLETION-SUMMARY.md
-│   │   │   ├── current-error-analysis.md
-│   │   │   ├── error-analysis-2026-02-06T12-47-44-408Z.json
-│   │   │   ├── FINAL-COMPLETION-REPORT.md
-│   │   │   ├── final-remediation-report.json
-│   │   │   ├── FINAL-REMEDIATION-REPORT.md
-│   │   │   ├── phase-1-2-completion-report.ts
-│   │   │   ├── phase-1-2-completion.md
-│   │   │   ├── phase-3-4-completion-report.json
-│   │   │   ├── phase-3-4-completion-report.txt
-│   │   │   ├── phase-3-progress.md
-│   │   │   ├── phase-4-interface-completion.md
-│   │   │   ├── PHASE1_SUMMARY.md
-│   │   │   ├── phase1-module-discovery.md
-│   │   │   ├── phase2-fix-generation.md
-│   │   │   ├── phase2-fixes.json
-│   │   │   ├── session-summary.md
-│   │   │   ├── TASK-17-FINAL-CHECKPOINT.md
-│   │   │   ├── TASK10_IMPLEMENTATION_SUMMARY.md
-│   │   │   └── TASK10.1_SUMMARY.md
-│   │   ├── scripts/
-│   │   │   ├── phase1-module-discovery.ts
-│   │   │   ├── phase2-generate-fixes.ts
-│   │   │   └── phase2-import-updates.ts
-│   │   ├── tests/
-│   │   │   ├── core/
-│   │   │   │   ├── error-analyzer.test.ts
-│   │   │   │   ├── fix-generator.test.ts
-│   │   │   │   ├── progress-tracker.test.ts
-│   │   │   │   └── type-validator.test.ts
-│   │   │   ├── integration/
-│   │   │   │   ├── phase-2-import-updates.integration.test.ts
-│   │   │   │   ├── phase-3-type-standardization.integration.test.ts
-│   │   │   │   ├── phase-4-interface-completion.integration.test.ts
-│   │   │   │   ├── phase-5-type-safety.test.ts
-│   │   │   │   └── phase-6-import-cleanup.integration.test.ts
-│   │   │   ├── properties/
-│   │   │   │   ├── batch-atomicity.property.test.ts
-│   │   │   │   ├── error-count-monotonicity.property.test.ts
-│   │   │   │   ├── id-type-analysis-consistency.property.test.ts
-│   │   │   │   ├── import-path-update-completeness.property.test.ts
-│   │   │   │   ├── migration-pattern-completeness.property.test.ts
-│   │   │   │   ├── module-location-discovery-accuracy.property.test.ts
-│   │   │   │   ├── type-annotation-completeness.test.ts
-│   │   │   │   ├── type-comparison-compatibility.test.ts
-│   │   │   │   └── type-consolidation-correctness.property.test.ts
-│   │   │   ├── reports/
-│   │   │   │   ├── backups/
-│   │   │   │   │   ├── backup-1770392055901/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── lib/
-│   │   │   │   │   ├── backup-1770392193915/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── lib/
-│   │   │   │   │   ├── backup-1770392607942/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── lib/
-│   │   │   │   │   ├── backup-1770439250540/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── core/
-│   │   │   │   │   ├── backup-1770506229485/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── core/
-│   │   │   │   │   ├── backup-1770547108334/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── core/
-│   │   │   │   │   ├── backup-1770554734162/
-│   │   │   │   │   │   └── src/
-│   │   │   │   │   │       └── core/
-│   │   │   │   │   ├── backup-1770940733622/
-│   │   │   │   │   ├── backup-1770940757538/
-│   │   │   │   │   ├── backup-1771159178508/
-│   │   │   │   │   ├── backup-1771159189490/
-│   │   │   │   │   ├── backup-1771174456229/
-│   │   │   │   │   ├── backup-1771174484537/
-│   │   │   │   │   ├── backup-1771183407430/
-│   │   │   │   │   ├── backup-1771183434096/
-│   │   │   │   │   ├── backup-1771259205622/
-│   │   │   │   │   ├── backup-1771259209696/
-│   │   │   │   │   ├── backup-1771264029865/
-│   │   │   │   │   ├── backup-1771264040665/
-│   │   │   │   │   ├── backup-1771265281812/
-│   │   │   │   │   ├── backup-1771265294174/
-│   │   │   │   │   ├── backup-1771266586925/
-│   │   │   │   │   ├── backup-1771266598469/
-│   │   │   │   │   ├── backup-1771282234723/
-│   │   │   │   │   ├── backup-1771282246610/
-│   │   │   │   │   ├── backup-1771413595262/
-│   │   │   │   │   ├── backup-1771413613080/
-│   │   │   │   │   ├── backup-1771427590389/
-│   │   │   │   │   ├── backup-1771427605079/
-│   │   │   │   │   ├── backup-1771428483064/
-│   │   │   │   │   ├── backup-1771428493700/
-│   │   │   │   │   ├── backup-1771488240065/
-│   │   │   │   │   ├── backup-1771488256065/
-│   │   │   │   │   ├── server/
-│   │   │   │   │   │   └── infrastructure/
-│   │   │   │   │   │       └── schema/
-│   │   │   │   │   └── shared/
-│   │   │   │   │       └── types/
-│   │   │   │   │           └── database/
-│   │   │   │   └── integration-tests/
-│   │   │   │       ├── batch-result-test.json
-│   │   │   │       ├── duplicate-types-test.json
-│   │   │   │       ├── final-duplicate-types-test.json
-│   │   │   │       ├── id-type-analysis-test.json
-│   │   │   │       ├── module-relocations-test.json
-│   │   │   │       ├── phase-2-integration-test-report.json
-│   │   │   │       ├── phase-3-batch-result-test.json
-│   │   │   │       ├── phase-3-integration-test-report.json
-│   │   │   │       ├── phase-6-file-comparison-test.json
-│   │   │   │       ├── phase-6-import-analysis-test.json
-│   │   │   │       ├── phase-6-initial-errors-test.json
-│   │   │   │       ├── phase-6-integration-test-report.json
-│   │   │   │       └── phase-6-type-locations-test.json
-│   │   │   ├── batch-processor.test.ts
-│   │   │   ├── progress-tracker.test.ts
-│   │   │   └── setup.ts
-│   │   ├── apply-import-updates.ts
-│   │   ├── apply-type-standardization.ts
-│   │   ├── config.ts
-│   │   ├── fix-all-errors.ts
-│   │   ├── fix-all-remaining.ts
-│   │   ├── fix-client-errors-batch1.ts
-│   │   ├── fix-enum-literal-types.ts
-│   │   ├── fix-explicit-types.ts
-│   │   ├── fix-final-31.ts
-│   │   ├── fix-interface-compatibility.ts
-│   │   ├── fix-last-12.ts
-│   │   ├── fix-module-resolution.ts
-│   │   ├── fix-phase-5-type-safety.ts
-│   │   ├── fix-remaining-errors.ts
-│   │   ├── fix-type-comparisons.ts
-│   │   ├── fix-undefined-safety.ts
-│   │   ├── generate-final-report.ts
-│   │   ├── generate-phase-3-4-report.ts
-│   │   ├── index.ts
-│   │   ├── package-lock.json
-│   │   ├── package.json
-│   │   ├── PHASE-6-COMPLETE.md
-│   │   ├── PHASE-6-README.md
-│   │   ├── postcss.config.js
-│   │   ├── README.md
-│   │   ├── run-analysis.ts
-│   │   ├── run-final-validation.ts
-│   │   ├── run-import-cleanup.ts
-│   │   ├── run-phase-6.ts
-│   │   ├── run-type-assertion-analysis.ts
-│   │   ├── SETUP.md
-│   │   ├── test-phase-6.ts
-│   │   ├── tsconfig.json
-│   │   ├── types.ts
-│   │   └── vitest.config.ts
 │   ├── seeds/
 │   │   ├── legislative-seed.ts
 │   │   ├── seed.ts
 │   │   └── simple-seed.ts
-│   ├── typescript-fixer/
-│   │   ├── src/
-│   │   │   ├── analyzers/
-│   │   │   │   ├── database-pattern-detector.ts
-│   │   │   │   ├── drizzle-pattern-detector.ts
-│   │   │   │   ├── import-path-resolver.ts
-│   │   │   │   ├── project-analyzer.ts
-│   │   │   │   ├── schema-import-detector.ts
-│   │   │   │   ├── schema-parser.ts
-│   │   │   │   ├── schema-table-analyzer.ts
-│   │   │   │   └── shared-core-utility-detector.ts
-│   │   │   ├── core/
-│   │   │   │   ├── error-extractor.ts
-│   │   │   │   └── typescript-program-loader.ts
-│   │   │   ├── fixers/
-│   │   │   │   ├── api-response-fixer.ts
-│   │   │   │   ├── database-connection-fixer.ts
-│   │   │   │   ├── exact-optional-property-fixer.ts
-│   │   │   │   ├── shared-core-import-fixer.ts
-│   │   │   │   └── unused-variable-cleaner.ts
-│   │   │   ├── formatters/
-│   │   │   │   └── error-message-formatter.ts
-│   │   │   ├── types/
-│   │   │   │   └── core.ts
-│   │   │   ├── validators/
-│   │   │   │   └── api-parameter-validator.ts
-│   │   │   ├── cli.ts
-│   │   │   └── index.ts
-│   │   ├── tests/
-│   │   │   ├── fixtures/
-│   │   │   │   ├── chanuka-edge-case-patterns.ts
-│   │   │   │   ├── chanuka-shared-core-patterns.ts
-│   │   │   │   ├── chanuka-unused-patterns.ts
-│   │   │   │   ├── chanuka-validation-patterns.ts
-│   │   │   │   ├── database-patterns.ts
-│   │   │   │   └── sample-chanuka-file.ts
-│   │   │   ├── global.d.ts
-│   │   │   └── setup.ts
-│   │   ├── jest.config.js
-│   │   ├── package-lock.json
-│   │   ├── package.json
-│   │   └── tsconfig.json
 │   ├── validation/
 │   │   └── audit-constraints.ts
 │   ├── accessibility-audit.js
-│   ├── add-react-imports.js
-│   ├── align-imports.ts
-│   ├── align-schema.ts
 │   ├── analyze-bundle.cjs
-│   ├── analyze-codebase-errors.ts
-│   ├── analyze-phase2.sh
-│   ├── analyzer.js
-│   ├── architecture_fixer.ts
-│   ├── audit-codebase-utilities.ts
-│   ├── audit-error-handling-sprawl.ts
-│   ├── audit-imports-exports.ts
-│   ├── audit-middleware-sprawl.ts
-│   ├── bulk-migrate-types.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── CHANUKA_MIGRATION_PLAN.md
-│   ├── check-table-structure.ts
-│   ├── check-tables.ts
 │   ├── check-thresholds.js
-│   ├── check-type-compatibility.ts
 │   ├── CLASSIFICATION.md
-│   ├── clean-shared-core-imports.ts
-│   ├── cleanup-deprecated-folders.ts
-│   ├── cleanup-legacy-adapters.js
-│   ├── cleanup-orphaned-files.ts
-│   ├── cleanup-redundant-utils.js
-│   ├── complete-fsd-migration.sh
-│   ├── complete-migrations.ts
-│   ├── complete-realignment.ts
-│   ├── complete-schema-fix.ts
-│   ├── consolidate-imports.ts
-│   ├── consolidate-redundant-implementations.ts
-│   ├── consolidate-sprawl.ts
-│   ├── database-analyzer.ts
-│   ├── demo-repository-deployment.ts
 │   ├── dependency-cruiser.js
-│   ├── deploy-error-handling.ts
-│   ├── deploy-phase1-utilities.ts
 │   ├── deploy-production.js
-│   ├── deploy-repository-migration.ts
-│   ├── deploy-search-optimization.ts
-│   ├── design-system-audit.js
-│   ├── diagnose-503-issues.js
 │   ├── domain-type-migration-plan.md
-│   ├── drop-schema.ts
-│   ├── dynamic-path-updater.js
 │   ├── enum-alignment-audit.md
-│   ├── execute-comprehensive-migration.ts
-│   ├── final-client-cleanup.sh
-│   ├── final-verification.ts
-│   ├── fix-all-imports.js
-│   ├── fix-all-shared-core-imports.ts
-│   ├── fix-api-response-calls.js
-│   ├── fix-client-issues.sh
-│   ├── fix-commented-imports.ts
 │   ├── fix-config.json
-│   ├── fix-database-service-calls.cjs
-│   ├── fix-design-system.ts
-│   ├── fix-display-names.ts
-│   ├── fix-error-components.sh
-│   ├── fix-error-fallback.ts
-│   ├── fix-eslint-easy-wins.ts
-│   ├── fix-eslint-remaining.ts
 │   ├── fix-eslint-suppressions.ts
-│   ├── fix-features-integration.ts
-│   ├── fix-frontend-imports.js
-│   ├── fix-graph-imports.ts
-│   ├── fix-import-paths.ts
-│   ├── fix-import-resolution.ts
-│   ├── fix-infrastructure-issues.ts
-│   ├── fix-js-extensions.ts
-│   ├── fix-lucide-imports.ts
-│   ├── fix-missing-exports.ts
-│   ├── fix-plural-singular-consistency.ts
-│   ├── fix-property-naming-consistency.ts
-│   ├── fix-remaining-api-calls.js
-│   ├── fix-remaining-client-issues.sh
-│   ├── fix-remaining-errors.ts
-│   ├── fix-remaining-imports.js
-│   ├── fix-remaining-types.js
-│   ├── fix-schema-imports.ts
-│   ├── fix-schema-references.ts
-│   ├── fix-server-logger-imports.js
-│   ├── fix-shared-core-imports.ts
-│   ├── fix-shared-folder.ts
-│   ├── fix-shared-imports.js
-│   ├── fix-shared-ui-bugs.sh
-│   ├── fix-shared-ui.sh
 │   ├── fix-templates.ts
-│   ├── fix-type-safety-advanced.ts
-│   ├── fix-type-safety-batch.ts
-│   ├── fix-type-safety-phase2.ts
-│   ├── fix-typescript-syntax-errors.ts
-│   ├── flatten-codebase.sh
-│   ├── functional_validator.js
 │   ├── generate-bundle-report.js
-│   ├── generate-comprehensive-migrations.ts
-│   ├── identify-any-usage.ts
-│   ├── identify-deprecated-files.cjs
-│   ├── identify-deprecated-files.js
-│   ├── identify-deprecated-files.ts
 │   ├── immediate-memory-cleanup.cjs
-│   ├── import-resolution-monitor.js
-│   ├── integrate-error-management.ts
-│   ├── integration-validator.ts
 │   ├── jscpd.json
 │   ├── knip.json
-│   ├── migrate_types.py
-│   ├── migrate-api-imports.js
-│   ├── migrate-codebase-utilities.ts
-│   ├── migrate-console-logs.ts
-│   ├── migrate-consolidated-imports.cjs
-│   ├── migrate-database-imports.ts
-│   ├── migrate-database-service-calls.ts
-│   ├── migrate-error-handling-api.ts
-│   ├── migrate-error-handling.ts
-│   ├── migrate-imports.js
-│   ├── migrate-logging.js
-│   ├── migrate-shared-types.ts
-│   ├── migrate-to-unified-websocket.ts
-│   ├── migrate-types.js
-│   ├── migrate-types.ts
-│   ├── migrate-utils-consolidation.ts
-│   ├── ml-service-demo.ts
+│   ├── LIFECYCLE.md
 │   ├── modern-project-analyzer.ts
-│   ├── nuanced-verification.ts
-│   ├── optimize-memory.js
 │   ├── performance-budget-enforcer.cjs
 │   ├── performance-regression-detector.js
 │   ├── performance-trend-analyzer.cjs
-│   ├── performance-validator.ts
-│   ├── phase2-analyze.js
-│   ├── phase2-migration-generator.sh
-│   ├── prepare-module-deletion.ts
-│   ├── production-readiness-check.ts
-│   ├── profiling-suite.ts
-│   ├── query-analyzer.ts
-│   ├── race-condition-analyzer.js
 │   ├── README.md
-│   ├── rollback-cleanup.ts
-│   ├── run-adapter-cleanup.js
-│   ├── runtime_diagnostics.js
-│   ├── runtime-dependency-check.js
 │   ├── scan-client-type-violations.ts
 │   ├── scan-eslint-suppressions.ts
-│   ├── scan-migration-artifacts.sh
-│   ├── scan-remaining-imports.js
 │   ├── scan-todos.ts
 │   ├── scan-type-violations.ts
 │   ├── setup-playwright.js
-│   ├── standardize-imports.ts
-│   ├── strategic-contrast-migration.js
-│   ├── test-consolidated-design-system.ts
-│   ├── test-design-system-architecture.ts
-│   ├── test-neo4j-integration.ts
 │   ├── track-progress.ts
-│   ├── update-core-imports.js
-│   ├── update-core-references.js
-│   ├── update-import-references.ts
-│   ├── update-imports-after-flatten.sh
-│   ├── update-infrastructure-imports.sh
-│   ├── validate_structure.ts
-│   ├── validate-client-codebase.js
-│   ├── validate-client-implementations.ts
-│   ├── validate-config-consistency.ts
-│   ├── validate-config.js
-│   ├── validate-design-system-final.ts
-│   ├── validate-design-system.ts
-│   ├── validate-fsd-migration.ts
-│   ├── validate-functional-validator.js
-│   ├── validate-imports.js
-│   ├── validate-migration-completion.ts
-│   ├── validate-new-domains.cjs
-│   ├── validate-property-naming.ts
-│   ├── validate-shared-folder.ts
-│   ├── validate-shared-ui.js
-│   ├── validate-syntax.ts
-│   ├── verify-and-fix-project-structure.ts
 │   ├── verify-api-contract-coverage.ts
-│   ├── verify-cleanup.ts
-│   ├── verify-consolidation.sh
-│   ├── verify-graph-refactoring.ts
 │   ├── verify-metrics.ts
-│   ├── verify-project-structure.ts
-│   ├── verify-security-patches.ts
 │   └── web-vitals-checker.js
 ├── server/
 │   ├── config/
@@ -3794,67 +3447,6 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
-├── tools/
-│   ├── codebase-health/
-│   │   ├── src/
-│   │   │   ├── analysis/
-│   │   │   │   └── AnalysisEngine.ts
-│   │   │   ├── classification/
-│   │   │   │   └── IssueClassifier.ts
-│   │   │   ├── models/
-│   │   │   │   ├── CodeIssue.ts
-│   │   │   │   └── FixResult.ts
-│   │   │   ├── utils/
-│   │   │   │   ├── ASTUtils.ts
-│   │   │   │   └── FileUtils.ts
-│   │   │   └── index.ts
-│   │   ├── tests/
-│   │   │   ├── analysis/
-│   │   │   │   └── AnalysisEngine.test.ts
-│   │   │   ├── classification/
-│   │   │   │   └── IssueClassifier.test.ts
-│   │   │   ├── fixtures/
-│   │   │   │   ├── ast/
-│   │   │   │   │   ├── export-test.ts
-│   │   │   │   │   ├── import-test.ts
-│   │   │   │   │   ├── test.js
-│   │   │   │   │   ├── test.ts
-│   │   │   │   │   └── test.tsx
-│   │   │   │   ├── circular-dep-b.ts
-│   │   │   │   ├── import-issues.ts
-│   │   │   │   └── sample-issues.ts
-│   │   │   ├── models/
-│   │   │   │   └── CodeIssue.test.ts
-│   │   │   ├── test-data/
-│   │   │   │   ├── circular-import-file.ts
-│   │   │   │   ├── correct-file.ts
-│   │   │   │   └── sample-with-issues.ts
-│   │   │   ├── utils/
-│   │   │   │   └── ASTUtils.test.ts
-│   │   │   └── setup.ts
-│   │   ├── cspell.json
-│   │   ├── package-lock.json
-│   │   ├── package.json
-│   │   ├── postcss.config.js
-│   │   ├── README.md
-│   │   ├── tsconfig.build.json
-│   │   ├── tsconfig.json
-│   │   └── vitest.config.ts
-│   ├── analyze-orphans-metadata.cjs
-│   ├── calculate-loc.cjs
-│   ├── evaluate-orphans.cjs
-│   ├── find-orphans.cjs
-│   ├── find-orphans.js
-│   ├── gather-metadata.cjs
-│   ├── INTEGRATION_ROADMAP.csv
-│   ├── ORPHAN_VALUE_ANALYSIS.md
-│   ├── orphan-evaluation-report.md
-│   ├── orphan-report.json
-│   ├── orphans-evaluation.json
-│   ├── orphans-metadata.csv
-│   ├── orphans-metadata.json
-│   ├── TIER_1_INTEGRATION_STATUS.md
-│   └── top-orphans-loc.json
 ├── ARCHITECTURE.md
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -3878,8 +3470,6 @@
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json
-├── tsconfig.server.tsbuildinfo
-├── tsconfig.tsbuildinfo
 ├── vitest.setup.ts
 └── vitest.workspace.ts
 ```
