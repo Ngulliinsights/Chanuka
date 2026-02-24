@@ -6,10 +6,8 @@
  * connection management across the platform.
  */
 
-import { logger } from '../../observability/core/logger';
+import { logger as baseLogger } from '../../observability/core/logger';
 import type { Logger } from '../../observability/core/logger';
-import { DatabaseOrchestrator } from '@server/infrastructure/core/database-orchestrator';
-import { DatabaseConfigManager } from '@server/infrastructure/core/unified-config';
 
 // ============================================================================
 // Types and Interfaces
@@ -33,8 +31,6 @@ export interface ScriptResult {
 }
 
 export interface ScriptContext {
-  orchestrator: DatabaseOrchestrator;
-  config: DatabaseConfigManager;
   logger: DatabaseScriptLogger;
   options: ScriptOptions;
   startTime: Date;
@@ -45,56 +41,56 @@ export interface ScriptContext {
 // ============================================================================
 
 export class DatabaseScriptLogger {
-  private logger: Logger;
+  private _logger: Logger;
   private _scriptName: string = '';
   private verbose: boolean;
 
   constructor(scriptName: string, verbose = false) {
     this._scriptName = scriptName;
     this.verbose = verbose;
-    this.logger = logger.child({ scriptName });
+    this._logger = baseLogger.child({ scriptName });
   }
 
   /**
    * Log script start
    */
   logStart(message: string, details?: unknown): void {
-    this.logger.info(`🚀 ${message}`, details);
+    this._logger.info({ details }, `🚀 ${message}`);
   }
 
   /**
    * Log successful operation
    */
   logSuccess(message: string, details?: unknown): void {
-    this.logger.info(`✅ ${message}`, details);
+    this._logger.info({ details }, `✅ ${message}`);
   }
 
   /**
    * Log operation in progress
    */
   logOperation(message: string, details?: unknown): void {
-    this.logger.info(`🔧 ${message}`, details);
+    this._logger.info({ details }, `🔧 ${message}`);
   }
 
   /**
    * Log warning
    */
   logWarning(message: string, details?: unknown): void {
-    this.logger.warn(`⚠️ ${message}`, details);
+    this._logger.warn({ details }, `⚠️ ${message}`);
   }
 
   /**
    * Log error
    */
   logError(message: string, error?: Error | any): void {
-    this.logger.error(`❌ ${message}`, { error });
+    this._logger.error({ error }, `❌ ${message}`);
   }
 
   /**
    * Log completion
    */
   logComplete(message: string, duration: number, details?: unknown): void {
-    this.logger.info(`🏁 ${message} (${duration}ms)`, details);
+    this._logger.info({ details }, `🏁 ${message} (${duration}ms)`);
   }
 
   /**
@@ -102,7 +98,7 @@ export class DatabaseScriptLogger {
    */
   logVerbose(message: string, details?: unknown): void {
     if (this.verbose) {
-      this.logger.debug(`🔍 ${message}`, details);
+      this._logger.debug({ details }, `🔍 ${message}`);
     }
   }
 
@@ -110,7 +106,7 @@ export class DatabaseScriptLogger {
    * Log dry run information
    */
   logDryRun(message: string, details?: unknown): void {
-    this.logger.info(`🧪 [DRY RUN] ${message}`, details);
+    this._logger.info({ details }, `🧪 [DRY RUN] ${message}`);
   }
 
   /**

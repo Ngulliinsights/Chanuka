@@ -7,13 +7,13 @@
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
-// Import unified types from services
+// Import unified types from features analytics model
 import {
   errorAnalyticsBridge,
-  type ErrorAnalyticsData,
-  type ErrorMetrics,
-  type RealTimeAlert,
-} from '@client/lib/services/errorAnalyticsBridge';
+  type Alert as RealTimeAlert,
+  type CoreError as ErrorAnalyticsData,
+  type ErrorOverviewMetrics,
+} from '@client/features/analytics/model/error-analytics-bridge';
 
 // Define extended types for dashboard features
 export interface DashboardFilters {
@@ -129,14 +129,19 @@ const initialState: ErrorAnalyticsState = {
 export const fetchOverviewMetrics = createAsyncThunk(
   'errorAnalytics/fetchOverviewMetrics',
   async (filters: DashboardFilters) => {
-    // Transform bridge data to dashboard format
-    const metrics = errorAnalyticsBridge.getMetrics();
+    // Use the comprehensive analytics bridge
+    const metrics = await errorAnalyticsBridge.getOverviewMetrics({
+      timeRange: filters.timeRange,
+      severity: filters.severity as any[],
+      domain: filters.domain as any[],
+      component: filters.component,
+    });
     
     return {
       totalErrors: metrics.totalErrors,
       errorRate: metrics.errorRate,
-      affectedUsers: 0, // Would need tracking implementation
-      criticalErrors: Object.values(metrics.errorsByType).reduce((sum, count) => sum + count, 0),
+      affectedUsers: metrics.affectedUsers,
+      criticalErrors: metrics.severityDistribution.CRITICAL || 0,
       trends: {
         daily: metrics.totalErrors,
         weekly: metrics.totalErrors,
@@ -148,32 +153,39 @@ export const fetchOverviewMetrics = createAsyncThunk(
 export const fetchTrendData = createAsyncThunk(
   'errorAnalytics/fetchTrendData',
   async ({ period, filters }: { period: string; filters: DashboardFilters }) => {
-    // This would need actual trend tracking implementation
-    // For now, return mock structure
-    const metrics = errorAnalyticsBridge.getMetrics();
+    // Use comprehensive trend analysis
+    const trendData = await errorAnalyticsBridge.getTrendData(period, {
+      timeRange: filters.timeRange,
+      severity: filters.severity as any[],
+      domain: filters.domain as any[],
+      component: filters.component,
+    });
     
-    return [{
-      timestamp: Date.now(),
-      count: metrics.totalErrors,
-    }] as TimeSeriesDataPoint[];
+    return trendData.timeSeries.map(point => ({
+      timestamp: point.timestamp,
+      count: point.totalErrors,
+    })) as TimeSeriesDataPoint[];
   }
 );
 
 export const fetchPatterns = createAsyncThunk(
   'errorAnalytics/fetchPatterns',
   async (filters: DashboardFilters) => {
-    const metrics = errorAnalyticsBridge.getMetrics();
+    const patterns = await errorAnalyticsBridge.getPatterns({
+      timeRange: filters.timeRange,
+      severity: filters.severity as any[],
+      domain: filters.domain as any[],
+      component: filters.component,
+    });
 
-    // Transform top errors to patterns
-    return metrics.topErrors.map((error, index) => ({
-      id: `pattern-${index}`,
-      pattern: error.message,
-      frequency: error.count,
-      affectedComponents: [],
-      firstSeen: Date.now() - 3600000,
-      lastSeen: Date.now(),
-      impact: 'medium',
-      trend: 'stable',
+    // Transform to dashboard format
+    return patterns.map(pattern => ({
+      id: pattern.id,
+      pattern: pattern.name,
+      frequency: pattern.frequency,
+      impact: pattern.impact.businessImpact,
+      trend: pattern.impact.frequency === 'persistent' ? 'increasing' : 
+             pattern.impact.frequency === 'frequent' ? 'stable' : 'decreasing',
     })) as ErrorPattern[];
   }
 );
@@ -181,12 +193,22 @@ export const fetchPatterns = createAsyncThunk(
 export const fetchRecoveryAnalytics = createAsyncThunk(
   'errorAnalytics/fetchRecoveryAnalytics',
   async (filters: DashboardFilters) => {
-    // Mock recovery analytics - would need actual tracking
+    const analytics = await errorAnalyticsBridge.getRecoveryAnalytics({
+      timeRange: filters.timeRange,
+      severity: filters.severity as any[],
+      domain: filters.domain as any[],
+      component: filters.component,
+    });
+    
     return {
-      totalRecoveries: 0,
-      averageRecoveryTime: 0,
-      successRate: 0,
-      topRecoveryMethods: [],
+      totalRecoveries: Math.floor(analytics.overallSuccessRate * 100),
+      averageRecoveryTime: analytics.recoveryTimeDistribution.average,
+      successRate: analytics.overallSuccessRate,
+      topRecoveryMethods: analytics.strategyEffectiveness.map(strategy => ({
+        method: strategy.strategyName,
+        count: strategy.usageCount,
+        successRate: strategy.successRate,
+      })),
     } as RecoveryAnalytics;
   }
 );
@@ -194,14 +216,13 @@ export const fetchRecoveryAnalytics = createAsyncThunk(
 export const fetchRealTimeMetrics = createAsyncThunk(
   'errorAnalytics/fetchRealTimeMetrics',
   async () => {
-    const metrics = errorAnalyticsBridge.getMetrics();
-    const alerts = errorAnalyticsBridge.getAlerts();
+    const metrics = await errorAnalyticsBridge.getRealTimeMetrics();
     
     return {
-      currentErrorRate: metrics.errorRate,
-      activeAlerts: alerts,
-      liveStream: [],
-      systemHealth: 'healthy' as const,
+      currentErrorRate: metrics.currentErrorRate,
+      activeAlerts: metrics.activeAlerts,
+      liveStream: metrics.liveStream as any[],
+      systemHealth: metrics.systemHealth.overall,
     } as RealTimeMetrics;
   }
 );

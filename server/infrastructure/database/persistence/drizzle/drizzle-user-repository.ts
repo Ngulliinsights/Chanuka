@@ -6,9 +6,8 @@
  */
 
 import type { IUserRepository } from '@server/domain/interfaces/user-repository.interface';
-import { queryCache } from '@server/infrastructure/caching/query-cache';
-import { withTransaction } from '@server/infrastructure/database';
-import { databaseLogger } from '@server/infrastructure/logging/database-logger';
+import { getDatabase, withTransaction } from '@server/infrastructure/database';
+import { databaseLogger } from '@server/infrastructure/observability/database-logger';
 import { performanceMonitor } from '@server/infrastructure/observability/monitoring/performance-monitor';
 import {
   newUserSchema,
@@ -20,7 +19,8 @@ import {
 } from '@server/infrastructure/database/repository-validation';
 import type { Maybe,Result } from '@shared/core';
 import { Err, none,Ok, some } from '@shared/core';
-import type { NewUser, NewUserProfile,User, UserProfile } from '@server/infrastructure/schema';
+import type { User } from '@server/infrastructure/schema';
+import type { NewUser, NewUserProfile, UserProfile } from '@server/infrastructure/schema/foundation';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import type { SQLWrapper } from 'drizzle-orm';
 import { and, desc, eq, inArray,or, sql } from 'drizzle-orm';
@@ -29,8 +29,8 @@ import { userDbToDomain, userProfileDbToDomain } from '@shared/utils/transformer
 
 
 export class DrizzleUserRepository implements IUserRepository {
-  private get db() {
-    return databaseService.getDatabase();
+  private get db(): any {
+    return getDatabase('write');
   }
 
   /**
@@ -217,7 +217,7 @@ export class DrizzleUserRepository implements IUserRepository {
   ): Promise<Result<User[], Error>> {
     try {
       const dbUsers = await this.buildUserQueryConditions(eq(users.role, role), options);
-      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+      return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find users by role'));
     }
@@ -233,7 +233,7 @@ export class DrizzleUserRepository implements IUserRepository {
   ): Promise<Result<User[], Error>> {
     try {
       const dbUsers = await this.buildUserQueryConditions(eq(users.county, county), options);
-      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+      return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find users by county'));
     }
@@ -260,7 +260,7 @@ export class DrizzleUserRepository implements IUserRepository {
 
           const searchTerm = `%${searchValidation.query.toLowerCase()}%`;
           const dbUsers = await this.buildUserSearchQuery(searchTerm, searchValidation.options);
-          return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+          return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
         } catch (error) {
           return new Err(error instanceof Error ? error : new Error('Failed to search users'));
         }
@@ -276,7 +276,7 @@ export class DrizzleUserRepository implements IUserRepository {
   }): Promise<Result<User[], Error>> {
     try {
       const dbUsers = await this.buildUserQueryConditions(eq(users.is_active, true), options);
-      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+      return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find active users'));
     }
@@ -312,16 +312,17 @@ export class DrizzleUserRepository implements IUserRepository {
           });
 
           // Log audit trail for sensitive user updates
-          if (currentUser && (updates.role || updates.is_active !== undefined || updates.two_factor_enabled !== undefined)) {
+          if (currentUser && currentUser.isSome()) {
+            const user = currentUser.value;
             const changes: Record<string, { old: unknown; new: unknown }> = {};
-            if (updates.role !== undefined && updates.role !== currentUser.role) {
-              changes.role = { old: currentUser.role, new: updates.role };
+            if (updates.role !== undefined && updates.role !== user.role) {
+              changes.role = { old: user.role, new: updates.role };
             }
-            if (updates.is_active !== undefined && updates.is_active !== currentUser.is_active) {
-              changes.is_active = { old: currentUser.is_active, new: updates.is_active };
+            if (updates.is_active !== undefined && updates.is_active !== user.is_active) {
+              changes.is_active = { old: user.is_active, new: updates.is_active };
             }
-            if (updates.two_factor_enabled !== undefined && updates.two_factor_enabled !== currentUser.two_factor_enabled) {
-              changes.two_factor_enabled = { old: currentUser.two_factor_enabled, new: updates.two_factor_enabled };
+            if (updates.two_factor_enabled !== undefined && updates.two_factor_enabled !== user.two_factor_enabled) {
+              changes.two_factor_enabled = { old: user.two_factor_enabled, new: updates.two_factor_enabled };
             }
 
             if (Object.keys(changes).length > 0) {
@@ -341,7 +342,7 @@ export class DrizzleUserRepository implements IUserRepository {
             duration: 0,
             recordCount: 1,
             affectedIds: [updatedDbUser.id],
-            data: userDbToDomain.transform(updatedDbUser) // Transform DB → Domain
+            data: userDbToDomain.transform(updatedDbUser as any) // Transform DB → Domain
           };
         }
       );
@@ -422,13 +423,13 @@ export class DrizzleUserRepository implements IUserRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      const result = await databaseLogger.logOperation(
+      await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'auth')
           .operation('update')
           .entityId(id)
           .build(),
         async () => {
-          await withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: any) => {
             const updateResult = await tx
               .update(users)
               .set({
@@ -497,13 +498,13 @@ export class DrizzleUserRepository implements IUserRepository {
       const currentUserResult = await this.findById(id);
       const currentUser = currentUserResult.isOk() ? currentUserResult.value : null;
 
-      const result = await databaseLogger.logOperation(
+      await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'security')
           .operation('update')
           .entityId(id)
           .build(),
         async () => {
-          await withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: any) => {
             const updateResult = await tx
               .update(users)
               .set({
@@ -519,10 +520,11 @@ export class DrizzleUserRepository implements IUserRepository {
           });
 
           // Log audit trail for security settings changes
-          if (currentUser) {
+          if (currentUser && currentUser.isSome()) {
+            const user = currentUser.value;
             const changes: Record<string, { old: unknown; new: unknown }> = {};
-            if (security.two_factor_enabled !== undefined && security.two_factor_enabled !== currentUser.two_factor_enabled) {
-              changes.two_factor_enabled = { old: currentUser.two_factor_enabled, new: security.two_factor_enabled };
+            if (security.two_factor_enabled !== undefined && security.two_factor_enabled !== user.two_factor_enabled) {
+              changes.two_factor_enabled = { old: user.two_factor_enabled, new: security.two_factor_enabled };
             }
             if (security.two_factor_secret !== undefined) {
               changes.two_factor_secret = { old: '[REDACTED]', new: '[SET]' };
@@ -564,13 +566,13 @@ export class DrizzleUserRepository implements IUserRepository {
       const userResult = await this.findById(id);
       const userToDelete = userResult.isOk() ? userResult.value : null;
 
-      const result = await databaseLogger.logOperation(
+      await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'user')
           .operation('delete')
           .entityId(id)
           .build(),
         async () => {
-          await withTransaction(async (tx: PgDatabase<any>) => {
+          await withTransaction(async (tx: any) => {
             // Delete profile first due to foreign key constraint
             await tx
               .delete(user_profiles)
@@ -587,15 +589,16 @@ export class DrizzleUserRepository implements IUserRepository {
           });
 
           // Log audit trail for user deletion
-          if (userToDelete) {
+          if (userToDelete && userToDelete.isSome()) {
+            const user = userToDelete.value;
             databaseLogger.logAudit({
               action: 'user_delete',
               entityType: 'user',
               entityId: id,
               changes: {
-                user_deleted: { old: userToDelete, new: null },
-                email: { old: userToDelete.email, new: null },
-                role: { old: userToDelete.role, new: null }
+                user_deleted: { old: user, new: null },
+                email: { old: user.email, new: null },
+                role: { old: user.role, new: null }
               },
               sensitive: true,
               userId: id // Could be admin or self-deletion
@@ -623,29 +626,22 @@ export class DrizzleUserRepository implements IUserRepository {
     is_active?: boolean;
     is_verified?: boolean;
   }): Promise<Result<number, Error>> {
-    return queryCache.withCache(
-      'user_count',
-      criteria || {},
-      async () => {
-        try {
-          const conditions = this.buildUserCountConditions(criteria);
+    try {
+      const conditions = this.buildUserCountConditions(criteria);
 
-          const query = this.db
-            .select({ count: sql<number>`COUNT(*)` })
-            .from(users);
+      const query = this.db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(users);
 
-          if (conditions.length > 0) {
-            query.where(and(...conditions));
-          }
+      if (conditions.length > 0) {
+        query.where(and(...conditions));
+      }
 
-          const [result] = await query;
-          return new Ok(Number(result.count));
-        } catch (error) {
-          return new Err(error instanceof Error ? error : new Error('Failed to count users'));
-        }
-      },
-      { ttl: 2 * 60 * 1000, keyPrefix: 'user_stats' } // Cache for 2 minutes
-    );
+      const [result] = await query;
+      return new Ok(Number(result.count));
+    } catch (error) {
+      return new Err(error instanceof Error ? error : new Error('Failed to count users'));
+    }
   }
 
   async createBatch(users: NewUser[]): Promise<Result<User[], Error>> {
@@ -666,16 +662,20 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} users`));
       }
 
-      const dbUsers = await withTransaction(async (tx: PgDatabase<any>) => {
+      const validatedData = validations
+        .filter((v): v is { success: true; data: any } => v.success)
+        .map(v => v.data);
+
+      const dbUsers = await withTransaction(async (tx: any) => {
         const newUsers = await tx
           .insert(users)
-          .values(validations.map(v => v.data))
+          .values(validatedData)
           .returning();
 
         return newUsers;
       });
 
-      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+      return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to create users in batch'));
     }
@@ -731,7 +731,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return updatedUsers;
       });
 
-      return new Ok(dbUsers.map(dbUser => userDbToDomain.transform(dbUser)));
+      return new Ok(dbUsers.map((dbUser: any) => userDbToDomain.transform(dbUser)));
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to update users in batch'));
     }
@@ -755,16 +755,20 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} user IDs`));
       }
 
-      await withTransaction(async (tx: PgDatabase<any>) => {
+      const validatedIds = validations
+        .filter((v): v is { success: true; data: string } => v.success)
+        .map(v => v.data);
+
+      await withTransaction(async (tx: any) => {
         // Delete profiles first due to foreign key constraint
         await tx
           .delete(user_profiles)
-          .where(inArray(user_profiles.user_id, validations.map(v => v.data)));
+          .where(inArray(user_profiles.user_id, validatedIds));
 
         // Then delete users
         await tx
           .delete(users)
-          .where(inArray(users.id, validations.map(v => v.data)));
+          .where(inArray(users.id, validatedIds));
       });
 
       return new Ok(undefined);
@@ -786,7 +790,7 @@ export class DrizzleUserRepository implements IUserRepository {
       );
 
       // Transform users to domain and include lazy profile loading
-      const usersWithLazyProfiles = dbUsers.map(dbUser => {
+      const usersWithLazyProfiles = dbUsers.map((dbUser: any) => {
         const domainUser = userDbToDomain.transform(dbUser);
         return {
           ...domainUser,

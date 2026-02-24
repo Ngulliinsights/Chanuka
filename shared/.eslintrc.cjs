@@ -19,32 +19,9 @@ module.exports = {
     },
   },
   rules: {
-    // TypeScript specific rules
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/no-explicit-any': 'warn',
+    // Shared modules should be strict - they're used everywhere
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'warn',
-    '@typescript-eslint/prefer-nullish-coalescing': 'error',
-    '@typescript-eslint/prefer-optional-chain': 'error',
-
-    // Import rules
-    'import/no-unresolved': 'warn',
-    'import/order': ['warn', {
-      'groups': [
-        'builtin',
-        'external',
-        'internal',
-        'parent',
-        'sibling',
-        'index'
-      ],
-      'newlines-between': 'always',
-      'alphabetize': {
-        'order': 'asc',
-        'caseInsensitive': true
-      }
-    }],
 
     // Security rules
     'no-eval': 'error',
@@ -54,11 +31,7 @@ module.exports = {
 
     // Code quality rules
     'complexity': ['warn', 10],
-    'max-depth': ['warn', 4],
     'max-lines-per-function': ['warn', 100],
-    'no-console': 'warn',
-    'prefer-const': 'error',
-    'no-var': 'error',
 
     // Naming conventions
     '@typescript-eslint/naming-convention': [

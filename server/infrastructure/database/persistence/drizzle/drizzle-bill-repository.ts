@@ -6,7 +6,7 @@
  */
 
 import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
-import { withTransaction } from '@server/infrastructure/database';
+import { getDatabase, withTransaction } from '@server/infrastructure/database';
 import {
   billSearchOptionsSchema,
   newBillSchema,
@@ -17,13 +17,14 @@ import {
 } from '@server/infrastructure/database/repository-validation';
 import type { Maybe,Result } from '@shared/core';
 import { Err, none,Ok, some } from '@shared/core';
-import type { Bill, NewBill } from '@server/infrastructure/schema';
+import type { Bill } from '@server/infrastructure/schema';
+import type { NewBill } from '@server/infrastructure/schema/foundation';
 import { bills } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, or, sql, SQLWrapper } from 'drizzle-orm';
 
 export class DrizzleBillRepository implements IBillRepository {
-  private get db() {
-    return databaseService.getDatabase();
+  private get db(): any {
+    return getDatabase('write');
   }
 
   /**
@@ -132,10 +133,12 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(validation.error);
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const validatedData = validation.data;
+
+      const result = await withTransaction(async (tx: any) => {
         const [newBill] = await tx
           .insert(bills)
-          .values(validation.data)
+          .values(validatedData)
           .returning();
 
         return newBill;
@@ -261,14 +264,17 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(updateValidation.error);
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const validatedId = idValidation.data;
+      const validatedData = updateValidation.data;
+
+      const result = await withTransaction(async (tx: any) => {
         const [updatedBill] = await tx
           .update(bills)
           .set({
-            ...updateValidation.data,
+            ...validatedData,
             updated_at: new Date()
           })
-          .where(eq(bills.id, idValidation.data))
+          .where(eq(bills.id, validatedId))
           .returning();
 
         if (!updatedBill) {
@@ -296,7 +302,7 @@ export class DrizzleBillRepository implements IBillRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      await withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: any) => {
         await tx
           .update(bills)
           .set({
@@ -314,7 +320,7 @@ export class DrizzleBillRepository implements IBillRepository {
 
   async delete(id: string): Promise<Result<void, Error>> {
     try {
-      await withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: any) => {
         await tx
           .delete(bills)
           .where(eq(bills.id, id));
@@ -368,10 +374,14 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} bills`));
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: any) => {
+        const validatedData = validations
+          .filter((v): v is { success: true; data: any } => v.success)
+          .map(v => v.data);
+        
         const newBills = await tx
           .insert(bills)
-          .values(validations.map(v => v.data))
+          .values(validatedData)
           .returning();
 
         return newBills;
@@ -409,7 +419,7 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} updates`));
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: any) => {
         const updatedBills: Bill[] = [];
 
         // Process updates individually to handle potential conflicts
@@ -457,10 +467,14 @@ export class DrizzleBillRepository implements IBillRepository {
         return new Err(new Error(`Validation failed for ${validationErrors.length} bill IDs`));
       }
 
-      await withTransaction(async (tx: unknown) => {
+      const validatedIds = validations
+        .filter((v): v is { success: true; data: string } => v.success)
+        .map(v => v.data);
+
+      await withTransaction(async (tx: any) => {
         await tx
           .delete(bills)
-          .where(inArray(bills.id, validations.map(v => v.data)));
+          .where(inArray(bills.id, validatedIds));
       });
 
       return new Ok(undefined);

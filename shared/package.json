@@ -13,8 +13,6 @@
     "./utils": "./utils/index.ts",
     "./core": "./core/src/index.ts",
     "./core/*": "./core/src/*",
-    "./schema": "./schema/index.ts",
-    "./database": "./database/index.ts",
     "./platform": "./platform/index.ts"
   },
   "scripts": {

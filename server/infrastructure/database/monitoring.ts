@@ -5,6 +5,9 @@ import { monitorPoolHealth } from './pool';
 /**
  * Performance monitoring integration - optional dependency
  * Returns null if performance monitoring is not available
+/**
+ * Performance monitoring integration - optional dependency
+ * Returns null if performance monitoring is not available
  */
 const getPerformanceMonitoring = async (): Promise<{
   recordMetric: (name: string, value: number, tags?: Record<string, string>) => void;
@@ -17,11 +20,9 @@ const getPerformanceMonitoring = async (): Promise<{
     // Wrap the monitor to match expected interface
     return {
       recordMetric: (name: string, value: number, tags?: Record<string, string>) => {
-        monitor.recordMetric({
-          name,
-          value,
-          unit: 'ms',
-          tags: tags || {},
+        // Use monitorOperation to track the metric
+        monitor.monitorOperation(name, async () => value, tags).catch(() => {
+          // Ignore errors in metric recording
         });
       },
     };

@@ -6,7 +6,7 @@
  */
 
 import type { ISponsorRepository } from '@server/domain/interfaces/sponsor-repository.interface';
-import { withTransaction } from '@server/infrastructure/database';
+import { getDatabase, withTransaction } from '@server/infrastructure/database';
 import {
   newSponsorSchema,
   sponsorSearchOptionsSchema,
@@ -17,14 +17,15 @@ import {
 } from '@server/infrastructure/database/repository-validation';
 import type { Maybe,Result } from '@shared/core';
 import { Err, none,Ok, some } from '@shared/core';
-import type { NewSponsor,Sponsor } from '@server/infrastructure/schema';
+import type { Sponsor } from '@server/infrastructure/schema';
+import type { NewSponsor } from '@server/infrastructure/schema/foundation';
 import { sponsors } from '@server/infrastructure/schema';
 import { and, desc, eq, or, sql, SQLWrapper } from 'drizzle-orm';
 
 
 export class DrizzleSponsorRepository implements ISponsorRepository {
-  private get db() {
-    return databaseService.getDatabase();
+  private get db(): any {
+    return getDatabase('write');
   }
 
   /**
@@ -133,7 +134,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(validation.error);
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: any) => {
         const [newSponsor] = await tx
           .insert(sponsors)
           .values(validation.data)
@@ -277,7 +278,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
         return new Err(updateValidation.error);
       }
 
-      const result = await withTransaction(async (tx: unknown) => {
+      const result = await withTransaction(async (tx: any) => {
         const [updatedSponsor] = await tx
           .update(sponsors)
           .set({
@@ -309,7 +310,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
     }
   ): Promise<Result<void, Error>> {
     try {
-      await withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: any) => {
         await tx
           .update(sponsors)
           .set({
@@ -327,7 +328,7 @@ export class DrizzleSponsorRepository implements ISponsorRepository {
 
   async delete(id: string): Promise<Result<void, Error>> {
     try {
-      await withTransaction(async (tx: unknown) => {
+      await withTransaction(async (tx: any) => {
         await tx
           .delete(sponsors)
           .where(eq(sponsors.id, id));

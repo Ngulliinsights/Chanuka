@@ -50,6 +50,11 @@ jspm_packages/
 # TypeScript cache
 *.tsbuildinfo
 
+# Diagnostic and debug outputs
+type_check_output*.txt
+debug-*.log
+module-resolution-analysis.json
+
 # Compiled artifacts in source directories (should only be in dist/)
 client/src/**/*.js
 client/src/**/*.js.map

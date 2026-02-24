@@ -1,7 +1,8 @@
-import { logger } from '@server/infrastructure/core/src/observability/logging';
+import { logger } from '@server/infrastructure/observability';
+import { databaseMonitor } from './monitoring';
 
 // Monitoring handled via shared/core
-import { monitorPoolHealth } from './pool';
+import { monitorPoolHealth, type PoolHealthStatus } from './pool';
 
 /**
  * Database initialization and safety setup
@@ -47,7 +48,7 @@ export async function initializeDatabaseSafety(): Promise<void> {
     // Reset promise but NOT isInitialized - prevents repeated init attempts
     // if an error occurs. Can be retried by calling again after resolving the issue.
     initializationPromise = null;
-    logger.error('Database initialization failed, will retry on next call', { error });
+    logger.error({ error }, 'Database initialization failed, will retry on next call');
     throw error;
   }
 }
@@ -81,18 +82,18 @@ async function performInitialization(): Promise<void> {
       .filter(([_, status]) => status?.isHealthy !== true)
       .map(([name]) => name);
     
-    logger.info('✓ Initial pool health check completed', {
+    logger.info({
       healthyPools,
       unhealthyPools,
       totalPools: poolEntries.length,
-    });
+    }, '✓ Initial pool health check completed');
 
     // Warn if any pools are unhealthy at startup, as this may indicate configuration issues
     if (unhealthyPools.length > 0) {
-      logger.warn('Some database pools are unhealthy at startup', {
+      logger.warn({
         unhealthyPools,
         recommendation: 'Check database connectivity and configuration',
-      });
+      }, 'Some database pools are unhealthy at startup');
     }
 
     // Start database monitoring service
@@ -100,7 +101,7 @@ async function performInitialization(): Promise<void> {
     logger.info('✓ Database monitoring service started');
 
     // Log configuration summary with more structured information
-    logger.info('Database safety initialization completed successfully', {
+    logger.info({
       features: [
         'Thread-safe metrics tracking',
         'Circuit breaker protection',
@@ -115,19 +116,19 @@ async function performInitialization(): Promise<void> {
         totalPools: poolEntries.length,
       },
       timestamp: new Date().toISOString(),
-    });
+    }, 'Database safety initialization completed successfully');
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
     
-    logger.error('Failed to initialize database safety mechanisms', {
+    logger.error({
       error: errorMessage,
       stack: errorStack,
       // Include more context to help with debugging
       phase: 'initialization',
       timestamp: new Date().toISOString(),
-    });
+    }, 'Failed to initialize database safety mechanisms');
     
     // Attempt to clean up any partially initialized resources
     await cleanupPartialInitialization();
@@ -151,9 +152,9 @@ async function cleanupPartialInitialization(): Promise<void> {
     }
   } catch (cleanupError) {
     // Log but don't throw, as we're already handling an error
-    logger.warn('Error during initialization cleanup', {
+    logger.warn({
       error: cleanupError instanceof Error ? cleanupError.message : String(cleanupError),
-    });
+    }, 'Error during initialization cleanup');
   }
 }
 
@@ -187,12 +188,12 @@ export async function shutdownDatabaseSafety(): Promise<void> {
       );
       
       const finalHealthStatus = await Promise.race([finalHealthCheckPromise, timeoutPromise]);
-      logger.info('✓ Final health check completed', { finalHealthStatus });
+      logger.info({ finalHealthStatus }, '✓ Final health check completed');
     } catch (healthCheckError) {
       // Don't fail the entire shutdown if the final health check fails
-      logger.warn('Final health check failed during shutdown', {
+      logger.warn({
         error: healthCheckError instanceof Error ? healthCheckError.message : String(healthCheckError),
-      });
+      }, 'Final health check failed during shutdown');
     }
 
     // Reset initialization state to allow re-initialization if needed
@@ -203,10 +204,10 @@ export async function shutdownDatabaseSafety(): Promise<void> {
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Error during database safety shutdown', {
+    logger.error({
       error: errorMessage,
       timestamp: new Date().toISOString(),
-    });
+    }, 'Error during database safety shutdown');
     
     // Reset state even on error to prevent stuck state
     isInitialized = false;
@@ -223,7 +224,7 @@ export async function shutdownDatabaseSafety(): Promise<void> {
 export async function getDatabaseSafetyStatus(): Promise<{
   initialized: boolean;
   monitoring: boolean;
-  poolHealth: Record<string, unknown>;
+  poolHealth: Record<string, PoolHealthStatus>;
   timestamp: Date;
   summary: {
     totalPools: number;
@@ -232,7 +233,7 @@ export async function getDatabaseSafetyStatus(): Promise<{
   };
 }> {
   // Attempt to get pool health with timeout protection
-  let poolHealth: Record<string, unknown> = {};
+  let poolHealth: Record<string, PoolHealthStatus> = {};
   let error: Error | null = null;
   
   try {
@@ -244,9 +245,9 @@ export async function getDatabaseSafetyStatus(): Promise<{
     poolHealth = await Promise.race([healthCheckPromise, timeoutPromise]);
   } catch (err) {
     error = err instanceof Error ? err : new Error(String(err));
-    logger.warn('Failed to retrieve pool health status', {
+    logger.warn({
       error: error.message,
-    });
+    }, 'Failed to retrieve pool health status');
   }
   
   // Calculate summary statistics for easier consumption

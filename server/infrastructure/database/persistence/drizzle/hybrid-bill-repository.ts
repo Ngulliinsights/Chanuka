@@ -6,9 +6,10 @@
  */
 
 import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
-import type { Result } from '@shared/core';
-import { Err,Ok } from '@shared/core';
-import type { Bill, NewBill } from '@server/infrastructure/schema';
+import type { Result, Maybe } from '@shared/core';
+import { Err } from '@shared/core';
+import type { Bill } from '@server/infrastructure/schema';
+import type { NewBill } from '@server/infrastructure/schema/foundation';
 
 import { DrizzleBillRepository } from './drizzle-bill-repository';
 
@@ -274,4 +275,27 @@ export class HybridBillRepository implements IBillRepository {
     }
   }
 
+  async createBatch(bills: NewBill[]): Promise<Result<Bill[], Error>> {
+    try {
+      return await this.drizzleRepo.createBatch(bills);
+    } catch (error) {
+      return new Err(error instanceof Error ? error : new Error('Failed to create bills in batch'));
+    }
+  }
+
+  async updateBatch(updates: Array<{ id: string; data: Partial<NewBill> }>): Promise<Result<Bill[], Error>> {
+    try {
+      return await this.drizzleRepo.updateBatch(updates);
+    } catch (error) {
+      return new Err(error instanceof Error ? error : new Error('Failed to update bills in batch'));
+    }
+  }
+
+  async deleteBatch(ids: string[]): Promise<Result<void, Error>> {
+    try {
+      return await this.drizzleRepo.deleteBatch(ids);
+    } catch (error) {
+      return new Err(error instanceof Error ? error : new Error('Failed to delete bills in batch'));
+    }
+  }
 }

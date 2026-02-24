@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import type * as pg from 'pg';
 
 import { logger } from '../observability/core/logger';
-import { databaseLogger } from '../observability/database/database-logger';
+import { databaseLogger } from '../observability/database-logger';
 import * as schema from '../schema';
 
 // ============================================================================

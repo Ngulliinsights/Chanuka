@@ -44,6 +44,9 @@ export type DatabaseConnection = {
 /**
  * Database transaction interface for type-safe transaction operations.
  * The generic parameter T allows for flexible return types while maintaining type safety.
+ * 
+ * Note: When using with Drizzle ORM, the transaction object will be a PgDatabase instance
+ * with full query builder capabilities.
  */
 export interface DatabaseTransaction {
   /** Execute a query within the transaction, returning results of type T */
@@ -55,6 +58,18 @@ export interface DatabaseTransaction {
   /** Check if transaction is still active */
   isActive(): boolean;
 }
+
+/**
+ * Extended transaction type that includes Drizzle ORM query builder methods.
+ * This allows repositories to use both raw SQL and Drizzle's query builder.
+ */
+export type ExtendedTransaction = DatabaseTransaction & {
+  select: (...args: any[]) => any;
+  insert: (...args: any[]) => any;
+  update: (...args: any[]) => any;
+  delete: (...args: any[]) => any;
+  [key: string]: any; // Allow any Drizzle methods
+};
 
 /**
  * Database health check results across all connections.
@@ -136,10 +151,10 @@ export function initializeDatabaseConnections(
   
   pool = rawPool;
   
-  logger.info('Database connections initialized', {
+  logger.info({
     component: 'DatabaseConnection',
     timestamp: new Date().toISOString(),
-  });
+  }, 'Database connections initialized');
 }
 
 /**
@@ -250,7 +265,7 @@ export function getDatabase(operation: DatabaseOperation = 'general'): DatabaseC
  * );
  */
 export async function withTransaction<T>(
-  callback: (tx: DatabaseTransaction) => Promise<T>,
+  callback: (tx: any) => Promise<T>,
   options: TransactionOptions = {}
 ): Promise<T> {
   const { 
@@ -291,7 +306,7 @@ export async function withTransaction<T>(
       const errorCode = isPostgreSQLError(lastError) ? lastError.code : undefined;
 
       // Log comprehensive error context for debugging
-      logger.error('Transaction failed', {
+      logger.error({
         error: lastError,
         component: 'DatabaseTransaction',
         attempt: attempt + 1,
@@ -300,14 +315,14 @@ export async function withTransaction<T>(
         isRetryable,
         errorCode,
         timestamp: new Date().toISOString(),
-      });
+      }, 'Transaction failed');
 
       // Invoke custom error handler if provided
       if (onError) {
         try {
           onError(lastError, attempt + 1);
         } catch (handlerError) {
-          logger.error('Error handler threw exception', { error: handlerError });
+          logger.error({ error: handlerError }, 'Error handler threw exception');
         }
       }
 
@@ -318,11 +333,11 @@ export async function withTransaction<T>(
 
       // Wait before retry using configured delay strategy
       const delayMs = retryDelay(attempt);
-      logger.info('Retrying transaction after delay', {
+      logger.info({
         component: 'DatabaseTransaction',
         delayMs,
         nextAttempt: attempt + 2,
-      });
+      }, 'Retrying transaction after delay');
       await sleep(delayMs);
     }
   }
@@ -522,11 +537,11 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     
-    logger.error('Database health check failed', { 
+    logger.error({ 
       error,
       component: 'DatabaseHealth',
       timestamp: new Date().toISOString(),
-    });
+    }, 'Database health check failed');
 
     return {
       operational: false,
@@ -581,16 +596,16 @@ export async function closeDatabaseConnections(timeoutMs: number = 10000): Promi
       timeoutPromise,
     ]);
 
-    logger.info('Database connections closed successfully', {
+    logger.info({
       component: 'DatabaseShutdown',
       timestamp: new Date().toISOString(),
-    });
+    }, 'Database connections closed successfully');
   } catch (error) {
-    logger.error('Failed to close database connections', { 
+    logger.error({ 
       error,
       component: 'DatabaseShutdown',
       timestamp: new Date().toISOString(),
-    });
+    }, 'Failed to close database connections');
     throw error;
   }
 }

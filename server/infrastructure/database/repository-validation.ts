@@ -5,9 +5,9 @@
  * and prevent invalid inputs from reaching database operations.
  */
 
-import { validationService } from '@shared/core/validation';
 import { z } from 'zod';
-import { emailSchema, uuidSchema, userRoleSchema, paginationSchema } from '@shared/validation';
+import { emailSchema, userRoleSchema } from '@shared/validation';
+import { inputValidationService } from '@server/infrastructure/validation';
 
 // ============================================================================
 // COMMON VALIDATION SCHEMAS
@@ -409,13 +409,17 @@ export async function validateRepositoryInput<T>(
   context: string = 'repository input'
 ): Promise<{ success: true; data: T } | { success: false; error: Error }> {
   try {
-    const validatedData = await validationService.validate(schema, data, {
-      preprocess: true,
-      abortEarly: false,
-    }, {
-      schemaName: context,
-    });
-    return { success: true, data: validatedData };
+    const result = inputValidationService.instance.validateApiInput(schema, data);
+    
+    if (result.isValid && result.data) {
+      return { success: true, data: result.data as T };
+    }
+    
+    const errorMessage = result.errors.map(e => `${e.field}: ${e.message}`).join(', ');
+    return { 
+      success: false, 
+      error: new Error(`Validation failed for ${context}: ${errorMessage}`) 
+    };
   } catch (error) {
     if (error instanceof Error) {
       return { success: false, error };
@@ -433,18 +437,32 @@ export async function validateSearchParams(
   schema?: z.ZodSchema
 ): Promise<{ success: true; query: string; options?: any } | { success: false; error: Error }> {
   try {
-    const validatedQuery = await validationService.validate(searchQuerySchema, query, {}, {
-      schemaName: 'search query',
-    });
+    const queryResult = inputValidationService.instance.validateApiInput(searchQuerySchema, query);
+    
+    if (!queryResult.isValid) {
+      const errorMessage = queryResult.errors.map(e => `${e.field}: ${e.message}`).join(', ');
+      return { 
+        success: false, 
+        error: new Error(`Search query validation failed: ${errorMessage}`) 
+      };
+    }
 
     let validatedOptions;
     if (options && schema) {
-      validatedOptions = await validationService.validate(schema, options, {}, {
-        schemaName: 'search options',
-      });
+      const optionsResult = inputValidationService.instance.validateApiInput(schema, options);
+      
+      if (!optionsResult.isValid) {
+        const errorMessage = optionsResult.errors.map(e => `${e.field}: ${e.message}`).join(', ');
+        return { 
+          success: false, 
+          error: new Error(`Search options validation failed: ${errorMessage}`) 
+        };
+      }
+      
+      validatedOptions = optionsResult.data;
     }
 
-    return { success: true, query: validatedQuery, options: validatedOptions };
+    return { success: true, query: queryResult.data as string, options: validatedOptions };
   } catch (error) {
     if (error instanceof Error) {
       return { success: false, error };

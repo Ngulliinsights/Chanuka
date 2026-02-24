@@ -1,135 +1,33 @@
 /**
  * Loading-specific Error Types
- * Self-contained error system for loading operations
- * Provides unified recovery strategies, analytics, and reporting
+ * 
+ * Uses shared base error classes from dashboard/errors.ts (canonical source)
+ * to eliminate duplication across the error handling system.
  */
 
-// ============================================================================
-// Core Error Types & Constants
-// ============================================================================
+// Re-export shared base types so existing consumers don't break
+export {
+  ErrorDomain,
+  ErrorSeverity,
+  BaseError,
+  NetworkError,
+  ValidationError,
+} from '@client/lib/ui/dashboard/errors';
 
-export enum ErrorDomain {
-  UI = 'UI',
-  NETWORK = 'NETWORK',
-  VALIDATION = 'VALIDATION',
-  BUSINESS_LOGIC = 'BUSINESS_LOGIC',
-  SYSTEM = 'SYSTEM',
-}
+export type {
+  ErrorContext,
+  BaseErrorOptions,
+} from '@client/lib/ui/dashboard/errors';
 
-export enum ErrorSeverity {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  CRITICAL = 'CRITICAL',
-}
+import {
+  BaseError,
+  NetworkError,
+  ValidationError,
+  ErrorDomain,
+  ErrorSeverity,
+} from '@client/lib/ui/dashboard/errors';
 
-export interface ErrorContext {
-  component?: string;
-  operation?: string;
-  stage?: string;
-  timeout?: number;
-  retryCount?: number;
-  [key: string]: unknown;
-}
-
-export interface BaseErrorOptions {
-  statusCode?: number;
-  code?: string;
-  domain?: ErrorDomain;
-  severity?: ErrorSeverity;
-  retryable?: boolean;
-  recoverable?: boolean;
-  context?: ErrorContext;
-  cause?: Error | unknown;
-  zodError?: unknown; // ZodError from zod validation
-  config?: unknown; // Configuration that caused the error
-  retryCount?: number; // Number of retry attempts
-}
-
-// ============================================================================
-// Core Error Base Classes
-// ============================================================================
-
-/**
- * Base error class with enhanced metadata
- */
-export class BaseError extends Error {
-  public readonly name: string;
-  public readonly statusCode: number;
-  public readonly code: string;
-  public readonly domain: ErrorDomain;
-  public readonly severity: ErrorSeverity;
-  public readonly retryable: boolean;
-  public readonly recoverable: boolean;
-  public readonly context?: ErrorContext;
-  public readonly timestamp: Date;
-  public readonly cause?: Error | unknown;
-
-  constructor(message: string, options?: BaseErrorOptions) {
-    super(message);
-    this.name = 'BaseError';
-    this.statusCode = options?.statusCode ?? 500;
-    this.code = options?.code ?? 'UNKNOWN_ERROR';
-    this.domain = options?.domain ?? ErrorDomain.SYSTEM;
-    this.severity = options?.severity ?? ErrorSeverity.MEDIUM;
-    this.retryable = options?.retryable ?? false;
-    this.recoverable = options?.recoverable ?? true;
-    this.context = options?.context;
-    this.timestamp = new Date();
-    this.cause = options?.cause;
-
-    // Maintains proper stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
-  }
-}
-
-/**
- * Network-related errors
- */
-export class NetworkError extends BaseError {
-  public readonly name: string;
-
-  constructor(message: string, context?: ErrorContext) {
-    super(message, {
-      statusCode: 503,
-      code: 'NETWORK_ERROR',
-      domain: ErrorDomain.NETWORK,
-      severity: ErrorSeverity.HIGH,
-      retryable: true,
-      recoverable: true,
-      context,
-    });
-    this.name = 'NetworkError';
-  }
-}
-
-/**
- * Validation-related errors
- */
-export class ValidationError extends BaseError {
-  public readonly name: string;
-  public readonly errors: Record<string, string[]>;
-
-  constructor(
-    message: string,
-    errors: Record<string, string[]>,
-    context?: ErrorContext
-  ) {
-    super(message, {
-      statusCode: 400,
-      code: 'VALIDATION_ERROR',
-      domain: ErrorDomain.VALIDATION,
-      severity: ErrorSeverity.LOW,
-      retryable: false,
-      recoverable: true,
-      context,
-    });
-    this.name = 'ValidationError';
-    this.errors = errors;
-  }
-}
+import type { ErrorContext } from '@client/lib/ui/dashboard/errors';
 
 // ============================================================================
 // Loading Error Classes
@@ -146,7 +44,7 @@ export class ValidationError extends BaseError {
  * });
  */
 export class LoadingError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
 
   constructor(
     message: string,
@@ -180,10 +78,9 @@ export class LoadingError extends BaseError {
  * });
  */
 export class LoadingTimeoutError extends NetworkError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly operation: string;
   public readonly timeout: number;
-  public override readonly cause?: Error | unknown;
 
   constructor(
     operationId: string,
@@ -204,9 +101,6 @@ export class LoadingTimeoutError extends NetworkError {
     this.name = 'LoadingTimeoutError';
     this.operation = operationId;
     this.timeout = timeout;
-    if (options?.cause) {
-      this.cause = options.cause;
-    }
   }
 }
 
@@ -219,9 +113,8 @@ export class LoadingTimeoutError extends NetworkError {
  * });
  */
 export class LoadingNetworkError extends NetworkError {
-  public readonly name: string;
+  public override readonly name: string;
   public override readonly statusCode: number;
-  public override readonly cause?: Error | unknown;
 
   constructor(
     message: string,
@@ -234,9 +127,6 @@ export class LoadingNetworkError extends NetworkError {
     super(message, options?.context);
     this.name = 'LoadingNetworkError';
     this.statusCode = options?.statusCode ?? 503;
-    if (options?.cause) {
-      this.cause = options.cause;
-    }
   }
 }
 
@@ -249,8 +139,7 @@ export class LoadingNetworkError extends NetworkError {
  * });
  */
 export class LoadingValidationError extends ValidationError {
-  public readonly name: string;
-  public override readonly cause?: Error | unknown;
+  public override readonly name: string;
 
   constructor(
     message: string,
@@ -261,9 +150,6 @@ export class LoadingValidationError extends ValidationError {
   ) {
     super(message, { validation: [message] }, options?.context);
     this.name = 'LoadingValidationError';
-    if (options?.cause) {
-      this.cause = options.cause;
-    }
   }
 }
 
@@ -274,7 +160,7 @@ export class LoadingValidationError extends ValidationError {
  * throw new LoadingOperationFailedError('fetchBills', 'Server returned error', 2);
  */
 export class LoadingOperationFailedError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly operation: string;
   public readonly retryCount?: number;
 
@@ -317,7 +203,7 @@ export class LoadingOperationFailedError extends BaseError {
  * });
  */
 export class LoadingStageError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly stage: string;
 
   constructor(

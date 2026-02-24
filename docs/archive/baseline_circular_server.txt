@@ -1,9 +1,0 @@
-$ npx madge --circular --extensions ts,tsx server/
-Processed 1979 files (30.9s) (603 warnings)
-
-✖ Found 4 circular dependencies!
-
-1) dist/server/infrastructure/migration/migration-api.js > dist/server/infrastructure/migration/index.js
-2) infrastructure/schema/foundation.ts > infrastructure/schema/participation_oversight.ts
-3) infrastructure/schema/foundation.ts > infrastructure/schema/political_economy.ts
-4) infrastructure/schema/foundation.ts > infrastructure/schema/trojan_bill_detection.ts

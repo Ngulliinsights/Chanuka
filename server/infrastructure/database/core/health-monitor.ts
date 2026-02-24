@@ -190,23 +190,23 @@ export class UnifiedHealthMonitor {
     
     // Perform initial health check
     this.performHealthCheck().catch(error => {
-      logger.error('Initial health check failed', { error });
+      logger.error({ error }, 'Initial health check failed');
     });
 
     // Schedule regular health checks
     if (this.config.checkInterval > 0) {
       this.monitorTimer = setInterval(() => {
         this.performHealthCheck().catch(error => {
-          logger.error('Scheduled health check failed', { error });
+          logger.error({ error }, 'Scheduled health check failed');
         });
       }, this.config.checkInterval);
     }
 
-    logger.info('Database health monitor started', {
+    logger.info({
       component: 'HealthMonitor',
       checkInterval: this.config.checkInterval,
       alertRules: this.config.alertRules.length
-    });
+    }, 'Database health monitor started');
   }
 
   /**
@@ -223,9 +223,9 @@ export class UnifiedHealthMonitor {
 
     this._isRunning = false;
 
-    logger.info('Database health monitor stopped', {
+    logger.info({
       component: 'HealthMonitor'
-    });
+    }, 'Database health monitor stopped');
   }
 
   /**
@@ -294,12 +294,12 @@ export class UnifiedHealthMonitor {
       // Store results in history
       this.addToHistory(results);
 
-      logger.debug('Health check completed', {
+      logger.debug({
         component: 'HealthMonitor',
         results: results.length,
         overallStatus: overallResult.status,
         latency: overallLatency
-      });
+      }, 'Health check completed');
 
       return results;
 
@@ -313,10 +313,10 @@ export class UnifiedHealthMonitor {
 
       results.push(errorResult);
 
-      logger.error('Health check failed', {
+      logger.error({
         component: 'HealthMonitor',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, 'Health check failed');
 
       return results;
     }
@@ -412,7 +412,7 @@ export class UnifiedHealthMonitor {
 
     this.alerts.push(alert);
 
-    logger.warn('Database health alert triggered', {
+    logger.warn({
       component: 'HealthMonitor',
       alert: {
         id: alert.id,
@@ -420,7 +420,7 @@ export class UnifiedHealthMonitor {
         severity: alert.severity,
         message: alert.message
       }
-    });
+    }, 'Database health alert triggered');
 
     // Emit alert event for external handling
     this.emitAlert(alert);
@@ -432,12 +432,12 @@ export class UnifiedHealthMonitor {
     const logLevel = alert.severity === 'critical' ? 'error' : 
                     alert.severity === 'high' ? 'warn' : 'info';
     
-    logger[logLevel](`Database Alert: ${alert.message}`, {
+    logger[logLevel]({
       component: 'HealthMonitor',
       alertId: alert.id,
       severity: alert.severity,
       metadata: alert.metadata
-    });
+    }, `Database Alert: ${alert.message}`);
   }
 
   private addToHistory(results: HealthCheckResult[]): void {
@@ -498,11 +498,11 @@ export class UnifiedHealthMonitor {
       alert.resolved = true;
       alert.resolvedAt = new Date();
       
-      logger.info('Database alert resolved', {
+      logger.info({
         component: 'HealthMonitor',
         alertId,
         resolvedAt: alert.resolvedAt
-      });
+      }, 'Database alert resolved');
       
       return true;
     }
@@ -515,11 +515,11 @@ export class UnifiedHealthMonitor {
   public addAlertRule(rule: AlertRule): void {
     this.config.alertRules.push(rule);
     
-    logger.info('Custom alert rule added', {
+    logger.info({
       component: 'HealthMonitor',
       ruleName: rule.name,
       severity: rule.severity
-    });
+    }, 'Custom alert rule added');
   }
 
   /**
@@ -531,10 +531,10 @@ export class UnifiedHealthMonitor {
     
     const removed = this.config.alertRules.length < initialLength;
     if (removed) {
-      logger.info('Alert rule removed', {
+      logger.info({
         component: 'HealthMonitor',
         ruleName
-      });
+      }, 'Alert rule removed');
     }
     
     return removed;

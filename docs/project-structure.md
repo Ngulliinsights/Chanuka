@@ -1,47 +1,19 @@
 # Project Structure
 
-**Generated:** February 24, 2026 at 02:36 AM
+**Generated:** February 24, 2026 at 08:28 AM
 **Max Depth:** 7 levels
-**Total Items:** 4,048
+**Total Items:** 3,879
 
 ```
 .
 ├── analysis-results/
-│   ├── cache-factory-comparison.md
-│   ├── client-type-violations-summary.md
-│   ├── client-type-violations.html
-│   ├── client-type-violations.json
-│   ├── config-manager-feature-matrix.md
-│   ├── config-manager-unique-features.md
-│   ├── hack-comments-scan.md
-│   ├── infrastructure-consolidation-import-analysis.md
-│   ├── observability-server-specific-utilities.md
-│   ├── observability-thin-wrappers-analysis.md
-│   ├── progress-dashboard.html
-│   ├── progress-report.json
-│   ├── task-6-completion-summary.md
-│   ├── task-25-type-safety-verification.md
-│   ├── todo-comments.html
-│   ├── todo-comments.json
-│   ├── type-safety-tooling-summary.md
-│   ├── type-violations-priority-analysis.md
-│   ├── type-violations-summary.md
-│   ├── type-violations.html
-│   └── type-violations.json
 ├── client/
 │   ├── docs/
 │   │   ├── architecture/
-│   │   │   ├── BUG_FIXES_SUMMARY.md
-│   │   │   └── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   │   ├── brand/
-│   │   │   ├── ERROR_CHECK_REPORT.md
-│   │   │   ├── FINAL_STATUS_REPORT.md
 │   │   │   ├── QUICK_REFERENCE.md
-│   │   │   ├── SVG_FIXES_SUMMARY.md
 │   │   │   ├── SVG_INTEGRATION_README.md
 │   │   │   ├── SVG_INTEGRATION_STRATEGY.md
-│   │   │   ├── SVG_INTEGRATION_SUMMARY.md
-│   │   │   ├── SVG_MIGRATION_GUIDE.md
 │   │   │   └── SVG_VISUAL_GUIDE.md
 │   │   └── README.md
 │   ├── logs/
@@ -1195,7 +1167,6 @@
 │   │   │   │   ├── auth-service-init.ts
 │   │   │   │   ├── cache.ts
 │   │   │   │   ├── dataRetentionService.ts
-│   │   │   │   ├── errorAnalyticsBridge.ts
 │   │   │   │   ├── errors.ts
 │   │   │   │   ├── factory.ts
 │   │   │   │   ├── FSD_MIGRATION_SUMMARY.md
@@ -1624,8 +1595,6 @@
 │   │   │   ├── validate-home-page.ts
 │   │   │   ├── validate-migration.ts
 │   │   │   └── validate-websocket-consolidation.ts
-│   │   ├── services/
-│   │   │   └── errorAnalyticsBridge.ts
 │   │   ├── tests/
 │   │   │   ├── accessibility/
 │   │   │   │   └── home-page-accessibility.test.ts
@@ -1638,15 +1607,10 @@
 │   │   ├── main.tsx
 │   │   ├── test-styles.html
 │   │   └── vite-env.d.ts
-│   ├── CHANUKA_IMPLEMENTATION_PLAN.md
-│   ├── COMPREHENSIVE_AUDIT_KENYAN_CONTEXT.md
 │   ├── debug-storybook.log
 │   ├── index.html
-│   ├── LEGAL_PAGES_UPDATE_SUMMARY.md
-│   ├── ORPHANED_COMPONENTS_FIXED.md
 │   ├── package-scripts.json
 │   ├── package.json
-│   ├── PAGES_AUDIT_COMPLETE.md
 │   ├── playwright.config.ts
 │   ├── playwright.visual.config.ts
 │   ├── postcss.config.js
@@ -1660,8 +1624,7 @@
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
-│   ├── vitest.config.ts
-│   └── WHERE_DOES_CODE_BELONG.md
+│   └── vitest.config.ts
 ├── deployment/
 │   ├── environment-configs/
 │   │   ├── development.env
@@ -1700,147 +1663,34 @@
 │   │   ├── CLIENT_OVERLAP_ANALYSIS.md
 │   │   └── data-flow-pipelines.md
 │   ├── archive/
-│   │   ├── legacy_migrations/
-│   │   │   ├── 00_README_SESSION_SUMMARY.md
-│   │   │   ├── ADMIN_ROUTER_MIGRATION_COMPLETE.md
-│   │   │   ├── ANALYSIS_SUMMARY.md
-│   │   │   ├── ARCHITECTURAL_OPTIONS_SHARED_CORE.md
-│   │   │   ├── ARCHITECTURE_MIGRATION_FINAL_REPORT.md
-│   │   │   ├── ARCHITECTURE_QUICK_REFERENCE.md
-│   │   │   ├── ARCHITECTURE_REFACTORING_COMPLETE.md
-│   │   │   ├── ARCHITECTURE_VISUAL_OVERVIEW.md
-│   │   │   ├── ARGUMENT_CONSTITUTIONAL_IMPLEMENTATION.md
-│   │   │   ├── AUTH_ROUTER_MIGRATION_COMPLETE.md
-│   │   │   ├── CLIENT_ERROR_MIGRATION_REPORT.md
-│   │   │   ├── CLIENT_ERROR_SYSTEM_AUDIT.md
-│   │   │   ├── CLIENT_ERROR_USAGE_GUIDE.md
-│   │   │   ├── CONFLICT_ANALYSIS_AND_RESOLUTION.md
-│   │   │   ├── CONFLICT_RESOLUTION_EXECUTION_PLAN.md
-│   │   │   ├── CONFLICT_RESOLUTION_FILE_INVENTORY.md
-│   │   │   ├── CONFLICT_RESOLUTION_INDEX.md
-│   │   │   ├── CONFLICT_RESOLUTION_PROJECT_COMPLETE.md
-│   │   │   ├── CONFLICT_RESOLUTION_QUICK_REFERENCE.md
-│   │   │   ├── CONFLICT_RESOLUTION_SESSION_COMPLETE.md
-│   │   │   ├── CONFLICT_RESOLUTION_VISUAL_SUMMARY.md
-│   │   │   ├── CRITICAL_DISCOVERY_PHASE_R4_REVERSAL.md
-│   │   │   ├── DATABASE_ALIGNMENT_AND_FEATURE_INTEGRATION.md
-│   │   │   ├── DATABASE_ALIGNMENT_COMPLETE.md
-│   │   │   ├── DATABASE_MIGRATION_GUIDE.md
-│   │   │   ├── DATABASE_SCHEMA_ANALYSIS.md
-│   │   │   ├── DELETED_VS_REPLACEMENT_ANALYSIS.md
-│   │   │   ├── DOCUMENTATION_INDEX.md
-│   │   │   ├── ERROR_CONSOLIDATION_SUMMARY.md
-│   │   │   ├── ERROR_SYSTEM_DOCUMENTATION_INDEX.md
-│   │   │   ├── EXECUTION_COMPLETE_SUMMARY.md
-│   │   │   ├── FEATURE_INTEGRATION_ANALYSIS.md
-│   │   │   ├── FEATURE_VERIFICATION_SUMMARY.md
-│   │   │   ├── IMPLEMENTATION_GUIDE.md
-│   │   │   ├── IMPORT_MIGRATION_AND_UI_COMPLETION.md
-│   │   │   ├── IMPORT_MIGRATION_GUIDE.md
-│   │   │   ├── INCOMPLETE_MIGRATIONS_COMPREHENSIVE_AUDIT.md
-│   │   │   ├── INFRASTRUCTURE_AUDIT_REPORT.md
-│   │   │   ├── INFRASTRUCTURE_AUDIT_SUMMARY.md
-│   │   │   ├── INFRASTRUCTURE_QUICK_REFERENCE.md
-│   │   │   ├── INFRASTRUCTURE_REORGANIZATION_SUMMARY.md
-│   │   │   ├── MIGRATION_EXECUTION_PHASE_R4_COMPLETE.md
-│   │   │   ├── MIGRATION_PROGRESS_TRACKER_PHASE2B.txt
-│   │   │   ├── MVP_COMPLETION_ACTION_PLAN.md
-│   │   │   ├── MVP_READINESS_QUICK_REFERENCE.md
-│   │   │   ├── OPTION_1_IMPLEMENTATION_COMPLETE.md
-│   │   │   ├── PHASE_1_2A_COMPLETION.md
-│   │   │   ├── PHASE_1_CACHING_CONSOLIDATION_COMPLETE.md
-│   │   │   ├── PHASE_2_MIDDLEWARE_ASSESSMENT_COMPLETE.md
-│   │   │   ├── PHASE_2B_3_4_PLAN.md
-│   │   │   ├── PHASE_2B_SESSION_2_STATUS.md
-│   │   │   ├── PHASE_3_COMPLETION_SUMMARY.md
-│   │   │   ├── PHASE_3_ERROR_HANDLING_VERIFICATION_COMPLETE.md
-│   │   │   ├── PHASE_4_CONFIG_AUDIT_COMPLETE.md
-│   │   │   ├── PHASE_4_QUALITY_AUDIT_REDUNDANCY_ANALYSIS.md
-│   │   │   ├── PHASE_R4_COMPATIBILITY_LAYER_COMPLETE.md
-│   │   │   ├── PHASE_R4_COMPLETION_REPORT.md
-│   │   │   ├── PHASE_R4_GHOST_MODULE_CLEANUP.md
-│   │   │   ├── PHASE2_IMPLEMENTATION_ROADMAP.md
-│   │   │   ├── PROJECT_STATUS.md
-│   │   │   ├── QUICK_MIGRATION_REFERENCE.md
-│   │   │   ├── QUICK_REFERENCE.md
-│   │   │   ├── QUICK_START_REFERENCE.md
-│   │   │   ├── README_CONFLICT_RESOLUTION.md
-│   │   │   ├── REFACTORING_EXECUTION_SUMMARY.md
-│   │   │   ├── SAFE_MIGRATION_CLEANUP_COMPLETE.md
-│   │   │   ├── SCHEMA_ANALYSIS_AND_READINESS_REPORT.md
-│   │   │   ├── SEARCH_FEATURE_MIGRATION_COMPLETE.md
-│   │   │   ├── SERVER_SERVICES_DEPRECATION.md
-│   │   │   ├── SESSION_2_EXECUTION_SUMMARY.md
-│   │   │   ├── SESSION_2_FINAL_SUMMARY.md
-│   │   │   ├── SESSION_COMPLETE_INFRASTRUCTURE_AUDIT.md
-│   │   │   ├── SESSION_COMPLETION_SUMMARY.md
-│   │   │   ├── SESSION_SUMMARY_TYPE_SYSTEM_CLEANUP.md
-│   │   │   ├── SHARED_AUDIT_QUICK_SUMMARY.md
-│   │   │   ├── SHARED_AUDIT_REPORT.md
-│   │   │   ├── SHARED_REORGANIZATION_STRATEGY.md
-│   │   │   ├── STATUS_REPORT.md
-│   │   │   ├── STRATEGIC_FEATURE_INTEGRATION_ROADMAP.md
-│   │   │   ├── TYPE_SYSTEM_COMPLETE_AUDIT.md
-│   │   │   ├── TYPE_SYSTEM_RESTRUCTURE_PLAN.md
-│   │   │   ├── TYPES_MIGRATION_GUIDE.md
-│   │   │   ├── TYPES_SYSTEM_GOVERNANCE.md
-│   │   │   └── USERS_FEATURE_MIGRATION_COMPLETE.md
-│   │   ├── server/
-│   │   │   ├── CIRCULAR_DEPENDENCIES_RESOLUTION.md
-│   │   │   ├── DDD_STRUCTURE_ANALYSIS.md
-│   │   │   ├── error-baseline-report.md
-│   │   │   ├── files-with-10plus-errors.md
-│   │   │   ├── MANUAL_FIX_GUIDE.md
-│   │   │   ├── module-resolution-analysis-detailed.md
-│   │   │   ├── module-resolution-analysis.md
-│   │   │   ├── module-resolution-categorization.md
-│   │   │   ├── module-resolution-fix-report.md
-│   │   │   ├── module-resolution-progress-report.md
-│   │   │   ├── PHASE1_ARCHITECTURAL_DECISIONS.md
-│   │   │   ├── PHASE1_BREAKTHROUGH.md
-│   │   │   ├── PHASE1_COMPLETE.md
-│   │   │   ├── PHASE1_COMPLETION_SUMMARY.md
-│   │   │   ├── PHASE1_FINAL_REPORT.md
-│   │   │   ├── PHASE1_FINAL_STATUS.md
-│   │   │   ├── PHASE1_PROGRESS_UPDATE.md
-│   │   │   ├── phase1-checkpoint-report.md
-│   │   │   └── phase1-continuation-plan.md
 │   │   ├── ACCESSIBILITY_AUDIT_STATUS.md
-│   │   ├── archive-docs.sh
 │   │   ├── baseline_analysis.md
-│   │   ├── baseline_circular_client.txt
-│   │   ├── baseline_circular_server.txt
-│   │   ├── baseline_circular_shared.txt
-│   │   ├── baseline_depcheck.json
-│   │   ├── baseline_error_counts.json
-│   │   ├── baseline_tsc_client.txt
-│   │   ├── baseline_tsc_root.txt
-│   │   ├── baseline_tsc_server.txt
-│   │   ├── baseline_tsc_shared.txt
 │   │   ├── baseline_unused_exports.txt
-│   │   ├── baseline_vitest_full.txt
-│   │   ├── baseline_vitest.txt
-│   │   ├── canary_files.txt
+│   │   ├── BUG_FIX_REPORT.md
+│   │   ├── BUG_FIXES_SUMMARY.md
+│   │   ├── cache-factory-comparison.md
 │   │   ├── chanuka_architecture.txt
 │   │   ├── CHANUKA_CLIENT_COMPREHENSIVE_ANALYSIS.md
 │   │   ├── CHANUKA_CLIENT_DEEP_DIVE_ANALYSIS.md
+│   │   ├── CHANUKA_IMPLEMENTATION_PLAN.md
 │   │   ├── chanuka_platform_client_improvement_recommendations.md
 │   │   ├── CIRCULAR_DEPENDENCY_FIX.md
-│   │   ├── clear-sw.html
 │   │   ├── CLIENT_ARCHITECTURE_BOUNDARIES_ANALYSIS.md
 │   │   ├── CLIENT_ARCHITECTURE_CLEANUP_SUMMARY.md
 │   │   ├── CLIENT_ARCHITECTURE_CONSOLIDATION_COMPLETE.md
 │   │   ├── CLIENT_CONSOLIDATION_FINAL_REPORT.md
 │   │   ├── CLIENT_CONSOLIDATION_IMPLEMENTATION_PLAN.md
 │   │   ├── CLIENT_CONSOLIDATION_REVIEW.md
+│   │   ├── CLIENT_HEALTH_CHECK.md
 │   │   ├── CLIENT_I18N_CONSOLIDATION_COMPLETE.md
+│   │   ├── client-type-violations-summary.md
 │   │   ├── CODEBASE_AMBITION_VS_REALITY_AUDIT.md
 │   │   ├── CODEBASE_CONSOLIDATION_COMPLETE.md
-│   │   ├── COMMIT_READY_SUMMARY.md
-│   │   ├── COMMIT_SUMMARY.md
-│   │   ├── COMPLETE_IMPLEMENTATION_SUMMARY.md
 │   │   ├── COMPLETE_MIGRATION_NOW.md
+│   │   ├── COMPREHENSIVE_AUDIT_KENYAN_CONTEXT.md
 │   │   ├── COMPREHENSIVE_CODEBASE_AUDIT.md
+│   │   ├── config-manager-feature-matrix.md
+│   │   ├── config-manager-unique-features.md
 │   │   ├── CONSOLIDATION_PROGRESS_REPORT.md
 │   │   ├── CONSOLIDATION_SESSION_SUMMARY.md
 │   │   ├── CONTRADICTIONS_RECONCILIATION.md
@@ -1850,62 +1700,66 @@
 │   │   ├── DATABASE_SERVICE_MIGRATION_GUIDE.md
 │   │   ├── DATABASE_SERVICE_MIGRATION_SUMMARY.md
 │   │   ├── DECISIONS_IMPLEMENTATION_SUMMARY.md
-│   │   ├── dependency-graph.json
 │   │   ├── DOCUMENTATION_AUDIT_REPORT.md
 │   │   ├── DOCUMENTATION_INDEX.md
-│   │   ├── enum-alignment-report.json
-│   │   ├── error_counts.txt
-│   │   ├── EXECUTIVE_SUMMARY.md
+│   │   ├── ERROR_CHECK_REPORT.md
 │   │   ├── FEATURES_INTEGRATION_STATUS.md
 │   │   ├── FINAL_MIGRATION_STATUS.md
 │   │   ├── FINAL_SESSION_SUMMARY.md
+│   │   ├── FINAL_STATUS_REPORT.md
 │   │   ├── FINAL-SCHEMA-INTEGRATION-ZERO-REDUNDANCY.md
 │   │   ├── fix-root-cause.md
-│   │   ├── flat-imports.txt
-│   │   ├── gov-data-imports.txt
 │   │   ├── GOVERNOR_INTEGRATION_PHASE1.md
-│   │   ├── identify-canaries.sh
+│   │   ├── GRAPH_SCHEMA_ANALYSIS_AND_INTEGRATION_PLAN.md
+│   │   ├── hack-comments-scan.md
+│   │   ├── HOOKS_CONSOLIDATION_OPPORTUNITIES.md
 │   │   ├── IMMEDIATE_ACTIONS_COMPLETION_SUMMARY.md
 │   │   ├── IMPLEMENTATION_TRACKER.md
-│   │   ├── IMPORT_EXPORT_AUDIT.json
 │   │   ├── import-resolution-audit-progress.md
 │   │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
 │   │   ├── INFRASTRUCTURE_CONSISTENCY_FIXES_APPLIED.md
+│   │   ├── infrastructure-consolidation-import-analysis.md
 │   │   ├── INHERITANCE_COMPOSITION_ANALYSIS.md
+│   │   ├── LEGAL_PAGES_UPDATE_SUMMARY.md
 │   │   ├── MIGRATION_CHECKLIST.md
 │   │   ├── MIGRATION_COMPLETE_SUMMARY.md
 │   │   ├── MIGRATION_PROGRESS.md
 │   │   ├── MIGRATION_STATUS_REPORT.md
-│   │   ├── migration-verification-report.json
 │   │   ├── missing-strategic-features-analysis.md
 │   │   ├── MONDAY_KICKOFF_CHECKLIST.md
-│   │   ├── NEXT_STEPS_IMPLEMENTATION_COMPLETE.md
-│   │   ├── NEXT_STEPS_IMPLEMENTATION_SUMMARY.md
-│   │   ├── performance-baselines.json
+│   │   ├── observability-server-specific-utilities.md
+│   │   ├── observability-thin-wrappers-analysis.md
+│   │   ├── ORPHANED_COMPONENTS_FIXED.md
+│   │   ├── PAGES_AUDIT_COMPLETE.md
+│   │   ├── PERFORMANCE_IMPLEMENTATION_SUMMARY.md
 │   │   ├── PHASE_4_FINAL_REPORT.md
 │   │   ├── phase4-completion-summary.md
 │   │   ├── phase4-progress.md
-│   │   ├── project-structure-reference.md
+│   │   ├── QUALITY_COMPARISON_FRAMEWORK.md
+│   │   ├── QUALITY_COMPARISON_RESULTS.md
 │   │   ├── QUICK_START_ACCESSIBILITY_AUDIT.md
-│   │   ├── referenced-scripts.txt
-│   │   ├── regression_canaries.json
 │   │   ├── REVISED-SCHEMA-INTEGRATION-FOCUSED.md
-│   │   ├── run_codebase_stats.bat
-│   │   ├── schema-type-alignment-report.json
 │   │   ├── security-consolidation-plan.md
-│   │   ├── SESSION_SUMMARY.md
+│   │   ├── SERVICE_ARCHITECTURE_IMPLEMENTATION_SUMMARY.md
 │   │   ├── SHARED_INTEGRATION_STATUS.md
-│   │   ├── START_HERE.md
 │   │   ├── STRATEGIC_DOCUMENTATION_ANALYSIS.md
 │   │   ├── STRATEGIC_RECOMMENDATIONS_IMPLEMENTATION.md
 │   │   ├── strategic-ui-features-analysis.md
 │   │   ├── structural-ambiguities.md
-│   │   ├── test_api_integration.js
+│   │   ├── SVG_FIXES_SUMMARY.md
+│   │   ├── SVG_INTEGRATION_SUMMARY.md
+│   │   ├── SVG_MIGRATION_GUIDE.md
+│   │   ├── task-6-completion-summary.md
+│   │   ├── task-25-type-safety-verification.md
 │   │   ├── tool_verification_summary.md
+│   │   ├── type-safety-tooling-summary.md
+│   │   ├── type-violations-priority-analysis.md
+│   │   ├── type-violations-summary.md
+│   │   ├── UI_IMPLEMENTATION_CHECKLIST.md
+│   │   ├── UI_UX_IMPROVEMENTS_SUMMARY.md
 │   │   ├── VALIDATION_CONSOLIDATION_COMPLETE.md
-│   │   ├── verify-graph-implementation.sh
 │   │   ├── WCAG_ACCESSIBILITY_AUDIT.md
-│   │   └── WORK_COMPLETE_SUMMARY.md
+│   │   └── WHERE_DOES_CODE_BELONG.md
 │   ├── chanuka/
 │   │   ├── # Chanuka Platform Consolidation Impleme.md
 │   │   ├── chanuka_complete_slogans.md
@@ -1942,7 +1796,6 @@
 │   │   ├── setup.md
 │   │   ├── troubleshooting-guide.md
 │   │   └── user-manual.md
-│   ├── guides,/
 │   ├── plans/
 │   │   └── monitoring-fsd-restructure.md
 │   ├── reference/
@@ -1991,7 +1844,6 @@
 │   │   ├── api_strategy_doc.md
 │   │   ├── brand-roadmap.md
 │   │   ├── chanuka idea validation.md
-│   │   ├── chanuka idea validation.txt
 │   │   ├── Chanuka Validation_ A Rigorous Plan.md
 │   │   ├── chanuka_automation_strategy.md
 │   │   ├── chanuka_brand_roadmap.md
@@ -2003,7 +1855,6 @@
 │   │   ├── Strategic Funding and Networking Plan.md
 │   │   ├── Validating Legislative Intelligence Market.md
 │   │   └── Validating Parliamentary Compliance Infrastructure.md
-│   ├── strategy,/
 │   ├── technical/
 │   │   ├── application-flow.md
 │   │   ├── architecture.md
@@ -2014,19 +1865,13 @@
 │   │   ├── MIGRATION_LOG.md
 │   │   ├── race-condition-analysis.md
 │   │   └── schema-domain-relationships.md
-│   ├── technical,/
 │   ├── api-client-guide.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
-│   ├── BUG_FIX_REPORT.md
-│   ├── CLIENT_HEALTH_CHECK.md
-│   ├── PERFORMANCE_IMPLEMENTATION_SUMMARY.md
+│   ├── CONSOLIDATION_VISUAL_MAP.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
-│   ├── project-structure.md
-│   ├── reorganize-docs.sh
 │   ├── ROUTING_EXPLANATION.md
-│   ├── UI_IMPLEMENTATION_CHECKLIST.md
-│   └── UI_UX_IMPROVEMENTS_SUMMARY.md
+│   └── STRATEGIC_ARCHITECTURE_ANALYSIS.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2063,19 +1908,7 @@
 │   ├── LEGACY_MIGRATION_ARCHIVE.md
 │   └── legacy_migration_validation.sql
 ├── plans/
-│   ├── COMPREHENSIVE_REDUNDANCY_CONSOLIDATION_PLAN.md
-│   ├── dashboard-consolidation-plan.md
 │   ├── design.md
-│   ├── GRAPH_SCHEMA_ANALYSIS_AND_INTEGRATION_PLAN.md
-│   ├── HOOKS_CONSOLIDATION_OPPORTUNITIES.md
-│   ├── IMPLEMENTATION_PROGRESS.md
-│   ├── implementation-plan-updated.md
-│   ├── implementation-plan.md
-│   ├── infrastructure-consolidation-plan-updated.md
-│   ├── infrastructure-consolidation-plan.md
-│   ├── PLAN_UPDATE_SUMMARY.md
-│   ├── QUALITY_COMPARISON_FRAMEWORK.md
-│   ├── QUALITY_COMPARISON_RESULTS.md
 │   └── requirements.md
 ├── playwright-report/
 │   └── index.html
@@ -3587,8 +3420,6 @@
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   └── vite.ts
-├── serverinfrastructuredatabasegraphanalytics/
-├── serverinfrastructuredatabasegraphsync/
 ├── shared/
 │   ├── constants/
 │   │   ├── error-codes.ts

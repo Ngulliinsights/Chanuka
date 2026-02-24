@@ -1,7 +1,12 @@
 /**
  * Navigation-specific error types
- * Using simplified error classes for client-side navigation
+ * 
+ * Uses shared BaseError from dashboard/errors.ts (canonical source)
+ * to unify the error hierarchy across the application.
  */
+
+import { BaseError, ErrorDomain, ErrorSeverity } from '@client/lib/ui/dashboard/errors';
+import type { ErrorContext } from '@client/lib/ui/dashboard/errors';
 
 export enum NavigationErrorType {
   NAVIGATION_ERROR = 'NAVIGATION_ERROR',
@@ -12,9 +17,8 @@ export enum NavigationErrorType {
   NAVIGATION_CONFIGURATION_ERROR = 'NAVIGATION_CONFIGURATION_ERROR',
 }
 
-export class NavigationError extends Error {
+export class NavigationError extends BaseError {
   public readonly type: NavigationErrorType;
-  public readonly statusCode: number;
   public readonly details?: Record<string, unknown>;
   public readonly isOperational: boolean;
 
@@ -24,17 +28,22 @@ export class NavigationError extends Error {
     statusCode: number = 400,
     details?: Record<string, unknown>
   ) {
-    super(message);
-    this.name = 'NavigationError';
+    super(message, {
+      statusCode,
+      code: type,
+      domain: ErrorDomain.UI,
+      severity: ErrorSeverity.MEDIUM,
+      retryable: false,
+      recoverable: true,
+      context: {
+        component: 'Navigation',
+        ...details,
+      } as ErrorContext,
+    });
+    Object.defineProperty(this, 'name', { value: 'NavigationError', writable: true });
     this.type = type;
-    this.statusCode = statusCode;
     this.details = details;
     this.isOperational = true;
-
-    // Maintain proper stack trace
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, NavigationError);
-    }
   }
 }
 

@@ -6,7 +6,7 @@
  * and operational tasks into a single, cohesive interface.
  */
 
-import { logger } from '../../core/src';
+import { logger } from '../../observability';
 
 import { UnifiedConnectionManager } from './connection-manager';
 import { UnifiedHealthMonitor } from './health-monitor';
@@ -135,7 +135,7 @@ export class DatabaseOrchestrator {
       logger.info('✅ Database orchestrator initialized successfully');
 
     } catch (error) {
-      logger.error('❌ Failed to initialize database orchestrator', { error });
+      logger.error({ error }, '❌ Failed to initialize database orchestrator');
       await this.cleanup();
       throw error;
     }
@@ -203,7 +203,7 @@ export class DatabaseOrchestrator {
         status.connections.analytics = healthStatus.analytics;
         status.connections.security = healthStatus.security;
       } catch (error) {
-        logger.error('Failed to get connection status', { error });
+        logger.error({ error }, 'Failed to get connection status');
       }
     }
 
@@ -245,7 +245,7 @@ export class DatabaseOrchestrator {
         metrics.performance.averageQueryTime = connectionMetrics.averageQueryTime;
         metrics.performance.errorRate = connectionMetrics.errorCount / Math.max(connectionMetrics.totalQueries, 1);
       } catch (error) {
-        logger.error('Failed to get connection metrics', { error });
+        logger.error({ error }, 'Failed to get connection metrics');
         metrics.health.issues.push('Failed to retrieve connection metrics');
       }
     }
@@ -256,7 +256,7 @@ export class DatabaseOrchestrator {
         metrics.health.status = healthSummary.status as 'healthy' | 'degraded' | 'unhealthy';
         metrics.health.lastCheck = new Date(healthSummary.lastCheck);
       } catch (error) {
-        logger.error('Failed to get health metrics', { error });
+        logger.error({ error }, 'Failed to get health metrics');
         metrics.health.issues.push('Failed to retrieve health metrics');
       }
     }
@@ -297,7 +297,7 @@ export class DatabaseOrchestrator {
     } catch (error) {
       healthy = false;
       issues.push(`Health check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      logger.error('Health check failed', { error });
+      logger.error({ error }, 'Health check failed');
     }
 
     return { healthy, issues };
@@ -387,7 +387,7 @@ export class DatabaseOrchestrator {
       logger.info('Stopping health monitor');
       shutdownPromises.push(
         Promise.resolve(this.healthMonitor.stop()).catch(error => {
-          logger.error('Error stopping health monitor', { error });
+          logger.error({ error }, 'Error stopping health monitor');
         })
       );
     }
@@ -397,7 +397,7 @@ export class DatabaseOrchestrator {
       logger.info('Closing connection manager');
       shutdownPromises.push(
         this.connectionManager.close().catch(error => {
-          logger.error('Error closing connection manager', { error });
+          logger.error({ error }, 'Error closing connection manager');
         })
       );
     }
@@ -413,7 +413,7 @@ export class DatabaseOrchestrator {
 
       logger.info('✅ Database orchestrator shutdown completed');
     } catch (error) {
-      logger.error('⚠️ Database orchestrator shutdown completed with errors', { error });
+      logger.error({ error }, '⚠️ Database orchestrator shutdown completed with errors');
     } finally {
       await this.cleanup();
     }

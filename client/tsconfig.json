@@ -37,94 +37,34 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    // Path Mappings - Client-specific aliases only
-    // ========================================================
-    // RULE: All client-side paths use @/ or @core, @lib (local)
-    //       All workspace-level paths use @workspace prefix
-    //       This prevents ambiguity between workspace /shared and client @lib
-    // ========================================================
     "paths": {
-      // ===== CLIENT FRAMEWORK =====
+      // Client framework
       "@client": ["./src"],
       "@client/*": ["./src/*"],
-      "@client/@types": ["./@types"],
-      "@client/@types/*": ["./@types/*"],
-      "@client/test-utils": ["./test-utils"],
-      "@client/test-utils/*": ["./test-utils/*"],
       
-      // ===== CLIENT-SIDE MODULES (all in ./src) =====
+      // Client-side modules
       "@core": ["./src/infrastructure"],
-      
-      // ===== SHARED MODULES (root-level shared/) =====
-      "@shared": ["../shared"],
-      "@shared/*": ["../shared/*"],
-      "@shared/types": ["../shared/types"],
-      "@shared/types/*": ["../shared/types/*"],
-      "@shared/validation": ["../shared/validation"],
-      "@shared/validation/*": ["../shared/validation/*"],
-      "@shared/constants": ["../shared/constants"],
-      "@shared/constants/*": ["../shared/constants/*"],
-      "@shared/utils": ["../shared/utils"],
-      "@shared/utils/*": ["../shared/utils/*"],
-      "@shared/core": ["../shared/core"],
-      "@shared/core/*": ["../shared/core/*"],
-      "@shared/platform": ["../shared/platform"],
-      "@shared/i18n": ["../shared/i18n"],
-      "@workspace": ["../shared"],
-      "@workspace/*": ["../shared/*"],
-      "@workspace/types": ["../shared/types"],
-      "@workspace/types/*": ["../shared/types/*"],
-      "@workspace/core": ["../shared/core"],
-      "@workspace/core/*": ["../shared/core/*"],
-      "@workspace/validation": ["../shared/validation"],
-      "@workspace/validation/*": ["../shared/validation/*"],
-      "@workspace/constants": ["../shared/constants"],
-      "@workspace/constants/*": ["../shared/constants/*"],
       "@core/*": ["./src/infrastructure/*"],
       "@lib": ["./src/lib"],
       "@lib/*": ["./src/lib/*"],
-      "@lib/types": ["./src/lib/types"],
-      "@lib/types/*": ["./src/lib/types/*"],
-      "@lib/services": ["./src/lib/services"],
-      "@lib/services/*": ["./src/lib/services/*"],
-      "@lib/ui": ["./src/lib/ui"],
-      "@lib/ui/*": ["./src/lib/ui/*"],
-      "@lib/hooks": ["./src/lib/hooks"],
-      "@lib/hooks/*": ["./src/lib/hooks/*"],
-      "@lib/utils": ["./src/lib/utils"],
-      "@lib/utils/*": ["./src/lib/utils/*"],
-      "@lib/context": ["./src/lib/context"],
-      "@lib/context/*": ["./src/lib/context/*"],
-      "@lib/components": ["./src/lib/components"],
-      "@lib/components/*": ["./src/lib/components/*"],
-      "@lib/design-system": ["./src/lib/design-system"],
-      "@lib/design-system/*": ["./src/lib/design-system/*"],
-      
-      // ===== APP/FEATURE MODULES (all in ./src) =====
       "@features": ["./src/features"],
       "@features/*": ["./src/features/*"],
       "@app": ["./src/app"],
       "@app/*": ["./src/app/*"],
       
-      // ===== LIBRARY SHORTCUTS =====
+      // Convenience shortcuts
       "@hooks": ["./src/lib/hooks"],
       "@hooks/*": ["./src/lib/hooks/*"],
       "@utils": ["./src/lib/utils"],
       "@utils/*": ["./src/lib/utils/*"],
       
-
+      // Shared workspace modules
+      "@shared": ["../shared"],
+      "@shared/*": ["../shared/*"],
       
-      // ===== STUBS FOR SERVER-ONLY MODULES =====
+      // Server stubs for type-only imports
       "@server-stub/database": ["./src/stubs/database-stub.ts"],
-      "@server-stub/middleware": ["./src/stubs/middleware-stub.ts"],
-      
-      // ===== SECURITY MODULES =====
-      "@secure": ["./src/lib/utils/secure"],
-      "@secure/*": ["./src/lib/utils/secure/*"],
-      
-      // ===== LOGGING (UNIFIED) =====
-      "@logger": ["./src/lib/utils/logger"],
-      "@logger/*": ["./src/lib/utils/logger/*"]
+      "@server-stub/middleware": ["./src/stubs/middleware-stub.ts"]
     },
 
     // Type Definitions

@@ -11,7 +11,7 @@
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
 
-import { logger } from '../../core/src/index';
+import { logger } from '../../observability';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -164,7 +164,7 @@ export class UnifiedConnectionManager {
       this.startHealthMonitoring();
       this.isInitialized = true;
 
-      logger.info('Unified connection manager initialized successfully', {
+      logger.info({
         component: 'ConnectionManager',
         primaryPool: true,
         readReplicas: this.readPools.length,
@@ -174,12 +174,12 @@ export class UnifiedConnectionManager {
           security: !!this.securityPool
         },
         maxConnections: this.config.max
-      });
+      }, 'Unified connection manager initialized successfully');
     } catch (error) {
-      logger.error('Failed to initialize connection manager', {
+      logger.error({
         component: 'ConnectionManager',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, 'Failed to initialize connection manager');
       throw error;
     }
   }
@@ -260,34 +260,34 @@ export class UnifiedConnectionManager {
 
   private setupPoolEventHandlers(pool: Pool, poolName: string): void {
     pool.on('connect', (_client: PoolClient) => {
-      logger.debug(`New client connected to ${poolName} pool`, {
+      logger.debug({
         component: 'ConnectionManager',
         pool: poolName
-      });
+      }, `New client connected to ${poolName} pool`);
       this.updateConnectionMetrics();
     });
 
     pool.on('acquire', (_client: PoolClient) => {
-      logger.debug(`Client acquired from ${poolName} pool`, {
+      logger.debug({
         component: 'ConnectionManager',
         pool: poolName
-      });
+      }, `Client acquired from ${poolName} pool`);
     });
 
     pool.on('remove', (_client: PoolClient) => {
-      logger.debug(`Client removed from ${poolName} pool`, {
+      logger.debug({
         component: 'ConnectionManager',
         pool: poolName
-      });
+      }, `Client removed from ${poolName} pool`);
       this.updateConnectionMetrics();
     });
 
     pool.on('error', (err: Error, _client: PoolClient) => {
-      logger.error(`Database pool error in ${poolName}`, {
+      logger.error({
         component: 'ConnectionManager',
         pool: poolName,
         error: err.message
-      });
+      }, `Database pool error in ${poolName}`);
       this.errorCount++;
       this.updateConnectionMetrics();
     });
@@ -373,11 +373,11 @@ export class UnifiedConnectionManager {
       try {
         return await this.readPools[randomIndex]!.connect();
       } catch (error) {
-        logger.warn('Read replica connection failed, falling back to primary', {
+        logger.warn({
           component: 'ConnectionManager',
           replicaIndex: randomIndex,
           error: error instanceof Error ? error.message : 'Unknown error'
-        });
+        }, 'Read replica connection failed, falling back to primary');
       }
     }
 
@@ -420,11 +420,11 @@ export class UnifiedConnectionManager {
       return result;
     } catch (error) {
       this.errorCount++;
-      logger.error('Database query failed', {
+      logger.error({
         component: 'ConnectionManager',
         query: text.substring(0, 100) + '...',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, 'Database query failed');
       throw error;
     } finally {
       if (client!) {
@@ -480,7 +480,7 @@ export class UnifiedConnectionManager {
         try {
           await client.query('ROLLBACK');
         } catch (rollbackError) {
-          logger.error('Rollback failed', { error: rollbackError });
+          logger.error({ error: rollbackError }, 'Rollback failed');
         }
         
         client.release();
@@ -488,7 +488,7 @@ export class UnifiedConnectionManager {
         const isRetryable = this.isTransientError(lastError);
         const shouldRetry = attempt < maxRetries && isRetryable;
 
-        logger.error('Transaction failed', {
+        logger.error({
           error: lastError,
           component: 'ConnectionManager',
           attempt: attempt + 1,
@@ -496,13 +496,13 @@ export class UnifiedConnectionManager {
           willRetry: shouldRetry,
           isRetryable,
           timestamp: new Date().toISOString(),
-        });
+        }, 'Transaction failed');
 
         if (onError) {
           try {
             onError(lastError, attempt + 1);
           } catch (handlerError) {
-            logger.error('Error handler threw exception', { error: handlerError });
+            logger.error({ error: handlerError }, 'Error handler threw exception');
           }
         }
 
@@ -673,17 +673,17 @@ export class UnifiedConnectionManager {
       this.metrics.lastHealthCheck = new Date();
       this.updateConnectionMetrics();
 
-      logger.debug('Database health check completed', {
+      logger.debug({
         component: 'ConnectionManager',
         healthyPools,
         totalPools: pools.length
-      });
+      }, 'Database health check completed');
 
     } catch (error) {
-      logger.error('Health check failed', {
+      logger.error({
         component: 'ConnectionManager',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, 'Health check failed');
     }
   }
 
@@ -700,11 +700,11 @@ export class UnifiedConnectionManager {
       client.release();
       return true;
     } catch (error) {
-      logger.warn(`Health check failed for ${poolName} pool`, {
+      logger.warn({
         component: 'ConnectionManager',
         pool: poolName,
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, `Health check failed for ${poolName} pool`);
       return false;
     }
   }
@@ -744,11 +744,11 @@ export class UnifiedConnectionManager {
         latencyMs,
       };
     } catch (error) {
-      logger.error('Database health check failed', { 
+      logger.error({ 
         error,
         component: 'ConnectionManager',
         timestamp: new Date().toISOString(),
-      });
+      }, 'Database health check failed');
 
       return {
         operational: false,
@@ -833,10 +833,10 @@ export class UnifiedConnectionManager {
 
     this.isInitialized = false;
 
-    logger.info('All database connections closed successfully', {
+    logger.info({
       component: 'ConnectionManager',
       timestamp: new Date().toISOString(),
-    });
+    }, 'All database connections closed successfully');
   }
 
   /**
@@ -859,10 +859,10 @@ export class UnifiedConnectionManager {
 
     this.isInitialized = false;
 
-    logger.warn('Database connections force closed', {
+    logger.warn({
       component: 'ConnectionManager',
       timestamp: new Date().toISOString(),
-    });
+    }, 'Database connections force closed');
   }
 }
 

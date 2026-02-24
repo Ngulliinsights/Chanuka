@@ -11,6 +11,7 @@ export enum ErrorDomain {
   BUSINESS_LOGIC = 'BUSINESS_LOGIC',
   NETWORK = 'NETWORK',
   VALIDATION = 'VALIDATION',
+  UI = 'UI',
   SYSTEM = 'SYSTEM',
 }
 
@@ -29,6 +30,9 @@ export interface ErrorContext {
   value?: unknown;
   action?: string;
   topicId?: string;
+  stage?: string;
+  timeout?: number;
+  retryCount?: number;
   [key: string]: unknown;
 }
 
@@ -40,6 +44,7 @@ export interface BaseErrorOptions {
   retryable?: boolean;
   recoverable?: boolean;
   context?: ErrorContext;
+  cause?: Error | unknown;
   zodError?: unknown; // ZodError from zod validation
   config?: unknown; // Configuration that caused the error
   retryCount?: number; // Number of retry attempts
@@ -53,7 +58,7 @@ export interface BaseErrorOptions {
  * Base error class with enhanced metadata
  */
 export class BaseError extends Error {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly statusCode: number;
   public readonly code: string;
   public readonly domain: ErrorDomain;
@@ -62,6 +67,7 @@ export class BaseError extends Error {
   public readonly recoverable: boolean;
   public readonly context?: ErrorContext;
   public readonly timestamp: Date;
+  public override readonly cause?: Error | unknown;
 
   constructor(message: string, options?: BaseErrorOptions) {
     super(message);
@@ -74,6 +80,7 @@ export class BaseError extends Error {
     this.recoverable = options?.recoverable ?? true;
     this.context = options?.context;
     this.timestamp = new Date();
+    this.cause = options?.cause;
 
     // Maintains proper stack trace for where our error was thrown
     if (Error.captureStackTrace) {
@@ -86,7 +93,7 @@ export class BaseError extends Error {
  * Network-related errors
  */
 export class NetworkError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
 
   constructor(message: string, context?: ErrorContext) {
     super(message, {
@@ -106,7 +113,7 @@ export class NetworkError extends BaseError {
  * Validation-related errors
  */
 export class ValidationError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly errors: Record<string, string[]>;
 
   constructor(
@@ -149,7 +156,7 @@ export enum DashboardErrorType {
  * Base dashboard error - all dashboard errors extend this
  */
 export class DashboardError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly dashboardType: DashboardErrorType;
   public readonly details?: Record<string, unknown>;
 
@@ -185,7 +192,7 @@ export class DashboardError extends BaseError {
  * Dashboard data fetch error - for data loading failures
  */
 export class DashboardDataFetchError extends NetworkError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly endpoint: string;
 
   constructor(
@@ -213,7 +220,7 @@ export class DashboardDataFetchError extends NetworkError {
  * Dashboard validation error - for input validation failures
  */
 export class DashboardValidationError extends ValidationError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly field?: string;
   public readonly value?: unknown;
 
@@ -248,7 +255,7 @@ export class DashboardValidationError extends ValidationError {
  * Dashboard configuration error - for setup/config failures
  */
 export class DashboardConfigurationError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
 
   constructor(
     message: string,
@@ -282,7 +289,7 @@ export class DashboardConfigurationError extends BaseError {
  * Dashboard action error - for operation/action failures
  */
 export class DashboardActionError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly action: string;
 
   constructor(
@@ -316,7 +323,7 @@ export class DashboardActionError extends BaseError {
  * Dashboard topic error - for topic/data entity failures
  */
 export class DashboardTopicError extends BaseError {
-  public readonly name: string;
+  public override readonly name: string;
   public readonly operation: string;
   public readonly topicId?: string;
 

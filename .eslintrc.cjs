@@ -32,24 +32,24 @@ module.exports = {
         extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
     },
+    "import/internal-regex": "^@(shared|client|server|workspace)/",
   },
   rules: {
-    "@typescript-eslint/no-unused-vars": "off", // Handled in overrides per-section
-    "@typescript-eslint/no-explicit-any": "off", // Allow for placeholder implementations
+    "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    "@typescript-eslint/no-explicit-any": "warn", // Warn instead of allowing freely
     "@typescript-eslint/prefer-nullish-coalescing": "off", // Stylistic preference
     "@typescript-eslint/prefer-optional-chain": "off", // Stylistic preference
     "@typescript-eslint/no-namespace": "off", // Allow namespaces for legacy code
-    "@typescript-eslint/no-non-null-assertion": "off", // Allow non-null assertions
+    "@typescript-eslint/no-non-null-assertion": "warn", // Warn on non-null assertions
     "@typescript-eslint/ban-types": "off", // Allow Function, Object types
     "import/no-unresolved": "warn", // Warn instead of error on unresolved
-    "no-restricted-imports": "warn", // Warn instead of error on restricted imports
     "no-case-declarations": "off", // Allow declarations in case blocks for intermediate states
     "no-control-regex": "off", // Allow in specific contexts
     "no-useless-escape": "off", // Allow escape sequences in patterns
-    "no-console": "off", // Allow console for development
+    "no-console": "warn", // Warn on console usage
     "no-prototype-builtins": "warn", // Warn on prototype access
-    "no-var": "warn", // Warn on var usage
-    "prefer-const": "off", // Allow reassigned declarations
+    "no-var": "error", // Error on var usage
+    "prefer-const": "error", // Error on reassignable const candidates
     "max-depth": "off", // Allow nested blocks
     "import/order": [
       "warn",
@@ -143,6 +143,39 @@ module.exports = {
             importNames: ["z"],
             message:
               "Use validation primitives from @shared/validation instead of defining local schemas. Import emailSchema, uuidSchema, userRoleSchema, etc.",
+          },
+        ],
+      },
+    ],
+    // Client architectural boundary enforcement
+    "import/no-restricted-paths": [
+      "error",
+      {
+        zones: [
+          {
+            target: "./client/src/infrastructure",
+            from: "./client/src/features",
+            message:
+              "Infrastructure cannot import from features - violates architectural boundaries",
+          },
+          {
+            target: "./client/src/lib",
+            from: "./client/src/infrastructure",
+            message:
+              "Lib cannot import from infrastructure - creates circular dependencies",
+          },
+          {
+            target: "./client/src/lib",
+            from: "./client/src/features",
+            message:
+              "Lib cannot import from features - violates architectural boundaries",
+          },
+          {
+            target: "./client/src/features/*",
+            from: "./client/src/features/*",
+            except: ["./*/"],
+            message:
+              "Features cannot import from other features - creates tight coupling",
           },
         ],
       },
