@@ -153,7 +153,7 @@ export const smartPreloads: PreloadConfig[] = [
 
   // Dashboard - preload only if user is authenticated
   {
-    href: '/src/pages/bills-dashboard-page.tsx',
+    href: '/src/features/bills/pages/bills-dashboard-page.tsx',
     as: 'script',
     type: 'module',
     condition: () => {

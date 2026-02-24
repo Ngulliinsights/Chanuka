@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 24, 2026 at 08:28 AM
+**Generated:** February 24, 2026 at 09:32 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,879
+**Total Items:** 3,876
 
 ```
 .
@@ -1607,7 +1607,6 @@
 │   │   ├── main.tsx
 │   │   ├── test-styles.html
 │   │   └── vite-env.d.ts
-│   ├── debug-storybook.log
 │   ├── index.html
 │   ├── package-scripts.json
 │   ├── package.json
@@ -1619,8 +1618,6 @@
 │   ├── tailwind.config.ts
 │   ├── tsconfig.json
 │   ├── tsconfig.tsbuildinfo
-│   ├── type_check_output_2.txt
-│   ├── type_check_output.txt
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
@@ -1868,8 +1865,12 @@
 │   ├── api-client-guide.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
 │   ├── CONSOLIDATION_VISUAL_MAP.md
+│   ├── migration-examples.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
+│   ├── PHASE_1_3_COMPLETION.md
+│   ├── project-structure-analysis.md
+│   ├── project-structure.md
 │   ├── ROUTING_EXPLANATION.md
 │   └── STRATEGIC_ARCHITECTURE_ANALYSIS.md
 ├── drizzle/
@@ -3101,6 +3102,7 @@
 │   │   │   ├── utils/
 │   │   │   │   └── base-script.ts
 │   │   │   ├── connection.ts
+│   │   │   ├── DATASERVICE_MIGRATION_PLAN.md
 │   │   │   ├── example-usage.ts
 │   │   │   ├── index.ts
 │   │   │   ├── init.ts
@@ -3413,8 +3415,6 @@
 │   │   ├── shared-core-fallback.ts
 │   │   └── validation.ts
 │   ├── index.ts
-│   ├── MIGRATION_EXAMPLES.ts
-│   ├── module-resolution-analysis.json
 │   ├── package.json
 │   ├── project.json
 │   ├── tsconfig.json
@@ -3678,12 +3678,9 @@
 │   │   ├── middleware.ts
 │   │   ├── SCHEMA_ALIGNMENT_GUIDE.md
 │   │   └── test-schemas.ts
-│   ├── fix-unused.ts
 │   ├── index.ts
-│   ├── package-lock.json
 │   ├── package.json
 │   ├── project.json
-│   ├── temp-schema-tsconfig.tsbuildinfo
 │   ├── tsconfig.json
 │   └── vite.config.ts
 ├── tests/

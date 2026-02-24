@@ -8,7 +8,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 class HomePageValidator {
-  private homePagePath = join(process.cwd(), 'src/pages/StrategicHomePage.tsx');
+  private homePagePath = join(process.cwd(), 'src/features/home/pages/home.tsx');
 
   validate(): ValidationResult[] {
     const results: ValidationResult[] = [];

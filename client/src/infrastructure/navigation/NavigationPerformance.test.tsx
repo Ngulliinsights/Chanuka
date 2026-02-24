@@ -20,11 +20,11 @@ vi.mock('@client/lib/utils/logger', () => ({
 }));
 
 // Mock dynamic imports
-vi.mock('../../pages/StrategicHomePage', () => ({
+vi.mock('../../features/home/pages/home', () => ({
   default: () => <div>Home Page</div>,
 }));
 
-vi.mock('../../pages/bills/bills-dashboard-page', () => ({
+vi.mock('../../features/bills/pages/bills-dashboard-page', () => ({
   default: () => <div>Bills Dashboard</div>,
 }));
 

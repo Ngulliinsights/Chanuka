@@ -354,9 +354,9 @@ class WebSocketConsolidationMigrator {
     const filesToUpdate = [
       'client/src/features/bills/services/tracking.ts',
       'client/src/features/community/hooks/useCommunityWebSocket.ts',
-      'client/src/components/notifications/NotificationCenter.tsx',
-      'client/src/pages/dashboard.tsx',
-      'client/src/pages/analytics-dashboard.tsx',
+      'client/src/features/notifications/ui/NotificationCenter.tsx',
+      'client/src/features/dashboard/pages/dashboard.tsx',
+      'client/src/features/analytics/pages/analytics-dashboard.tsx',
     ];
 
     for (const filePath of filesToUpdate) {

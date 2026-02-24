@@ -81,20 +81,15 @@ export default defineConfig({
           'chart-vendor': ['d3', 'recharts'],
           'utils-vendor': ['lodash', 'date-fns'],
 
-          // Feature chunks
+          // Feature chunks - updated to FSD structure
           'bills-feature': [
-            './src/components/bills',
-            './src/pages/bills',
+            './src/features/bills',
           ],
           'community-feature': [
-            './src/components/community',
-            './src/components/discussion',
-            './src/store/slices/discussionSlice',
+            './src/features/community',
           ],
           'analytics-feature': [
-            './src/components/analytics',
-            './src/components/error',
-            './src/store/slices/errorAnalyticsSlice',
+            './src/features/analytics',
           ],
         },
 
