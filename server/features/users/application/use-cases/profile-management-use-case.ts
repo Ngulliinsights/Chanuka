@@ -1,4 +1,5 @@
 // Using repository pattern with Drizzle-based implementation for decoupling
+import { logger } from '@server/infrastructure/observability';
 import { UserProfile } from '../../domain/entities/user-profile';
 import { ProfileCompletenessScore,ProfileDomainService, ProfileValidationResult } from '../../domain/services/profile-domain-service';
 import { ProfileUpdateResult,UserManagementDomainService } from '../../domain/services/user-management-domain-service';
@@ -268,8 +269,10 @@ export class ProfileManagementUseCase {
   }
 
   private logProfileUpdate(user_id: string, action: string): void {
-    // This would typically use a logging service
-    console.log(`Profile ${action} for user: ${ user_id }`);
+    logger.info(
+      { user_id, action },
+      `Profile ${action} for user: ${user_id}`
+    );
   }
 }
 

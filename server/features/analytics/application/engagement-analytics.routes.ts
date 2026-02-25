@@ -1,6 +1,6 @@
 // Security Services
 import { dataPrivacyService } from '@server/features/security/services/data-privacy-service';
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
+import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { bill_engagement,comments as comments_cp } from '@server/infrastructure/schema';
 import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache  } from '@server/infrastructure/cache';

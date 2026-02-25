@@ -150,7 +150,10 @@ class PrivacySchedulerService {
       });
 
       if (result.success) {
-        console.log(`✅ Scheduled data cleanup completed. Deleted ${totalRecordsDeleted} records.`);
+        logger.info(
+          { totalRecordsDeleted },
+          `✅ Scheduled data cleanup completed. Deleted ${totalRecordsDeleted} records.`
+        );
       } else {
         logger.error('❌ Scheduled data cleanup completed with errors', { component: 'Chanuka' });
       }
@@ -233,10 +236,10 @@ class PrivacySchedulerService {
       });
 
       if (stalePolicies.length > 0) {
-        console.warn(`⚠️  Found ${stalePolicies.length} stale retention policies that need attention`);
-        stalePolicies.forEach(policy => {
-          console.warn(`   - ${policy.dataType}: Last cleanup ${policy.lastCleanup || 'never'}`);
-        });
+        logger.warn(
+          { stalePoliciesCount: stalePolicies.length, stalePolicies },
+          `⚠️  Found ${stalePolicies.length} stale retention policies that need attention`
+        );
       } else {
         logger.info('✅ All retention policies are up to date', { component: 'Chanuka' });
       }

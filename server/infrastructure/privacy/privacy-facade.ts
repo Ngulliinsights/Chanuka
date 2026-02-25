@@ -22,6 +22,7 @@ export interface PrivacyPreferences {
     shareVotingHistory: boolean;
   };
   cookies: {
+    essential: boolean;
     analytics: boolean;
     marketing: boolean;
     preferences: boolean;
@@ -29,6 +30,7 @@ export interface PrivacyPreferences {
   dataRetention?: {
     keepComments: boolean;
     keepEngagementHistory: boolean;
+    keepNotifications: boolean;
     retentionPeriodMonths: number;
   };
 }

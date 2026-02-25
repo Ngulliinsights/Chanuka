@@ -3,7 +3,7 @@ import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
-import { constitutionalAnalysisServiceComplete } from '../../../../constitutional-analysis-service-complete';
+import { constitutionalAnalysisServiceComplete } from '../../../../constitutional-analysis-service';
 
 // ============================================================================
 // TYPE DEFINITIONS

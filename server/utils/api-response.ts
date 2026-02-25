@@ -7,14 +7,14 @@ import {
   ApiResponse,
   ApiSuccessResponse as sendApiResponse,
   ApiValidationErrorResponse
- } from './shared-core-fallback';
+ } from './api-response-helpers';
 
 // For backward compatibility
 export const UnifiedApiResponse = ApiResponse;
 
 console.warn(
   '[DEPRECATED] server/utils/api-response.ts is deprecated. ' +
-  'Please import from \'@shared/core/src/utils/api-utils\' instead.'
+  'Please import from \'@server/utils/api-response-helpers\' instead.'
 );
 
 export const ApiResponseWrapper = UnifiedApiResponse;

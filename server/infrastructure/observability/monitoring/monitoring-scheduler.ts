@@ -7,7 +7,7 @@
  * scheduler has no opinion about what the tasks do.
  */
 
-import { schemaValidationService } from '../../core/validation/schema-validation-service';
+import { schemaValidationService } from '../../validation/schema-validation-service';
 import { logger } from '../core/logger';
 import {
   INTERVALS,

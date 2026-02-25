@@ -12,7 +12,7 @@
  */
 
 import { securityAuditService } from '@server/features/security/security-audit-service';
-import { commonSchemas, inputValidationService } from '@server/infrastructure/security/input-validation-service';
+import { commonSchemas, inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';

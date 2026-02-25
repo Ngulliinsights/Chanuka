@@ -776,7 +776,7 @@ class PrivacyService {
           policy.recordsAffected = recordsDeleted;
 
         } catch (error) {
-          console.error(`Error cleaning up ${policy.dataType}:`, error);
+          logger.error({ dataType: policy.dataType, error }, `Error cleaning up ${policy.dataType}`);
           cleanupResults.push({
             dataType: policy.dataType,
             recordsDeleted: 0,

@@ -7,17 +7,18 @@
  * The only external dependencies are the core logger and the error tracker.
  */
 
-import { errorTracker } from '../monitoring/error-tracker';
-import { logger, logBuffer } from '../core/logger';
+import { errorTracker } from './monitoring/error-tracker';
+import { logger, logBuffer } from './core/logger';
 import {
   DB_SLOW_QUERY_MS,
   DB_VERY_SLOW_QUERY_MS,
-} from '../monitoring/monitoring-policy';
+} from './monitoring/monitoring-policy';
 import type {
   AuditOperation,
   DatabaseOperationContext,
   DatabaseOperationResult,
-} from '../core/types';
+} from './core/types';
+import type { BufferedLogEntry } from './core/log-buffer';
 
 const COMPONENT = 'database';
 
@@ -63,7 +64,6 @@ export class DatabaseLogger {
       operation: context.operation,
       table: context.table,
       operationId,
-      ...context,
       ...additionalMetadata,
     };
 
@@ -116,14 +116,35 @@ export class DatabaseLogger {
       slowQueriesOnly?: boolean;
       errorsOnly?: boolean;
     }
-  ): DatabaseLogEntry[] {
+  ): BufferedLogEntry[] {
+    const now = new Date();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    
     const logs = logBuffer.query({
-      component: COMPONENT,
-      limit,
-      ...filters,
+      start: oneHourAgo,
+      end: now,
     });
 
-    return logs as DatabaseLogEntry[];
+    // Apply filters
+    let filtered = logs.filter(log => log.component === COMPONENT);
+    
+    if (filters?.operation) {
+      filtered = filtered.filter(log => log.operation === filters.operation);
+    }
+    
+    if (filters?.table) {
+      filtered = filtered.filter(log => log['table'] === filters.table);
+    }
+    
+    if (filters?.slowQueriesOnly) {
+      filtered = filtered.filter(log => log['slowQuery'] === true);
+    }
+    
+    if (filters?.errorsOnly) {
+      filtered = filtered.filter(log => log.level === 'error');
+    }
+
+    return filtered.slice(0, limit);
   }
 
   /**

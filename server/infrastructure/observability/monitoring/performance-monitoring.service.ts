@@ -86,13 +86,13 @@ export class PerformanceMonitoringService {
         this.generateAlert(metric, threshold);
       }
 
-      logger.debug('Performance metric recorded', {
+      logger.debug({
         name: metric.name,
         value: metric.value,
         timestamp: metric.timestamp,
-      });
+      }, 'Performance metric recorded');
     } catch (error) {
-      logger.error('Failed to record performance metric', { error, metric });
+      logger.error({ error, metric }, 'Failed to record performance metric');
     }
   }
 
@@ -118,7 +118,7 @@ export class PerformanceMonitoringService {
 
       return results;
     } catch (error) {
-      logger.error('Failed to get performance metrics', { error, startTime, endTime });
+      logger.error({ error, startTime, endTime }, 'Failed to get performance metrics');
       return [];
     }
   }
@@ -128,7 +128,7 @@ export class PerformanceMonitoringService {
    */
   setThreshold(threshold: PerformanceThreshold): void {
     this.thresholds.set(threshold.metric, threshold);
-    logger.info('Performance threshold set', { threshold });
+    logger.info({ threshold }, 'Performance threshold set');
   }
 
   /**
@@ -136,7 +136,7 @@ export class PerformanceMonitoringService {
    */
   removeThreshold(metricName: string): void {
     this.thresholds.delete(metricName);
-    logger.info('Performance threshold removed', { metricName });
+    logger.info({ metricName }, 'Performance threshold removed');
   }
 
   /**
@@ -152,14 +152,14 @@ export class PerformanceMonitoringService {
 
         // Check the most recent metric
         const latestMetric = metricsArray[metricsArray.length - 1];
-        if (latestMetric.value > threshold.threshold) {
+        if (latestMetric && latestMetric.value > threshold.threshold) {
           return true;
         }
       }
 
       return false;
     } catch (error) {
-      logger.error('Failed to check performance thresholds', { error, thresholds });
+      logger.error({ error, thresholds }, 'Failed to check performance thresholds');
       return false;
     }
   }
@@ -184,7 +184,7 @@ export class PerformanceMonitoringService {
       this.alerts.shift();
     }
 
-    logger.warn('Performance alert generated', { alert });
+    logger.warn({ alert }, 'Performance alert generated');
   }
 
   /**
@@ -209,7 +209,7 @@ export class PerformanceMonitoringService {
     if (values.length === 0) return 0;
     const sorted = [...values].sort((a, b) => a - b);
     const index = Math.ceil((percentile / 100) * sorted.length) - 1;
-    return sorted[Math.max(0, index)];
+    return sorted[Math.max(0, index)] ?? 0;
   }
 
   /**
@@ -234,13 +234,14 @@ export class PerformanceMonitoringService {
       const metricStats = Array.from(metricsByName.entries()).map(([name, values]) => {
         const sorted = [...values].sort((a, b) => a - b);
         const sum = values.reduce((a, b) => a + b, 0);
+        const avg = values.length > 0 ? sum / values.length : 0;
         
         return {
           name,
           count: values.length,
-          min: Math.min(...values),
-          max: Math.max(...values),
-          avg: sum / values.length,
+          min: values.length > 0 ? Math.min(...values) : 0,
+          max: values.length > 0 ? Math.max(...values) : 0,
+          avg,
           p50: this.calculatePercentile(sorted, 50),
           p95: this.calculatePercentile(sorted, 95),
           p99: this.calculatePercentile(sorted, 99),
@@ -268,16 +269,16 @@ export class PerformanceMonitoringService {
         },
       };
 
-      logger.info('Performance report generated', {
+      logger.info({
         startTime,
         endTime,
         totalMetrics: metrics.length,
         totalAlerts: alertsInRange.length,
-      });
+      }, 'Performance report generated');
 
       return report;
     } catch (error) {
-      logger.error('Failed to generate performance report', { error, startTime, endTime });
+      logger.error({ error, startTime, endTime }, 'Failed to generate performance report');
       return {
         startTime,
         endTime,

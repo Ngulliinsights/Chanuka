@@ -13,10 +13,10 @@
 import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../core/logger';
 import type { AuditLogEntry } from '../core/types';
-import { classifyRisk, classifySecurityEventType, isSensitiveEndpoint } from '../security/security-policy';
-import { emitSecurityEvent } from '../security/security-event-logger';
+import { classifyRisk, classifySecurityEventType, isSensitiveEndpoint } from '../../../features/security/security-policy';
+import { emitSecurityEvent } from '../../../features/security/security-event-logger';
 
-export { emitSensitiveOperationAudit as logSensitiveOperation } from '../security/security-event-logger';
+export { emitSensitiveOperationAudit as logSensitiveOperation } from '../../../features/security/security-event-logger';
 
 /**
  * Express middleware that logs every HTTP request as a structured audit entry

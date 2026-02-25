@@ -33,16 +33,6 @@ interface BudgetConfig {
   currency: string;
 }
 
-interface CostProjection {
-  source: string;
-  currentDailyCost: number;
-  projectedDailyCost: number;
-  currentMonthlyCost: number;
-  projectedMonthlyCost: number;
-  trend: 'increasing' | 'decreasing' | 'stable';
-  confidence: number;
-}
-
 export class APICostMonitoringService extends EventEmitter {
   private budgetConfigs: Map<string, BudgetConfig> = new Map();
   private costHistory: Map<string, Array<{ timestamp: Date; cost: number; requests: number }>> = new Map();

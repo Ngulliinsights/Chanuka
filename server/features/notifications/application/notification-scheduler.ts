@@ -3,16 +3,16 @@ import { database as db } from '@server/infrastructure/database';
 import { bill_engagement,bills, notifications, users } from '@server/infrastructure/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
+import { logger } from '@server/infrastructure/observability';
 
 // Temporary stub implementation until enhanced-notification service is created
 const enhancedNotificationService = {
   createEnhancedNotification: async (data: unknown) => {
-    console.log('[NOTIFICATION] Creating enhanced notification:', data);
+    logger.info({ data }, '[NOTIFICATION] Creating enhanced notification');
   }
 };
 
 type EnhancedNotificationData = any;
-import { logger } from '@server/infrastructure/observability';
 
 export interface ScheduledDigest { user_id: string;
   frequency: 'daily' | 'weekly' | 'monthly';
@@ -94,7 +94,10 @@ export class NotificationSchedulerService {
         await this.scheduleUserDigest(users.user_id, users.preferences.billTracking);
       }
 
-      console.log(`Scheduled digest notifications for ${usersWithDigests.length} users`);
+      logger.info(
+        { usersCount: usersWithDigests.length },
+        `Scheduled digest notifications for ${usersWithDigests.length} users`
+      );
     } catch (error) {
       logger.error('Error scheduling digest notifications:', { component: 'Chanuka' }, error);
     }
@@ -111,7 +114,8 @@ export class NotificationSchedulerService {
     const jobId = `digest_${ user_id }`;
     
     // Prevent concurrent updates to the same job
-    if (this.jobUpdateLock.has(jobId)) { console.log(`Job update already in progress for user ${user_id }`);
+    if (this.jobUpdateLock.has(jobId)) {
+      logger.debug({ user_id, jobId }, `Job update already in progress for user ${user_id}`);
       return;
     }
     
@@ -127,16 +131,18 @@ export class NotificationSchedulerService {
       }
 
     // Create new scheduled job
-    const job = cron.schedule(cronExpression, async () => { try {
+    const job = cron.schedule(cronExpression, async () => {
+      try {
         await this.sendDigestNotification(user_id);
-       } catch (error) { console.error(`Error sending digest for user ${user_id }:`, error);
+      } catch (error) {
+        logger.error({ user_id, error }, `Error sending digest for user ${user_id}`);
       }
     }, {
       timezone: 'UTC' // TODO: Use user's timezone
     });
 
       this.scheduledJobs.set(jobId, job);
-      console.log(`Scheduled digest for user ${ user_id } with cron: ${cronExpression}`);
+      logger.info({ user_id, cronExpression }, `Scheduled digest for user ${user_id} with cron: ${cronExpression}`);
     } finally {
       this.jobUpdateLock.delete(jobId);
     }
@@ -149,7 +155,7 @@ export class NotificationSchedulerService {
       const digestContent = await this.generateDigestContent(user_id);
       
       if (this.isDigestEmpty(digestContent)) {
-        console.log(`Skipping empty digest for user ${user_id }`);
+        logger.debug({ user_id }, `Skipping empty digest for user ${user_id}`);
         return;
       }
 
@@ -167,8 +173,9 @@ export class NotificationSchedulerService {
 
       await enhancedNotificationService.createEnhancedNotification(digestData);
       
-      console.log(`Sent digest notification to user ${ user_id }`);
-    } catch (error) { console.error(`Error generating digest for user ${user_id }:`, error);
+      logger.info({ user_id }, `Sent digest notification to user ${user_id}`);
+    } catch (error) {
+      logger.error({ user_id, error }, `Error generating digest for user ${user_id}`);
     }
   }
 
@@ -391,7 +398,8 @@ export class NotificationSchedulerService {
   async removeUserDigestSchedule(user_id: string): Promise<void> { const jobId = `digest_${user_id }`;
     
     // Prevent concurrent updates
-    if (this.jobUpdateLock.has(jobId)) { console.log(`Job update in progress for user ${user_id }, skipping removal`);
+    if (this.jobUpdateLock.has(jobId)) {
+      logger.debug({ user_id, jobId }, `Job update in progress for user ${user_id}, skipping removal`);
       return;
     }
     
@@ -400,7 +408,7 @@ export class NotificationSchedulerService {
     try { if (this.scheduledJobs.has(jobId)) {
         this.scheduledJobs.get(jobId)?.destroy();
         this.scheduledJobs.delete(jobId);
-        console.log(`Removed digest schedule for user ${user_id }`);
+        logger.info({ user_id }, `Removed digest schedule for user ${user_id}`);
       }
     } finally {
       this.jobUpdateLock.delete(jobId);
@@ -589,7 +597,10 @@ export class NotificationSchedulerService {
   cleanup(): void {
     // Wait for any pending job updates to complete
     if (this.jobUpdateLock.size > 0) {
-      console.log(`Waiting for ${this.jobUpdateLock.size} job updates to complete before cleanup`);
+      logger.warn(
+        { pendingUpdates: this.jobUpdateLock.size },
+        `Waiting for ${this.jobUpdateLock.size} job updates to complete before cleanup`
+      );
       // In a real implementation, you might want to wait or force cleanup
     }
     

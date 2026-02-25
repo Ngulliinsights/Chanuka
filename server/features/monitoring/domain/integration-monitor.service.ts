@@ -503,7 +503,7 @@ export class IntegrationMonitorService {
       await db.insert(integrationLogs).values(log);
     } catch (error) {
       // Don't throw on logging errors, just log to console
-      console.error('Failed to log integration event:', error);
+      logger.error({ error }, 'Failed to log integration event');
     }
   }
 

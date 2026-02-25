@@ -67,7 +67,7 @@ export class PerformanceMonitor {
       try {
         hook.beforeQuery(operation, metadata);
       } catch (error) {
-        logger.warn('Performance hook beforeQuery failed', { error, operation });
+        logger.warn({ error, operation }, 'Performance hook beforeQuery failed');
       }
     });
 
@@ -99,7 +99,7 @@ export class PerformanceMonitor {
         try {
           hook.afterQuery(metrics);
         } catch (error) {
-          logger.warn('Performance hook afterQuery failed', { error, operation });
+          logger.warn({ error, operation }, 'Performance hook afterQuery failed');
         }
       });
 
@@ -109,15 +109,16 @@ export class PerformanceMonitor {
           try {
             hook.onSlowQuery(metrics, this.slowQueryThreshold);
           } catch (error) {
-            logger.warn('Performance hook onSlowQuery failed', { error, operation });
+            logger.warn({ error, operation }, 'Performance hook onSlowQuery failed');
           }
         });
 
-        logger.warn(`Slow query detected: ${operation}`, {
+        logger.warn({
+          operation,
           duration,
           threshold: this.slowQueryThreshold,
           metadata
-        });
+        }, `Slow query detected: ${operation}`);
       }
     }
   }
@@ -164,10 +165,11 @@ export class PerformanceMonitor {
       if (!operations[metric.operation]) {
         operations[metric.operation] = { count: 0, durations: [], slowCount: 0 };
       }
-      operations[metric.operation].count++;
-      operations[metric.operation].durations.push(metric.duration);
+      const op = operations[metric.operation]!;
+      op.count++;
+      op.durations.push(metric.duration);
       if (metric.duration > this.slowQueryThreshold) {
-        operations[metric.operation].slowCount++;
+        op.slowCount++;
       }
     });
 
@@ -203,22 +205,24 @@ export const performanceMonitor = PerformanceMonitor.getInstance();
 // Default logging hook
 class LoggingPerformanceHook implements QueryPerformanceHook {
   beforeQuery(operation: string, metadata?: Record<string, unknown>): void {
-    logger.debug(`Starting database operation: ${operation}`, { metadata });
+    logger.debug({ operation, metadata }, `Starting database operation: ${operation}`);
   }
 
   afterQuery(metrics: PerformanceMetrics): void {
-    logger.debug(`Completed database operation: ${metrics.operation}`, {
+    logger.debug({
+      operation: metrics.operation,
       duration: metrics.duration,
       success: metrics.success
-    });
+    }, `Completed database operation: ${metrics.operation}`);
   }
 
   onSlowQuery(metrics: PerformanceMetrics, threshold: number): void {
-    logger.warn(`Slow database operation detected: ${metrics.operation}`, {
+    logger.warn({
+      operation: metrics.operation,
       duration: metrics.duration,
       threshold,
       metadata: metrics.metadata
-    });
+    }, `Slow database operation detected: ${metrics.operation}`);
   }
 }
 

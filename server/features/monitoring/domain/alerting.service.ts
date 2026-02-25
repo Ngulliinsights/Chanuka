@@ -152,7 +152,9 @@ export class AlertingService {
     });
 
     // For now, just log the alert
-    console.log(`
+    logger.warn(
+      { alert },
+      `
 ╔════════════════════════════════════════════════════════════════╗
 ║                      INTEGRATION ALERT                          ║
 ╠════════════════════════════════════════════════════════════════╣

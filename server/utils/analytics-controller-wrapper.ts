@@ -1,9 +1,7 @@
-import { logger } from '@server/utils/shared-core-fallback';
-import { Request, Response } from 'express';
+import { logger } from '@server/infrastructure/observability';
+import { Response } from 'express';
 import { z, ZodError } from 'zod';
-
-import { ApiError, ApiSuccess,ApiValidationError } from '../../api-response-fixer';
-import { AuthenticatedRequest } from '../../missing-modules-fallback';
+import type { AuthenticatedRequest } from '@shared/core/types/auth.types';
 
 /**
  * Options for configuring the controller wrapper
@@ -164,14 +162,14 @@ export function controllerWrapper<
 
     } catch (error) {
       // Log the error with context
-      logger.error('Controller error', {
+      logger.error({
         component: 'analytics-controller-wrapper',
         traceId: req.analyticsContext?.traceId,
         method: req.method,
         path: req.path,
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
-      });
+      }, 'Controller error');
 
       // Return error response
       res.status(500).json({

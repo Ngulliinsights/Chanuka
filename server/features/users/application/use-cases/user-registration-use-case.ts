@@ -1,4 +1,5 @@
 // Using repository pattern with Drizzle-based implementation for decoupling
+import { logger } from '@server/infrastructure/observability';
 import { User } from '../../domain/entities/user';
 import { UserCreationResult,UserManagementDomainService } from '../../domain/services/user-management-domain-service';
 
@@ -101,8 +102,11 @@ export class UserRegistrationUseCase {
     };
   }
 
-  private logUserRegistration(user_id: string, email: string): void { // This would typically use a logging service
-    console.log(`User registered: ${user_id } (${email})`);
+  private logUserRegistration(user_id: string, email: string): void {
+    logger.info(
+      { user_id, email },
+      `User registered: ${user_id} (${email})`
+    );
   }
 }
 

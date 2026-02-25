@@ -3,6 +3,8 @@
  * Handles application-level metrics collection for user operations
  */
 
+import { logger } from '@server/infrastructure/observability';
+
 export interface MetricData {
   name: string;
   value: number;
@@ -67,9 +69,14 @@ export class MetricsService {
     // For now, we'll store in memory and log
     this.metrics.push(metricData);
 
-    console.log(`METRIC: ${metricData.name} = ${metricData.value}`, {
-      tags: metricData.tags,
-      timestamp: new Date(metricData.timestamp || Date.now()).toISOString()
+    logger.info(
+      {
+        metric: metricData.name,
+        value: metricData.value,
+        tags: metricData.tags,
+        timestamp: new Date(metricData.timestamp || Date.now()).toISOString()
+      },
+      `METRIC: ${metricData.name} = ${metricData.value}`
     });
   }
 

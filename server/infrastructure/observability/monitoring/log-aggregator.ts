@@ -8,7 +8,7 @@
 
 import { logBuffer } from '../core/logger';
 import { logger } from '../core/logger';
-import { loggingConfig } from '../config/logging-config';
+import { loggingConfig } from '../logging-config';
 import {
   ALERT_DEFAULTS,
 } from './monitoring-policy';

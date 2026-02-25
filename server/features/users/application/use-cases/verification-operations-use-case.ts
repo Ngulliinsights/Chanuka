@@ -1,4 +1,5 @@
 // Repository interfaces removed - using direct service calls
+import { logger } from '@server/infrastructure/observability';
 import { CitizenVerification, VerificationType } from '../../domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '../../domain/entities/value-objects';
 import { UserVerificationDomainService, VerificationCreationResult, VerificationUpdateResult } from '../../domain/services/user-verification-domain-service';
@@ -350,8 +351,10 @@ export class VerificationOperationsUseCase {
   }
 
   private logVerificationActivity(user_id: string, action: string, targetId: string): void {
-    // This would typically use a logging service
-    console.log(`Verification activity: ${action} by ${ user_id } on ${targetId}`);
+    logger.info(
+      { user_id, action, targetId },
+      `Verification activity: ${action} by ${user_id} on ${targetId}`
+    );
   }
 }
 

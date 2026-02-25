@@ -3,7 +3,6 @@ import { correlationIdMiddleware } from '@server/middleware/error-management';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
 import { performanceMonitor } from '@server/utils/missing-modules-fallback';
-import { Performance } from '@server/utils/shared-core-fallback';
 import { logger } from '@server/infrastructure/observability';
 import cors from 'cors';
 import express, { Express,NextFunction, Request, Response } from 'express';
@@ -21,10 +20,10 @@ const PORT = config.server.port;
 
 // Request logger middleware with performance tracking
 const requestLogger = (req: Request, res: Response, next: NextFunction): void => {
-  const timer = Performance.startTimer(`${req.method} ${req.path}`);
+  const startTime = Date.now();
 
   res.on('finish', () => {
-    const duration = timer.end();
+    const duration = Date.now() - startTime;
     logger.info({
       method: req.method,
       url: req.url,
