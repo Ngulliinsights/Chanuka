@@ -27,7 +27,7 @@ export interface ConstitutionalAnalysisEntity {
   confidenceScore: number; // 0-1
   
   // Constitutional implications
-  provisionsC ited: string[]; // IDs of constitutional provisions
+  provisionsCited: string[]; // IDs of constitutional provisions
   potentialViolations: PotentialViolation[];
   
   // Expert review
@@ -53,7 +53,7 @@ export interface CreateAnalysisInput {
   confidenceScore: number;
   summary: string;
   detailedAnalysis: string;
-  provisionsC ited?: string[];
+  provisionsCited?: string[];
   potentialViolations?: PotentialViolation[];
   recommendations?: string[];
 }
@@ -70,9 +70,9 @@ export class ConstitutionalAnalysis {
       billId: input.billId,
       analysisType: input.analysisType,
       confidenceScore: input.confidenceScore,
-      provisionsC ited: input.provisionsC ited || [],
+      provisionsCited: input.provisionsCited || [],
       potentialViolations: input.potentialViolations || [],
-      expertReviewRequired: input.confidenceScore < 0.8 || (input.potentialViolations && input.potentialViolations.length > 0),
+      expertReviewRequired: input.confidenceScore < 0.8 || !!(input.potentialViolations && input.potentialViolations.length > 0),
       expertReviewStatus: 'not_required',
       reviewedBy: null,
       reviewedAt: null,
@@ -98,8 +98,8 @@ export class ConstitutionalAnalysis {
 
   // Domain methods
   addProvision(provisionId: string): void {
-    if (!this.data.provisionsC ited.includes(provisionId)) {
-      this.data.provisionsC ited.push(provisionId);
+    if (!this.data.provisionsCited.includes(provisionId)) {
+      this.data.provisionsCited.push(provisionId);
       this.data.updatedAt = new Date();
     }
   }

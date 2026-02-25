@@ -10,10 +10,11 @@ export { PrecedentFinderService } from './application/precedent-finder';
 export { ExpertFlaggingService } from './application/expert-flagging-service';
 
 // Infrastructure
-export { ConstitutionalProvisionsRepository } from './infrastructure/repositories/constitutional-provisions-repository';
-export { LegalPrecedentsRepository } from './infrastructure/repositories/legal-precedents-repository';
-export { ConstitutionalAnalysesRepository } from './infrastructure/repositories/constitutional-analyses-repository';
-export { ExpertReviewQueueRepository } from './infrastructure/repositories/expert-review-queue-repository';
+// Note: Repository exports commented out - these modules don't exist yet
+// export { ConstitutionalProvisionsRepository } from './infrastructure/repositories/constitutional-provisions-repository';
+// export { LegalPrecedentsRepository } from './infrastructure/repositories/legal-precedents-repository';
+// export { ConstitutionalAnalysesRepository } from './infrastructure/repositories/constitutional-analyses-repository';
+// export { ExpertReviewQueueRepository } from './infrastructure/repositories/expert-review-queue-repository';
 export { LegalDatabaseClient } from './infrastructure/external/legal-database-client';
 
 // Services
@@ -24,7 +25,7 @@ export {
 } from './services/constitutional-analysis-factory';
 
 // Presentation
-export { constitutionalAnalysisRouter } from './presentation/constitutional-analysis-router';
+export { constitutionalAnalysisRouter } from './constitutional-analysis-router';
 
 // Configuration
 export { 

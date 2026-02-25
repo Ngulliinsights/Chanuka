@@ -3,14 +3,12 @@
 // ============================================================================
 // Factory for creating and configuring constitutional analysis services
 
-import { AnalysisConfiguration } from '@server/types/index';
-import { constitutionalAnalysisServiceComplete } from '@shared/application/constitutional-analysis-service-complete';
-import { ConstitutionalAnalyzer } from '@shared/application/constitutional-analyzer';
-import { ExpertFlaggingService } from '@shared/application/expert-flagging-service';
-import { PrecedentFinderService } from '@shared/application/precedent-finder';
-import { ProvisionMatcherService } from '@shared/application/provision-matcher';
-import { pool as db } from '@server/infrastructure/database/pool';
-import { LegalDatabaseClient } from '@shared/infrastructure/external/legal-database-client';
+import { AnalysisConfiguration } from '../types/index';
+import { ConstitutionalAnalyzer } from '../application/constitutional-analyzer';
+import { ExpertFlaggingService } from '../application/expert-flagging-service';
+import { PrecedentFinderService } from '../application/precedent-finder';
+import { ProvisionMatcherService } from '../application/provision-matcher';
+import { LegalDatabaseClient } from '../infrastructure/external/legal-database-client';
 
 /**
  * Default configuration for constitutional analysis
@@ -81,28 +79,16 @@ export class ConstitutionalAnalysisFactory {
       return this.analyzer;
     }
 
-    // Create repositories
-    const provisionsRepo = this.createProvisionsRepository();
-    const precedentsRepo = this.createPrecedentsRepository();
-    const analysesRepo = this.createAnalysesRepository();
-    const expertReviewRepo = this.createExpertReviewRepository();
-
-    // Create external services
-    const legalDbClient = this.createLegalDatabaseClient();
-
     // Create application services
-    const provisionMatcher = this.createProvisionMatcher(provisionsRepo, legalDbClient);
-    const precedentFinder = this.createPrecedentFinder(precedentsRepo, legalDbClient);
-    const expertFlagger = this.createExpertFlagger(expertReviewRepo);
+    const provisionMatcher = this.createProvisionMatcher();
+    const precedentFinder = this.createPrecedentFinder();
+    const expertFlagger = this.createExpertFlagger();
 
     // Create main analyzer
     this.analyzer = new ConstitutionalAnalyzer(
       provisionMatcher,
       precedentFinder,
-      expertFlagger,
-      provisionsRepo,
-      precedentsRepo,
-      analysesRepo
+      expertFlagger
     );
 
     return this.analyzer;
@@ -111,37 +97,23 @@ export class ConstitutionalAnalysisFactory {
   /**
    * Create provision matcher service
    */
-  createProvisionMatcher(
-    legalDbClient?: LegalDatabaseClient
-  ): ProvisionMatcherService {
-    return new ProvisionMatcherService(
-      constitutionalAnalysisServiceComplete,
-      legalDbClient || this.createLegalDatabaseClient()
-    );
+  createProvisionMatcher(): ProvisionMatcherService {
+    return new ProvisionMatcherService();
   }
 
   /**
    * Create precedent finder service
    */
-  createPrecedentFinder(
-    legalDbClient?: LegalDatabaseClient
-  ): PrecedentFinderService {
-    return new PrecedentFinderService(
-      constitutionalAnalysisServiceComplete,
-      legalDbClient || this.createLegalDatabaseClient()
-    );
+  createPrecedentFinder(): PrecedentFinderService {
+    return new PrecedentFinderService();
   }
 
   /**
    * Create expert flagging service
    */
   createExpertFlagger(): ExpertFlaggingService {
-    return new ExpertFlaggingService(
-      constitutionalAnalysisServiceComplete
-    );
+    return new ExpertFlaggingService();
   }
-
-  // Repository creation methods removed - using consolidated service instead
 
   /**
    * Create legal database client
@@ -186,12 +158,6 @@ export function createAnalysisServices(config?: AnalysisConfiguration) {
     provisionMatcher: factory.createProvisionMatcher(),
     precedentFinder: factory.createPrecedentFinder(),
     expertFlagger: factory.createExpertFlagger(),
-    repositories: {
-      provisions: factory.createProvisionsRepository(),
-      precedents: factory.createPrecedentsRepository(),
-      analyses: factory.createAnalysesRepository(),
-      expertReview: factory.createExpertReviewRepository()
-    },
     external: {
       legalDatabase: factory.createLegalDatabaseClient()
     }

@@ -27,6 +27,7 @@ export interface ExternalConstitutionalProvision {
 
 export class LegalDatabaseClient {
   private readonly baseUrl: string;
+  // Stored for future use when implementing actual API calls
   private readonly apiKey: string;
   private readonly timeout: number;
 
@@ -49,30 +50,31 @@ export class LegalDatabaseClient {
     limit: number = 10
   ): Promise<ExternalLegalCase[]> {
     try {
-      logger.debug(`Searching external legal database for cases`, {
+      logger.debug({
         component: 'LegalDatabaseClient',
         keywords,
         jurisdiction,
         limit
-      });
+      }, 'Searching external legal database for cases');
 
       // For now, return mock data since we don't have a real legal database API
       // In production, this would make actual HTTP requests to legal databases
       const mockCases = this.generateMockCases(keywords, limit);
 
-      logger.debug(`Found ${mockCases.length} cases from external database`, {
+      logger.debug({
         component: 'LegalDatabaseClient',
-        keywords
-      });
+        keywords,
+        count: mockCases.length
+      }, `Found ${mockCases.length} cases from external database`);
 
       return mockCases;
 
     } catch (error) {
-      logger.error('Failed to search external legal database for cases', {
+      logger.error({
         component: 'LegalDatabaseClient',
         keywords,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Failed to search external legal database for cases');
       
       // Return empty array on error to not break the analysis
       return [];
@@ -87,28 +89,29 @@ export class LegalDatabaseClient {
     jurisdiction: string = 'kenya'
   ): Promise<ExternalConstitutionalProvision[]> {
     try {
-      logger.debug(`Searching external database for constitutional provisions`, {
+      logger.debug({
         component: 'LegalDatabaseClient',
         topic,
         jurisdiction
-      });
+      }, 'Searching external database for constitutional provisions');
 
       // Mock implementation - in production would query real legal databases
       const mockProvisions = this.generateMockProvisions(topic);
 
-      logger.debug(`Found ${mockProvisions.length} provisions from external database`, {
+      logger.debug({
         component: 'LegalDatabaseClient',
-        topic
-      });
+        topic,
+        count: mockProvisions.length
+      }, `Found ${mockProvisions.length} provisions from external database`);
 
       return mockProvisions;
 
     } catch (error) {
-      logger.error('Failed to search external database for constitutional provisions', {
+      logger.error({
         component: 'LegalDatabaseClient',
         topic,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Failed to search external database for constitutional provisions');
       
       return [];
     }
@@ -119,9 +122,10 @@ export class LegalDatabaseClient {
    */
   async getCaseDetails(citation: string): Promise<ExternalLegalCase | null> {
     try {
-      logger.debug(`Getting case details for citation: ${citation}`, {
-        component: 'LegalDatabaseClient'
-      });
+      logger.debug({
+        component: 'LegalDatabaseClient',
+        citation
+      }, `Getting case details for citation: ${citation}`);
 
       // Mock implementation
       if (citation.includes('Wickard')) {
@@ -140,10 +144,11 @@ export class LegalDatabaseClient {
       return null;
 
     } catch (error) {
-      logger.error(`Failed to get case details for citation: ${citation}`, {
+      logger.error({
         component: 'LegalDatabaseClient',
+        citation,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `Failed to get case details for citation: ${citation}`);
       
       return null;
     }
@@ -154,25 +159,26 @@ export class LegalDatabaseClient {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      logger.debug('Performing health check on external legal database', {
+      logger.debug({
         component: 'LegalDatabaseClient'
-      });
+      }, 'Performing health check on external legal database');
 
       // In production, this would ping the actual API
       // For now, return true if we have configuration
       const isHealthy = !!this.baseUrl;
 
-      logger.debug(`External legal database health check: ${isHealthy ? 'healthy' : 'unhealthy'}`, {
-        component: 'LegalDatabaseClient'
-      });
+      logger.debug({
+        component: 'LegalDatabaseClient',
+        isHealthy
+      }, `External legal database health check: ${isHealthy ? 'healthy' : 'unhealthy'}`);
 
       return isHealthy;
 
     } catch (error) {
-      logger.error('Health check failed for external legal database', {
+      logger.error({
         component: 'LegalDatabaseClient',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Health check failed for external legal database');
       
       return false;
     }
@@ -265,29 +271,27 @@ export class LegalDatabaseClient {
    * Future integration methods (placeholders)
    */
 
-  async searchInternationalCases(keywords: string[]): Promise<ExternalLegalCase[]> {
+  async searchInternationalCases(_keywords: string[]): Promise<ExternalLegalCase[]> {
     // Placeholder for international case law databases
-    logger.debug('International case search not yet implemented', {
+    logger.debug({
       component: 'LegalDatabaseClient'
-    });
+    }, 'International case search not yet implemented');
     return [];
   }
 
-  async getComparativeConstitutionalProvisions(topic: string): Promise<ExternalConstitutionalProvision[]> {
+  async getComparativeConstitutionalProvisions(_topic: string): Promise<ExternalConstitutionalProvision[]> {
     // Placeholder for comparative constitutional law databases
-    logger.debug('Comparative constitutional search not yet implemented', {
+    logger.debug({
       component: 'LegalDatabaseClient'
-    });
+    }, 'Comparative constitutional search not yet implemented');
     return [];
   }
 
-  async getCitationNetwork(caseId: string): Promise<{ citedBy: string[]; cites: string[] }> {
+  async getCitationNetwork(_caseId: string): Promise<{ citedBy: string[]; cites: string[] }> {
     // Placeholder for citation network analysis
-    logger.debug('Citation network analysis not yet implemented', {
+    logger.debug({
       component: 'LegalDatabaseClient'
-    });
+    }, 'Citation network analysis not yet implemented');
     return { citedBy: [], cites: [] };
   }
 }
-
-

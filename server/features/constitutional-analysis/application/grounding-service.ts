@@ -3,7 +3,7 @@
  */
 
 export class GroundingService {
-  async groundAnalysis(analysisId, provisionId, interpretationText) {
+  async groundAnalysis(analysisId: string, provisionId: string, _interpretationText: string) {
     console.log('Grounding analysis:', { analysisId, provisionId });
     
     return {

@@ -3,7 +3,7 @@
  */
 
 export class UncertaintyAssessor {
-  assessUncertainty(interpretation, provisionText, groundingResult) {
+  assessUncertainty(_interpretation: string, _provisionText: string, _groundingResult: unknown) {
     console.log('Assessing uncertainty...');
     
     return {

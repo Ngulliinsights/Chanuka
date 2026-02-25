@@ -110,7 +110,7 @@ export class AnalyzeBillConstitutionalityUseCase {
         confidenceScore,
         summary,
         detailedAnalysis,
-        provisionsC ited: relevantProvisions.map(p => p.id),
+        provisionsCited: relevantProvisions.map(p => p.id),
         potentialViolations: violations,
         recommendations,
       };

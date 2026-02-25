@@ -182,16 +182,16 @@ const SAMPLE_PRECEDENTS = [
  * Populate constitutional provisions
  */
 async function populateProvisions(): Promise<void> {
-  logger.info('Populating constitutional provisions...', { component: 'ConstitutionalAnalysis' });
+  logger.info({ component: 'ConstitutionalAnalysis' }, 'Populating constitutional provisions...');
 
   for (const provision of SAMPLE_PROVISIONS) {
     try {
-      await db.execute(`
+      await db.query(`
         INSERT INTO constitutional_provisions (
           id, article_number, section_number, subsection_number, provision_text,
           provision_summary, keywords, rights_category, constitutional_chapter,
           enforcement_mechanisms, related_articles, created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
         ON CONFLICT(id) DO UPDATE SET
           provision_text = excluded.provision_text,
           provision_summary = excluded.provision_summary,
@@ -213,9 +213,9 @@ async function populateProvisions(): Promise<void> {
         provision.updated_at
       ]);
 
-      logger.info(`✅ Inserted provision: Article ${provision.article_number}`, { component: 'ConstitutionalAnalysis' });
+      logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted provision: Article ${provision.article_number}`);
     } catch (error) {
-      logger.error(`❌ Failed to insert provision ${provision.id}:`, error, { component: 'ConstitutionalAnalysis' });
+      logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert provision ${provision.id}`);
     }
   }
 }
@@ -224,17 +224,17 @@ async function populateProvisions(): Promise<void> {
  * Populate legal precedents
  */
 async function populatePrecedents(): Promise<void> {
-  logger.info('Populating legal precedents...', { component: 'ConstitutionalAnalysis' });
+  logger.info({ component: 'ConstitutionalAnalysis' }, 'Populating legal precedents...');
 
   for (const precedent of SAMPLE_PRECEDENTS) {
     try {
-      await db.execute(`
+      await db.query(`
         INSERT INTO legal_precedents (
           id, case_name, case_number, court_level, judgment_date, judges,
           holding, facts_summary, legal_principles, constitutional_provisions_cited,
           citation_count, binding_precedent, relevance_score_percentage,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
         ON CONFLICT(id) DO UPDATE SET
           holding = excluded.holding,
           facts_summary = excluded.facts_summary,
@@ -260,9 +260,9 @@ async function populatePrecedents(): Promise<void> {
         precedent.updated_at
       ]);
 
-      logger.info(`✅ Inserted precedent: ${precedent.case_name}`, { component: 'ConstitutionalAnalysis' });
+      logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted precedent: ${precedent.case_name}`);
     } catch (error) {
-      logger.error(`❌ Failed to insert precedent ${precedent.id}:`, error, { component: 'ConstitutionalAnalysis' });
+      logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert precedent ${precedent.id}`);
     }
   }
 }
@@ -272,14 +272,14 @@ async function populatePrecedents(): Promise<void> {
  */
 export async function populateSampleData(): Promise<void> {
   try {
-    logger.info('🏛️ Starting constitutional analysis sample data population...', { component: 'ConstitutionalAnalysis' });
+    logger.info({ component: 'ConstitutionalAnalysis' }, '🏛️ Starting constitutional analysis sample data population...');
 
     await populateProvisions();
     await populatePrecedents();
 
-    logger.info('✅ Constitutional analysis sample data populated successfully!', { component: 'ConstitutionalAnalysis' });
+    logger.info({ component: 'ConstitutionalAnalysis' }, '✅ Constitutional analysis sample data populated successfully!');
   } catch (error) {
-    logger.error('❌ Failed to populate constitutional analysis sample data:', error, { component: 'ConstitutionalAnalysis' });
+    logger.error({ component: 'ConstitutionalAnalysis', error }, '❌ Failed to populate constitutional analysis sample data');
     throw error;
   }
 }

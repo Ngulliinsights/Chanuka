@@ -3,23 +3,26 @@
  */
 
 export class PrecedentDatabase {
+  private precedents: Map<string, any>;
+  private provisions: Map<string, any>;
+
   constructor() {
     this.precedents = new Map();
     this.provisions = new Map();
     this.initializeSampleData();
   }
 
-  async findByProvision(provisionId) {
+  async findByProvision(provisionId: string) {
     const results = [];
     for (const precedent of this.precedents.values()) {
       if (precedent.provisionIds.includes(provisionId)) {
         results.push(precedent);
       }
     }
-    return results.sort((a, b) => b.year - a.year);
+    return results.sort((a: any, b: any) => b.year - a.year);
   }
 
-  async getProvision(provisionId) {
+  async getProvision(provisionId: string) {
     return this.provisions.get(provisionId);
   }
 

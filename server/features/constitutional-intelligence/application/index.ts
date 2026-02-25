@@ -6,7 +6,10 @@
 
 // Use Cases
 export { 
-  AnalyzeBillConstitutionalityUseCase, 
+  AnalyzeBillConstitutionalityUseCase
+} from './use-cases/analyze-bill-constitutionality.use-case';
+
+export type {
   AnalyzeBillCommand, 
   AnalyzeBillResult 
 } from './use-cases/analyze-bill-constitutionality.use-case';

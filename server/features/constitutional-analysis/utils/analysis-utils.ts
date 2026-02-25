@@ -128,16 +128,13 @@ export class RiskAssessmentUtils {
   static identifyRiskFactors(analysis: ConstitutionalAnalysis): string[] {
     const factors: string[] = [];
 
-    if (analysis.confidence_percentage < 70) {
+    const confidenceScore = analysis.confidence_score ? parseFloat(analysis.confidence_score) : 0;
+    if (confidenceScore < 0.7) {
       factors.push('Low confidence analysis');
     }
 
-    if (analysis.constitutional_risk === 'critical' || analysis.constitutional_risk === 'high') {
+    if (analysis.constitutional_alignment === 'violates' || analysis.constitutional_alignment === 'concerning') {
       factors.push('High constitutional risk identified');
-    }
-
-    if (analysis.impact_severity_percentage > 80) {
-      factors.push('High impact severity');
     }
 
     if (analysis.analysis_type === 'potential_conflict') {
@@ -157,19 +154,26 @@ export class PrecedentAnalysisUtils {
    */
   static weightByCourtHierarchy(precedents: LegalPrecedent[]): LegalPrecedent[] {
     const hierarchyWeights = {
-      'supreme_court': 1.0,
-      'court_of_appeal': 0.8,
-      'high_court': 0.6,
-      'subordinate_court': 0.4
+      'Supreme Court': 1.0,
+      'Court of Appeal': 0.8,
+      'High Court': 0.6,
+      'Magistrates Court': 0.4,
+      'Environment and Land Court': 0.5,
+      'Employment and Labour Relations Court': 0.5
     };
 
-    return precedents.map(precedent => ({
-      ...precedent,
-      relevance_score_percentage: Math.min(100,
-        precedent.relevance_score_percentage * 
-        (hierarchyWeights[precedent.court_level as keyof typeof hierarchyWeights] || 0.5)
-      )
-    })).sort((a, b) => b.relevance_score_percentage - a.relevance_score_percentage);
+    // Return precedents sorted by court hierarchy and citation count
+    return [...precedents].sort((a, b) => {
+      const weightA = hierarchyWeights[a.court_level as keyof typeof hierarchyWeights] || 0.5;
+      const weightB = hierarchyWeights[b.court_level as keyof typeof hierarchyWeights] || 0.5;
+      
+      if (weightA !== weightB) {
+        return weightB - weightA;
+      }
+      
+      // If same court level, sort by citation count
+      return b.cited_by_count - a.cited_by_count;
+    });
   }
 
   /**
@@ -183,10 +187,14 @@ export class PrecedentAnalysisUtils {
     const supporting: LegalPrecedent[] = [];
 
     precedents.forEach(precedent => {
-      const holding = precedent.holding.toLowerCase();
-      if (holding.includes('unconstitutional') || 
-          holding.includes('violation') || 
-          holding.includes('invalid')) {
+      const principle = (precedent.legal_principle || '').toLowerCase();
+      const summary = (precedent.case_summary || '').toLowerCase();
+      const text = `${principle} ${summary}`;
+      
+      if (text.includes('unconstitutional') || 
+          text.includes('violation') || 
+          text.includes('invalid') ||
+          text.includes('breach')) {
         conflicting.push(precedent);
       } else {
         supporting.push(precedent);
@@ -204,22 +212,27 @@ export class PrecedentAnalysisUtils {
 
     // Court hierarchy bonus
     const courtBonuses = {
-      'supreme_court': 30,
-      'court_of_appeal': 20,
-      'high_court': 10,
-      'subordinate_court': 0
+      'Supreme Court': 30,
+      'Court of Appeal': 20,
+      'High Court': 10,
+      'Magistrates Court': 0,
+      'Environment and Land Court': 5,
+      'Employment and Labour Relations Court': 5
     };
     score += courtBonuses[precedent.court_level as keyof typeof courtBonuses] || 0;
 
     // Recency bonus (cases from last 10 years get bonus)
-    const yearsOld = new Date().getFullYear() - precedent.judgment_date.getFullYear();
-    if (yearsOld <= 10) {
-      score += Math.max(0, 20 - yearsOld * 2);
+    if (precedent.judgment_date) {
+      const judgmentYear = new Date(precedent.judgment_date).getFullYear();
+      const yearsOld = new Date().getFullYear() - judgmentYear;
+      if (yearsOld <= 10) {
+        score += Math.max(0, 20 - yearsOld * 2);
+      }
     }
 
     // Citation frequency bonus
-    if (precedent.citation_count > 10) {
-      score += Math.min(20, Math.log10(precedent.citation_count) * 5);
+    if (precedent.cited_by_count > 10) {
+      score += Math.min(20, Math.log10(precedent.cited_by_count) * 5);
     }
 
     return Math.min(100, score);
@@ -243,25 +256,21 @@ export class ValidationUtils {
 
     // Required fields validation
     if (!analysis.bill_id) errors.push('Bill ID is required');
-    if (!analysis.provision_id) errors.push('Provision ID is required');
-    if (!analysis.analysis_text) errors.push('Analysis text is required');
+    if (!analysis.executive_summary) errors.push('Executive summary is required');
 
     // Range validations
-    if (analysis.confidence_percentage < 0 || analysis.confidence_percentage > 100) {
-      errors.push('Confidence percentage must be between 0 and 100');
-    }
-
-    if (analysis.impact_severity_percentage < 0 || analysis.impact_severity_percentage > 100) {
-      errors.push('Impact severity percentage must be between 0 and 100');
+    const confidenceScore = analysis.confidence_score ? parseFloat(analysis.confidence_score) : null;
+    if (confidenceScore !== null && (confidenceScore < 0 || confidenceScore > 1)) {
+      errors.push('Confidence score must be between 0 and 1');
     }
 
     // Logic validations
-    if (analysis.constitutional_risk === 'critical' && analysis.confidence_percentage > 90) {
-      warnings.push('High confidence with critical risk may need review');
+    if (analysis.constitutional_alignment === 'violates' && confidenceScore && confidenceScore > 0.9) {
+      warnings.push('High confidence with constitutional violation may need review');
     }
 
-    if (analysis.constitutional_risk === 'low' && analysis.requires_expert_review) {
-      warnings.push('Low risk analysis flagged for expert review');
+    if (analysis.constitutional_alignment === 'aligned' && analysis.requires_expert_review) {
+      warnings.push('Aligned analysis flagged for expert review');
     }
 
     return {
@@ -284,25 +293,28 @@ export class ValidationUtils {
       return { isConsistent: true, inconsistencies: [] };
     }
 
-    // Check for conflicting risk assessments on same provision
-    const provisionRisks = new Map<string, string[]>();
+    // Check for conflicting alignment assessments on same bill
+    const billAlignments = new Map<string, string[]>();
     analyses.forEach(analysis => {
-      const risks = provisionRisks.get(analysis.provision_id) || [];
-      risks.push(analysis.constitutional_risk);
-      provisionRisks.set(analysis.provision_id, risks);
+      const alignments = billAlignments.get(analysis.bill_id) || [];
+      if (analysis.constitutional_alignment) {
+        alignments.push(analysis.constitutional_alignment);
+      }
+      billAlignments.set(analysis.bill_id, alignments);
     });
 
-    provisionRisks.forEach((risks, provisionId) => {
-      const uniqueRisks = [...new Set(risks)];
-      if (uniqueRisks.length > 1 && uniqueRisks.includes('critical') && uniqueRisks.includes('low')) {
-        inconsistencies.push(`Conflicting risk assessments for provision ${provisionId}`);
+    billAlignments.forEach((alignments, billId) => {
+      const uniqueAlignments = [...new Set(alignments)];
+      if (uniqueAlignments.length > 1 && uniqueAlignments.includes('violates') && uniqueAlignments.includes('aligned')) {
+        inconsistencies.push(`Conflicting alignment assessments for bill ${billId}`);
       }
     });
 
-    // Check for confidence vs risk consistency
+    // Check for confidence vs alignment consistency
     analyses.forEach(analysis => {
-      if (analysis.constitutional_risk === 'critical' && analysis.confidence_percentage < 60) {
-        inconsistencies.push(`Low confidence critical risk analysis: ${analysis.id}`);
+      const confidenceScore = analysis.confidence_score ? parseFloat(analysis.confidence_score) : null;
+      if (analysis.constitutional_alignment === 'violates' && confidenceScore && confidenceScore < 0.6) {
+        inconsistencies.push(`Low confidence violation analysis: ${analysis.id}`);
       }
     });
 

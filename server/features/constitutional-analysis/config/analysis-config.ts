@@ -3,7 +3,42 @@
 // ============================================================================
 // Configuration settings for the constitutional analysis feature
 
-import { AnalysisConfiguration } from '@server/types/index';
+// Define AnalysisConfiguration interface locally since it doesn't exist in @server/types
+export interface AnalysisConfiguration {
+  provisionMatching: {
+    keywordWeighting: number;
+    semanticWeighting: number;
+    structuralWeighting: number;
+    minRelevanceThreshold: number;
+  };
+  precedentAnalysis: {
+    courtHierarchyWeights: {
+      supreme_court: number;
+      court_of_appeal: number;
+      high_court: number;
+      subordinate_court: number;
+    };
+    recencyWeighting: number;
+    citationWeighting: number;
+    minRelevanceThreshold: number;
+  };
+  riskAssessment: {
+    rightsViolationMultiplier: number;
+    precedentConflictMultiplier: number;
+    confidencePenalty: number;
+  };
+  expertReview: {
+    autoFlagThresholds: {
+      confidence: number;
+      risk: string[];
+      complexity: number;
+    };
+    priorityCalculation: {
+      urgencyFactors: string[];
+      timeConstraints: number;
+    };
+  };
+}
 
 /**
  * Production configuration for constitutional analysis
