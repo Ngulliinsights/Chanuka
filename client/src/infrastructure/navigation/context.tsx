@@ -73,7 +73,7 @@ export function createNavigationProvider(
       }
 
       // Check user role
-      const newUserRole = isAuthenticated && user?.role ? (user.role as UserRole) : 'public';
+      const newUserRole = isAuthenticated && user?.role ? (user.role as UserRole) : UserRole.Public;
 
       if (state.user_role !== newUserRole) {
         updates.push(() => dispatch(setUserRole(newUserRole)));

@@ -122,6 +122,18 @@ const PretextDetectionPage = createLazyComponent(
   () => import('@client/features/pretext-detection/pages/PretextDetectionPage'),
   'Pretext Detection'
 );
+const FeatureFlagManager = createLazyComponent(
+  () => import('@client/features/feature-flags/pages/FeatureFlagManagerPage'),
+  'Feature Flag Manager'
+);
+const IntegrationMonitoringDashboard = createLazyComponent(
+  () => import('@client/features/monitoring/pages/IntegrationMonitoringPage'),
+  'Integration Monitoring'
+);
+const ArgumentIntelligencePage = createLazyComponent(
+  () => import('@client/features/argument-intelligence/pages/ArgumentIntelligencePage'),
+  'Argument Intelligence'
+);
 
 interface RouteConfig {
   path: string;
@@ -458,6 +470,30 @@ const routes: RouteConfig[] = [
     roles: ['admin', 'super_admin'],
     requireVerification: true,
   },
+  {
+    id: 'admin-feature-flags',
+    path: '/admin/feature-flags',
+    element: (
+      <AdminRoute>
+        <FeatureFlagManager />
+      </AdminRoute>
+    ),
+    protected: true,
+    roles: ['admin', 'super_admin'],
+    requireVerification: true,
+  },
+  {
+    id: 'admin-monitoring',
+    path: '/admin/monitoring',
+    element: (
+      <AdminRoute>
+        <IntegrationMonitoringDashboard />
+      </AdminRoute>
+    ),
+    protected: true,
+    roles: ['admin', 'super_admin'],
+    requireVerification: true,
+  },
 
   // Workaround Analysis - Strategic Dashboard
   {
@@ -471,6 +507,13 @@ const routes: RouteConfig[] = [
     id: 'pretext-detection',
     path: '/pretext-detection',
     element: <PretextDetectionPage />,
+  },
+
+  // Argument Intelligence
+  {
+    id: 'argument-intelligence',
+    path: '/bills/:billId/arguments',
+    element: <ArgumentIntelligencePage />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility

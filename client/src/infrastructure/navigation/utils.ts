@@ -309,7 +309,7 @@ export function hasRouteAccess(
     }
 
     // Admin-only routes
-    if (item.adminOnly && userRole !== 'admin') {
+    if (item.adminOnly && userRole !== UserRole.Admin) {
       return false;
     }
 

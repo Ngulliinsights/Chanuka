@@ -29,6 +29,7 @@ import type {
 import { ActivitySection } from './sections/ActivitySection';
 import { BillsSection } from './sections/BillsSection';
 import { StatsSection } from './sections/StatsSection';
+import { RecommendationsSection } from './sections/RecommendationsSection';
 import { useDashboardData } from './useDashboardData';
 
 // --- Type Definitions ---
@@ -255,6 +256,9 @@ function FullPageDashboard({
               />
             )}
           </div>
+
+          {/* Recommendations Section */}
+          <RecommendationsSection compact={true} />
         </TabsContent>
 
         <TabsContent value="bills">
@@ -409,15 +413,17 @@ function SectionDashboard({ dashboardData, loading, user, className }: SectionDa
               compact={true}
             />
 
-            {/* Recommended Bills */}
+            {/* Tracked Bills */}
             <BillsSection
-              trackedBills={[]}
-              recommendations={dashboardData?.recommendations?.slice(0, 3)}
+              trackedBills={dashboardData?.trackedBills?.slice(0, 5)}
               loading={loading}
               compact={true}
-              showRecommendations={true}
+              showRecommendations={false}
             />
           </div>
+
+          {/* Recommendations Section */}
+          <RecommendationsSection compact={false} />
 
           {/* Civic Score Trend */}
           {dashboardData?.civicMetrics && (

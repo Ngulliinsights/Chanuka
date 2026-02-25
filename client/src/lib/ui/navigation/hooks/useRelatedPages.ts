@@ -42,13 +42,9 @@ export const useRelatedPages = (
 
     const { maxResults = 5, includeBreadcrumbs = false, filterByRole = true } = options;
 
-    // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = userRole as string;
-    validateUserRole(contextRole);
-    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
-
+    // Use the userRole directly since it's already a UserRole enum
     // Get relationships for current path
-    let relatedPages = getPageRelationships(currentPath, navUserRole, user, preferences);
+    let relatedPages = getPageRelationships(currentPath, userRole, user, preferences);
 
     // Filter by role access if requested
     if (filterByRole) {

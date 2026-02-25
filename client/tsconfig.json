@@ -68,7 +68,7 @@
     },
 
     // Type Definitions
-    "types": ["vite/client", "vitest/globals", "@testing-library/vitest-dom", "node"],
+    "types": ["vite/client", "vitest/globals", "node"],
     "typeRoots": ["./node_modules/@types", "../@types"]
   },
 

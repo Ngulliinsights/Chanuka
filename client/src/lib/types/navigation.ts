@@ -1,3 +1,5 @@
+import { UserRole } from '@shared/types/core/enums';
+
 export type NavigationSection =
   | 'legislative'
   | 'community'
@@ -5,6 +7,9 @@ export type NavigationSection =
   | 'admin'
   | 'tools'
   | 'system';
+
+// Re-export UserRole for convenience
+export { UserRole };
 
 // ============================================================================
 // Navigation Items
@@ -220,8 +225,8 @@ export interface AccessDenial {
  */
 export function hasRole(userRole: UserRole, allowedRoles: UserRole[]): boolean {
   // Handle 'user' and 'citizen' as aliases
-  const normalizedUserRole = userRole === 'citizen' ? 'user' : userRole;
-  const normalizedAllowed = allowedRoles.map(r => r === 'citizen' ? 'user' : r);
+  const normalizedUserRole = userRole === UserRole.Citizen ? UserRole.Citizen : userRole;
+  const normalizedAllowed = allowedRoles.map(r => r === UserRole.Citizen ? UserRole.Citizen : r);
 
   return normalizedAllowed.includes(normalizedUserRole);
 }
@@ -247,7 +252,7 @@ export function canAccessItem(
   user: unknown
 ): boolean {
   // Admin-only check
-  if (item.adminOnly && userRole !== 'admin') {
+  if (item.adminOnly && userRole !== UserRole.Admin) {
     return false;
   }
 

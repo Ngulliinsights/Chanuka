@@ -6,7 +6,7 @@
  */
 
 export {
-  type UserRole,
+  UserRole,
   type NavigationSection,
   type NavigationItem,
   type BreadcrumbItem,

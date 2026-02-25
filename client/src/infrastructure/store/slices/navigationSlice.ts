@@ -6,16 +6,16 @@
  * using Redux Toolkit's Immer integration for safe state mutations.
  */
 
-import { createSlice, PayloadAction, createSelector, castDraft } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit';
 
 import {
   NavigationState,
   BreadcrumbItem,
   RelatedPage,
   NavigationSection,
-  UserRole,
   NavigationPreferences,
   RecentPage,
+  UserRole,
 } from '@client/lib/types/navigation';
 import { logger } from '@client/lib/utils/logger';
 
@@ -39,7 +39,7 @@ const initialState: NavigationState = {
   isMobile: false,
   sidebarCollapsed: false,
   mounted: false,
-  userRole: 'public',
+  userRole: UserRole.Public,
   preferences: {
     defaultLandingPage: DEFAULT_PATH,
     favoritePages: [],
@@ -176,8 +176,8 @@ const navigationSlice = createSlice({
     updatePreferences: (state, action: PayloadAction<Partial<NavigationPreferences>>) => {
       const updates = { ...action.payload };
       if (updates.favoritePages) {
-        // Use castDraft to properly handle readonly to mutable conversion in Immer
-        state.preferences.favoritePages = castDraft([...updates.favoritePages]);
+        // Immer handles the readonly conversion automatically
+        state.preferences.favoritePages = [...updates.favoritePages];
         delete updates.favoritePages;
       }
       
@@ -200,13 +200,16 @@ const navigationSlice = createSlice({
 
       if (existingIndex >= 0) {
         // Move existing page to front and update metadata
-        const [existingPage] = recentPages.splice(existingIndex, 1);
-        recentPages.unshift({
-          ...existingPage,
-          title, // Update title in case it changed
-          visitedAt: new Date().toISOString(),
-          visitCount: existingPage.visitCount + 1,
-        });
+        const existingPage = recentPages[existingIndex];
+        if (existingPage) {
+          recentPages.splice(existingIndex, 1);
+          recentPages.unshift({
+            path: existingPage.path,
+            title, // Update title in case it changed
+            visitedAt: new Date().toISOString(),
+            visitCount: existingPage.visitCount + 1,
+          });
+        }
       } else {
         // Add new page at the front
         recentPages.unshift({
@@ -328,7 +331,7 @@ const navigationSlice = createSlice({
       };
       state.sidebarOpen = false;
       state.sidebarCollapsed = false;
-      state.userRole = 'public';
+      state.userRole = UserRole.Public;
       logger.debug('Navigation persisted state cleared');
     },
 

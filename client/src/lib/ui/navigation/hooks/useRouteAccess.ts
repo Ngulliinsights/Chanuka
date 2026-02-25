@@ -27,12 +27,8 @@ export const useRouteAccess = (path: string): UseRouteAccessResult => {
     // Validate the path parameter
     validateNavigationPath(path);
 
-    // Validate and convert the context UserRole to our navigation UserRole
-    const contextRole = userRole as string;
-    validateUserRole(contextRole);
-    const navUserRole: UserRole = contextRole === 'user' ? 'citizen' : (contextRole as UserRole);
-
-    return checkRouteAccess(path, navUserRole, user);
+    // Use the userRole directly since it's already a UserRole enum
+    return checkRouteAccess(path, userRole, user);
   } catch (error) {
     // Handle validation errors
     if (

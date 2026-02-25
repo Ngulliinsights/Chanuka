@@ -66,11 +66,11 @@ export const checkRouteAccess = (
     }
 
     // Check admin requirement
-    if (navigationItem.adminOnly && userRole !== 'admin') {
+    if (navigationItem.adminOnly && userRole !== UserRole.Admin) {
       return {
         canAccess: false,
         denialReason: 'admin_required',
-        requiredRole: ['admin'],
+        requiredRole: [UserRole.Admin],
       };
     }
 
@@ -117,7 +117,7 @@ export const getAccessDenialReason = (
 
   try {
     if (item.requiresAuth && !user) return 'unauthenticated';
-    if (item.adminOnly && userRole !== 'admin') return 'admin_required';
+    if (item.adminOnly && userRole !== UserRole.Admin) return 'admin_required';
     if (item.allowedRoles && !item.allowedRoles.includes(userRole)) return 'insufficient_role';
     if (item.condition && !item.condition(userRole, user)) return 'custom_condition';
 
