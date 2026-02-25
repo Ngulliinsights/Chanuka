@@ -1,83 +1,108 @@
 /**
- * Recommendation Engine Hooks
+ * useRecommendations Hook
  * 
- * React hooks for interacting with the recommendation engine API
+ * React hook for fetching and managing bill recommendations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { recommendationApi } from '../api/recommendation-api';
-import type { EngagementTrackingRequest } from '../types';
-import { logger } from '@client/lib/utils/logger';
+import type { BillRecommendation } from '../types';
 
-/**
- * Hook to get personalized recommendations
- */
-export function usePersonalizedRecommendations(limit: number = 10) {
+interface UseRecommendationsOptions {
+  type?: 'personalized' | 'trending' | 'collaborative';
+  billId?: string;
+  limit?: number;
+  enabled?: boolean;
+}
+
+interface UseRecommendationsResult {
+  recommendations: BillRecommendation[];
+  isLoading: boolean;
+  isError: boolean;
+  error: Error | null;
+  refetch: () => void;
+}
+
+export function useRecommendations(
+  options: UseRecommendationsOptions = {}
+): UseRecommendationsResult {
+  const { type = 'personalized', billId, limit = 10, enabled = true } = options;
+
+  const queryKey = billId
+    ? ['recommendations', 'similar', billId, limit]
+    : ['recommendations', type, limit];
+
+  const queryFn = async () => {
+    if (billId) {
+      return recommendationApi.getSimilarBills(billId, limit);
+    }
+
+    switch (type) {
+      case 'trending':
+        return recommendationApi.getTrendingBills(limit);
+      case 'collaborative':
+        return recommendationApi.getCollaborativeRecommendations(limit);
+      case 'personalized':
+      default:
+        return recommendationApi.getPersonalizedRecommendations(limit);
+    }
+  };
+
+  const {
+    data: recommendations = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey,
+    queryFn,
+    enabled,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  return {
+    recommendations,
+    isLoading,
+    isError,
+    error: error as Error | null,
+    refetch,
+  };
+}
+
+export function usePersonalizedRecommendations(limit = 10) {
   return useQuery({
     queryKey: ['recommendations', 'personalized', limit],
-    queryFn: () => recommendationApi.getPersonalized(limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+    queryFn: () => recommendationApi.getPersonalizedRecommendations(limit),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
-/**
- * Hook to get similar bills
- */
-export function useSimilarBills(billId: number | undefined, limit: number = 5) {
-  return useQuery({
-    queryKey: ['recommendations', 'similar', billId, limit],
-    queryFn: () => recommendationApi.getSimilarBills(billId!, limit),
-    enabled: !!billId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    retry: 2,
-  });
-}
-
-/**
- * Hook to get trending bills
- */
-export function useTrendingBills(days: number = 7, limit: number = 10) {
+export function useTrendingBills(days = 7, limit = 10) {
   return useQuery({
     queryKey: ['recommendations', 'trending', days, limit],
-    queryFn: () => recommendationApi.getTrending(days, limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+    queryFn: () => recommendationApi.getTrendingBills(limit),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
-/**
- * Hook to get collaborative recommendations
- */
-export function useCollaborativeRecommendations(limit: number = 10) {
+export function useSimilarBills(billId: number, limit = 10) {
   return useQuery({
-    queryKey: ['recommendations', 'collaborative', limit],
-    queryFn: () => recommendationApi.getCollaborative(limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 2,
+    queryKey: ['recommendations', 'similar', billId, limit],
+    queryFn: () => recommendationApi.getSimilarBills(String(billId), limit),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 
-/**
- * Hook to track engagement
- */
 export function useTrackEngagement() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (request: EngagementTrackingRequest) => 
-      recommendationApi.trackEngagement(request),
-    onSuccess: (_, variables) => {
-      logger.info('Engagement tracked', { 
-        billId: variables.bill_id, 
-        type: variables.engagement_type 
-      });
-      
-      // Invalidate recommendations to get updated results
-      queryClient.invalidateQueries({ queryKey: ['recommendations'] });
+  return {
+    mutate: (data: { bill_id: string; engagement_type: string }) => {
+      // Track engagement - implement when analytics is ready
+      console.log('Track engagement:', data);
     },
-    onError: (error) => {
-      logger.error('Failed to track engagement', { component: 'useRecommendations' }, error);
-    },
-  });
+  };
 }

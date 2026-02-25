@@ -12,18 +12,16 @@
  * - Memory-efficient Fuse instance management
  */
 
-import Fuse, { type IFuseOptions } from 'fuse';
+import Fuse, { type IFuseOptions } from 'fuse.js';
 
 import { searchApiClient } from '@client/features/search/services/api';
 import { logger } from '@client/lib/utils/logger';
 
 import type {
   SearchResult,
-  SearchMetadata,
   SearchSuggestion,
   AutocompleteResult,
   SavedSearch,
-  SearchAnalytics,
   SearchHighlight,
   SearchRequest as SearchQuery,
   SearchFacets,
@@ -324,7 +322,7 @@ class IntelligentSearchService {
       });
 
       // Transform Fuse results to standardized format
-      const results: SearchResult[] = fuseResults.map(result => ({
+      const results: SearchResult[] = fuseResults.map((result: any) => ({
         id: result.item.id?.toString() || crypto.randomUUID(),
         type: this.getResultType(request.type),
         title: result.item.title || result.item.name || 'Untitled',
@@ -377,7 +375,7 @@ class IntelligentSearchService {
     const cached = this.fuseInstances.get(cacheKey);
 
     // Return cached instance if still valid (within 10 minutes)
-    if (cached && Date.now() - cached.timestamp < 10 * 60 * 1000) {
+    if (cached && cached.instance && Date.now() - cached.timestamp < 10 * 60 * 1000) {
       return cached.instance;
     }
 
@@ -387,10 +385,13 @@ class IntelligentSearchService {
 
     // Cleanup old instances if we have too many
     if (this.fuseInstances.size >= 10) {
-      const oldestKey = Array.from(this.fuseInstances.entries()).sort(
+      const entries = Array.from(this.fuseInstances.entries()).sort(
         (a, b) => a[1].timestamp - b[1].timestamp
-      )[0][0];
-      this.fuseInstances.delete(oldestKey);
+      );
+      const oldestEntry = entries[0];
+      if (oldestEntry) {
+        this.fuseInstances.delete(oldestEntry[0]);
+      }
     }
 
     this.fuseInstances.set(cacheKey, { instance: fuse, timestamp: Date.now() });
@@ -576,7 +577,7 @@ class IntelligentSearchService {
         const fuse = this.getFuseInstance('bills', billData);
         const results = fuse.search(query, { limit: 3 });
 
-        results.forEach(result => {
+        results.forEach((result: any) => {
           suggestions.push({
             text: result.item.title,
             type: 'bill_title',
@@ -654,7 +655,7 @@ class IntelligentSearchService {
   /**
    * Get comprehensive search analytics and performance metrics
    */
-  async getSearchAnalytics(): Promise<SearchAnalytics> {
+  async getSearchAnalytics(): Promise<any> {
     try {
       const response = await searchApiClient.getSearchAnalytics();
       return response;
@@ -847,7 +848,8 @@ class IntelligentSearchService {
    * Generate contextual excerpt with query highlighting
    */
   private generateExcerpt(item: unknown, query: string): string {
-    const content = item.summary || item.content || item.title || '';
+    const typedItem = item as any;
+    const content = typedItem.summary || typedItem.content || typedItem.title || '';
     const maxLength = 200;
     const contextWindow = 50;
 
@@ -879,8 +881,8 @@ class IntelligentSearchService {
   private generateHighlights(matches: readonly unknown[] | undefined): SearchHighlight[] {
     if (!matches || matches.length === 0) return [];
 
-    const highlights: (SearchHighlight | null)[] = matches.map(match => {
-      if (!match.value || !match.indices) return null;
+    const highlights: (SearchHighlight | null)[] = matches.map((match: any) => {
+      if (!match || !match.value || !match.indices) return null;
 
       const { value, indices } = match;
       let highlighted = value;
@@ -987,13 +989,13 @@ class IntelligentSearchService {
 
       // Count by category if available
       if (result.metadata?.category) {
-        const category = result.metadata.category;
+        const category = String(result.metadata.category);
         facets.categories![category] = (facets.categories![category] || 0) + 1;
       }
 
       // Count by status if available
       if (result.metadata?.status) {
-        const status = result.metadata.status;
+        const status = String(result.metadata.status);
         facets.statuses![status] = (facets.statuses![status] || 0) + 1;
       }
     });

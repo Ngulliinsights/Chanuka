@@ -50,7 +50,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/infrastructure/auth';
-import type { User } from '@client/infrastructure/auth/types';
+import type { User } from '@shared/core/types/auth.types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { copySystem } from '@client/lib/content/copy-system';
 import {
@@ -62,7 +62,6 @@ import {
   CardHeader,
   CardTitle,
   DocumentShieldIcon,
-  ChanukaWordmark,
 } from '@client/lib/design-system';
 import { ChanukaShield } from '@client/lib/design-system/media/ChanukaShield';
 import { logger } from '@client/lib/utils/logger';
@@ -100,7 +99,7 @@ const useIntersectionObserver = (options: IntersectionObserverInit = {}) => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setIsVisible(true);
           // Once visible, stop observing for performance
           if (ref.current) observer.unobserve(ref.current);
@@ -783,6 +782,14 @@ const FeatureCards = React.memo(() => {
       featured: true,
     },
     {
+      icon: AlertTriangle,
+      title: 'Pretext Detection',
+      description: 'Identify potential pretext bills using advanced pattern recognition, timing analysis, and network mapping to detect hidden agendas.',
+      link: '/pretext-detection',
+      color: COLORS.accent,
+      featured: true,
+    },
+    {
       icon: Users,
       title: 'Civic Engagement',
       description: 'Connect with citizens nationwide, share insights, and participate in informed discussions about policy impacts.',
@@ -1242,7 +1249,7 @@ const PersonalizedDashboardPreview = React.memo<{ user: User; persona: string }>
                 transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
-              Welcome back, {user.profile?.displayName || user.name || 'Citizen'}!
+              Welcome back, {user.display_name || user.first_name || 'Citizen'}!
             </h2>
             <p 
               className="text-2xl font-body font-light text-gray-600"
@@ -1332,7 +1339,7 @@ export default function EnhancedHomePage() {
 // ...
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { data: profile } = useUserProfile(user?.id);
+  useUserProfile(user?.id);
 
   // Persona state
   const [userPersona, setUserPersona] = useState<'novice' | 'intermediate' | 'expert'>('novice');
@@ -1366,7 +1373,7 @@ export default function EnhancedHomePage() {
   }, [isAuthenticated, user, isPersonaDetected]);
 
   // Statistics data with memoization
-  const stats: StatItem[] = useMemo(
+  useMemo(
     () => [
       { icon: FileText, label: 'Bills Tracked', value: '500+', change: '↑ 15% this week' },
       { icon: Users, label: 'Active Citizens', value: '10,000+', change: '↑ 25% monthly' },

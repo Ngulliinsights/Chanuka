@@ -5,9 +5,10 @@
 
 
 import { clientRateLimiter, RateLimitConfigs } from '@client/infrastructure/security/rate-limiter';
-import { securityService, SecurityStatus } from '@client/infrastructure/security/security-service';
+import { securityService, type SecurityStatus } from '@client/infrastructure/security/security-service';
+import { type SecurityThreat } from '@client/infrastructure/security/vulnerability-scanner';
+
 export type { SecurityStatus };
-import { SecurityThreat } from '@client/infrastructure/security/vulnerability-scanner';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 // Constants extracted to module level for better performance
@@ -87,7 +88,8 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
 
   const validateInput = useCallback(async <T>(schema: unknown, input: unknown) => {
     try {
-      return await securityService.validateInput<T>(schema as Record<string, unknown>, input);
+      const result = await securityService.validateInput<T>(schema as Record<string, unknown>, input);
+      return result;
     } catch (error) {
       console.error('Input validation failed:', error);
       return {
@@ -147,6 +149,10 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
     (key: string, configName: keyof typeof RateLimitConfigs): RateLimitStatus => {
       try {
         const config = RateLimitConfigs[configName];
+        if (!config) {
+          console.error('Rate limit config not found:', configName);
+          return { allowed: true, remaining: Infinity, resetTime: 0 };
+        }
         const result = clientRateLimiter.checkLimit(key, config);
         return result;
       } catch (error) {
@@ -164,10 +170,15 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
       action: () => Promise<T>
     ): Promise<T> => {
       const config = RateLimitConfigs[configName];
+      if (!config) {
+        throw new Error(`Rate limit config not found: ${configName}`);
+      }
+      
       const limitCheck = clientRateLimiter.checkLimit(key, config);
 
       if (!limitCheck.allowed) {
-        throw new Error(`Rate limit exceeded. Retry after ${limitCheck.resetTime}ms`);
+        const retryAfterMs = limitCheck.retryAfter ? limitCheck.retryAfter * 1000 : limitCheck.resetTime;
+        throw new Error(`Rate limit exceeded. Retry after ${retryAfterMs}ms`);
       }
 
       // Execute the action
@@ -189,7 +200,7 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
       if (!isMountedRef.current) return;
 
       // Check if we have threats in the result
-      if (result.threats && result.threats.length > 0) {
+      if (result?.threats && Array.isArray(result.threats) && result.threats.length > 0) {
         setThreats(prev => [...result.threats, ...prev].slice(0, MAX_THREATS_HISTORY));
         setLatestThreat(result.threats[0]);
       }
@@ -351,17 +362,21 @@ export function useSecureForm<T extends Record<string, unknown>>(
       // Improved error parsing with fallback
       const fieldErrors: Record<string, string[]> = {};
 
-      result.errors.forEach(error => {
-        // Handle both "field: message" and plain message formats
-        const colonIndex = error.indexOf(': ');
-        const field = colonIndex > 0 ? error.substring(0, colonIndex) : 'form';
-        const message = colonIndex > 0 ? error.substring(colonIndex + 2) : error;
+      if (Array.isArray(result.errors)) {
+        result.errors.forEach(error => {
+          // Handle both "field: message" and plain message formats
+          const colonIndex = error.indexOf(': ');
+          const field = colonIndex > 0 ? error.substring(0, colonIndex) : 'form';
+          const message = colonIndex > 0 ? error.substring(colonIndex + 2) : error;
 
-        if (!fieldErrors[field]) {
-          fieldErrors[field] = [];
-        }
-        fieldErrors[field].push(message);
-      });
+          if (!fieldErrors[field]) {
+            fieldErrors[field] = [];
+          }
+          fieldErrors[field].push(message);
+        });
+      } else {
+        fieldErrors.form = ['Validation failed with unknown error format'];
+      }
 
       setErrors(fieldErrors);
       return false;

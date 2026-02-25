@@ -1,5 +1,4 @@
 /// <reference types="vitest/globals" />
-/// <reference types="@testing-library/vitest-dom" />
 /**
  * RecommendationCard Component Tests
  */

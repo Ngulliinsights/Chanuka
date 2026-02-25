@@ -16,6 +16,7 @@ import { ActionPromptCard } from '@client/features/bills/ui/action-prompts';
 import { PlainLanguageView } from '@client/features/bills/ui/translation';
 import { ImpactCalculator } from '@client/features/bills/ui/impact';
 import { SimilarBillsWidget } from '@client/features/recommendation';
+import { ConstitutionalIntelligenceTab } from '@client/features/constitutional-intelligence';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 import { useQuery } from '@tanstack/react-query';
@@ -92,7 +93,7 @@ export default function BillDetail() {
 
       {/* Main Content Tabs */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-10 h-auto">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-11 h-auto">
           <TabsTrigger value="overview" className="py-3">
             Overview
           </TabsTrigger>
@@ -104,6 +105,9 @@ export default function BillDetail() {
           </TabsTrigger>
           <TabsTrigger value="actions" className="py-3">
             🎯 Actions
+          </TabsTrigger>
+          <TabsTrigger value="constitutional" className="py-3">
+            ⚖️ Constitutional
           </TabsTrigger>
           <TabsTrigger value="brief" className="py-3">
             📄 Brief
@@ -153,6 +157,10 @@ export default function BillDetail() {
               <p className="text-gray-500 italic">No actions available at this time.</p>
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="constitutional" className="space-y-4">
+          <ConstitutionalIntelligenceTab bill={bill} />
         </TabsContent>
 
         <TabsContent value="brief" className="space-y-4">

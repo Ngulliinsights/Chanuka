@@ -2,9 +2,9 @@
 // FLAG EDITOR - Create/Edit feature flags
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCreateFlag, useUpdateFlag } from '../hooks/useFeatureFlags';
-import type { FeatureFlag, CreateFlagRequest, ABTestConfig } from '../types';
+import type { FeatureFlag, CreateFlagRequest } from '../types';
 
 interface FlagEditorProps {
   flag?: FeatureFlag;

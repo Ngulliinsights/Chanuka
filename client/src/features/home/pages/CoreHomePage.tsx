@@ -41,7 +41,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/infrastructure/auth';
-import type { User } from '@client/infrastructure/auth/types';
 import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import PerformanceMonitor from '@client/lib/components/performance/PerformanceMonitor';
 import { copySystem } from '@client/lib/content/copy-system';
@@ -200,7 +199,7 @@ const RecentActivity: React.FC = () => (
   </div>
 );
 
-const PersonalizedDashboardPreview: React.FC<{ persona: string; userId: string }> = ({ persona, userId }) => (
+const PersonalizedDashboardPreview: React.FC<{ persona: string }> = ({ persona }) => (
   <div className="text-center">
     <h2 className="text-3xl font-bold text-gray-900 mb-8">Your Dashboard</h2>
     <p className="text-gray-600">Personalized dashboard for {persona} user</p>
@@ -329,8 +328,7 @@ SearchInput.displayName = 'SearchInput';
 const AnonymousHero: React.FC<{
   onSearch: (query: string) => void;
   stats: StatItem[];
-  currentStat: number;
-}> = ({ onSearch, stats, currentStat }) => {
+}> = ({ onSearch, stats }) => {
   return (
     <div className="text-center" data-testid="home-hero">
       <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 text-white px-4 py-2 rounded-full text-sm font-medium mb-8">
@@ -395,7 +393,7 @@ const AnonymousHero: React.FC<{
 
       {/* Statistics carousel */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-16">
-        {stats.map((stat, index) => {
+        {stats.map((stat) => {
           const Icon = stat.icon;
           return (
             <div
@@ -552,7 +550,6 @@ export default function CoreHomePage() {
   const { user: authUser } = useAuth();
   const { data: userProfile } = useUserProfile() as { data: ExtendedUserProfile | undefined };
 
-  const [currentStat, setCurrentStat] = useState<number>(0);
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [userPersona, setUserPersona] = useState<'novice' | 'intermediate' | 'expert'>('novice');
   const [isPersonaDetected, setIsPersonaDetected] = useState<boolean>(false);
@@ -674,7 +671,7 @@ export default function CoreHomePage() {
             {isAuthenticated && userProfile ? (
               <AuthenticatedHero user={userProfile} persona={userPersona} onSearch={handleSearch} />
             ) : (
-              <AnonymousHero onSearch={handleSearch} stats={stats} currentStat={currentStat} />
+              <AnonymousHero onSearch={handleSearch} stats={stats} />
             )}
           </div>
         </div>
@@ -692,7 +689,7 @@ export default function CoreHomePage() {
               </p>
             </div>
 
-            <PersonalizedDashboardPreview persona={userPersona} userId={userProfile.id} />
+            <PersonalizedDashboardPreview persona={userPersona} />
           </div>
         </section>
       ) : (
@@ -757,6 +754,32 @@ export default function CoreHomePage() {
                       className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300"
                     >
                       View Analysis
+                      <ChevronRight className="ml-2 w-4 h-4" />
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-purple-50 to-purple-100">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <Shield className="w-8 h-8 text-white" />
+                  </div>
+                  <CardTitle className="text-2xl font-bold text-gray-900">
+                    Pretext Detection
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <CardDescription className="text-gray-600 mb-6 leading-relaxed">
+                    Identify potential pretext bills using pattern recognition, timing analysis, and
+                    network mapping to detect hidden agendas.
+                  </CardDescription>
+                  <Link to="/pretext-detection">
+                    <Button
+                      variant="ghost"
+                      className="group-hover:bg-purple-600 group-hover:text-white transition-all duration-300"
+                    >
+                      Detect Pretext
                       <ChevronRight className="ml-2 w-4 h-4" />
                     </Button>
                   </Link>

@@ -59,20 +59,24 @@ export default function SecurityDemoPage() {
       }
 
       // Get CSRF token
-      const token = securitySystem.csrf.getToken();
+      const token = securitySystem.csrf?.getToken();
       setCsrfToken(token || 'Not available');
 
       // Get CSP nonce
-      const nonce = securitySystem.csp.getNonce();
+      const nonce = securitySystem.csp?.getNonce();
       setCspNonce(nonce || 'Not available');
 
       // Get rate limit status
-      const rateLimitInfo = securitySystem.rateLimiter.getRateLimitInfo('demo-page');
-      setRateLimitStatus(rateLimitInfo);
+      const rateLimitInfo = securitySystem.rateLimiter?.getRateLimitInfo('demo-page');
+      if (rateLimitInfo) {
+        setRateLimitStatus(rateLimitInfo);
+      }
 
       // Get vulnerabilities
-      const vulnerabilityReports = securitySystem.vulnerabilityScanner.getVulnerabilities();
-      setVulnerabilities(vulnerabilityReports);
+      const vulnerabilityReports = securitySystem.vulnerabilityScanner?.getVulnerabilities();
+      if (vulnerabilityReports) {
+        setVulnerabilities(vulnerabilityReports);
+      }
     } catch (error) {
       logger.error('Failed to load security info', { component: 'SecurityDemoPage' }, error);
     }
@@ -81,13 +85,13 @@ export default function SecurityDemoPage() {
   const testInputSanitization = async () => {
     try {
       const securitySystem = getSecuritySystem();
-      if (!securitySystem) {
+      if (!securitySystem || !securitySystem.sanitizer) {
         setSanitizedResult({ error: 'Security system not available' });
         return;
       }
 
       const result = await securitySystem.sanitizer.sanitizeHTML(testInput);
-      setSanitizedResult(result);
+      setSanitizedResult(result || { error: 'No result returned' });
     } catch (error) {
       logger.error('Failed to sanitize input', { component: 'SecurityDemoPage' }, error);
       setSanitizedResult({ error: 'Sanitization failed' });
@@ -105,11 +109,11 @@ export default function SecurityDemoPage() {
             method: 'POST',
             body: JSON.stringify({ test: `request-${i}` }),
             headers: { 'Content-Type': 'application/json' },
-          }).catch(() => ({ status: 429, statusText: 'Rate Limited' }))
+          }).catch(() => ({ status: 429, statusText: 'Rate Limited' } as Response))
         );
 
       const responses = await Promise.all(requests);
-      const rateLimitedCount = responses.filter(r => r.status === 429).length;
+      const rateLimitedCount = responses.filter(r => r?.status === 429).length;
 
       // Update rate limit status
       const securitySystem = getSecuritySystem();

@@ -4,7 +4,6 @@
  * Displays argument clusters with visual grouping and statistics.
  */
 
-import React from 'react';
 import type { ArgumentCluster } from '../types';
 
 interface ArgumentClusterDisplayProps {

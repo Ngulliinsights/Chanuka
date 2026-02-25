@@ -2,15 +2,13 @@
  * Pretext Detection Page Tests
  */
 
-import { render, screen, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PretextDetectionPage } from '../pages/PretextDetectionPage';
 import * as hooks from '../hooks/usePretextDetectionApi';
-
-// Mock the hooks
-vi.mock('../hooks/usePretextDetectionApi');
 
 // Mock analytics service
 vi.mock('@client/infrastructure/analytics/service', () => ({
@@ -20,50 +18,114 @@ vi.mock('@client/infrastructure/analytics/service', () => ({
   },
 }));
 
-// Mock Helmet
-vi.mock('react-helmet-async', () => ({
-  Helmet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
+// Mock hooks
+vi.mock('../hooks/usePretextDetectionApi');
 
-const createWrapper = () => {
+const mockAlerts = [
+  {
+    id: '1',
+    billId: 'HB-123',
+    detections: [
+      {
+        type: 'timing_anomaly',
+        severity: 'high' as const,
+        description: 'Bill introduced shortly after crisis event',
+        evidence: ['Event occurred on 2024-01-01', 'Bill introduced on 2024-01-05'],
+        confidence: 0.85,
+      },
+    ],
+    score: 75,
+    status: 'pending' as const,
+    createdAt: '2024-01-05T10:00:00Z',
+  },
+  {
+    id: '2',
+    billId: 'SB-456',
+    detections: [
+      {
+        type: 'beneficiary_mismatch',
+        severity: 'medium' as const,
+        description: 'Stated purpose differs from actual beneficiaries',
+        evidence: ['Purpose: public safety', 'Beneficiaries: private contractors'],
+        confidence: 0.72,
+      },
+    ],
+    score: 60,
+    status: 'approved' as const,
+    createdAt: '2024-01-10T14:30:00Z',
+  },
+];
+
+const mockAnalytics = {
+  totalAnalyses: 150,
+  totalAlerts: 25,
+  averageScore: 65,
+  detectionsByType: {
+    timing_anomaly: 10,
+    beneficiary_mismatch: 8,
+    scope_creep: 7,
+  },
+  alertsByStatus: {
+    pending: 5,
+    approved: 15,
+    rejected: 5,
+  },
+};
+
+function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: false,
-      },
+      queries: { retry: false },
     },
   });
 
-  return ({ children }: { children: React.ReactNode }) => (
+  return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>{children}</BrowserRouter>
+      <BrowserRouter>
+        {ui}
+      </BrowserRouter>
     </QueryClientProvider>
   );
-};
+}
 
 describe('PretextDetectionPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('renders the page title and description', () => {
+  it('renders page header and description', () => {
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: [],
       isLoading: false,
       error: null,
     } as any);
-
     vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: undefined,
+      data: mockAnalytics,
       isLoading: false,
     } as any);
 
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
+    renderWithProviders(<PretextDetectionPage />);
 
     expect(screen.getByText('Pretext Detection')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Identify potential pretext bills using advanced pattern recognition/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Identify potential pretext bills/i)).toBeInTheDocument();
+  });
+
+  it('displays stats cards with correct data', () => {
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: mockAlerts,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    expect(screen.getByText('150')).toBeInTheDocument(); // Total Analyses
+    expect(screen.getByText('1')).toBeInTheDocument(); // Pending Alerts
+    expect(screen.getByText('65')).toBeInTheDocument(); // Average Score
   });
 
   it('displays loading state while fetching alerts', () => {
@@ -72,187 +134,161 @@ describe('PretextDetectionPage', () => {
       isLoading: true,
       error: null,
     } as any);
-
     vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
       data: undefined,
       isLoading: true,
     } as any);
 
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
+    renderWithProviders(<PretextDetectionPage />);
 
-    // Stats should show loading state
-    expect(screen.getAllByText('...').length).toBeGreaterThan(0);
+    expect(screen.getByText(/Loading alerts/i)).toBeInTheDocument();
   });
 
-  it('displays alerts when data is loaded', async () => {
-    const mockAlerts = [
-      {
-        id: 'alert-1',
-        billId: 'HB-123',
-        score: 85,
-        status: 'pending' as const,
-        detections: [
-          {
-            type: 'timing',
-            severity: 'high' as const,
-            description: 'Bill introduced shortly after crisis',
-            evidence: ['Evidence 1'],
-            confidence: 0.9,
-          },
-        ],
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
-    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
-      data: mockAlerts,
-      isLoading: false,
-      error: null,
-    } as any);
-
-    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: {
-        totalAnalyses: 10,
-        totalAlerts: 5,
-        averageScore: 65,
-        detectionsByType: {},
-        alertsByStatus: {},
-      },
-      isLoading: false,
-    } as any);
-
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
-
-    // Switch to alerts tab
-    const alertsTab = screen.getByRole('tab', { name: /Alerts/ });
-    alertsTab.click();
-
-    await waitFor(() => {
-      expect(screen.getByText('Bill HB-123')).toBeInTheDocument();
-      expect(screen.getByText(/Risk Score: 85\/100/)).toBeInTheDocument();
-    });
-  });
-
-  it('displays error state when alerts fail to load', async () => {
+  it('displays error state when alerts fail to load', () => {
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: undefined,
       isLoading: false,
       error: new Error('Failed to fetch'),
     } as any);
-
     vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: undefined,
+      data: mockAnalytics,
       isLoading: false,
     } as any);
 
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
+    renderWithProviders(<PretextDetectionPage />);
 
-    // Switch to alerts tab
-    const alertsTab = screen.getByRole('tab', { name: /Alerts/ });
-    alertsTab.click();
-
-    await waitFor(() => {
-      expect(screen.getByText(/Failed to load alerts/)).toBeInTheDocument();
-    });
+    expect(screen.getByText(/Failed to load alerts/i)).toBeInTheDocument();
   });
 
-  it('displays empty state when no alerts exist', async () => {
-    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    } as any);
-
-    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: undefined,
-      isLoading: false,
-    } as any);
-
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
-
-    // Switch to alerts tab
-    const alertsTab = screen.getByRole('tab', { name: /Alerts/ });
-    alertsTab.click();
-
-    await waitFor(() => {
-      expect(screen.getByText(/No alerts found/)).toBeInTheDocument();
-    });
-  });
-
-  it('displays analytics data correctly', () => {
-    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
-      data: [],
-      isLoading: false,
-      error: null,
-    } as any);
-
-    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: {
-        totalAnalyses: 42,
-        totalAlerts: 15,
-        averageScore: 68,
-        detectionsByType: {
-          timing: 10,
-          beneficiary: 5,
-        },
-        alertsByStatus: {
-          pending: 8,
-          approved: 5,
-          rejected: 2,
-        },
-      },
-      isLoading: false,
-    } as any);
-
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
-
-    expect(screen.getByText('42')).toBeInTheDocument(); // Total analyses
-    expect(screen.getByText('68')).toBeInTheDocument(); // Average score
-  });
-
-  it('calculates pending and high risk alerts correctly', () => {
-    const mockAlerts = [
-      {
-        id: 'alert-1',
-        billId: 'HB-123',
-        score: 85,
-        status: 'pending' as const,
-        detections: [],
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'alert-2',
-        billId: 'HB-124',
-        score: 75,
-        status: 'pending' as const,
-        detections: [],
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'alert-3',
-        billId: 'HB-125',
-        score: 50,
-        status: 'approved' as const,
-        detections: [],
-        createdAt: new Date().toISOString(),
-      },
-    ];
-
+  it('displays alerts in alerts tab', async () => {
+    const user = userEvent.setup();
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: mockAlerts,
       isLoading: false,
       error: null,
     } as any);
-
     vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
-      data: undefined,
+      data: mockAnalytics,
       isLoading: false,
     } as any);
 
-    render(<PretextDetectionPage />, { wrapper: createWrapper() });
+    renderWithProviders(<PretextDetectionPage />);
 
-    // Should show 2 pending alerts
-    const pendingBadges = screen.getAllByText('2');
-    expect(pendingBadges.length).toBeGreaterThan(0);
+    const alertsTab = screen.getByRole('tab', { name: /Alerts/i });
+    await user.click(alertsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('Bill HB-123')).toBeInTheDocument();
+      expect(screen.getByText('Bill SB-456')).toBeInTheDocument();
+    });
+  });
+
+  it('displays analytics in analytics tab', async () => {
+    const user = userEvent.setup();
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: mockAlerts,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    const analyticsTab = screen.getByRole('tab', { name: /Analytics/i });
+    await user.click(analyticsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText('Detections by Type')).toBeInTheDocument();
+      expect(screen.getByText('Alerts by Status')).toBeInTheDocument();
+    });
+  });
+
+  it('shows badge with pending count on alerts tab', () => {
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: mockAlerts,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    const alertsTab = screen.getByRole('tab', { name: /Alerts/i });
+    expect(alertsTab).toHaveTextContent('1'); // Badge with pending count
+  });
+
+  it('displays empty state when no alerts exist', async () => {
+    const user = userEvent.setup();
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    const alertsTab = screen.getByRole('tab', { name: /Alerts/i });
+    await user.click(alertsTab);
+
+    await waitFor(() => {
+      expect(screen.getByText(/No alerts found/i)).toBeInTheDocument();
+    });
+  });
+
+  it('tracks page view on mount', () => {
+    const { analyticsService } = require('@client/infrastructure/analytics/service');
+    
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    expect(analyticsService.trackPageView).toHaveBeenCalledWith({
+      path: '/pretext-detection',
+      title: 'Pretext Detection',
+    });
+  });
+
+  it('tracks tab changes', async () => {
+    const user = userEvent.setup();
+    const { analyticsService } = require('@client/infrastructure/analytics/service');
+    
+    vi.mocked(hooks.usePretextAlerts).mockReturnValue({
+      data: mockAlerts,
+      isLoading: false,
+      error: null,
+    } as any);
+    vi.mocked(hooks.usePretextAnalytics).mockReturnValue({
+      data: mockAnalytics,
+      isLoading: false,
+    } as any);
+
+    renderWithProviders(<PretextDetectionPage />);
+
+    const alertsTab = screen.getByRole('tab', { name: /Alerts/i });
+    await user.click(alertsTab);
+
+    expect(analyticsService.trackUserAction).toHaveBeenCalledWith({
+      action: 'tab_change',
+      category: 'pretext_detection',
+      label: 'alerts',
+    });
   });
 });
