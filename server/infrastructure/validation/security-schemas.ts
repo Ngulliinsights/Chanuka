@@ -328,7 +328,7 @@ export const SecuritySchemas = {
 
 // Utility function to create validation middleware
 export const createValidationMiddleware = (schema: z.ZodSchema) => {
-  return async (req: unknown, res: unknown, next: unknown) => {
+  return async (req: { body: unknown }, res: { status: (code: number) => { json: (data: unknown) => unknown } }, next: () => void): Promise<unknown> => {
     try {
       const result = await schema.safeParseAsync(req.body);
       if (!result.success) {

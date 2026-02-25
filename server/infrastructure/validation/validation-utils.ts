@@ -1,4 +1,4 @@
-import DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'dompurify';
 import { z } from 'zod';
 
 /**
@@ -287,11 +287,12 @@ function validateObjectStructure(obj: unknown, depth: number = 0): boolean {
   }
 
   if (obj && typeof obj === 'object') {
-    const keys = Object.keys(obj);
+    const record = obj as Record<string, unknown>;
+    const keys = Object.keys(record);
     if (keys.length > 100) { // Max 100 properties per object
       return false;
     }
-    return keys.every(key => validateObjectStructure(obj[key], depth + 1));
+    return keys.every(key => validateObjectStructure(record[key], depth + 1));
   }
 
   return true;

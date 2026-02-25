@@ -99,10 +99,10 @@ export class InputValidationService {
 
          endMetric(false, primaryError?.code || 'validation_error', errorCategory);
 
-         logger.warn('Input validation failed', {
+         logger.warn({
            component: 'input-validation',
            errors: errors.map(e => `${e.field}: ${e.message}`)
-         });
+         }, 'Input validation failed');
 
          return {
            isValid: false,
@@ -112,10 +112,10 @@ export class InputValidationService {
      } catch (error) {
        endMetric(false, 'internal_error', 'system');
 
-       logger.error('Validation error', {
+       logger.error({
          component: 'input-validation',
          error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Validation error');
 
        return {
          isValid: false,
@@ -286,12 +286,12 @@ export class InputValidationService {
     schema: z.ZodSchema<T>,
     source: 'body' | 'query' | 'params' = 'body'
   ) {
-    return (req: Request, res: Response, next: NextFunction) => {
+    return (req: Request, res: Response, next: NextFunction): void | Response => {
       const input = req[source];
       const validation = this.validateApiInput(schema, input);
 
       if (!validation.isValid) {
-        return ApiValidationError(res, validation.errors);
+        return new ApiValidationError(res, validation.errors);
       }
 
       // Replace the original input with validated/sanitized data

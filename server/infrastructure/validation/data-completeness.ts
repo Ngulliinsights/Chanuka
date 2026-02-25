@@ -1,12 +1,12 @@
 // TODO: Fix import when shared/core modules are available
 
-// Stub for apiRequest
-function apiRequest(method: string, url: string, data?: unknown): Promise<any> {
+// Stub for apiRequest (unused imports removed)
+function apiRequest(_method: string, _url: string, _data?: unknown): Promise<any> {
   return Promise.resolve({
     json: () => Promise.resolve({}),
   });
 }
-import { cache } from '@server/infrastructure/cache';
+import { cache } from '@server/infrastructure/cache/intelligent-cache';
 import { logger } from '@server/infrastructure/observability';
 
 interface VerificationRule {
@@ -297,9 +297,9 @@ export class DataCompletenessService {
 
     try {
       // Check cache first
-      const cachedData = await cache.get(`entity:${entity_type}:${entity_id}`);
-      if (cachedData) {
-        return JSON.parse(cachedData);
+      const cachedData = await cache.get<string>(`entity:${entity_type}:${entity_id}`);
+      if (cachedData && cachedData.value) {
+        return JSON.parse(cachedData.value);
       }
 
       // Fetch from API
@@ -311,7 +311,7 @@ export class DataCompletenessService {
 
       return data;
     } catch (error) {
-      logger.error('Failed to fetch entity data', { entity_type, entity_id, error });
+      logger.error({ entity_type, entity_id, error }, 'Failed to fetch entity data');
       return null;
     }
   }
@@ -327,7 +327,7 @@ export class DataCompletenessService {
       const response = await apiRequest('GET', `/api/data-sources/${entity_type}/${entity_id}`);
       return await response.json();
     } catch (error) {
-      logger.error('Failed to fetch data sources', { entity_type, entity_id, error });
+      logger.error({ entity_type, entity_id, error }, 'Failed to fetch data sources');
       return [];
     }
   }
@@ -474,8 +474,9 @@ export class DataCompletenessService {
         break;
 
       case 'introduced_date':
+        const dateValue = value as string | number | Date;
         try {
-          const date = new Date(value);
+          const date = new Date(dateValue);
           const now = new Date();
           if (isNaN(date.getTime())) {
             issues.push('Invalid date format');
@@ -521,7 +522,7 @@ export class DataCompletenessService {
   private evaluateCondition(condition: string, data: unknown): boolean {
     try {
       // Create a safe evaluation context with only the data
-      const context = { ...data };
+      const context = data && typeof data === 'object' ? { ...(data as Record<string, unknown>) } : {};
 
       // Use Function constructor to create a function that evaluates the condition
       // This is safer than eval() but still requires careful validation of condition strings
@@ -529,7 +530,7 @@ export class DataCompletenessService {
 
       return conditionFn(...Object.values(context));
     } catch (error) {
-      logger.error('Failed to evaluate condition', { condition, error });
+      logger.error({ condition, error }, 'Failed to evaluate condition');
       return false;
     }
   }
@@ -606,17 +607,17 @@ export class DataCompletenessService {
   private async storeVerificationResult(result: VerificationResult): Promise<void> {
     try {
       await apiRequest('POST', '/internal/verification-results', result);
-      logger.info('Stored verification result', {
+      logger.info({
         entity_type: result.entity_type,
         entity_id: result.entity_id,
         completeness: result.overallCompleteness,
-      });
+      }, 'Stored verification result');
     } catch (error) {
-      logger.error('Failed to store verification result', {
+      logger.error({
         entity_type: result.entity_type,
         entity_id: result.entity_id,
         error,
-      });
+      }, 'Failed to store verification result');
     }
   }
 
@@ -634,7 +635,7 @@ export class DataCompletenessService {
         const result = await this.verifyEntity(entity_type, entity_id);
         results.push(result);
       } catch (error) {
-        logger.error('Failed to verify entity', { entity_type, entity_id, error });
+        logger.error({ entity_type, entity_id, error }, 'Failed to verify entity');
       }
     }
 
@@ -651,7 +652,7 @@ export class DataCompletenessService {
       const entities = await response.json();
 
       // Verify each entity
-      const entity_ids = entities.map((entity: unknown) => entity.id);
+      const entity_ids = (entities as Array<{ id: string }>).map((entity) => entity.id);
       const verificationResults = await this.verifyMultipleEntities(entity_type, entity_ids);
 
       // Calculate overall statistics
@@ -697,7 +698,7 @@ export class DataCompletenessService {
         recommendations: this.generateReportRecommendations(commonMissingFields, entity_type),
       };
     } catch (error) {
-      logger.error('Failed to generate completeness report', { entity_type, error });
+      logger.error({ entity_type, error }, 'Failed to generate completeness report');
       throw error;
     }
   }
@@ -751,7 +752,7 @@ export class DataCompletenessService {
   scheduleRegularVerification(intervalHours = 24): void {
     // This would typically be implemented with a job scheduler
     // For now, we'll just log that it's been scheduled
-    logger.info('Scheduled regular verification', { intervalHours });
+    logger.info({ intervalHours }, 'Scheduled regular verification');
   }
 }
 

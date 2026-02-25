@@ -1,6 +1,4 @@
 import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
-import { logger } from '@server/infrastructure/observability';
-import { z } from 'zod';
 
 // Comprehensive data validation service for government data integration
 export class GovernmentDataValidationService {
@@ -53,32 +51,34 @@ export class GovernmentDataValidationService {
       }
     };
 
+    const billData = bill as Record<string, any>;
+
     // Check required fields
-    const missingRequired = this.checkRequiredFields(bill, this.VALIDATION_RULES.bills.required);
+    const missingRequired = this.checkRequiredFields(billData, this.VALIDATION_RULES.bills.required);
     if (missingRequired.length > 0) {
       result.isValid = false;
       result.errors.push(`Missing required fields: ${missingRequired.join(', ')}`);
     }
 
     // Validate field lengths
-    const lengthErrors = this.validateFieldLengths(bill, this.VALIDATION_RULES.bills.maxLengths);
+    const lengthErrors = this.validateFieldLengths(billData, this.VALIDATION_RULES.bills.maxLengths);
     if (lengthErrors.length > 0) {
       result.errors.push(...lengthErrors);
       result.isValid = false;
     }
 
     // Validate bill status
-    if (bill.status && !this.VALIDATION_RULES.bills.statusValues.includes(bill.status)) {
-      result.warnings.push(`Invalid bill status: ${bill.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
+    if (billData.status && !this.VALIDATION_RULES.bills.statusValues.includes(billData.status)) {
+      result.warnings.push(`Invalid bill status: ${billData.status}. Expected one of: ${this.VALIDATION_RULES.bills.statusValues.join(', ')}`);
     }
 
     // Validate bill number format
-    if (bill.bill_number && !this.VALIDATION_RULES.bills.bill_numberPattern.test(bill.bill_number)) {
-      result.warnings.push(`Bill number format may be invalid: ${bill.bill_number}`);
+    if (billData.bill_number && !this.VALIDATION_RULES.bills.bill_numberPattern.test(billData.bill_number)) {
+      result.warnings.push(`Bill number format may be invalid: ${billData.bill_number}`);
     }
 
     // Validate dates
-    const dateValidation = this.validateDates(bill, ['introduced_date', 'last_action_date']);
+    const dateValidation = this.validateDates(billData, ['introduced_date', 'last_action_date']);
     result.errors.push(...dateValidation.errors);
     result.warnings.push(...dateValidation.warnings);
     if (dateValidation.errors.length > 0) {
@@ -86,7 +86,7 @@ export class GovernmentDataValidationService {
     }
 
     // Calculate completeness score
-    result.details.completeness = this.calculateCompleteness(bill, [
+    result.details.completeness = this.calculateCompleteness(billData, [
       ...this.VALIDATION_RULES.bills.required,
       ...this.VALIDATION_RULES.bills.optional
     ]);
@@ -95,10 +95,10 @@ export class GovernmentDataValidationService {
     result.details.accuracy = this.calculateAccuracy(result.errors, result.warnings);
 
     // Calculate consistency score
-    result.details.consistency = this.calculateConsistency(bill);
+    result.details.consistency = this.calculateConsistency(billData);
 
     // Calculate timeliness score
-    result.details.timeliness = this.calculateTimeliness(bill);
+    result.details.timeliness = this.calculateTimeliness(billData);
 
     // Overall score
     result.score = (
@@ -130,38 +130,40 @@ export class GovernmentDataValidationService {
       }
     };
 
+    const sponsorData = sponsor as Record<string, any>;
+
     // Check required fields
-    const missingRequired = this.checkRequiredFields(sponsor, this.VALIDATION_RULES.sponsors.required);
+    const missingRequired = this.checkRequiredFields(sponsorData, this.VALIDATION_RULES.sponsors.required);
     if (missingRequired.length > 0) {
       result.isValid = false;
       result.errors.push(`Missing required fields: ${missingRequired.join(', ')}`);
     }
 
     // Validate field lengths
-    const lengthErrors = this.validateFieldLengths(sponsor, this.VALIDATION_RULES.sponsors.maxLengths);
+    const lengthErrors = this.validateFieldLengths(sponsorData, this.VALIDATION_RULES.sponsors.maxLengths);
     if (lengthErrors.length > 0) {
       result.errors.push(...lengthErrors);
       result.isValid = false;
     }
 
     // Validate role
-    if (sponsor.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsor.role)) {
-      result.warnings.push(`Uncommon role: ${sponsor.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
+    if (sponsorData.role && !this.VALIDATION_RULES.sponsors.roleValues.includes(sponsorData.role)) {
+      result.warnings.push(`Uncommon role: ${sponsorData.role}. Expected one of: ${this.VALIDATION_RULES.sponsors.roleValues.join(', ')}`);
     }
 
     // Validate email format
-    if (sponsor.email && !this.isValidEmail(sponsor.email)) {
-      result.errors.push(`Invalid email format: ${sponsor.email}`);
+    if (sponsorData.email && !this.isValidEmail(sponsorData.email)) {
+      result.errors.push(`Invalid email format: ${sponsorData.email}`);
       result.isValid = false;
     }
 
     // Validate phone format
-    if (sponsor.phone && !this.isValidPhone(sponsor.phone)) {
-      result.warnings.push(`Phone number format may be invalid: ${sponsor.phone}`);
+    if (sponsorData.phone && !this.isValidPhone(sponsorData.phone)) {
+      result.warnings.push(`Phone number format may be invalid: ${sponsorData.phone}`);
     }
 
     // Calculate completeness score
-    result.details.completeness = this.calculateCompleteness(sponsor, [
+    result.details.completeness = this.calculateCompleteness(sponsorData, [
       ...this.VALIDATION_RULES.sponsors.required,
       ...this.VALIDATION_RULES.sponsors.optional
     ]);
@@ -170,10 +172,10 @@ export class GovernmentDataValidationService {
     result.details.accuracy = this.calculateAccuracy(result.errors, result.warnings);
 
     // Calculate consistency score
-    result.details.consistency = this.calculateConsistency(sponsor);
+    result.details.consistency = this.calculateConsistency(sponsorData);
 
     // Calculate timeliness score
-    result.details.timeliness = this.calculateTimeliness(sponsor);
+    result.details.timeliness = this.calculateTimeliness(sponsorData);
 
     // Overall score
     result.score = (
@@ -192,7 +194,7 @@ export class GovernmentDataValidationService {
   static validateBatch(records: unknown[], type: 'bills' | 'sponsors'): BatchValidationResult {
     const results: ValidationResult[] = [];
     const validRecords: unknown[] = [];
-    const invalidRecords: unknown[] = [];
+    const invalidRecords: Array<{ record: unknown; validation: ValidationResult }> = [];
 
     for (const record of records) {
       const validation = type === 'bills' 
@@ -266,7 +268,7 @@ export class GovernmentDataValidationService {
   /**
    * Check for required fields
    */
-  private static checkRequiredFields(data: unknown, requiredFields: string[]): string[] {
+  private static checkRequiredFields(data: Record<string, any>, requiredFields: string[]): string[] {
     const missing: string[] = [];
     
     for (const field of requiredFields) {
@@ -281,7 +283,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate field lengths
    */
-  private static validateFieldLengths(data: unknown, maxLengths: Record<string, number>): string[] {
+  private static validateFieldLengths(data: Record<string, any>, maxLengths: Record<string, number>): string[] {
     const errors: string[] = [];
     
     for (const [field, maxLength] of Object.entries(maxLengths)) {
@@ -296,7 +298,7 @@ export class GovernmentDataValidationService {
   /**
    * Validate date fields
    */
-  private static validateDates(data: unknown, dateFields: string[]): { errors: string[]; warnings: string[] } {
+  private static validateDates(data: Record<string, any>, dateFields: string[]): { errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
     
@@ -326,7 +328,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate completeness score (0-1)
    */
-  private static calculateCompleteness(data: unknown, allFields: string[]): number {
+  private static calculateCompleteness(data: Record<string, any>, allFields: string[]): number {
     const presentFields = allFields.filter(field => 
       data[field] && 
       (typeof data[field] !== 'string' || data[field].trim() !== '')
@@ -350,7 +352,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate consistency score
    */
-  private static calculateConsistency(data: unknown): number {
+  private static calculateConsistency(data: Record<string, any>): number {
     let score = 1.0;
     
     // Check for internal consistency issues
@@ -377,7 +379,7 @@ export class GovernmentDataValidationService {
   /**
    * Calculate timeliness score
    */
-  private static calculateTimeliness(data: unknown): number {
+  private static calculateTimeliness(data: Record<string, any>): number {
     if (!data.lastUpdated) return 0.5; // Neutral score if no update info
     
     const lastUpdate = new Date(data.lastUpdated);

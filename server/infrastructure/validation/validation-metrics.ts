@@ -84,14 +84,14 @@ export class ValidationMetricsCollector {
 
     // Log significant events
     if (!metric.success) {
-      logger.warn('Validation failure recorded', {
+      logger.warn({
         component: 'validation-metrics',
         service: metric.service,
         operation: metric.operation,
         errorType: metric.errorType || 'unknown',
         errorCategory: metric.errorCategory || 'system',
         duration: metric.duration
-      });
+      }, 'Validation failure recorded');
     }
   }
 
@@ -409,11 +409,11 @@ export class ValidationMetricsCollector {
 
     const removedCount = initialCount - this.metrics.length;
     if (removedCount > 0) {
-      logger.info('Cleaned up old validation metrics', {
+      logger.info({
         component: 'validation-metrics',
         removed: removedCount,
         remaining: this.metrics.length
-      });
+      }, 'Cleaned up old validation metrics');
     }
   }
 
@@ -422,7 +422,7 @@ export class ValidationMetricsCollector {
    */
   public reset(): void {
     this.metrics = [];
-    logger.info('Validation metrics reset', { component: 'validation-metrics' });
+    logger.info({ component: 'validation-metrics' }, 'Validation metrics reset');
   }
 }
 

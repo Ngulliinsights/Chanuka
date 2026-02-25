@@ -18,7 +18,7 @@ import { InputValidationService } from '@server/infrastructure/validation/input-
 import { SchemaValidationService } from '@server/infrastructure/validation/schema-validation-service';
 // Import service classes
 import { ValidationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
-import { getDbInstance } from '@server/infrastructure/database/index';
+import { pool as dbPool } from '@server/infrastructure/database/index';
 import { logger } from '@server/infrastructure/observability';
 import type { Pool as PoolType } from 'pg';
 
@@ -44,7 +44,7 @@ let validationServicesContainer: ValidationServicesContainer | null = null;
  * Initialize all validation services in the correct order
  * This function ensures that dependencies are resolved properly
  */
-export async function initializeValidationServices(dbPool?: PoolType): Promise<ValidationServicesContainer> {
+export async function initializeValidationServices(providedDbPool?: PoolType): Promise<ValidationServicesContainer> {
   if (validationServicesContainer) {
     logger.debug('Validation services already initialized, returning existing container');
     return validationServicesContainer;
@@ -62,19 +62,7 @@ export async function initializeValidationServices(dbPool?: PoolType): Promise<V
     const inputValidation = InputValidationService.getInstance();
 
     // Step 3: Get database connection for services that need it
-    let dbInstance;
-    let pool: PoolType;
-    
-    if (dbPool) {
-      pool = dbPool;
-      logger.debug('Using provided database pool');
-    } else {
-      logger.debug('Getting database instance...');
-      dbInstance = await getDbInstance();
-      // Note: We'll need to get the pool from the database instance
-      // This might need adjustment based on your database setup
-      pool = dbInstance as unknown; // Type assertion - adjust based on actual implementation
-    }
+    const pool: PoolType = providedDbPool || dbPool;
 
     // Step 4: Initialize schema validation service
     logger.debug('Initializing schema validation service...');
@@ -114,7 +102,7 @@ export async function initializeValidationServices(dbPool?: PoolType): Promise<V
     return validationServicesContainer;
 
   } catch (error) {
-    logger.error('Failed to initialize validation services:', error);
+    logger.error({ component: 'ValidationServicesInit', error }, 'Failed to initialize validation services');
     
     // Reset container on failure
     validationServicesContainer = null;
@@ -180,7 +168,7 @@ export async function shutdownValidationServices(): Promise<void> {
     
     logger.info('Validation services shutdown completed');
   } catch (error) {
-    logger.error('Error during validation services shutdown:', error);
+    logger.error({ component: 'ValidationServicesInit', error }, 'Error during validation services shutdown');
     throw error;
   }
 }
