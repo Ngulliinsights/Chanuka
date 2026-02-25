@@ -1,15 +1,11 @@
-import { ErrorDomain, ErrorSeverity } from '../../errors/error-types';
-
-// Define BaseError locally since it's not exported from shared/core
-class BaseError extends Error {
+// Simple error class for image utilities
+class ImageError extends Error {
   constructor(
     message: string,
-    public domain: ErrorDomain,
-    public severity: ErrorSeverity,
     public code?: string
   ) {
     super(message);
-    this.name = 'BaseError';
+    this.name = 'ImageError';
   }
 }
 
@@ -90,15 +86,9 @@ export class ImageUtils {
         metadata: validation.metadata
       };
     } catch (err) {
-      throw new BaseError(
-        'Image validation failed',
-        {
-          domain: ErrorDomain.VALIDATION,
-          severity: ErrorSeverity.MEDIUM,
-          code: 'IMAGE_VALIDATION_ERROR',
-          cause: err as Error,
-          details: { fileName: file.name }
-        }
+      throw new ImageError(
+        `Image validation failed: ${file.name}`,
+        'IMAGE_VALIDATION_ERROR'
       );
     }
   }
@@ -119,14 +109,9 @@ export class ImageUtils {
       img.onerror = () => {
         URL.revokeObjectURL(url);
         reject(
-          new BaseError(
-            'Failed to load image',
-            {
-              domain: ErrorDomain.SYSTEM,
-              severity: ErrorSeverity.HIGH,
-              code: 'IMAGE_LOAD_ERROR',
-              details: { fileName: file.name }
-            }
+          new ImageError(
+            `Failed to load image: ${file.name}`,
+            'IMAGE_LOAD_ERROR'
           )
         );
       };
