@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 24, 2026 at 03:41 PM
+**Generated:** February 25, 2026 at 12:54 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,574
+**Total Items:** 3,699
 
 ```
 .
@@ -15,6 +15,16 @@
 │   │   │   ├── SVG_INTEGRATION_README.md
 │   │   │   ├── SVG_INTEGRATION_STRATEGY.md
 │   │   │   └── SVG_VISUAL_GUIDE.md
+│   │   └── README.md
+│   ├── load-tests/
+│   │   ├── scenarios/
+│   │   │   ├── advocacy-coordination.js
+│   │   │   ├── argument-intelligence.js
+│   │   │   ├── constitutional-intelligence.js
+│   │   │   ├── pretext-detection.js
+│   │   │   └── recommendations.js
+│   │   ├── config.js
+│   │   ├── main.js
 │   │   └── README.md
 │   ├── logs/
 │   │   └── README.md
@@ -85,7 +95,15 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useAdvocacy.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── AdvocacyDashboard.tsx
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── ActionCard.tsx
+│   │   │   │   │   └── CampaignCard.tsx
 │   │   │   │   ├── ElectoralPressure.tsx
+│   │   │   │   ├── index.ts
 │   │   │   │   └── index.tsx
 │   │   │   ├── analysis/
 │   │   │   │   ├── model/
@@ -142,6 +160,25 @@
 │   │   │   ├── api/
 │   │   │   │   └── pages/
 │   │   │   │       └── api-access.tsx
+│   │   │   ├── argument-intelligence/
+│   │   │   │   ├── api/
+│   │   │   │   │   └── argument-intelligence-api.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useArgumentIntelligence.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── ArgumentIntelligencePage.tsx
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── ArgumentClusterDisplay.tsx
+│   │   │   │   │   ├── ArgumentFilters.tsx
+│   │   │   │   │   ├── ArgumentIntelligenceDashboard.tsx
+│   │   │   │   │   ├── ArgumentIntelligenceWidget.tsx
+│   │   │   │   │   ├── PositionTrackingChart.tsx
+│   │   │   │   │   ├── QualityMetricsDisplay.tsx
+│   │   │   │   │   └── SentimentHeatmap.tsx
+│   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
 │   │   │   ├── auth/
 │   │   │   │   └── pages/
 │   │   │   │       ├── auth-page.tsx
@@ -274,6 +311,13 @@
 │   │   │   │   │   │   └── CommunityHub.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── constitutional-intelligence/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useConstitutionalAnalysis.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── ConstitutionalAnalysisDisplay.tsx
+│   │   │   │   │   └── ConstitutionalIntelligenceTab.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── dashboard/
 │   │   │   │   ├── pages/
 │   │   │   │   │   └── dashboard.tsx
@@ -291,6 +335,24 @@
 │   │   │   │   └── pages/
 │   │   │   │       ├── expert-insights.tsx
 │   │   │   │       └── expert-verification.tsx
+│   │   │   ├── feature-flags/
+│   │   │   │   ├── api/
+│   │   │   │   │   └── feature-flags-api.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useFeatureFlags.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   ├── FeatureFlagManagerPage.tsx
+│   │   │   │   │   └── FeatureFlagsPage.tsx
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── AnalyticsDashboard.tsx
+│   │   │   │   │   ├── FeatureFlagManager.tsx
+│   │   │   │   │   ├── FlagEditor.tsx
+│   │   │   │   │   ├── FlagList.tsx
+│   │   │   │   │   └── RolloutControls.tsx
+│   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
 │   │   │   ├── home/
 │   │   │   │   └── pages/
 │   │   │   │       ├── CoreHomePage.tsx
@@ -327,6 +389,12 @@
 │   │   │   ├── market/
 │   │   │   │   └── SokoHaki.tsx
 │   │   │   ├── monitoring/
+│   │   │   │   ├── api/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── monitoring-api.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useMonitoring.ts
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── continuous-performance-monitor.ts
 │   │   │   │   │   ├── index.ts
@@ -335,7 +403,21 @@
 │   │   │   │   │   ├── render-tracker.ts
 │   │   │   │   │   ├── render-tracking-integration.ts
 │   │   │   │   │   └── route-profiler.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   ├── IntegrationMonitoringPage.tsx
+│   │   │   │   │   └── MonitoringDashboardPage.tsx
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── AlertManagement.tsx
+│   │   │   │   │   ├── ErrorTrackingDisplay.tsx
+│   │   │   │   │   ├── FeatureUsageCharts.tsx
+│   │   │   │   │   ├── HealthStatusDisplay.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── IntegrationMonitoringDashboard.tsx
+│   │   │   │   │   ├── MetricsVisualization.tsx
+│   │   │   │   │   └── PerformanceMetrics.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
 │   │   │   ├── navigation/
 │   │   │   │   └── model/
 │   │   │   │       └── index.ts
@@ -1635,6 +1717,7 @@
 │   ├── README.md
 │   ├── tailwind.config.ts
 │   ├── tsconfig.json
+│   ├── tsconfig.test.json
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
@@ -1816,6 +1899,11 @@
 │   │   ├── setup.md
 │   │   ├── troubleshooting-guide.md
 │   │   └── user-manual.md
+│   ├── integration/
+│   │   ├── advocacy-coordination.md
+│   │   ├── architecture.md
+│   │   ├── constitutional-intelligence.md
+│   │   └── README.md
 │   ├── plans/
 │   │   └── monitoring-fsd-restructure.md
 │   ├── reference/
@@ -1860,6 +1948,8 @@
 │   │   ├── Research Strategy for Kenyan Constitutionalism.md
 │   │   ├── strategy_template_flow.mermaid
 │   │   └── sustainable_uprising.md
+│   ├── security/
+│   │   └── phase1-security-review.md
 │   ├── strategy/
 │   │   ├── api_strategy_doc.md
 │   │   ├── brand-roadmap.md
@@ -1901,6 +1991,8 @@
 │   ├── deprecated-cleanup-summary.md
 │   ├── deprecated-directories-cleanup.md
 │   ├── DEVELOPER_GUIDE_Feature_Creation.md
+│   ├── DEVELOPER_ONBOARDING.md
+│   ├── DEVELOPMENT_WORKFLOW.md
 │   ├── FINAL_CLEANUP_2026-02-24.md
 │   ├── FSD_IMPORT_GUIDE.md
 │   ├── INTERNAL_CONSISTENCY_ANALYSIS_2026-02-24.md
@@ -1920,6 +2012,7 @@
 │   ├── scripts-tools-cleanup-implementation.md
 │   ├── scripts-tools-strategic-analysis.md
 │   ├── scripts-tools-strategic-audit.md
+│   ├── SECURITY_CONSOLIDATION.md
 │   ├── SERVER_MIGRATION_2026-02-24.md
 │   ├── SERVER_PHASE2_MIGRATION_2026-02-24.md
 │   ├── server-consistency-analysis.md
@@ -1927,7 +2020,8 @@
 │   ├── specs-plans-obsolete-assessment.md
 │   ├── specs-plans-relevance-assessment.md
 │   ├── STRATEGIC_ARCHITECTURE_ANALYSIS.md
-│   └── strategic-implementation-audit.md
+│   ├── strategic-implementation-audit.md
+│   └── TASK_COMPLETION_SUMMARY.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2144,7 +2238,8 @@
 │   │   │   │   ├── action-coordinator.ts
 │   │   │   │   ├── campaign-service.ts
 │   │   │   │   ├── coalition-builder.ts
-│   │   │   │   └── impact-tracker.ts
+│   │   │   │   ├── impact-tracker.ts
+│   │   │   │   └── monitoring-integration.ts
 │   │   │   ├── config/
 │   │   │   │   └── advocacy-config.ts
 │   │   │   ├── domain/
@@ -2161,6 +2256,8 @@
 │   │   │   │   └── services/
 │   │   │   │       ├── notification-service.ts
 │   │   │   │       └── representative-contact-service.ts
+│   │   │   ├── presentation/
+│   │   │   │   └── advocacy-router.ts
 │   │   │   ├── types/
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy-factory.ts
@@ -2302,19 +2399,27 @@
 │   │   │   │   ├── brief-generator.ts
 │   │   │   │   ├── clustering-service.ts
 │   │   │   │   ├── coalition-finder.ts
+│   │   │   │   ├── comment-integration.ts
 │   │   │   │   ├── evidence-validator.ts
+│   │   │   │   ├── nlp-pipeline-config.ts
 │   │   │   │   ├── power-balancer.ts
 │   │   │   │   └── structure-extractor.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── cache/
+│   │   │   │   │   └── nlp-cache.ts
 │   │   │   │   └── nlp/
 │   │   │   │       ├── entity-extractor.ts
+│   │   │   │       ├── quality-metrics.ts
 │   │   │   │       ├── sentence-classifier.ts
+│   │   │   │       ├── sentiment-analyzer.ts
 │   │   │   │       └── similarity-calculator.ts
 │   │   │   ├── types/
 │   │   │   │   └── argument.types.ts
+│   │   │   ├── API_DOCUMENTATION.md
 │   │   │   ├── argument-intelligence-router.ts
 │   │   │   ├── IMPLEMENTATION_STATUS.md
 │   │   │   ├── index.ts
+│   │   │   ├── INTEGRATION_SUMMARY.md
 │   │   │   └── routes.ts
 │   │   ├── bills/
 │   │   │   ├── application/
@@ -2394,7 +2499,7 @@
 │   │   │   └── social-share-storage.ts
 │   │   ├── constitutional-analysis/
 │   │   │   ├── application/
-│   │   │   │   ├── constitutional-analysis-service-complete.ts
+│   │   │   │   ├── constitutional-analysis-service.ts
 │   │   │   │   ├── constitutional-analyzer.ts
 │   │   │   │   ├── expert-flagging-service.ts
 │   │   │   │   ├── grounding-service.ts
@@ -2425,8 +2530,10 @@
 │   │   │   ├── application/
 │   │   │   │   ├── use-cases/
 │   │   │   │   │   └── analyze-bill-constitutionality.use-case.ts
-│   │   │   │   ├── constitutional-analysis.service.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── constitutional-service.ts
+│   │   │   │   ├── expert-review-workflow.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── monitoring-integration.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
 │   │   │   │   │   ├── constitutional-analysis.entity.ts
@@ -2436,8 +2543,10 @@
 │   │   │   │   │   ├── provision-matcher.service.ts
 │   │   │   │   │   └── violation-detector.service.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── API.md
 │   │   │   ├── index.ts
-│   │   │   └── README.md
+│   │   │   ├── README.md
+│   │   │   └── routes.ts
 │   │   ├── feature-flags/
 │   │   │   ├── application/
 │   │   │   │   ├── controller.ts
@@ -2622,11 +2731,14 @@
 │   │   │   ├── index.ts
 │   │   │   ├── intrusion-detection-service.ts
 │   │   │   ├── privacy-service.ts
+│   │   │   ├── README.md
 │   │   │   ├── security-audit-service.ts
+│   │   │   ├── security-event-logger.ts
 │   │   │   ├── security-initialization-service.ts
 │   │   │   ├── security-middleware.ts
 │   │   │   ├── security-monitoring-service.ts
 │   │   │   ├── security-monitoring.ts
+│   │   │   ├── security-policy.ts
 │   │   │   └── tls-config-service.ts
 │   │   ├── sponsors/
 │   │   │   ├── application/
@@ -2635,10 +2747,14 @@
 │   │   │   ├── types/
 │   │   │   │   ├── analysis.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── CONFLICT_ANALYSIS_FIXES_NEEDED.md
 │   │   │   ├── index.ts
+│   │   │   ├── REWRITE_COMPLETE.md
+│   │   │   ├── SPONSORS_MODULE_COMPLETE.md
 │   │   │   └── sponsors.routes.ts
 │   │   ├── universal_access/
 │   │   │   ├── index.ts
+│   │   │   ├── README.md
 │   │   │   ├── ussd.analytics.ts
 │   │   │   ├── ussd.composition.ts
 │   │   │   ├── ussd.config.ts
@@ -2695,8 +2811,11 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── index.ts
 │   │   │   └── MIGRATION_SUMMARY.md
+│   │   ├── CONTINUATION_SUMMARY.md
 │   │   ├── DDD_COMPLETION_SUMMARY.md
 │   │   ├── index.ts
+│   │   ├── LOGGING_STANDARDIZATION_SUMMARY.md
+│   │   ├── MODULES_REWRITE_SUMMARY.md
 │   │   ├── README.md
 │   │   └── search-suggestions.ts
 │   ├── infrastructure/
@@ -2939,9 +3058,6 @@
 │   │   │   │   ├── monitoring-scheduler.ts
 │   │   │   │   ├── performance-monitor.ts
 │   │   │   │   └── performance-monitoring.service.ts
-│   │   │   ├── security/
-│   │   │   │   ├── security-event-logger.ts
-│   │   │   │   └── security-policy.ts
 │   │   │   ├── api-cost-monitoring.service.ts
 │   │   │   ├── database-logger.ts
 │   │   │   ├── index.ts
@@ -3004,7 +3120,7 @@
 │   │   │   ├── validation-integration.ts
 │   │   │   └── websocket.ts
 │   │   ├── security/
-│   │   │   ├── input-validation-service.ts
+│   │   │   ├── README.md
 │   │   │   └── secure-query-builder.ts
 │   │   ├── validation/
 │   │   │   ├── data-completeness.ts
@@ -3094,6 +3210,7 @@
 │   │   ├── error-management.ts
 │   │   ├── index.ts
 │   │   ├── privacy-middleware.ts
+│   │   ├── rate-limit-config.ts
 │   │   ├── rate-limiter.ts
 │   │   ├── safeguards.ts
 │   │   ├── service-availability.ts
@@ -3123,8 +3240,6 @@
 │   │   ├── validate-connection-migration.ts
 │   │   ├── verify-external-api-management.ts
 │   │   └── websocket-performance-validation.ts
-│   ├── services/
-│   ├── storage/
 │   ├── tests/
 │   │   ├── integration/
 │   │   │   ├── websocket-backward-compatibility.test.ts
@@ -3155,11 +3270,12 @@
 │   │   ├── api.ts
 │   │   ├── common.ts
 │   │   ├── index.ts
-│   │   ├── vitest-extensions.d.ts
+│   │   ├── jest-extensions.d.ts
 │   │   └── shared-schema-short.d.ts
 │   ├── utils/
 │   │   ├── analytics-controller-wrapper.ts
 │   │   ├── anonymity-service.ts
+│   │   ├── api-response-helpers.ts
 │   │   ├── api-response.ts
 │   │   ├── api-utils.ts
 │   │   ├── cache-utils.ts
@@ -3170,9 +3286,9 @@
 │   │   ├── featureFlags.ts
 │   │   ├── metrics.ts
 │   │   ├── missing-modules-fallback.ts
+│   │   ├── README.md
 │   │   ├── request-utils.ts
 │   │   ├── response-helpers.ts
-│   │   ├── shared-core-fallback.ts
 │   │   └── validation.ts
 │   ├── index.ts
 │   ├── package.json
@@ -3471,7 +3587,10 @@
 │   │   │   ├── graph-module.integration.test.ts
 │   │   │   ├── transformation-pipeline.integration.test.ts
 │   │   │   └── user-flow.integration.test.ts
+│   │   ├── advocacy-coordination.test.ts
+│   │   ├── constitutional-intelligence.test.ts
 │   │   ├── index.ts
+│   │   ├── phase1-integration.test.ts
 │   │   ├── README.md
 │   │   └── vitest.config.ts
 │   ├── mocks/
@@ -3566,6 +3685,7 @@
 ├── generate-structure.mjs
 ├── knip.config.ts
 ├── knip.json
+├── migration-verification-report.json
 ├── nginx.conf
 ├── nx.json
 ├── package.json
@@ -3574,6 +3694,11 @@
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
 ├── README.md
+├── SEARCH_ARCHITECTURE_DIAGRAM.md
+├── SEARCH_INTEGRATION_COMPLETE.md
+├── SEARCH_INTEGRATION_SUMMARY.md
+├── SEARCH_INTEGRATION_TEST_PLAN.md
+├── SEARCH_QUICK_START.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json
