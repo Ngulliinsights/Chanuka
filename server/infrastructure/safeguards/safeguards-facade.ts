@@ -10,7 +10,8 @@
 
 import { 
   cibDetectionService,
-  type SuspiciousActivityContext 
+  type SuspiciousActivityContext,
+  type CIBDetectionResult
 } from '@server/features/safeguards/application/cib-detection-service';
 import { 
   moderationService,
@@ -48,7 +49,7 @@ export class SafeguardsFacade {
   /**
    * Log suspicious activity for CIB detection
    */
-  async logSuspiciousActivity(context: SuspiciousActivityContext): Promise<void> {
+  async logSuspiciousActivity(context: SuspiciousActivityContext): Promise<CIBDetectionResult> {
     return cibDetectionService.logSuspiciousActivity(context);
   }
 }

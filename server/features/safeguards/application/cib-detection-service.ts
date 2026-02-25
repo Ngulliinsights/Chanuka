@@ -1,11 +1,7 @@
 import { and, desc, eq, lte, sql } from 'drizzle-orm';
 
 import { logger } from '@server/infrastructure/observability';
-import {
-  readDatabase,
-  withTransaction,
-  type DatabaseTransaction,
-} from '@server/infrastructure/database/connection';
+import { readDatabase } from '@server/infrastructure/database/connection';
 import {
   behavioralAnomalies,
   cibDetections,
@@ -99,6 +95,7 @@ export type CIBPatternType =
 
 export interface CIBDetectionContext {
   patternType: CIBPatternType;
+  patternDescription?: string;
   affectedUserIds: string[];
   investigationStatus: string;
   confidenceScore: number;
@@ -139,94 +136,79 @@ export interface PaginatedResult<T> {
 
 // ==================== Helper Functions ====================
 
-/**
- * Safely extract error message from unknown error type
- */
+/** Safely extract error message from unknown error type */
 function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
+  if (error instanceof Error) return error.message;
   return String(error);
 }
 
 /**
- * Validate suspicious activity context
+ * Extract the ID from a .returning() result.
+ * readDatabase's returning() is typed as unknown, so we cast the whole array here.
  */
+function extractId(rows: unknown): string | undefined {
+  return (rows as Array<{ id?: string }>)[0]?.id;
+}
+
+/**
+ * Cast a readDatabase query result to the expected typed array.
+ * readDatabase returns unknown for select/delete results.
+ */
+function castRows<T>(rows: unknown): T[] {
+  return rows as T[];
+}
+
+/** Validate suspicious activity context */
 function validateActivityContext(context: SuspiciousActivityContext): void {
   if (!context.userId && !context.ipAddress && !context.deviceFingerprint) {
     throw new Error(
       'At least one identifier (userId, ipAddress, or deviceFingerprint) is required'
     );
   }
-  if (!context.activityType) {
-    throw new Error('Activity type is required');
-  }
-  if (!context.suspicionReason) {
-    throw new Error('Suspicion reason is required');
-  }
+  if (!context.activityType) throw new Error('Activity type is required');
+  if (!context.suspicionReason) throw new Error('Suspicion reason is required');
   if (context.severityLevel < 1 || context.severityLevel > 5) {
     throw new Error('Severity level must be between 1 and 5');
   }
 }
 
-/**
- * Validate behavioral anomaly context
- */
+/** Validate behavioral anomaly context */
 function validateAnomalyContext(context: BehavioralAnomalyContext): void {
-  if (!context.userId) {
-    throw new Error('User ID is required');
-  }
-  if (!context.anomalyType) {
-    throw new Error('Anomaly type is required');
-  }
-  if (!context.anomalyDescription) {
-    throw new Error('Anomaly description is required');
-  }
+  if (!context.userId) throw new Error('User ID is required');
+  if (!context.anomalyType) throw new Error('Anomaly type is required');
+  if (!context.anomalyDescription) throw new Error('Anomaly description is required');
   if (context.anomalyScore < 0 || context.anomalyScore > 10) {
     throw new Error('Anomaly score must be between 0 and 10');
   }
-  if (!context.detectionMethod) {
-    throw new Error('Detection method is required');
-  }
+  if (!context.detectionMethod) throw new Error('Detection method is required');
 }
 
-/**
- * Validate CIB detection context
- */
+/** Validate CIB detection context */
 function validateCIBContext(context: CIBDetectionContext): void {
-  if (!context.patternType) {
-    throw new Error('Pattern type is required');
-  }
+  if (!context.patternType) throw new Error('Pattern type is required');
   if (!context.affectedUserIds || context.affectedUserIds.length === 0) {
     throw new Error('At least one affected user is required');
   }
   if (context.affectedUserIds.length > 1000) {
     throw new Error('Cannot process more than 1000 affected users at once');
   }
-  if (!context.investigationStatus) {
-    throw new Error('Investigation status is required');
-  }
+  if (!context.investigationStatus) throw new Error('Investigation status is required');
   if (context.confidenceScore < 0 || context.confidenceScore > 1) {
     throw new Error('Confidence score must be between 0 and 1');
   }
-  if (!context.severity) {
-    throw new Error('Severity is required');
-  }
-  if (!context.detectionMethod) {
-    throw new Error('Detection method is required');
-  }
+  if (!context.severity) throw new Error('Severity is required');
+  if (!context.detectionMethod) throw new Error('Detection method is required');
 }
 
 // ==================== Service Class ====================
 
 /**
- * Service for detecting and managing Coordinated Inauthentic Behavior (CIB)
- * Handles suspicious activities, behavioral anomalies, and CIB pattern detection
+ * Service for detecting and managing Coordinated Inauthentic Behavior (CIB).
+ * Handles suspicious activities, behavioral anomalies, and CIB pattern detection.
  *
  * SECURITY & CONCURRENCY FEATURES:
- * - Transaction-based operations for data consistency
  * - Input validation on all operations
- * - Atomic operations using database transactions
+ * - Atomic cleanup operations
  * - Comprehensive audit trail
  */
 export class CIBDetectionService {
@@ -235,9 +217,6 @@ export class CIBDetectionService {
   private static readonly MAX_LIMIT = 500;
   private static readonly DEFAULT_CLEANUP_DAYS = 30;
 
-  /**
-   * Get singleton instance of CIBDetectionService
-   */
   static getInstance(): CIBDetectionService {
     if (!CIBDetectionService.instance) {
       CIBDetectionService.instance = new CIBDetectionService();
@@ -247,11 +226,7 @@ export class CIBDetectionService {
 
   // ==================== Suspicious Activity Logging ====================
 
-  /**
-   * Log suspicious activity with validation
-   * @param context - Activity context with details
-   * @returns Result with activity log ID
-   */
+  /** Log suspicious activity with validation. */
   async logSuspiciousActivity(
     context: SuspiciousActivityContext
   ): Promise<CIBDetectionResult> {
@@ -265,88 +240,76 @@ export class CIBDetectionService {
         activity_type: context.activityType,
         suspicion_reason: context.suspicionReason,
         severity_level: context.severityLevel,
-        related_entities: (context.relatedEntities || {}) as Record<string, unknown>,
+        related_entities: (context.relatedEntities ?? {}) as Record<string, unknown>,
         activity_metadata: context.activityMetadata as Record<string, unknown> | undefined,
         auto_action_taken: context.autoActionTaken,
         requires_manual_review: context.requiresManualReview ?? false,
       };
 
-      const result = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .insert(suspiciousActivityLogs)
         .values(activity)
         .returning();
+      
+      const rows = result as Array<{ id?: string }>;
+      const activityLogId = extractId(rows);
 
-      logger.info('Suspicious activity logged', {
-        activityLogId: result[0]?.id,
-        userId: context.userId,
-        activityType: context.activityType,
-        severity: context.severityLevel,
-      });
+      logger.info(
+        { activityLogId, userId: context.userId, activityType: context.activityType, severity: context.severityLevel },
+        'Suspicious activity logged'
+      );
 
-      return {
-        success: true,
-        activityLogId: result[0]?.id,
-      };
+      return { success: true, activityLogId };
     } catch (error) {
-      logger.error('Failed to log suspicious activity', {
-        error: getErrorMessage(error),
-        context,
-      });
-      return {
-        success: false,
-        error: getErrorMessage(error),
-      };
+      logger.error(
+        { error: getErrorMessage(error), context },
+        'Failed to log suspicious activity'
+      );
+      return { success: false, error: getErrorMessage(error) };
     }
   }
 
-  /**
-   * Get suspicious activities for a user
-   * @param userId - User identifier
-   * @param limit - Maximum number of records
-   * @returns Array of suspicious activity logs
-   */
+  /** Get suspicious activities for a user. */
   async getUserSuspiciousActivities(
     userId: string,
     limit = 100
   ): Promise<SuspiciousActivityLog[]> {
     try {
-      if (!userId) {
-        throw new Error('User ID is required');
-      }
+      if (!userId) throw new Error('User ID is required');
 
-      const activities = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .select()
         .from(suspiciousActivityLogs)
         .where(eq(suspiciousActivityLogs.user_id, userId))
         .orderBy(desc(suspiciousActivityLogs.created_at))
         .limit(Math.min(limit, 500));
 
-      return activities;
+      const rows = result as SuspiciousActivityLog[];
+      return castRows<SuspiciousActivityLog>(rows);
     } catch (error) {
-      logger.error('Failed to get user suspicious activities', {
-        error: getErrorMessage(error),
-        userId,
-      });
+      logger.error(
+        { error: getErrorMessage(error), userId },
+        'Failed to get user suspicious activities'
+      );
       return [];
     }
   }
 
-  /**
-   * Get activities requiring manual review
-   * @param params - Pagination parameters
-   * @returns Paginated activities
-   */
+  /** Get activities requiring manual review. */
   async getActivitiesForReview(
     params: PaginationParams = {}
   ): Promise<PaginatedResult<SuspiciousActivityLog>> {
     try {
       const limit = Math.min(
-        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        params.limit ?? CIBDetectionService.DEFAULT_LIMIT,
         CIBDetectionService.MAX_LIMIT
       );
-      const offset = params.offset || 0;
+      const offset = params.offset ?? 0;
 
-      const activities = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .select()
         .from(suspiciousActivityLogs)
         .where(eq(suspiciousActivityLogs.requires_manual_review, true))
@@ -357,18 +320,17 @@ export class CIBDetectionService {
         .limit(limit + 1)
         .offset(offset);
 
+      const rows = result as SuspiciousActivityLog[];
+      const activities = castRows<SuspiciousActivityLog>(rows);
       const hasMore = activities.length > limit;
       const data = hasMore ? activities.slice(0, limit) : activities;
 
-      return {
-        data,
-        total: data.length,
-        hasMore,
-      };
+      return { data, total: data.length, hasMore };
     } catch (error) {
-      logger.error('Failed to get activities for review', {
-        error: getErrorMessage(error),
-      });
+      logger.error(
+        { error: getErrorMessage(error) },
+        'Failed to get activities for review'
+      );
       return { data: [], total: 0, hasMore: false };
     }
   }
@@ -376,9 +338,12 @@ export class CIBDetectionService {
   // ==================== Behavioral Anomaly Detection ====================
 
   /**
-   * Record behavioral anomaly with validation
-   * @param context - Anomaly context with evidence
-   * @returns Result with anomaly ID
+   * Record behavioral anomaly with validation.
+   *
+   * Schema mapping notes:
+   * - `anomalyDescription`  → `explanation` (direct column)
+   * - `temporalEvidence`, `contentEvidence`, `networkEvidence`, `statisticalMeasures`,
+   *   `detectionMethod`, `detectionAlgorithm` → packed into `metadata` (no direct columns)
    */
   async recordBehavioralAnomaly(
     context: BehavioralAnomalyContext
@@ -389,69 +354,65 @@ export class CIBDetectionService {
       const anomaly: NewBehavioralAnomaly = {
         anomaly_type: context.anomalyType,
         anomaly_score: context.anomalyScore.toString(),
-        anomaly_description: context.anomalyDescription,
-        affected_users: context.affectedUsers || [],
-        affected_content: (context.affectedContent || []) as unknown,
-        temporal_evidence: (context.temporalEvidence || {}) as unknown,
-        content_evidence: (context.contentEvidence || {}) as unknown,
-        network_evidence: (context.networkEvidence || {}) as unknown,
-        statistical_measures: (context.statisticalMeasures || {}) as unknown,
-        detection_method: context.detectionMethod,
-        detection_algorithm: context.detectionAlgorithm,
-        detected_at: context.detectedAt || new Date(),
+        explanation: context.anomalyDescription,
+        affected_users: context.affectedUsers ?? [],
+        affected_content: (context.affectedContent ?? []) as unknown,
+        detected_at: context.detectedAt ?? new Date(),
         is_escalated: context.isEscalated ?? false,
-        escalated_at: context.escalatedAt,
-        escalated_to_moderation: context.escalatedToModeration ?? false,
         false_positive: context.isFalsePositive ?? false,
-        verified_by: context.verifiedBy,
-        resolution_notes: context.resolutionNotes,
-        metadata: { userId: context.userId } as unknown,
+        // Store additional fields in metadata since they're not in the schema
+        metadata: {
+          userId: context.userId,
+          detectionMethod: context.detectionMethod,
+          detectionAlgorithm: context.detectionAlgorithm,
+          escalatedAt: context.escalatedAt,
+          escalatedToModeration: context.escalatedToModeration,
+          verifiedBy: context.verifiedBy,
+          resolutionNotes: context.resolutionNotes,
+          temporalEvidence: context.temporalEvidence ?? {},
+          contentEvidence: context.contentEvidence ?? {},
+          networkEvidence: context.networkEvidence ?? {},
+          statisticalMeasures: context.statisticalMeasures ?? {},
+        } as unknown,
       };
 
-      const result = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .insert(behavioralAnomalies)
         .values(anomaly)
         .returning();
 
-      logger.info('Behavioral anomaly recorded', {
-        anomalyId: result[0]?.id,
-        userId: context.userId,
-        type: context.anomalyType,
-        score: context.anomalyScore,
-      });
+      const rows = result as Array<{ id?: string }>;
+      const anomalyId = extractId(rows);
 
-      return {
-        success: true,
-        anomalyId: result[0]?.id,
-      };
+      logger.info(
+        { anomalyId, userId: context.userId, type: context.anomalyType, score: context.anomalyScore },
+        'Behavioral anomaly recorded'
+      );
+
+      return { success: true, anomalyId };
     } catch (error) {
-      logger.error('Failed to record behavioral anomaly', {
-        error: getErrorMessage(error),
-        context,
-      });
-      return {
-        success: false,
-        error: getErrorMessage(error),
-      };
+      logger.error(
+        { error: getErrorMessage(error), context },
+        'Failed to record behavioral anomaly'
+      );
+      return { success: false, error: getErrorMessage(error) };
     }
   }
 
-  /**
-   * Get high-severity anomalies
-   * @param params - Pagination parameters
-   * @returns Paginated anomalies
-   */
+  /** Get high-severity anomalies. */
   async getHighSeverityAnomalies(
     params: PaginationParams = {}
   ): Promise<PaginatedResult<BehavioralAnomaly>> {
     try {
       const limit = Math.min(
-        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        params.limit ?? CIBDetectionService.DEFAULT_LIMIT,
         CIBDetectionService.MAX_LIMIT
       );
-      const offset = params.offset || 0;
+      const offset = params.offset ?? 0;
 
-      const anomalies = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .select()
         .from(behavioralAnomalies)
         .where(
@@ -467,34 +428,28 @@ export class CIBDetectionService {
         .limit(limit + 1)
         .offset(offset);
 
+      const rows = result as BehavioralAnomaly[];
+      const anomalies = castRows<BehavioralAnomaly>(rows);
       const hasMore = anomalies.length > limit;
       const data = hasMore ? anomalies.slice(0, limit) : anomalies;
 
-      return {
-        data,
-        total: data.length,
-        hasMore,
-      };
+      return { data, total: data.length, hasMore };
     } catch (error) {
-      logger.error('Failed to get high severity anomalies', {
-        error: getErrorMessage(error),
-      });
+      logger.error(
+        { error: getErrorMessage(error) },
+        'Failed to get high severity anomalies'
+      );
       return { data: [], total: 0, hasMore: false };
     }
   }
 
-  /**
-   * Get user anomalies by querying metadata field
-   * @param userId - User identifier
-   * @returns Array of anomalies
-   */
+  /** Get user anomalies by querying metadata field. */
   async getUserAnomalies(userId: string): Promise<BehavioralAnomaly[]> {
     try {
-      if (!userId) {
-        throw new Error('User ID is required');
-      }
+      if (!userId) throw new Error('User ID is required');
 
-      const anomalies = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .select()
         .from(behavioralAnomalies)
         .where(
@@ -503,12 +458,13 @@ export class CIBDetectionService {
         .orderBy(desc(behavioralAnomalies.detected_at))
         .limit(100);
 
-      return anomalies;
+      const rows = result as BehavioralAnomaly[];
+      return castRows<BehavioralAnomaly>(rows);
     } catch (error) {
-      logger.error('Failed to get user anomalies', {
-        error: getErrorMessage(error),
-        userId,
-      });
+      logger.error(
+        { error: getErrorMessage(error), userId },
+        'Failed to get user anomalies'
+      );
       return [];
     }
   }
@@ -516,9 +472,11 @@ export class CIBDetectionService {
   // ==================== CIB Detection ====================
 
   /**
-   * Record CIB detection with validation
-   * @param context - CIB detection context
-   * @returns Result with detection ID
+   * Record CIB detection with validation.
+   *
+   * Schema mapping notes:
+   * - `detectionMethod`, `detectionAlgorithm`, `severity` → packed into `metadata`
+   *   (no direct columns on NewCIBDetection)
    */
   async recordCIBDetection(
     context: CIBDetectionContext
@@ -527,72 +485,69 @@ export class CIBDetectionService {
       validateCIBContext(context);
 
       const detection: NewCIBDetection = {
-        pattern_type: context.patternType as CIBPatternType,
+        pattern_type: context.patternType,
         confidence_score: context.confidenceScore.toString(),
-        severity: context.severity,
-        detection_method: context.detectionMethod,
-        detection_algorithm: context.detectionAlgorithm,
-        investigator_id: context.investigatorId,
+        pattern_description: context.patternDescription ?? `${context.patternType} pattern detected`,
+        suspected_accounts: context.affectedUserIds,
+        status: (context.investigationStatus === 'under_review' ? 'in_review' : context.investigationStatus) as 'pending' | 'in_review' | 'resolved' | 'escalated' | 'archived',
+        investigated_by: context.investigatorId,
         investigation_notes: context.investigationNotes,
-        mitigation_actions: context.mitigationActions || [],
-        mitigated_at: context.mitigatedAt,
-        mitigated_by: context.mitigatedBy,
+        mitigation_action: context.mitigationActions?.[0],
+        // Store additional fields in metadata since they're not direct schema columns
         metadata: {
+          severity: context.severity,
+          detectionMethod: context.detectionMethod,
+          detectionAlgorithm: context.detectionAlgorithm,
           affectedUserIds: context.affectedUserIds,
           investigationStatus: context.investigationStatus,
           evidence: context.evidence,
-          coordinatedActivityIndicators: context.coordinatedActivityIndicators || {},
-          networkAnalysis: context.networkAnalysis || {},
-          contentAnalysis: context.contentAnalysis || {},
-          temporalAnalysis: context.temporalAnalysis || {},
+          mitigatedAt: context.mitigatedAt,
+          mitigatedBy: context.mitigatedBy,
+          coordinatedActivityIndicators: context.coordinatedActivityIndicators ?? {},
+          networkAnalysis: context.networkAnalysis ?? {},
+          contentAnalysis: context.contentAnalysis ?? {},
+          temporalAnalysis: context.temporalAnalysis ?? {},
           isMitigated: context.isMitigated ?? false,
         } as unknown,
       };
 
-      const result = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .insert(cibDetections)
         .values(detection)
         .returning();
 
-      logger.info('CIB detection recorded', {
-        detectionId: result[0]?.id,
-        patternType: context.patternType,
-        affectedUsers: context.affectedUserIds.length,
-        confidence: context.confidenceScore,
-      });
+      const rows = result as Array<{ id?: string }>;
+      const detectionId = extractId(rows);
 
-      return {
-        success: true,
-        detectionId: result[0]?.id,
-      };
+      logger.info(
+        { detectionId, patternType: context.patternType, affectedUsers: context.affectedUserIds.length, confidence: context.confidenceScore },
+        'CIB detection recorded'
+      );
+
+      return { success: true, detectionId };
     } catch (error) {
-      logger.error('Failed to record CIB detection', {
-        error: getErrorMessage(error),
-        context,
-      });
-      return {
-        success: false,
-        error: getErrorMessage(error),
-      };
+      logger.error(
+        { error: getErrorMessage(error), context },
+        'Failed to record CIB detection'
+      );
+      return { success: false, error: getErrorMessage(error) };
     }
   }
 
-  /**
-   * Get active CIB detections
-   * @param params - Pagination parameters
-   * @returns Paginated detections
-   */
+  /** Get active CIB detections. */
   async getActiveCIBDetections(
     params: PaginationParams = {}
   ): Promise<PaginatedResult<CIBDetection>> {
     try {
       const limit = Math.min(
-        params.limit || CIBDetectionService.DEFAULT_LIMIT,
+        params.limit ?? CIBDetectionService.DEFAULT_LIMIT,
         CIBDetectionService.MAX_LIMIT
       );
-      const offset = params.offset || 0;
+      const offset = params.offset ?? 0;
 
-      const detections = await readDatabase
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
         .select()
         .from(cibDetections)
         .where(
@@ -605,18 +560,17 @@ export class CIBDetectionService {
         .limit(limit + 1)
         .offset(offset);
 
+      const rows = result as CIBDetection[];
+      const detections = castRows<CIBDetection>(rows);
       const hasMore = detections.length > limit;
       const data = hasMore ? detections.slice(0, limit) : detections;
 
-      return {
-        data,
-        total: data.length,
-        hasMore,
-      };
+      return { data, total: data.length, hasMore };
     } catch (error) {
-      logger.error('Failed to get active CIB detections', {
-        error: getErrorMessage(error),
-      });
+      logger.error(
+        { error: getErrorMessage(error) },
+        'Failed to get active CIB detections'
+      );
       return { data: [], total: 0, hasMore: false };
     }
   }
@@ -624,9 +578,9 @@ export class CIBDetectionService {
   // ==================== Cleanup Operations ====================
 
   /**
-   * Clean up old suspicious activity logs
-   * @param daysOld - Number of days old
-   * @returns Number of records deleted
+   * Clean up old suspicious activity logs.
+   * Note: DatabaseTransaction does not expose .delete() — cleanup runs directly
+   * on readDatabase without a transaction wrapper.
    */
   async cleanupOldActivityLogs(
     daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS
@@ -634,65 +588,54 @@ export class CIBDetectionService {
     try {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
-      const result = await withTransaction(async (tx: DatabaseTransaction) => {
-        const deleted = await readDatabase
-          .delete(suspiciousActivityLogs)
-          .where(
-            and(
-              lte(suspiciousActivityLogs.created_at, cutoffDate),
-              eq(suspiciousActivityLogs.requires_manual_review, false)
-            )
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
+        .delete(suspiciousActivityLogs)
+        .where(
+          and(
+            lte(suspiciousActivityLogs.created_at, cutoffDate),
+            eq(suspiciousActivityLogs.requires_manual_review, false)
           )
-          .returning({ id: suspiciousActivityLogs.id });
+        )
+        .returning({ id: suspiciousActivityLogs.id });
 
-        return deleted.length;
-      });
-
-      logger.info('Cleaned up old activity logs', { count: result, daysOld });
-      return result;
+      const rows = result as Array<{ id: string }>;
+      const count = castRows<{ id: string }>(rows).length;
+      logger.info({ count, daysOld }, 'Cleaned up old activity logs');
+      return count;
     } catch (error) {
-      logger.error('Failed to cleanup old activity logs', {
-        error: getErrorMessage(error),
-      });
+      logger.error({ error: getErrorMessage(error) }, 'Failed to cleanup old activity logs');
       return 0;
     }
   }
 
-  /**
-   * Clean up resolved anomalies
-   * @param daysOld - Number of days old
-   * @returns Number of records deleted
-   */
+  /** Clean up resolved anomalies. */
   async cleanupResolvedAnomalies(
     daysOld: number = CIBDetectionService.DEFAULT_CLEANUP_DAYS
   ): Promise<number> {
     try {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
-      const result = await withTransaction(async (tx: DatabaseTransaction) => {
-        const deleted = await readDatabase
-          .delete(behavioralAnomalies)
-          .where(
-            and(
-              lte(behavioralAnomalies.detected_at, cutoffDate),
-              eq(behavioralAnomalies.false_positive, true)
-            )
+      // @ts-expect-error - readDatabase returns unknown, but we know the shape
+      const result: any = await readDatabase
+        .delete(behavioralAnomalies)
+        .where(
+          and(
+            lte(behavioralAnomalies.detected_at, cutoffDate),
+            eq(behavioralAnomalies.false_positive, true)
           )
-          .returning({ id: behavioralAnomalies.id });
+        )
+        .returning({ id: behavioralAnomalies.id });
 
-        return deleted.length;
-      });
-
-      logger.info('Cleaned up resolved anomalies', { count: result, daysOld });
-      return result;
+      const rows = result as Array<{ id: string }>;
+      const count = castRows<{ id: string }>(rows).length;
+      logger.info({ count, daysOld }, 'Cleaned up resolved anomalies');
+      return count;
     } catch (error) {
-      logger.error('Failed to cleanup resolved anomalies', {
-        error: getErrorMessage(error),
-      });
+      logger.error({ error: getErrorMessage(error) }, 'Failed to cleanup resolved anomalies');
       return 0;
     }
   }
 }
 
-// Export singleton instance
 export const cibDetectionService = CIBDetectionService.getInstance();
