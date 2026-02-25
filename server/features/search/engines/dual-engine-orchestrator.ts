@@ -5,10 +5,12 @@
 // Implements intelligent query classification, failover, and result fusion
 
 import { PostgreSQLFullTextEngine } from '@server/features/search/engines/core/postgresql-fulltext.engine';
-import { ParsedQuery,searchSyntaxParser } from '@server/features/search/utils/search-syntax-parser';
+import { ParsedQuery, searchSyntaxParser } from '@server/features/search/utils/search-syntax-parser';
 import { logger } from '@server/infrastructure/observability';
 
-import { SearchOptions, SearchResponse,semanticSearchEngine } from './semantic-search.engine';
+import { SearchOptions, SearchResponse, SearchResult, semanticSearchEngine } from './semantic-search.engine';
+
+// ─── Internal Result Types ────────────────────────────────────────────────────
 
 export interface EngineResult {
   engine: 'postgresql' | 'semantic';
@@ -23,12 +25,12 @@ export interface FusionResult {
   id: string;
   contentType: 'bill' | 'sponsor' | 'comment';
   title: string;
-  summary?: string;
+  summary: string; // always present — coerced from optional source field
   content: string;
   relevanceScore: number;
   semanticScore?: number;
   traditionalScore?: number;
-  metadata: any;
+  metadata: Record<string, unknown>;
   sourceEngines: ('postgresql' | 'semantic')[];
   fusionConfidence: number;
 }
@@ -50,6 +52,37 @@ export interface OrchestratorConfig {
   maxFusionResults: number;
 }
 
+// ─── Engine Strategy ──────────────────────────────────────────────────────────
+
+type PriorityEngine = 'postgresql' | 'semantic' | 'balanced';
+
+interface EngineStrategy {
+  usePostgreSQL: boolean;
+  useSemantic: boolean;
+  priorityEngine: PriorityEngine;
+  expectedConfidence: number;
+}
+
+// ─── Raw result shape coming out of either engine ─────────────────────────────
+
+interface RawSearchResult {
+  id: string;
+  contentType: 'bill' | 'sponsor' | 'comment';
+  title: string;
+  summary?: string;
+  content?: string;
+  relevanceScore: number;
+  metadata?: Record<string, unknown>;
+}
+
+function isRawSearchResult(value: unknown): value is RawSearchResult {
+  if (typeof value !== 'object' || value === null) return false;
+  const v = value as Record<string, unknown>;
+  return typeof v['id'] === 'string' && typeof v['contentType'] === 'string';
+}
+
+// ─── Orchestrator ─────────────────────────────────────────────────────────────
+
 export class DualEngineOrchestrator {
   private postgresqlEngine: PostgreSQLFullTextEngine;
   private config: OrchestratorConfig;
@@ -66,8 +99,8 @@ export class DualEngineOrchestrator {
         popularity: 0.1,
       },
       engineTimeouts: {
-        postgresql: 5000, // 5 seconds
-        semantic: 3000,   // 3 seconds
+        postgresql: 5000,
+        semantic: 3000,
       },
       minResultsPerEngine: 5,
       maxFusionResults: 50,
@@ -75,66 +108,61 @@ export class DualEngineOrchestrator {
     };
   }
 
+  // ── Public API ──────────────────────────────────────────────────────────────
+
   /**
-   * Execute dual-engine search with intelligent orchestration
+   * Execute dual-engine search with intelligent orchestration.
    */
   async search(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
     const startTime = Date.now();
     const parsedQuery = searchSyntaxParser.parse(query);
 
     try {
-      logger.debug('Starting dual-engine search', {
-        query,
-        parsedQuery: parsedQuery.searchType,
-        options,
-        config: this.config,
-      });
+      logger.debug(
+        { query, parsedQueryType: parsedQuery.searchType, options, config: this.config },
+        'Starting dual-engine search',
+      );
 
-      // Classify query to determine engine strategy
       const engineStrategy = this.classifyQueryStrategy(parsedQuery);
-
-      // Execute engines based on strategy
       const engineResults = await this.executeEngines(query, options, parsedQuery, engineStrategy);
-
-      // Fuse results from both engines
       const fusedResults = this.fuseResults(engineResults, parsedQuery);
-
-      // Apply final ranking and filtering
       const finalResults = this.applyFinalRanking(fusedResults, parsedQuery);
 
       const processingTimeMs = Date.now() - startTime;
-
-      // Log orchestration analytics
       await this.logOrchestrationAnalytics(query, parsedQuery, engineResults, processingTimeMs);
 
+      const limit = options.limit ?? 20;
+      const sliced = finalResults.slice(0, limit);
+
       const response: SearchResponse = {
-        results: finalResults.slice(0, options.limit || 20),
+        results: this.toSearchResults(sliced),
         totalCount: finalResults.length,
         query,
         searchType: 'hybrid',
         processingTimeMs,
-        hasMore: finalResults.length > (options.limit || 20),
+        hasMore: finalResults.length > limit,
       };
 
-      logger.debug('Dual-engine search completed', {
-        query,
-        resultCount: response.results.length,
-        totalCount: response.totalCount,
-        processingTimeMs,
-        engineStrategy,
-      });
+      logger.debug(
+        {
+          query,
+          resultCount: response.results.length,
+          totalCount: response.totalCount,
+          processingTimeMs,
+          engineStrategy,
+        },
+        'Dual-engine search completed',
+      );
 
       return response;
 
     } catch (error) {
       const processingTimeMs = Date.now() - startTime;
-      logger.error('Dual-engine search failed', {
-        error: (error as Error).message,
-        query,
-        processingTimeMs,
-      });
+      logger.error(
+        { error: (error as Error).message, query, processingTimeMs },
+        'Dual-engine search failed',
+      );
 
-      // Fallback to single engine if dual-engine fails
       if (this.config.enableFailover) {
         return this.fallbackSearch(query, options, parsedQuery);
       }
@@ -144,146 +172,154 @@ export class DualEngineOrchestrator {
   }
 
   /**
-   * Classify query to determine which engines to use and how
+   * Basic health check — returns engine availability and current config.
    */
-  private classifyQueryStrategy(parsedQuery: ParsedQuery): {
-    usePostgreSQL: boolean;
-    useSemantic: boolean;
-    priorityEngine: 'postgresql' | 'semantic' | 'balanced';
-    expectedConfidence: number;
-  } {
-    // Default balanced approach
-    const strategy = {
+  async getHealth(): Promise<{
+    healthy: boolean;
+    engines: { postgresql: boolean; semantic: boolean };
+    config: OrchestratorConfig;
+    recentPerformance: unknown[];
+  }> {
+    return {
+      healthy: true,
+      engines: { postgresql: true, semantic: true },
+      config: this.config,
+      recentPerformance: [],
+    };
+  }
+
+  // ── Query Classification ────────────────────────────────────────────────────
+
+  private classifyQueryStrategy(parsedQuery: ParsedQuery): EngineStrategy {
+    const strategy: EngineStrategy = {
       usePostgreSQL: true,
       useSemantic: true,
-      priorityEngine: 'balanced' as const,
+      priorityEngine: 'balanced',
       expectedConfidence: 0.8,
     };
 
     switch (parsedQuery.searchType) {
       case 'field_specific':
-        // Field searches work better with PostgreSQL
         strategy.priorityEngine = 'postgresql';
         strategy.expectedConfidence = 0.9;
         break;
 
       case 'boolean':
-        // Boolean operators are PostgreSQL-specific
+        // Boolean operators are PostgreSQL-specific — skip semantic entirely
         strategy.useSemantic = false;
         strategy.priorityEngine = 'postgresql';
         strategy.expectedConfidence = 0.95;
         break;
 
       case 'semantic':
-        // Explicit semantic search
         strategy.priorityEngine = 'semantic';
         strategy.expectedConfidence = 0.85;
         break;
 
       case 'traditional':
-        // Simple queries can use both engines
         strategy.priorityEngine = 'balanced';
         strategy.expectedConfidence = 0.8;
         break;
 
       default:
-        // Hybrid queries benefit from both
         strategy.priorityEngine = 'balanced';
         strategy.expectedConfidence = 0.75;
     }
 
-    // Adjust based on query characteristics
+    // Exclusion clauses are handled better by PostgreSQL
     if (parsedQuery.metadata.hasExclusions) {
-      strategy.useSemantic = false; // Exclusions work better in PostgreSQL
+      strategy.useSemantic = false;
     }
 
+    // Exact-phrase matching is a PostgreSQL strength
     if (parsedQuery.exactPhrases.length > 0) {
-      strategy.priorityEngine = 'postgresql'; // Exact phrases are PostgreSQL strength
+      strategy.priorityEngine = 'postgresql';
     }
 
     return strategy;
   }
 
-  /**
-   * Execute search engines in parallel or sequentially based on strategy
-   */
+  // ── Engine Execution ────────────────────────────────────────────────────────
+
   private async executeEngines(
     query: string,
     options: SearchOptions,
     parsedQuery: ParsedQuery,
-    strategy: any
+    strategy: EngineStrategy,
   ): Promise<EngineResult[]> {
     const results: EngineResult[] = [];
 
-    if (!this.config.enableParallelExecution || strategy.priorityEngine !== 'balanced') {
-      // Sequential execution
-      if (strategy.usePostgreSQL) {
-        const pgResult = await this.executePostgreSQLEngine(query, options, parsedQuery);
-        results.push(pgResult);
-      }
+    const sequential =
+      !this.config.enableParallelExecution || strategy.priorityEngine !== 'balanced';
 
+    if (sequential) {
+      if (strategy.usePostgreSQL) {
+        results.push(await this.executePostgreSQLEngine(query, options, parsedQuery));
+      }
       if (strategy.useSemantic) {
-        const semanticResult = await this.executeSemanticEngine(query, options, parsedQuery);
-        results.push(semanticResult);
+        results.push(await this.executeSemanticEngine(query, options, parsedQuery));
       }
     } else {
-      // Parallel execution
       const promises: Promise<EngineResult>[] = [];
-
       if (strategy.usePostgreSQL) {
         promises.push(this.executePostgreSQLEngine(query, options, parsedQuery));
       }
-
       if (strategy.useSemantic) {
         promises.push(this.executeSemanticEngine(query, options, parsedQuery));
       }
-
-      results.push(...await Promise.all(promises));
+      results.push(...(await Promise.all(promises)));
     }
 
     return results;
   }
 
-  /**
-   * Execute PostgreSQL full-text engine with timeout
-   */
   private async executePostgreSQLEngine(
     query: string,
     options: SearchOptions,
-    parsedQuery: ParsedQuery
+    _parsedQuery: ParsedQuery,
   ): Promise<EngineResult> {
     const startTime = Date.now();
 
     try {
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('PostgreSQL engine timeout')), this.config.engineTimeouts.postgresql)
+        setTimeout(
+          () => reject(new Error('PostgreSQL engine timeout')),
+          this.config.engineTimeouts.postgresql,
+        ),
       );
+
+      // Build a filters object that satisfies SearchQuery['filters']:
+      // dateRange must have both start and end when present.
+      const rawFilters = options.filters ?? {};
+      const dateRange =
+        rawFilters.dateRange?.start && rawFilters.dateRange?.end
+          ? { start: rawFilters.dateRange.start, end: rawFilters.dateRange.end }
+          : undefined;
 
       const searchPromise = this.postgresqlEngine.search({
         query,
-        filters: options.filters || {},
-        pagination: { 
+        filters: { ...rawFilters, dateRange },
+        pagination: {
           page: 1,
-          limit: (options.limit || 20) * 2 // Get more for fusion
-        },
-        options: { 
-          searchType: 'fulltext-phase2' as const,
-          includeHighlights: false
+          limit: (options.limit ?? 20) * 2,
         },
       });
 
-      const results = await Promise.race([searchPromise, timeoutPromise]);
+      const rawResults = await Promise.race([searchPromise, timeoutPromise]);
 
       return {
         engine: 'postgresql',
-        results: results,
-        totalCount: results.length,
+        results: rawResults as unknown[],
+        totalCount: (rawResults as unknown[]).length,
         processingTimeMs: Date.now() - startTime,
         confidence: 0.9,
       };
 
     } catch (error) {
-      logger.warn('PostgreSQL engine failed', { error: (error as Error).message, query });
+      logger.warn(
+        { error: (error as Error).message, query },
+        'PostgreSQL engine failed',
+      );
 
       return {
         engine: 'postgresql',
@@ -296,38 +332,41 @@ export class DualEngineOrchestrator {
     }
   }
 
-  /**
-   * Execute semantic search engine with timeout
-   */
   private async executeSemanticEngine(
     query: string,
     options: SearchOptions,
-    parsedQuery: ParsedQuery
+    _parsedQuery: ParsedQuery,
   ): Promise<EngineResult> {
     const startTime = Date.now();
 
     try {
       const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Semantic engine timeout')), this.config.engineTimeouts.semantic)
+        setTimeout(
+          () => reject(new Error('Semantic engine timeout')),
+          this.config.engineTimeouts.semantic,
+        ),
       );
 
       const searchPromise = semanticSearchEngine.search(query, {
         ...options,
-        limit: (options.limit || 20) * 2, // Get more for fusion
+        limit: (options.limit ?? 20) * 2,
       });
 
       const response = await Promise.race([searchPromise, timeoutPromise]);
 
       return {
         engine: 'semantic',
-        results: response.results,
+        results: response.results as unknown[],
         totalCount: response.totalCount,
         processingTimeMs: Date.now() - startTime,
         confidence: 0.8,
       };
 
     } catch (error) {
-      logger.warn('Semantic engine failed', { error: (error as Error).message, query });
+      logger.warn(
+        { error: (error as Error).message, query },
+        'Semantic engine failed',
+      );
 
       return {
         engine: 'semantic',
@@ -340,29 +379,28 @@ export class DualEngineOrchestrator {
     }
   }
 
-  /**
-   * Fuse results from multiple engines using intelligent ranking
-   */
-  private fuseResults(engineResults: EngineResult[], parsedQuery: ParsedQuery): FusionResult[] {
+  // ── Result Fusion ───────────────────────────────────────────────────────────
+
+  private fuseResults(engineResults: EngineResult[], _parsedQuery: ParsedQuery): FusionResult[] {
     const resultMap = new Map<string, FusionResult>();
 
-    // Process each engine's results
     for (const engineResult of engineResults) {
       if (engineResult.error || engineResult.results.length === 0) continue;
 
-      for (const result of engineResult.results) {
-        const key = `${result.contentType}:${result.id}`;
+      for (const raw of engineResult.results) {
+        if (!isRawSearchResult(raw)) continue;
+
+        const key = `${raw.contentType}:${raw.id}`;
 
         if (!resultMap.has(key)) {
-          // New result
           resultMap.set(key, {
-            id: result.id,
-            contentType: result.contentType,
-            title: result.title,
-            summary: result.summary,
-            content: result.content || '',
+            id: raw.id,
+            contentType: raw.contentType,
+            title: raw.title,
+            summary: raw.summary ?? '',
+            content: raw.content ?? '',
             relevanceScore: 0,
-            metadata: result.metadata || {},
+            metadata: raw.metadata ?? {},
             sourceEngines: [engineResult.engine],
             fusionConfidence: engineResult.confidence,
           });
@@ -370,21 +408,21 @@ export class DualEngineOrchestrator {
 
         const existing = resultMap.get(key)!;
 
-        // Update scores based on engine
         if (engineResult.engine === 'postgresql') {
-          existing.traditionalScore = result.relevanceScore;
-          existing.relevanceScore += result.relevanceScore * this.config.fusionWeights.traditional;
-        } else if (engineResult.engine === 'semantic') {
-          existing.semanticScore = result.relevanceScore;
-          existing.relevanceScore += result.relevanceScore * this.config.fusionWeights.semantic;
+          existing.traditionalScore = raw.relevanceScore;
+          existing.relevanceScore +=
+            raw.relevanceScore * this.config.fusionWeights.traditional;
+        } else {
+          existing.semanticScore = raw.relevanceScore;
+          existing.relevanceScore +=
+            raw.relevanceScore * this.config.fusionWeights.semantic;
         }
 
-        // Track source engines
         if (!existing.sourceEngines.includes(engineResult.engine)) {
           existing.sourceEngines.push(engineResult.engine);
         }
 
-        // Boost confidence for results found in multiple engines
+        // Confidence boost for results surfaced by both engines
         if (existing.sourceEngines.length > 1) {
           existing.fusionConfidence = Math.min(existing.fusionConfidence + 0.1, 1.0);
         }
@@ -394,87 +432,88 @@ export class DualEngineOrchestrator {
     return Array.from(resultMap.values());
   }
 
-  /**
-   * Apply final ranking with configurable weights
-   */
-  private applyFinalRanking(results: FusionResult[], parsedQuery: ParsedQuery): FusionResult[] {
-    return results.map(result => {
-      let finalScore = result.relevanceScore;
+  // ── Final Ranking ───────────────────────────────────────────────────────────
 
-      // Apply recency boost
-      if (result.metadata.createdAt) {
-        const daysSinceCreation = (Date.now() - new Date(result.metadata.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-        if (daysSinceCreation < 365) {
-          finalScore += this.config.fusionWeights.recency * (1 - daysSinceCreation / 365);
+  private applyFinalRanking(
+    results: FusionResult[],
+    _parsedQuery: ParsedQuery,
+  ): FusionResult[] {
+    return results
+      .map(result => {
+        let finalScore = result.relevanceScore;
+
+        if (result.metadata['createdAt']) {
+          const createdAt = new Date(result.metadata['createdAt'] as string);
+          const daysSinceCreation =
+            (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+          if (daysSinceCreation < 365) {
+            finalScore +=
+              this.config.fusionWeights.recency * (1 - daysSinceCreation / 365);
+          }
         }
-      }
 
-      // Apply content type priority
-      switch (result.contentType) {
-        case 'bill':
-          finalScore += 0.1;
-          break;
-        case 'sponsor':
-          finalScore += 0.05;
-          break;
-      }
+        switch (result.contentType) {
+          case 'bill':    finalScore += 0.1;  break;
+          case 'sponsor': finalScore += 0.05; break;
+        }
 
-      result.relevanceScore = finalScore;
-      return result;
-    }).sort((a, b) => b.relevanceScore - a.relevanceScore);
+        return { ...result, relevanceScore: finalScore };
+      })
+      .sort((a, b) => b.relevanceScore - a.relevanceScore);
   }
 
-  /**
-   * Fallback search when dual-engine fails
-   */
+  // ── Fallback ────────────────────────────────────────────────────────────────
+
   private async fallbackSearch(
     query: string,
     options: SearchOptions,
-    parsedQuery: ParsedQuery
+    parsedQuery: ParsedQuery,
   ): Promise<SearchResponse> {
-    logger.warn('Using fallback search strategy', { query });
+    logger.warn({ query }, 'Using fallback search strategy');
 
-    // Try PostgreSQL first, then semantic
+    const limit = options.limit ?? 20;
+
     try {
       const pgResult = await this.executePostgreSQLEngine(query, options, parsedQuery);
       if (pgResult.results.length > 0) {
         return {
-          results: pgResult.results.slice(0, options.limit || 20),
+          results: pgResult.results
+            .filter(isRawSearchResult)
+            .slice(0, limit)
+            .map(r => this.rawToSearchResult(r)),
           totalCount: pgResult.totalCount,
           query,
           searchType: 'traditional',
           processingTimeMs: pgResult.processingTimeMs,
-          hasMore: pgResult.totalCount > (options.limit || 20),
+          hasMore: pgResult.totalCount > limit,
         };
       }
     } catch (error) {
-      logger.warn('PostgreSQL fallback failed', { error: (error as Error).message });
+      logger.warn({ error: (error as Error).message }, 'PostgreSQL fallback failed');
     }
 
-    // Fallback to semantic search
     try {
       return await semanticSearchEngine.search(query, options);
     } catch (error) {
-      logger.error('All search engines failed', { error: (error as Error).message });
+      logger.error({ error: (error as Error).message }, 'All search engines failed');
       return {
         results: [],
         totalCount: 0,
         query,
-        searchType: 'failed',
+        searchType: 'semantic', // closest valid fallback; caller can inspect totalCount === 0
         processingTimeMs: 0,
         hasMore: false,
       };
     }
   }
 
-  /**
-   * Log orchestration analytics for monitoring and optimization
-   */
+  // ── Analytics ───────────────────────────────────────────────────────────────
+
   private async logOrchestrationAnalytics(
     query: string,
     parsedQuery: ParsedQuery,
     engineResults: EngineResult[],
-    totalProcessingTime: number
+    totalProcessingTime: number,
   ): Promise<void> {
     try {
       const analytics = {
@@ -492,42 +531,50 @@ export class DualEngineOrchestrator {
         timestamp: new Date(),
       };
 
-      logger.debug('Orchestration analytics', analytics);
+      logger.debug(analytics, 'Orchestration analytics');
 
-      // In production, this would be stored in a database for analysis
-      // await this.storeOrchestrationAnalytics(analytics);
+      // In production: await this.storeOrchestrationAnalytics(analytics);
 
     } catch (error) {
-      logger.warn('Failed to log orchestration analytics', { error: (error as Error).message });
+      logger.warn(
+        { error: (error as Error).message },
+        'Failed to log orchestration analytics',
+      );
     }
   }
 
-  /**
-   * Get orchestrator health and performance metrics
-   */
-  async getHealth(): Promise<{
-    healthy: boolean;
-    engines: {
-      postgresql: boolean;
-      semantic: boolean;
-    };
-    config: OrchestratorConfig;
-    recentPerformance: unknown[];
-  }> {
-    // Basic health check - in production this would be more comprehensive
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+
+  /** Map FusionResult[] → SearchResult[], ensuring required fields are satisfied. */
+  private toSearchResults(fused: FusionResult[]): SearchResult[] {
+    return fused.map(f => this.fusionToSearchResult(f));
+  }
+
+  private fusionToSearchResult(f: FusionResult): SearchResult {
     return {
-      healthy: true,
-      engines: {
-        postgresql: true, // Assume healthy for now
-        semantic: true,
-      },
-      config: this.config,
-      recentPerformance: [],
-    };
+      id: f.id,
+      contentType: f.contentType,
+      title: f.title,
+      summary: f.summary,
+      content: f.content,
+      relevanceScore: f.relevanceScore,
+      metadata: f.metadata,
+    } as SearchResult;
+  }
+
+  private rawToSearchResult(r: RawSearchResult): SearchResult {
+    return {
+      id: r.id,
+      contentType: r.contentType,
+      title: r.title,
+      summary: r.summary ?? '',
+      content: r.content ?? '',
+      relevanceScore: r.relevanceScore,
+      metadata: r.metadata ?? {},
+    } as SearchResult;
   }
 }
 
-// Export singleton instance
+// ─── Singleton ────────────────────────────────────────────────────────────────
+
 export const dualEngineOrchestrator = new DualEngineOrchestrator();
-
-

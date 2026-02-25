@@ -146,20 +146,24 @@ export class QueryIntentService {
    * Extract features from the query for intent classification
    */
   private extractFeatures(query: string, words: string[]): IntentClassification['features'] {
-    const hasQuestionWords = QueryIntentService.INTENT_PATTERNS[QueryIntent.INFORMATIONAL].questionWords
-      ?.some(word => words.includes(word)) ?? false;
+    const informationalPattern = QueryIntentService.INTENT_PATTERNS[QueryIntent.INFORMATIONAL]!;
+    const hasQuestionWords = (informationalPattern.questionWords || [])
+      .some(word => words.includes(word));
 
-    const hasNavigationalTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.NAVIGATIONAL].navigationalTerms
-      ?.some(term => query.includes(term)) ?? false;
+    const navigationalPattern = QueryIntentService.INTENT_PATTERNS[QueryIntent.NAVIGATIONAL]!;
+    const hasNavigationalTerms = (navigationalPattern.navigationalTerms || [])
+      .some(term => query.includes(term));
 
-    const hasTransactionalVerbs = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL].actionVerbs
-      ?.some(verb => words.includes(verb)) ?? false;
+    const transactionalPattern = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL]!;
+    const hasTransactionalVerbs = (transactionalPattern.actionVerbs || [])
+      .some(verb => words.includes(verb));
 
-    const hasLocationTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.LOCAL].locationTerms
-      ?.some(term => query.includes(term)) ?? false;
+    const localPattern = QueryIntentService.INTENT_PATTERNS[QueryIntent.LOCAL]!;
+    const hasLocationTerms = (localPattern.locationTerms || [])
+      .some(term => query.includes(term));
 
     // Detect specific entities (bills, ministries, etc.)
-    const hasSpecificEntities = this.detectSpecificEntities(query) || (QueryIntentService.INTENT_PATTERNS[QueryIntent.NAVIGATIONAL].entityPatterns?.some(p => query.includes(p)) ?? false);
+    const hasSpecificEntities = this.detectSpecificEntities(query) || (navigationalPattern.entityPatterns || []).some(p => query.includes(p));
 
     // Determine domain
     const domain = this.detectDomain(query);
@@ -264,9 +268,9 @@ export class QueryIntentService {
 
     // Calculate confidence as the ratio of best score to second best
     const sortedScores = Object.values(scores).sort((a, b) => b - a);
-    const confidence = sortedScores.length > 1 && sortedScores[1] > 0
-      ? sortedScores[0] / sortedScores[1]
-      : sortedScores[0] > 0 ? 0.8 : 0.3;
+    const confidence = sortedScores.length > 1 && (sortedScores[1] || 0) > 0
+      ? (sortedScores[0] || 0) / (sortedScores[1] || 1)
+      : (sortedScores[0] || 0) > 0 ? 0.8 : 0.3;
 
     return { intent: primaryIntent, confidence: Math.min(confidence, 1.0) };
   }
@@ -422,8 +426,8 @@ export class QueryIntentService {
    * Check if a query is transactional
    */
   private isTransactionalQuery(query: string): boolean {
-    const transactionalTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL].actionVerbs;
-    return transactionalTerms?.some(term => query.toLowerCase().includes(term)) ?? false;
+    const transactionalTerms = QueryIntentService.INTENT_PATTERNS[QueryIntent.TRANSACTIONAL]!.actionVerbs || [];
+    return transactionalTerms.some(term => query.toLowerCase().includes(term));
   }
 
   /**

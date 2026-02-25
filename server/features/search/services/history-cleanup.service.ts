@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/index';
+import { logger } from '@server/infrastructure/observability';
 
 export interface HistoryEntry {
   term: string;
@@ -46,7 +46,7 @@ export class HistoryCleanupService {
       // Convert to array for sorting and filtering
       // Each entry already contains the `term` property, avoid duplicating
       // the `term` key via spread which causes a TS2783 warning.
-      const entries = Array.from(history.entries()).map(([term, entry]) => ({
+      const entries = Array.from(history.entries()).map(([_term, entry]) => ({
         ...entry
       }));
 
@@ -81,15 +81,16 @@ export class HistoryCleanupService {
       });
 
       const removedCount = startSize - cleanedHistory.size;
-      logger.info(`Search history cleanup completed`, { component: 'Search' }, {
+      logger.info({
+        component: 'Search',
         originalSize: startSize,
         finalSize: cleanedHistory.size,
         removedEntries: removedCount
-      });
+      }, 'Search history cleanup completed');
 
       return cleanedHistory;
     } catch (error) {
-      logger.error('Error during history cleanup:', { component: 'Search' }, error);
+      logger.error({ component: 'Search', error }, 'Error during history cleanup');
       return history; // Return original on error
     }
   }

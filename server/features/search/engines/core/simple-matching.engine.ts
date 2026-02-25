@@ -8,13 +8,7 @@ import { SearchQuery, SearchResult } from '../types/search.types';
 import { db as database } from '../../../../infrastructure/database/pool';
 import { bills } from '@server/infrastructure/schema';
 import { desc, ilike, or } from 'drizzle-orm';
-// Simple logger for search engine
-const logger = {
-  debug: (message: string, meta?: unknown) => console.log(`[DEBUG] ${message}`, meta || ''),
-  error: (message: string, meta?: unknown) => console.error(`[ERROR] ${message}`, meta || ''),
-  warn: (message: string, meta?: unknown) => console.warn(`[WARN] ${message}`, meta || ''),
-  info: (message: string, meta?: unknown) => console.log(`[INFO] ${message}`, meta || '')
-};
+import { logger } from '@server/infrastructure/observability';
 
 interface CacheEntry {
   results: SearchResult[];

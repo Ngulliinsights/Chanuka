@@ -28,6 +28,6 @@ export type {
   Affiliation,
   TransparencyInfo,
   FinancialBreakdown
-} from '@shared/core/types';
+} from '@server/types/common';
 
 

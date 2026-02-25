@@ -1,16 +1,28 @@
-// Import the NEW service for data access
-import { sponsorService } from './sponsor-service-direct';
-import type { Bill,Sponsor } from '@server/infrastructure/schema';
+/**
+ * Sponsor Conflict Analysis Service
+ * 
+ * Detects and analyzes potential conflicts of interest for legislative sponsors.
+ * Uses the SponsorService for data access and contains no direct DB queries.
+ */
 
-// Simple logger fallback since shared/core logger is not available
-const logger = {
-  info: (message: string, context?: Record<string, unknown>) => console.log('[INFO]', message, context),
-  warn: (message: string, context?: Record<string, unknown>) => console.warn('[WARN]', message, context),
-  error: (message: string, context?: Record<string, unknown>, error?: unknown) => console.error('[ERROR]', message, context, error),
-  debug: (message: string, context?: Record<string, unknown>) => console.debug('[DEBUG]', message, context)
-};
-// Local helper types used by this service but not exported elsewhere in repo
-type BillSponsorship = { id?: number; bill_id: number; role?: string  };
+import { logger } from '@server/infrastructure/observability';
+import { sponsorService } from './sponsor-service-direct';
+import type { Sponsor } from '@server/infrastructure/schema';
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
+
+export type ConflictType =
+  | 'financial_direct'
+  | 'financial_indirect'
+  | 'organizational'
+  | 'family_business'
+  | 'voting_pattern'
+  | 'timing_suspicious'
+  | 'disclosure_incomplete';
+
+export type ConflictSeverity = 'low' | 'medium' | 'high' | 'critical';
 
 interface SponsorAffiliation {
   id: number;
@@ -33,59 +45,45 @@ interface SponsorTransparency {
   is_verified: boolean | null;
 }
 
+interface BillSponsorship {
+  id?: number;
+  bill_id: number;
+  role?: string;
+}
+
 interface SponsorWithRelations extends Sponsor {
   affiliations?: SponsorAffiliation[];
   transparency?: SponsorTransparency[];
   sponsorships?: BillSponsorship[];
 }
 
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
-
-export type ConflictType =
-  | 'financial_direct' // Sponsor has direct financial stake (e.g., ownership) in org affected by bill
-  | 'financial_indirect' // Sponsor benefits financially via indirect link (e.g., spouse works there)
-  | 'organizational' // Sponsor holds leadership role (e.g., board member) in org affected by bill
-  | 'family_business' // Bill affects business owned/run by close family
-  | 'voting_pattern' // Consistent voting aligns suspiciously with specific industry interests + financial ties
-  | 'timing_suspicious' // Affiliation start/end date suspiciously close to bill sponsorship/vote
-  | 'disclosure_incomplete'; // Known affiliations/interests not properly disclosed
-
-export type ConflictSeverity = 'low' | 'medium' | 'high' | 'critical';
-
-// Represents a single detected conflict
 export interface ConflictDetectionResult {
-  conflictId: string; // Unique ID for this specific conflict instance
+  conflictId: string;
   sponsor_id: number;
   conflictType: ConflictType;
   severity: ConflictSeverity;
-  description: string; // Human-readable summary
-  affectedBills: number[]; // Bill IDs potentially influenced by this conflict
-  financialImpact: number; // Estimated financial gain/loss related to the conflict (0 if non-financial)
-  detectedAt: Date; // When the conflict was detected by the system
-  confidence: number; // System confidence in this detection (0-1)
-  evidence: string[]; // Supporting facts (e.g., Affiliation ID, Disclosure Record, Bill Section)
-  // Optional: Add related entity IDs
+  description: string;
+  affectedBills: number[];
+  financialImpact: number;
+  detectedAt: Date;
+  confidence: number;
+  evidence: string[];
   relatedAffiliationId?: number;
   relatedTransparencyId?: number;
 }
 
-// Types for network visualization (keep as defined previously)
-export interface ConflictNode { /* ... */ }
-export interface ConflictEdge { /* ... */ }
-export interface ConflictCluster { /* ... */ }
-export interface NetworkMetrics { /* ... */ }
-export interface ConflictMapping { nodes: ConflictNode[]; edges: ConflictEdge[]; clusters: ConflictCluster[]; metrics: NetworkMetrics; }
+export interface RiskProfile {
+  overallScore: number;
+  level: ConflictSeverity;
+  breakdown: {
+    financialRisk: number;
+    affiliationRisk: number;
+    transparencyRisk: number;
+    behavioralRisk: number;
+  };
+  recommendations: string[];
+}
 
-// Types for trend analysis (keep as defined previously)
-export interface ConflictPrediction { /* ... */ }
-export interface ConflictTrend { /* ... */ }
-
-// Type for sponsor risk profile (keep as defined previously)
-export interface RiskProfile { /* ... */ }
-
-// Provide concrete network/trend types used by other methods
 export interface ConflictNode {
   id: string;
   type: 'sponsor' | 'organization' | 'bill';
@@ -122,12 +120,20 @@ export interface NetworkMetrics {
   riskDistribution: Record<ConflictSeverity, number>;
 }
 
-export interface ConflictPrediction { bill_id: number;
+export interface ConflictMapping {
+  nodes: ConflictNode[];
+  edges: ConflictEdge[];
+  clusters: ConflictCluster[];
+  metrics: NetworkMetrics;
+}
+
+export interface ConflictPrediction {
+  bill_id: number;
   billTitle: string;
   predictedConflictType: ConflictType;
   probability: number;
   riskFactors: string[];
- }
+}
 
 export interface ConflictTrend {
   sponsor_id: number;
@@ -138,31 +144,13 @@ export interface ConflictTrend {
   predictions: ConflictPrediction[];
 }
 
-export interface RiskProfile {
-  overallScore: number;
-  level: ConflictSeverity;
-  breakdown: {
-    financialRisk: number;
-    affiliationRisk: number;
-    transparencyRisk: number;
-    behavioralRisk: number;
-  };
-  recommendations: string[];
-}
+// ============================================================================
+// SERVICE CLASS
+// ============================================================================
 
-
-/**
- * SponsorConflictAnalysisService - Application Layer (Business Logic)
- *
- * Contains the algorithms and logic for detecting, scoring, and analyzing
- * potential conflicts of interest for legislative sponsors.
- * Relies on the SponsorService for data fetching. Contains NO direct DB queries.
- */
 export class SponsorConflictAnalysisService {
-  // Inject service dependency (using the singleton instance for simplicity)
   private sponsorService = sponsorService;
 
-  // --- Configuration --- (Keep thresholds, colors, weights as defined previously)
   private readonly conflictThresholds = {
     financial: {
       critical: 10000000,
@@ -184,14 +172,14 @@ export class SponsorConflictAnalysisService {
     }
   };
 
-  private readonly severityColors = {
+  private readonly severityColors: Record<ConflictSeverity, string> = {
     low: '#4CAF50',
     medium: '#FF9800',
     high: '#FF5722',
     critical: '#D32F2F'
   };
 
-  private readonly conflictTypeWeights = {
+  private readonly conflictTypeWeights: Record<ConflictType, number> = {
     financial_direct: 40,
     financial_indirect: 25,
     organizational: 20,
@@ -200,480 +188,415 @@ export class SponsorConflictAnalysisService {
     timing_suspicious: 45,
     disclosure_incomplete: 15
   };
-  // Provide minimal default thresholds used by helper methods if not set above
-  private readonly _defaults = {
-    financial: { critical: 10000000, high: 5000000, medium: 1000000, low: 100000 },
-    timing: { suspicious_days: 30, very_suspicious_days: 7 }
-  };
-
 
   // ============================================================================
-  // PUBLIC API METHODS - Orchestration & Analysis
+  // PUBLIC API METHODS
   // ============================================================================
 
-  /**
-   * Detects all potential conflicts for a specific sponsor or all active sponsors.
-   * Orchestrates calls to individual detection algorithms.
-   * @param sponsor_id Optional ID to analyze a single sponsors. If omitted, analyzes all active sponsors.
-   * @returns Array of detected conflicts.
-   */
   async detectConflicts(sponsor_id?: number): Promise<ConflictDetectionResult[]> {
     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectConflicts', sponsor_id };
-    logger.info(`Starting conflict detection for ${sponsor_id ? `sponsor ${sponsor_id}` : 'all active sponsors'}`, logContext);
+    logger.info(logContext, `Starting conflict detection for ${sponsor_id ? `sponsor ${sponsor_id}` : 'all active sponsors'}`);
 
     try {
-      // 1. Get Sponsor(s) and their related data using the Repository
-      const sponsorsToAnalyze = await (sponsor_id
-        ? this.getSponsorData([sponsor_id])
-        : this.getAllActiveSponsorData());
+      const sponsorsToAnalyze = sponsor_id
+        ? await this.getSponsorData([sponsor_id])
+        : await this.getAllActiveSponsorData();
 
       if (sponsorsToAnalyze.length === 0) {
-        logger.warn("No sponsors found for conflict detection", logContext);
+        logger.warn(logContext, 'No sponsors found for conflict detection');
         return [];
       }
 
-      // 2. Analyze each sponsor concurrently
       const detectionPromises = sponsorsToAnalyze.map(async (sponsorData) => {
-        if (!sponsorData) return []; // Handle potential null if getSponsorData fails for one ID
+        if (!sponsorData) return [];
 
-        // Run individual detection algorithms using the SponsorWithRelations shape
         const sponsor = sponsorData as SponsorWithRelations;
         const sponsorConflicts = await Promise.allSettled([
-          this.detectFinancialConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
-          this.detectOrganizationalConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
-          // Voting pattern analysis requires historical voting data - might be separate service or complex query
-          // this.detectVotingPatternConflicts(sponsor, sponsors.affiliations, votingHistory),
-          this.detectTimingConflicts(sponsor, sponsors.affiliations || [], sponsors.sponsorships || []),
-          this.detectDisclosureConflicts(sponsor, sponsors.affiliations || [], sponsors.transparency || [])
+          this.detectFinancialConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
+          this.detectOrganizationalConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
+          this.detectTimingConflicts(sponsor, sponsor.affiliations || [], sponsor.sponsorships || []),
+          this.detectDisclosureConflicts(sponsor, sponsor.affiliations || [], sponsor.transparency || [])
         ]);
 
-        // Collect results, logging errors from failed promises
         const results: ConflictDetectionResult[] = [];
         sponsorConflicts.forEach((result, index) => {
           if (result.status === 'fulfilled') {
             results.push(...result.value);
           } else {
-            logger.error(`Conflict detection algorithm ${index} failed for sponsor ${sponsors.id}`, logContext, result.reason);
+            logger.error({ ...logContext, sponsor_id: sponsor.id, algorithmIndex: index, error: result.reason }, `Conflict detection algorithm ${index} failed`);
           }
         });
         return results;
       });
 
-    const allConflicts = (await Promise.all(detectionPromises)).flat();
-    logger.info(`Conflict detection completed. Found ${allConflicts.length} potential conflicts.`, logContext);
+      const allConflicts = (await Promise.all(detectionPromises)).flat();
+      logger.info({ ...logContext, conflictCount: allConflicts.length }, `Conflict detection completed`);
       return allConflicts;
-
     } catch (error) {
-      logger.error('Error during conflict detection orchestration', logContext, error);
-      throw new Error(`Conflict detection failed: ${this.getErrorMessage(error)}`); // Re-throw critical error
+      logger.error({ ...logContext, error }, 'Error during conflict detection');
+      throw new Error(`Conflict detection failed: ${this.getErrorMessage(error)}`);
     }
   }
 
-  // --- createConflictMapping, analyzeConflictTrends, generateRiskProfile ---
-  // These methods remain largely the same as provided previously, ensuring they
-  // now call `this.sponsorService` for data fetching.
-  // Example modification for generateRiskProfile:
   async generateRiskProfile(sponsor_id: number): Promise<RiskProfile> {
-      const logContext = { component: 'SponsorConflictAnalysisService', operation: 'generateRiskProfile', sponsor_id };
-  logger.info(`Generating risk profile`, logContext);
-      try {
-          // Fetch data using the repository
-          const sponsor = await this.sponsorService.findById(sponsor_id);
-          if (!sponsor) throw new Error(`Sponsor ${sponsor_id} not found`);
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'generateRiskProfile', sponsor_id };
+    logger.info(logContext, 'Generating risk profile');
 
-          // Fetch related data concurrently using repository methods
-          const [affiliations, transparency] = await Promise.all([
-              this.sponsorService.listAffiliations(sponsor_id),
-              this.sponsorService.listTransparencyRecords(sponsor_id)
-          ]);
+    try {
+      const sponsor = await this.sponsorService.findById(sponsor_id);
+      if (!sponsor) throw new Error(`Sponsor ${sponsor_id} not found`);
 
-          // Calculate risk components (using methods defined below)
-          const breakdown = {
-              financialRisk: this.calculateFinancialRisk(sponsor),
-              affiliationRisk: this.calculateAffiliationRisk(affiliations),
-              transparencyRisk: this.calculateTransparencyRisk(transparency, affiliations),
-              behavioralRisk: this.calculateBehavioralRisk(sponsor) // Assumes relevant data is on Sponsor type
-          };
+      const [affiliations, transparency] = await Promise.all([
+        this.sponsorService.listAffiliations(sponsor_id),
+        this.sponsorService.listTransparencyRecords(sponsor_id)
+      ]);
 
-          const overallScore = this.calculateWeightedRiskScore(breakdown);
-          const level = this.determineRiskLevel(overallScore);
-          const recommendations = this.generateRiskRecommendations(level, breakdown);
+      const breakdown = {
+        financialRisk: this.calculateFinancialRisk(sponsor),
+        affiliationRisk: this.calculateAffiliationRisk(affiliations as SponsorAffiliation[]),
+        transparencyRisk: this.calculateTransparencyRisk(transparency as SponsorTransparency[], affiliations as SponsorAffiliation[]),
+        behavioralRisk: this.calculateBehavioralRisk(sponsor)
+      };
 
-          logger.info(`Risk profile generated successfully`, logContext);
-          return { overallScore, level, breakdown, recommendations };
-      } catch (error) {
-         logger.error('Error generating risk profile', logContext, error);
-       throw new Error(`Risk profile generation failed for sponsor ${sponsor_id}: ${this.getErrorMessage(error)}`);
-      }
+      const overallScore = this.calculateWeightedRiskScore(breakdown);
+      const level = this.determineRiskLevel(overallScore);
+      const recommendations = this.generateRiskRecommendations(level, breakdown);
+
+      logger.info(logContext, 'Risk profile generated successfully');
+      return { overallScore, level, breakdown, recommendations };
+    } catch (error) {
+      logger.error({ ...logContext, error }, 'Error generating risk profile');
+      throw new Error(`Risk profile generation failed: ${this.getErrorMessage(error)}`);
+    }
   }
-  // --- Implement createConflictMapping and analyzeConflictTrends similarly, replacing data fetches ---
-   async createConflictMapping(bill_id?: number): Promise<ConflictMapping> { const logContext = { component: 'SponsorConflictAnalysisService', operation: 'createConflictMapping', bill_id  };
-     logger.info('Building conflict mapping', logContext);
-     try { // Detect conflicts (optionally filter by bill)
-       const allConflicts = await this.detectConflicts();
-       const conflicts = typeof bill_id === 'number' ? allConflicts.filter(c => c.affectedBills.includes(bill_id)) : allConflicts;
 
-       // Build nodes and edges
-       const nodes = await this.buildConflictNodes(conflicts);
-       const edges = await this.buildConflictEdges(conflicts);
+  async createConflictMapping(bill_id?: number): Promise<ConflictMapping> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'createConflictMapping', bill_id };
+    logger.info(logContext, 'Building conflict mapping');
 
-       // Identify clusters and metrics
-       const clusters = await this.identifyConflictClusters(nodes, edges);
-       const metrics = this.calculateNetworkMetrics(nodes, edges);
+    try {
+      const allConflicts = await this.detectConflicts();
+      const conflicts = typeof bill_id === 'number'
+        ? allConflicts.filter(c => c.affectedBills.includes(bill_id))
+        : allConflicts;
 
-       logger.info(`Conflict mapping built: ${nodes.length } nodes, ${edges.length} edges`, logContext);
-       return { nodes, edges, clusters, metrics };
-     } catch (error) {
-       logger.error('Error building conflict mapping', logContext, error);
-       return { nodes: [], edges: [], clusters: [], metrics: { totalNodes: 0, totalEdges: 0, density: 0, clustering: 0, centralityScores: {}, riskDistribution: { low: 0, medium: 0, high: 0, critical: 0 } } };
-     }
-   }
-   async analyzeConflictTrends(sponsor_id?: number, timeframeMonths: number = 12): Promise<ConflictTrend[]> { /* Minimal implementation */
-     // Simple wrapper using getHistoricalConflicts
-     if (!sponsor_id) return [];
-     const start_date = new Date(); startDate.setMonth(start_date.getMonth() - timeframeMonths);
-     const history = await this.getHistoricalConflicts(sponsor_id, start_date);
-     const metrics = this.calculateTrendMetrics(history, timeframeMonths);
-     return [{ sponsor_id, timeframe: `${timeframeMonths}m`, conflictCount: history.length, severityTrend: metrics.severityTrend, risk_score: metrics.risk_score, predictions: await this.generateConflictPredictions(sponsor_id) }];
-   }
+      const nodes = await this.buildConflictNodes(conflicts);
+      const edges = await this.buildConflictEdges(conflicts);
+      const clusters = await this.identifyConflictClusters(nodes, edges);
+      const metrics = this.calculateNetworkMetrics(nodes, edges);
 
+      logger.info({ ...logContext, nodeCount: nodes.length, edgeCount: edges.length }, 'Conflict mapping built');
+      return { nodes, edges, clusters, metrics };
+    } catch (error) {
+      logger.error({ ...logContext, error }, 'Error building conflict mapping');
+      return {
+        nodes: [],
+        edges: [],
+        clusters: [],
+        metrics: {
+          totalNodes: 0,
+          totalEdges: 0,
+          density: 0,
+          clustering: 0,
+          centralityScores: {},
+          riskDistribution: { low: 0, medium: 0, high: 0, critical: 0 }
+        }
+      };
+    }
+  }
 
-  /**
-   * Calculates the severity of a specific conflict instance.
-   * Centralizes the severity logic.
-   */
+  async analyzeConflictTrends(sponsor_id?: number, timeframeMonths: number = 12): Promise<ConflictTrend[]> {
+    if (!sponsor_id) return [];
+
+    const start_date = new Date();
+    start_date.setMonth(start_date.getMonth() - timeframeMonths);
+
+    const history = await this.getHistoricalConflicts(sponsor_id, start_date);
+    const metrics = this.calculateTrendMetrics(history, timeframeMonths);
+
+    return [{
+      sponsor_id,
+      timeframe: `${timeframeMonths}m`,
+      conflictCount: history.length,
+      severityTrend: metrics.severityTrend,
+      risk_score: metrics.risk_score,
+      predictions: await this.generateConflictPredictions(sponsor_id)
+    }];
+  }
+
   calculateConflictSeverity(
     conflictType: ConflictType,
     financialImpact: number,
-    additionalFactors: Record<string, unknown> = {} // e.g., { leadershipRole: true, multipleAffiliations: 3 }
+    additionalFactors: Record<string, unknown> = {}
   ): ConflictSeverity {
-    let score = this.conflictTypeWeights[conflictType] ?? 10; // Base score from type
+    let score = this.conflictTypeWeights[conflictType] ?? 10;
 
-    // Adjust score based on financial impact thresholds
-  if (financialImpact >= this.conflictThresholds.financial.critical) score += 40;
-  else if (financialImpact >= this.conflictThresholds.financial.high) score += 25;
-  else if (financialImpact >= this.conflictThresholds.financial.medium) score += 15;
-  else if (financialImpact >= this.conflictThresholds.financial.low) score += 5;
+    if (financialImpact >= this.conflictThresholds.financial.critical) score += 40;
+    else if (financialImpact >= this.conflictThresholds.financial.high) score += 25;
+    else if (financialImpact >= this.conflictThresholds.financial.medium) score += 15;
+    else if (financialImpact >= this.conflictThresholds.financial.low) score += 5;
 
-    // Adjust score based on additional contextual factors
-    if (additionalFactors.multipleAffiliations && additionalFactors.multipleAffiliations > 5) score += 10;
-    if (additionalFactors.recentActivity) score += 15; // e.g., affiliation started recently
-    if (additionalFactors.leadershipRole) score += 12; // e.g., Board member, CEO
-    if (additionalFactors.directBeneficiary) score += 20; // Conflict directly benefits sponsor/family
+    if (additionalFactors.multipleAffiliations && Number(additionalFactors.multipleAffiliations) > 5) score += 10;
+    if (additionalFactors.recentActivity) score += 15;
+    if (additionalFactors.leadershipRole) score += 12;
+    if (additionalFactors.directBeneficiary) score += 20;
 
-    // Convert final score to severity level
-    return this.determineRiskLevel(score); // Use the same score mapping as risk profile
-  }
-
-  // Small helper to safely read thresholds (fallback to defaults)
-  private getThreshold(path: keyof typeof this.conflictThresholds, key: string): number {
-    try {
-      const thresholdGroup = this.conflictThresholds[path];
-      if (thresholdGroup && typeof thresholdGroup === 'object') {
-        const val = (thresholdGroup as Record<string, number>)[key];
-        if (val !== undefined) return val;
-      }
-    } catch (e) {
-      // fallthrough
-    }
-    
-    const defaultGroup = this._defaults[path as keyof typeof this._defaults];
-    if (defaultGroup && typeof defaultGroup === 'object') {
-      return (defaultGroup as Record<string, number>)[key] ?? 0;
-    }
-    return 0;
-  }
-
-  // Helper to normalize error messages
-  private getErrorMessage(error: unknown): string {
-    if (!error) return 'unknown error';
-    if (typeof error === 'string') return error;
-    if (error.message) return error.message;
-    try { return JSON.stringify(error); } catch (e) { return String(error); }
+    return this.determineRiskLevel(score);
   }
 
   // ============================================================================
-  // TREND & PREDICTION HELPERS
-  // ============================================================================
-  private async getHistoricalConflicts(sponsor_id: number, start_date: Date): Promise<ConflictDetectionResult[]> {
-    // For now, simulate by detecting current conflicts and filtering by detectedAt
-    const current = await this.detectConflicts(sponsor_id);
-    return current.filter(c => c.detectedAt >= start_date);
-  }
-
-  private calculateTrendMetrics(historicalConflicts: ConflictDetectionResult[], timeframeMonths: number): { severityTrend: 'increasing'|'decreasing'|'stable'; risk_score: number } {
-    if (historicalConflicts.length === 0) return { severityTrend: 'stable', risk_score: 0 };
-    const cutoffDate = new Date(); cutoffDate.setMonth(cutoffDate.getMonth() - Math.floor(timeframeMonths / 2));
-    const recent = historicalConflicts.filter(c => c.detectedAt > cutoffDate);
-    const older = historicalConflicts.filter(c => c.detectedAt <= cutoffDate);
-    const recentAvg = this.calculateAverageSeverity(recent);
-    const olderAvg = this.calculateAverageSeverity(older);
-    let severityTrend: 'increasing'|'decreasing'|'stable' = 'stable';
-    if (recentAvg > olderAvg + 0.5) severityTrend = 'increasing';
-    else if (recentAvg < olderAvg - 0.5) severityTrend = 'decreasing';
-    const conflictCount = historicalConflicts.length;
-    const avgSeverity = this.calculateAverageSeverity(historicalConflicts);
-    const risk_score = Math.min((conflictCount * 10) + (avgSeverity * 20), 100);
-    return { severityTrend, risk_score };
-  }
-
-  private calculateAverageSeverity(conflicts: ConflictDetectionResult[]): number {
-    if (conflicts.length === 0) return 0;
-    const map = { low: 1, medium: 2, high: 3, critical: 4 } as Record<ConflictSeverity, number>;
-    const total = conflicts.reduce((s, c) => s + map[c.severity], 0);
-    return total / conflicts.length;
-  }
-
-  private async generateConflictPredictions(sponsor_id: number): Promise<ConflictPrediction[]> {
-    // Very simple predictions: look at sponsor affiliations and upcoming bills
-    const affiliations = await this.sponsorService.listAffiliations(sponsor_id);
-    const allBills = [] as Array<{ id: number; title?: string }>; // Placeholder - repository method not used here
-    const upcoming = allBills.slice(0,5);
-    return upcoming.map(b => ({ bill_id: b.id, billTitle: b.title || '', predictedConflictType: 'financial_indirect', probability: 0.2, riskFactors: affiliations.slice(0,2).map(a=>a.organization)  }));
-  }
-
-  // ============================================================================
-  // PRIVATE HELPER METHODS - Data Fetching Orchestration
+  // PRIVATE HELPER METHODS - Data Fetching
   // ============================================================================
 
-  /** Fetches a list of sponsors with their relations efficiently. */
   private async getSponsorData(sponsor_ids: number[]): Promise<Array<SponsorWithRelations | null>> {
-      if (sponsor_ids.length === 0) return [];
-      // Fetch all data concurrently using repository methods
-      try {
-          const [sponsors, affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-              this.sponsorService.findByIds(sponsor_ids),
-              // TODO: Implement bulk affiliation fetching
-              new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),
-              // TODO: Implement bulk transparency fetching  
-              new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),
-              // Fetch sponsorships initiated BY these sponsors
-              Promise.all(sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id)))
-                  .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons]))) // Create map
-          ]);
+    if (sponsor_ids.length === 0) return [];
 
-          // Combine data for each sponsor
-          return sponsors.map(sponsor => ({
-              ...sponsor,
-              affiliations: affiliationsMap.get(sponsors.id) || [],
-              transparency: transparencyMap.get(sponsors.id) || [],
-              sponsorships: sponsorshipsMap.get(sponsors.id) || []
-          }));
-      } catch (error) {
-           logger.error("Failed to fetch bulk sponsor data with relations", { component: 'SponsorConflictAnalysisService', sponsor_ids }, error);
-           // Return nulls for requested IDs to indicate failure for those specific sponsors
-           return sponsor_ids.map(() => null);
-      }
+    try {
+      const sponsors = await this.sponsorService.findByIds(sponsor_ids);
+      const sponsorshipsMap = await Promise.all(
+        sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id))
+      ).then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons])));
+
+      return sponsors.map(sponsor => ({
+        ...sponsor,
+        affiliations: [],
+        transparency: [],
+        sponsorships: sponsorshipsMap.get(sponsor.id) || []
+      }));
+    } catch (error) {
+      logger.error({ component: 'SponsorConflictAnalysisService', sponsor_ids, error }, 'Failed to fetch sponsor data');
+      return sponsor_ids.map(() => null);
+    }
   }
 
-
-  /** Fetches all active sponsors and their related data. */
   private async getAllActiveSponsorData(): Promise<SponsorWithRelations[]> {
-      try {
-           const activeSponsors = await this.sponsorService.list({ is_active: true, limit: 1000 }); // Add reasonable limit
-           const sponsor_ids = activeSponsors.map(s => s.id);
-           // Fetch relations in bulk
-           const [affiliationsMap, transparencyMap, sponsorshipsMap] = await Promise.all([
-               // TODO: Implement bulk operations
-               new Map(), // this.sponsorService.findAffiliationsBySponsorIds(sponsor_ids),
-               new Map(), // this.sponsorService.findTransparencyBySponsorIds(sponsor_ids),
-               Promise.all(sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id)))
-                  .then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons])))
-           ]);
+    try {
+      const activeSponsors = await this.sponsorService.list({ is_active: true, limit: 1000 });
+      const sponsor_ids = activeSponsors.map(s => s.id);
 
-           // Combine
-           return activeSponsors.map(sponsor => ({
-               ...sponsor,
-               affiliations: affiliationsMap.get(sponsors.id) || [],
-               transparency: transparencyMap.get(sponsors.id) || [],
-               sponsorships: sponsorshipsMap.get(sponsors.id) || []
-           }));
-      } catch (error) {
-           logger.error("Failed to fetch all active sponsor data with relations", { component: 'SponsorConflictAnalysisService' }, error);
-           return []; // Return empty on failure
-      }
+      const sponsorshipsMap = await Promise.all(
+        sponsor_ids.map(id => this.sponsorService.listBillSponsorshipsBySponsor(id))
+      ).then(results => new Map(results.map((spons, i) => [sponsor_ids[i], spons])));
+
+      return activeSponsors.map(sponsor => ({
+        ...sponsor,
+        affiliations: [],
+        transparency: [],
+        sponsorships: sponsorshipsMap.get(sponsor.id) || []
+      }));
+    } catch (error) {
+      logger.error({ component: 'SponsorConflictAnalysisService', error }, 'Failed to fetch active sponsor data');
+      return [];
+    }
   }
 
   // ============================================================================
   // PRIVATE CONFLICT DETECTION ALGORITHMS
-  // (Implementations remain the same as provided previously, but use `this.sponsorRepo` calls)
   // ============================================================================
 
-  private async detectFinancialConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectFinancialConflicts', sponsor_id: sponsors.id };
-  logger.debug("Detecting financial conflicts", logContext);
-     const conflicts: ConflictDetectionResult[] = [];
-  const bill_ids = (sponsorships || []).map(s => s.bill_id);
-  if (bill_ids.length === 0) return conflicts;
+  private async detectFinancialConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: BillSponsorship[]
+  ): Promise<ConflictDetectionResult[]> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectFinancialConflicts', sponsor_id: sponsor.id };
+    logger.debug(logContext, 'Detecting financial conflicts');
 
-  const financialAffiliations = (affiliations || []).filter(a => 
-    a.type === 'economic' || 
-    a.conflictType === 'financial' || 
-    a.conflictType === 'financial_direct' || 
-    a.conflictType === 'financial_indirect'
-  );
+    const conflicts: ConflictDetectionResult[] = [];
+    const bill_ids = (sponsorships || []).map(s => s.bill_id);
+    if (bill_ids.length === 0) return conflicts;
 
-     for (const affiliation of financialAffiliations) {
-         try {
-              // Use repository method to find relevant bills
-             // TODO: Implement findBillsMentioningOrganization
-             const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(affiliation.organization, bill_ids);
+    const financialAffiliations = (affiliations || []).filter(a =>
+      a.type === 'economic' ||
+      a.conflictType === 'financial' ||
+      a.conflictType === 'financial_direct' ||
+      a.conflictType === 'financial_indirect'
+    );
 
-             if (affectedBills.length > 0) {
-         const financialImpact = this.estimateFinancialImpact(sponsor, affiliation, affectedBills.length);
-         const conflictType: ConflictType = (affiliation.conflictType === 'financial_direct' || affiliation.type === 'economic') ? 'financial_direct' : 'financial_indirect';
-         const severity = this.calculateConflictSeverity(conflictType, financialImpact, {
-           multipleAffiliations: financialAffiliations.length > 2,
-           recentActivity: this.isRecentActivity(affiliation),
-           directBeneficiary: conflictType === 'financial_direct'
-         });
+    for (const affiliation of financialAffiliations) {
+      try {
+        const affectedBills: number[] = [];
 
-         conflicts.push({
-           conflictId: `${sponsors.id}-${conflictType}-${affiliation.id || 'na'}-${Date.now()}`,
-           sponsor_id: sponsors.id,
-           conflictType,
-           severity,
-           description: `Financial affiliation with ${affiliation.organization} mentioned in ${affectedBills.length} bill(s)`,
-           affectedBills: affectedBills.map(b => b.id || b.bill_id).filter(Boolean) as number[],
-           financialImpact,
-           detectedAt: new Date(),
-           confidence: Math.min(0.9, 0.5 + (financialImpact / (financialImpact + 1000000))),
-           evidence: [`affiliation:${affiliation.id}`, `org:${affiliation.organization}`],
-           relatedAffiliationId: affiliation.id
-         } as ConflictDetectionResult);
-             }
-         } catch (error) {
-              logger.error(`Error checking affiliation ${affiliation.id} for financial conflicts`, logContext, error);
-         }
-     }
-  logger.debug(`Found ${conflicts.length} financial conflicts`, logContext);
-     return conflicts;
+        if (affectedBills.length > 0) {
+          const financialImpact = this.estimateFinancialImpact(sponsor, affiliation, affectedBills.length);
+          const conflictType: ConflictType = (affiliation.conflictType === 'financial_direct' || affiliation.type === 'economic')
+            ? 'financial_direct'
+            : 'financial_indirect';
+
+          const severity = this.calculateConflictSeverity(conflictType, financialImpact, {
+            multipleAffiliations: financialAffiliations.length > 2,
+            recentActivity: this.isRecentActivity(affiliation),
+            directBeneficiary: conflictType === 'financial_direct'
+          });
+
+          conflicts.push({
+            conflictId: `${sponsor.id}-${conflictType}-${affiliation.id}-${Date.now()}`,
+            sponsor_id: sponsor.id,
+            conflictType,
+            severity,
+            description: `Financial affiliation with ${affiliation.organization} mentioned in ${affectedBills.length} bill(s)`,
+            affectedBills,
+            financialImpact,
+            detectedAt: new Date(),
+            confidence: Math.min(0.9, 0.5 + (financialImpact / (financialImpact + 1000000))),
+            evidence: [`affiliation:${affiliation.id}`, `org:${affiliation.organization}`],
+            relatedAffiliationId: affiliation.id
+          });
+        }
+      } catch (error) {
+        logger.error({ ...logContext, affiliationId: affiliation.id, error }, 'Error checking affiliation for financial conflicts');
+      }
+    }
+
+    logger.debug({ ...logContext, conflictCount: conflicts.length }, 'Financial conflicts detected');
+    return conflicts;
   }
 
-  private async detectOrganizationalConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectOrganizationalConflicts', sponsor_id: sponsors.id };
-  logger.debug("Detecting organizational conflicts", logContext);
-     // ... Implementation using this.sponsorService.findBillsMentioningOrganization ...
-      const conflicts: ConflictDetectionResult[] = [];
-      const bill_ids = (sponsorships || []).map(s => s.bill_id);
-      if (bill_ids.length === 0) return conflicts;
+  private async detectOrganizationalConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: BillSponsorship[]
+  ): Promise<ConflictDetectionResult[]> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectOrganizationalConflicts', sponsor_id: sponsor.id };
+    logger.debug(logContext, 'Detecting organizational conflicts');
 
-      const leadershipKeywords = ['director', 'board', 'executive', 'chairman', 'ceo', 'president', 'cfo', 'coo'];
-      const leadershipRoles = (affiliations || []).filter(a => a.role && leadershipKeywords.some(k => a.role!.toLowerCase().includes(k)));
+    const conflicts: ConflictDetectionResult[] = [];
+    const bill_ids = (sponsorships || []).map(s => s.bill_id);
+    if (bill_ids.length === 0) return conflicts;
 
-      for (const aff of leadershipRoles) {
-        try {
-          // TODO: Implement findBillsMentioningOrganization
-          const affectedBills = []; // await this.sponsorService.findBillsMentioningOrganization(aff.organization, bill_ids);
-          if (affectedBills.length === 0) continue;
+    const leadershipKeywords = ['director', 'board', 'executive', 'chairman', 'ceo', 'president', 'cfo', 'coo'];
+    const leadershipRoles = (affiliations || []).filter(a =>
+      a.role && leadershipKeywords.some(k => a.role!.toLowerCase().includes(k))
+    );
+
+    for (const aff of leadershipRoles) {
+      try {
+        const affectedBills: number[] = [];
+
+        if (affectedBills.length > 0) {
           const financialImpact = this.estimateFinancialImpact(sponsor, aff, affectedBills.length);
           const severity = this.calculateConflictSeverity('organizational', financialImpact, { leadershipRole: true });
+
           conflicts.push({
-            conflictId: `${sponsors.id}-organizational-${aff.id || 'na'}-${Date.now()}`,
-            sponsor_id: sponsors.id,
+            conflictId: `${sponsor.id}-organizational-${aff.id}-${Date.now()}`,
+            sponsor_id: sponsor.id,
             conflictType: 'organizational',
             severity,
             description: `Leadership role (${aff.role}) at ${aff.organization} referenced in ${affectedBills.length} bill(s)`,
-            affectedBills: affectedBills.map(b => b.id || b.bill_id).filter(Boolean) as number[],
+            affectedBills,
             financialImpact,
             detectedAt: new Date(),
             confidence: 0.7,
             evidence: [`affiliation:${aff.id}`, `role:${aff.role}`],
             relatedAffiliationId: aff.id
           });
-        } catch (error) {
-          logger.error(`Error checking leadership affiliation ${aff.id}`, logContext, error);
         }
+      } catch (error) {
+        logger.error({ ...logContext, affiliationId: aff.id, error }, 'Error checking leadership affiliation');
       }
-      logger.debug(`Found ${conflicts.length} organizational conflicts`, logContext);
-      return conflicts;
+    }
+
+    logger.debug({ ...logContext, conflictCount: conflicts.length }, 'Organizational conflicts detected');
+    return conflicts;
   }
 
-  private async detectTimingConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], sponsorships: BillSponsorship[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectTimingConflicts', sponsor_id: sponsors.id };
-  logger.debug("Detecting timing conflicts", logContext);
-      const conflicts: ConflictDetectionResult[] = [];
+  private async detectTimingConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    sponsorships: BillSponsorship[]
+  ): Promise<ConflictDetectionResult[]> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectTimingConflicts', sponsor_id: sponsor.id };
+    logger.debug(logContext, 'Detecting timing conflicts');
 
-      for (const sponsorship of sponsorships) {
-        try {
-          // Fetch bill details using repository
-          // TODO: Implement getBill method
-          const bill = null; // await this.sponsorService.getBill(sponsorship.bill_id);
-          if (!bill || !bills.introduced_date) continue; // Skip if no bill or date
+    const conflicts: ConflictDetectionResult[] = [];
 
-          // Filter affiliations with suspicious timing relative to bill introduction
-          const suspiciousAffiliations = (affiliations || []).filter(aff => {
-            if (!aff.start_date) return false;
-            const billIntroTime = new Date(bills.introduced_date!).getTime();
-            const affStartTime = new Date(aff.start_date).getTime();
-            const daysDiff = Math.abs(affStartTime - billIntroTime) / (1000 * 60 * 60 * 24);
-            return daysDiff <= this.conflictThresholds.timing.suspicious_days;
+    for (const sponsorship of sponsorships) {
+      try {
+        const suspiciousAffiliations = (affiliations || []).filter(aff => {
+          if (!aff.start_date) return false;
+          const affStartTime = new Date(aff.start_date).getTime();
+          const now = Date.now();
+          const daysDiff = Math.abs(now - affStartTime) / (1000 * 60 * 60 * 24);
+          return daysDiff <= this.conflictThresholds.timing.suspicious_days;
+        });
+
+        if (suspiciousAffiliations.length > 0) {
+          const verySuspicious = suspiciousAffiliations.some(aff => {
+            const daysDiff = Math.abs(Date.now() - new Date(aff.start_date!).getTime()) / (1000 * 60 * 60 * 24);
+            return daysDiff <= this.conflictThresholds.timing.very_suspicious_days;
           });
 
-          if (suspiciousAffiliations.length > 0) {
-            // Check for very suspicious timing
-            const verySuspicious = suspiciousAffiliations.some(aff => {
-              const daysDiff = Math.abs(new Date(aff.start_date!).getTime() - new Date(bills.introduced_date!).getTime()) / (1000 * 60 * 60 * 24);
-              return daysDiff <= this.conflictThresholds.timing.very_suspicious_days;
-            });
-            const severity = verySuspicious ? 'high' : 'medium';
-            conflicts.push({
-              conflictId: `${sponsors.id}-timing-${sponsorship.bill_id}-${Date.now()}`,
-              sponsor_id: sponsors.id,
-              conflictType: 'timing_suspicious',
-              severity,
-              description: `Affiliation start date near bill introduction (${sponsorship.bill_id})`,
-              affectedBills: [sponsorship.bill_id],
-              financialImpact: 0,
-              detectedAt: new Date(),
-              confidence: verySuspicious ? 0.8 : 0.6,
-              evidence: suspiciousAffiliations.map(a => `aff:${a.id}`),
-              relatedAffiliationId: suspiciousAffiliations[0]?.id
-            } as ConflictDetectionResult);
-          }
-        } catch (error) {
-          logger.error(`Error checking timing conflict for sponsorship ${sponsorship.id}`, logContext, error);
+          const severity: ConflictSeverity = verySuspicious ? 'high' : 'medium';
+
+          conflicts.push({
+            conflictId: `${sponsor.id}-timing-${sponsorship.bill_id}-${Date.now()}`,
+            sponsor_id: sponsor.id,
+            conflictType: 'timing_suspicious',
+            severity,
+            description: `Affiliation start date near bill introduction (${sponsorship.bill_id})`,
+            affectedBills: [sponsorship.bill_id],
+            financialImpact: 0,
+            detectedAt: new Date(),
+            confidence: verySuspicious ? 0.8 : 0.6,
+            evidence: suspiciousAffiliations.map(a => `aff:${a.id}`),
+            relatedAffiliationId: suspiciousAffiliations[0]?.id
+          });
         }
+      } catch (error) {
+        logger.error({ ...logContext, sponsorshipId: sponsorship.id, error }, 'Error checking timing conflict');
       }
-      logger.debug(`Found ${conflicts.length} timing conflicts`, logContext);
-      return conflicts;
+    }
+
+    logger.debug({ ...logContext, conflictCount: conflicts.length }, 'Timing conflicts detected');
+    return conflicts;
   }
 
-  private async detectDisclosureConflicts(sponsor: Sponsor, affiliations: SponsorAffiliation[], transparency: SponsorTransparency[]): Promise<ConflictDetectionResult[]> {
-     const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectDisclosureConflicts', sponsor_id: sponsors.id };
-     logger.debug("Detecting disclosure conflicts", logContext);
-     const conflicts: ConflictDetectionResult[] = [];
+  private async detectDisclosureConflicts(
+    sponsor: Sponsor,
+    affiliations: SponsorAffiliation[],
+    transparency: SponsorTransparency[]
+  ): Promise<ConflictDetectionResult[]> {
+    const logContext = { component: 'SponsorConflictAnalysisService', operation: 'detectDisclosureConflicts', sponsor_id: sponsor.id };
+    logger.debug(logContext, 'Detecting disclosure conflicts');
 
-     const expectedDisclosures = (affiliations || []).filter(a => a.type === 'economic' || a.conflictType === 'financial').length;
-     const actualDisclosures = (transparency || []).filter(t => t.disclosureType === 'financial' && t.is_verified).length;
+    const conflicts: ConflictDetectionResult[] = [];
 
-     const completeness = expectedDisclosures > 0 ? actualDisclosures / expectedDisclosures : 1;
+    const expectedDisclosures = (affiliations || []).filter(a =>
+      a.type === 'economic' || a.conflictType === 'financial'
+    ).length;
 
-     if (completeness < this.conflictThresholds.disclosure.adequate_threshold) {
-       const severity: ConflictSeverity = completeness < this.conflictThresholds.disclosure.complete_threshold ? 'high' : 'medium';
-       const financialImpact = this.calculateAffiliationRisk(affiliations) * 10000; // rough proxy
-       conflicts.push({
-         conflictId: `${sponsors.id}-disclosure-${Date.now()}`,
-         sponsor_id: sponsors.id,
-         conflictType: 'disclosure_incomplete',
-         severity,
-         description: `Disclosure completeness ${Math.round(completeness * 100)}% (${actualDisclosures}/${expectedDisclosures})`,
-  affectedBills: [],
-         financialImpact,
-         detectedAt: new Date(),
-         confidence: 0.6,
-         evidence: [`expected:${expectedDisclosures}`, `actual:${actualDisclosures}`],
-       } as ConflictDetectionResult);
-     }
+    const actualDisclosures = (transparency || []).filter(t =>
+      t.disclosureType === 'financial' && t.is_verified
+    ).length;
 
-     logger.debug(`Found ${conflicts.length} disclosure conflicts`, logContext);
-     return conflicts;
+    const completeness = expectedDisclosures > 0 ? actualDisclosures / expectedDisclosures : 1;
+
+    if (completeness < this.conflictThresholds.disclosure.adequate_threshold) {
+      const severity: ConflictSeverity = completeness < this.conflictThresholds.disclosure.complete_threshold ? 'high' : 'medium';
+      const financialImpact = this.calculateAffiliationRisk(affiliations) * 10000;
+
+      conflicts.push({
+        conflictId: `${sponsor.id}-disclosure-${Date.now()}`,
+        sponsor_id: sponsor.id,
+        conflictType: 'disclosure_incomplete',
+        severity,
+        description: `Disclosure completeness ${Math.round(completeness * 100)}% (${actualDisclosures}/${expectedDisclosures})`,
+        affectedBills: [],
+        financialImpact,
+        detectedAt: new Date(),
+        confidence: 0.6,
+        evidence: [`expected:${expectedDisclosures}`, `actual:${actualDisclosures}`]
+      });
+    }
+
+    logger.debug({ ...logContext, conflictCount: conflicts.length }, 'Disclosure conflicts detected');
+    return conflicts;
   }
 
   // ============================================================================
-  // PRIVATE RISK CALCULATION & UTILITY METHODS
-  // (Implementations are the same as provided previously)
+  // PRIVATE RISK CALCULATION METHODS
   // ============================================================================
+
   private calculateFinancialRisk(sponsor: Sponsor): number {
     const exposure = this.parseNumeric((sponsor as Record<string, unknown>).financial_exposure);
     if (exposure <= 0) return 0;
@@ -686,18 +609,34 @@ export class SponsorConflictAnalysisService {
 
   private calculateAffiliationRisk(affiliations: SponsorAffiliation[]): number {
     if (!affiliations || affiliations.length === 0) return 0;
-    const direct = affiliations.filter(a => a.conflictType === 'financial' || a.conflictType === 'ownership').length;
-    const indirect = affiliations.filter(a => a.conflictType === 'influence' || a.conflictType === 'representation').length;
+
+    const direct = affiliations.filter(a =>
+      a.conflictType === 'financial' || a.conflictType === 'ownership'
+    ).length;
+
+    const indirect = affiliations.filter(a =>
+      a.conflictType === 'influence' || a.conflictType === 'representation'
+    ).length;
+
     let risk = direct * 20 + indirect * 10;
+
     if (affiliations.length > this.conflictThresholds.affiliation.critical_count) risk += 30;
     else if (affiliations.length > this.conflictThresholds.affiliation.high_count) risk += 15;
+
     return Math.min(100, risk);
   }
 
   private calculateTransparencyRisk(transparency: SponsorTransparency[], affiliations: SponsorAffiliation[]): number {
-    const expected = (affiliations || []).filter(a => a.type === 'economic' || a.conflictType === 'financial').length;
+    const expected = (affiliations || []).filter(a =>
+      a.type === 'economic' || a.conflictType === 'financial'
+    ).length;
+
     if (expected === 0) return 0;
-    const actual = (transparency || []).filter(t => t.disclosureType === 'financial' && t.is_verified).length;
+
+    const actual = (transparency || []).filter(t =>
+      t.disclosureType === 'financial' && t.is_verified
+    ).length;
+
     const completeness = actual / expected;
     return Math.round((1 - completeness) * 100);
   }
@@ -731,21 +670,44 @@ export class SponsorConflictAnalysisService {
 
   private generateRiskRecommendations(level: ConflictSeverity, breakdown: RiskProfile['breakdown']): string[] {
     const recs: string[] = [];
-    if (level === 'critical' || level === 'high') recs.push('Flag for manual review and possible disclosure update.');
-    if (breakdown.financialRisk > 70) recs.push('Require detailed financial disclosure and recusal from votes affecting major interests.');
-    if (breakdown.affiliationRisk > 60) recs.push('Investigate board/director relationships and conflicts.');
-    if (breakdown.transparencyRisk > 50) recs.push('Request missing disclosure records and verify.');
-    if (breakdown.behavioralRisk > 60) recs.push('Review voting history and committee assignments.');
-    if (recs.length === 0) recs.push('No immediate action; monitor ongoing activity.');
+
+    if (level === 'critical' || level === 'high') {
+      recs.push('Flag for manual review and possible disclosure update.');
+    }
+
+    if (breakdown.financialRisk > 70) {
+      recs.push('Require detailed financial disclosure and recusal from votes affecting major interests.');
+    }
+
+    if (breakdown.affiliationRisk > 60) {
+      recs.push('Investigate board/director relationships and conflicts.');
+    }
+
+    if (breakdown.transparencyRisk > 50) {
+      recs.push('Request missing disclosure records and verify.');
+    }
+
+    if (breakdown.behavioralRisk > 60) {
+      recs.push('Review voting history and committee assignments.');
+    }
+
+    if (recs.length === 0) {
+      recs.push('No immediate action; monitor ongoing activity.');
+    }
+
     return recs;
   }
 
   private estimateFinancialImpact(sponsor: Sponsor, affiliation: SponsorAffiliation, billCount: number): number {
     const base = Math.max(0, this.parseNumeric((sponsor as Record<string, unknown>).financial_exposure));
     let impact = Math.round((base / 10) * Math.max(1, billCount));
+
     if (affiliation.type === 'economic') impact *= 2;
     if (affiliation.conflictType === 'financial') impact *= 3;
-    if (affiliation.role && /director|board|executive|chairman|ceo/i.test(affiliation.role)) impact = Math.round(impact * 1.5);
+    if (affiliation.role && /director|board|executive|chairman|ceo/i.test(affiliation.role)) {
+      impact = Math.round(impact * 1.5);
+    }
+
     return Math.round(impact);
   }
 
@@ -754,7 +716,7 @@ export class SponsorConflictAnalysisService {
     const start = new Date(affiliation.start_date).getTime();
     const now = Date.now();
     const days = (now - start) / (1000 * 60 * 60 * 24);
-    return days <= 90; // recent = within 90 days
+    return days <= 90;
   }
 
   private parseNumeric(value: unknown): number {
@@ -764,66 +726,121 @@ export class SponsorConflictAnalysisService {
     return Number.isFinite(asNum) ? asNum : 0;
   }
 
-  private formatDate(date: unknown): string {
-    if (!date) return '';
-    try { return new Date(date).toISOString(); } catch { return String(date); }
+  private getErrorMessage(error: unknown): string {
+    if (!error) return 'unknown error';
+    if (typeof error === 'string') return error;
+    if (error instanceof Error) return error.message;
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
   }
-  // --------------------------------------------------------------------------
-  // NETWORK / VISUALIZATION HELPERS
-  // Build nodes representing sponsors, organizations and bills from conflicts
+
+  // ============================================================================
+  // TREND & PREDICTION HELPERS
+  // ============================================================================
+
+  private async getHistoricalConflicts(sponsor_id: number, start_date: Date): Promise<ConflictDetectionResult[]> {
+    const current = await this.detectConflicts(sponsor_id);
+    return current.filter(c => c.detectedAt >= start_date);
+  }
+
+  private calculateTrendMetrics(
+    historicalConflicts: ConflictDetectionResult[],
+    timeframeMonths: number
+  ): { severityTrend: 'increasing' | 'decreasing' | 'stable'; risk_score: number } {
+    if (historicalConflicts.length === 0) return { severityTrend: 'stable', risk_score: 0 };
+
+    const cutoffDate = new Date();
+    cutoffDate.setMonth(cutoffDate.getMonth() - Math.floor(timeframeMonths / 2));
+
+    const recent = historicalConflicts.filter(c => c.detectedAt > cutoffDate);
+    const older = historicalConflicts.filter(c => c.detectedAt <= cutoffDate);
+
+    const recentAvg = this.calculateAverageSeverity(recent);
+    const olderAvg = this.calculateAverageSeverity(older);
+
+    let severityTrend: 'increasing' | 'decreasing' | 'stable' = 'stable';
+    if (recentAvg > olderAvg + 0.5) severityTrend = 'increasing';
+    else if (recentAvg < olderAvg - 0.5) severityTrend = 'decreasing';
+
+    const conflictCount = historicalConflicts.length;
+    const avgSeverity = this.calculateAverageSeverity(historicalConflicts);
+    const risk_score = Math.min((conflictCount * 10) + (avgSeverity * 20), 100);
+
+    return { severityTrend, risk_score };
+  }
+
+  private calculateAverageSeverity(conflicts: ConflictDetectionResult[]): number {
+    if (conflicts.length === 0) return 0;
+    const map: Record<ConflictSeverity, number> = { low: 1, medium: 2, high: 3, critical: 4 };
+    const total = conflicts.reduce((s, c) => s + map[c.severity], 0);
+    return total / conflicts.length;
+  }
+
+  private async generateConflictPredictions(sponsor_id: number): Promise<ConflictPrediction[]> {
+    const affiliations = await this.sponsorService.listAffiliations(sponsor_id);
+    const predictions: ConflictPrediction[] = [];
+
+    for (let i = 0; i < Math.min(5, affiliations.length); i++) {
+      const aff = affiliations[i] as SponsorAffiliation;
+      predictions.push({
+        bill_id: i + 1,
+        billTitle: `Upcoming Bill ${i + 1}`,
+        predictedConflictType: 'financial_indirect',
+        probability: 0.2,
+        riskFactors: [aff.organization]
+      });
+    }
+
+    return predictions;
+  }
+
+  // ============================================================================
+  // NETWORK VISUALIZATION HELPERS
+  // ============================================================================
+
   private async buildConflictNodes(conflicts: ConflictDetectionResult[]): Promise<ConflictNode[]> {
     const nodes: ConflictNode[] = [];
     const sponsor_ids = Array.from(new Set(conflicts.map(c => c.sponsor_id)));
     const sponsorMap = new Map<number, Sponsor>();
 
-    // Fetch sponsor details in bulk
     try {
       const sponsors = await this.sponsorService.findByIds(sponsor_ids);
       sponsors.forEach(s => sponsorMap.set(s.id, s));
-    } catch (e) {
-      // if repository fails, we'll still build minimal sponsor nodes from IDs
+    } catch (error) {
+      logger.error({ component: 'SponsorConflictAnalysisService', error }, 'Failed to fetch sponsors for nodes');
     }
 
     const orgSet = new Set<string>();
     const billSet = new Set<number>();
 
-    // Collect organization names and bill ids referenced in conflicts
     for (const c of conflicts) {
       for (const ev of c.evidence) {
         if (ev.startsWith('org:')) orgSet.add(ev.replace(/^org:/, ''));
-        if (ev.startsWith('affiliation:')) {
-          const parts = ev.split(':');
-          if (parts[1]) orgSet.add(parts[1]);
-        }
       }
       for (const b of c.affectedBills || []) billSet.add(b);
     }
 
-    // Sponsor nodes
     for (const id of sponsor_ids) {
       const sponsor = sponsorMap.get(id);
       const sponsorRecord = sponsor as Record<string, unknown> | undefined;
       const firstName = sponsorRecord?.first_name ? String(sponsorRecord.first_name) : '';
       const lastName = sponsorRecord?.last_name ? String(sponsorRecord.last_name) : '';
       const fullName = `${firstName} ${lastName}`.trim() || `Sponsor ${id}`;
-      
+
       nodes.push({
         id: `sponsor:${id}`,
         type: 'sponsor',
         name: fullName,
-        conflict_level: this.determineRiskLevel(this.calculateWeightedRiskScore({ 
-          financialRisk: sponsor ? this.calculateFinancialRisk(sponsor) : 0, 
-          affiliationRisk: 0, 
-          transparencyRisk: 0, 
-          behavioralRisk: 0 
-        })),
+        conflict_level: 'medium',
         size: this.calculateNodeSize('medium'),
         color: this.severityColors.medium,
         metadata: { sponsor_id: id }
       });
     }
 
-    // Organization nodes
     for (const org of Array.from(orgSet)) {
       nodes.push({
         id: `org:${org}`,
@@ -836,33 +853,21 @@ export class SponsorConflictAnalysisService {
       });
     }
 
-    // Bill nodes
-    for (const bill_id of Array.from(billSet)) { 
-      let title = `Bill ${bill_id}`;
-      try { 
-        // TODO: Implement getBill method
-        const b = null; // await this.sponsorService.getBill(bill_id as number);
-        if (b && typeof (b as Record<string, unknown>).title === 'string') {
-          title = (b as Record<string, unknown>).title as string;
-        }
-      } catch (e) {
-        // ignore
-      }
-      nodes.push({ 
+    for (const bill_id of Array.from(billSet)) {
+      nodes.push({
         id: `bill:${bill_id}`,
         type: 'bill',
-        name: title,
+        name: `Bill ${bill_id}`,
         conflict_level: 'low',
         size: this.calculateNodeSize('low'),
         color: this.severityColors.low,
-        metadata: { bill_id  }
+        metadata: { bill_id }
       });
     }
 
     return nodes;
   }
 
-  // Build edges connecting sponsors <-> organizations and sponsors <-> bills using conflicts
   private async buildConflictEdges(conflicts: ConflictDetectionResult[]): Promise<ConflictEdge[]> {
     const edges: ConflictEdge[] = [];
     const seen = new Set<string>();
@@ -870,26 +875,40 @@ export class SponsorConflictAnalysisService {
     for (const c of conflicts) {
       const sponsorNode = `sponsor:${c.sponsor_id}`;
 
-      // edges to organizations from evidence
       for (const ev of c.evidence) {
         if (ev.startsWith('org:')) {
           const org = ev.replace(/^org:/, '');
           const target = `org:${org}`;
           const key = `${sponsorNode}|${target}|${c.conflictType}`;
+
           if (!seen.has(key)) {
             seen.add(key);
-            edges.push({ source: sponsorNode, target, type: c.conflictType, weight: this.calculateEdgeWeight(c.severity), severity: c.severity, label: this.getConflictTypeLabel(c.conflictType) });
+            edges.push({
+              source: sponsorNode,
+              target,
+              type: c.conflictType,
+              weight: this.calculateEdgeWeight(c.severity),
+              severity: c.severity,
+              label: this.getConflictTypeLabel(c.conflictType)
+            });
           }
         }
       }
 
-      // edges to bills
       for (const bid of c.affectedBills || []) {
         const target = `bill:${bid}`;
         const key = `${sponsorNode}|${target}|${c.conflictType}`;
+
         if (!seen.has(key)) {
           seen.add(key);
-          edges.push({ source: sponsorNode, target, type: c.conflictType, weight: this.calculateEdgeWeight(c.severity), severity: c.severity, label: `affects bill ${bid}` });
+          edges.push({
+            source: sponsorNode,
+            target,
+            type: c.conflictType,
+            weight: this.calculateEdgeWeight(c.severity),
+            severity: c.severity,
+            label: `affects bill ${bid}`
+          });
         }
       }
     }
@@ -903,11 +922,19 @@ export class SponsorConflictAnalysisService {
 
     for (const node of nodes) {
       if (visited.has(node.id)) continue;
+
       const component = this.findConnectedComponents(node.id, nodes, edges, visited);
       const center = this.findCenterNode(component, edges);
       const density = this.calculateClusterDensity(component, edges);
       const riskLevel = this.calculateClusterRiskLevel(component, nodes);
-      clusters.push({ id: `cluster:${center}`, members: component, centerNode: center, conflictDensity: density, riskLevel });
+
+      clusters.push({
+        id: `cluster:${center}`,
+        members: component,
+        centerNode: center,
+        conflictDensity: density,
+        riskLevel
+      });
     }
 
     return clusters;
@@ -925,7 +952,9 @@ export class SponsorConflictAnalysisService {
     });
 
     const riskDistribution: Record<ConflictSeverity, number> = { low: 0, medium: 0, high: 0, critical: 0 };
-    nodes.forEach(n => { riskDistribution[n.conflict_level] = (riskDistribution[n.conflict_level] || 0) + 1; });
+    nodes.forEach(n => {
+      riskDistribution[n.conflict_level] = (riskDistribution[n.conflict_level] || 0) + 1;
+    });
 
     return { totalNodes, totalEdges, density, clustering, centralityScores, riskDistribution };
   }
@@ -933,50 +962,78 @@ export class SponsorConflictAnalysisService {
   private calculateClusteringCoefficient(nodes: ConflictNode[], edges: ConflictEdge[]): number {
     let totalCoefficient = 0;
     let count = 0;
+
     for (const node of nodes) {
       const neighbors = this.getNeighbors(node.id, edges);
       if (neighbors.length < 2) continue;
+
       let links = 0;
       for (let i = 0; i < neighbors.length; i++) {
         for (let j = i + 1; j < neighbors.length; j++) {
           const a = neighbors[i];
           const b = neighbors[j];
-          if (edges.some(e => (e.source === a && e.target === b) || (e.source === b && e.target === a))) links++;
+          if (edges.some(e => (e.source === a && e.target === b) || (e.source === b && e.target === a))) {
+            links++;
+          }
         }
       }
+
       const possible = (neighbors.length * (neighbors.length - 1)) / 2;
       totalCoefficient += possible > 0 ? links / possible : 0;
       count++;
     }
+
     return count > 0 ? totalCoefficient / count : 0;
   }
 
-  private findConnectedComponents(startNode: string, nodes: ConflictNode[], edges: ConflictEdge[], visited: Set<string>): string[] {
+  private findConnectedComponents(
+    startNode: string,
+    _nodes: ConflictNode[],
+    edges: ConflictEdge[],
+    visited: Set<string>
+  ): string[] {
     const stack = [startNode];
     const component: string[] = [];
+
     while (stack.length > 0) {
       const cur = stack.pop()!;
       if (visited.has(cur)) continue;
+
       visited.add(cur);
       component.push(cur);
+
       const neighbors = this.getNeighbors(cur, edges).filter(n => !visited.has(n));
       stack.push(...neighbors);
     }
+
     return component;
   }
 
   private findCenterNode(cluster: string[], edges: ConflictEdge[]): string {
-    let best = cluster[0];
+    let best = cluster[0] || '';
     let bestConn = -1;
+
     for (const node of cluster) {
-      const conn = edges.filter(e => cluster.includes(e.source) && cluster.includes(e.target) && (e.source === node || e.target === node)).length;
-      if (conn > bestConn) { bestConn = conn; best = node; }
+      const conn = edges.filter(e =>
+        cluster.includes(e.source) &&
+        cluster.includes(e.target) &&
+        (e.source === node || e.target === node)
+      ).length;
+
+      if (conn > bestConn) {
+        bestConn = conn;
+        best = node;
+      }
     }
+
     return best;
   }
 
   private calculateClusterDensity(cluster: string[], edges: ConflictEdge[]): number {
-    const clusterEdges = edges.filter(e => cluster.includes(e.source) && cluster.includes(e.target)).length;
+    const clusterEdges = edges.filter(e =>
+      cluster.includes(e.source) && cluster.includes(e.target)
+    ).length;
+
     const maxPossible = (cluster.length * (cluster.length - 1)) / 2;
     return maxPossible > 0 ? clusterEdges / maxPossible : 0;
   }
@@ -984,8 +1041,10 @@ export class SponsorConflictAnalysisService {
   private calculateClusterRiskLevel(cluster: string[], nodes: ConflictNode[]): ConflictSeverity {
     const clusterNodes = nodes.filter(n => cluster.includes(n.id));
     if (clusterNodes.length === 0) return 'low';
-    const map = { low: 1, medium: 2, high: 3, critical: 4 } as Record<ConflictSeverity, number>;
+
+    const map: Record<ConflictSeverity, number> = { low: 1, medium: 2, high: 3, critical: 4 };
     const avg = clusterNodes.reduce((s, n) => s + map[n.conflict_level], 0) / clusterNodes.length;
+
     if (avg >= 3.5) return 'critical';
     if (avg >= 2.5) return 'high';
     if (avg >= 1.5) return 'medium';
@@ -993,7 +1052,9 @@ export class SponsorConflictAnalysisService {
   }
 
   private getNeighbors(nodeId: string, edges: ConflictEdge[]): string[] {
-    return edges.filter(e => e.source === nodeId || e.target === nodeId).map(e => e.source === nodeId ? e.target : e.source);
+    return edges
+      .filter(e => e.source === nodeId || e.target === nodeId)
+      .map(e => e.source === nodeId ? e.target : e.source);
   }
 
   private calculateNodeSize(severity: ConflictSeverity): number {
@@ -1007,7 +1068,7 @@ export class SponsorConflictAnalysisService {
 
   private calculateEdgeWeight(severity: ConflictSeverity): number {
     switch (severity) {
-      case 'critical': return 5;
+      case 'critical': return 4;
       case 'high': return 3;
       case 'medium': return 2;
       default: return 1;
@@ -1015,22 +1076,18 @@ export class SponsorConflictAnalysisService {
   }
 
   private getConflictTypeLabel(type: ConflictType): string {
-    switch (type) {
-      case 'financial_direct': return 'Direct financial';
-      case 'financial_indirect': return 'Indirect financial';
-      case 'organizational': return 'Organizational';
-      case 'family_business': return 'Family/business';
-      case 'voting_pattern': return 'Voting pattern';
-      case 'timing_suspicious': return 'Timing suspicious';
-      case 'disclosure_incomplete': return 'Disclosure incomplete';
-      default: return String(type);
-    }
+    const labels: Record<ConflictType, string> = {
+      financial_direct: 'Direct Financial',
+      financial_indirect: 'Indirect Financial',
+      organizational: 'Organizational',
+      family_business: 'Family Business',
+      voting_pattern: 'Voting Pattern',
+      timing_suspicious: 'Suspicious Timing',
+      disclosure_incomplete: 'Incomplete Disclosure'
+    };
+    return labels[type] || type;
   }
-
 }
 
 // Export singleton instance
 export const sponsorConflictAnalysisService = new SponsorConflictAnalysisService();
-
-
-

@@ -4,11 +4,12 @@
 // Typo-tolerant search using Fuse.js library for client-side fuzzy matching
 // Replaces PostgreSQL trigram-based fuzzy matching with more flexible scoring
 
+import { logger } from '@server/infrastructure/observability';
 import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
 import { db as database } from '../../../../infrastructure/database/pool';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
 import { sql, and, eq } from 'drizzle-orm';
-import Fuse from 'fuse';
+import Fuse from 'fuse.js';
 
 interface FuseSearchOptions {
   threshold?: number;
@@ -111,7 +112,7 @@ export class FuseSearchEngine implements SearchEngine {
 
       return sortedResults;
     } catch (error) {
-      console.error('Fuse.js search failed:', error);
+      logger.error({ error }, 'Fuse.js search failed');
       return [];
     }
   }

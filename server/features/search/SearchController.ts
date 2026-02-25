@@ -15,8 +15,50 @@ import { searchRepository } from './infrastructure/SearchRepository';
 
 import { asyncHandler } from '../../middleware/error-management';
 import { authenticateToken, requireRole } from '../../middleware/auth';
-import { createValidationError, createError, ErrorCategory, ErrorSeverity } from '../../infrastructure/error-handling';
+import { ErrorSeverity } from '../../infrastructure/error-handling';
 import { ERROR_CODES } from '@shared/constants';
+
+// Helper to create error context from request
+function createErrorContext(req: Request, endpoint: string) {
+  return {
+    endpoint,
+    method: req.method,
+    path: req.path,
+    query: req.query,
+    ip: req.ip,
+  };
+}
+
+// Custom error classes for better error handling
+class ValidationError extends Error {
+  constructor(message: string, public details?: Array<{ field: string; message: string; code: string }>) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}
+
+class BaseError extends Error {
+  constructor(
+    message: string,
+    public options: {
+      statusCode: number;
+      code: string;
+      domain: string;
+      severity: ErrorSeverity;
+      details?: Record<string, unknown>;
+    }
+  ) {
+    super(message);
+    this.name = 'BaseError';
+  }
+}
+
+// Error domain constant
+const ErrorDomain = {
+  SYSTEM: 'SYSTEM',
+  BUSINESS: 'BUSINESS',
+  VALIDATION: 'VALIDATION',
+} as const;
 
 // Type guards for query parameters
 function isSortBy(value: unknown): value is 'relevance' | 'date' | 'title' | 'engagement' {

@@ -18,9 +18,9 @@ export class RelevanceScorer {
     if (!q) return 0;
 
     let score = 0;
-    const title = bills.title?.toLowerCase() || '';
-    const description = bills.description?.toLowerCase() || '';
-    const summary = bills.summary?.toLowerCase() || '';
+    const title = bill.title?.toLowerCase() || '';
+    const description = bill.description?.toLowerCase() || '';
+    const summary = bill.summary?.toLowerCase() || '';
 
     // Title matching
     if (title === q) {
@@ -41,13 +41,13 @@ export class RelevanceScorer {
     }
 
     // Short title bonus
-    if (bills.title && bills.title.length < 50) {
+    if (bill.title && bill.title.length < 50) {
       score += this.WEIGHTS.SHORT_TITLE;
     }
 
     // Recency bonus for newer bills
-    if (bills.created_at) {
-      const daysSinceCreation = (Date.now() - new Date(bills.created_at).getTime()) / (1000 * 60 * 60 * 24);
+    if (bill.created_at) {
+      const daysSinceCreation = (Date.now() - new Date(bill.created_at).getTime()) / (1000 * 60 * 60 * 24);
       if (daysSinceCreation < 30) {
         score += this.WEIGHTS.RECENCY_BONUS;
       }
@@ -65,10 +65,10 @@ export class RelevanceScorer {
 
     const highlights: string[] = [];
     const fields = [
-      { name: 'title', value: bills.title },
-      { name: 'summary', value: bills.summary },
-      { name: 'description', value: bills.description },
-      { name: 'content', value: bills.content },
+      { name: 'title', value: bill.title },
+      { name: 'summary', value: bill.summary },
+      { name: 'description', value: bill.description },
+      { name: 'content', value: bill.content },
     ];
 
     for (const field of fields) {
@@ -90,7 +90,7 @@ export class RelevanceScorer {
     const tags1 = bill1.tags || [];
     const tags2 = bill2.tags || [];
     if (tags1.length > 0 && tags2.length > 0) {
-      const overlap = tags1.filter(tag => tags2.includes(tag)).length;
+      const overlap = tags1.filter((tag: string) => tags2.includes(tag)).length;
       const maxTags = Math.max(tags1.length, tags2.length);
       score += (overlap / maxTags) * 0.6; // 60% weight for tag similarity
     }
@@ -125,8 +125,8 @@ export class RelevanceScorer {
     const scored = bills.map(bill => ({
       bill,
       relevanceScore: this.score(query, bill),
-      engagement_score: (bills.view_count || 0) + (bills.comment_count || 0) * 2 + (bills.share_count || 0) * 3,
-      dateScore: bills.created_at ? new Date(bills.created_at).getTime() : 0,
+      engagement_score: (bill.view_count || 0) + (bill.comment_count || 0) * 2 + (bill.share_count || 0) * 3,
+      dateScore: bill.created_at ? new Date(bill.created_at).getTime() : 0,
     }));
 
     scored.sort((a, b) => {

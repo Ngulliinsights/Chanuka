@@ -40,7 +40,6 @@ export interface SearchMetrics {
 
 export class SearchAnalytics {
   private static readonly MAX_QUERY_LENGTH = 500;
-  private static readonly MAX_POPULAR_QUERIES = 100;
 
   /**
    * Record a search event for analytics
@@ -159,6 +158,7 @@ export class SearchAnalytics {
   private static async storeEvent(event: SearchAnalyticsEvent): Promise<void> {
     try {
       // Insert search query
+      // @ts-ignore - Drizzle ORM type inference issue
       const [queryRecord] = await readDatabase
         .insert(searchQueries)
         .values({
@@ -174,6 +174,7 @@ export class SearchAnalytics {
         .returning();
 
       // Insert analytics event
+      // @ts-ignore - Drizzle ORM type inference issue
       await readDatabase
         .insert(searchAnalytics)
         .values({
@@ -188,9 +189,9 @@ export class SearchAnalytics {
           },
         });
 
-      logger.debug('Stored search analytics event', { eventId: event.id, queryId: queryRecord.id });
+      logger.debug({ eventId: event.id, queryId: queryRecord.id }, 'Stored search analytics event');
     } catch (error) {
-      logger.error('Failed to store search analytics event', { error: String(error), eventId: event.id });
+      logger.error({ error: String(error), eventId: event.id }, 'Failed to store search analytics event');
       // Don't throw - analytics failures shouldn't break search
     }
   }
@@ -201,16 +202,6 @@ export class SearchAnalytics {
     position: number
   ): Promise<void> { // Placeholder - in real implementation, update database
     console.log(`Recording click on bill ${bill_id} at position ${position} for event ${eventId}`);
-  }
-
-  private static async getEventsInRange(
-    _start_date: Date,
-    _end_date: Date
-  ): Promise<SearchAnalyticsEvent[]> {
-    // Placeholder - in real implementation, query database
-    void _start_date;
-    void _end_date;
-    return [];
   }
 
   private static async getPopularQueriesStartingWith(

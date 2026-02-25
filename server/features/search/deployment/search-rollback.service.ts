@@ -66,7 +66,7 @@ export class SearchRollbackService {
     reason: string,
     severity: 'low' | 'medium' | 'high' | 'critical' = 'medium'
   ): Promise<string> {
-    logger.warn(`🔄 Initiating rollback for ${component}`, { reason, severity });
+    logger.warn({ component, reason, severity }, `🔄 Initiating rollback for ${component}`);
 
     const rollbackId = `rollback-${component}-${Date.now()}`;
     
@@ -214,16 +214,17 @@ export class SearchRollbackService {
       execution.completionTime = new Date();
       execution.metrics.rollbackDuration = execution.completionTime.getTime() - execution.startTime.getTime();
 
-      logger.info(`✅ Rollback completed successfully for ${execution.component}`, {
+      logger.info({
+        component: execution.component,
         duration: execution.metrics.rollbackDuration,
         trafficShifted: execution.metrics.trafficShifted,
         stabilityAchieved: execution.metrics.performanceRecovery.stabilityAchieved
-      });
+      }, `✅ Rollback completed successfully for ${execution.component}`);
 
     } catch (error) {
       execution.status = 'failed';
       execution.completionTime = new Date();
-      logger.error(`❌ Rollback failed for ${execution.component}:`, error);
+      logger.error({ component: execution.component, error }, `❌ Rollback failed for ${execution.component}`);
       throw error;
     } finally {
       // Move to history
@@ -239,10 +240,12 @@ export class SearchRollbackService {
     stage.status = 'in_progress';
     stage.startTime = new Date();
 
-    logger.info(`🔄 Executing rollback stage ${stage.stage} for ${execution.component}`, {
+    logger.info({
+      component: execution.component,
+      stage: stage.stage,
       targetPercentage: stage.targetPercentage,
       description: stage.description
-    });
+    }, `🔄 Executing rollback stage ${stage.stage} for ${execution.component}`);
 
     try {
       // Update feature flag to shift traffic
@@ -270,7 +273,7 @@ export class SearchRollbackService {
       stage.issues.push((error as Error).message);
       execution.metrics.errorsDuringRollback++;
 
-      logger.error(`❌ Rollback stage ${stage.stage} failed for ${execution.component}:`, error);
+      logger.error({ component: execution.component, stage: stage.stage, error }, `❌ Rollback stage ${stage.stage} failed for ${execution.component}`);
       throw error;
     }
   }
@@ -506,7 +509,7 @@ export class SearchRollbackService {
     const recentHistory = this.getRollbackHistory(20);
 
     const successfulRollbacks = recentHistory.filter(r => r.status === 'completed').length;
-    const _failedRollbacks = recentHistory.filter(r => r.status === 'failed').length;
+    const failedRollbacks = recentHistory.filter(r => r.status === 'failed').length;
     const successRate = recentHistory.length > 0 ? (successfulRollbacks / recentHistory.length) * 100 : 100;
 
     const avgRollbackDuration = recentHistory.length > 0
@@ -518,6 +521,8 @@ export class SearchRollbackService {
       summary: {
         activeRollbacks: activeRollbacks.length,
         totalRollbacks: recentHistory.length,
+        successfulRollbacks,
+        failedRollbacks,
         successRate,
         avgDuration: avgRollbackDuration,
         emergencyRollbacks: recentHistory.filter(r => r.plan.severity === 'critical').length
