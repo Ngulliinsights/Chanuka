@@ -42,11 +42,10 @@ import {
   ConferenceId,
   createBrandedId,
   isBrandedId
-} from "../../../shared/dist/core/src/validation/schemas/common";
+} from "@shared/validation/schemas/common";
 
 // Import validation utilities
-import { createValidatedType, ValidatedType } from "../../../shared/dist/core/caching/validation.d";
-import { z } from "zod";
+import { createValidatedType, ValidatedType } from "../../../shared/types/core/validation";
 
 // ============================================================================
 // CORE ENTITY TABLES - Following Standardized Patterns
@@ -248,20 +247,8 @@ export type {
   ConferenceId,
 };
 
-// Validation types
-export type {
-  ValidatedUser,
-};
-
-export {
-  ValidatedUserType,
-  UserSchema,
-  isUser,
-  isUserId,
-  createUserId,
-  createBillId,
-  createSessionId,
-};
+// Validation types already exported above with their definitions
+// No need to re-export here
 
 // ============================================================================
 // SCHEMA VERSION & CHANGELOG

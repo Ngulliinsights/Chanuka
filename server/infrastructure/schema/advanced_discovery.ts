@@ -7,31 +7,49 @@ import { relations, sql } from 'drizzle-orm';
 import { pgTable, uuid, varchar, integer, decimal, boolean, timestamp, jsonb, text, index, unique } from 'drizzle-orm/pg-core';
 
 import { users, bills } from './foundation';
+import { searchQueries } from './search_system'; // Import base search queries
 
 // ============================================================================
-// SEARCH QUERIES & INTELLIGENCE
+// SEARCH INTELLIGENCE - Query intent and satisfaction tracking
 // ============================================================================
+// Links to search_system.search_queries for base query data
+// Adds intelligence layer: intent classification, satisfaction scoring, context
 
-export const searchQueries = pgTable('search_queries', {
+export const searchIntelligence = pgTable('search_intelligence', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  
+  // Link to base search query
+  searchQueryId: uuid('search_query_id').references(() => searchQueries.id, { onDelete: 'cascade' }),
+  
+  // User identification (duplicated for analytics independence)
   userId: uuid('user_id').references(() => users.id),
+  sessionId: varchar('session_id', { length: 255 }),
+  
+  // Query text (duplicated for analytics queries without joins)
   queryText: text('query_text').notNull(),
+  
+  // Intent analysis - WHY is the user searching?
   queryIntent: varchar('query_intent', { length: 50 }), // 'exploratory', 'specific', 'comparative', 'monitoring'
   searchContext: jsonb('search_context'), // User context: previous searches, viewed bills, etc.
   filtersApplied: jsonb('filters_applied'),
+  
+  // Satisfaction metrics - HOW satisfied was the user?
   resultsReturned: integer('results_returned'),
   resultsClicked: integer('results_clicked'),
-  querySatisfaction: decimal('query_satisfaction', { precision: 3, scale: 2 }), // Implicit satisfaction score
-  sessionId: varchar('session_id', { length: 255 }),
+  querySatisfaction: decimal('query_satisfaction', { precision: 3, scale: 2 }), // Implicit satisfaction score (0-1)
+  
+  // Technical metadata
   userAgent: text('user_agent'),
   ipAddress: varchar('ip_address', { length: 45 }), // IPv6 compatible
+  
   createdAt: timestamp('created_at').defaultNow()
 }, (table) => ({
-  userIdx: index('idx_search_user').on(table.userId),
-  createdIdx: index('idx_search_created').on(table.createdAt),
-  intentIdx: index('idx_search_intent').on(table.queryIntent),
-  sessionIdx: index('idx_search_session').on(table.sessionId),
-  satisfactionIdx: index('idx_search_satisfaction').on(table.querySatisfaction)
+  searchQueryIdx: index('idx_search_intel_query').on(table.searchQueryId),
+  userIdx: index('idx_search_intel_user').on(table.userId),
+  createdIdx: index('idx_search_intel_created').on(table.createdAt),
+  intentIdx: index('idx_search_intel_intent').on(table.queryIntent),
+  sessionIdx: index('idx_search_intel_session').on(table.sessionId),
+  satisfactionIdx: index('idx_search_intel_satisfaction').on(table.querySatisfaction)
 }));
 
 // ============================================================================
@@ -93,7 +111,7 @@ export const billRelationships = pgTable('bill_relationships', {
 
 export const searchAnalytics = pgTable('search_analytics', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
-  queryId: uuid('query_id').references(() => searchQueries.id),
+  searchQueryId: uuid('search_query_id').references(() => searchQueries.id), // Link to base query
   analyticsType: varchar('analytics_type', { length: 50 }), // 'click_through', 'dwell_time', 'refinement', 'abandonment'
   entityType: varchar('entity_type', { length: 50 }), // 'bill', 'sponsor', 'topic'
   entityId: uuid('entity_id'),
@@ -101,7 +119,7 @@ export const searchAnalytics = pgTable('search_analytics', {
   analyticsMetadata: jsonb('analytics_metadata'),
   createdAt: timestamp('created_at').defaultNow()
 }, (table) => ({
-  queryIdx: index('idx_search_analytics_query').on(table.queryId),
+  queryIdx: index('idx_search_analytics_query').on(table.searchQueryId),
   typeIdx: index('idx_search_analytics_type').on(table.analyticsType),
   entityIdx: index('idx_search_analytics_entity').on(table.entityType, table.entityId),
   createdIdx: index('idx_search_analytics_created').on(table.createdAt)
@@ -166,9 +184,13 @@ export const userRecommendations = pgTable('user_recommendations', {
 // RELATIONS
 // ============================================================================
 
-export const searchQueriesRelations = relations(searchQueries, ({ one, many }) => ({
+export const searchIntelligenceRelations = relations(searchIntelligence, ({ one, many }) => ({
+  baseQuery: one(searchQueries, {
+    fields: [searchIntelligence.searchQueryId],
+    references: [searchQueries.id]
+  }),
   user: one(users, {
-    fields: [searchQueries.userId],
+    fields: [searchIntelligence.userId],
     references: [users.id]
   }),
   analytics: many(searchAnalytics)
@@ -190,8 +212,8 @@ export const billRelationshipsRelations = relations(billRelationships, ({ one })
 }));
 
 export const searchAnalyticsRelations = relations(searchAnalytics, ({ one }) => ({
-  query: one(searchQueries, {
-    fields: [searchAnalytics.queryId],
+  baseQuery: one(searchQueries, {
+    fields: [searchAnalytics.searchQueryId],
     references: [searchQueries.id]
   })
 }));
@@ -207,13 +229,19 @@ export const userRecommendationsRelations = relations(userRecommendations, ({ on
 // TYPES
 // ============================================================================
 
-export type SearchQuery = typeof searchQueries.$inferSelect;
-export type NewSearchQuery = typeof searchQueries.$inferInsert;
+export type SearchIntelligence = typeof searchIntelligence.$inferSelect;
+export type NewSearchIntelligence = typeof searchIntelligence.$inferInsert;
 
 export type DiscoveryPattern = typeof discoveryPatterns.$inferSelect;
 export type NewDiscoveryPattern = typeof discoveryPatterns.$inferInsert;
+
+export type BillRelationship = typeof billRelationships.$inferSelect;
 export type NewBillRelationship = typeof billRelationships.$inferInsert;
+
+export type SearchAnalytics = typeof searchAnalytics.$inferSelect;
 export type NewSearchAnalytics = typeof searchAnalytics.$inferInsert;
+
+export type TrendingTopic = typeof trendingTopics.$inferSelect;
 export type NewTrendingTopic = typeof trendingTopics.$inferInsert;
 
 export type UserRecommendation = typeof userRecommendations.$inferSelect;

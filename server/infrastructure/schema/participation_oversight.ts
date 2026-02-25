@@ -560,18 +560,7 @@ export const RED_FLAG_SEVERITY = {
 // ============================================================================
 // These relations are defined here to avoid circular dependencies between
 // foundation.ts and participation_oversight.ts
-
-// Relations for participation_quality_audits
-export const participationQualityAuditsRelations = relations(participation_quality_audits, ({ one }) => ({
-  bill: one(bills, {
-    fields: [participation_quality_audits.bill_id],
-    references: [bills.id],
-  }),
-  auditor: one(users, {
-    fields: [participation_quality_audits.auditor_id],
-    references: [users.id],
-  }),
-}));
+// NOTE: participationQualityAuditsRelations already defined above at line 478
 
 // Reverse relations for users (audits)
 export const usersAuditsRelations = relations(users, ({ many }) => ({

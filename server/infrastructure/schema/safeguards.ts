@@ -582,7 +582,7 @@ export const expertModeratorEligibility = pgTable('expert_moderator_eligibility'
   id: primaryKeyUuid(),
 
   expert_id: uuid('expert_id')
-    .references(() => expertCredentials.userId, { onDelete: 'cascade' })
+    .references(() => users.id, { onDelete: 'cascade' })
     .notNull(),
 
   // Moderation permissions
@@ -1584,9 +1584,9 @@ export const moderationAppealsRelations = relations(moderationAppeals, ({ one })
 export const expertModeratorEligibilityRelations = relations(
   expertModeratorEligibility,
   ({ one }) => ({
-    expert: one(expertCredentials, {
+    expert: one(users, {
       fields: [expertModeratorEligibility.expert_id],
-      references: [expertCredentials.userId],
+      references: [users.id],
     }),
   })
 );

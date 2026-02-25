@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 25, 2026 at 01:59 PM
+**Generated:** February 25, 2026 at 04:51 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,694
+**Total Items:** 3,691
 
 ```
 .
@@ -11,7 +11,7 @@
 │   ├── design-assets/
 │   │   ├── Chanuka Logo Design with Maasai Influence.ai
 │   │   ├── Chanuka Shield Logo on Navy Background.ai
-│   │   └── Untitled-2.ai
+│   │   └── chanuka-logo-source.ai
 │   ├── docs/
 │   │   ├── architecture/
 │   │   ├── brand/
@@ -41,12 +41,12 @@
 │   │   │   ├── doc-in-shield.svg
 │   │   │   ├── favicon.svg
 │   │   │   └── wordmark.svg
-│   │   ├── Chanuka Civic Tech Logo Variations.png
 │   │   ├── Chanuka Logo Design with Maasai Influence.png
 │   │   ├── Chanuka Shield Logo on Navy Background.png
-│   │   ├── Chanuka_hero_parliament.png
-│   │   ├── Chanuka_logo.png
-│   │   ├── Chanuka_logo.webp
+│   │   ├── chanuka-civic-tech-logo-variations.png
+│   │   ├── chanuka-hero-parliament.png
+│   │   ├── chanuka-logo.png
+│   │   ├── chanuka-logo.webp
 │   │   ├── favicon.ico
 │   │   ├── manifest.webmanifest
 │   │   ├── offline.html
@@ -84,7 +84,7 @@
 │   │   │   ├── admin/
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── admin.tsx
-│   │   │   │   │   ├── AnalyticsDashboardPage.tsx
+│   │   │   │   │   ├── analytics-dashboard.tsx
 │   │   │   │   │   ├── coverage.tsx
 │   │   │   │   │   ├── database-manager.tsx
 │   │   │   │   │   └── integration-status.tsx
@@ -96,7 +96,7 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy/
 │   │   │   │   ├── hooks/
-│   │   │   │   │   └── useAdvocacy.ts
+│   │   │   │   │   └── use-advocacy.ts
 │   │   │   │   ├── pages/
 │   │   │   │   │   └── AdvocacyDashboard.tsx
 │   │   │   │   ├── ui/
@@ -132,10 +132,10 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── use-analytics.ts
 │   │   │   │   │   ├── use-comprehensive-analytics.ts
+│   │   │   │   │   ├── use-error-analytics.ts
 │   │   │   │   │   ├── use-journey-tracker.ts
 │   │   │   │   │   ├── use-render-tracker.ts
-│   │   │   │   │   ├── use-web-vitals.ts
-│   │   │   │   │   └── useErrorAnalytics.ts
+│   │   │   │   │   └── use-web-vitals.ts
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── error-analytics-bridge.ts
 │   │   │   │   │   ├── index.ts
@@ -181,8 +181,8 @@
 │   │   │   ├── auth/
 │   │   │   │   └── pages/
 │   │   │   │       ├── auth-page.tsx
-│   │   │   │       ├── ForgotPasswordPage.tsx
-│   │   │   │       ├── LoginPage.tsx
+│   │   │   │       ├── forgot-password.tsx
+│   │   │   │       ├── login.tsx
 │   │   │   │       ├── PrivacyPage.tsx
 │   │   │   │       ├── RegisterPage.tsx
 │   │   │   │       ├── ResetPasswordPage.tsx
@@ -312,7 +312,7 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── constitutional-intelligence/
 │   │   │   │   ├── hooks/
-│   │   │   │   │   └── useConstitutionalAnalysis.ts
+│   │   │   │   │   └── use-constitutional-analysis.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── ConstitutionalAnalysisDisplay.tsx
 │   │   │   │   │   └── ConstitutionalIntelligenceTab.tsx
@@ -343,8 +343,8 @@
 │   │   │   │   │   ├── feature-flags.tsx
 │   │   │   │   │   └── FeatureFlagManagerPage.tsx
 │   │   │   │   ├── ui/
-│   │   │   │   │   ├── AnalyticsDashboard.tsx
 │   │   │   │   │   ├── FeatureFlagManager.tsx
+│   │   │   │   │   ├── FlagAnalyticsDashboard.tsx
 │   │   │   │   │   ├── FlagEditor.tsx
 │   │   │   │   │   ├── FlagList.tsx
 │   │   │   │   │   └── RolloutControls.tsx
@@ -366,7 +366,6 @@
 │   │   │   ├── legal/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── useConflicts.ts
-│   │   │   │   │   ├── useConstitutionalAnalysis.ts
 │   │   │   │   │   ├── useLegalRisks.ts
 │   │   │   │   │   └── usePrecedents.ts
 │   │   │   │   ├── pages/
@@ -386,6 +385,7 @@
 │   │   │   │   │   └── LegalAnalysisTab.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── market/
+│   │   │   │   ├── pages/
 │   │   │   │   └── SokoHaki.tsx
 │   │   │   ├── monitoring/
 │   │   │   │   ├── api/
@@ -432,7 +432,6 @@
 │   │   │   │   ├── api/
 │   │   │   │   │   └── pretext-detection-api.ts
 │   │   │   │   ├── hooks/
-│   │   │   │   │   ├── use-safe-query.ts
 │   │   │   │   │   ├── usePretextAnalysis.ts
 │   │   │   │   │   └── usePretextDetectionApi.ts
 │   │   │   │   ├── pages/
@@ -572,6 +571,7 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
 │   │   │   ├── analytics/
@@ -1003,8 +1003,6 @@
 │   │   │   ├── content/
 │   │   │   │   └── copy-system.ts
 │   │   │   ├── contexts/
-│   │   │   │   ├── context/
-│   │   │   │   │   └── index.ts
 │   │   │   │   ├── KenyanContextProvider.tsx
 │   │   │   │   ├── NavigationContext.tsx
 │   │   │   │   └── ThemeContext.tsx
@@ -1374,19 +1372,19 @@
 │   │   │   │   │   │   ├── useDashboardLoading.ts
 │   │   │   │   │   │   ├── useDashboardRefresh.ts
 │   │   │   │   │   │   └── useDashboardTopics.ts
-│   │   │   │   │   ├── layout/
+│   │   │   │   │   ├── layout-components/
 │   │   │   │   │   │   ├── DashboardContent.tsx
 │   │   │   │   │   │   ├── DashboardFooter.tsx
 │   │   │   │   │   │   ├── DashboardHeader.tsx
 │   │   │   │   │   │   └── DashboardSidebar.tsx
-│   │   │   │   │   ├── layouts/
+│   │   │   │   │   ├── modals/
+│   │   │   │   │   │   ├── DashboardPreferencesModal.tsx
+│   │   │   │   │   │   └── DataExportModal.tsx
+│   │   │   │   │   ├── persona-layouts/
 │   │   │   │   │   │   ├── ExpertDashboardLayout.tsx
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   ├── IntermediateDashboardLayout.tsx
 │   │   │   │   │   │   └── NoviceDashboardLayout.tsx
-│   │   │   │   │   ├── modals/
-│   │   │   │   │   │   ├── DashboardPreferencesModal.tsx
-│   │   │   │   │   │   └── DataExportModal.tsx
 │   │   │   │   │   ├── sections/
 │   │   │   │   │   │   ├── ActivitySection.tsx
 │   │   │   │   │   │   ├── BillsSection.tsx
@@ -1876,6 +1874,12 @@
 │   │   └── strategy_template_flow.mermaid
 │   ├── development/
 │   │   └── CIRCULAR_DEPENDENCY_PREVENTION.md
+│   ├── features/
+│   │   └── search/
+│   │       ├── SEARCH_INTEGRATION_COMPLETE.md
+│   │       ├── SEARCH_INTEGRATION_SUMMARY.md
+│   │       ├── SEARCH_INTEGRATION_TEST_PLAN.md
+│   │       └── SEARCH_QUICK_START.md
 │   ├── guides/
 │   │   ├── templates/
 │   │   │   ├── new-api-endpoint-template.md
@@ -2019,38 +2023,14 @@
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
-│   │   ├── 0000_snapshot.json
-│   │   ├── 0001_snapshot.json
-│   │   ├── 0002_snapshot.json
-│   │   ├── 0021_snapshot.json
-│   │   └── 20251104110148_snapshot.json
-│   ├── 0001_create_foundation_tables_optimized.sql
-│   ├── 0001_create_foundation_tables.sql
-│   ├── 0021_clean_comprehensive_schema.sql
-│   ├── 0022_fix_schema_alignment.sql
-│   ├── 0023_migration_infrastructure.sql
-│   ├── 0024_migration_infrastructure.sql
-│   ├── 0025_postgresql_fulltext_enhancements.sql
-│   ├── 0026_optimize_search_indexes.sql
-│   ├── 20260114_phase2_argument_intelligence.sql
-│   ├── 20260114_phase2_constitutional_intelligence.sql
-│   ├── 20260114_phase2_transparency_conflicts.sql
-│   ├── 20260115_argument_intelligence_tables.sql
-│   ├── 20260115_constitutional_intelligence_fix.sql
-│   ├── 20260115_constitutional_intelligence_tables.sql
-│   ├── 20260211_enum_alignment.sql
-│   ├── 1766469695772_init_schema.sql
-│   ├── 20251104110148_soft_captain_marvel.sql
-│   ├── 20251104110149_advanced_discovery.sql
-│   ├── 20251104110150_real_time_engagement.sql
-│   ├── 20251104110151_transparency_intelligence.sql
-│   ├── 20251104110152_expert_verification.sql
-│   ├── 20251117080000_intelligent_search_phase2.sql
-│   ├── 20251117104802_intelligent_search_system.sql
-│   ├── 20251223154627_database_performance_optimizations.sql
+│   │   ├── 20260225131220_snapshot.json
+│   │   ├── 20260225131859_snapshot.json
+│   │   └── 20260225133920_snapshot.json
+│   ├── 20260225131859_fancy_maverick.sql
+│   ├── 20260225133920_brief_killraven.sql
 │   ├── COMPREHENSIVE_MIGRATION_SUMMARY.md
 │   ├── LEGACY_MIGRATION_ARCHIVE.md
-│   └── legacy_migration_validation.sql
+│   └── MIGRATION_NAMING_GUIDE.md
 ├── plans/
 │   └── archived/
 │       ├── design-obsolete-2026-02.md
@@ -2097,6 +2077,7 @@
 │   │   ├── ensure-foundation-tables.ts
 │   │   ├── execute-sql-migrations-advanced.ts
 │   │   ├── execute-sql-migrations.ts
+│   │   ├── fresh-start-migration.ts
 │   │   ├── generate-migration-with-types.ts
 │   │   ├── generate-migration.ts
 │   │   ├── generate-types-simple.ts
@@ -2151,11 +2132,14 @@
 │   │   └── audit-constraints.ts
 │   ├── accessibility-audit.js
 │   ├── analyze-bundle.cjs
+│   ├── apply-schema-direct.ts
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── CHANUKA_MIGRATION_PLAN.md
+│   ├── check-db-status.ts
 │   ├── check-thresholds.js
 │   ├── CLASSIFICATION.md
+│   ├── db-fresh-start.sql
 │   ├── dependency-cruiser.js
 │   ├── deploy-production.js
 │   ├── domain-type-migration-plan.md
@@ -2163,10 +2147,10 @@
 │   ├── fix-config.json
 │   ├── fix-eslint-suppressions.ts
 │   ├── fix-templates.ts
+│   ├── fresh-db-push.sh
 │   ├── generate-bundle-report.js
 │   ├── immediate-memory-cleanup.cjs
 │   ├── jscpd.json
-│   ├── knip.json
 │   ├── LIFECYCLE.md
 │   ├── modern-project-analyzer.ts
 │   ├── performance-budget-enforcer.cjs
@@ -2180,6 +2164,7 @@
 │   ├── setup-playwright.js
 │   ├── track-progress.ts
 │   ├── verify-api-contract-coverage.ts
+│   ├── verify-consistency.ts
 │   ├── verify-metrics.ts
 │   └── web-vitals-checker.js
 ├── server/
@@ -3573,19 +3558,18 @@
 │   │   │   ├── test-database.ts
 │   │   │   ├── test-server.ts
 │   │   │   └── vitest-setup.ts
-│   │   ├── tests/
-│   │   │   ├── bill-flow.integration.test.ts
-│   │   │   ├── comment-flow.integration.test.ts
-│   │   │   ├── data-retrieval-flow.integration.test.ts
-│   │   │   ├── error-scenarios.integration.test.ts
-│   │   │   ├── graph-module.integration.test.ts
-│   │   │   ├── transformation-pipeline.integration.test.ts
-│   │   │   └── user-flow.integration.test.ts
 │   │   ├── advocacy-coordination.test.ts
+│   │   ├── bill-flow.integration.test.ts
+│   │   ├── comment-flow.integration.test.ts
 │   │   ├── constitutional-intelligence.test.ts
+│   │   ├── data-retrieval-flow.integration.test.ts
+│   │   ├── error-scenarios.integration.test.ts
+│   │   ├── graph-module.integration.test.ts
 │   │   ├── index.ts
 │   │   ├── phase1-integration.test.ts
 │   │   ├── README.md
+│   │   ├── transformation-pipeline.integration.test.ts
+│   │   ├── user-flow.integration.test.ts
 │   │   └── vitest.config.ts
 │   ├── mocks/
 │   │   ├── performance.mock.ts
@@ -3670,17 +3654,29 @@
 ├── ARCHITECTURE.md
 ├── CHANGELOG.md
 ├── CODEBASE_CLEANUP_COMPLETE.md
+├── COMPLETE_CLEANUP_SUMMARY.md
+├── CONFLICT_RESOLVED.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
+├── DATABASE_CONSISTENCY_ANALYSIS.md
+├── DATABASE_CONSISTENCY_VERIFIED.md
+├── DEFERRED_ISSUES_RESOLUTION.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
 ├── drizzle.config.ts
+├── EXECUTE_NOW.md
+├── FINAL_CLEANUP_REPORT.md
+├── FRESH_START_MIGRATION_PLAN.md
 ├── generate-structure.mjs
+├── IMPORT_VALIDATION_REPORT.md
 ├── knip.config.ts
-├── knip.json
+├── MIGRATION_COMPLETE.md
+├── MIGRATION_EXECUTION_GUIDE.md
 ├── migration-verification-report.json
+├── MOCK_DATA_GENERATION_PROMPTS.md
+├── MOCK_DATA_STRATEGY.md
 ├── nginx.conf
 ├── nx.json
 ├── package.json
@@ -3690,16 +3686,17 @@
 ├── postcss.config.js
 ├── QUICK_CLEANUP_SUMMARY.md
 ├── README.md
-├── SEARCH_INTEGRATION_COMPLETE.md
-├── SEARCH_INTEGRATION_SUMMARY.md
-├── SEARCH_INTEGRATION_TEST_PLAN.md
-├── SEARCH_QUICK_START.md
+├── READY_TO_EXECUTE.md
+├── SCHEMA_CONFLICTS_RESOLUTION.md
+├── SCHEMA_TABLES_NEEDED_ANALYSIS.md
+├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── vitest.setup.ts
-└── vitest.workspace.ts
+├── vitest.workspace.ts
+└── WHY_TABLES_ARE_UNUSED_ANALYSIS.md
 ```
 
 ## Configuration

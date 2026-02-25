@@ -54,8 +54,10 @@ export const BillSchema = z.object({
   short_title: optionalNonEmptyString('short title', BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH, BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH),
   summary: optionalNonEmptyString('summary', BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH),
   full_text: optionalNonEmptyString('full text', BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH),
-  bill_number: nonEmptyString('bill number')
-    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)'),
+  bill_number: z.string()
+    .min(1, 'Bill number is required')
+    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)')
+    .refine((val) => val.trim().length > 0, 'Bill number cannot be empty or contain only whitespace'),
   status: z.enum([
     'draft',
     'first_reading',
@@ -83,8 +85,11 @@ export const LegacyBillSchema = z.object({
   short_title: optionalNonEmptyString('short title', BILL_VALIDATION_RULES.SHORT_TITLE_MIN_LENGTH, BILL_VALIDATION_RULES.SHORT_TITLE_MAX_LENGTH),
   summary: nonEmptyString('summary', BILL_VALIDATION_RULES.SUMMARY_MIN_LENGTH, BILL_VALIDATION_RULES.SUMMARY_MAX_LENGTH),
   content: nonEmptyString('content', BILL_VALIDATION_RULES.CONTENT_MIN_LENGTH, BILL_VALIDATION_RULES.CONTENT_MAX_LENGTH),
-  bill_number: optionalNonEmptyString('bill number')
-    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)'),
+  bill_number: z.string()
+    .min(1, 'Bill number must be at least 1 character')
+    .regex(BILL_VALIDATION_RULES.BILL_NUMBER_PATTERN, 'Invalid bill number format (e.g., H.123 or S.456)')
+    .refine((val) => val.trim().length > 0, 'Bill number cannot be empty or contain only whitespace')
+    .optional(),
   status: z.enum([
     'draft',
     'introduced',

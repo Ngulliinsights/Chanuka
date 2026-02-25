@@ -6,9 +6,9 @@
 
 import { z } from "zod";
 import { emailSchema, uuidSchema, userRoleSchema } from '@shared/validation';
-import { createValidatedType, ValidatedType, validateWithSchema } from "../types/core/validation";
-import { ValidationError, Result } from "../types/core/errors";
-import { isBrandedId } from "../types/core/common";
+import { createValidatedType, ValidatedType, validateWithSchema } from "../../../shared/types/core/validation";
+import { ValidationError, Result } from "../../../shared/types/core/errors";
+import { isBrandedId } from "@shared/validation/schemas/common";
 
 // Import database types
 import { users, userRelations, UserSchema, ValidatedUserType, isUser } from "./integration";
@@ -286,22 +286,6 @@ export function validateDatabaseTransaction(
 // ============================================================================
 // VALIDATION INTEGRATION - Type Exports
 // ============================================================================
-
-export type {
-  DatabaseValidationRegistry,
-  TransactionValidationResult,
-};
-
-export {
-  validateDatabaseEntity,
-  validateDatabaseEntityAsync,
-  validateDatabaseBatch,
-  validateBrandedId,
-  validateBrandedIds,
-  validateDatabaseConstraints,
-  validateDatabaseTransaction,
-  DatabaseConstraintSchemas,
-};
 
 // ============================================================================
 // VALIDATION INTEGRATION VERSION & CHANGELOG

@@ -18,9 +18,9 @@ import {
   ConferenceId,
   createBrandedId,
   isBrandedId,
-} from "../../../shared/dist/core/src/validation/schemas/common";
-import type { ValidatedType } from "../types/core/validation";
-import { createValidatedType } from "../types/core/validation";
+} from "@shared/validation/schemas/common";
+import type { ValidatedType } from "../../../shared/types/core/validation";
+import { createValidatedType } from "../../../shared/types/core/validation";
 
 // ============================================================================
 // BRANDED TYPE GENERATORS - Create and Validate Branded IDs

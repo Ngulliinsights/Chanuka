@@ -39,10 +39,10 @@ import {
   ConferenceId,
   createBrandedId,
   isBrandedId
-} from "../../../shared/dist/core/src/validation/schemas/common";
+} from "@shared/validation/schemas/common";
 
 // Import validation utilities
-import { createValidatedType, ValidatedType } from "../../../shared/dist/core/caching/validation.d";
+import { createValidatedType, ValidatedType } from "../../../shared/types/core/validation";
 import { z } from "zod";
 
 // ============================================================================
@@ -726,23 +726,6 @@ export type NewGovernor = typeof governors.$inferInsert;
 
 export type Committee = typeof committees.$inferSelect;
 export type NewCommittee = typeof committees.$inferInsert;
-
-// Validation types
-export type {
-  ValidatedBill,
-  ValidatedSponsor,
-};
-
-export {
-  ValidatedBillType,
-  ValidatedSponsorType,
-  BillSchema,
-  SponsorSchema,
-  isBill,
-  isSponsor,
-  isGovernor,
-  isCommittee,
-};
 
 // ============================================================================
 // EXTENDED SCHEMA VERSION & CHANGELOG

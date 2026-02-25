@@ -36,8 +36,11 @@ export const USER_VALIDATION_RULES = {
 export const UserSchema = z.object({
   id: uuidSchema.optional(),
   email: emailSchema,
-  username: nonEmptyString('username')
-    .regex(USER_VALIDATION_RULES.USERNAME_PATTERN, 'Username must be 3-20 characters (alphanumeric, dash, underscore)'),
+  username: z.string()
+    .min(3, 'Username must be at least 3 characters')
+    .max(20, 'Username must not exceed 20 characters')
+    .regex(USER_VALIDATION_RULES.USERNAME_PATTERN, 'Username must be 3-20 characters (alphanumeric, dash, underscore)')
+    .refine((val) => val.trim().length > 0, 'Username cannot be empty or contain only whitespace'),
   role: userRoleSchema.default('citizen'),
   is_active: z.boolean().default(true),
   created_at: z.date().optional(),
@@ -83,12 +86,16 @@ export const UserWithProfileSchema = UserSchema.merge(
  * User Registration Schema - includes password validation
  */
 export const UserRegistrationSchema = UserSchema.extend({
-  password: nonEmptyString('password', USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH)
+  password: z.string()
+    .min(USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH, `Password must be at least ${USER_VALIDATION_RULES.PASSWORD_MIN_LENGTH} characters`)
     .regex(
       USER_VALIDATION_RULES.PASSWORD_PATTERN,
       'Password must contain uppercase, lowercase, number, and special character'
-    ),
-  password_confirm: nonEmptyString('password confirmation'),
+    )
+    .refine((val) => val.trim().length > 0, 'Password cannot be empty or contain only whitespace'),
+  password_confirm: z.string()
+    .min(1, 'Password confirmation is required')
+    .refine((val) => val.trim().length > 0, 'Password confirmation cannot be empty or contain only whitespace'),
 }).refine((data) => data.password === data.password_confirm, {
   message: 'Passwords do not match',
   path: ['password_confirm'],

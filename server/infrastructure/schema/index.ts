@@ -58,10 +58,6 @@ export {
 // SCHEMA INTEGRATION - Unified Type System with Standardized Patterns
 // ============================================================================
 export {
-  // Core integration types
-  users,
-  userRelations,
-
   // Branded types for type safety
   type UserId,
   type BillId,
@@ -95,13 +91,9 @@ export {
 // ============================================================================
 // SCHEMA INTEGRATION EXTENDED - Comprehensive Relationship Migration
 // ============================================================================
+// NOTE: Tables are exported from foundation.ts section below
+// NOTE: Tables are exported from foundation.ts section below
 export {
-  // Extended entity tables with comprehensive relationships
-  bills,
-  sponsors,
-  governors,
-  committees,
-
   // Type-safe relationships using branded types
   sponsorRelations,
   governorRelations,
