@@ -63,11 +63,11 @@ const PRELOAD_CONFIG: RoutePreloadConfig[] = [
 const ROUTE_IMPORTS: Record<string, () => Promise<RouteModule>> = {
   '/': () => import('../../features/home/pages/home'),
   '/bills': () => import('../../features/bills/pages/BillsPortalPage'),
-  '/search': () => import('../../features/search/pages/UniversalSearchPage'),
-  '/dashboard': () => import('../../features/users/pages/UserAccountPage'),
+  '/search': () => import('../../features/search/pages/universal-search'),
+  '/dashboard': () => import('../../features/users/pages/user-account'),
   '/community': () => import('../../features/community/pages/community-input'),
-  '/account': () => import('../../features/users/pages/UserAccountPage'),
-  '/auth': () => import('../../features/auth/pages/LoginPage'),
+  '/account': () => import('../../features/users/pages/user-account'),
+  '/auth': () => import('../../features/auth/pages/login'),
 };
 
 /**

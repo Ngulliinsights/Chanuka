@@ -10,7 +10,7 @@
 import { Users, Scale, MapPin, Award, MessageCircle, ChevronRight } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useKenyanContext } from '@client/lib/context/KenyanContextProvider';
+import { useKenyanContext } from '@client/lib/contexts/KenyanContextProvider';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';

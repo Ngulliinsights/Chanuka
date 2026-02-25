@@ -4,8 +4,8 @@ import { logger } from '@client/lib/utils/logger';
 import BrandedLoadingScreen from '@client/lib/ui/loading/BrandedLoadingScreen';
 
 // Lazy load both implementations
-const CoreHomePage = React.lazy(() => import('./CoreHomePage'));
-const EnhancedHomePage = React.lazy(() => import('./EnhancedHomePage'));
+const CoreHomePage = React.lazy(() => import('./core-home'));
+const EnhancedHomePage = React.lazy(() => import('./enhanced-home'));
 
 /**
  * Smart Home Page Selector

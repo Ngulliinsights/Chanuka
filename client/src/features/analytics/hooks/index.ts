@@ -4,7 +4,7 @@
  */
 
 export { useJourneyTracker } from './use-journey-tracker';
-export { useErrorAnalytics } from './useErrorAnalytics';
+export { useErrorAnalytics } from './use-error-analytics';
 export { useWebVitals } from './use-web-vitals';
 export { useRenderTracker } from './use-render-tracker';
-export * from './useAnalytics';
+export * from './use-analytics';

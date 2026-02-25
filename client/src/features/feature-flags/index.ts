@@ -2,11 +2,11 @@
 // FEATURE FLAGS - Public API
 // ============================================================================
 
-export { FeatureFlagsPage } from './pages/FeatureFlagsPage';
+export { FeatureFlagsPage } from './pages/feature-flags';
 export { FlagList } from './ui/FlagList';
 export { FlagEditor } from './ui/FlagEditor';
 export { RolloutControls } from './ui/RolloutControls';
-export { AnalyticsDashboard } from './ui/AnalyticsDashboard';
+export { FlagAnalyticsDashboard } from './ui/FlagAnalyticsDashboard';
 
 export {
   useFeatureFlags,

@@ -18,10 +18,10 @@ import type {
 
 import { useDashboard } from './hooks/useDashboard';
 import { useDashboardLayout } from './hooks/useDashboardLayout';
-import { DashboardContent } from './layout/DashboardContent';
-import { DashboardFooter } from './layout/DashboardFooter';
-import { DashboardHeader } from './layout/DashboardHeader';
-import { DashboardSidebar } from './layout/DashboardSidebar';
+import { DashboardContent } from './layout-components/DashboardContent';
+import { DashboardFooter } from './layout-components/DashboardFooter';
+import { DashboardHeader } from './layout-components/DashboardHeader';
+import { DashboardSidebar } from './layout-components/DashboardSidebar';
 import {
   DashboardFrameworkProps,
   DashboardLayoutConfig,

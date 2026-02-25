@@ -26,7 +26,7 @@ export {
 export { useI18n } from '@client/lib/hooks/use-i18n';
 
 // Re-export Kenyan context hook
-export { useKenyanContext } from '@client/lib/context/KenyanContextProvider';
+export { useKenyanContext } from '@client/lib/contexts/KenyanContextProvider';
 
 // Types
 export type { SupportedLanguage } from '@client/lib/utils/i18n';

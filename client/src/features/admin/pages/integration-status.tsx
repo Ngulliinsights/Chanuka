@@ -30,7 +30,7 @@ import { Badge } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
-import { useIntegratedServices } from '@client/lib/hooks/useIntegratedServices';
+import { useIntegratedServices } from '@client/lib/hooks/use-integrated-services';
 
 export default function IntegrationStatusPage() {
   const { isReady, status, error, services, security, privacy, mobile } = useIntegratedServices();

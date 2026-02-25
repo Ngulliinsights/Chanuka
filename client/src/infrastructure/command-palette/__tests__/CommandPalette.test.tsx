@@ -8,8 +8,8 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-import { CommandPalette } from './CommandPalette';
-import type { Command } from './types';
+import { CommandPalette } from '../CommandPalette';
+import type { Command } from '../types';
 
 // Mock the Modal component since it uses createPortal
 vi.mock('./Modal', () => ({

@@ -10,7 +10,7 @@ export { AdaptiveDashboard } from './AdaptiveDashboard';
 export { useDashboardData } from './useDashboardData';
 
 // Layouts
-export * from './layouts';
+export * from './persona-layouts';
 
 // Widgets
 export * from './widgets';

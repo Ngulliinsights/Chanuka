@@ -10,7 +10,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 
 import navigationReducer from '../../../shared/infrastructure/store/slices/navigationSlice';
-import { useNavigationSlice, useSidebar, useMobileMenu } from '../useNavigationSlice';
+import { useNavigationSlice, useSidebar, useMobileMenu } from '../use-navigation-slice';
 
 // Create a test store
 const createTestStore = () =>

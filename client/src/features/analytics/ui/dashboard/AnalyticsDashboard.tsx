@@ -7,7 +7,7 @@
  * Requirements: 11.1, 11.2, 11.3
  */
 
-import { useAnalyticsDashboard } from '@client/lib/hooks/useAnalytics';
+import { useAnalyticsDashboard } from '@client/lib/hooks/use-analytics';
 import {
   Users,
   Activity,

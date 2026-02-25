@@ -7,4 +7,4 @@
 export * from './hooks/useSecurity';
 
 // Pages
-export { default as SecurityDemoPage } from './pages/SecurityDemoPage';
+export { default as SecurityDemoPage } from './pages/security-demo';

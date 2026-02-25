@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useCallback, useRef } from 'react';
 
 import { useToast } from '@client/lib/hooks/use-toast';
-import { useDebounce } from '@client/lib/hooks/useDebounce';
+import { useDebounce } from '@client/lib/hooks/use-debounce';
 import { logger } from '@client/lib/utils/logger';
 
 

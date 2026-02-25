@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useFeatureAlerts, useAcknowledgeAlert, useResolveAlert } from '../hooks/useMonitoring';
+import { useFeatureAlerts, useAcknowledgeAlert, useResolveAlert } from '../hooks/use-monitoring';
 import type { IntegrationAlert } from '../types';
 
 interface AlertManagementProps {

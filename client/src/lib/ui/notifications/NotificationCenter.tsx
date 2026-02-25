@@ -20,7 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from '@client/lib/design-system';
-import { useNotifications, useNotificationHistory } from '@client/lib/hooks/useNotifications';
+import { useNotifications, useNotificationHistory } from '@client/lib/hooks/use-notifications';
 import { LoadingSpinner } from '@client/lib/ui/loading';
 
 import { NotificationItem } from './NotificationItem';

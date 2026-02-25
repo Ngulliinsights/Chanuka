@@ -5,4 +5,4 @@
  * while avoiding duplication and stubs.
  */
 
-export * from '../../features/analytics/hooks/useAnalytics';
+export * from '../../features/analytics/hooks/use-analytics';

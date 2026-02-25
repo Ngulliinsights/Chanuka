@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useFeatureMetrics, useFeatureLogs } from '../hooks/useMonitoring';
+import { useFeatureMetrics, useFeatureLogs } from '../hooks/use-monitoring';
 
 interface ErrorTrackingDisplayProps {
   featureId: string;

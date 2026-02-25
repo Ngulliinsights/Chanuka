@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AnalyticsDashboard } from '../ui/AnalyticsDashboard';
+import { FlagAnalyticsDashboard } from '../ui/FlagAnalyticsDashboard';
 import type { FlagAnalytics } from '../types';
 
 vi.mock('../hooks/useFeatureFlags', () => ({
@@ -54,7 +54,7 @@ describe('AnalyticsDashboard', () => {
       error: null,
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -69,7 +69,7 @@ describe('AnalyticsDashboard', () => {
       error: new Error('Failed to load'),
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -84,7 +84,7 @@ describe('AnalyticsDashboard', () => {
       error: null,
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -102,7 +102,7 @@ describe('AnalyticsDashboard', () => {
       error: null,
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -118,7 +118,7 @@ describe('AnalyticsDashboard', () => {
       error: null,
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -134,7 +134,7 @@ describe('AnalyticsDashboard', () => {
       error: null,
     });
 
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 
@@ -151,7 +151,7 @@ describe('AnalyticsDashboard', () => {
     });
 
     const user = userEvent.setup();
-    render(<AnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
+    render(<FlagAnalyticsDashboard flagName="test-flag" onClose={mockOnClose} />, {
       wrapper: createWrapper(),
     });
 

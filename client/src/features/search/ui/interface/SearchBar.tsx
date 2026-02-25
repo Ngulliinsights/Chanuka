@@ -1,4 +1,4 @@
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/lib/hooks/useSearch';
+import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/lib/hooks/use-search';
 import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import React from 'react';

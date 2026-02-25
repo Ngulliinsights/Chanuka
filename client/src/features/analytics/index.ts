@@ -29,7 +29,7 @@ export {
   useStakeholderAnalysis,
   useRealtimeAnalytics,
   useAnalyticsExport,
-} from './hooks/useAnalytics';
+} from './hooks/use-analytics';
 
 export {
   useJourneyTracker,
@@ -42,7 +42,7 @@ export {
   usePerformanceBudget,
 } from './hooks/use-web-vitals';
 
-export { useErrorAnalytics } from './hooks/useErrorAnalytics';
+export { useErrorAnalytics } from './hooks/use-error-analytics';
 export { useRenderTracker } from './hooks/use-render-tracker';
 
 // Services

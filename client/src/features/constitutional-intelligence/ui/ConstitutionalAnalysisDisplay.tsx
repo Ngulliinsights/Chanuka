@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@clie
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
-import type { ConstitutionalAnalysis } from '../hooks/useConstitutionalAnalysis';
+import type { ConstitutionalAnalysis } from '../hooks/use-constitutional-analysis';
 
 interface ConstitutionalAnalysisDisplayProps {
   analysis: ConstitutionalAnalysis;

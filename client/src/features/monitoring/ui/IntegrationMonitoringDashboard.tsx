@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { useDashboardData } from '../hooks/useMonitoring';
+import { useDashboardData } from '../hooks/use-monitoring';
 import { HealthStatusDisplay } from './HealthStatusDisplay';
 import { MetricsVisualization } from './MetricsVisualization';
 import { AlertManagement } from './AlertManagement';

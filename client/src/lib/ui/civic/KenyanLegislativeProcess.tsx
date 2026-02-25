@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { useKenyanContext } from '@client/lib/context/KenyanContextProvider';
+import { useKenyanContext } from '@client/lib/contexts/KenyanContextProvider';
 import {
   Card,
   CardContent,

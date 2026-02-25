@@ -3,7 +3,7 @@
  * Example component demonstrating security features usage
  */
 
-import { useSecureForm, useSecurity, ValidationSchemas } from '@client/lib/hooks/useSecurity';
+import { useSecureForm, useSecurity, ValidationSchemas } from '@client/lib/hooks/use-security';
 import { Shield, CheckCircle, AlertTriangle } from 'lucide-react';
 import React, { useState } from 'react';
 

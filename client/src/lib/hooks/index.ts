@@ -50,23 +50,23 @@ export { useStrategyManager, useDynamicStrategyManager, useConditionalStrategy }
 
 // Core Hooks - Direct exports from this directory
 // export { useToast } from './use-toast';
-export { useErrorRecovery, useAutoRecovery, usePredictiveRecovery } from './useErrorRecovery';
+export { useErrorRecovery, useAutoRecovery, usePredictiveRecovery } from './use-error-recovery';
 export { useOfflineDetection } from './use-offline-detection';
-export { useOfflineCapabilities } from './useOfflineCapabilities';
+export { useOfflineCapabilities } from './use-offline-capabilities';
 // export { useSystem } from './use-system'; // Invalid
 export type { SystemHealth, SystemStats, SystemActivity, SystemSchema, SystemEnvironment } from './use-system';
 export { useCleanup, useResourceCleanup, useEventListenerCleanup } from './use-cleanup';
-export { useDebounce } from './useDebounce';
-export { useMediaQuery } from './useMediaQuery';
+export { useDebounce } from './use-debounce';
+export { useMediaQuery } from './use-media-query';
 export { useKeyboardFocus } from './use-keyboard-focus';
 export { usePerformanceBudget, useCoreWebVitals, usePerformanceAlert, useLazyLoading } from './use-performance-monitor';
 export { useArchitecturePerformance } from './use-architecture-performance';
 export { useSafeQuery } from './use-safe-query';
-export { useSafeEffect } from './useSafeEffect';
-export { useNotifications } from './useNotifications';
-export { useProgressiveDisclosure } from './useProgressiveDisclosure';
-export { useSeamlessIntegration } from './useSeamlessIntegration';
-export { useIntegratedServices } from './useIntegratedServices';
+export { useSafeEffect } from './use-safe-effect';
+export { useNotifications } from './use-notifications';
+export { useProgressiveDisclosure } from './use-progressive-disclosure';
+export { useSeamlessIntegration } from './use-seamless-integration';
+export { useIntegratedServices } from './use-integrated-services';
 
 // Mobile Hooks - Direct exports from mobile subdirectory
 
@@ -96,24 +96,24 @@ export { useMobileMenu as useMobileMenuFSD } from '@client/infrastructure/naviga
 // export { useErrorAnalytics } from '../features/analytics/hooks';
 // export { useWebVitals } from '../features/analytics/hooks';
 // export { useRenderTracker } from '../features/analytics/hooks';
-export { useSecurity, useSecureForm, useRateLimit } from './useSecurity';
+export { useSecurity, useSecureForm, useRateLimit } from './use-security';
 
 // Shared UI Hooks - Re-exports for convenience (excluding duplicates)
 export { useI18n, I18nProvider } from './use-i18n';
 export { useToast } from './use-toast';
-export { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from './useNavigationSlice';
+export { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from './use-navigation-slice';
 export { useMobile, useTablet, useDesktop } from './use-mobile';
 export { useSystemOverview } from './use-system';
 // export { useSystem } from './use-system'; // Deprecated/Removed
 
 // Analytics hooks - re-exported from features
-export * from './useAnalytics';
+export * from './use-analytics';
 
 // Search hooks - re-exported from features  
-export * from './useSearch';
+export * from './use-search';
 
 // Notification history export
-export { useNotificationHistory } from './useNotifications';
+export { useNotificationHistory } from './use-notifications';
 
 // Mobile hooks from shared - Re-exports for convenience (excluding duplicates)
 // TODO: Uncomment when mobile hooks module is created

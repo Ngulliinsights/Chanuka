@@ -10,7 +10,7 @@ export { LegalAnalysisTab } from './ui/LegalAnalysisTab';
 export { ConflictAlertCard, ConflictAlertGrid, ConflictSummary } from './ui/ConflictAlertCard';
 
 // Hooks
-export { useConstitutionalAnalysis } from './hooks/useConstitutionalAnalysis';
+export { useConstitutionalAnalysis } from './hooks/use-constitutional-analysis';
 export { useConflicts } from './hooks/useConflicts';
 export { useLegalRisks } from './hooks/useLegalRisks';
 export { usePrecedents } from './hooks/usePrecedents';

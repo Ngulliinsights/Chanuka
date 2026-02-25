@@ -4,7 +4,7 @@
  * Displays usage charts for a feature
  */
 
-import { useFeatureMetrics } from '../hooks/useMonitoring';
+import { useFeatureMetrics } from '../hooks/use-monitoring';
 
 interface FeatureUsageChartsProps {
   featureId: string;

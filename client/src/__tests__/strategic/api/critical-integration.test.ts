@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { NetworkError, ValidationError, ServerError } from '@client/infrastructure/api/errors';
 import { useApiConnection } from '@client/infrastructure/api/hooks/useApiConnection';
-import { useAuth } from '@client/infrastructure/auth/hooks/useAuth';
+import { useAuth } from '@client/infrastructure/auth/hooks/use-auth';
 
 // Mock API services
 vi.mock('@client/infrastructure/api/client', () => ({

@@ -28,7 +28,7 @@ import {
   ChanukaWordmark,
   ChanukaSmallLogo,
 } from '../../lib/design-system';
-import { useMobileMenu } from '../../lib/hooks/useNavigationSlice';
+import { useMobileMenu } from '../../lib/hooks/use-navigation-slice';
 import { LanguageSwitcher } from '../../lib/ui/i18n/LanguageSwitcher';
 
 // Local notification type for UI display

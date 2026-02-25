@@ -5,7 +5,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 
-import { useErrorRecovery } from '../../useErrorRecovery';
+import { useErrorRecovery } from '../../use-error-recovery';
 
 describe('useErrorRecovery', () => {
   beforeEach(() => {

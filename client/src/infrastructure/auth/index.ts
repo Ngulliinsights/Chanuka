@@ -109,7 +109,7 @@ export {
 
   // Legacy compatibility
   useAuthStore,
-} from './hooks/useAuth';
+} from './hooks/use-auth';
 
 // ============================================================================
 // Redux Integration

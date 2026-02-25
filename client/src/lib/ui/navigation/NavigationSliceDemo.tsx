@@ -13,7 +13,7 @@ import {
   useSidebar,
   useMobileMenu,
   useNavigationPreferences,
-} from '@client/lib/hooks/useNavigationSlice';
+} from '@client/lib/hooks/use-navigation-slice';
 
 export function NavigationSliceDemo() {
   const navigation = useNavigationSlice();

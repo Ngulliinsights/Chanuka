@@ -15,8 +15,8 @@ export { useOnlineStatus } from '../loading/hooks';
 // Original files are still in hooks/ directory
 // Transition: hooks/ → core/ over next 2 weeks
 
-export { useErrorRecovery } from '@client/lib/hooks/useErrorRecovery';
-export { useOfflineCapabilities } from '@client/lib/hooks/useOfflineCapabilities';
+export { useErrorRecovery } from '@client/lib/hooks/use-error-recovery';
+export { useOfflineCapabilities } from '@client/lib/hooks/use-offline-capabilities';
 
 // Error handling
-export { useErrorRecovery as useErrorHandling } from '@client/lib/hooks/useErrorRecovery';
+export { useErrorRecovery as useErrorHandling } from '@client/lib/hooks/use-error-recovery';

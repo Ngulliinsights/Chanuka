@@ -4,4 +4,4 @@
  * Centralized exports for monitoring hooks
  */
 
-export * from './useMonitoring';
+export * from './use-monitoring';

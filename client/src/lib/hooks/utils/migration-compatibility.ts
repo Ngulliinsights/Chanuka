@@ -25,14 +25,14 @@ import { usePerformanceMonitor } from '../use-performance-monitor';
 import { useSafeQuery } from '../use-safe-query';
 import { useSystem } from '../use-system';
 import { useToast } from '../use-toast';
-import { useDebounce } from '../useDebounce';
-import { useErrorRecovery } from '../useErrorRecovery';
-import { useIntegratedServices } from '../useIntegratedServices';
-import { useMediaQuery } from '../useMediaQuery';
-import { useNotifications } from '../useNotifications';
-import { useProgressiveDisclosure } from '../useProgressiveDisclosure';
-import { useSafeEffect } from '../useSafeEffect';
-import { useSeamlessIntegration } from '../useSeamlessIntegration';
+import { useDebounce } from '../use-debounce';
+import { useErrorRecovery } from '../use-error-recovery';
+import { useIntegratedServices } from '../use-integrated-services';
+import { useMediaQuery } from '../use-media-query';
+import { useNotifications } from '../use-notifications';
+import { useProgressiveDisclosure } from '../use-progressive-disclosure';
+import { useSafeEffect } from '../use-safe-effect';
+import { useSeamlessIntegration } from '../use-seamless-integration';
 
 // Legacy mobile hooks
 

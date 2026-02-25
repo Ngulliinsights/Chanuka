@@ -5,7 +5,7 @@
 import React, { useState } from 'react';
 import { FlagList } from '../ui/FlagList';
 import { FlagEditor } from '../ui/FlagEditor';
-import { AnalyticsDashboard } from '../ui/AnalyticsDashboard';
+import { FlagAnalyticsDashboard } from '../ui/FlagAnalyticsDashboard';
 import type { FeatureFlag } from '../types';
 
 export function FeatureFlagsPage() {
@@ -71,7 +71,7 @@ export function FeatureFlagsPage() {
 
         {/* Analytics Modal */}
         {analyticsFlag && (
-          <AnalyticsDashboard flagName={analyticsFlag} onClose={handleCloseAnalytics} />
+          <FlagAnalyticsDashboard flagName={analyticsFlag} onClose={handleCloseAnalytics} />
         )}
       </div>
     </div>

@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { Plus, TrendingUp, Users, Target } from 'lucide-react';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
-import { useCampaigns, useTrendingCampaigns, useUserActions, useUserDashboard, useJoinCampaign } from '../hooks/useAdvocacy';
+import { useCampaigns, useTrendingCampaigns, useUserActions, useUserDashboard, useJoinCampaign } from '../hooks/use-advocacyy';
 import { CampaignCard } from '../ui/CampaignCard';
 import { ActionCard } from '../ui/ActionCard';
 import { useNavigate } from 'react-router-dom';

@@ -1,1 +1,0 @@
-export { ElectoralPressure } from './ElectoralPressure';

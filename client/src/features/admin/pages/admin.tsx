@@ -35,7 +35,7 @@ import {
   CardTitle,
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
-import { useDatabaseStatus } from '@client/lib/hooks/useDatabaseStatus';
+import { useDatabaseStatus } from '@client/lib/hooks/use-database-status';
 import ConnectionStatus from '@client/lib/ui/status/connection-status';
 import DatabaseStatus from '@client/lib/ui/status/database-status';
 

@@ -25,9 +25,9 @@ import { personaDetector } from '@client/lib/types';
 import type { UserActivity } from '@client/lib/types/analytics';
 import { logger } from '@client/lib/utils/logger';
 
-import { ExpertDashboardLayout } from './layouts/ExpertDashboardLayout';
-import { IntermediateDashboardLayout } from './layouts/IntermediateDashboardLayout';
-import { NoviceDashboardLayout } from './layouts/NoviceDashboardLayout';
+import { ExpertDashboardLayout } from './persona-layouts/ExpertDashboardLayout';
+import { IntermediateDashboardLayout } from './persona-layouts/IntermediateDashboardLayout';
+import { NoviceDashboardLayout } from './persona-layouts/NoviceDashboardLayout';
 import { SmartDashboard } from './SmartDashboard';
 import { UserDashboard } from './UserDashboard';
 import { useDashboardPerformance } from './utils/performance';

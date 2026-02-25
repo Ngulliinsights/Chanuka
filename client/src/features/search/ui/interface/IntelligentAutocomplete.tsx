@@ -17,7 +17,7 @@ import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { Input } from '@client/lib/design-system';
 import { Separator } from '@client/lib/design-system';
-import { useDebounce } from '@client/lib/hooks/useDebounce';
+import { useDebounce } from '@client/lib/hooks/use-debounce';
 import { logger } from '@client/lib/utils/logger';
 
 import { intelligentSearch } from '../../services/intelligent-search';

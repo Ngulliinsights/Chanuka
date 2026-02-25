@@ -4,7 +4,7 @@
  * Displays key metrics for a feature
  */
 
-import { useFeatureMetrics } from '../hooks/useMonitoring';
+import { useFeatureMetrics } from '../hooks/use-monitoring';
 
 interface MetricsVisualizationProps {
   featureId: string;

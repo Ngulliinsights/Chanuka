@@ -6,7 +6,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { useAuth } from '../../../infrastructure/auth/hooks/useAuth';
+import { useAuth } from '../../../infrastructure/auth/hooks/use-auth';
 
 // Mock the auth service
 const mockAuthService = {

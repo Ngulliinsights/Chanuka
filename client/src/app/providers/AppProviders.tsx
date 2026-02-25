@@ -12,7 +12,7 @@ import { LoadingProvider } from '@client/infrastructure/loading';
 import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
 import { AuthProvider } from '@client/features/users/hooks';
-import { KenyanContextProvider } from '@client/lib/context/KenyanContextProvider';
+import { KenyanContextProvider } from '@client/lib/contexts/KenyanContextProvider';
 import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
 import { ChanukaProviders } from '@client/lib/design-system';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';

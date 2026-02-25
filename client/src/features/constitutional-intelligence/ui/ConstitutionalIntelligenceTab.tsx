@@ -8,7 +8,7 @@ import React from 'react';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
-import { useConstitutionalAnalysis, useAnalyzeBill } from '../hooks/useConstitutionalAnalysis';
+import { useConstitutionalAnalysis, useAnalyzeBill } from '../hooks/use-constitutional-analysis';
 import { ConstitutionalAnalysisDisplay } from './ConstitutionalAnalysisDisplay';
 import type { Bill } from '@client/features/bills/types';
 

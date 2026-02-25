@@ -153,6 +153,7 @@ playwright/.cache/client/src/components/Sidebar.tsx
 # Strategic/Business documents (don't commit)
 docs/strategy/
 client/logs/
+client/design-assets/
 
 # Development artifacts and session files
 *.orig
@@ -166,6 +167,12 @@ tsc-errors.txt
 tsc_output*.txt
 type-check-output.txt
 performance-baselines.json
+
+# Backup and debug files
+*-backup.*
+*_backup.*
+*.bak
+test-styles.html
 
 # Analysis and summary documents (should be in .archive/ or docs/)
 *_ANALYSIS.md

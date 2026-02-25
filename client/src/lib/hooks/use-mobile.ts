@@ -5,7 +5,7 @@
  * Default breakpoint: 768px (tablet and below)
  */
 
-import { useMediaQuery } from './useMediaQuery';
+import { useMediaQuery } from './use-media-query';
 
 interface UseMobileOptions {
   /** Custom breakpoint in pixels (default: 768) */

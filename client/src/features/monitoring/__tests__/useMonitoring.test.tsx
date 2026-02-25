@@ -11,7 +11,7 @@ import {
   useFeatureAlerts,
   useAcknowledgeAlert,
   useResolveAlert,
-} from '../hooks/useMonitoring';
+} from '../hooks/use-monitoring';
 import * as monitoringApi from '../api/monitoring-api';
 
 // Mock the API

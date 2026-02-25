@@ -71,7 +71,7 @@ const ExpertVerificationPage = createLazyComponent(
   'Expert Verification'
 );
 const UniversalSearchPage = createLazyComponent(
-  () => import('@client/features/search/pages/UniversalSearchPage'),
+  () => import('@client/features/search/pages/universal-search'),
   'Universal Search'
 );
 const AuthPage = createLazyComponent(
@@ -81,13 +81,13 @@ const AuthPage = createLazyComponent(
 const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
 const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
-const SupportPage = createLazyComponent(() => import('@client/features/legal/pages/support'), 'Support');
+const SupportPage = createLazyComponent(() => import('@client/features/home/pages/support'), 'Support');
 const DocumentationPage = createLazyComponent(() => import('@client/features/legal/pages/documentation'), 'Documentation');
-const ContactPage = createLazyComponent(() => import('@client/features/legal/pages/contact'), 'Contact');
-const AboutPage = createLazyComponent(() => import('@client/features/legal/pages/about'), 'About');
-const CareersPage = createLazyComponent(() => import('@client/features/legal/pages/careers'), 'Careers');
-const PressPage = createLazyComponent(() => import('@client/features/legal/pages/press'), 'Press');
-const BlogPage = createLazyComponent(() => import('@client/features/legal/pages/blog'), 'Blog');
+const ContactPage = createLazyComponent(() => import('@client/features/home/pages/contact'), 'Contact');
+const AboutPage = createLazyComponent(() => import('@client/features/home/pages/about'), 'About');
+const CareersPage = createLazyComponent(() => import('@client/features/home/pages/careers'), 'Careers');
+const PressPage = createLazyComponent(() => import('@client/features/home/pages/press'), 'Press');
+const BlogPage = createLazyComponent(() => import('@client/features/home/pages/blog'), 'Blog');
 const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
 const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility'), 'Accessibility');
 const CivicEducationPage = createLazyComponent(() => import('@client/features/civic/pages/civic-education'), 'Civic Education');
@@ -98,11 +98,11 @@ const SystemStatusPage = createLazyComponent(() => import('@client/features/stat
 const SitemapPage = createLazyComponent(() => import('@client/features/sitemap/pages/sitemap'), 'Sitemap');
 const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
 const UserProfile = createLazyComponent(
-  () => import('@client/features/users/pages/UserAccountPage'),
+  () => import('@client/features/users/pages/user-account'),
   'User Account'
 );
 const UserDashboard = createLazyComponent(
-  () => import('@client/features/users/pages/UserAccountPage'),
+  () => import('@client/features/users/pages/user-account'),
   'User Dashboard'
 );
 const AdminDashboard = createLazyComponent(
@@ -110,7 +110,7 @@ const AdminDashboard = createLazyComponent(
   'Admin Dashboard'
 );
 const AnalyticsDashboard = createLazyComponent(
-  () => import('@client/features/admin/pages/AnalyticsDashboardPage'),
+  () => import('@client/features/admin/pages/analytics-dashboard'),
   'Analytics Dashboard'
 );
 const NotFoundPage = createLazyComponent(() => import('@client/lib/pages/not-found'), 'Not Found');
@@ -119,7 +119,7 @@ const WorkaroundAnalysisPage = createLazyComponent(
   'Workaround Analysis'
 );
 const PretextDetectionPage = createLazyComponent(
-  () => import('@client/features/pretext-detection/pages/PretextDetectionPage'),
+  () => import('@client/features/pretext-detection/pages/pretext-detection'),
   'Pretext Detection'
 );
 const FeatureFlagManager = createLazyComponent(
@@ -127,11 +127,11 @@ const FeatureFlagManager = createLazyComponent(
   'Feature Flag Manager'
 );
 const IntegrationMonitoringDashboard = createLazyComponent(
-  () => import('@client/features/monitoring/pages/IntegrationMonitoringPage'),
+  () => import('@client/features/monitoring/pages/integration-monitoring'),
   'Integration Monitoring'
 );
 const ArgumentIntelligencePage = createLazyComponent(
-  () => import('@client/features/argument-intelligence/pages/ArgumentIntelligencePage'),
+  () => import('@client/features/argument-intelligence/pages/argument-intelligence'),
   'Argument Intelligence'
 );
 
@@ -549,7 +549,7 @@ type PreloadMapEntry = () => Promise<{ default: React.ComponentType<any> }>;
 const preloadMap: Record<string, PreloadMapEntry> = {
   home: () => import('@client/features/home/pages/home'),
   'bills-portal': () => import('@client/features/bills/pages/BillsPortalPage'),
-  search: () => import('@client/features/search/pages/UniversalSearchPage'),
+  search: () => import('@client/features/search/pages/universal-search'),
 };
 
 /**
