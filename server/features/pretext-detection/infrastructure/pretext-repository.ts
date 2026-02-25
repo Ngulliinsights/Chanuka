@@ -190,4 +190,101 @@ export class PretextRepository {
       throw error;
     }
   }
+
+  /**
+   * Get admin users
+   */
+  async getAdminUsers(): Promise<Array<{ id: string; email: string }>> {
+    try {
+      const result = await db.query(
+        `SELECT id, email
+         FROM users
+         WHERE role = 'admin' AND is_active = true`
+      );
+
+      return result.rows.map(row => ({
+        id: row.id,
+        email: row.email
+      }));
+    } catch (error) {
+      logger.error({
+        component: 'PretextRepository',
+        error
+      }, 'Failed to get admin users');
+      // Return empty array on error to not block alert creation
+      return [];
+    }
+  }
+
+  /**
+   * Get alert by ID
+   */
+  async getAlertById(alertId: string): Promise<PretextAlert | null> {
+    try {
+      const result = await db.query(
+        `SELECT id, bill_id, detections, score, status, reviewed_by, reviewed_at, created_at
+         FROM pretext_alerts
+         WHERE id = $1`,
+        [alertId]
+      );
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const row = result.rows[0];
+      return {
+        id: row.id,
+        billId: row.bill_id,
+        detections: JSON.parse(row.detections),
+        score: row.score,
+        status: row.status,
+        reviewedBy: row.reviewed_by,
+        reviewedAt: row.reviewed_at ? new Date(row.reviewed_at) : undefined,
+        createdAt: new Date(row.created_at)
+      };
+    } catch (error) {
+      logger.error({
+        component: 'PretextRepository',
+        error
+      }, 'Failed to get alert by ID');
+      throw error;
+    }
+  }
+
+  /**
+   * Get users interested in a bill (followers, commenters, etc.)
+   */
+  async getUsersInterestedInBill(billId: string): Promise<Array<{ id: string; email: string }>> {
+    try {
+      const result = await db.query(
+        `SELECT DISTINCT u.id, u.email
+         FROM users u
+         WHERE u.id IN (
+           -- Users who commented on the bill
+           SELECT DISTINCT user_id FROM comments WHERE bill_id = $1
+           UNION
+           -- Users who voted on the bill
+           SELECT DISTINCT user_id FROM votes WHERE bill_id = $1
+           UNION
+           -- Users tracking the bill
+           SELECT DISTINCT user_id FROM bill_tracking WHERE bill_id = $1
+         )
+         AND u.is_active = true`,
+        [billId]
+      );
+
+      return result.rows.map(row => ({
+        id: row.id,
+        email: row.email
+      }));
+    } catch (error) {
+      logger.error({
+        component: 'PretextRepository',
+        error
+      }, 'Failed to get users interested in bill');
+      // Return empty array on error to not block notification
+      return [];
+    }
+  }
 }

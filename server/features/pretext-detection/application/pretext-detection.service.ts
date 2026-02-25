@@ -6,6 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { integrationMonitor } from '@server/features/monitoring/domain/integration-monitor.service';
+import { EnhancedNotificationService } from '@server/infrastructure/notifications/enhanced-notification.service';
 import { PretextAnalysisService } from '../domain/pretext-analysis.service';
 import { PretextRepository } from '../infrastructure/pretext-repository';
 import { PretextCache } from '../infrastructure/pretext-cache';
@@ -20,12 +21,14 @@ export class PretextDetectionService {
   private analysisService: PretextAnalysisService;
   private repository: PretextRepository;
   private cache: PretextCache;
+  private notificationService: EnhancedNotificationService;
   private readonly ALERT_THRESHOLD = 60; // Score threshold for creating alerts
 
   constructor() {
     this.analysisService = new PretextAnalysisService();
     this.repository = new PretextRepository();
     this.cache = new PretextCache();
+    this.notificationService = new EnhancedNotificationService();
   }
 
   /**
@@ -220,27 +223,39 @@ export class PretextDetectionService {
    */
   private async sendAlertNotification(alert: PretextAlert, result: PretextAnalysisResult): Promise<void> {
     try {
-      // Get bill details to include in notification
       const billId = result.billId;
       const severity = this.getAlertSeverity(result.score);
       
-      // TODO: Get admin users who should be notified
-      // For now, we'll log that notification should be sent
+      // Get admin users from repository
+      const adminUsers = await this.repository.getAdminUsers();
+      
+      // Send notification to each admin
+      for (const adminUser of adminUsers) {
+        await this.notificationService.send({
+          id: `pretext-alert-${alert.id}-${adminUser.id}`,
+          userId: adminUser.id,
+          type: 'in-app',
+          title: `Pretext Detection Alert: ${severity.toUpperCase()} Risk`,
+          message: `Bill ${billId} has been flagged with a risk score of ${result.score}. ${result.detections.length} potential issues detected.`,
+          data: {
+            alertId: alert.id,
+            billId,
+            score: result.score,
+            severity,
+            detectionsCount: result.detections.length,
+            detections: result.detections
+          },
+          priority: severity === 'critical' ? 'urgent' : severity === 'high' ? 'high' : 'medium'
+        });
+      }
+
       logger.info({
         component: 'PretextDetectionService',
         alertId: alert.id,
         billId,
-        severity
-      }, 'Alert notification should be sent to admins');
-
-      // When user management is available, send notifications like:
-      // await this.notificationService.createNotification({
-      //   user_id: adminUserId,
-      //   notification_type: 'bill_update',
-      //   title: `Pretext Detection Alert: ${severity} Risk`,
-      //   message: `Bill ${billId} has been flagged with a risk score of ${result.score}`,
-      //   related_bill_id: billId
-      // });
+        severity,
+        notifiedAdmins: adminUsers.length
+      }, 'Alert notifications sent to admins');
     } catch (error) {
       logger.error({
         component: 'PretextDetectionService',
@@ -255,13 +270,44 @@ export class PretextDetectionService {
    */
   private async sendReviewNotification(input: PretextReviewInput): Promise<void> {
     try {
+      // Get the alert details
+      const alert = await this.repository.getAlertById(input.alertId);
+      if (!alert) {
+        logger.warn({
+          component: 'PretextDetectionService',
+          alertId: input.alertId
+        }, 'Alert not found for review notification');
+        return;
+      }
+
+      // Get users who should be notified about the review
+      const interestedUsers = await this.repository.getUsersInterestedInBill(alert.billId);
+      
+      // Send notification to interested users
+      for (const user of interestedUsers) {
+        await this.notificationService.send({
+          id: `pretext-review-${input.alertId}-${user.id}`,
+          userId: user.id,
+          type: 'in-app',
+          title: `Pretext Alert ${input.status === 'approved' ? 'Confirmed' : 'Dismissed'}`,
+          message: `A pretext detection alert for Bill ${alert.billId} has been ${input.status} by an administrator.${input.notes ? ` Note: ${input.notes}` : ''}`,
+          data: {
+            alertId: input.alertId,
+            billId: alert.billId,
+            status: input.status,
+            reviewedBy: input.reviewedBy,
+            notes: input.notes
+          },
+          priority: input.status === 'approved' ? 'high' : 'medium'
+        });
+      }
+
       logger.info({
         component: 'PretextDetectionService',
         alertId: input.alertId,
-        status: input.status
-      }, 'Review notification should be sent');
-
-      // When user management is available, send notifications to relevant users
+        status: input.status,
+        notifiedUsers: interestedUsers.length
+      }, 'Review notifications sent');
     } catch (error) {
       logger.error({
         component: 'PretextDetectionService',

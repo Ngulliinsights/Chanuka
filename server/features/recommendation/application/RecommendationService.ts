@@ -48,7 +48,7 @@ export class RecommendationService {
     } catch (error) {
       // If fetch fails but we have stale cache, return it as fallback
       if (cached) {
-        console.warn(`Using stale cache for key: ${key}`, error);
+        logger.warn({ key, error }, 'Using stale cache for key');
         return cached.data;
       }
       throw error;
