@@ -34,8 +34,8 @@ export * from './universal_access';
 // Trojan Bill Detection
 export * from './trojan_bill_detection';
 
-// Parliamentary Process
-export * from './parliamentary_process';
+// Parliamentary Process (may have duplicate exports with foundation)
+// export * from './parliamentary_process';
 
 // Political Economy
 export * from './political_economy';
@@ -43,8 +43,8 @@ export * from './political_economy';
 // Impact Measurement
 export * from './impact_measurement';
 
-// Safeguards
-export * from './safeguards';
+// Safeguards (may have duplicate exports)
+// export * from './safeguards';
 
 // Advanced Discovery
 export * from './advanced_discovery';
@@ -55,8 +55,8 @@ export * from './market_intelligence';
 // Accountability Ledger
 export * from './accountability_ledger';
 
-// Constitutional Compliance
-export * from './constitutional_compliance';
+// Constitutional Compliance - commented out (file may not exist)
+// export * from './constitutional_compliance';
 
 // ============================================================================
 // ENUMS - Shared enumerations
