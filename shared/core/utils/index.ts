@@ -1,15 +1,19 @@
 /**
  * Core Utilities Index
  * Centralized export of all core utilities
+ * 
+ * Phase 2A Cleanup: Removed unused utilities
+ * - browser-logger (0 imports)
+ * - dashboard-utils (0 imports)
+ * - loading-utils (0 imports, client has its own)
+ * - navigation-utils (0 imports, client has its own)
+ * - performance-utils (0 imports)
+ * - race-condition-prevention (0 imports)
+ * - concurrency-adapter (0 imports)
+ * - http-utils (0 imports)
  */
 
-// ==================== Consolidated Utility Modules ====================
-
-// API utilities - response handling, error formatting, status codes
-
-
-// Cache utilities - caching decorators, metrics, management
-
+// ==================== Core Utilities (Truly Shared) ====================
 
 // Async utilities - debouncing, throttling, retry logic, concurrency control
 export * from './async-utils';
@@ -17,74 +21,31 @@ export * from './async-utils';
 // Data utilities - validation, transformation, filtering, pagination
 export * from './data-utils';
 
-// HTTP utilities - request/response handling, client, status codes
-// Note: Excluding ApiResponse to avoid conflict with api-utils
-export {
-  HttpClient,
-  HttpError,
-  NetworkError,
-  TimeoutError,
-  HTTP_STATUS,
-  createSuccessResponse,
-  createErrorResponse,
-  generateRequestId,
-  buildUrl,
-  parseQueryParams,
-  safeEncodeURIComponent,
-  getContentTypeFromExtension,
-  getExtensionFromContentType,
-  httpClient
-} from './http-utils';
-
-export type { HttpRequestOptions, HttpResponse, HttpClientConfig } from './http-utils';
-
 // Security utilities - sanitization, validation, encryption, authentication
 export * from './security-utils';
 
-// Performance utilities - monitoring, benchmarking, memory tracking
-export * from './performance-utils';
-
 // String utilities - manipulation, validation, formatting
 export * from './string-utils';
+
+// Number utilities - formatting, validation, calculations
+export * from './number-utils';
+
+// Regex patterns - common validation patterns
+export * from './regex-patterns';
 
 // Type guards - runtime type checking and validation
 export { TypeGuards } from './type-guards';
 export type { TypeValidationResult, SchemaValidationOptions } from './type-guards';
 
-// Browser logger - client-side logging utility
-export * from './browser-logger';
-
-// ==================== Legacy/Existing Utilities ====================
-
-// Formatting utilities
+// Formatting utilities - date, currency, number formatting
 export * from './formatting';
 
-// Image utilities
+// Image utilities - image processing and optimization
 export * from './images/image-utils';
 
-// Form testing utilities (only in test environment)
+// Common utilities - general purpose helpers
+export * from './common-utils';
 
-
-// ==================== Backward Compatibility ====================
-
-// Re-export existing utilities for backward compatibility
-// Note: Some utilities have been consolidated into the new modules above
-// These exports maintain backward compatibility while encouraging migration
-
-// Legacy utilities (consider migrating to consolidated modules)
-// Note: HTTP_STATUS from constants conflicts with http-utils, use explicit imports
-// export * from './constants';
-
-// Migration utilities removed by design during development
-export * from './number-utils';
-export * from './regex-patterns';
-
-// Response helpers (consider migrating to http-utils)
-
-
-// Race condition prevention (consider migrating to async-utils)
-// Note: These may conflict with async-utils exports, so use explicit imports if needed
-// export * from '@shared/core/utils/async-utils'';
 
 
 

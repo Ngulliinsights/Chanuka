@@ -2,11 +2,11 @@
  * Validation Middleware (Server-Only)
  * 
  * Express middleware for request validation using Zod schemas.
+ * Moved from shared/validation/middleware.ts in Phase 2A.
  */
 
 import type { Request, Response, NextFunction } from 'express';
 import { z, ZodError } from 'zod';
-import { ValidationError } from '../utils/errors/types';
 
 type ZodSchema<T> = z.ZodType<T>;
 
@@ -21,7 +21,7 @@ type ZodSchema<T> = z.ZodType<T>;
  * @example
  * ```typescript
  * import { z } from 'zod';
- * import { validateSchema } from '@shared/validation';
+ * import { validateSchema } from '@server/infrastructure/validation';
  * 
  * const userSchema = z.object({
  *   email: z.string().email(),
@@ -36,7 +36,7 @@ type ZodSchema<T> = z.ZodType<T>;
  * ```
  */
 export function validateSchema<T>(schema: ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.body = schema.parse(req.body);
       next();
@@ -48,11 +48,12 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
           message: e.message,
         }));
 
-        next(new ValidationError(
-          'Request validation failed',
-          { operation: 'validateSchema', layer: 'middleware' },
-          errors
-        ));
+        // Create validation error without ErrorContext (server-specific)
+        const error = new Error('Request validation failed') as any;
+        error.name = 'ValidationError';
+        error.errors = errors;
+        error.statusCode = 400;
+        next(error);
       } else {
         next(err);
       }
@@ -67,7 +68,7 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
  * @returns Express middleware function
  */
 export function validateQuery<T>(schema: ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.query = schema.parse(req.query) as any;
       next();
@@ -79,11 +80,11 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
           message: e.message,
         }));
 
-        next(new ValidationError(
-          'Query parameter validation failed',
-          { operation: 'validateQuery', layer: 'middleware' },
-          errors
-        ));
+        const error = new Error('Query parameter validation failed') as any;
+        error.name = 'ValidationError';
+        error.errors = errors;
+        error.statusCode = 400;
+        next(error);
       } else {
         next(err);
       }
@@ -98,7 +99,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
  * @returns Express middleware function
  */
 export function validateParams<T>(schema: ZodSchema<T>) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     try {
       req.params = schema.parse(req.params) as any;
       next();
@@ -110,14 +111,19 @@ export function validateParams<T>(schema: ZodSchema<T>) {
           message: e.message,
         }));
 
-        next(new ValidationError(
-          'Route parameter validation failed',
-          { operation: 'validateParams', layer: 'middleware' },
-          errors
-        ));
+        const error = new Error('Route parameter validation failed') as any;
+        error.name = 'ValidationError';
+        error.errors = errors;
+        error.statusCode = 400;
+        next(error);
       } else {
         next(err);
       }
     }
   };
 }
+
+/**
+ * Alias for validateSchema (backward compatibility)
+ */
+export const validateBody = validateSchema;

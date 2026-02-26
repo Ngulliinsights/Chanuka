@@ -29,6 +29,16 @@ export {
 } from './validation-services-init';
 export type { ValidationServicesContainer } from './validation-services-init';
 
+// Express validation middleware (moved from shared/validation)
+// Phase 2A: Middleware is server-only (Express-specific)
+export {
+  validateSchema,
+  validateQuery,
+  validateParams,
+  validateBody
+} from './middleware';
+
+
 
 
 

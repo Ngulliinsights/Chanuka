@@ -16,7 +16,7 @@ export {
   validateSchema,
   validateQuery,
   validateParams,
-} from '@shared/validation/middleware';
+} from '@server/infrastructure/validation/middleware';
 
 type ZodSchema<T> = z.ZodType<T>;
 

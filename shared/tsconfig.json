@@ -11,6 +11,6 @@
       "@shared/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.d.ts"],
+  "include": ["**/*.ts", "**/*.d.ts", "../server/infrastructure/validation/middleware.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }
