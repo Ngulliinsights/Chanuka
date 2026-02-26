@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 26, 2026 at 01:31 AM
+**Generated:** February 26, 2026 at 01:28 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,710
+**Total Items:** 3,730
 
 ```
 .
@@ -1710,6 +1710,8 @@
 │   ├── tsconfig.json
 │   ├── tsconfig.test.json
 │   ├── tsconfig.tsbuildinfo
+│   ├── type-check-output.txt
+│   ├── type-errors-client.txt
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
@@ -1735,6 +1737,7 @@
 │   │   ├── ADR-008-incomplete-migrations.md
 │   │   ├── ADR-009-graph-module-refactoring.md
 │   │   ├── ADR-010-government-data-consolidation.md
+│   │   ├── ADR-011-type-system-single-source.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -1748,9 +1751,12 @@
 │   │   │   ├── unified-code-analysis-v2.md
 │   │   │   ├── unified-code-analysis.md
 │   │   │   └── unified-coding.md
+│   │   ├── BOUNDARY_FIX_PLAN.md
 │   │   ├── CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
 │   │   ├── CLIENT_OVERLAP_ANALYSIS.md
-│   │   └── data-flow-pipelines.md
+│   │   ├── data-flow-pipelines.md
+│   │   ├── SHARED_FOLDER_ANALYSIS.md
+│   │   └── UNUSED_UTILITIES_ANALYSIS.md
 │   ├── archive/
 │   │   ├── orphan-analysis-2025/
 │   │   │   ├── INTEGRATION_ROADMAP.csv
@@ -1903,7 +1909,23 @@
 │   │   ├── constitutional-intelligence.md
 │   │   └── README.md
 │   ├── plans/
-│   │   └── monitoring-fsd-restructure.md
+│   │   ├── COMMIT-SUCCESS-SUMMARY.md
+│   │   ├── ERROR-FIXING-EXECUTION-PLAN.md
+│   │   ├── IMMEDIATE-EXECUTION-PLAN.md
+│   │   ├── INFRASTRUCTURE-CHANGES-REVIEW.md
+│   │   ├── monitoring-fsd-restructure.md
+│   │   ├── PHASE1-COMPLETION-SUMMARY.md
+│   │   ├── phase1-type-consolidation-tracker.md
+│   │   ├── PHASE2-COMPLETION-SUMMARY.md
+│   │   ├── PHASE3-COMPLETION-SUMMARY.md
+│   │   ├── PHASE4-COMPLETION-SUMMARY.md
+│   │   ├── PHASE5-COMPLETION-SUMMARY.md
+│   │   ├── PHASES-1-5-VALIDATION-SUMMARY.md
+│   │   ├── SESSION-SUMMARY-2026-02-26.md
+│   │   ├── TYPE-CONSOLIDATION-AUDIT-AND-NEXT-STEPS.md
+│   │   ├── TYPE-CONSOLIDATION-FINAL-REPORT.md
+│   │   ├── TYPE-CONSOLIDATION-PROGRESS.md
+│   │   └── VALIDATION-AND-ERROR-FIXING-PLAN.md
 │   ├── reference/
 │   │   ├── Adversarial Validation of 'Chanuka' as Democratic Infrastructure in Kenya.md
 │   │   ├── chanuka_serpent_dove.md
@@ -2139,6 +2161,7 @@
 │   ├── accessibility-audit.js
 │   ├── analyze-bundle.cjs
 │   ├── apply-schema-direct.ts
+│   ├── boundary-fix-phase2a.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── CHANUKA_MIGRATION_PLAN.md
@@ -3084,7 +3107,6 @@
 │   │   │   ├── graph_sync.ts
 │   │   │   ├── impact_measurement.ts
 │   │   │   ├── index-full.ts.backup
-│   │   │   ├── index-minimal.ts
 │   │   │   ├── index.ts
 │   │   │   ├── integration_monitoring.ts
 │   │   │   ├── integration-extended.ts
@@ -3119,6 +3141,7 @@
 │   │   │   ├── data-validation.ts
 │   │   │   ├── index.ts
 │   │   │   ├── input-validation-service.ts
+│   │   │   ├── middleware.ts
 │   │   │   ├── schema-validation-service.ts
 │   │   │   ├── security-schemas.ts
 │   │   │   ├── validation-metrics.ts
@@ -3329,22 +3352,13 @@
 │   │   │   │   └── image-utils.ts
 │   │   │   ├── anonymity-interface.ts
 │   │   │   ├── async-utils.ts
-│   │   │   ├── browser-logger.d.ts
-│   │   │   ├── browser-logger.ts
 │   │   │   ├── CLIENT_SAFE_UTILITIES.md
 │   │   │   ├── common-utils.ts
-│   │   │   ├── concurrency-adapter.ts
 │   │   │   ├── concurrency-migration-router.ts
 │   │   │   ├── constants.ts
-│   │   │   ├── dashboard-utils.ts
 │   │   │   ├── data-utils.ts
-│   │   │   ├── http-utils.ts
 │   │   │   ├── index.ts
-│   │   │   ├── loading-utils.ts
-│   │   │   ├── navigation-utils.ts
 │   │   │   ├── number-utils.ts
-│   │   │   ├── performance-utils.ts
-│   │   │   ├── race-condition-prevention.ts
 │   │   │   ├── regex-patterns.ts
 │   │   │   ├── security-utils.test.ts
 │   │   │   ├── security-utils.ts
@@ -3543,7 +3557,6 @@
 │   │   │   └── password.ts
 │   │   ├── errors.ts
 │   │   ├── index.ts
-│   │   ├── middleware.ts
 │   │   ├── SCHEMA_ALIGNMENT_GUIDE.md
 │   │   └── test-schemas.ts
 │   ├── index.ts
@@ -3681,6 +3694,7 @@
 ├── Dockerfile.client
 ├── drizzle.config.ts
 ├── EXECUTE_NOW.md
+├── EXECUTE_PHASE_2A.md
 ├── FINAL_CLEANUP_REPORT.md
 ├── FRESH_START_MIGRATION_PLAN.md
 ├── generate-structure.mjs
@@ -3697,6 +3711,11 @@
 ├── nginx.conf
 ├── nx.json
 ├── package.json
+├── PHASE_2A_COMPLETE.md
+├── PHASE_2A_EXECUTION_SUMMARY.md
+├── PHASE_2B_AND_TYPESCRIPT_FIXES_STATUS.md
+├── PHASE_2B_COMPLETE.md
+├── PHASE_2B_LOGGER_CONVERSION_COMPLETE.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
@@ -3713,6 +3732,7 @@
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
+├── TYPESCRIPT_FIXES_SUMMARY.md
 ├── vitest.setup.ts
 ├── vitest.workspace.ts
 └── WHY_TABLES_ARE_UNUSED_ANALYSIS.md
