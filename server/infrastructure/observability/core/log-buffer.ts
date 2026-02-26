@@ -6,7 +6,7 @@
  * It knows nothing about Pino, Express, or any other infrastructure.
  */
 
-import type { LoggingConfig } from '../config/logging-config';
+import type { LoggingConfig } from '../logging-config';
 
 export interface BufferedLogEntry extends Record<string, unknown> {
   timestamp: Date;

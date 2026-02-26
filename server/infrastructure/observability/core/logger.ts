@@ -8,7 +8,7 @@
  */
 
 import pino from 'pino';
-import { loggingConfig } from '../config/logging-config';
+import { loggingConfig } from '../logging-config';
 import { LogBuffer } from './log-buffer';
 
 // ─── Buffer ───────────────────────────────────────────────────────────────────
