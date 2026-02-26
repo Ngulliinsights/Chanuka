@@ -387,20 +387,20 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - _Requirements: 22.5, 22.6_
   
   - [ ] 14.2 Integrate error handling with observability
-    - [-] 14.2.1 Create ErrorHandler service
+    - [x] 14.2.1 Create ErrorHandler service
       - Implement handleError() with explicit side effects
       - Integrate with observability.trackError()
       - Integrate with logger.error()
       - Add error recovery strategy execution
       - _Requirements: 22.7, 22.8_
     
-    - [ ] 14.2.2 Update error construction to use ErrorHandler
+    - [x] 14.2.2 Update error construction to use ErrorHandler
       - Refactor AppError class to remove constructor side effects
       - Update all error creation to use factory + handler pattern
       - Ensure errors are logged through ErrorHandler, not constructors
       - _Requirements: 22.9_
     
-    - [ ] 14.2.3 Add Result monad support (optional)
+    - [-] 14.2.3 Add Result monad support (optional)
       - Create ClientResult<T> type using neverthrow
       - Implement safeAsync() wrapper for client operations
       - Provide both functional (Result) and imperative (try/catch) patterns

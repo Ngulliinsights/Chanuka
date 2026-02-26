@@ -176,6 +176,38 @@ export {
   cloneError,
 } from './serialization';
 
+// Unified error handler (with observability and logging integration)
+export {
+  UnifiedErrorHandler,
+  errorHandler as unifiedErrorHandler,
+  handleError as handleUnifiedError,
+} from './unified-handler';
+export type { ErrorHandlerConfig as UnifiedErrorHandlerConfig } from './unified-handler';
+
+// Result monad for functional error handling
+export type { ClientResult, Ok, Err } from './result';
+export {
+  ok,
+  err,
+  isOk,
+  isErr,
+  safeAsync,
+  safe,
+  map,
+  mapError,
+  andThen,
+  unwrap,
+  unwrapOr,
+  unwrapOrElse,
+  match,
+  combine,
+  combineWith,
+  fromPromise,
+  toPromise,
+  tap,
+  tapError,
+} from './result';
+
 // ============================================================================
 // Error Boundary Components
 // ============================================================================
