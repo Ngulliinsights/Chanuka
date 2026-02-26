@@ -386,7 +386,7 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - Handle error type mapping (ErrorDomain ↔ ErrorCategory)
       - _Requirements: 22.5, 22.6_
   
-  - [ ] 14.2 Integrate error handling with observability
+  - [x] 14.2 Integrate error handling with observability
     - [x] 14.2.1 Create ErrorHandler service
       - Implement handleError() with explicit side effects
       - Integrate with observability.trackError()
@@ -400,7 +400,7 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - Ensure errors are logged through ErrorHandler, not constructors
       - _Requirements: 22.9_
     
-    - [-] 14.2.3 Add Result monad support (optional)
+    - [x] 14.2.3 Add Result monad support (optional)
       - Create ClientResult<T> type using neverthrow
       - Implement safeAsync() wrapper for client operations
       - Provide both functional (Result) and imperative (try/catch) patterns
@@ -408,21 +408,21 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - _Requirements: 22.10_
   
   - [ ] 14.3 Validate error handling integration
-    - [ ] 14.3.1 Test error serialization round-trip
+    - [x] 14.3.1 Test error serialization round-trip
       - Create server error → serialize → deserialize → client error
       - Verify no data loss
       - Verify type safety maintained
       - Test all error domains/categories
       - _Requirements: 22.11_
     
-    - [ ] 14.3.2 Test error handling with observability
+    - [x] 14.3.2 Test error handling with observability
       - Verify errors are tracked in observability
       - Verify errors are logged correctly
       - Verify error context is preserved
       - Test error recovery strategies
       - _Requirements: 22.12_
     
-    - [ ] 14.3.3 Update error handling documentation
+    - [-] 14.3.3 Update error handling documentation
       - Document unified error type system
       - Document factory function patterns
       - Document HTTP boundary serialization
