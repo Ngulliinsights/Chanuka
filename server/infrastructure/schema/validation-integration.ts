@@ -8,7 +8,7 @@ import { z } from "zod";
 import { emailSchema, uuidSchema, userRoleSchema } from '@shared/validation';
 import { createValidatedType, ValidatedType, validateWithSchema } from "../../../shared/types/core/validation";
 import { ValidationError, Result } from "../../../shared/types/core/errors";
-import { isBrandedId } from "@shared/validation/schemas/common";
+import { isBrandedId } from "@shared/types/core/common";
 
 // Import database types
 import { users, userRelations, UserSchema, ValidatedUserType, isUser } from "./integration";

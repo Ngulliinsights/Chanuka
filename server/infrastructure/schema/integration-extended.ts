@@ -37,9 +37,9 @@ import {
   SponsorId,
   AmendmentId,
   ConferenceId,
-  createBrandedId,
+  brandId,
   isBrandedId
-} from "@shared/validation/schemas/common";
+} from "@shared/types/core/common";
 
 // Import validation utilities
 import { createValidatedType, ValidatedType } from "../../../shared/types/core/validation";

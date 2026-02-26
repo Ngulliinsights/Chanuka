@@ -149,7 +149,7 @@ export const user_profiles = pgTable("user_profiles", {
   // Localization and accessibility
   preferred_language: varchar("preferred_language", { length: 10 }).notNull().default('en'), // 'en', 'sw'
   timezone: varchar("timezone", { length: 50 }).notNull().default('Africa/Nairobi'),
-  accessibility_needs: metadataField(),
+  metadata: metadataField(), // Consolidated metadata for accessibility, preferences, privacy
 
   // Emergency contact
   emergency_contact_name: varchar("emergency_contact_name", { length: 200 }),
@@ -160,8 +160,6 @@ export const user_profiles = pgTable("user_profiles", {
   avatar_url: varchar("avatar_url", { length: 500 }),
   cover_image_url: varchar("cover_image_url", { length: 500 }),
   website: varchar("website", { length: 255 }),
-  preferences: metadataField(),
-  privacy_settings: metadataField(),
 
   // Profile completeness score (0-100)
   completeness_score: smallint("completeness_score").notNull().default(0),
@@ -253,7 +251,7 @@ export const sponsors = pgTable("sponsors", {
 
   // Media and social
   photo_url: varchar("photo_url", { length: 500 }),
-  social_media_metrics: metadataField(),
+  metadata: metadataField(), // Consolidated metadata including social media metrics
 
   created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),

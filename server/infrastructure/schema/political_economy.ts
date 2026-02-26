@@ -588,14 +588,6 @@ export type NewStrategicInfrastructureProject = typeof strategic_infrastructure_
 // These relations are defined here to avoid circular dependencies between
 // foundation.ts and political_economy.ts
 
-// Relations for political_appointments
-export const politicalAppointmentsRelations = relations(political_appointments, ({ one }) => ({
-  sponsor: one(sponsors, {
-    fields: [political_appointments.sponsor_id],
-    references: [sponsors.id],
-  }),
-}));
-
 // Reverse relations for sponsors (appointments)
 export const sponsorsAppointmentsRelations = relations(sponsors, ({ many }) => ({
   appointments: many(political_appointments),

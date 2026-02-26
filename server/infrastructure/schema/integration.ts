@@ -40,9 +40,9 @@ import {
   SponsorId,
   AmendmentId,
   ConferenceId,
-  createBrandedId,
+  brandId,
   isBrandedId
-} from "@shared/validation/schemas/common";
+} from "@shared/types/core/common";
 
 // Import validation utilities
 import { createValidatedType, ValidatedType } from "../../../shared/types/core/validation";
@@ -136,15 +136,15 @@ export const users = pgTable("users", {
  * Ensures type safety across the application
  */
 export function createUserId(id: string): UserId {
-  return createBrandedId<UserId>(id, 'UserId');
+  return brandId<UserId>(id);
 }
 
 export function createBillId(id: string): BillId {
-  return createBrandedId<BillId>(id, 'BillId');
+  return brandId<BillId>(id);
 }
 
 export function createSessionId(id: string): SessionId {
-  return createBrandedId<SessionId>(id, 'SessionId');
+  return brandId<SessionId>(id);
 }
 
 // ============================================================================

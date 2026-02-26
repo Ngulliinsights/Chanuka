@@ -16,9 +16,9 @@ import {
   SponsorId,
   AmendmentId,
   ConferenceId,
-  createBrandedId,
+  brandId,
   isBrandedId,
-} from "@shared/validation/schemas/common";
+} from "@shared/types/core/common";
 import type { ValidatedType } from "../../../shared/types/core/validation";
 import { createValidatedType } from "../../../shared/types/core/validation";
 
@@ -35,63 +35,63 @@ export class BrandedIdGenerator {
    * Create UserId from database value
    */
   static userId(id: string): UserId {
-    return createBrandedId<UserId>(id);
+    return brandId<UserId>(id);
   }
 
   /**
    * Create BillId from database value
    */
   static billId(id: string): BillId {
-    return createBrandedId<BillId>(id);
+    return brandId<BillId>(id);
   }
 
   /**
    * Create SessionId from database value
    */
   static sessionId(id: string): SessionId {
-    return createBrandedId<SessionId>(id);
+    return brandId<SessionId>(id);
   }
 
   /**
    * Create ModerationId from database value
    */
   static moderationId(id: string): ModerationId {
-    return createBrandedId<ModerationId>(id);
+    return brandId<ModerationId>(id);
   }
 
   /**
    * Create LegislatorId from database value
    */
   static legislatorId(id: string): LegislatorId {
-    return createBrandedId<LegislatorId>(id);
+    return brandId<LegislatorId>(id);
   }
 
   /**
    * Create CommitteeId from database value
    */
   static committeeId(id: string): CommitteeId {
-    return createBrandedId<CommitteeId>(id);
+    return brandId<CommitteeId>(id);
   }
 
   /**
    * Create SponsorId from database value
    */
   static sponsorId(id: string): SponsorId {
-    return createBrandedId<SponsorId>(id);
+    return brandId<SponsorId>(id);
   }
 
   /**
    * Create AmendmentId from database value
    */
   static amendmentId(id: string): AmendmentId {
-    return createBrandedId<AmendmentId>(id);
+    return brandId<AmendmentId>(id);
   }
 
   /**
    * Create ConferenceId from database value
    */
   static conferenceId(id: string): ConferenceId {
-    return createBrandedId<ConferenceId>(id);
+    return brandId<ConferenceId>(id);
   }
 }
 
