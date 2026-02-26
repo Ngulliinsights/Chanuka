@@ -5,9 +5,9 @@
  * This is a stub implementation - full implementation pending.
  */
 
-import { logger } from '../../infrastructure/observability/core/loggertructure/observability';
-import type { SecurityEvent, AuditOperation } from '../../infrastructure/observability/core/typesstructure/observability/core/types';
-import { classifyRisk, classifySecurityEventType } from '../../infrastructure/observability/security/security-policy';
+import { logger } from '../../infrastructure/observability';
+import type { SecurityEvent, AuditOperation } from '../../infrastructure/observability/core/types';
+import { classifyRisk, classifySecurityEventType } from './security-policy';
 
 /**
  * Emit a security event

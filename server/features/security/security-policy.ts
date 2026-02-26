@@ -5,7 +5,7 @@
  */
 
 import type { Request } from 'express';
-import type { RiskLevel, SecurityEventType } from '../../infrastructure/observability/core/typesstructure/observability/core/types';
+import type { RiskLevel, SecurityEventType } from '../../infrastructure/observability/core/types';
 
 /**
  * Determine if an endpoint is sensitive based on path and method
