@@ -1,0 +1,33 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "baseUrl": "..",
+    "paths": {
+      "@shared": ["shared/index.ts"],
+      "@shared/*": ["shared/*"],
+      "@server": ["server/index.ts"],
+      "@server/*": ["server/*"],
+      "@client": ["client/src/index.ts"],
+      "@client/*": ["client/src/*"]
+    },
+    "outDir": "../dist/scripts",
+    "rootDir": "..",
+    "composite": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true
+  },
+  "include": [
+    "**/*.ts",
+    "../server/**/*.ts",
+    "../shared/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../node_modules",
+    "../dist"
+  ]
+}
