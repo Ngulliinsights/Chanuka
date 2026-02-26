@@ -1,0 +1,211 @@
+================================================================================
+INFRASTRUCTURE DEPENDENCY ANALYSIS REPORT
+================================================================================
+
+Generated: 2/26/2026, 4:22:51 PM
+
+SUMMARY
+--------------------------------------------------------------------------------
+Total Modules: 31
+Total Dependencies: 2
+Circular Dependencies: 0
+
+MODULES
+--------------------------------------------------------------------------------
+Module Name                    | Exports | Deps | Used By
+--------------------------------------------------------------------------------
+analytics                      |      20 |    0 |       0
+api                            |      58 |    0 |       0
+asset-loading                  |       0 |    0 |       0
+auth                           |     122 |    0 |       2
+browser                        |      33 |    0 |       0
+cache                          |       4 |    0 |       0
+command-palette                |      14 |    0 |       0
+community                      |       7 |    0 |       0
+dashboard                      |       1 |    0 |       0
+error                          |     136 |    0 |       0
+events                         |       6 |    0 |       0
+hooks                          |       6 |    0 |       0
+http                           |       2 |    0 |       0
+loading                        |       9 |    0 |       0
+mobile                         |      32 |    0 |       0
+monitoring                     |       6 |    0 |       0
+navigation                     |      31 |    0 |       0
+performance                    |      36 |    0 |       0
+personalization                |      10 |    0 |       0
+realtime                       |      25 |    0 |       0
+recovery                       |       0 |    0 |       0
+search                         |      12 |    0 |       0
+security                       |      23 |    0 |       0
+storage                        |      34 |    1 |       0
+store                          |       7 |    1 |       0
+sync                           |       1 |    0 |       0
+system                         |       0 |    0 |       0
+telemetry                      |      11 |    0 |       0
+validation                     |       7 |    0 |       0
+websocket                      |       5 |    0 |       0
+workers                        |       5 |    0 |       0
+
+✅ NO CIRCULAR DEPENDENCIES FOUND!
+
+DETAILED MODULE INFORMATION
+--------------------------------------------------------------------------------
+
+analytics
+  Exports (20): ComprehensiveAnalyticsTracker, AnalyticsEvent, AnalyticsEventType, AnalyticsDashboardData, PagePerformanceMetrics, UserEngagementMetrics, AnalyticsProvider, useAnalyticsContext, withAnalytics, AnalyticsStatus...
+  Dependencies (0): none
+  Used by (0): none
+
+api
+  Exports (58): AuthenticationInterceptor, TokenRefreshInterceptor, createAuthInterceptors, shouldRefreshToken, proactiveTokenRefresh, DEFAULT_AUTH_CONFIG, AuthConfig, RetryHandler, retryOperation, safeRetryOperation...
+  Dependencies (0): none
+  Used by (0): none
+
+asset-loading
+  Exports (0): 
+  Dependencies (0): none
+  Used by (0): none
+
+auth
+  Exports (122): User, AuthUser, LoginCredentials, RegisterData, AuthResponse, AuthTokens, TokenInfo, SessionInfo, SessionValidation, TokenValidation...
+  Dependencies (0): none
+  Used by (2): storage, store
+
+browser
+  Exports (33): BrowserInfo, CompatibilityRecommendation, CompatibilityStatus, FetchOptions, FetchResponse, FeatureSet, IntersectionObserverEntry, IntersectionObserverOptions, PolyfillStatus, StoragePolyfill...
+  Dependencies (0): none
+  Used by (0): none
+
+cache
+  Exports (4): cacheInvalidationManager, invalidateCache, setCacheEntry, getCacheEntry
+  Dependencies (0): none
+  Used by (0): none
+
+command-palette
+  Exports (14): Command, CommandSection, CommandPaletteState, CommandPaletteConfig, CommandPaletteProps, createNavigationCommands, createQuickActionCommands, createHelpCommands, createDefaultSections, filterCommands...
+  Dependencies (0): none
+  Used by (0): none
+
+community
+  Exports (7): UnifiedComment, UnifiedThread, UnifiedModeration, CommunityState, DiscussionState, ModerationService, StateSyncService
+  Dependencies (0): none
+  Used by (0): none
+
+dashboard
+  Exports (1): ChartData
+  Dependencies (0): none
+  Used by (0): none
+
+error
+  Exports (136): ErrorContext, ErrorRecoveryStrategy, RecoveryStrategy, ErrorHandlerConfig, ErrorListener, ErrorStats, ReactErrorInfo, ErrorBoundaryProps, ErrorFallbackProps, RecoveryResult...
+  Dependencies (0): none
+  Used by (0): none
+
+events
+  Exports (6): eventBus, EventBus, on, once, emit, off
+  Dependencies (0): none
+  Used by (0): none
+
+hooks
+  Exports (6): useOfflineDetection, useConnectionAware, useServiceStatus, useOnlineStatus, useErrorRecovery, useOfflineCapabilities
+  Dependencies (0): none
+  Used by (0): none
+
+http
+  Exports (2): RequestDeduplicator, requestDeduplicator
+  Dependencies (0): none
+  Used by (0): none
+
+loading
+  Exports (9): LoadingProvider, useLoading, getConnectionMultiplier, shouldSkipOperation, LoadingPerformanceMonitor, globalLoadingMonitor, LOADING_SCENARIOS, LoadingScenarioBuilder, createOperationFromScenario
+  Dependencies (0): none
+  Used by (0): none
+
+mobile
+  Exports (32): DeviceInfo, ResponsiveBreakpoints, MobileErrorContext, DeviceDetector, ResponsiveUtils, MobileErrorHandler, MobilePerformanceOptimizer, deviceDetector, responsiveUtils, mobileErrorHandler...
+  Dependencies (0): none
+  Used by (0): none
+
+monitoring
+  Exports (6): ErrorMonitor, default, MonitoringIntegrationService, monitoringIntegration, DevelopmentMonitoringDashboard, MonitoringConfig
+  Dependencies (0): none
+  Used by (0): none
+
+navigation
+  Exports (31): getNavigationPreferences, saveNavigationPreferences, addToRecentPages, addToFavorites, removeFromFavorites, isPageFavorite, validateNavigationItem, validateNavigationItems, isValidNavigationPath, hasRouteAccess...
+  Dependencies (0): none
+  Used by (0): none
+
+performance
+  Exports (36): WebVitalsMonitor, PerformanceBudgetChecker, PerformanceAlertsManager, PerformanceMonitor, PerformanceMetric, WebVitalsMetric, PerformanceBudget, PerformanceAlert, BudgetCheckResult, PerformanceConfig...
+  Dependencies (0): none
+  Used by (0): none
+
+personalization
+  Exports (10): PersonaType, PersonaMetrics, PersonaClassification, PersonaPreferences, PersonaDetectionConfig, PersonaThresholds, UserPersonaProfile, PersonaDetector, personaDetector, createPersonaDetector
+  Dependencies (0): none
+  Used by (0): none
+
+realtime
+  Exports (25): RealTimeHub, realTimeHub, RealTimeHubState, UnifiedWebSocketManager, WebSocketClient, createWebSocketClient, RealTimeService, realTimeService, BillTrackingService, CommunityService...
+  Dependencies (0): none
+  Used by (0): none
+
+recovery
+  Exports (0): 
+  Dependencies (0): none
+  Used by (0): none
+
+search
+  Exports (12): SearchStrategy, SearchStrategyConfig, UnifiedSearchQuery, UnifiedSearchResult, SearchProgress, UnifiedSearchInterfaceProps, SearchDecisionMatrix, SearchStrategyDecision, SearchStrategySelector, DEFAULT_SEARCH_STRATEGY_CONFIG...
+  Dependencies (0): none
+  Used by (0): none
+
+security
+  Exports (23): UnifiedCSPManager, CSRFProtection, InputSanitizer, RateLimiter, VulnerabilityScanner, SecurityMonitor, SecurityEvent, SecurityAlert, VulnerabilityReport, validatePasswordStrength...
+  Dependencies (0): none
+  Used by (0): none
+
+storage
+  Exports (34): StorageOptions, SessionInfo, TokenInfo, StorageStats, SessionValidation, TokenValidation, CleanupOptions, StorageError, StorageErrorCode, StorageBackend...
+  Dependencies (1): auth
+  Used by (0): none
+
+store
+  Exports (7): initializeStore, getStore, StoreData, RootState, AppDispatch, store, persistor
+  Dependencies (1): auth
+  Used by (0): none
+
+sync
+  Exports (1): backgroundSyncManager
+  Dependencies (0): none
+  Used by (0): none
+
+system
+  Exports (0): 
+  Dependencies (0): none
+  Used by (0): none
+
+telemetry
+  Exports (11): telemetryService, TelemetryServiceImpl, TelemetryService, SystemMetrics, MetricsData, ExportConfig, MetricsResult, SendResult, AggregateResult, ValidationResult...
+  Dependencies (0): none
+  Used by (0): none
+
+validation
+  Exports (7): validateNavigationPath, validateUserRole, validateNavigationItem, validateRelatedPage, validateUseRelatedPagesOptions, safeValidateNavigationPath, safeValidateUserRole
+  Dependencies (0): none
+  Used by (0): none
+
+websocket
+  Exports (5): WebSocketManager, WebSocketManagerImpl, ReconnectionConfig, ConnectionState, createWebSocketManager
+  Dependencies (0): none
+  Used by (0): none
+
+workers
+  Exports (5): registerServiceWorker, sendMessageToServiceWorker, isServiceWorkerAvailable, getNetworkStatus, onNetworkStatusChange
+  Dependencies (0): none
+  Used by (0): none
+
+================================================================================
+END OF REPORT
+================================================================================

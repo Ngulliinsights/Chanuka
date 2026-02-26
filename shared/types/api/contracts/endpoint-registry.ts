@@ -3,7 +3,7 @@
  * Centralized registry of all API endpoints with type-safe contracts
  */
 
-import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery, ApiEndpointWithParamsAndQuery } from './endpoint';
+import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery } from './endpoint';
 import {
   CreateUserRequestSchema,
   CreateUserResponseSchema,
@@ -182,7 +182,7 @@ export const UserEndpoints = {
     description: 'Create a new user account',
     tags: ['users', 'authentication'],
     requiresAuth: false,
-  } as ApiEndpoint<CreateUserRequest, CreateUserResponse>,
+  } as unknown as ApiEndpoint<CreateUserRequest, CreateUserResponse>,
 
   /**
    * Get user by ID
@@ -197,7 +197,7 @@ export const UserEndpoints = {
     description: 'Get user details by ID',
     tags: ['users'],
     requiresAuth: true,
-  } as ApiEndpointWithParams<GetUserRequest, GetUserResponse, GetUserRequest>,
+  } as unknown as ApiEndpointWithParams<GetUserRequest, GetUserResponse, GetUserRequest>,
 
   /**
    * Update user
@@ -213,7 +213,7 @@ export const UserEndpoints = {
     tags: ['users'],
     requiresAuth: true,
     requiredPermissions: ['user:update'],
-  } as ApiEndpointWithParams<UpdateUserRequest, UpdateUserResponse, GetUserRequest>,
+  } as unknown as ApiEndpointWithParams<UpdateUserRequest, UpdateUserResponse, GetUserRequest>,
 
   /**
    * List users
@@ -229,7 +229,7 @@ export const UserEndpoints = {
     tags: ['users'],
     requiresAuth: true,
     requiredPermissions: ['user:list'],
-  } as ApiEndpointWithQuery<ListUsersRequest, ListUsersResponse, ListUsersRequest>,
+  } as unknown as ApiEndpointWithQuery<ListUsersRequest, ListUsersResponse, ListUsersRequest>,
 
   /**
    * Delete user
@@ -245,7 +245,7 @@ export const UserEndpoints = {
     tags: ['users'],
     requiresAuth: true,
     requiredPermissions: ['user:delete'],
-  } as ApiEndpointWithParams<DeleteUserRequest, DeleteUserResponse, DeleteUserRequest>,
+  } as unknown as ApiEndpointWithParams<DeleteUserRequest, DeleteUserResponse, DeleteUserRequest>,
 } as const;
 
 // ============================================================================
@@ -266,7 +266,7 @@ export const BillEndpoints = {
     tags: ['bills', 'legislative'],
     requiresAuth: true,
     requiredPermissions: ['bill:create'],
-  } as ApiEndpoint<CreateBillRequest, CreateBillResponse>,
+  } as unknown as ApiEndpoint<CreateBillRequest, CreateBillResponse>,
 
   /**
    * Get bill by ID
@@ -281,7 +281,7 @@ export const BillEndpoints = {
     description: 'Get bill details by ID',
     tags: ['bills', 'legislative'],
     requiresAuth: false,
-  } as ApiEndpointWithParams<GetBillRequest, GetBillResponse, GetBillRequest>,
+  } as unknown as ApiEndpointWithParams<GetBillRequest, GetBillResponse, GetBillRequest>,
 
   /**
    * Update bill
@@ -297,7 +297,7 @@ export const BillEndpoints = {
     tags: ['bills', 'legislative'],
     requiresAuth: true,
     requiredPermissions: ['bill:update'],
-  } as ApiEndpointWithParams<UpdateBillRequest, UpdateBillResponse, GetBillRequest>,
+  } as unknown as ApiEndpointWithParams<UpdateBillRequest, UpdateBillResponse, GetBillRequest>,
 
   /**
    * List bills
@@ -312,7 +312,7 @@ export const BillEndpoints = {
     description: 'List bills with pagination, filtering, and sorting',
     tags: ['bills', 'legislative'],
     requiresAuth: false,
-  } as ApiEndpointWithQuery<ListBillsRequest, ListBillsResponse, ListBillsRequest>,
+  } as unknown as ApiEndpointWithQuery<ListBillsRequest, ListBillsResponse, ListBillsRequest>,
 
   /**
    * Delete bill
@@ -328,7 +328,7 @@ export const BillEndpoints = {
     tags: ['bills', 'legislative'],
     requiresAuth: true,
     requiredPermissions: ['bill:delete'],
-  } as ApiEndpointWithParams<DeleteBillRequest, DeleteBillResponse, DeleteBillRequest>,
+  } as unknown as ApiEndpointWithParams<DeleteBillRequest, DeleteBillResponse, DeleteBillRequest>,
 
   /**
    * Get bill engagement metrics
@@ -343,7 +343,7 @@ export const BillEndpoints = {
     description: 'Get engagement metrics for a bill',
     tags: ['bills', 'analytics'],
     requiresAuth: false,
-  } as ApiEndpointWithParams<GetBillEngagementRequest, GetBillEngagementResponse, GetBillEngagementRequest>,
+  } as unknown as ApiEndpointWithParams<GetBillEngagementRequest, GetBillEngagementResponse, GetBillEngagementRequest>,
 } as const;
 
 // ============================================================================
@@ -363,7 +363,7 @@ export const NotificationEndpoints = {
     description: 'Create a new notification',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpoint<CreateNotificationRequest, CreateNotificationResponse>,
+  } as unknown as ApiEndpoint<CreateNotificationRequest, CreateNotificationResponse>,
 
   /**
    * Get notifications
@@ -378,7 +378,7 @@ export const NotificationEndpoints = {
     description: 'Get user notifications with pagination',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpointWithQuery<GetNotificationsRequest, GetNotificationsResponse, GetNotificationsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetNotificationsRequest, GetNotificationsResponse, GetNotificationsRequest>,
 
   /**
    * Mark notification as read
@@ -393,7 +393,7 @@ export const NotificationEndpoints = {
     description: 'Mark a notification as read',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpointWithParams<MarkNotificationReadRequest, MarkNotificationReadResponse, MarkNotificationReadRequest>,
+  } as unknown as ApiEndpointWithParams<MarkNotificationReadRequest, MarkNotificationReadResponse, MarkNotificationReadRequest>,
 
   /**
    * Mark all notifications as read
@@ -407,7 +407,7 @@ export const NotificationEndpoints = {
     description: 'Mark all notifications as read',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpoint<unknown, MarkAllNotificationsReadResponse>,
+  } as unknown as ApiEndpoint<unknown, MarkAllNotificationsReadResponse>,
 
   /**
    * Delete notification
@@ -422,7 +422,7 @@ export const NotificationEndpoints = {
     description: 'Delete a notification',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpointWithParams<DeleteNotificationRequest, DeleteNotificationResponse, DeleteNotificationRequest>,
+  } as unknown as ApiEndpointWithParams<DeleteNotificationRequest, DeleteNotificationResponse, DeleteNotificationRequest>,
 
   /**
    * Get notification stats
@@ -436,7 +436,7 @@ export const NotificationEndpoints = {
     description: 'Get notification statistics',
     tags: ['notifications'],
     requiresAuth: true,
-  } as ApiEndpoint<unknown, GetNotificationStatsResponse>,
+  } as unknown as ApiEndpoint<unknown, GetNotificationStatsResponse>,
 
   /**
    * Get notification preferences
@@ -450,7 +450,7 @@ export const NotificationEndpoints = {
     description: 'Get user notification preferences',
     tags: ['notifications', 'preferences'],
     requiresAuth: true,
-  } as ApiEndpoint<unknown, GetNotificationPreferencesResponse>,
+  } as unknown as ApiEndpoint<unknown, GetNotificationPreferencesResponse>,
 
   /**
    * Update notification preferences
@@ -464,7 +464,7 @@ export const NotificationEndpoints = {
     description: 'Update user notification preferences',
     tags: ['notifications', 'preferences'],
     requiresAuth: true,
-  } as ApiEndpoint<UpdateNotificationPreferencesRequest, UpdateNotificationPreferencesResponse>,
+  } as unknown as ApiEndpoint<UpdateNotificationPreferencesRequest, UpdateNotificationPreferencesResponse>,
 
   /**
    * Test notification filter
@@ -478,7 +478,7 @@ export const NotificationEndpoints = {
     description: 'Test notification filter rules',
     tags: ['notifications', 'testing'],
     requiresAuth: true,
-  } as ApiEndpoint<TestNotificationFilterRequest, TestNotificationFilterResponse>,
+  } as unknown as ApiEndpoint<TestNotificationFilterRequest, TestNotificationFilterResponse>,
 
   /**
    * Get notification service status
@@ -492,7 +492,7 @@ export const NotificationEndpoints = {
     description: 'Get notification service health status',
     tags: ['notifications', 'monitoring'],
     requiresAuth: false,
-  } as ApiEndpoint<unknown, GetNotificationServiceStatusResponse>,
+  } as unknown as ApiEndpoint<unknown, GetNotificationServiceStatusResponse>,
 } as const;
 
 // ============================================================================
@@ -514,7 +514,7 @@ export const AnalyticsEndpoints = {
     tags: ['analytics'],
     requiresAuth: true,
     requiredPermissions: ['analytics:read'],
-  } as ApiEndpointWithQuery<GetAnalyticsMetricsRequest, GetAnalyticsMetricsResponse, GetAnalyticsMetricsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetAnalyticsMetricsRequest, GetAnalyticsMetricsResponse, GetAnalyticsMetricsRequest>,
 
   /**
    * Get bill analytics
@@ -529,7 +529,7 @@ export const AnalyticsEndpoints = {
     description: 'Get analytics for a specific bill',
     tags: ['analytics', 'bills'],
     requiresAuth: false,
-  } as ApiEndpointWithParams<GetBillAnalyticsRequest, GetBillAnalyticsResponse, GetBillAnalyticsRequest>,
+  } as unknown as ApiEndpointWithParams<GetBillAnalyticsRequest, GetBillAnalyticsResponse, GetBillAnalyticsRequest>,
 
   /**
    * Get user analytics
@@ -545,7 +545,7 @@ export const AnalyticsEndpoints = {
     tags: ['analytics', 'users'],
     requiresAuth: true,
     requiredPermissions: ['analytics:read'],
-  } as ApiEndpointWithParams<GetUserAnalyticsRequest, GetUserAnalyticsResponse, GetUserAnalyticsRequest>,
+  } as unknown as ApiEndpointWithParams<GetUserAnalyticsRequest, GetUserAnalyticsResponse, GetUserAnalyticsRequest>,
 
   /**
    * Track event
@@ -559,7 +559,7 @@ export const AnalyticsEndpoints = {
     description: 'Track an analytics event',
     tags: ['analytics', 'tracking'],
     requiresAuth: false,
-  } as ApiEndpoint<TrackEventRequest, TrackEventResponse>,
+  } as unknown as ApiEndpoint<TrackEventRequest, TrackEventResponse>,
 } as const;
 
 // ============================================================================
@@ -580,7 +580,7 @@ export const SearchEndpoints = {
     description: 'Search across all content types',
     tags: ['search'],
     requiresAuth: false,
-  } as ApiEndpointWithQuery<SearchRequest, SearchResponse, SearchRequest>,
+  } as unknown as ApiEndpointWithQuery<SearchRequest, SearchResponse, SearchRequest>,
 
   /**
    * Search bills
@@ -595,7 +595,7 @@ export const SearchEndpoints = {
     description: 'Search bills specifically',
     tags: ['search', 'bills'],
     requiresAuth: false,
-  } as ApiEndpointWithQuery<SearchBillsRequest, SearchBillsResponse, SearchBillsRequest>,
+  } as unknown as ApiEndpointWithQuery<SearchBillsRequest, SearchBillsResponse, SearchBillsRequest>,
 
   /**
    * Search users
@@ -610,7 +610,7 @@ export const SearchEndpoints = {
     description: 'Search users specifically',
     tags: ['search', 'users'],
     requiresAuth: true,
-  } as ApiEndpointWithQuery<SearchUsersRequest, SearchUsersResponse, SearchUsersRequest>,
+  } as unknown as ApiEndpointWithQuery<SearchUsersRequest, SearchUsersResponse, SearchUsersRequest>,
 
   /**
    * Get search suggestions
@@ -625,7 +625,7 @@ export const SearchEndpoints = {
     description: 'Get search suggestions for autocomplete',
     tags: ['search', 'suggestions'],
     requiresAuth: false,
-  } as ApiEndpointWithQuery<GetSearchSuggestionsRequest, GetSearchSuggestionsResponse, GetSearchSuggestionsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetSearchSuggestionsRequest, GetSearchSuggestionsResponse, GetSearchSuggestionsRequest>,
 } as const;
 
 // ============================================================================
@@ -647,7 +647,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'monitoring'],
     requiresAuth: true,
     requiredPermissions: ['admin:read'],
-  } as ApiEndpointWithQuery<GetSystemStatusRequest, GetSystemStatusResponse, GetSystemStatusRequest>,
+  } as unknown as ApiEndpointWithQuery<GetSystemStatusRequest, GetSystemStatusResponse, GetSystemStatusRequest>,
 
   /**
    * Get system metrics
@@ -663,7 +663,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'monitoring'],
     requiresAuth: true,
     requiredPermissions: ['admin:read'],
-  } as ApiEndpointWithQuery<GetSystemMetricsRequest, GetSystemMetricsResponse, GetSystemMetricsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetSystemMetricsRequest, GetSystemMetricsResponse, GetSystemMetricsRequest>,
 
   /**
    * Get audit logs
@@ -679,7 +679,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'audit'],
     requiresAuth: true,
     requiredPermissions: ['admin:audit:read'],
-  } as ApiEndpointWithQuery<GetAuditLogsRequest, GetAuditLogsResponse, GetAuditLogsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetAuditLogsRequest, GetAuditLogsResponse, GetAuditLogsRequest>,
 
   /**
    * Create moderation action
@@ -694,7 +694,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'moderation'],
     requiresAuth: true,
     requiredPermissions: ['admin:moderate'],
-  } as ApiEndpoint<CreateModerationActionRequest, CreateModerationActionResponse>,
+  } as unknown as ApiEndpoint<CreateModerationActionRequest, CreateModerationActionResponse>,
 
   /**
    * Get moderation actions
@@ -710,7 +710,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'moderation'],
     requiresAuth: true,
     requiredPermissions: ['admin:moderate:read'],
-  } as ApiEndpointWithQuery<GetModerationActionsRequest, GetModerationActionsResponse, GetModerationActionsRequest>,
+  } as unknown as ApiEndpointWithQuery<GetModerationActionsRequest, GetModerationActionsResponse, GetModerationActionsRequest>,
 
   /**
    * Update user role
@@ -725,7 +725,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'users'],
     requiresAuth: true,
     requiredPermissions: ['admin:users:update'],
-  } as ApiEndpoint<UpdateUserRoleRequest, UpdateUserRoleResponse>,
+  } as unknown as ApiEndpoint<UpdateUserRoleRequest, UpdateUserRoleResponse>,
 
   /**
    * Bulk delete
@@ -740,7 +740,7 @@ export const AdminEndpoints = {
     tags: ['admin', 'bulk-operations'],
     requiresAuth: true,
     requiredPermissions: ['admin:delete'],
-  } as ApiEndpoint<BulkDeleteRequest, BulkDeleteResponse>,
+  } as unknown as ApiEndpoint<BulkDeleteRequest, BulkDeleteResponse>,
 } as const;
 
 // ============================================================================

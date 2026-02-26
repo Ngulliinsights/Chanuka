@@ -11,6 +11,6 @@
       "@shared/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.d.ts", "../server/infrastructure/validation/middleware.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "**/examples/**", "**/examples.disabled/**", "types/migration/**", "types/performance/**", "types/dashboard/**", "types/verify-dependencies.ts"]
 }

@@ -170,10 +170,23 @@ export type { ApiService, BillsService, CommunityService, AuthService } from './
 // Real-time & WebSocket Types
 // ============================================================================
 
-// WebSocket types are now available from @shared/types/api/websocket
-// Import ConnectionState, ConnectionQuality, WebSocketMessage from there for real-time functionality
+// WebSocket client types
 export type {
+  IWebSocketClient,
+  WebSocketOptions,
+  WebSocketClientEvents,
+  WebSocketError,
   ConnectionState,
   ConnectionQuality,
   WebSocketMessage,
-} from '@shared/types/api/websocket';
+} from './websocket';
+
+// Realtime client types
+export type {
+  IRealtimeClient,
+  Subscription,
+  EventHandler,
+  RealtimeEvent,
+  RealtimeOptions,
+  RealtimeHubState,
+} from './realtime';

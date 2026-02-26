@@ -406,4 +406,49 @@ export default defineWorkspace([
       },
     },
   },
+
+  // ============================================================================
+  // PROPERTY-BASED TESTS
+  // ============================================================================
+  {
+    name: 'properties',
+    test: {
+      globals: true,
+      environment: 'node',
+      setupFiles: ['./vitest.setup.ts'],
+      testTimeout: 120000, // Property tests can take longer
+      hookTimeout: 30000,
+
+      include: ['tests/properties/**/*.property.test.{ts,tsx}'],
+      exclude: ['**/node_modules/**', '**/dist/**'],
+
+      coverage: {
+        provider: 'v8',
+        reporter: ['text', 'json', 'html'],
+        reportsDirectory: './coverage/properties',
+      },
+
+      reporters: ['verbose'],
+      retry: 0, // Property tests should not retry
+      pool: 'threads',
+      poolOptions: {
+        threads: {
+          singleThread: false,
+          isolate: true,
+        },
+      },
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, './client/src'),
+        '@client': resolve(__dirname, './client/src'),
+        '@shared': resolve(__dirname, './shared'),
+        '@workspace': resolve(__dirname, './shared'),
+        '@workspace/types': resolve(__dirname, './shared/types'),
+        '@workspace/core': resolve(__dirname, './shared/core'),
+        '@workspace/validation': resolve(__dirname, './shared/validation'),
+        '@workspace/constants': resolve(__dirname, './shared/constants'),
+      },
+    },
+  },
 ])

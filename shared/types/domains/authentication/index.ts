@@ -4,7 +4,7 @@
  */
 
 export * from './user';
-export * from './auth-state';
+// export * from './auth-state'; // Commented out to avoid duplicate isAuthenticated export
 
 /**
  * Authentication domain version and metadata

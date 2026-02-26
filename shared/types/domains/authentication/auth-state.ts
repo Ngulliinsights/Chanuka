@@ -5,7 +5,7 @@
 
 import { User } from './user';
 
-import { UserId, SessionId } from '../../core/common';
+import { UserId, SessionId } from '../../core/branded';
 
 /**
  * Authentication Status Types

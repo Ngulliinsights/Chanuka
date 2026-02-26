@@ -160,7 +160,9 @@ export const arrays = {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      const temp = shuffled[i];
+      shuffled[i] = shuffled[j]!;
+      shuffled[j] = temp!;
     }
     return shuffled;
   }
@@ -241,7 +243,7 @@ export const functions = {
 // ============================================================================
 
 export const objects = {
-  pick: <T, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
+  pick: <T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> => {
     const result = {} as Pick<T, K>;
     keys.forEach(key => {
       if (key in obj) {
@@ -259,14 +261,15 @@ export const objects = {
     return result;
   },
   
-  deepMerge: <T>(target: T, source: Partial<T>): T => {
+  deepMerge: <T extends Record<string, unknown>>(target: T, source: Partial<T>): T => {
     const result = { ...target };
     
     for (const key in source) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        result[key] = objects.deepMerge(result[key], source[key] as any);
+      const sourceValue = source[key];
+      if (sourceValue && typeof sourceValue === 'object' && !Array.isArray(sourceValue)) {
+        result[key] = objects.deepMerge(result[key] as Record<string, unknown>, sourceValue as Record<string, unknown>) as T[Extract<keyof T, string>];
       } else {
-        result[key] = source[key] as unknown;
+        result[key] = sourceValue as T[Extract<keyof T, string>];
       }
     }
     

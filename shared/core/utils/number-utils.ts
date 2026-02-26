@@ -3,7 +3,13 @@
  */
 export class NumberUtils {
   static parseNumber(value: unknown): number {
-    return typeof value === 'string' ? parseFloat(value) : value;
+    if (typeof value === 'string') {
+      return parseFloat(value);
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    return NaN;
   }
 
   static isValidNumber(value: unknown): boolean {

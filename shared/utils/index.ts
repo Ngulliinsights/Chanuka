@@ -19,5 +19,4 @@
 export * from './correlation-id';
 export * from './errors';
 export * from './transformers';
-export * from './serialization';
 

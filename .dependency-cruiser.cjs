@@ -45,6 +45,35 @@ module.exports = {
           '^server/persistence/.*'
         ]
       }
+    },
+    {
+      name: 'no-circular-infrastructure',
+      severity: 'error',
+      comment: 'Circular dependencies in infrastructure modules are not allowed',
+      from: {
+        path: '^client/src/infrastructure/'
+      },
+      to: {
+        path: '^client/src/infrastructure/',
+        circular: true
+      }
+    },
+    {
+      name: 'infrastructure-public-api-only',
+      severity: 'warn',
+      comment: 'Infrastructure modules should be imported through their public API (index.ts)',
+      from: {
+        path: '^client/src/',
+        pathNot: '^client/src/infrastructure/'
+      },
+      to: {
+        path: '^client/src/infrastructure/[^/]+/.+',
+        pathNot: [
+          '^client/src/infrastructure/[^/]+/index\\.ts$',
+          '^client/src/infrastructure/[^/]+/types\\.ts$',
+          '^client/src/infrastructure/[^/]+/types/'
+        ]
+      }
     }
   ],
   options: {

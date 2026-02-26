@@ -1,0 +1,22 @@
+{
+  "fileExtensions": ["ts", "tsx"],
+  "excludeRegExp": [
+    "node_modules",
+    "dist",
+    ".nx",
+    "__tests__",
+    ".test.ts",
+    ".test.tsx",
+    ".spec.ts",
+    ".spec.tsx"
+  ],
+  "detectiveOptions": {
+    "ts": {
+      "skipTypeImports": true
+    }
+  },
+  "baseDir": "client/src/infrastructure",
+  "includeNpm": false,
+  "circular": true,
+  "warning": true
+}

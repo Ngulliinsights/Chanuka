@@ -12,7 +12,7 @@ export type {
   TransformationContext,
   TransformationOptions,
   TransformationResult,
-  TransformationError,
+  TransformerError,
   TransformerRegistryEntry,
   TransformationPipeline,
 } from './types';

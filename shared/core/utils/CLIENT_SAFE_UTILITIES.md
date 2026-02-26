@@ -4,9 +4,9 @@
 
 This document identifies which utilities in the shared layer are safe for use in client (browser) contexts.
 
-**Last Updated**: 2026-02-12  
-**Spec**: Full-Stack Integration  
-**Task**: 11.3 - Consolidate shared utilities
+**Last Updated**: 2026-02-26  
+**Spec**: Client Infrastructure Consolidation  
+**Task**: 11.3 - Update documentation for shared layer cleanup
 
 ---
 
@@ -46,23 +46,27 @@ These utilities have no server-only dependencies and can be safely used in both 
 
 ### Loading Utilities
 **File**: `shared/core/utils/loading-utils.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Loading state management utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality moved to client/src/infrastructure/store/slices/loading/  
+**Functions**: Loading state management utilities (now in Redux slice)
 
 ### Navigation Utilities
 **File**: `shared/core/utils/navigation-utils.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Navigation and routing utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality moved to client/src/infrastructure/store/slices/navigation/  
+**Functions**: Navigation and routing utilities (now in Redux slice)
 
 ### Dashboard Utilities
 **File**: `shared/core/utils/dashboard-utils.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Dashboard-specific utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality moved to client/src/infrastructure/store/slices/dashboard/  
+**Functions**: Dashboard-specific utilities (now in Redux slice)
 
 ### Browser Logger
 **File**: `shared/core/utils/browser-logger.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Browser-compatible logging utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, replaced by unified logging infrastructure at client/src/infrastructure/logging/  
+**Functions**: Browser-compatible logging utilities (replaced by UnifiedLogger)
 
 ### Anonymity Interface
 **File**: `shared/core/utils/anonymity-interface.ts`  
@@ -76,13 +80,15 @@ These utilities have no server-only dependencies and can be safely used in both 
 
 ### Race Condition Prevention
 **File**: `shared/core/utils/race-condition-prevention.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Race condition prevention utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality available in async-utils.ts  
+**Functions**: Race condition prevention utilities (debounce, throttle now in async-utils)
 
 ### Concurrency Adapter
 **File**: `shared/core/utils/concurrency-adapter.ts`  
-**Status**: ✅ Fully Client-Safe  
-**Functions**: Concurrency management utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality available in async-utils.ts  
+**Functions**: Concurrency management utilities (Promise utilities now in async-utils)
 
 ### Concurrency Migration Router
 **File**: `shared/core/utils/concurrency-migration-router.ts`  
@@ -103,15 +109,15 @@ These utilities have been cleaned up to remove server-only dependencies and are 
 
 ### HTTP Utilities
 **File**: `shared/core/utils/http-utils.ts`  
-**Status**: ✅ Client-Safe (logger already commented out)  
-**Functions**: HTTP status codes, error handling, request utilities
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality moved to client/src/infrastructure/api/http/  
+**Functions**: HTTP status codes, error handling, request utilities (now in API module)
 
 ### Performance Utilities
 **File**: `shared/core/utils/performance-utils.ts`  
-**Status**: ✅ Client-Safe (after cleanup)  
-**Changes**: Removed logger dependency, replaced with safeLog helper  
-**Functions**: Performance monitoring, benchmarking, metrics tracking  
-**Note**: Some Node.js-specific APIs (process.memoryUsage, process.cpuUsage) will only work in Node.js
+**Status**: ❌ DELETED (Task 11.1)  
+**Reason**: Never imported, functionality moved to client/src/infrastructure/observability/performance/  
+**Functions**: Performance monitoring, benchmarking, metrics tracking (now in observability module)
 
 ### Security Utilities
 **File**: `shared/core/utils/security-utils.ts`  
@@ -288,16 +294,29 @@ To verify a utility is client-safe:
 
 ## Summary Statistics
 
-| Category | Total Files | Client-Safe | Server-Only | Conditional |
-|----------|-------------|-------------|-------------|-------------|
-| Core Utils | 20 | 16 | 0 | 4 |
+### After Task 11.1 Cleanup (Current State)
+
+| Category | Total Files | Client-Safe | Deleted | Conditional |
+|----------|-------------|-------------|---------|-------------|
+| Core Utils | 12 | 10 | 8 | 2 |
 | Formatting | 6 | 6 | 0 | 0 |
 | Images | 1 | 1 | 0 | 0 |
 | Shared Utils | 2 dirs | 2 dirs | 0 | 0 |
-| **Total** | **~29** | **~25** | **0** | **~4** |
+| **Total** | **~21** | **~19** | **8** | **~2** |
 
-**Client-Safe Percentage**: ~86% (25/29)  
-**Conditional Features**: ~14% (4/29)
+**Client-Safe Percentage**: ~90% (19/21)  
+**Conditional Features**: ~10% (2/21)  
+**Files Deleted**: 8 files (2,160+ lines removed)
+
+### Deleted Files (Task 11.1)
+1. `browser-logger.ts` - Replaced by unified logging infrastructure
+2. `dashboard-utils.ts` - Moved to Redux dashboard slice
+3. `loading-utils.ts` - Moved to Redux loading slice
+4. `navigation-utils.ts` - Moved to Redux navigation slice
+5. `performance-utils.ts` - Moved to observability/performance module
+6. `race-condition-prevention.ts` - Functionality in async-utils.ts
+7. `concurrency-adapter.ts` - Functionality in async-utils.ts
+8. `http-utils.ts` - Moved to API module
 
 ---
 
@@ -316,6 +335,8 @@ When adding new utilities to `shared/core/utils/`:
 
 ## Related Documentation
 
-- `SHARED_LAYER_AUDIT.md` - Audit of server-only code in shared layer
-- `SHARED_UTILITIES_CONSOLIDATION.md` - Consolidation plan for duplicate utilities
-- `TASK_11.2_COMPLETION_SUMMARY.md` - Summary of server-only code migration
+- **SHARED_CLIENT_SERVER_BOUNDARIES.md** - Comprehensive guide on what belongs in shared vs client vs server
+- **BOUNDARY_FIX_PLAN.md** - Implementation plan for fixing boundary violations
+- **SHARED_LAYER_AUDIT.md** - Audit of server-only code in shared layer
+- **TASK-8-9-COMPLETION-SUMMARY.md** - Summary of store consolidation (Task 8) and logging infrastructure (Task 9)
+- **Client Infrastructure Consolidation Spec** - Current implementation of client infrastructure improvements

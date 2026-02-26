@@ -4,5 +4,5 @@
  * HTTP utilities and request optimization
  */
 
-export * from './request-deduplicator';
-export { RequestDeduplicator, requestDeduplicator } from './request-deduplicator';
+export * from '../api/http/request-deduplicator';
+export { RequestDeduplicator, requestDeduplicator } from '../api/http/request-deduplicator';

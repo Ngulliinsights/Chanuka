@@ -3,8 +3,8 @@
  * Discriminated unions for legislative actions following the loading.ts pattern
  */
 
-import { BillId } from '../../core/common';
-import { BillStatus, LegislativeActionType } from './bill';
+import { BillId } from '../../core/branded';
+import { BillStatus } from './bill';
 
 // ============================================================================
 // Action Payloads

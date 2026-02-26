@@ -10,7 +10,7 @@
  * @canonical
  */
 
-import { BaseEntity, UserTrackableEntity } from '../../core/base';
+import { UserTrackableEntity } from '../../core/base';
 import { CommentId, BillId, UserId } from '../../core/branded';
 import { CommentStatus, ModerationStatus } from '../../core/enums';
 

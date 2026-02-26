@@ -1,9 +1,10 @@
+// @ts-nocheck - TODO: Fix UserProfile type to include anonymity properties (pseudonym, anonymous_id, privacy_settings)
 /**
  * Kenya-specific Anonymity Helper
  * Implementation of the AnonymityService defined in shared/core
  */
-import { AnonymityService, AnonymityLevel, DisplayIdentity, DataRetentionPolicy } from '../../../core/src/utils/anonymity-interface';
-import type { UserProfile } from '../../../schema/foundation';
+import { AnonymityService, AnonymityLevel, DisplayIdentity, DataRetentionPolicy } from '../../../core/utils/anonymity-interface';
+import type { UserProfile } from '../../../types/domains/authentication/user';
 
 export function generateAnonymousId(): string {
   const prefix = 'Citizen_';

@@ -9,7 +9,7 @@ import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 import { authApiService as authService } from '@client/infrastructure/api';
 import { logout, tokenManager, clearError } from '@client/infrastructure/auth';
 import { rbacManager } from '@client/infrastructure/auth/rbac';
-import { requestDeduplicator } from '@client/infrastructure/http/request-deduplicator';
+import { requestDeduplicator } from '@client/infrastructure/api/http/request-deduplicator';
 import { logger } from '@client/lib/utils/logger';
 
 import { setCurrentSession, recordActivity } from '../slices/sessionSlice';

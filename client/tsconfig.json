@@ -45,6 +45,8 @@
       // Client-side modules
       "@core": ["./src/infrastructure"],
       "@core/*": ["./src/infrastructure/*"],
+      "@/infrastructure": ["./src/infrastructure"],
+      "@/infrastructure/*": ["./src/infrastructure/*"],
       "@lib": ["./src/lib"],
       "@lib/*": ["./src/lib/*"],
       "@features": ["./src/features"],
@@ -72,7 +74,7 @@
     "typeRoots": ["./node_modules/@types", "../@types"]
   },
 
-  "include": ["src/**/*", "../@types/**/*", "src/__tests__/integration/react-initialization.test.tsx", "vite.config.ts", "vite.production.config.ts"],
+  "include": ["src/**/*", "../@types/**/*", "src/__tests__/integration/react-initialization.test.tsx", "vite.config.ts", "vite.production.config.ts", "../tests/properties/public-api-completeness.property.test.ts"],
 
   "exclude": [
     "node_modules",

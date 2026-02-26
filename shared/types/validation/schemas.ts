@@ -11,7 +11,7 @@ import { z } from 'zod';
 /**
  * Validation error structure
  */
-export interface ValidationError {
+export interface SchemaValidationError {
   field: string;
   message: string;
   code: string;
@@ -29,7 +29,7 @@ export interface ValidationContext {
 /**
  * Schema validator function type
  */
-export type SchemaValidator<T> = (data: unknown) => ValidationResult<T>;
+export type SchemaValidator<T> = (data: unknown) => { success: boolean; data?: T; errors?: string[] };
 
 /**
  * Zod schema type helper

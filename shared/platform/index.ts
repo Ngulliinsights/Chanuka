@@ -12,8 +12,8 @@ export type {
   AnonymityLevel,
   DisplayIdentity,
   DataRetentionPolicy,
-  AnonymityService
-} from '../core/src/utils/anonymity-interface';
+  AnonymityService as IAnonymityService
+} from '../core/utils/anonymity-interface';
 
 // Default export for current platform (Kenya)
 export { default as AnonymityService } from './kenya/anonymity/anonymity-helper';

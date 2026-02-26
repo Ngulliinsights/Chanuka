@@ -4,7 +4,9 @@
  */
 
 import { z, ZodSchema } from 'zod';
-import { Result, ValidationError } from './errors';
+import { Result, ok, err, isErr } from './errors';
+import { ValidationError } from '../../utils/errors/types';
+import { ErrorContextBuilder } from '../../utils/errors/context';
 
 /**
  * Type guard factory for consistent validation
@@ -68,44 +70,50 @@ export function createValidatedType<T>(
     validate: (input: unknown): Result<T, ValidationError> => {
       try {
         const result = schema.parse(input);
-        return { success: true, data: result };
+        return ok(result);
       } catch (error) {
         if (error instanceof z.ZodError) {
           const errorMessages = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-          return {
-            success: false,
-            error: new ValidationError(`Validation failed for ${typeName}: ${errorMessages}`, undefined, {
-              errors: error.errors,
-              input
-            })
-          };
+          const context = new ErrorContextBuilder()
+            .operation('validation')
+            .layer('client')
+            .severity('medium')
+            .metadata({ errors: error.errors, input })
+            .build();
+          return err(new ValidationError(`Validation failed for ${typeName}: ${errorMessages}`, context, []));
         }
-        return {
-          success: false,
-          error: new ValidationError(`Validation failed for ${typeName}: ${error instanceof Error ? error.message : 'Unknown error'}`, undefined, { input })
-        };
+        const context = new ErrorContextBuilder()
+          .operation('validation')
+          .layer('client')
+          .severity('medium')
+          .metadata({ input })
+          .build();
+        return err(new ValidationError(`Validation failed for ${typeName}: ${error instanceof Error ? error.message : 'Unknown error'}`, context, []));
       }
     },
 
     validateAsync: async (input: unknown): Promise<Result<T, ValidationError>> => {
       try {
         const result = await schema.parseAsync(input);
-        return { success: true, data: result };
+        return ok(result);
       } catch (error) {
         if (error instanceof z.ZodError) {
           const errorMessages = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-          return {
-            success: false,
-            error: new ValidationError(`Validation failed for ${typeName}: ${errorMessages}`, undefined, {
-              errors: error.errors,
-              input
-            })
-          };
+          const context = new ErrorContextBuilder()
+            .operation('validation')
+            .layer('client')
+            .severity('medium')
+            .metadata({ errors: error.errors, input })
+            .build();
+          return err(new ValidationError(`Validation failed for ${typeName}: ${errorMessages}`, context, []));
         }
-        return {
-          success: false,
-          error: new ValidationError(`Validation failed for ${typeName}: ${error instanceof Error ? error.message : 'Unknown error'}`, undefined, { input })
-        };
+        const context = new ErrorContextBuilder()
+          .operation('validation')
+          .layer('client')
+          .severity('medium')
+          .metadata({ input })
+          .build();
+        return err(new ValidationError(`Validation failed for ${typeName}: ${error instanceof Error ? error.message : 'Unknown error'}`, context, []));
       }
     },
 
@@ -125,26 +133,29 @@ export function validateWithSchema<T>(
 ): Result<T, ValidationError> {
   try {
     const result = schema.parse(input);
-    return { success: true, data: result };
+    return ok(result);
   } catch (error) {
     const typeName = context?.typeName ?? 'unknown';
     const fieldName = context?.fieldName;
 
     if (error instanceof z.ZodError) {
       const errorMessages = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('; ');
-      return {
-        success: false,
-        error: new ValidationError(`Validation failed for ${typeName}${fieldName ? ` (field: ${fieldName})` : ''}: ${errorMessages}`, fieldName, {
-          errors: error.errors,
-          input
-        })
-      };
+      const errorContext = new ErrorContextBuilder()
+        .operation('validation')
+        .layer('client')
+        .severity('medium')
+        .metadata({ errors: error.errors, input })
+        .build();
+      return err(new ValidationError(`Validation failed for ${typeName}${fieldName ? ` (field: ${fieldName})` : ''}: ${errorMessages}`, errorContext, []));
     }
 
-    return {
-      success: false,
-      error: new ValidationError(`Validation failed for ${typeName}${fieldName ? ` (field: ${fieldName})` : ''}: ${error instanceof Error ? error.message : 'Unknown error'}`, fieldName, { input })
-    };
+    const errorContext = new ErrorContextBuilder()
+      .operation('validation')
+      .layer('client')
+      .severity('medium')
+      .metadata({ input })
+      .build();
+    return err(new ValidationError(`Validation failed for ${typeName}${fieldName ? ` (field: ${fieldName})` : ''}: ${error instanceof Error ? error.message : 'Unknown error'}`, errorContext, []));
   }
 }
 
@@ -177,16 +188,16 @@ export function validateEntityWithError<T>(
   entityName: string
 ): Result<T, ValidationError> {
   if (validator(value)) {
-    return { success: true, data: value };
+    return ok(value);
   }
 
-  return {
-    success: false,
-    error: new ValidationError(`Invalid ${entityName} structure`, undefined, {
-      value,
-      validator: validator.name
-    })
-  };
+  const context = new ErrorContextBuilder()
+    .operation('entity-validation')
+    .layer('client')
+    .severity('medium')
+    .metadata({ value, validator: validator.name })
+    .build();
+  return err(new ValidationError(`Invalid ${entityName} structure`, context, []));
 }
 
 /**
@@ -213,17 +224,20 @@ export function validateArray<T>(
   }
 
   if (errors.length === 0) {
-    return { success: true, data: validatedItems };
+    return ok(validatedItems);
   }
 
-  return {
-    success: false,
-    error: new ValidationError(`Validation failed for ${errors.length} ${itemTypeName} items`, undefined, {
+  const context = new ErrorContextBuilder()
+    .operation('array-validation')
+    .layer('client')
+    .severity('medium')
+    .metadata({
       errors,
       totalItems: items.length,
       validItems: validatedItems.length
     })
-  };
+    .build();
+  return err(new ValidationError(`Validation failed for ${errors.length} ${itemTypeName} items`, context, []));
 }
 
 /**
@@ -239,22 +253,28 @@ export function createValidatedTypeFromValidator<T>(
 
     validate: (input: unknown): Result<T, ValidationError> => {
       if (validator(input)) {
-        return { success: true, data: input };
+        return ok(input);
       }
-      return {
-        success: false,
-        error: new ValidationError(`Validation failed for ${typeName}`, undefined, { input })
-      };
+      const context = new ErrorContextBuilder()
+        .operation('validation')
+        .layer('client')
+        .severity('medium')
+        .metadata({ input })
+        .build();
+      return err(new ValidationError(`Validation failed for ${typeName}`, context, []));
     },
 
     validateAsync: async (input: unknown): Promise<Result<T, ValidationError>> => {
       if (validator(input)) {
-        return { success: true, data: input };
+        return ok(input);
       }
-      return {
-        success: false,
-        error: new ValidationError(`Validation failed for ${typeName}`, undefined, { input })
-      };
+      const context = new ErrorContextBuilder()
+        .operation('validation')
+        .layer('client')
+        .severity('medium')
+        .metadata({ input })
+        .build();
+      return err(new ValidationError(`Validation failed for ${typeName}`, context, []));
     },
 
     typeGuard: validator
@@ -292,40 +312,40 @@ export function extendValidatedType<T, U extends T>(
 
     validate: (input: unknown): Result<U, ValidationError> => {
       const baseResult = baseValidatedType.validate(input);
-      if (!baseResult.success) {
+      if (isErr(baseResult)) {
         return baseResult as Result<U, ValidationError>;
       }
 
-      if (extensionValidator(baseResult.data)) {
-        return { success: true, data: baseResult.data };
+      if (extensionValidator(baseResult.value)) {
+        return ok(baseResult.value);
       }
 
-      return {
-        success: false,
-        error: new ValidationError(`Extension validation failed for ${extendedTypeName}`, undefined, {
-          baseValidation: 'success',
-          input
-        })
-      };
+      const context = new ErrorContextBuilder()
+        .operation('extension-validation')
+        .layer('client')
+        .severity('medium')
+        .metadata({ baseValidation: 'success', input })
+        .build();
+      return err(new ValidationError(`Extension validation failed for ${extendedTypeName}`, context, []));
     },
 
     validateAsync: async (input: unknown): Promise<Result<U, ValidationError>> => {
       const baseResult = await baseValidatedType.validateAsync(input);
-      if (!baseResult.success) {
+      if (isErr(baseResult)) {
         return baseResult as Result<U, ValidationError>;
       }
 
-      if (extensionValidator(baseResult.data)) {
-        return { success: true, data: baseResult.data };
+      if (extensionValidator(baseResult.value)) {
+        return ok(baseResult.value);
       }
 
-      return {
-        success: false,
-        error: new ValidationError(`Extension validation failed for ${extendedTypeName}`, undefined, {
-          baseValidation: 'success',
-          input
-        })
-      };
+      const context = new ErrorContextBuilder()
+        .operation('extension-validation')
+        .layer('client')
+        .severity('medium')
+        .metadata({ baseValidation: 'success', input })
+        .build();
+      return err(new ValidationError(`Extension validation failed for ${extendedTypeName}`, context, []));
     },
 
     typeGuard: (input: unknown): input is U => {

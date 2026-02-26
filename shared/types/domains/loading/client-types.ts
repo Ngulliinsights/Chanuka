@@ -19,8 +19,8 @@ import type {
   RetryStrategy,
   ConnectionType,
   LoadingError,
-  LoadingConfig,
-  LoadingConfigPriority
+  LoadingConfig
+  // LoadingConfigPriority // Unused
 } from './types';
 
 // ============================================================================

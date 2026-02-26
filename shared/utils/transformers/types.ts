@@ -121,7 +121,7 @@ export interface TransformationResult<T> {
   /**
    * Validation errors if any
    */
-  readonly errors?: readonly TransformationError[];
+  readonly errors?: readonly TransformerError[];
 
   /**
    * Warnings during transformation
@@ -137,7 +137,7 @@ export interface TransformationResult<T> {
 /**
  * Transformation error details
  */
-export interface TransformationError {
+export interface TransformerError {
   /**
    * Error code
    */

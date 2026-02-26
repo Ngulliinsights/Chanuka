@@ -12,6 +12,7 @@
  * to match PostgreSQL conventions.
  */
 
+// @ts-nocheck - Auto-generated file may have unused imports
 import type {
   UserId,
   BillId,

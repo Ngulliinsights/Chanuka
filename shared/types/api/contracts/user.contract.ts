@@ -3,7 +3,7 @@
  * Type-safe API contracts for user-related endpoints
  */
 
-import { User, CreateUserPayload, UpdateUserPayload } from '../../domains/authentication';
+import { User } from '../../domains/authentication';
 import { UserId } from '../../core/branded';
 
 // ============================================================================

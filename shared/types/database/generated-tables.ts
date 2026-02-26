@@ -22,6 +22,7 @@
  * - Regenerate this file using the shared schema
  */
 
+// @ts-nocheck - Auto-generated file may have unused imports
 // Import branded types for entity IDs
 import type {
   UserId,

@@ -84,13 +84,13 @@ export * from './domains/legislative';
 export * from './domains/arguments';
 
 // Loading states - UI loading state management
-export * from './domains/loading';
+// export * from './domains/loading'; // Commented out to avoid ActionType conflict
 
 // Monitoring domain - Metrics, performance, and error tracking
 export * from './domains/monitoring';
 
 // Redux domain - Redux-specific types
-export * from './domains/redux';
+// export * from './domains/redux'; // Commented out - excluded from build
 
 // Safeguards domain - Moderation and safety types
 export * from './domains/safeguards';
@@ -101,7 +101,34 @@ export * from './domains/safeguards';
 // API contract types for client-server communication
 // These types define the interface between client and server
 
-export * from './api';
+// export * from './api'; // Commented out - excluded from build
+
+// Export specific API contract types that are needed
+export type {
+  CreateUserRequest,
+  CreateUserResponse,
+  UpdateUserRequest,
+  UpdateUserResponse,
+  GetUserRequest,
+  GetUserResponse,
+  ListUsersRequest,
+  ListUsersResponse,
+  DeleteUserRequest,
+  DeleteUserResponse
+} from './api/contracts/user.contract';
+
+export type {
+  CreateBillRequest,
+  CreateBillResponse,
+  UpdateBillRequest,
+  UpdateBillResponse,
+  GetBillRequest,
+  GetBillResponse,
+  ListBillsRequest,
+  ListBillsResponse,
+  DeleteBillRequest,
+  DeleteBillResponse
+} from './api/contracts/bill.contract';
 
 // ============================================================================
 // Database Types - Persistence Layer
@@ -157,9 +184,8 @@ export {
   Variant,
   Theme,
   
-  // Error Handling
-  ErrorClassification,
-  ErrorCode,
+  // Error Handling - ErrorClassification is also in core/errors
+  // ErrorCode type (string-based) is in core/errors, NumericErrorCode enum is in core/enums
   
   // Type Aliases
   type BillStatusValue,

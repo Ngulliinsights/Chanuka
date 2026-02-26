@@ -32,6 +32,15 @@ export interface UserAnalytics {
   }>;
 }
 
+export interface AnalyticsMetrics {
+  totalUsers: number;
+  activeUsers: number;
+  totalBills: number;
+  totalComments: number;
+  totalVotes: number;
+  engagementRate: number;
+}
+
 // ============================================================================
 // Request Types
 // ============================================================================

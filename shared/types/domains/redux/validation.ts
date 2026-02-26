@@ -13,12 +13,35 @@ import type {
   PaginatedSliceState,
   SliceStateWithOperations,
   AsyncOperationState,
-  ThunkResult,
-  PaginatedThunkResult,
-  ThunkOperationState,
-  ThunkExecutionContext
 } from './slice-state';
-import type { ThunkResult as ThunkResultType } from './thunk-result';
+
+// Local type definitions for types not exported from slice-state
+type ThunkResult<TData = unknown, TError = string> = {
+  success: boolean;
+  data?: TData;
+  error?: TError;
+};
+
+type PaginatedThunkResult<TData = unknown, TError = string> = ThunkResult<TData, TError> & {
+  page: number;
+  limit: number;
+  total: number;
+};
+
+// Stub types for ThunkOperationState and ThunkExecutionContext
+type ThunkOperationState = {
+  operationId: string;
+  thunkName: string;
+  status: 'idle' | 'pending' | 'fulfilled' | 'rejected';
+  retryCount: number;
+  maxRetries: number;
+};
+
+type ThunkExecutionContext = {
+  requestId: string;
+  signal: AbortSignal;
+  rejectWithValue: (value: unknown) => unknown;
+};
 
 // ============================================================================
 // Comprehensive Type Guards
@@ -259,7 +282,7 @@ export function validateThunkResult<TData, TError>(
  * Validate state transitions for consistency
  */
 export function validateStateTransition(
-  previousState: SliceState,
+  _previousState: SliceState,
   nextState: SliceState,
   actionType: string
 ): boolean {

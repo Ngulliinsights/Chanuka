@@ -11,7 +11,13 @@
     "python": ">=3.11.0"
   },
   "scripts": {
+    "// --- TYPE CHECKING ---": "",
+    "type-check": "nx run-many --target=type-check --all",
+    "type-check:shared": "nx type-check shared",
+    "type-check:client": "nx type-check client",
+    "type-check:server": "nx type-check server",
     "// --- CORE LIFECYCLE ---": "",
+    "prepare": "command -v husky >/dev/null 2>&1 && husky install || echo 'Husky not installed, skipping'",
     "dev": "nx run-many --target=serve --projects=client,server --parallel",
     "dev:server": "nx serve server",
     "dev:client": "nx serve client",
@@ -104,6 +110,11 @@
     "quality:baseline:prod": "cp combined_analysis.json quality-baseline-prod.json",
     "// --- MODERN PROJECT ANALYSIS (TOOL ORCHESTRATION) ---": "",
     "analyze:modern": "tsx --tsconfig scripts/tsconfig.json scripts/modern-project-analyzer.ts",
+    "analyze:infrastructure": "tsx --tsconfig scripts/tsconfig.json scripts/analyze-infrastructure.ts",
+    "analyze:infrastructure:circular": "madge --circular --extensions ts,tsx client/src/infrastructure",
+    "analyze:infrastructure:graph": "madge --image analysis-results/infrastructure-graph.svg --extensions ts,tsx client/src/infrastructure",
+    "analyze:infrastructure:deps": "dependency-cruiser --config .dependency-cruiser.cjs --output-type dot client/src/infrastructure | dot -T svg > analysis-results/infrastructure-deps.svg",
+    "validate:infrastructure": "tsx --tsconfig scripts/tsconfig.json scripts/validate-infrastructure.ts",
     "analyze:circular": "madge --circular --extensions ts,tsx --exclude 'dist|node_modules|.nx|server/infrastructure/schema' client/src server shared",
     "analyze:circular:check": "npm run analyze:circular && echo '✅ No circular dependencies found (excluding intentional schema patterns)!'",
     "analyze:duplication": "jscpd . --config .jscpd.json || true",
@@ -159,6 +170,15 @@
       "warning": 30,
       "info": 20
     }
+  },
+  "lint-staged": {
+    "client/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "client/src/infrastructure/**/*.{ts,tsx}": [
+      "npm run analyze:infrastructure:circular"
+    ]
   },
   "dependencies": {
     "@aws-sdk/client-sns": "^3.922.0",

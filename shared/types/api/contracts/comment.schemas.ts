@@ -122,7 +122,10 @@ export const ListCommentsResponseSchema = z.object({
 /**
  * Comment Thread Schema
  */
-const CommentThreadSchema = z.object({
+const CommentThreadSchema: z.ZodType<{
+  comment: z.infer<typeof CommentSchema>;
+  replies: Array<any>;
+}> = z.object({
   comment: CommentSchema,
   replies: z.array(z.lazy(() => CommentThreadSchema)),
 });

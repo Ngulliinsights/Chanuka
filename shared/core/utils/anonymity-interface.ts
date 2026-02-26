@@ -1,4 +1,4 @@
-import type { UserProfile } from '../../../schema/foundation';
+import type { UserProfile } from '../types/auth.types';
 
 export type AnonymityLevel = 'public' | 'pseudonymous' | 'anonymous' | 'private';
 

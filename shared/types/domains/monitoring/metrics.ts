@@ -26,7 +26,7 @@ export type ErrorEventId = string & { readonly __brand: 'ErrorEventId' };
  */
 export function createBrandedMonitoringId<T extends string>(
   value: string,
-  brand: T
+  _brand: T
 ): string & { readonly __brand: T } {
   return value as string & { readonly __brand: T };
 }

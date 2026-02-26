@@ -11,7 +11,6 @@
  */
 
 import type { Request } from 'express';
-import { BaseEntity, UserTrackableEntity } from '../../core/base';
 import { UserId } from '../../core/branded';
 import { 
   UserRole, 

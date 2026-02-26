@@ -6,7 +6,9 @@
 import { ApiRequest, PaginatedApiRequest, FileUploadRequest, GraphQLRequest, WebSocketRequest } from './request-types';
 import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, HttpStatusCode } from './response-types';
 import { ApiError, ApiErrorContext } from './error-types';
-import { Result, ValidationError } from '../core/errors';
+import { Result, ok, err } from '../core/errors';
+import { ValidationError } from '../../utils/errors/types';
+import { ErrorContextBuilder } from '../../utils/errors/context';
 
 /**
  * Serializable API Request
@@ -118,33 +120,33 @@ export class ApiSerializer {
    */
   static deserializeRequest<T = unknown>(serialized: SerializableApiRequest<T>): Result<ApiRequest<T>, ValidationError> {
     try {
-      return {
-        success: true,
-        data: {
-          id: serialized.id,
-          requestId: serialized.requestId,
-          endpoint: serialized.endpoint,
-          method: serialized.method as ApiRequest['method'],
-          headers: serialized.headers,
-          body: serialized.body,
-          queryParams: serialized.queryParams,
-          pathParams: serialized.pathParams,
-          contentType: serialized.contentType as ApiRequest['contentType'],
-          authType: serialized.authType as ApiRequest['authType'],
-          authToken: serialized.authToken,
-          timeout: serialized.timeout,
-          priority: serialized.priority as ApiRequest['priority'],
-          metadata: serialized.metadata,
-          version: serialized.version,
-          createdAt: new Date(serialized.createdAt),
-          updatedAt: new Date(serialized.updatedAt),
-        },
-      };
+      return ok({
+        id: serialized.id,
+        requestId: serialized.requestId,
+        endpoint: serialized.endpoint,
+        method: serialized.method as ApiRequest['method'],
+        headers: serialized.headers,
+        body: serialized.body,
+        queryParams: serialized.queryParams,
+        pathParams: serialized.pathParams,
+        contentType: serialized.contentType as ApiRequest['contentType'],
+        authType: serialized.authType as ApiRequest['authType'],
+        authToken: serialized.authToken,
+        timeout: serialized.timeout,
+        priority: serialized.priority as ApiRequest['priority'],
+        metadata: serialized.metadata,
+        version: serialized.version,
+        createdAt: new Date(serialized.createdAt),
+        updatedAt: new Date(serialized.updatedAt),
+      });
     } catch (error) {
-      return {
-        success: false,
-        error: new ValidationError(`Failed to deserialize API request: ${error instanceof Error ? error.message : String(error)}`, 'request'),
-      };
+      const context = new ErrorContextBuilder()
+        .operation('deserialize-request')
+        .layer('api')
+        .field('request')
+        .severity('medium')
+        .build();
+      return err(new ValidationError(`Failed to deserialize API request: ${error instanceof Error ? error.message : String(error)}`, context, []));
     }
   }
 
@@ -177,32 +179,32 @@ export class ApiSerializer {
    */
   static deserializeResponse<T = unknown>(serialized: SerializableApiResponse<T>): Result<ApiResponse<T>, ValidationError> {
     try {
-      return {
-        success: true,
-        data: {
-          id: serialized.id,
-          responseId: serialized.responseId,
-          requestId: serialized.requestId,
-          status: serialized.status as ApiResponse['status'],
-          httpStatus: serialized.httpStatus as HttpStatusCode,
-          data: serialized.data,
-          metadata: serialized.metadata,
-          headers: serialized.headers,
-          contentType: serialized.contentType as ApiResponse['contentType'],
-          timestamp: new Date(serialized.timestamp),
-          duration: serialized.duration,
-          cacheControl: serialized.cacheControl,
-          pagination: serialized.pagination,
-          version: serialized.version,
-          createdAt: new Date(serialized.createdAt),
-          updatedAt: new Date(serialized.updatedAt),
-        },
-      };
+      return ok({
+        id: serialized.id,
+        responseId: serialized.responseId,
+        requestId: serialized.requestId,
+        status: serialized.status as ApiResponse['status'],
+        httpStatus: serialized.httpStatus as HttpStatusCode,
+        data: serialized.data,
+        metadata: serialized.metadata,
+        headers: serialized.headers,
+        contentType: serialized.contentType as ApiResponse['contentType'],
+        timestamp: new Date(serialized.timestamp),
+        duration: serialized.duration,
+        cacheControl: serialized.cacheControl,
+        pagination: serialized.pagination,
+        version: serialized.version,
+        createdAt: new Date(serialized.createdAt),
+        updatedAt: new Date(serialized.updatedAt),
+      });
     } catch (error) {
-      return {
-        success: false,
-        error: new ValidationError(`Failed to deserialize API response: ${error instanceof Error ? error.message : String(error)}`, 'response'),
-      };
+      const context = new ErrorContextBuilder()
+        .operation('deserialize-response')
+        .layer('api')
+        .field('response')
+        .severity('medium')
+        .build();
+      return err(new ValidationError(`Failed to deserialize API response: ${error instanceof Error ? error.message : String(error)}`, context, []));
     }
   }
 
@@ -240,15 +242,15 @@ export class ApiSerializer {
         }
       }
 
-      return {
-        success: true,
-        data: new DeserializedApiError(),
-      };
+      return ok(new DeserializedApiError());
     } catch (error) {
-      return {
-        success: false,
-        error: new ValidationError(`Failed to deserialize API error: ${error instanceof Error ? error.message : String(error)}`, 'error'),
-      };
+      const context = new ErrorContextBuilder()
+        .operation('deserialize-error')
+        .layer('api')
+        .field('error')
+        .severity('medium')
+        .build();
+      return err(new ValidationError(`Failed to deserialize API error: ${error instanceof Error ? error.message : String(error)}`, context, []));
     }
   }
 
@@ -264,15 +266,15 @@ export class ApiSerializer {
    */
   static deserializeFromJson<T>(json: string): Result<T, ValidationError> {
     try {
-      return {
-        success: true,
-        data: JSON.parse(json),
-      };
+      return ok(JSON.parse(json));
     } catch (error) {
-      return {
-        success: false,
-        error: new ValidationError(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`, 'json'),
-      };
+      const context = new ErrorContextBuilder()
+        .operation('deserialize-json')
+        .layer('api')
+        .field('json')
+        .severity('medium')
+        .build();
+      return err(new ValidationError(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`, context, []));
     }
   }
 

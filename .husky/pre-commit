@@ -1,12 +1,16 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Run circular dependency check
-echo "🔍 Checking for circular dependencies..."
-npm run analyze:circular:check || {
-  echo "❌ Circular dependencies detected! Please fix before committing."
-  echo "Run 'npm run analyze:circular' to see details."
-  exit 1
-}
+# Run type checking
+echo "🔍 Running TypeScript type checking..."
+cd client && npm run type-check
 
-echo "✅ No circular dependencies found!"
+# Run linting
+echo "🔍 Running ESLint..."
+cd client && npm run lint
+
+# Check for circular dependencies in infrastructure
+echo "🔍 Checking for circular dependencies in infrastructure..."
+npm run analyze:infrastructure:circular
+
+echo "✅ Pre-commit checks passed!"

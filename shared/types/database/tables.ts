@@ -12,8 +12,8 @@ import type {
   CommitteeId,
   CommentId,
   SponsorId,
-  ArgumentId,
-  ArgumentEvidenceId,
+  // ArgumentId, // Unused
+  // ArgumentEvidenceId, // Unused
   BillTimelineEventId,
   BillCommitteeAssignmentId,
   LegislatorId,
@@ -238,4 +238,4 @@ export type InsertType<T> = Omit<T, 'id' | 'created_at' | 'updated_at'>;
 /**
  * Extract update type (all fields optional except id)
  */
-export type UpdateType<T> = Partial<Omit<T, 'id' | 'created_at'>> & Pick<T, 'id'>;
+export type UpdateType<T extends { id: unknown; created_at?: unknown }> = Partial<Omit<T, 'id' | 'created_at'>> & Pick<T, 'id'>;

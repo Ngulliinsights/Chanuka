@@ -3,7 +3,7 @@
  * Type-safe API contracts for admin-related endpoints
  */
 
-import { UserId, BillId } from '../../core/branded';
+import { UserId } from '../../core/branded';
 
 // ============================================================================
 // Domain Types
@@ -54,7 +54,7 @@ export interface AuditLog {
   metadata?: Record<string, unknown>;
 }
 
-export interface ModerationAction {
+export interface AdminModerationAction {
   id: string;
   moderatorId: UserId;
   targetType: 'user' | 'bill' | 'comment';
@@ -177,7 +177,7 @@ export interface GetAuditLogsResponse {
  * Create Moderation Action Response
  */
 export interface CreateModerationActionResponse {
-  action: ModerationAction;
+  action: AdminModerationAction;
   success: boolean;
 }
 
@@ -185,7 +185,7 @@ export interface CreateModerationActionResponse {
  * Get Moderation Actions Response
  */
 export interface GetModerationActionsResponse {
-  actions: ModerationAction[];
+  actions: AdminModerationAction[];
   total: number;
   page: number;
   limit: number;

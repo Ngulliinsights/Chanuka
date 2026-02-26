@@ -1,10 +1,11 @@
 /**
- * Core API Module - Modular API System
+ * Core API Module - Unified API System
  *
  * This module provides comprehensive API functionality including:
- * - Base HTTP client with retry logic and caching
+ * - HTTP client with retry logic, caching, and circuit breaker
+ * - WebSocket client with reconnection and subscriptions
+ * - Realtime event hub with pub/sub messaging
  * - Authentication with automatic token refresh
- * - Safe API wrapper for error handling
  * - Request deduplication and batching
  * - Circuit breaker and monitoring
  * 
@@ -17,9 +18,17 @@
  * - Search API → @client/features/search/services/api
  */
 
-// Core API clients
+// ============================================================================
+// HTTP Client Sub-Module
+// ============================================================================
 
-
+// Core HTTP client
+export { 
+  UnifiedApiClientImpl,
+  globalApiClient,
+  createAuthRequestInterceptor,
+  createLoggingResponseInterceptor,
+} from './client';
 
 // Authentication
 export {
@@ -58,8 +67,7 @@ export {
   type InvalidationOptions,
 } from './cache-manager';
 
-
-
+// Circuit breaker
 export {
   CircuitBreakerMonitor,
   circuitBreakerMonitor,
@@ -72,6 +80,44 @@ export {
   type ServiceHealthStatus,
   type ErrorCorrelation,
 } from './circuit-breaker-monitor';
+
+// Request deduplication
+export {
+  RequestDeduplicator,
+  requestDeduplicator,
+} from './http/request-deduplicator';
+
+// ============================================================================
+// WebSocket Client Sub-Module
+// ============================================================================
+
+// Unified WebSocket client
+export {
+  UnifiedWebSocketClient,
+  createWebSocketClient,
+} from './websocket/client';
+
+// Legacy WebSocket manager (for backward compatibility)
+export {
+  WebSocketManager,
+  WebSocketManagerImpl,
+  createWebSocketManager,
+  type ReconnectionConfig,
+} from './websocket/manager';
+
+// ============================================================================
+// Realtime Client Sub-Module
+// ============================================================================
+
+// Unified realtime client
+export {
+  UnifiedRealtimeClient,
+  createRealtimeClient,
+} from './realtime/client';
+
+// Legacy realtime hub (for backward compatibility)
+// Note: The full realtime module remains in infrastructure/realtime
+// Import from there for legacy features like RealTimeHub, services, and hooks
 
 // Service APIs - Auth is cross-cutting and stays in infrastructure
 export {
@@ -98,6 +144,24 @@ export { contractApiClient } from './contract-client';
 
 // Types
 export * from './types';
+
+// WebSocket types
+export type {
+  IWebSocketClient,
+  WebSocketOptions,
+  WebSocketClientEvents,
+  WebSocketError,
+} from './types/websocket';
+
+// Realtime types
+export type {
+  IRealtimeClient,
+  Subscription,
+  EventHandler,
+  RealtimeEvent,
+  RealtimeOptions,
+  RealtimeHubState,
+} from './types/realtime';
 
 // Error handling
 export {

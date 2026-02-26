@@ -41,6 +41,16 @@ jobs:
       - name: TypeScript type checking
         run: npm run type-check
 
+      - name: Check for circular dependencies
+        run: |
+          cd ..
+          npm run analyze:infrastructure:circular
+
+      - name: Validate dependency boundaries
+        run: |
+          cd ..
+          npm run analyze:imports
+
       - name: ESLint with accessibility rules
         run: npm run lint
 

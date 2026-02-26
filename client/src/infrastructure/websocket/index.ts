@@ -10,4 +10,4 @@ export {
   ReconnectionConfig,
   ConnectionState,
   createWebSocketManager,
-} from './manager';
+} from '../api/websocket/manager';

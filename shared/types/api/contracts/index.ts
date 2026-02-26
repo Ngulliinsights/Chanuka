@@ -11,7 +11,7 @@ export * from './analytics.contract';
 export * from './search.contract';
 export * from './admin.contract';
 export * from './endpoint';
-export * from './endpoints';
+export * from './endpoint-registry';
 export * from './user.schemas';
 export * from './bill.schemas';
 export * from './comment.schemas';

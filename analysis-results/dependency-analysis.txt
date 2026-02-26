@@ -1,0 +1,375 @@
+================================================================================
+INFRASTRUCTURE DEPENDENCY ANALYSIS REPORT
+================================================================================
+
+SUMMARY
+--------------------------------------------------------------------------------
+Total Modules: 31
+Total Dependencies: 35
+Circular Dependencies: 33
+
+MODULES
+--------------------------------------------------------------------------------
+  analytics                      | Exports:  20 | Deps:   1 | Used by:   1
+  api                            | Exports:  58 | Deps:   0 | Used by:   0
+  asset-loading                  | Exports:   0 | Deps:   0 | Used by:   0
+  auth                           | Exports: 122 | Deps:   0 | Used by:   2
+  browser                        | Exports:  33 | Deps:   6 | Used by:   6
+  cache                          | Exports:   4 | Deps:   0 | Used by:   0
+  command-palette                | Exports:  14 | Deps:   0 | Used by:   0
+  community                      | Exports:   7 | Deps:   0 | Used by:   0
+  dashboard                      | Exports:   1 | Deps:   0 | Used by:   0
+  error                          | Exports: 136 | Deps:   3 | Used by:   3
+  events                         | Exports:   6 | Deps:   0 | Used by:   0
+  hooks                          | Exports:   6 | Deps:   0 | Used by:   0
+  http                           | Exports:   2 | Deps:   0 | Used by:   0
+  loading                        | Exports:   9 | Deps:   0 | Used by:   0
+  mobile                         | Exports:  32 | Deps:   5 | Used by:   5
+  monitoring                     | Exports:   6 | Deps:   0 | Used by:   0
+  navigation                     | Exports:  31 | Deps:   0 | Used by:   0
+  performance                    | Exports:  36 | Deps:   5 | Used by:   5
+  personalization                | Exports:  10 | Deps:   0 | Used by:   0
+  realtime                       | Exports:  25 | Deps:   0 | Used by:   0
+  recovery                       | Exports:   0 | Deps:   0 | Used by:   0
+  search                         | Exports:  12 | Deps:   0 | Used by:   0
+  security                       | Exports:  23 | Deps:   5 | Used by:   5
+  storage                        | Exports:  34 | Deps:   4 | Used by:   2
+  store                          | Exports:   7 | Deps:   6 | Used by:   6
+  sync                           | Exports:   1 | Deps:   0 | Used by:   0
+  system                         | Exports:   0 | Deps:   0 | Used by:   0
+  telemetry                      | Exports:  11 | Deps:   0 | Used by:   0
+  validation                     | Exports:   7 | Deps:   0 | Used by:   0
+  websocket                      | Exports:   5 | Deps:   0 | Used by:   0
+  workers                        | Exports:   5 | Deps:   0 | Used by:   0
+
+CIRCULAR DEPENDENCIES
+--------------------------------------------------------------------------------
+
+1. Severity: LOW
+   Modules involved: analytics
+   Dependency path: analytics → analytics
+
+2. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+3. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+4. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+5. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+6. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+7. Severity: LOW
+   Modules involved: browser
+   Dependency path: browser → browser
+
+8. Severity: LOW
+   Modules involved: error
+   Dependency path: error → error
+
+9. Severity: LOW
+   Modules involved: error
+   Dependency path: error → error
+
+10. Severity: LOW
+   Modules involved: error
+   Dependency path: error → error
+
+11. Severity: LOW
+   Modules involved: mobile
+   Dependency path: mobile → mobile
+
+12. Severity: LOW
+   Modules involved: mobile
+   Dependency path: mobile → mobile
+
+13. Severity: LOW
+   Modules involved: mobile
+   Dependency path: mobile → mobile
+
+14. Severity: LOW
+   Modules involved: mobile
+   Dependency path: mobile → mobile
+
+15. Severity: LOW
+   Modules involved: mobile
+   Dependency path: mobile → mobile
+
+16. Severity: LOW
+   Modules involved: performance
+   Dependency path: performance → performance
+
+17. Severity: LOW
+   Modules involved: performance
+   Dependency path: performance → performance
+
+18. Severity: LOW
+   Modules involved: performance
+   Dependency path: performance → performance
+
+19. Severity: LOW
+   Modules involved: performance
+   Dependency path: performance → performance
+
+20. Severity: LOW
+   Modules involved: performance
+   Dependency path: performance → performance
+
+21. Severity: LOW
+   Modules involved: security
+   Dependency path: security → security
+
+22. Severity: LOW
+   Modules involved: security
+   Dependency path: security → security
+
+23. Severity: LOW
+   Modules involved: security
+   Dependency path: security → security
+
+24. Severity: LOW
+   Modules involved: security
+   Dependency path: security → security
+
+25. Severity: LOW
+   Modules involved: security
+   Dependency path: security → security
+
+26. Severity: LOW
+   Modules involved: storage
+   Dependency path: storage → storage
+
+27. Severity: LOW
+   Modules involved: storage
+   Dependency path: storage → storage
+
+28. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+29. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+30. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+31. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+32. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+33. Severity: LOW
+   Modules involved: store
+   Dependency path: store → store
+
+DETAILED MODULE INFORMATION
+--------------------------------------------------------------------------------
+
+analytics
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\analytics
+  Exports (20): ComprehensiveAnalyticsTracker, AnalyticsEvent, AnalyticsEventType, AnalyticsDashboardData, PagePerformanceMetrics, UserEngagementMetrics, AnalyticsProvider, useAnalyticsContext, withAnalytics, AnalyticsStatus, analyticsApiService, PerformanceMonitor, ErrorAnalyticsService, PerformanceMetric, WebVitalsMetric, PerformanceStats, PerformanceAlert, PerformanceConfig, initializeAnalytics, ANALYTICS_CONFIG
+  Dependencies (1):
+    - analytics
+
+api
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\api
+  Exports (58): AuthenticationInterceptor, TokenRefreshInterceptor, createAuthInterceptors, shouldRefreshToken, proactiveTokenRefresh, DEFAULT_AUTH_CONFIG, AuthConfig, RetryHandler, retryOperation, safeRetryOperation, createHttpRetryHandler, createServiceRetryHandler, DEFAULT_RETRY_CONFIG, SERVICE_RETRY_CONFIGS, RetryConfig, RetryContext, RetryResult, ApiCacheManager, CacheKeyGenerator, globalCache, DEFAULT_CACHE_CONFIG, CacheEntry, CacheConfig, CacheStats, InvalidationOptions, CircuitBreakerMonitor, circuitBreakerMonitor, recordCircuitBreakerEvent, recordError, getServiceHealth, getErrorCorrelations, getMonitoringStatus, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation, AuthApiService, createAuthApiService, authApiService, LoginCredentials, RegisterData, AuthUser, UserPreferences, AuthTokens, globalApiClient, contractApiClient, APIErrorCode, APIErrorDetails, APIError, NetworkError, TimeoutError, ValidationError, UnauthorizedError, ForbiddenError, NotFoundError, ServerError, createAPIError, ErrorDomain, ErrorSeverity
+  Dependencies: none
+
+asset-loading
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\asset-loading
+  Exports (0): none
+  Dependencies: none
+
+auth
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\auth
+  Exports (122): User, AuthUser, LoginCredentials, RegisterData, AuthResponse, AuthTokens, TokenInfo, SessionInfo, SessionValidation, TokenValidation, TwoFactorSetup, SecurityEvent, SuspiciousActivityAlert, PasswordRequirements, PasswordValidationResult, PrivacySettings, NotificationPreferences, ConsentRecord, DataRetentionPreference, DataExportRequest, DataDeletionRequest, UserPreferences, SocialLoginProvider, AuthContextType, ConsentModalProps, PrivacyDashboardProps, AuthApiService, createAuthApiService, authApiService, AuthService, authService, TokenManager, tokenManager, SessionManager, sessionManager, validatePasswordComprehensive, checkPasswordStrength, validateEmailDomain, validateFormBatch, createDebouncedValidator, formatValidationErrors, PasswordStrength, BatchValidationResult, AuthProvider, useAuth, useAuthStore, default, login, register, logout, refreshTokens, clearError, verifyEmail, requestPasswordReset, resetPassword, changePassword, setupTwoFactor, enableTwoFactor, disableTwoFactor, verifyTwoFactor, updateUserProfile, loginWithOAuth, extendSession, getActiveSessions, terminateSession, terminateAllSessions, updatePrivacySettings, requestDataExport, requestDataDeletion, getSecurityEvents, getSuspiciousActivity, validateStoredTokens, selectUser, selectIsAuthenticated, selectIsLoading, selectAuthError, selectSessionExpiry, selectIsInitialized, selectTwoFactorRequired, selectAuthStatus, selectUserProfile, AuthState, createAuthMiddleware, authMiddleware, AuthMiddlewareConfig, AuthenticationInterceptor, TokenRefreshInterceptor, createAuthInterceptors, shouldRefreshToken, proactiveTokenRefresh, DEFAULT_AUTH_CONFIG, AuthConfig, AuthenticatedApiClient, AuthenticatedApiClientConfig, storeSecurely, retrieveSecurely, getCurrentSession, isAuthenticated, getAuthToken, hasPermission, hasRole, hasAnyRole, checkResourcePermission, sanitizeInput, isCommonPassword, hasSequentialChars, hasRepeatedChars, createAuthConfig, DEFAULT_AUTH_SETTINGS, AuthSettings, initializeAuth, configureAuth, AuthInitOptions, AUTH_VALIDATION_RULES, AUTH_ERROR_MESSAGES, SESSION_REFRESH_BUFFER_MS, MINIMUM_REFRESH_DELAY_MS, AuthValidationError, AuthenticationError, AuthorizationError, SessionExpiredError, TokenRefreshError
+  Dependencies: none
+
+browser
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\browser
+  Exports (33): BrowserInfo, CompatibilityRecommendation, CompatibilityStatus, FetchOptions, FetchResponse, FeatureSet, IntersectionObserverEntry, IntersectionObserverOptions, PolyfillStatus, StoragePolyfill, BrowserCompatibilityManager, BrowserDetector, FeatureDetector, PolyfillManager, browserCompatibilityManager, browserDetector, featureDetector, polyfillManager, BROWSER_NAME_MAP, CRITICAL_FEATURES, MINIMUM_VERSIONS, isBrowserEnv, isTestEnv, default, getBrowserInfo, isBrowserSupported, hasFeature, hasCriticalFeatures, initializeBrowserCompatibility, getBrowserCompatibilityStatus, shouldBlockBrowser, getCompatibilityWarnings, loadPolyfills
+  Dependencies (6):
+    - browser
+    - browser
+    - browser
+    - browser
+    - browser
+    - browser
+
+cache
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\cache
+  Exports (4): cacheInvalidationManager, invalidateCache, setCacheEntry, getCacheEntry
+  Dependencies: none
+
+command-palette
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\command-palette
+  Exports (14): Command, CommandSection, CommandPaletteState, CommandPaletteConfig, CommandPaletteProps, createNavigationCommands, createQuickActionCommands, createHelpCommands, createDefaultSections, filterCommands, groupCommandsBySection, CommandPalette, useCommandPalette, Modal
+  Dependencies: none
+
+community
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\community
+  Exports (7): UnifiedComment, UnifiedThread, UnifiedModeration, CommunityState, DiscussionState, ModerationService, StateSyncService
+  Dependencies: none
+
+dashboard
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\dashboard
+  Exports (1): ChartData
+  Dependencies: none
+
+error
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\error
+  Exports (136): ErrorContext, ErrorRecoveryStrategy, RecoveryStrategy, ErrorHandlerConfig, ErrorListener, ErrorStats, ReactErrorInfo, ErrorBoundaryProps, ErrorFallbackProps, RecoveryResult, ErrorMetadata, ErrorAnalyticsProvider, ErrorReporter, ErrorTransformer, NavigationErrorType, ErrorBoundaryState, ErrorDisplayMode, ErrorFallbackVariant, RecoveryUIVariant, RecoveryUIProps, RecoveryAction, UseErrorBoundaryReturn, ErrorDomain, ErrorSeverity, AppError, BaseError, ValidationError, NetworkError, UnauthorizedError, NotFoundError, CacheError, NavigationError, NavigationItemNotFoundError, InvalidNavigationPathError, NavigationAccessDeniedError, NavigationValidationError, NavigationConfigurationError, DashboardError, DashboardDataFetchError, DashboardActionError, DashboardTopicError, DashboardConfigurationError, coreErrorHandler, createNetworkError, createValidationError, createAuthError, ErrorAnalyticsService, ErrorReportingService, ConsoleReporter, SentryReporter, ApiReporter, CompositeReporter, AlertRule, AlertCondition, AlertChannel, Alert, AnomalyDetectionConfig, AnomalyResult, ErrorCorrelation, CorrelationPattern, PatternRecognitionResult, ErrorPattern, PatternSignature, ErrorRateLimiter, ErrorFactory, ErrorBoundary, ErrorFallback, RecoveryUI, ErrorMessageTemplate, LocalizedErrorMessage, FormattedErrorMessage, FormatOptions, RecoverySuggestion, SuggestionAnalytics, EnhancedErrorMessage, getTemplateById, getTemplatesByDomain, getTemplatesBySeverity, getBestMatchTemplate, getLocalizedMessage, addLocalizedMessages, formatErrorMessage, formatMessageWithContext, createAppErrorFromError, formatMemoryUsage, formatErrorForDisplay, formatErrorForHTML, escapeHtml, getErrorSeverityClass, getErrorIconClass, RECOVERY_SUGGESTIONS, getRecoverySuggestions, isSuggestionApplicable, convertSuggestionsToRecoveryStrategies, enhanceSuggestionsWithContext, trackSuggestionUsage, getSuggestionAnalytics, clearSuggestionAnalytics, getBestRecoverySuggestion, getSuggestionById, addCustomRecoverySuggestion, removeRecoverySuggestion, createEnhancedErrorMessage, ErrorMessageService, errorMessageService, networkRetryStrategy, connectionAwareRetryStrategy, cacheClearStrategy, cacheFallbackStrategy, cacheRecoveryStrategy, pageReloadStrategy, authRefreshStrategy, authRetryStrategy, authLogoutStrategy, gracefulDegradationStrategy, offlineModeStrategy, reducedFunctionalityStrategy, defaultRecoveryStrategies, registerDefaultRecoveryStrategies, executeRecovery, useRecovery, isRecoverable, default, addErrorReporter, removeErrorReporter, getErrorReporters, initializeCoreErrorHandling, getErrorStats, getRecentErrors, getErrorsByType, getErrorsBySeverity, clearErrors, handleError, useCoreErrorHandler, createError, logError
+  Dependencies (3):
+    - error
+    - error
+    - error
+
+events
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\events
+  Exports (6): eventBus, EventBus, on, once, emit, off
+  Dependencies: none
+
+hooks
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\hooks
+  Exports (6): useOfflineDetection, useConnectionAware, useServiceStatus, useOnlineStatus, useErrorRecovery, useOfflineCapabilities
+  Dependencies: none
+
+http
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\http
+  Exports (2): RequestDeduplicator, requestDeduplicator
+  Dependencies: none
+
+loading
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\loading
+  Exports (9): LoadingProvider, useLoading, getConnectionMultiplier, shouldSkipOperation, LoadingPerformanceMonitor, globalLoadingMonitor, LOADING_SCENARIOS, LoadingScenarioBuilder, createOperationFromScenario
+  Dependencies: none
+
+mobile
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\mobile
+  Exports (32): DeviceInfo, ResponsiveBreakpoints, MobileErrorContext, DeviceDetector, ResponsiveUtils, MobileErrorHandler, MobilePerformanceOptimizer, deviceDetector, responsiveUtils, mobileErrorHandler, mobilePerformanceOptimizer, default, isMobileDevice, isTabletDevice, hasTouch, getCurrentScreenSize, getDeviceOrientation, isIOSDevice, isAndroidDevice, getDeviceInfo, createResponsiveStyles, isBreakpointActive, isBreakpointUp, isBreakpointDown, getResponsiveValue, onDeviceChange, onBreakpointChange, getCurrentFPS, isPerformanceDegraded, optimizeForMobile, initializeMobileUtils, destroyMobileUtils
+  Dependencies (5):
+    - mobile
+    - mobile
+    - mobile
+    - mobile
+    - mobile
+
+monitoring
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\monitoring
+  Exports (6): ErrorMonitor, default, MonitoringIntegrationService, monitoringIntegration, DevelopmentMonitoringDashboard, MonitoringConfig
+  Dependencies: none
+
+navigation
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\navigation
+  Exports (31): getNavigationPreferences, saveNavigationPreferences, addToRecentPages, addToFavorites, removeFromFavorites, isPageFavorite, validateNavigationItem, validateNavigationItems, isValidNavigationPath, hasRouteAccess, filterNavigationByAccess, requiresAuthentication, requiresRole, getNavigationMenuItems, generateBreadcrumbs, findRelatedPages, calculateRelatedPages, searchNavigationItems, fuzzyMatchScore, trackNavigationEvent, getNavigationAnalytics, clearNavigationAnalytics, findNavigationItemByPath, findNavigationItemById, getNavigationItemsBySection, determineCurrentSection, getPageTitle, determineNavigationSection, isNavigationPathActive, normalizePath, extractPageTitle
+  Dependencies: none
+
+performance
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\performance
+  Exports (36): WebVitalsMonitor, PerformanceBudgetChecker, PerformanceAlertsManager, PerformanceMonitor, PerformanceMetric, WebVitalsMetric, PerformanceBudget, PerformanceAlert, BudgetCheckResult, PerformanceConfig, PerformanceStats, OptimizationSuggestion, DEFAULT_PERFORMANCE_CONFIG, getPerformanceMonitor, recordMetric, getWebVitalsScores, getOverallPerformanceScore, getPerformanceStats, getActiveAlerts, getBudgetCompliance, checkBudget, setBudget, setAlertThreshold, resolveAlert, addWebVitalsListener, addAlertListener, exportPerformanceReport, resetPerformanceData, updatePerformanceConfig, stopPerformanceMonitoring, measureAsync, measureSync, startTiming, markPerformance, measurePerformance, performanceUtils
+  Dependencies (5):
+    - performance
+    - performance
+    - performance
+    - performance
+    - performance
+
+personalization
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\personalization
+  Exports (10): PersonaType, PersonaMetrics, PersonaClassification, PersonaPreferences, PersonaDetectionConfig, PersonaThresholds, UserPersonaProfile, PersonaDetector, personaDetector, createPersonaDetector
+  Dependencies: none
+
+realtime
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\realtime
+  Exports (25): RealTimeHub, realTimeHub, RealTimeHubState, UnifiedWebSocketManager, WebSocketClient, createWebSocketClient, RealTimeService, realTimeService, BillTrackingService, CommunityService, NotificationService, useWebSocket, useBillTracking, useCommunityRealTime, useRealTimeEngagement, defaultWebSocketConfig, defaultRealTimeConfig, getWebSocketConfig, getRealTimeConfig, EventEmitter, realtimeOptimizer, ConnectionMetrics, OptimizationConfig, MessageBatch, DeltaState
+  Dependencies: none
+
+recovery
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\recovery
+  Exports (0): none
+  Dependencies: none
+
+search
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\search
+  Exports (12): SearchStrategy, SearchStrategyConfig, UnifiedSearchQuery, UnifiedSearchResult, SearchProgress, UnifiedSearchInterfaceProps, SearchDecisionMatrix, SearchStrategyDecision, SearchStrategySelector, DEFAULT_SEARCH_STRATEGY_CONFIG, createSearchStrategySelector, UnifiedSearchInterface
+  Dependencies: none
+
+security
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\security
+  Exports (23): UnifiedCSPManager, CSRFProtection, InputSanitizer, RateLimiter, VulnerabilityScanner, SecurityMonitor, SecurityEvent, SecurityAlert, VulnerabilityReport, validatePasswordStrength, validateCSRFToken, hashData, generateSecureToken, isSecureContext, SECURITY_HEADERS, DEFAULT_CSP, securityUtils, initializeSecurity, getSecuritySystem, getSecurityStatus, shutdownSecurity, SecurityConfig, SecuritySystem
+  Dependencies (5):
+    - security
+    - security
+    - security
+    - security
+    - security
+
+storage
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\storage
+  Exports (34): StorageOptions, SessionInfo, TokenInfo, StorageStats, SessionValidation, TokenValidation, CleanupOptions, StorageError, StorageErrorCode, StorageBackend, SecureStorage, SessionManager, sessionManager, TokenManager, tokenManager, CacheStorageManager, secureStorage, cacheStorageManager, default, storeSecurely, retrieveSecurely, getCurrentSession, isAuthenticated, getAuthToken, getRefreshToken, isTokenValid, cacheData, getCachedData, clearCache, clearSession, clearTokens, clearAllStorage, getStorageStats, storageUtils
+  Dependencies (4):
+    - auth
+    - auth
+    - storage
+    - storage
+
+store
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\store
+  Exports (7): initializeStore, getStore, StoreData, RootState, AppDispatch, store, persistor
+  Dependencies (6):
+    - store
+    - store
+    - store
+    - store
+    - store
+    - store
+
+sync
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\sync
+  Exports (1): backgroundSyncManager
+  Dependencies: none
+
+system
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\system
+  Exports (0): none
+  Dependencies: none
+
+telemetry
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\telemetry
+  Exports (11): telemetryService, TelemetryServiceImpl, TelemetryService, SystemMetrics, MetricsData, ExportConfig, MetricsResult, SendResult, AggregateResult, ValidationResult, ExportResult
+  Dependencies: none
+
+validation
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\validation
+  Exports (7): validateNavigationPath, validateUserRole, validateNavigationItem, validateRelatedPage, validateUseRelatedPagesOptions, safeValidateNavigationPath, safeValidateUserRole
+  Dependencies: none
+
+websocket
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\websocket
+  Exports (5): WebSocketManager, WebSocketManagerImpl, ReconnectionConfig, ConnectionState, createWebSocketManager
+  Dependencies: none
+
+workers
+  Path: C:\Users\Access Granted\Downloads\projects\SimpleTool\client\src\infrastructure\workers
+  Exports (5): registerServiceWorker, sendMessageToServiceWorker, isServiceWorkerAvailable, getNetworkStatus, onNetworkStatusChange
+  Dependencies: none
+
+================================================================================
+END OF REPORT
+================================================================================

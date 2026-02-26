@@ -1,0 +1,200 @@
+0faa1751|2026-02-26 13:40:31 +0300|muski4real|docs: comprehensive build status and strategic assessment
+439bdbd1|2026-02-26 13:39:30 +0300|muski4real|refactor: delete unused testing and tooling directories
+63d1fdb4|2026-02-26 13:27:31 +0300|muski4real|fix: resolve critical TypeScript errors in transformers and testing
+55f50557|2026-02-26 13:16:37 +0300|muski4real|fix: resolve TypeScript errors in shared folder (partial)
+1b20e0d2|2026-02-26 09:39:41 +0300|muski4real|Phase 2A: Remove unused utilities and move server-only middleware
+b02a4209|2026-02-26 07:57:32 +0300|muski4real|docs: add database utilities and status documentation
+3a68b569|2026-02-26 07:57:18 +0300|muski4real|chore: remove obsolete seed scripts
+b02e5c92|2026-02-26 07:57:06 +0300|muski4real|chore: update configuration and documentation
+cf31f554|2026-02-26 07:56:52 +0300|muski4real|refactor: enhance security event logging
+257b4725|2026-02-26 07:56:26 +0300|muski4real|refactor: consolidate schema exports and improve type safety
+4cbbd6b0|2026-02-26 07:56:09 +0300|muski4real|refactor: improve observability infrastructure
+b4ab2fb7|2026-02-26 07:55:33 +0300|muski4real|fix(schema): resolve duplicate exports and missing module errors
+40948812|2026-02-26 07:55:24 +0300|muski4real|docs: add MVP data strategy and session documentation
+99587d1e|2026-02-26 07:54:57 +0300|muski4real|feat: add aligned seed scripts with proper TypeScript config
+f445f40b|2026-02-26 07:54:41 +0300|muski4real|feat: implement government data integration services
+ee4611a2|2026-02-26 07:54:04 +0300|muski4real|chore: add cheerio dependency for web scraping
+fd82137a|2026-02-26 07:50:11 +0300|muski4real|refactor(schema): simplify schema index to export only database schemas
+6d2e2599|2026-02-26 07:41:10 +0300|muski4real|feat(types): consolidate domain types into canonical sources
+fe85779b|2026-02-25 16:52:37 +0300|muski4real|refactor: clean up legacy migrations and consolidate schema
+81c35d97|2026-02-25 14:27:05 +0300|muski4real|refactor: standardize file naming to kebab-case and consolidate codebase
+e4b7c3bc|2026-02-25 13:10:05 +0300|muski4real|docs(server): add security infrastructure documentation
+d62fd8df|2026-02-25 13:09:42 +0300|muski4real|docs: update documentation and project specifications
+756bc96d|2026-02-25 13:09:13 +0300|muski4real|feat: add integration tests and improve shared utilities
+b8d14939|2026-02-25 13:08:55 +0300|muski4real|feat(client): add testing infrastructure and update configuration
+cf254af8|2026-02-25 13:08:38 +0300|muski4real|refactor(client): enhance core infrastructure and navigation
+537beea4|2026-02-25 13:08:12 +0300|muski4real|refactor(client): improve existing feature modules
+8d617809|2026-02-25 13:07:50 +0300|muski4real|feat(client): add new feature modules and pages
+27eedb9a|2026-02-25 13:07:31 +0300|muski4real|refactor(server): improve infrastructure and supporting services
+1f93727e|2026-02-25 13:07:07 +0300|muski4real|feat(server): enhance core feature modules
+94fcc830|2026-02-25 13:06:47 +0300|muski4real|refactor(server): optimize search and sponsor features
+443f0ff4|2026-02-25 13:06:25 +0300|muski4real|refactor(server): improve safeguards system architecture
+8dea5a5d|2026-02-25 13:06:09 +0300|muski4real|refactor(server): enhance validation and security infrastructure
+d42e2c9e|2026-02-25 13:05:48 +0300|muski4real|refactor(server): consolidate constitutional analysis features
+16392328|2026-02-25 13:05:30 +0300|muski4real|feat(server): add USSD universal access feature
+47e511bc|2026-02-25 13:05:12 +0300|muski4real|refactor(server): remove obsolete and duplicate service files
+c4662b37|2026-02-24 17:04:05 +0300|muski4real|feat: implement strategic integration features (Tasks 1.1-1.5)
+f1b10e0d|2026-02-24 11:46:10 +0300|muski4real|feat: complete architecture migration to FSD and DDD patterns
+bc8d1136|2026-02-24 10:45:12 +0300|muski4real|docs: add cleanup summary for February 24, 2026
+69e97357|2026-02-24 10:44:14 +0300|muski4real|chore: archive obsolete specs and plans, delete build artifacts
+28711e65|2026-02-24 10:34:09 +0300|muski4real|docs: add executive summary for specs/plans evaluation
+7a631044|2026-02-24 10:33:21 +0300|muski4real|docs: evaluate and resolve specs/plans conflicts
+dded8260|2026-02-24 10:09:11 +0300|muski4real|chore: strategic cleanup - remove 164 obsolete scripts and tools
+5eeaec4c|2026-02-24 09:29:27 +0300|muski4real|refactor: strategic architecture consolidation (phases 1-4)
+f007ac15|2026-02-24 02:47:59 +0300|muski4real|refactor(infrastructure): major consolidation - remove 26 dead files, fix architecture
+4ef52db4|2026-02-24 02:02:02 +0300|muski4real|fix(middleware): resolve all remaining warnings and errors
+4af8aaa6|2026-02-24 01:59:20 +0300|muski4real|fix(middleware): fix remaining errors across 9 middleware files
+c34d0ca6|2026-02-24 01:45:00 +0300|muski4real|fix(middleware): fix bugs + remove 22 dead files
+13b785bd|2026-02-23 23:01:59 +0300|muski4real|refactor(client): consolidate architecture - rename core to infrastructure, remove redundant directories
+1fe51530|2026-02-23 16:00:21 +0300|muski4real|WIP: Type system cleanup, security consolidation, and import resolution progress
+d0610589|2026-02-20 18:38:20 +0300|muski4real|chore: add baseline metrics, analysis scripts, and tooling verification
+82ddb85b|2026-02-20 18:37:51 +0300|muski4real|docs: add comprehensive migration and analysis documentation
+855e8823|2026-02-20 18:37:08 +0300|muski4real|docs: update project documentation and spec tracking
+5d56214e|2026-02-20 18:36:39 +0300|muski4real|test: update test infrastructure and shared utilities with standardized imports
+6d28cefc|2026-02-20 18:36:12 +0300|muski4real|refactor(server): update utilities, types, config, and scripts with standardized imports
+01e46abe|2026-02-20 18:35:31 +0300|muski4real|refactor(infrastructure): consolidate migration, external data, and security services
+e2dbd396|2026-02-20 18:34:52 +0300|muski4real|refactor(features): update all feature modules with standardized imports and patterns
+01220e9b|2026-02-20 18:34:09 +0300|muski4real|refactor(database): enhance graph database integration and repository patterns
+3ebb7cf3|2026-02-20 18:33:13 +0300|muski4real|refactor(infrastructure): modernize WebSocket, notifications, and observability systems
+eecf9f9d|2026-02-20 18:32:29 +0300|muski4real|refactor(infrastructure): consolidate core services and improve error handling
+6d873347|2026-02-20 18:31:46 +0300|muski4real|refactor(cache): consolidate caching infrastructure with improved architecture
+a104340a|2026-02-20 18:30:49 +0300|muski4real|refactor(database): modernize database infrastructure with unified connection management
+448db19e|2026-02-20 18:30:27 +0300|muski4real|fix(config): resolve TypeScript module resolution and path mapping issues
+a28440b5|2026-02-20 18:30:01 +0300|muski4real|refactor(shared): consolidate error type definitions and improve type safety
+9a247734|2026-02-20 05:53:36 +0300|muski4real|chore: consolidate codebase changes and refactoring
+4cd9385f|2026-02-20 05:51:41 +0300|muski4real|fix: resolve circular dependency in build graph
+13bd5901|2026-02-18 17:52:53 +0300|muski4real|chore: remove merge artifacts
+44bf8492|2026-02-18 11:42:55 +0300|muski4real|docs: explain database service and update migration script
+b8fc4589|2026-02-18 11:37:23 +0300|muski4real|docs: create migration plan and automated migration script
+fd630e76|2026-02-18 11:31:06 +0300|muski4real|fix: resolve TypeScript alias issues and create missing database-service
+4533533b|2026-02-18 11:19:08 +0300|muski4real|refactor: consolidate infrastructure - error-handling and observability
+72c655d2|2026-02-18 01:52:05 +0300|muski4real|feat: comprehensive infrastructure consolidation and bug fixes
+88e0de99|2026-02-17 08:09:15 +0300|muski4real|chore: remove backup directory - consolidation complete and in git history
+f3fb44d4|2026-02-17 07:55:27 +0300|muski4real|fix: resolve TypeScript errors in coverage-routes.ts
+7d970455|2026-02-17 07:26:35 +0300|muski4real|feat: comprehensive bug fixes and infrastructure improvements
+b2d8956c|2026-02-16 19:33:48 +0300|muski4real|WIP: Infrastructure consolidation and bug fixes
+8c8d890c|2026-02-16 17:57:49 +0300|muski4real|docs: complete infrastructure consolidation import dependency analysis
+9c740028|2026-02-15 19:58:38 +0300|muski4real|Complete Phase 2: High-Impact Type Safety
+f29ac9dc|2026-02-13 16:24:45 +0300|muski4real|feat(specs): create bug-fixes-and-gaps spec for remaining issues
+79cacc54|2026-02-13 16:21:46 +0300|muski4real|feat(transformation): implement critical fixes for transformation pipeline
+1d1ca6d9|2026-02-13 16:11:05 +0300|muski4real|feat(full-stack-integration): implement task 5.4 - transformation pipeline correctness property test
+68e3a6ef|2026-02-10 21:44:51 +0300|muski4real|refactor: reduce logo size and remove dual loading animations
+a763432c|2026-02-10 21:12:32 +0300|muski4real|fix: correct broken /monitoring route link to /status
+b2f2b0f0|2026-02-10 20:36:26 +0300|muski4real|refactor: reduce logo size and moderate homepage proportions
+b916365b|2026-02-10 20:17:38 +0300|muski4real|feat: enhance UI/UX with brand improvements and performance optimizations
+135fefa6|2026-02-09 20:03:54 +0300|muski4real|feat(client): Complete Kenyan context integration and fix all broken links
+a93ab0cc|2026-02-09 18:03:18 +0300|muski4real|chore: exclude strategic docs and logs from version control
+04961ebc|2026-02-09 18:02:53 +0300|muski4real|docs: reorganize documentation structure by function
+4d3759a7|2026-02-09 16:58:33 +0300|muski4real|feat(client): strategic brand integration and project cleanup
+bb353ee5|2026-02-08 23:34:27 +0300|muski4real|fixed all errors in client
+67bcb581|2026-02-07 06:49:56 +0300|muski4real|feat: Introduce real-time communication, unified error monitoring, core API types, and an analysis page.
+867024cb|2026-02-07 03:09:37 +0300|muski4real|feat: Add new UI components for conflict of interest tracking and mobile pull-to-refresh, implement authentication middleware, introduce community types, and include an error remediation script.
+1627902e|2026-02-05 02:38:20 +0300|muski4real|feat: Implement comprehensive client-side bills feature with detailed UI, unified loading system, API client enhancements, and user verification workflows.
+728ea40f|2026-02-04 04:19:06 +0300|muski4real|feat: Introduce core features for bills, community, users, and sponsorship, along with foundational UI and data infrastructure.
+51eb1bc4|2026-02-03 12:24:52 +0300|muski4real|feat: Introduce comprehensive search, community, and security features, alongside new navigation, user profiles, analytics, and type definitions.
+a7e35871|2026-01-27 18:50:36 +0300|muski4real|Align UI with Design System
+28b7454e|2026-01-27 17:59:05 +0300|muski4real|Add SimpleIcons stub files for missing icon imports
+c97d9d77|2026-01-27 17:56:49 +0300|muski4real|Fix broken re-exports in lib/hooks/index.ts
+130ae1f2|2026-01-27 17:54:37 +0300|muski4real|Fix module resolution: add proxy types files
+82fc0604|2026-01-27 16:41:37 +0300|muski4real|feat(shared): create @shared types package for client/server sharing
+064cfff8|2026-01-27 16:03:07 +0300|muski4real|refactor(types): sustainable fixes for navigation and community types
+37804594|2026-01-27 15:55:00 +0300|muski4real|fix(types): resolve Bills, AppProviders, Navigation type errors
+24d7a5cf|2026-01-27 11:29:02 +0300|muski4real|chore: cleanup root directory
+9711c837|2026-01-27 11:28:59 +0300|muski4real|refactor(docs): organize active implementation plans
+e64efcdc|2026-01-27 11:28:58 +0300|muski4real|feat(docs): establish central migration log and update contributing guidelines
+98a98a5d|2026-01-27 11:28:56 +0300|muski4real|chore(docs): archive legacy migration reports and plans
+7ca8b34f|2026-01-17 13:51:09 +0300|muski4real|docs: add executive summary for conflict resolution project
+aceffec5|2026-01-17 13:48:13 +0300|muski4real|Phases 2-4: Complete conflict analysis - middleware verified, error handling architecture sound, config audit complete
+8ddc58dc|2026-01-17 13:40:12 +0300|muski4real|Phase 1: Consolidate caching to shared/core - extract wrapper classes, remove server/infrastructure/cache duplication
+e7886210|2026-01-15 02:08:25 +0300|muski4real|refactor: remove notification test service and validation service; introduce centralized validation schemas for bills, comments, and users
+221b8bd1|2026-01-14 16:17:48 +0300|muski4real|Add end-to-end workflow tests and performance regression suite
+2ba6f57d|2026-01-14 00:31:30 +0300|muski4real|feat(tooling): add type generation and validation schema generation utilities
+39da28d7|2026-01-12 18:18:44 +0300|muski4real|feat(types): consolidate and optimize type system across entire application
+825e7f28|2026-01-11 02:59:08 +0300|muski4real|feat: Add race condition fixes and prevention guide
+95199e82|2026-01-09 13:23:26 +0300|muski4real|Fix: Resolve 7 linting errors in sync-triggers.ts
+a431fb06|2026-01-09 13:21:10 +0300|muski4real|Fix: Refactor imports, add pagination and error handling across various query files
+87db725d|2026-01-09 13:19:44 +0300|muski4real|Fix: Remove 'as any' type casts from trojan_bill_detection.ts relations
+5a81292d|2026-01-09 13:18:47 +0300|muski4real|Fix: Resolve 26+ TypeScript compilation errors in trojan_bill_detection.ts
+33230111|2026-01-09 13:16:55 +0300|muski4real|Fix: Resolve 38+ TypeScript compilation errors in universal_access.ts
+2c425804|2026-01-09 13:11:25 +0300|muski4real|Fix: Resolve 21 TypeScript compilation errors in validate-static.ts
+355cc1c4|2026-01-09 13:08:32 +0300|muski4real|Fix: Resolve linting errors in schema files
+48e52ceb|2026-01-09 13:05:39 +0300|muski4real|Fix: Resolve 50+ TypeScript compilation errors in transparency_analysis.ts
+67628400|2026-01-09 13:00:55 +0300|muski4real|Fix: Resolve 35+ TypeScript compilation errors in search_system.ts
+e02e33ab|2026-01-09 12:57:01 +0300|muski4real|Fix: Resolve 40+ TypeScript compilation errors in political_economy.ts
+58b0349d|2026-01-09 12:49:05 +0300|muski4real|fix: resolve all compilation errors in platform_operations.ts
+3126f1dd|2026-01-09 12:21:42 +0300|muski4real|fix: resolve 32 compilation errors in participation_oversight.ts
+dd7ec4c6|2026-01-09 12:20:27 +0300|muski4real|fix: resolve compilation errors in market_intelligence.ts and integrity_operations.ts
+ecc5d786|2026-01-09 12:15:33 +0300|muski4real|fix: resolve 127 compilation errors in constitutional_intelligence.ts
+0e6eaa2c|2026-01-09 11:27:14 +0300|muski4real|Remove test script for Argument Intelligence and add verification script for Graph Database implementation
+7498aeca|2026-01-07 02:00:26 +0300|muski4real|Refactor code structure and optimize performance across multiple modules
+e168fd5c|2026-01-06 15:19:00 +0300|muski4real|feat(monitoring): implement comprehensive monitoring system with FSD architecture
+09b8e9ca|2026-01-06 02:06:55 +0300|muski4real|fix: replace invalid button variants with primary in BillsPortalPage
+e14e52aa|2026-01-05 22:58:05 +0000|jomuski34|feat: add react imports
+97c65a67|2026-01-05 21:43:38 +0300|muski4real| fix bugs in leger
+c2c739ee|2026-01-05 21:33:36 +0300|muski4real|feat: comprehensive platform enhancement with argument intelligence, safeguards, and civic engagement
+a13decc8|2026-01-05 21:16:53 +0300|muski4real|add new features
+b518a454|2025-12-29 20:23:48 +0300|muski4real|feat: add comprehensive tracing setup for application observability
+5d506028|2025-12-29 20:22:49 +0300|muski4real|chore: add knip for unused import/export analysis and update tsconfig for @types inclusion
+95850820|2025-12-29 19:23:54 +0300|muski4real|refactor(types): migrate type definitions to FSD structure and update import paths
+2793f699|2025-12-29 18:02:35 +0300|muski4real|refactor: consolidate websocket types and update import paths
+3dad9d0d|2025-12-27 09:19:27 +0300|muski4real|refactor(shared): consolidate type definitions and update import paths
+826b9013|2025-12-26 22:01:53 +0300|muski4real|Fix TypeScript error in EngagementHistorySection by updating icon imports and removing unused function
+6498b2cc|2025-12-26 05:41:43 +0300|muski4real|Infrastructure Cleanup and Documentation
+63cd0458|2025-12-26 05:41:19 +0300|muski4real|Feature Additions and ML Enhancements
+5bb6a22d|2025-12-26 05:40:55 +0300|muski4real|Database and Persistence Layer Updates
+1544c141|2025-12-26 05:40:34 +0300|muski4real|API and WebSocket Refactoring
+92177efe|2025-12-26 05:40:09 +0300|muski4real|UI/UX Loading System Consolidation
+66305db9|2025-12-26 05:39:45 +0300|muski4real|Security Infrastructure Enhancements
+13636fd2|2025-12-26 05:28:27 +0300|muski4real|feat: comprehensive system refactoring and enhancements
+ae351ec1|2025-12-22 23:58:06 +0300|muski4real|feat: Implement unified websocket infrastructure, consolidate shared modules, and add comprehensive documentation
+8d28438d|2025-12-21 16:55:57 +0300|muski4real|refactor stor to shared UI
+8d0d7cdd|2025-12-18 18:36:44 +0300|muski4real|refactor(realtime): consolidate WebSocket and real-time functionality
+2f100966|2025-12-18 11:48:05 +0300|muski4real|refactor: remove old import resolver script and update dependencies
+0abc468b|2025-12-17 16:49:43 +0300|muski4real|feat: Implement Chanuka design system with updated themes and governance colors
+141bfcc8|2025-12-17 15:54:06 +0300|muski4real|feat: add export validation tools and improve TypeScript project structure
+2b7ca0c0|2025-12-11 04:48:27 +0300|muski4real|feat: Enhance user API and services with improved type safety and error handling
+15260a19|2025-12-11 03:38:30 +0300|muski4real|Refactor code structure for improved readability and maintainability; optimize performance in key functions.
+67f5d897|2025-12-10 16:09:10 +0300|muski4real|feat: Add shared library for utilities, validation schemas, and React Query configuration
+ba054f5f|2025-12-10 08:06:19 +0300|muski4real|feat: add script for automated import updates and consolidate directory structure
+e3516627|2025-12-09 23:03:18 +0300|muski4real|refactor: streamline cache types and improve module exports for FSD compliance
+94e60371|2025-12-09 23:02:37 +0300|muski4real|feat: add shared folder validation script
+875b8ba7|2025-12-09 20:32:04 +0300|muski4real|refactor(structure): reorganize components into feature-sliced design structure
+3f1dfe64|2025-12-09 09:07:35 +0300|muski4real|Complete FSD migration: move all components to proper FSD structure
+ec303689|2025-12-09 08:59:16 +0300|muski4real|Backup before FSD migration completion
+0266cc27|2025-12-07 14:39:12 +0300|muski4real|refactor: remove unified test setup files for client, e2e, server integration, server unit, and shared libraries
+902f35fd|2025-12-06 07:47:24 +0300|muski4real|refactor: Consolidate vitest configuration to single workspace
+ee576c5d|2025-12-06 07:38:32 +0300|muski4real|refactor: Migrate testing utilities to tests/validation/
+54798f2a|2025-12-06 07:28:34 +0300|muski4real|doc: Phase 1 testing infrastructure complete (Option A - Consolidated)
+d496b492|2025-12-06 07:27:06 +0300|muski4real|refactor: consolidate testing infrastructure into tests/ (Option A)
+8ac766b0|2025-12-06 07:15:01 +0300|muski4real|refactor: remove all outdated tests (487 files, 58,622 LOC)
+e3971eb1|2025-12-06 06:29:21 +0300|muski4real|refactor: consolidate error handling to core/error, remove redundant utils/errors.ts
+e52b7668|2025-12-06 06:25:13 +0300|muski4real|cleanup: remove 25+ redundant utils files (migrations, suppressors, docs)
+99db33cb|2025-12-06 06:19:03 +0300|muski4real|docs: add comprehensive merge integration summary confirming all gains
+4aaae65b|2025-12-06 06:15:41 +0300|muski4real|Merge archive-unused-utils: integrate mobile, security, privacy, websocket, orphan tools
+18d73b67|2025-12-06 06:12:23 +0300|muski4real|chore: remove sidebar conflict file
+32888b36|2025-12-06 06:08:34 +0300|muski4real|chore: gitignore sidebar file
+a3ce8fb0|2025-12-06 06:04:21 +0300|muski4real|WIP on main: ba363bdc docs: add comprehensive branch analysis and comparison documents
+f0a32d53|2025-12-06 06:04:21 +0300|muski4real|index on main: ba363bdc docs: add comprehensive branch analysis and comparison documents
+ba363bdc|2025-12-06 05:56:38 +0300|muski4real|docs: add comprehensive branch analysis and comparison documents
+dd58192b|2025-12-06 05:04:04 +0300|muski4real|feat(tests): add unified server and shared libraries test setup
+3e3c2380|2025-12-05 19:28:26 +0300|muski4real|feat(client): add implementation workarounds component
+e14cbe64|2025-12-05 07:57:42 +0300|muski4real|docs: add comprehensive design system integration analysis and orphan file tools
+deb84ea4|2025-12-05 07:55:43 +0300|muski4real|feat(client): integrate orphaned modules and migrate systems to modular architecture
+0498ea76|2025-12-04 19:43:03 +0300|muski4real|Archive unused utils files: advanced-error-recovery.ts, connectionAwareLoading.ts, development-error-recovery.ts, index.ts, navigation/page-relationship-utils.ts, super-aggressive-suppressor.ts
+dd8be56d|2025-12-02 18:18:31 +0300|muski4real|feat(client): add shared components for auth, dashboard, and privacy management
+d7d01ace|2025-11-27 19:50:26 +0300|muski4real|WIP on main: fc752c33 refactor(monorepo): standardize import paths and enhance module organization
+1fdf40d6|2025-11-27 19:50:26 +0300|muski4real|index on main: fc752c33 refactor(monorepo): standardize import paths and enhance module organization
+fc752c33|2025-11-27 14:44:25 +0300|muski4real|refactor(monorepo): standardize import paths and enhance module organization
+8918668d|2025-11-27 14:44:25 +0300|muski4real|refactor(monorepo): standardize import paths and enhance module organization
+12bda2fb|2025-11-24 13:39:06 +0300|muski4real|refactor(shared): enhance type safety and add new UI components
+2fc57dd9|2025-11-23 17:02:14 +0300|muski4real|refactor: update import paths and refactor code structures across modules
+a3908b95|2025-11-22 17:53:49 +0300|muski4real|feat: Add comprehensive documentation for server, shared, and tests modules
+2f731565|2025-11-22 17:53:49 +0300|muski4real|feat: Add comprehensive documentation for server, shared, and tests modules
+1bcad4da|2025-11-21 01:08:50 +0300|muski4real|Refactor: Add new line at the end of multiple schema files for consistency
+685c14fc|2025-11-21 01:08:50 +0300|muski4real|Refactor: Add new line at the end of multiple schema files for consistency
+9109df8c|2025-11-20 12:07:11 +0300|muski4real|fix: ensure consistent newline at end of files across multiple modules
+1140c060|2025-11-20 12:07:11 +0300|muski4real|fix: ensure consistent newline at end of files across multiple modules
+c1c20965|2025-11-20 11:10:07 +0300|muski4real|refactor: update import paths and improve test cases for form field components
+61d476f5|2025-11-20 11:10:07 +0300|muski4real|refactor: update import paths and improve test cases for form field components
+d4a09085|2025-11-20 10:41:04 +0300|muski4real|Remove simple schema validation script and update TypeScript configuration to suppress deprecation warnings for baseUrl.
+59160aa9|2025-11-20 10:41:04 +0300|muski4real|Remove simple schema validation script and update TypeScript configuration to suppress deprecation warnings for baseUrl.

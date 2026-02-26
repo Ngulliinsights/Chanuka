@@ -1,12 +1,21 @@
 # Project Structure
 
-**Generated:** February 26, 2026 at 01:28 PM
+**Generated:** February 26, 2026 at 11:24 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,730
+**Total Items:** 3,785
 
 ```
 .
 ├── analysis-results/
+│   ├── DEPENDENCY_ANALYSIS_SUMMARY.md
+│   ├── dependency-analysis.json
+│   ├── dependency-analysis.txt
+│   ├── dependency-cruiser-raw.json
+│   ├── dependency-graph.md
+│   ├── dependency-report.json
+│   ├── dependency-report.txt
+│   ├── infrastructure-analysis.json
+│   └── madge-circular.json
 ├── client/
 │   ├── design-assets/
 │   │   ├── Chanuka Logo Design with Maasai Influence.ai
@@ -594,6 +603,12 @@
 │   │   │   │   │   ├── useApiConnection.ts
 │   │   │   │   │   ├── useConnectionAware.tsx
 │   │   │   │   │   └── useServiceStatus.ts
+│   │   │   │   ├── http/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── request-deduplicator.ts
+│   │   │   │   ├── realtime/
+│   │   │   │   │   ├── client.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── bill.service.ts
 │   │   │   │   │   ├── index.ts
@@ -611,10 +626,16 @@
 │   │   │   │   │   ├── interceptors.ts
 │   │   │   │   │   ├── performance.ts
 │   │   │   │   │   ├── preferences.ts
+│   │   │   │   │   ├── realtime.ts
 │   │   │   │   │   ├── request.ts
 │   │   │   │   │   ├── service.ts
 │   │   │   │   │   ├── shared-imports.ts
-│   │   │   │   │   └── sponsor.ts
+│   │   │   │   │   ├── sponsor.ts
+│   │   │   │   │   └── websocket.ts
+│   │   │   │   ├── websocket/
+│   │   │   │   │   ├── client.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── manager.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── authentication.ts
 │   │   │   │   ├── cache-manager.ts
@@ -628,6 +649,7 @@
 │   │   │   │   ├── notifications.ts
 │   │   │   │   ├── performance.ts
 │   │   │   │   ├── privacy.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── registry.ts
 │   │   │   │   ├── retry.ts
 │   │   │   │   ├── serialization-interceptors.ts
@@ -703,6 +725,18 @@
 │   │   │   │   │   └── state-sync.service.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── consolidation/
+│   │   │   │   ├── consolidation-algorithm.ts
+│   │   │   │   ├── di-container.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── interface-extraction.ts
+│   │   │   │   ├── mappings.ts
+│   │   │   │   ├── migration-script.ts
+│   │   │   │   ├── module-structure.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── rollback.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   └── validation.ts
 │   │   │   ├── dashboard/
 │   │   │   │   ├── context.tsx
 │   │   │   │   ├── hooks.ts
@@ -758,15 +792,15 @@
 │   │   │   │   ├── rate-limiter.ts
 │   │   │   │   ├── recovery.ts
 │   │   │   │   ├── reporting.ts
-│   │   │   │   └── types.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   └── unified-types.ts
 │   │   │   ├── events/
 │   │   │   │   ├── event-bus.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── hooks/
 │   │   │   │   └── index.ts
 │   │   │   ├── http/
-│   │   │   │   ├── index.ts
-│   │   │   │   └── request-deduplicator.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── loading/
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── GlobalLoadingIndicator.tsx
@@ -792,6 +826,10 @@
 │   │   │   │   ├── reducer.ts
 │   │   │   │   ├── utils.ts
 │   │   │   │   └── validation.ts
+│   │   │   ├── logging/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
 │   │   │   ├── mobile/
 │   │   │   │   ├── device-detector.ts
 │   │   │   │   ├── error-handler.ts
@@ -842,6 +880,19 @@
 │   │   │   │   ├── types.ts
 │   │   │   │   ├── utils.ts
 │   │   │   │   └── validation.ts
+│   │   │   ├── observability/
+│   │   │   │   ├── analytics/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── error-monitoring/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── performance/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── telemetry/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── CONSOLIDATION_SUMMARY.md
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
 │   │   │   ├── performance/
 │   │   │   │   ├── alerts.ts
 │   │   │   │   ├── architecture-performance-monitor.ts
@@ -882,6 +933,8 @@
 │   │   │   ├── recovery/
 │   │   │   │   ├── dashboard-recovery.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── scripts/
+│   │   │   │   └── validate-module-structure.ts
 │   │   │   ├── search/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── search-strategy-selector.ts
@@ -969,8 +1022,7 @@
 │   │   │   │   ├── dashboard-validation.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── websocket/
-│   │   │   │   ├── index.ts
-│   │   │   │   └── manager.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── workers/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── service-worker.ts
@@ -979,6 +1031,7 @@
 │   │   │   ├── index.ts
 │   │   │   ├── integration-validator.ts
 │   │   │   ├── MIGRATION_GUIDE.md
+│   │   │   ├── MODULE_VALIDATION_REPORT.md
 │   │   │   └── quality-optimizer.ts
 │   │   ├── lib/
 │   │   │   ├── components/
@@ -1755,7 +1808,15 @@
 │   │   ├── CLIENT_LIB_CORE_FEATURES_ANALYSIS.md
 │   │   ├── CLIENT_OVERLAP_ANALYSIS.md
 │   │   ├── data-flow-pipelines.md
+│   │   ├── ERROR_HANDLING_CONSISTENCY_ANALYSIS.md
+│   │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
+│   │   ├── MASTER_CONSOLIDATION_PLAN.md
+│   │   ├── SHARED_CLIENT_SERVER_BOUNDARIES.md
 │   │   ├── SHARED_FOLDER_ANALYSIS.md
+│   │   ├── SPEC_GAP_ANALYSIS_RESOLUTION.md
+│   │   ├── SPEC_UPDATE_COMPLETE.md
+│   │   ├── STRATEGIC_IMPLEMENTATION_ANALYSIS.md
+│   │   ├── SUSTAINABLE_APPROACH_ANALYSIS.md
 │   │   └── UNUSED_UTILITIES_ANALYSIS.md
 │   ├── archive/
 │   │   ├── orphan-analysis-2025/
@@ -1903,6 +1964,8 @@
 │   │   ├── setup.md
 │   │   ├── troubleshooting-guide.md
 │   │   └── user-manual.md
+│   ├── infrastructure/
+│   │   └── BUILD_CONFIGURATION.md
 │   ├── integration/
 │   │   ├── advocacy-coordination.md
 │   │   ├── architecture.md
@@ -1968,6 +2031,8 @@
 │   │   ├── Research Strategy for Kenyan Constitutionalism.md
 │   │   ├── strategy_template_flow.mermaid
 │   │   └── sustainable_uprising.md
+│   ├── retrospective/
+│   │   └── GIT_HISTORY_ANALYSIS.md
 │   ├── security/
 │   │   └── phase1-security-review.md
 │   ├── strategy/
@@ -2003,6 +2068,9 @@
 │   ├── ARCHITECTURE_MIGRATION_2026-02-24.md
 │   ├── ARCHITECTURE_MIGRATION_COMPLETE_2026-02-24.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
+│   ├── BUILD_FIX_PLAN.md
+│   ├── BUILD_FIX_PROGRESS.md
+│   ├── BUILD_FIX_SUMMARY.md
 │   ├── CLEANUP_EXECUTIVE_SUMMARY.md
 │   ├── CLEANUP_SUMMARY_2026-02-24.md
 │   ├── cleanup-verification-checklist.md
@@ -2160,6 +2228,8 @@
 │   │   └── audit-constraints.ts
 │   ├── accessibility-audit.js
 │   ├── analyze-bundle.cjs
+│   ├── analyze-dependencies.ts
+│   ├── analyze-infrastructure.ts
 │   ├── apply-schema-direct.ts
 │   ├── boundary-fix-phase2a.sh
 │   ├── bundle-analysis-plugin.js
@@ -2178,6 +2248,7 @@
 │   ├── fix-templates.ts
 │   ├── fresh-db-push.sh
 │   ├── generate-bundle-report.js
+│   ├── generate-dependency-report.ts
 │   ├── immediate-memory-cleanup.cjs
 │   ├── jscpd.json
 │   ├── LIFECYCLE.md
@@ -2193,6 +2264,7 @@
 │   ├── setup-playwright.js
 │   ├── track-progress.ts
 │   ├── tsconfig.json
+│   ├── validate-infrastructure.ts
 │   ├── verify-api-contract-coverage.ts
 │   ├── verify-consistency.ts
 │   ├── verify-metrics.ts
@@ -3337,7 +3409,7 @@
 │   │   │   ├── services.ts
 │   │   │   └── validation-types.ts
 │   │   ├── utils/
-│   │   │   ├── examples/
+│   │   │   ├── examples.disabled/
 │   │   │   │   └── concurrency-migration-example.ts
 │   │   │   ├── formatting/
 │   │   │   │   ├── currency.ts
@@ -3354,7 +3426,7 @@
 │   │   │   ├── async-utils.ts
 │   │   │   ├── CLIENT_SAFE_UTILITIES.md
 │   │   │   ├── common-utils.ts
-│   │   │   ├── concurrency-migration-router.ts
+│   │   │   ├── concurrency-migration-router.ts.disabled
 │   │   │   ├── constants.ts
 │   │   │   ├── data-utils.ts
 │   │   │   ├── index.ts
@@ -3395,8 +3467,8 @@
 │   │   │   │   ├── bill.schemas.ts
 │   │   │   │   ├── comment.contract.ts
 │   │   │   │   ├── comment.schemas.ts
+│   │   │   │   ├── endpoint-registry.ts
 │   │   │   │   ├── endpoint.ts
-│   │   │   │   ├── endpoints.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── notification.contract.ts
 │   │   │   │   ├── notification.schemas.ts
@@ -3480,29 +3552,6 @@
 │   │   │   ├── index.ts
 │   │   │   ├── tree-shakeable.ts
 │   │   │   └── validation-caching.ts
-│   │   ├── testing/
-│   │   │   ├── examples/
-│   │   │   │   ├── comprehensive.example.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── runtime-validation.example.ts
-│   │   │   │   └── type-level.example.ts
-│   │   │   ├── integration/
-│   │   │   │   ├── backward-compatibility-test.ts
-│   │   │   │   ├── comprehensive-integration-test.ts
-│   │   │   │   ├── comprehensive-type-tests.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── validation-middleware-tests.ts
-│   │   │   ├── automated-validation.ts
-│   │   │   ├── index.ts
-│   │   │   ├── integration.ts
-│   │   │   ├── runtime-validation.ts
-│   │   │   └── type-level.ts
-│   │   ├── tooling/
-│   │   │   ├── documentation.ts
-│   │   │   ├── eslint-config.ts
-│   │   │   ├── index.ts
-│   │   │   ├── type-generation.ts
-│   │   │   └── validation-schemas.ts
 │   │   ├── validation/
 │   │   │   ├── index.ts
 │   │   │   └── schemas.ts
@@ -3563,7 +3612,8 @@
 │   ├── package.json
 │   ├── project.json
 │   ├── tsconfig.json
-│   └── vite.config.ts
+│   ├── vite.config.ts
+│   └── vitest.config.ts
 ├── tests/
 │   ├── e2e/
 │   │   └── test-results/
@@ -3610,7 +3660,10 @@
 │   │   ├── error-context-enrichment.property.test.ts
 │   │   ├── error-logging-completeness.property.test.ts
 │   │   ├── error-structure-consistency.property.test.ts
+│   │   ├── import-path-consistency.property.test.ts
 │   │   ├── migration-integration-preservation.test.ts
+│   │   ├── module-count-reduction.property.test.ts
+│   │   ├── public-api-completeness.property.test.ts
 │   │   ├── round-trip-transformation.property.test.ts
 │   │   ├── schema-type-sync.property.test.ts
 │   │   ├── serialization-consistency.property.test.ts
@@ -3660,8 +3713,7 @@
 │   │   │   ├── schema-agnostic-test-helper.ts
 │   │   │   ├── stress-tests.ts
 │   │   │   └── test-data-factory.ts
-│   │   ├── index.ts
-│   │   └── integration-test-runner.ts
+│   │   └── index.ts
 │   ├── utils/
 │   │   └── test-helpers.ts
 │   ├── validation/
@@ -3678,6 +3730,7 @@
 │   ├── playwright.config.ts
 │   └── README.md
 ├── ARCHITECTURE.md
+├── BUILD_STATUS_FINAL.md
 ├── CHANGELOG.md
 ├── CODEBASE_CLEANUP_COMPLETE.md
 ├── COMPLETE_CLEANUP_SUMMARY.md
@@ -3698,6 +3751,7 @@
 ├── FINAL_CLEANUP_REPORT.md
 ├── FRESH_START_MIGRATION_PLAN.md
 ├── generate-structure.mjs
+├── git-history.txt
 ├── IMPORT_VALIDATION_REPORT.md
 ├── knip.config.ts
 ├── MIGRATION_COMPLETE.md
@@ -3729,6 +3783,7 @@
 ├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
 ├── SEED_IMPLEMENTATION_SUMMARY.md
 ├── start-dev.js
+├── STRATEGIC_FILE_DELETION_RATIONALE.md
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo

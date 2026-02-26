@@ -8,7 +8,7 @@
  * @version 1.0.0
  */
 
-import { AppError, ErrorSeverity } from '../../core/errors';
+import { AppError, ErrorSeverity, type ErrorCode } from '../../core/errors';
 
 // ============================================================================
 // WebSocket Error Hierarchy
@@ -34,15 +34,22 @@ export abstract class WebSocketError extends AppError {
    */
   public readonly recoverable?: boolean | undefined;
 
+  /**
+   * Additional context for the error
+   */
+  public readonly context?: Readonly<Record<string, unknown>>;
+
   constructor(
     message: string,
+    code: ErrorCode,
     severity: ErrorSeverity,
     context?: Readonly<Record<string, unknown>>,
     connectionId?: string,
     messageId?: string,
     recoverable?: boolean
   ) {
-    super(message, context);
+    super(message, code, severity, context);
+    this.context = context;
     this.connectionId = connectionId;
     this.messageId = messageId;
     this.recoverable = recoverable;
@@ -54,8 +61,8 @@ export abstract class WebSocketError extends AppError {
  * Errors related to connection establishment, maintenance, and termination
  */
 export class WebSocketConnectionError extends WebSocketError {
-  readonly code = 'WEBSOCKET_CONNECTION_ERROR';
-  readonly severity = 'high' as const;
+  override readonly code = 'WEBSOCKET_CONNECTION_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.HIGH;
 
   /**
    * WebSocket close code (if applicable)
@@ -76,7 +83,7 @@ export class WebSocketConnectionError extends WebSocketError {
     closeCode?: number,
     closeReason?: string
   ) {
-    super(message, 'high', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_CONNECTION_ERROR' as ErrorCode, ErrorSeverity.HIGH, context, connectionId, messageId, recoverable);
     this.closeCode = closeCode;
     this.closeReason = closeReason;
   }
@@ -87,8 +94,8 @@ export class WebSocketConnectionError extends WebSocketError {
  * Errors related to authentication and authorization
  */
 export class WebSocketAuthError extends WebSocketError {
-  readonly code = 'WEBSOCKET_AUTH_ERROR';
-  readonly severity = 'high' as const;
+  override readonly code = 'WEBSOCKET_AUTH_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.HIGH;
 
   /**
    * Authentication method that failed
@@ -109,7 +116,7 @@ export class WebSocketAuthError extends WebSocketError {
     authMethod?: string,
     isTokenExpired?: boolean
   ) {
-    super(message, 'high', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_AUTH_ERROR' as ErrorCode, ErrorSeverity.HIGH, context, connectionId, messageId, recoverable);
     this.authMethod = authMethod;
     this.isTokenExpired = isTokenExpired;
   }
@@ -120,8 +127,8 @@ export class WebSocketAuthError extends WebSocketError {
  * Errors related to message processing, validation, and handling
  */
 export class WebSocketMessageError extends WebSocketError {
-  readonly code = 'WEBSOCKET_MESSAGE_ERROR';
-  readonly severity = 'medium' as const;
+  override readonly code = 'WEBSOCKET_MESSAGE_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.MEDIUM;
 
   /**
    * Message type that caused the error
@@ -142,7 +149,7 @@ export class WebSocketMessageError extends WebSocketError {
     messageType?: string,
     isValidationError?: boolean
   ) {
-    super(message, 'medium', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_MESSAGE_ERROR' as ErrorCode, ErrorSeverity.MEDIUM, context, connectionId, messageId, recoverable);
     this.messageType = messageType;
     this.isValidationError = isValidationError;
   }
@@ -153,8 +160,8 @@ export class WebSocketMessageError extends WebSocketError {
  * Errors related to subscription management
  */
 export class WebSocketSubscriptionError extends WebSocketError {
-  readonly code = 'WEBSOCKET_SUBSCRIPTION_ERROR';
-  readonly severity = 'medium' as const;
+  override readonly code = 'WEBSOCKET_SUBSCRIPTION_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.MEDIUM;
 
   /**
    * Subscription ID that caused the error
@@ -181,7 +188,7 @@ export class WebSocketSubscriptionError extends WebSocketError {
     topic?: string,
     isDuplicate?: boolean
   ) {
-    super(message, 'medium', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_SUBSCRIPTION_ERROR' as ErrorCode, ErrorSeverity.MEDIUM, context, connectionId, messageId, recoverable);
     this.subscriptionId = subscriptionId;
     this.topic = topic;
     this.isDuplicate = isDuplicate;
@@ -193,8 +200,8 @@ export class WebSocketSubscriptionError extends WebSocketError {
  * Errors related to protocol violations and compatibility issues
  */
 export class WebSocketProtocolError extends WebSocketError {
-  readonly code = 'WEBSOCKET_PROTOCOL_ERROR';
-  readonly severity = 'high' as const;
+  override readonly code = 'WEBSOCKET_PROTOCOL_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.HIGH;
 
   /**
    * Expected protocol version
@@ -215,7 +222,7 @@ export class WebSocketProtocolError extends WebSocketError {
     expectedProtocol?: string,
     actualProtocol?: string
   ) {
-    super(message, 'high', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_PROTOCOL_ERROR' as ErrorCode, ErrorSeverity.HIGH, context, connectionId, messageId, recoverable);
     this.expectedProtocol = expectedProtocol;
     this.actualProtocol = actualProtocol;
   }
@@ -226,8 +233,8 @@ export class WebSocketProtocolError extends WebSocketError {
  * Errors related to timeouts in WebSocket operations
  */
 export class WebSocketTimeoutError extends WebSocketError {
-  readonly code = 'WEBSOCKET_TIMEOUT_ERROR';
-  readonly severity = 'medium' as const;
+  override readonly code = 'WEBSOCKET_TIMEOUT_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.MEDIUM;
 
   /**
    * Timeout duration in milliseconds
@@ -248,7 +255,7 @@ export class WebSocketTimeoutError extends WebSocketError {
     recoverable?: boolean,
     operation?: string
   ) {
-    super(message, 'medium', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_TIMEOUT_ERROR' as ErrorCode, ErrorSeverity.MEDIUM, context, connectionId, messageId, recoverable);
     this.timeout = timeout;
     this.operation = operation;
   }
@@ -259,8 +266,8 @@ export class WebSocketTimeoutError extends WebSocketError {
  * Errors related to rate limiting and throttling
  */
 export class WebSocketRateLimitError extends WebSocketError {
-  readonly code = 'WEBSOCKET_RATE_LIMIT_ERROR';
-  readonly severity = 'medium' as const;
+  override readonly code = 'WEBSOCKET_RATE_LIMIT_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.MEDIUM;
 
   /**
    * Rate limit threshold
@@ -287,7 +294,7 @@ export class WebSocketRateLimitError extends WebSocketError {
     recoverable?: boolean,
     resetTime?: number
   ) {
-    super(message, 'medium', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_RATE_LIMIT_ERROR' as ErrorCode, ErrorSeverity.MEDIUM, context, connectionId, messageId, recoverable);
     this.limit = limit;
     this.window = window;
     this.resetTime = resetTime;
@@ -299,8 +306,8 @@ export class WebSocketRateLimitError extends WebSocketError {
  * Errors originating from the server side
  */
 export class WebSocketServerError extends WebSocketError {
-  readonly code = 'WEBSOCKET_SERVER_ERROR';
-  readonly severity = 'critical' as const;
+  override readonly code = 'WEBSOCKET_SERVER_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.CRITICAL;
 
   /**
    * Server component that failed
@@ -321,7 +328,7 @@ export class WebSocketServerError extends WebSocketError {
     component?: string,
     originalError?: Error
   ) {
-    super(message, 'critical', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_SERVER_ERROR' as ErrorCode, ErrorSeverity.CRITICAL, context, connectionId, messageId, recoverable);
     this.component = component;
     this.originalError = originalError;
   }
@@ -332,8 +339,8 @@ export class WebSocketServerError extends WebSocketError {
  * Errors originating from the client side
  */
 export class WebSocketClientError extends WebSocketError {
-  readonly code = 'WEBSOCKET_CLIENT_ERROR';
-  readonly severity = 'medium' as const;
+  override readonly code = 'WEBSOCKET_CLIENT_ERROR' as ErrorCode;
+  override readonly severity = ErrorSeverity.MEDIUM;
 
   /**
    * Client platform information
@@ -354,7 +361,7 @@ export class WebSocketClientError extends WebSocketError {
     platform?: string,
     version?: string
   ) {
-    super(message, 'medium', context, connectionId, messageId, recoverable);
+    super(message, 'WEBSOCKET_CLIENT_ERROR' as ErrorCode, ErrorSeverity.MEDIUM, context, connectionId, messageId, recoverable);
     this.platform = platform;
     this.version = version;
   }

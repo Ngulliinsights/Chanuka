@@ -414,7 +414,6 @@ import {
   UrgencyLevel,
   ComplexityLevel,
   KenyanCounty,
-  USER_ROLE_VALUES,
 } from '../../types/core/enums';
 
 /**

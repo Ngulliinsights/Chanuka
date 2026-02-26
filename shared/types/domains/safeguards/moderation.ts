@@ -5,7 +5,8 @@
  */
 
 import { BaseEntity } from '../../core/base';
-import { UserId, ModerationId } from '../../core/common';
+import { UserId } from '../../core/branded';
+import { ModerationId } from '../../core/common';
 
 // ============================================================================
 // Core Enums & Types

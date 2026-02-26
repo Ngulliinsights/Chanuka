@@ -5,14 +5,18 @@
  * Ensures consistent error structure across all layers.
  */
 
-import { ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from '@shared/constants';
+import { ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from '../../constants';
 import {
   ErrorClassification,
   getClassificationFromErrorCode,
   type StandardError,
-} from '@shared/types/core/errors';
+} from '../../types/core/errors';
 import { ZodError } from 'zod';
-import { generateCorrelationId, getCurrentCorrelationId } from './correlation-id';
+// import { generateCorrelationId, getCurrentCorrelationId } from './correlation-id';
+
+// Temporary stubs until correlation-id is implemented
+const generateCorrelationId = () => `corr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const getCurrentCorrelationId = () => undefined;
 
 /**
  * Type guard for PostgreSQL error

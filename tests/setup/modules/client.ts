@@ -12,7 +12,7 @@ import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 
 // Import existing client setup
-import '@testing-library/jest-dom/vitest';
+// import '@testing-library/jest-dom/vitest';
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {

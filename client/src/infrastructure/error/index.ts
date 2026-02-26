@@ -26,6 +26,22 @@ export type {
   NavigationErrorType,
 } from './types';
 
+// Unified error types (aligned with server StandardizedError)
+export type {
+  BaseError,
+  ClientError,
+  ApiErrorResponse,
+  RecoveryStrategy as UnifiedRecoveryStrategy,
+  RecoveryResult as UnifiedRecoveryResult,
+} from './unified-types';
+
+export {
+  isBaseError,
+  isClientError,
+  isApiErrorResponse,
+  standardErrorToBaseError,
+} from './unified-types';
+
 // Component types
 export type {
   ErrorBoundaryProps as ComponentErrorBoundaryProps,
@@ -133,6 +149,32 @@ export type {
 } from './analytics';
 export { ErrorRateLimiter } from './rate-limiter';
 export { ErrorFactory } from './factory';
+
+// Unified factory functions (pure, no side effects)
+export {
+  createValidationError as createUnifiedValidationError,
+  createNetworkError as createUnifiedNetworkError,
+  createAuthenticationError,
+  createAuthorizationError,
+  createBusinessError,
+  createSystemError,
+  createNotFoundError,
+  createTimeoutError,
+  createClientError,
+} from './unified-factory';
+
+// HTTP boundary serialization
+export {
+  toApiError,
+  fromApiError,
+  serializeError,
+  deserializeError,
+  isValidApiErrorResponse,
+  errorToClientError,
+  sanitizeErrorForDisplay,
+  enrichErrorContext,
+  cloneError,
+} from './serialization';
 
 // ============================================================================
 // Error Boundary Components

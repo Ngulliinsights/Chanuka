@@ -25,7 +25,7 @@ export const createTranslator = (language: SupportedLanguage): TranslationFuncti
   const translations = languages[language];
   
   return (key: TranslationKey, params?: Record<string, string | number>): string => {
-    let translation = translations[key] || key;
+    let translation: string = translations[key] || key;
     
     // Replace parameters in translation
     if (params) {

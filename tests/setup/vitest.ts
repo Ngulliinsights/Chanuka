@@ -20,7 +20,8 @@
  */
 
 import { beforeAll, afterEach, vi } from 'vitest';
-import '@testing-library/jest-dom/vitest';
+// Import jest-dom matchers for vitest
+// import '@testing-library/jest-dom';
 
 // ============================================================================
 // MOCK DATA FACTORIES

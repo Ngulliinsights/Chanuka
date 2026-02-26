@@ -378,9 +378,12 @@ export function applyTransformationOptions<T extends Record<string, unknown>>(
  */
 export function createSafeTransformer<TSource, TTarget>(
   transformer: Transformer<TSource, TTarget>
-): Transformer<TSource, TTarget | null> {
+): Transformer<TSource | null, TTarget | null> {
   return {
-    transform: (source: TSource): TTarget | null => {
+    transform: (source: TSource | null): TTarget | null => {
+      if (source === null) {
+        return null;
+      }
       try {
         return transformer.transform(source);
       } catch {

@@ -31,7 +31,7 @@ export type {
   SocialProfile,
   CreateUserPayload,
   UpdateUserPayload,
-} from '@shared/types/domains/authentication/user';
+} from '../../types/domains/authentication/user';
 
 export {
   UserRole,
@@ -43,4 +43,4 @@ export {
   hasRole,
   getUserId,
   isUser,
-} from '@shared/types/domains/authentication/user';
+} from '../../types/domains/authentication/user';

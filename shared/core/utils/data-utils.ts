@@ -188,7 +188,7 @@ export function transformKeys<T extends Record<string, unknown>>(
     return obj;
   }
 
-  const result = {} as T;
+  const result = {} as Record<string, unknown>;
 
   for (const [key, value] of Object.entries(obj)) {
     const newKey = keyTransformer(key);
@@ -197,14 +197,14 @@ export function transformKeys<T extends Record<string, unknown>>(
       continue;
     }
 
-    if (options.deep && typeof value === 'object' && value !== null) {
-      result[newKey as keyof T] = transformKeys(value, keyTransformer, options);
+    if (options.deep && typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      result[newKey] = transformKeys(value as Record<string, unknown>, keyTransformer, options);
     } else {
-      result[newKey as keyof T] = value;
+      result[newKey] = value;
     }
   }
 
-  return result;
+  return result as T;
 }
 
 /**
@@ -225,6 +225,10 @@ export function snakeToCamel<T extends Record<string, unknown>>(obj: T): T {
  * Flattens a nested object into a single-level object with dot notation keys.
  */
 export function flattenObject(obj: unknown, prefix = '', result: Record<string, unknown> = {}): Record<string, unknown> {
+  if (typeof obj !== 'object' || obj === null) {
+    return result;
+  }
+  
   for (const [key, value] of Object.entries(obj)) {
     const newKey = prefix ? `${prefix}.${key}` : key;
 
@@ -384,14 +388,16 @@ export function deepEqual(a: unknown, b: unknown): boolean {
   }
 
   if (typeof a === 'object' && typeof b === 'object') {
-    const keysA = Object.keys(a);
-    const keysB = Object.keys(b);
+    const objA = a as Record<string, unknown>;
+    const objB = b as Record<string, unknown>;
+    const keysA = Object.keys(objA);
+    const keysB = Object.keys(objB);
 
     if (keysA.length !== keysB.length) return false;
 
     for (const key of keysA) {
       if (!keysB.includes(key)) return false;
-      if (!deepEqual(a[key], b[key])) return false;
+      if (!deepEqual(objA[key], objB[key])) return false;
     }
 
     return true;

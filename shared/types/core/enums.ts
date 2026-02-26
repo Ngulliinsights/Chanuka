@@ -388,25 +388,15 @@ export enum ComplexityLevel {
 // ============================================================================
 // Error Classification Enums
 // ============================================================================
+// Error Types
+// ============================================================================
+// Note: ErrorClassification is now in core/errors.ts to avoid duplication
 
 /**
- * Error classification for consistent error handling
+ * Numeric error codes for specific error types
+ * Note: For string-based error codes, use ErrorCode type from constants
  */
-export enum ErrorClassification {
-  /** Validation error (400) */
-  Validation = 'validation',
-  /** Authorization error (401, 403) */
-  Authorization = 'authorization',
-  /** Server error (500) */
-  Server = 'server',
-  /** Network error (503, timeout) */
-  Network = 'network',
-}
-
-/**
- * Error codes for specific error types
- */
-export enum ErrorCode {
+export enum NumericErrorCode {
   // Validation errors (1000-1999)
   VALIDATION_FAILED = 1000,
   INVALID_INPUT = 1001,

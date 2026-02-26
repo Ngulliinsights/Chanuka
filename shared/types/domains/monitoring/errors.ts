@@ -35,7 +35,7 @@ export type ErrorType =
   | 'resource_exhaustion'
   | 'unknown';
 
-export type ErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
+export type MonitoringErrorSeverity = 'low' | 'medium' | 'high' | 'critical' | 'blocker';
 export type ErrorStatus = 'open' | 'acknowledged' | 'investigating' | 'resolved' | 'rejected';
 export type ErrorImpact = 'none' | 'minor' | 'moderate' | 'major' | 'catastrophic';
 export type ErrorFrequency = 'one-time' | 'intermittent' | 'frequent' | 'constant';
@@ -51,7 +51,7 @@ export interface BaseErrorEvent {
   readonly id: ErrorEventId;
   readonly timestamp: number; // Unix timestamp in milliseconds
   readonly type: ErrorType;
-  readonly severity: ErrorSeverity;
+  readonly severity: MonitoringErrorSeverity;
   readonly message: string;
   readonly stackTrace?: string;
   readonly context?: Readonly<Record<string, unknown>>;
@@ -219,7 +219,7 @@ export interface ErrorGroup {
   readonly errorType: ErrorType;
   readonly title: string;
   readonly description?: string;
-  readonly severity: ErrorSeverity;
+  readonly severity: MonitoringErrorSeverity;
   readonly status: ErrorStatus;
   readonly createdAt: number;
   readonly updatedAt: number;
@@ -247,7 +247,7 @@ export interface ErrorAnalyticsSummary {
   };
   readonly totalErrors: number;
   readonly errorsByType: Readonly<Record<ErrorType, number>>;
-  readonly errorsBySeverity: Readonly<Record<ErrorSeverity, number>>;
+  readonly errorsBySeverity: Readonly<Record<MonitoringErrorSeverity, number>>;
   readonly errorsBySource: Readonly<Record<'frontend' | 'backend' | 'database' | 'external' | 'infrastructure', number>>;
   readonly errorRate: number; // errors per minute
   readonly uniqueErrorGroups: number;
@@ -268,7 +268,7 @@ export interface ErrorTrendAnalysis {
     readonly timestamp: number;
     readonly count: number;
     readonly uniqueGroups: number;
-    readonly severityDistribution: Readonly<Record<ErrorSeverity, number>>;
+    readonly severityDistribution: Readonly<Record<MonitoringErrorSeverity, number>>;
   }[];
   readonly trend: 'increasing' | 'decreasing' | 'stable' | 'spiking';
   readonly percentageChange: number;
@@ -308,7 +308,7 @@ export interface ErrorAlertConfiguration {
   readonly name: string;
   readonly description: string;
   readonly errorTypeFilter?: readonly ErrorType[];
-  readonly severityFilter?: readonly ErrorSeverity[];
+  readonly severityFilter?: readonly MonitoringErrorSeverity[];
   readonly threshold: number; // error count threshold
   readonly timeWindow: number; // in milliseconds
   readonly notificationChannels: readonly ('email' | 'slack' | 'pagerduty' | 'sms' | 'webhook')[];
@@ -326,7 +326,7 @@ export interface ErrorAlertTrigger {
   readonly triggeredAt: number;
   readonly errorGroupId: ErrorGroupId;
   readonly errorType: ErrorType;
-  readonly severity: ErrorSeverity;
+  readonly severity: MonitoringErrorSeverity;
   readonly count: number;
   readonly timeWindow: number; // in milliseconds
   readonly message: string;
@@ -351,7 +351,7 @@ export interface ErrorNotification {
   readonly message: string;
   readonly errorDetails?: {
     readonly errorType: ErrorType;
-    readonly severity: ErrorSeverity;
+    readonly severity: MonitoringErrorSeverity;
     readonly count: number;
     readonly firstOccurrence: number;
     readonly lastOccurrence: number;
@@ -388,7 +388,7 @@ export interface UpdateErrorStatusPayload {
 export interface AnalyzeErrorTrendsPayload {
   readonly errorType?: ErrorType;
   readonly timeRange: string;
-  readonly severityFilter?: readonly ErrorSeverity[];
+  readonly severityFilter?: readonly MonitoringErrorSeverity[];
 }
 
 export interface GenerateErrorReportPayload {
@@ -398,7 +398,7 @@ export interface GenerateErrorReportPayload {
   };
   readonly format: 'json' | 'csv' | 'pdf' | 'html';
   readonly includeDetails?: boolean;
-  readonly severityFilter?: readonly ErrorSeverity[];
+  readonly severityFilter?: readonly MonitoringErrorSeverity[];
 }
 
 /**

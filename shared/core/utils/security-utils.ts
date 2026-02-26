@@ -22,6 +22,17 @@ try {
   // Crypto not available in browser
 }
 
+// Helper to ensure crypto is available
+/**
+ * Ensures crypto module is available, throws if not
+ * @throws {Error} If crypto module is not available
+ */
+function ensureCrypto(): void {
+  if (!crypto) {
+    throw new Error('Crypto module not available in this environment');
+  }
+}
+
 // Client-safe logging helper
 const safeLog = {
   warn: (message: string, data?: unknown) => {
@@ -45,7 +56,7 @@ export interface SanitizationOptions {
   maxLength?: number;
 }
 
-export interface ValidationResult {
+export interface SecurityValidationResult {
   isValid: boolean;
   errors: string[];
   sanitizedValue?: string;
@@ -178,7 +189,7 @@ export const DEFAULT_PASSWORD_POLICY: PasswordPolicy = {
 export function validatePasswordStrength(
   password: string,
   policy: PasswordPolicy = DEFAULT_PASSWORD_POLICY
-): ValidationResult {
+): SecurityValidationResult {
   const errors: string[] = [];
 
   if (password.length < policy.minLength) {
@@ -260,7 +271,8 @@ export function generateSecurePassword(length: number = 12): string {
  * Generates a secure random key.
  */
 export function generateKey(length: number = 32): Buffer {
-  return crypto.randomBytes(length);
+  ensureCrypto();
+  return crypto!.randomBytes(length);
 }
 
 /**
@@ -271,11 +283,12 @@ export function encrypt(
   key: Buffer | string,
   options: EncryptionOptions = {}
 ): string {
+  ensureCrypto();
   const algorithm = options.algorithm || 'aes-256-cbc';
   const keyBuffer = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
-  const iv = crypto.randomBytes(options.ivLength || 16);
+  const iv = crypto!.randomBytes(options.ivLength || 16);
 
-  const cipher = crypto.createCipheriv(algorithm, keyBuffer, iv);
+  const cipher = crypto!.createCipheriv(algorithm, keyBuffer, iv);
   let encrypted = cipher.update(data, 'utf8', 'hex');
   encrypted += cipher.final('hex');
 
@@ -293,10 +306,11 @@ export function decrypt(
   encryptedData: string,
   key: Buffer | string
 ): string {
+  ensureCrypto();
   const keyBuffer = typeof key === 'string' ? Buffer.from(key, 'hex') : key;
   const { encrypted, iv, algorithm } = JSON.parse(encryptedData);
 
-  const decipher = crypto.createDecipheriv(algorithm, keyBuffer, Buffer.from(iv, 'hex'));
+  const decipher = crypto!.createDecipheriv(algorithm, keyBuffer, Buffer.from(iv, 'hex'));
 
   let decrypted = decipher.update(encrypted, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
@@ -308,15 +322,17 @@ export function decrypt(
  * Generates a hash of data using SHA-256.
  */
 export function hash(data: string, salt?: string): string {
+  ensureCrypto();
   const saltedData = salt ? data + salt : data;
-  return crypto.createHash('sha256').update(saltedData).digest('hex');
+  return crypto!.createHash('sha256').update(saltedData).digest('hex');
 }
 
 /**
  * Generates a secure salt.
  */
 export function generateSalt(length: number = 16): string {
-  return crypto.randomBytes(length).toString('hex');
+  ensureCrypto();
+  return crypto!.randomBytes(length).toString('hex');
 }
 
 /**
@@ -332,21 +348,24 @@ export function comparePassword(password: string, hashedPassword: string, salt?:
  * Generates a secure random token.
  */
 export function generateToken(length: number = 32): string {
-  return crypto.randomBytes(length).toString('hex');
+  ensureCrypto();
+  return crypto!.randomBytes(length).toString('hex');
 }
 
 /**
  * Generates a secure session ID.
  */
 export function generateSessionId(): string {
-  return `sess_${Date.now()}_${crypto.randomBytes(16).toString('hex')}`;
+  ensureCrypto();
+  return `sess_${Date.now()}_${crypto!.randomBytes(16).toString('hex')}`;
 }
 
 /**
  * Generates a CSRF token.
  */
 export function generateCsrfToken(): string {
-  return crypto.randomBytes(32).toString('hex');
+  ensureCrypto();
+  return crypto!.randomBytes(32).toString('hex');
 }
 
 // ==================== Input Validation ====================
@@ -354,7 +373,7 @@ export function generateCsrfToken(): string {
 /**
  * Validates email format and security.
  */
-export function validateEmail(email: string): ValidationResult {
+export function validateEmail(email: string): SecurityValidationResult {
   const errors: string[] = [];
 
   if (!email || typeof email !== 'string') {
@@ -389,7 +408,7 @@ export function validateEmail(email: string): ValidationResult {
 /**
  * Validates URL format and security.
  */
-export function validateUrl(url: string): ValidationResult {
+export function validateUrl(url: string): SecurityValidationResult {
   const errors: string[] = [];
 
   if (!url || typeof url !== 'string') {
