@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 25, 2026 at 04:51 PM
+**Generated:** February 26, 2026 at 01:31 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,691
+**Total Items:** 3,710
 
 ```
 .
@@ -1997,6 +1997,8 @@
 │   ├── MIGRATION_COMPLETE_2026-02-24.md
 │   ├── MIGRATION_STATUS_2026-02-24.md
 │   ├── migration-examples.md
+│   ├── MVP Data Strategy for NLP Training.md
+│   ├── PATH_ALIAS_RESOLUTION.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
 │   ├── PHASE_1_3_COMPLETION.md
@@ -2085,6 +2087,7 @@
 │   │   ├── health-check.ts
 │   │   ├── init-strategic-database.ts
 │   │   ├── initialize-database-integration.ts
+│   │   ├── list-tables.ts
 │   │   ├── migrate-with-verification.ts
 │   │   ├── migrate.ts
 │   │   ├── migration-performance-profile.ts
@@ -2125,9 +2128,12 @@
 │   │   ├── validator.mjs
 │   │   └── verify-exports.js
 │   ├── seeds/
-│   │   ├── legislative-seed.ts
-│   │   ├── seed.ts
-│   │   └── simple-seed.ts
+│   │   ├── primary-seed-aligned.ts
+│   │   ├── primary-seed-direct.ts
+│   │   ├── primary-seed.ts
+│   │   ├── secondary-seed-aligned.ts
+│   │   ├── secondary-seed.ts
+│   │   └── test-connection.ts
 │   ├── validation/
 │   │   └── audit-constraints.ts
 │   ├── accessibility-audit.js
@@ -2163,6 +2169,7 @@
 │   ├── scan-type-violations.ts
 │   ├── setup-playwright.js
 │   ├── track-progress.ts
+│   ├── tsconfig.json
 │   ├── verify-api-contract-coverage.ts
 │   ├── verify-consistency.ts
 │   ├── verify-metrics.ts
@@ -2543,7 +2550,10 @@
 │   │   │   ├── application/
 │   │   │   │   └── managed-integration.service.ts
 │   │   │   ├── services/
-│   │   │   │   └── government-data-integration.service.ts
+│   │   │   │   ├── api-integrations.service.ts
+│   │   │   │   ├── data-validation-pipeline.service.ts
+│   │   │   │   ├── government-data-integration.service.ts
+│   │   │   │   └── web-scraping.service.ts
 │   │   │   ├── index.ts
 │   │   │   └── routes.ts
 │   │   ├── institutional-api/
@@ -3073,6 +3083,8 @@
 │   │   │   ├── foundation.ts
 │   │   │   ├── graph_sync.ts
 │   │   │   ├── impact_measurement.ts
+│   │   │   ├── index-full.ts.backup
+│   │   │   ├── index-minimal.ts
 │   │   │   ├── index.ts
 │   │   │   ├── integration_monitoring.ts
 │   │   │   ├── integration-extended.ts
@@ -3196,6 +3208,7 @@
 │   │   └── validation-middleware.ts
 │   ├── routes/
 │   ├── scripts/
+│   │   ├── seeds/
 │   │   ├── analyze-module-errors.ts
 │   │   ├── api-race-condition-detector.ts
 │   │   ├── deploy-repository-migration.ts
@@ -3660,6 +3673,7 @@
 ├── cspell.config.yaml
 ├── DATABASE_CONSISTENCY_ANALYSIS.md
 ├── DATABASE_CONSISTENCY_VERIFIED.md
+├── DATABASE_MIGRATION_STATUS.md
 ├── DEFERRED_ISSUES_RESOLUTION.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
@@ -3676,6 +3690,9 @@
 ├── MIGRATION_EXECUTION_GUIDE.md
 ├── migration-verification-report.json
 ├── MOCK_DATA_GENERATION_PROMPTS.md
+├── MOCK_DATA_IMPLEMENTATION_SUMMARY.md
+├── MOCK_DATA_QUICK_START.md
+├── MOCK_DATA_QUICKSTART.md
 ├── MOCK_DATA_STRATEGY.md
 ├── nginx.conf
 ├── nx.json
@@ -3688,8 +3705,10 @@
 ├── README.md
 ├── READY_TO_EXECUTE.md
 ├── SCHEMA_CONFLICTS_RESOLUTION.md
+├── SCHEMA_IMPORT_FIXES_NEEDED.md
 ├── SCHEMA_TABLES_NEEDED_ANALYSIS.md
 ├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
+├── SEED_IMPLEMENTATION_SUMMARY.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json
