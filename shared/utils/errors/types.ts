@@ -7,7 +7,7 @@
 import { ErrorContext } from './context';
 
 export class TransformationError extends Error {
-  public readonly name = 'TransformationError';
+  public override readonly name = 'TransformationError';
   public readonly context: ErrorContext;
   public readonly originalError?: Error;
 
@@ -24,7 +24,7 @@ export class TransformationError extends Error {
 }
 
 export class ValidationError extends Error {
-  public readonly name = 'ValidationError';
+  public override readonly name = 'ValidationError';
   public readonly context: ErrorContext;
   public readonly validationErrors: Array<{
     field: string;
@@ -52,7 +52,7 @@ export class ValidationError extends Error {
 }
 
 export class NetworkError extends Error {
-  public readonly name = 'NetworkError';
+  public override readonly name = 'NetworkError';
   public readonly context: ErrorContext;
   public readonly statusCode?: number;
   public readonly retryable: boolean;

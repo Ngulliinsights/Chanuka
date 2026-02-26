@@ -27,18 +27,6 @@ function escapeErrorComponent(value: string): string {
 }
 
 /**
- * Unescape special characters in error message components
- * @internal Reserved for future use
- */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-function unescapeErrorComponent(value: string): string {
-  return value
-    .replace(/\\:/g, ':')
-    .replace(/\\;/g, ';')
-    .replace(/ \\- /g, ' - ');
-}
-
-/**
  * Format a single validation error message
  * Format: "{field}: {rule} - {description}"
  * Special characters are escaped to prevent parsing issues

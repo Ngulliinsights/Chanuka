@@ -12,8 +12,6 @@ import type { UserId } from '../../../types/core/branded';
 import { UserRole, UserStatus, VerificationStatus, AnonymityLevel } from '../../../types/core/enums';
 import {
   dateToStringTransformer,
-  optionalDateToStringTransformer,
-  createOptionalTransformer,
 } from '../base';
 
 // ============================================================================
@@ -91,7 +89,7 @@ export const userDbToDomain: Transformer<UserTable, UserDomain> = {
 
   reverse(user: UserDomain): UserTable {
     return {
-      id: user.id,
+      id: user.id as UserId,
       email: user.email,
       username: user.username,
       password_hash: user.passwordHash ?? '', // Restore from domain model
@@ -130,7 +128,7 @@ export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfileDom
 
   reverse(profile: UserProfileDomain): UserProfileTable {
     return {
-      user_id: profile.userId,
+      user_id: profile.userId as UserId,
       display_name: profile.displayName,
       first_name: profile.firstName ?? null,
       last_name: profile.lastName ?? null,

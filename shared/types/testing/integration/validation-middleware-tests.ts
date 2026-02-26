@@ -8,6 +8,7 @@
 import { z } from 'zod';
 import { createValidatedType, ValidatedType } from '../../core/validation';
 import { Result, ValidationError } from '../../core/errors';
+import { Ok, Err } from '../../core/primitives/types/result';
 import { TypeCompatibilityTestSuite, TypeCompatibilityTestSuiteResult, runTypeCompatibilityTestSuite } from './comprehensive-type-tests';
 
 // ============================================================================
@@ -114,18 +115,18 @@ export function runValidationMiddlewareTest(
 
   // Test middleware validation
   const middlewareResult = test.middlewareValidator(test.testData);
-  const middlewareValidationPassed = middlewareResult.success;
+  const middlewareValidationPassed = middlewareResult.isOk();
 
   if (!middlewareValidationPassed) {
-    errors.push(`Middleware validation failed: ${middlewareResult.error?.message}`);
+    errors.push(`Middleware validation failed: ${middlewareResult.isErr() ? middlewareResult.error?.message : 'Unknown error'}`);
   }
 
   // Test type validation
   const typeResult = test.validatedType.validate(test.testData);
-  const typeValidationPassed = typeResult.success;
+  const typeValidationPassed = typeResult.isOk();
 
   if (!typeValidationPassed) {
-    errors.push(`Type validation failed: ${typeResult.error?.message}`);
+    errors.push(`Type validation failed: ${typeResult.isErr() ? typeResult.error?.message : 'Unknown error'}`);
   }
 
   // Check compatibility
@@ -206,9 +207,9 @@ export function runBackwardCompatibilityTest(
   let dataCompatibility = true;
   for (const legacyData of test.legacyData) {
     const validationResult = test.currentType.validate(legacyData);
-    if (!validationResult.success) {
+    if (!validationResult.isOk()) {
       dataCompatibility = false;
-      breakingChanges.push(`Legacy data validation failed: ${validationResult.error?.message}`);
+      breakingChanges.push(`Legacy data validation failed: ${validationResult.isErr() ? validationResult.error?.message : 'Unknown error'}`);
     }
   }
 
@@ -218,11 +219,11 @@ export function runBackwardCompatibilityTest(
     test.currentType.schema
   );
 
-  if (!schemaCompatibilityResult.success) {
-    breakingChanges.push(`Schema compatibility issue: ${schemaCompatibilityResult.error?.message}`);
+  if (!schemaCompatibilityResult.isOk()) {
+    breakingChanges.push(`Schema compatibility issue: ${schemaCompatibilityResult.isErr() ? schemaCompatibilityResult.error?.message : 'Unknown error'}`);
   }
 
-  const schemaCompatibility = schemaCompatibilityResult.success;
+  const schemaCompatibility = schemaCompatibilityResult.isOk();
 
   // Determine overall result
   const expectedFullCompatibility = test.expectedCompatibility === 'full';
@@ -238,7 +239,7 @@ export function runBackwardCompatibilityTest(
     dataCompatibility,
     schemaCompatibility,
     breakingChanges: breakingChanges.length > 0 ? breakingChanges : [],
-    warnings: warnings.length > 0 ? warnings : undefined,
+    warnings: warnings.length > 0 ? warnings : [],
     timestamp: Date.now(),
   };
 }
@@ -260,24 +261,19 @@ export function validateSchemaCompatibility(
     const currentType = getSchemaType(currentSchema);
 
     if (legacyType !== currentType) {
-      return {
-        success: false,
-        error: new ValidationError(
-          `Schema type mismatch: legacy ${legacyType} vs current ${currentType}`,
-          undefined,
-          { legacyType, currentType }
-        )
-      };
+      return new Err(new ValidationError(
+        `Schema type mismatch: legacy ${legacyType} vs current ${currentType}`,
+        'validation',
+        { legacyType, currentType }
+      ));
     }
 
-    return { success: true, data: true };
+    return new Ok(true);
   } catch (error) {
-    return {
-      success: false,
-      error: new ValidationError(
-        `Schema compatibility validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        undefined,
-        { legacySchema: legacySchema.description, currentSchema: currentSchema.description }
+    return new Err(new ValidationError(
+      `Schema compatibility validation failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      'validation',
+      { legacySchema: legacySchema.description, currentSchema: currentSchema.description }
       )
     };
   }
