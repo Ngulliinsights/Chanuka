@@ -297,7 +297,7 @@ export function validateData<T>(
   if (!result.success) {
     const context = new ErrorContextBuilder()
       .operation(operation)
-      .layer('validation')
+      .layer('transformation')
       .value(data)
       .severity('high')
       .metadata({

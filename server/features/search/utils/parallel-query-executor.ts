@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/index';
+import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 
 export interface QueryTask<T = any> {
@@ -53,13 +53,13 @@ export class ParallelQueryExecutor {
             error: result.reason
           };
           
-          logger.error(`Query task ${task.name} failed:`, { component: 'Search' }, result.reason);
+          logger.error({ component: 'Search', error: result.reason }, `Query task ${task.name} failed`);
         }
       });
 
       return resultMap;
     } catch (error) {
-      logger.error('Parallel query execution failed:', { component: 'Search' }, error);
+      logger.error({ component: 'Search', error }, 'Parallel query execution failed');
       throw error;
     }
   }
@@ -82,7 +82,7 @@ export class ParallelQueryExecutor {
         if (result.status === 'fulfilled') {
           results.push(result.value);
         } else {
-          logger.warn('Batch query failed:', { component: 'Search' }, result.reason);
+          logger.warn({ component: 'Search', error: result.reason }, 'Batch query failed');
           // Push null for failed queries to maintain array indices
           results.push(null as T);
         }
@@ -166,7 +166,7 @@ export class ParallelQueryExecutor {
     const failureRate = failedQueries / totalQueries;
     
     if (failureRate > failureThreshold) {
-      logger.warn(`High failure rate detected: ${failureRate * 100}%`, { component: 'Search' });
+      logger.warn({ component: 'Search', failureRate: failureRate * 100 }, `High failure rate detected: ${failureRate * 100}%`);
       
       // Return fallback data for all queries
       const fallbackResults: Record<string, QueryResult<T>> = {};

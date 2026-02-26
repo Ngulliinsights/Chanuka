@@ -5,7 +5,7 @@ import {
   withResultHandling
 } from '@server/infrastructure/error-handling';
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 export interface DashboardMetrics {
   deployment: {
@@ -110,10 +110,10 @@ export class DeploymentMonitoringDashboard {
    */
   async startMonitoring(): AsyncServiceResult<void> {
     return withResultHandling(async () => {
-      logger.info('Starting deployment monitoring dashboard', {
+      logger.info({
         component: 'DeploymentMonitoringDashboard',
         config: this.config
-      });
+      }, 'Starting deployment monitoring dashboard');
 
       // Start periodic data collection
       this.monitoringInterval = setInterval(async () => {
@@ -122,7 +122,7 @@ export class DeploymentMonitoringDashboard {
           await this.checkAlerts();
           this.cleanupHistoricalData();
         } catch (error) {
-          logger.error('Error during monitoring cycle', { component: 'DeploymentMonitoringDashboard' }, error as any);
+          logger.error({ component: 'DeploymentMonitoringDashboard', error }, 'Error during monitoring cycle');
         }
       }, this.config.refreshInterval * 1000);
 
@@ -140,9 +140,9 @@ export class DeploymentMonitoringDashboard {
       this.monitoringInterval = undefined;
     }
 
-    logger.info('Stopped deployment monitoring dashboard', {
+    logger.info({
       component: 'DeploymentMonitoringDashboard'
-    });
+    }, 'Stopped deployment monitoring dashboard');
   }
 
   /**
@@ -178,11 +178,11 @@ export class DeploymentMonitoringDashboard {
     const alert = this.alerts.find(a => a.id === alertId);
     if (alert) {
       alert.resolved = true;
-      logger.info('Alert resolved', {
+      logger.info({
         component: 'DeploymentMonitoringDashboard',
         alertId,
         message: alert.message
-      });
+      }, 'Alert resolved');
     }
   }
 
@@ -235,12 +235,12 @@ export class DeploymentMonitoringDashboard {
         metrics
       });
 
-      logger.debug('Collected deployment metrics', {
+      logger.debug({
         component: 'DeploymentMonitoringDashboard',
         metricsCount: this.historicalData.length
-      });
+      }, 'Collected deployment metrics');
     } catch (error) {
-      logger.error('Error collecting metrics', { component: 'DeploymentMonitoringDashboard' }, error as any);
+      logger.error({ component: 'DeploymentMonitoringDashboard', error }, 'Error collecting metrics');
     }
   }
 
@@ -364,17 +364,17 @@ export class DeploymentMonitoringDashboard {
 
     this.alerts.push(alert);
 
-    logger.warn('Alert created', {
+    logger.warn({
       component: 'DeploymentMonitoringDashboard',
       alert
-    });
+    }, 'Alert created');
 
     // Notify callbacks
     this.alertCallbacks.forEach(callback => {
       try {
         callback(alert);
       } catch (error) {
-        logger.error('Error in alert callback', { component: 'DeploymentMonitoringDashboard' }, error as any);
+        logger.error({ component: 'DeploymentMonitoringDashboard', error }, 'Error in alert callback');
       }
     });
   }
@@ -386,11 +386,11 @@ export class DeploymentMonitoringDashboard {
     this.historicalData = this.historicalData.filter(point => point.timestamp >= cutoffTime);
     
     if (this.historicalData.length < initialLength) {
-      logger.debug('Cleaned up historical data', {
+      logger.debug({
         component: 'DeploymentMonitoringDashboard',
         removed: initialLength - this.historicalData.length,
         remaining: this.historicalData.length
-      });
+      }, 'Cleaned up historical data');
     }
   }
 

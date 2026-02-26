@@ -138,7 +138,7 @@ export function validatePassword(
   }
 
   // Determine strength
-  const maxScore = 7;
+  // const maxScore = 7; // Reserved for future use
   const strength: 'weak' | 'medium' | 'strong' = 
     score >= 5 ? 'strong' : 
     score >= 3 ? 'medium' : 

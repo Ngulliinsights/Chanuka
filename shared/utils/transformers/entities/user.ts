@@ -6,7 +6,7 @@
  */
 
 import type { Transformer } from '../types';
-import type { User, UserProfile, UserPreferences } from '../../../types/domains/authentication/user';
+import type { UserPreferences } from '../../../types/domains/authentication/user';
 import type { UserTable, UserProfileTable, UserPreferencesTable } from '../../../types/database/tables';
 import type { UserId } from '../../../types/core/branded';
 import { UserRole, UserStatus, VerificationStatus, AnonymityLevel } from '../../../types/core/enums';
@@ -17,14 +17,58 @@ import {
 } from '../base';
 
 // ============================================================================
+// Internal Domain Types (camelCase for transformer layer)
+// ============================================================================
+
+/**
+ * Internal User representation used by transformers
+ * This is separate from the database User type which uses snake_case
+ */
+interface UserDomain {
+  readonly id: UserId | string;
+  readonly email: string;
+  readonly username: string;
+  readonly role: UserRole | string;
+  readonly status: UserStatus | string;
+  readonly profile: UserProfileDomain | null;
+  readonly preferences: UserPreferences | Record<string, never>;
+  readonly verification: VerificationStatus | string;
+  readonly lastLogin?: Date;
+  readonly isActive: boolean;
+  readonly metadata?: Readonly<Record<string, unknown>>;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+  readonly createdBy?: UserId | string;
+  readonly updatedBy?: UserId | string;
+  readonly passwordHash?: string;
+}
+
+/**
+ * Internal UserProfile representation used by transformers
+ * This is separate from the database UserProfile type which uses snake_case
+ */
+interface UserProfileDomain {
+  readonly userId: UserId | string;
+  readonly displayName: string;
+  readonly firstName?: string;
+  readonly lastName?: string;
+  readonly bio?: string;
+  readonly avatarUrl?: string;
+  readonly anonymityLevel: AnonymityLevel | string;
+  readonly isPublic: boolean;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+// ============================================================================
 // Database to Domain Transformers
 // ============================================================================
 
 /**
- * Transform UserTable (database) to User (domain)
+ * Transform UserTable (database) to UserDomain (domain)
  */
-export const userDbToDomain: Transformer<UserTable, User> = {
-  transform(dbUser: UserTable): User {
+export const userDbToDomain: Transformer<UserTable, UserDomain> = {
+  transform(dbUser: UserTable): UserDomain {
     return {
       id: dbUser.id,
       email: dbUser.email,
@@ -45,7 +89,7 @@ export const userDbToDomain: Transformer<UserTable, User> = {
     };
   },
 
-  reverse(user: User): UserTable {
+  reverse(user: UserDomain): UserTable {
     return {
       id: user.id,
       email: user.email,
@@ -66,10 +110,10 @@ export const userDbToDomain: Transformer<UserTable, User> = {
 };
 
 /**
- * Transform UserProfileTable (database) to UserProfile (domain)
+ * Transform UserProfileTable (database) to UserProfileDomain (domain)
  */
-export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfile> = {
-  transform(dbProfile: UserProfileTable): UserProfile {
+export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfileDomain> = {
+  transform(dbProfile: UserProfileTable): UserProfileDomain {
     return {
       userId: dbProfile.user_id,
       displayName: dbProfile.display_name,
@@ -84,7 +128,7 @@ export const userProfileDbToDomain: Transformer<UserProfileTable, UserProfile> =
     };
   },
 
-  reverse(profile: UserProfile): UserProfileTable {
+  reverse(profile: UserProfileDomain): UserProfileTable {
     return {
       user_id: profile.userId,
       display_name: profile.displayName,
@@ -119,14 +163,14 @@ export const userPreferencesDbToDomain: Transformer<UserPreferencesTable, UserPr
 
   reverse(preferences: UserPreferences): UserPreferencesTable {
     return {
-      user_id: preferences.userId,
+      user_id: preferences.userId as UserId,
       theme: preferences.theme ?? null,
       language: preferences.language ?? null,
       notifications_enabled: preferences.notificationsEnabled ?? false,
       email_notifications: preferences.emailNotifications ?? false,
       push_notifications: preferences.pushNotifications ?? false,
-      created_at: preferences.createdAt,
-      updated_at: preferences.updatedAt,
+      created_at: preferences.createdAt ?? new Date(),
+      updated_at: preferences.updatedAt ?? new Date(),
     };
   },
 };
@@ -177,7 +221,7 @@ export interface ApiUserProfile {
  */
 export interface ApiUserPreferences {
   readonly userId: string;
-  readonly theme?: 'light' | 'dark' | 'system';
+  readonly theme?: 'light' | 'dark' | 'system' | 'auto';
   readonly language?: string;
   readonly notificationsEnabled?: boolean;
   readonly emailNotifications?: boolean;
@@ -189,8 +233,8 @@ export interface ApiUserPreferences {
 /**
  * Transform User (domain) to ApiUser (API)
  */
-export const userDomainToApi: Transformer<User, ApiUser> = {
-  transform(user: User): ApiUser {
+export const userDomainToApi: Transformer<UserDomain, ApiUser> = {
+  transform(user: UserDomain): ApiUser {
     // Check if preferences is a proper UserPreferences object or an empty object
     const hasPreferences = 'userId' in user.preferences && 'createdAt' in user.preferences;
     
@@ -216,7 +260,7 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
     };
   },
 
-  reverse(apiUser: ApiUser): User {
+  reverse(apiUser: ApiUser): UserDomain {
     // Check if preferences is a proper ApiUserPreferences object or an empty object
     const hasPreferences = 'userId' in apiUser.preferences && 'createdAt' in apiUser.preferences;
     
@@ -246,8 +290,8 @@ export const userDomainToApi: Transformer<User, ApiUser> = {
 /**
  * Transform UserProfile (domain) to ApiUserProfile (API)
  */
-export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = {
-  transform(profile: UserProfile): ApiUserProfile {
+export const userProfileDomainToApi: Transformer<UserProfileDomain, ApiUserProfile> = {
+  transform(profile: UserProfileDomain): ApiUserProfile {
     return {
       userId: profile.userId,
       displayName: profile.displayName,
@@ -262,7 +306,7 @@ export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = 
     };
   },
 
-  reverse(apiProfile: ApiUserProfile): UserProfile {
+  reverse(apiProfile: ApiUserProfile): UserProfileDomain {
     return {
       userId: apiProfile.userId as UserId,
       displayName: apiProfile.displayName,
@@ -284,14 +328,14 @@ export const userProfileDomainToApi: Transformer<UserProfile, ApiUserProfile> = 
 export const userPreferencesDomainToApi: Transformer<UserPreferences, ApiUserPreferences> = {
   transform(preferences: UserPreferences): ApiUserPreferences {
     return {
-      userId: preferences.userId,
+      userId: preferences.userId!,
       theme: preferences.theme,
       language: preferences.language,
       notificationsEnabled: preferences.notificationsEnabled,
       emailNotifications: preferences.emailNotifications,
       pushNotifications: preferences.pushNotifications,
-      createdAt: dateToStringTransformer.transform(preferences.createdAt),
-      updatedAt: dateToStringTransformer.transform(preferences.updatedAt),
+      createdAt: dateToStringTransformer.transform(preferences.createdAt!),
+      updatedAt: dateToStringTransformer.transform(preferences.updatedAt!),
     };
   },
 

@@ -5,7 +5,7 @@ import {
 import { bill_engagement,bills, comments, users } from '@server/infrastructure/schema/index';
 import { and, avg, count, desc,eq, sql } from "drizzle-orm";
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 // Types for deployment validation
 export interface DeploymentValidationConfig {
@@ -115,11 +115,11 @@ export class RepositoryDeploymentValidator {
    */
   async initializeValidation(): AsyncServiceResult<void> {
     return withResultHandling(async () => {
-      logger.info('Initializing repository deployment validation', { 
+      logger.info({ 
         component: 'RepositoryDeploymentValidator',
         phase: this.config.phase,
         rolloutPercentage: this.config.rolloutPercentage
-      });
+      }, 'Initializing repository deployment validation');
 
       // Capture baseline performance metrics
       this.performanceBaseline = await this.capturePerformanceMetrics('baseline');
@@ -127,10 +127,10 @@ export class RepositoryDeploymentValidator {
       // Initialize cohort tracking
       await this.initializeCohortTracking();
       
-      logger.info('Repository deployment validation initialized successfully', {
+      logger.info({
         component: 'RepositoryDeploymentValidator',
         baseline: this.performanceBaseline
-      });
+      }, 'Repository deployment validation initialized successfully');
     }, { service: 'RepositoryDeploymentValidator', operation: 'initializeValidation' });
   }
 
@@ -216,10 +216,10 @@ export class RepositoryDeploymentValidator {
    */
   async runABTesting(): AsyncServiceResult<StatisticalAnalysisResult> {
     return withResultHandling(async () => {
-      logger.info('Starting A/B testing for repository migration', {
+      logger.info({
         component: 'RepositoryDeploymentValidator',
         cohortSize: this.config.abTestingConfig.cohortSize
-      });
+      }, 'Starting A/B testing for repository migration');
 
       // Collect metrics from both cohorts
       const controlCohort = await this.collectCohortMetrics('control', 'legacy');
@@ -228,10 +228,10 @@ export class RepositoryDeploymentValidator {
       // Perform statistical analysis
       const statisticalResult = await this.performStatisticalAnalysis(controlCohort, treatmentCohort);
 
-      logger.info('A/B testing completed', {
+      logger.info({
         component: 'RepositoryDeploymentValidator',
         result: statisticalResult
-      });
+      }, 'A/B testing completed');
 
       return statisticalResult;
     }, { service: 'RepositoryDeploymentValidator', operation: 'runABTesting' });
@@ -275,9 +275,9 @@ export class RepositoryDeploymentValidator {
    */
   async runCrossPhaseValidation(): AsyncServiceResult<CrossPhaseValidationResult> {
     return withResultHandling(async () => {
-      logger.info('Running cross-phase validation', {
+      logger.info({
         component: 'RepositoryDeploymentValidator'
-      });
+      }, 'Running cross-phase validation');
 
       // Validate error handling consistency
       const errorHandlingConsistency = await this.validateErrorHandlingConsistency();
@@ -472,7 +472,7 @@ export class RepositoryDeploymentValidator {
         });
       }
     } catch (error) {
-      logger.error('Error validating user data consistency', { component: 'RepositoryDeploymentValidator' }, error as any);
+      logger.error({ component: 'RepositoryDeploymentValidator', error }, 'Error validating user data consistency');
     }
 
     return inconsistencies;
@@ -500,7 +500,7 @@ export class RepositoryDeploymentValidator {
         });
       }
     } catch (error) {
-      logger.error('Error validating bill data consistency', { component: 'RepositoryDeploymentValidator' }, error as any);
+      logger.error({ component: 'RepositoryDeploymentValidator', error }, 'Error validating bill data consistency');
     }
 
     return inconsistencies;
@@ -524,7 +524,7 @@ export class RepositoryDeploymentValidator {
         });
       }
     } catch (error) {
-      logger.error('Error validating engagement data consistency', { component: 'RepositoryDeploymentValidator' }, error as any);
+      logger.error({ component: 'RepositoryDeploymentValidator', error }, 'Error validating engagement data consistency');
     }
 
     return inconsistencies;

@@ -1,4 +1,4 @@
-import { logger } from '@shared/core/index';
+import { logger } from '@server/infrastructure/observability';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@server/features/bills/domain/events/bill-events';
 
 import { BillNotificationService } from './bill-notification-service';
@@ -17,11 +17,11 @@ export class BillEventHandler {
    */
   async handle(event: BillCreatedEvent | BillStatusChangedEvent | BillUpdatedEvent): Promise<void> {
     try {
-      logger.info('Handling bill domain event', {
+      logger.info({
         component: 'BillEventHandler',
         eventType: event.constructor.name,
         bill_id: event.bill_id
-      });
+      }, 'Handling bill domain event');
 
       switch (event.constructor.name) {
         case 'BillCreatedEvent':
@@ -37,18 +37,19 @@ export class BillEventHandler {
           break;
 
         default:
-          logger.warn('Unknown bill event type', {
+          logger.warn({
             component: 'BillEventHandler',
             eventType: event.constructor.name
-          });
+          }, 'Unknown bill event type');
       }
 
     } catch (error) {
-      logger.error('Failed to handle bill domain event', {
+      logger.error({
         component: 'BillEventHandler',
         eventType: event.constructor.name,
-        bill_id: event.bill_id
-      }, error);
+        bill_id: event.bill_id,
+        error
+      }, 'Failed to handle bill domain event');
 
       // Don't rethrow - event handling should not break the main flow
     }
@@ -58,19 +59,19 @@ export class BillEventHandler {
    * Handle multiple events in batch
    */
   async handleBatch(events: Array<BillCreatedEvent | BillStatusChangedEvent | BillUpdatedEvent>): Promise<void> {
-    logger.info('Handling batch of bill events', {
+    logger.info({
       component: 'BillEventHandler',
       eventCount: events.length
-    });
+    }, 'Handling batch of bill events');
 
     // Process events in parallel but handle errors individually
     const promises = events.map(event => this.handle(event));
     await Promise.allSettled(promises);
 
-    logger.info('Batch bill event handling completed', {
+    logger.info({
       component: 'BillEventHandler',
       eventCount: events.length
-    });
+    }, 'Batch bill event handling completed');
   }
 }
 

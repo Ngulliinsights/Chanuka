@@ -57,8 +57,8 @@ export function validateBillNumber(billNumber: string): BillNumberValidationResu
     };
   }
 
-  const year = parseInt(match[1], 10);
-  const sequence = parseInt(match[2], 10);
+  const year = parseInt(match[1]!, 10);
+  const sequence = parseInt(match[2]!, 10);
 
   // Validate year (reasonable range)
   const currentYear = new Date().getFullYear();

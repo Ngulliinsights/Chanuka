@@ -3,7 +3,7 @@ import { Pool } from 'pg';
 import { UserProfile, OAuthProvider, SocialProfile } from '@shared/core/types/auth.types';
 import { BaseStorage } from '../../../../BaseStorage.d';
 import type { StorageOptions } from '../../../../StorageTypes.d';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 export interface CreateUserData {
     username: string;
     email: string;

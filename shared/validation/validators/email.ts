@@ -47,11 +47,11 @@ export function validateEmail(email: string): EmailValidationResult {
 
   const [localPart, domain] = trimmed.split('@');
   
-  if (localPart.length > 64) {
+  if (localPart && localPart.length > 64) {
     return { isValid: false, error: 'Email local part too long (max 64 characters)' };
   }
 
-  if (domain.length > 253) {
+  if (domain && domain.length > 253) {
     return { isValid: false, error: 'Email domain too long (max 253 characters)' };
   }
 
@@ -81,5 +81,5 @@ export function isDisposableEmail(email: string): boolean {
   ];
 
   const domain = email.split('@')[1]?.toLowerCase();
-  return disposableDomains.includes(domain);
+  return domain ? disposableDomains.includes(domain) : false;
 }

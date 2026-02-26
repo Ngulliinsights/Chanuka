@@ -28,7 +28,9 @@ function escapeErrorComponent(value: string): string {
 
 /**
  * Unescape special characters in error message components
+ * @internal Reserved for future use
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function unescapeErrorComponent(value: string): string {
   return value
     .replace(/\\:/g, ':')

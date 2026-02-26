@@ -3,7 +3,7 @@ import {
   ResultAdapter,
   withResultHandling} from '@server/infrastructure/error-handling';
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { 
   createRepositoryDeploymentValidator,
@@ -82,10 +82,10 @@ export class DeploymentOrchestrator {
    */
   async startDeployment(): AsyncServiceResult<DeploymentStatus> {
     return withResultHandling(async () => {
-      logger.info('Starting repository migration deployment', {
+      logger.info({
         component: 'DeploymentOrchestrator',
         plan: this.deploymentPlan
-      });
+      }, 'Starting repository migration deployment');
 
       this.status.status = 'initializing';
       this.status.startTime = new Date();
@@ -106,11 +106,11 @@ export class DeploymentOrchestrator {
         this.status.rolloutPercentage = phase.rolloutPercentage;
         this.status.status = 'deploying';
 
-        logger.info(`Executing deployment phase ${i + 1}/${this.deploymentPlan.phases.length}`, {
+        logger.info({
           component: 'DeploymentOrchestrator',
           phase: phase.name,
           rolloutPercentage: phase.rolloutPercentage
-        });
+        }, `Executing deployment phase ${i + 1}/${this.deploymentPlan.phases.length}`);
 
         // Deploy phase
         await this.executePhase(phase);
@@ -121,10 +121,10 @@ export class DeploymentOrchestrator {
           const validationPassed = await this.validatePhase(phase);
           
           if (!validationPassed) {
-            logger.error('Phase validation failed, initiating rollback', {
+            logger.error({
               component: 'DeploymentOrchestrator',
               phase: phase.name
-            });
+            }, 'Phase validation failed, initiating rollback');
             
             await this.initiateRollback({
               reason: `Phase ${phase.name} validation failed`,
@@ -147,10 +147,10 @@ export class DeploymentOrchestrator {
       this.status.status = 'completed';
       this.stopContinuousMonitoring();
 
-      logger.info('Repository migration deployment completed successfully', {
+      logger.info({
         component: 'DeploymentOrchestrator',
         finalStatus: this.status
-      });
+      }, 'Repository migration deployment completed successfully');
 
       return this.status;
     }, { service: 'DeploymentOrchestrator', operation: 'startDeployment' });
@@ -257,10 +257,10 @@ export class DeploymentOrchestrator {
   }
 
   private async executePhase(phase: DeploymentPhase): Promise<void> {
-    logger.info(`Executing phase: ${phase.name}`, {
+    logger.info({
       component: 'DeploymentOrchestrator',
       rolloutPercentage: phase.rolloutPercentage
-    });
+    }, `Executing phase: ${phase.name}`);
 
     // Update validator configuration for new rollout percentage
     this.validator = createRepositoryDeploymentValidator(phase.rolloutPercentage);
@@ -273,9 +273,9 @@ export class DeploymentOrchestrator {
   }
 
   private async validatePhase(phase: DeploymentPhase): Promise<boolean> {
-    logger.info(`Validating phase: ${phase.name}`, {
+    logger.info({
       component: 'DeploymentOrchestrator'
-    });
+    }, `Validating phase: ${phase.name}`);
 
     try {
       // Run all validations
@@ -322,15 +322,15 @@ export class DeploymentOrchestrator {
 
       return validationPassed && thresholdsPassed;
     } catch (error) {
-      logger.error('Phase validation error', { component: 'DeploymentOrchestrator' }, error as any);
+      logger.error({ component: 'DeploymentOrchestrator', error }, 'Phase validation error');
       return false;
     }
   }
 
   private async runFinalValidation(): Promise<void> {
-    logger.info('Running final deployment validation', {
+    logger.info({
       component: 'DeploymentOrchestrator'
-    });
+    }, 'Running final deployment validation');
 
     // Run comprehensive final validation
     const finalValidation = await this.validator.runCrossPhaseValidation();
@@ -356,20 +356,20 @@ export class DeploymentOrchestrator {
     const { rollbackThresholds } = phase;
 
     if (metrics.errorRate > rollbackThresholds.errorRate) {
-      logger.warn('Error rate threshold exceeded', {
+      logger.warn({
         component: 'DeploymentOrchestrator',
         current: metrics.errorRate,
         threshold: rollbackThresholds.errorRate
-      });
+      }, 'Error rate threshold exceeded');
       return false;
     }
 
     if (metrics.userSatisfactionScore < rollbackThresholds.userSatisfactionScore) {
-      logger.warn('User satisfaction threshold not met', {
+      logger.warn({
         component: 'DeploymentOrchestrator',
         current: metrics.userSatisfactionScore,
         threshold: rollbackThresholds.userSatisfactionScore
-      });
+      }, 'User satisfaction threshold not met');
       return false;
     }
 
@@ -400,7 +400,7 @@ export class DeploymentOrchestrator {
       try {
         await this.performMonitoringCheck();
       } catch (error) {
-        logger.error('Monitoring check failed', { component: 'DeploymentOrchestrator' }, error as any);
+        logger.error({ component: 'DeploymentOrchestrator', error }, 'Monitoring check failed');
       }
     }, this.deploymentPlan.monitoringInterval * 1000);
   }
@@ -431,10 +431,10 @@ export class DeploymentOrchestrator {
   }
 
   private async initiateRollback(trigger: RollbackTrigger): Promise<void> {
-    logger.error('Initiating deployment rollback', {
+    logger.error({
       component: 'DeploymentOrchestrator',
       trigger
-    });
+    }, 'Initiating deployment rollback');
 
     this.status.status = 'rolling_back';
 
@@ -450,30 +450,30 @@ export class DeploymentOrchestrator {
       this.status.status = 'failed';
       this.stopContinuousMonitoring();
 
-      logger.info('Rollback completed', {
+      logger.info({
         component: 'DeploymentOrchestrator',
         trigger
-      });
+      }, 'Rollback completed');
     } catch (error) {
-      logger.error('Rollback failed', { component: 'DeploymentOrchestrator' }, error as any);
+      logger.error({ component: 'DeploymentOrchestrator', error }, 'Rollback failed');
       throw error;
     }
   }
 
   private async updateFeatureFlags(rolloutPercentage: number): Promise<void> {
     // Simulate feature flag update
-    logger.info(`Updated feature flags to ${rolloutPercentage}% rollout`, {
+    logger.info({
       component: 'DeploymentOrchestrator'
-    });
+    }, `Updated feature flags to ${rolloutPercentage}% rollout`);
     
     // In real implementation, this would update actual feature flag service
     await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   private async waitForPhaseDuration(duration: number): Promise<void> {
-    logger.info(`Waiting for phase duration: ${duration} minutes`, {
+    logger.info({
       component: 'DeploymentOrchestrator'
-    });
+    }, `Waiting for phase duration: ${duration} minutes`);
     
     // In real implementation, this would be the actual duration
     // For testing, we'll use a shorter duration

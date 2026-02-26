@@ -3,22 +3,22 @@
  */
 
 import { 
-  UserSchema, 
-  UserProfileSchema, 
-  UserWithProfileSchema,
+  UserSchema as _UserSchema, 
+  UserProfileSchema as _UserProfileSchema, 
+  UserWithProfileSchema as _UserWithProfileSchema,
   validateUser,
   validateUserProfile 
 } from './schemas/user.schema';
 
 import { 
-  CommentSchema, 
-  LegacyCommentSchema,
+  CommentSchema as _CommentSchema, 
+  LegacyCommentSchema as _LegacyCommentSchema,
   validateComment 
 } from './schemas/comment.schema';
 
 import { 
-  BillSchema, 
-  LegacyBillSchema,
+  BillSchema as _BillSchema, 
+  LegacyBillSchema as _LegacyBillSchema,
   validateBill 
 } from './schemas/bill.schema';
 

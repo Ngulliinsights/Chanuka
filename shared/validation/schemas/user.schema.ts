@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { nonEmptyString, optionalNonEmptyString, optionalNullableNonEmptyString, emailSchema, uuidSchema, userRoleSchema } from './common';
+import { optionalNonEmptyString, optionalNullableNonEmptyString, emailSchema, uuidSchema, userRoleSchema } from './common';
 
 /**
  * User Validation Rules

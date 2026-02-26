@@ -1,7 +1,7 @@
 import { database as db } from '@server/infrastructure/database';
 import type { User } from '@server/infrastructure/schema';
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {
@@ -304,7 +304,7 @@ export class SocialIntegrationService {
 
       return await response.json();
     } catch (error) {
-      logger.error('Social auth token exchange failed', { platform, error });
+      logger.error({ platform, error }, 'Social auth token exchange failed');
       throw error;
     }
   }
@@ -325,12 +325,12 @@ export class SocialIntegrationService {
        });
 
       // Log the connection details
-      logger.info('Social profile linked successfully', { user_id,
+      logger.info({ user_id,
         platform,
         profile_id: profileData.id,
         username: profileData.username
-       });
-    } catch (error) { logger.error('Failed to link social profile', { user_id, platform, error  });
+       }, 'Social profile linked successfully');
+    } catch (error) { logger.error({ user_id, platform, error  }, 'Failed to link social profile');
       throw error;
     }
   }
@@ -362,7 +362,7 @@ export class SocialIntegrationService {
 
       return await response.json();
     } catch (error) {
-      logger.error('Social profile fetch failed', { platform, error });
+      logger.error({ platform, error }, 'Social profile fetch failed');
       throw error;
     }
   }
@@ -375,7 +375,7 @@ export class SocialIntegrationService {
   async createCommunityAction(action: CommunityAction): Promise<string> {
     // Generate unique identifier for tracking this action
     const actionId = `action_${Date.now()}`;
-    logger.info('Community action created', { actionId, action });
+    logger.info({ actionId, action }, 'Community action created');
 
     // Schedule for later execution if scheduledTime is provided
     if (action.scheduledTime) {
@@ -392,10 +392,10 @@ export class SocialIntegrationService {
    * Coordinates the actual sharing across user networks
    */
   private async executeCommunityAction(actionId: string): Promise<void> {
-    logger.info('Executing community action', { actionId });
+    logger.info({ actionId }, 'Executing community action');
 
     // In production, this would fetch action details from database and execute
-    logger.info('Community action completed', { actionId });
+    logger.info({ actionId }, 'Community action completed');
   }
 
   /**
@@ -421,16 +421,16 @@ export class SocialIntegrationService {
               optimizedContent,
             );
 
-            logger.info('Content shared to social platform successfully', {
+            logger.info({
               user_id: users.id,
               platform: profile.platform,
               content_id: action.content.url,
-             });
-          } catch (error) { logger.error('Failed to share content to social platform', {
+             }, 'Content shared to social platform successfully');
+          } catch (error) { logger.error({
               user_id: users.id,
               platform: profile.platform,
               error,
-             });
+             }, 'Failed to share content to social platform');
           }
         }),
       );
@@ -495,7 +495,7 @@ export class SocialIntegrationService {
         throw new Error(`Failed to share: ${JSON.stringify(errorData)}`);
       }
     } catch (error) {
-      logger.error('Social sharing failed', { platform, error });
+      logger.error({ platform, error }, 'Social sharing failed');
       throw error;
     }
   }
@@ -512,7 +512,7 @@ export class SocialIntegrationService {
     }
 
     // Log the start of social listening (would integrate with actual service in production)
-    logger.info('Social listening started', { configKey, keywords: config.keywords });
+    logger.info({ configKey, keywords: config.keywords }, 'Social listening started');
 
     // In production, this would register webhooks or start polling for mentions
   }
@@ -525,14 +525,14 @@ export class SocialIntegrationService {
     const { text, author, url, sentiment } = mention;
 
     // Store mention data for analysis and reporting
-    logger.info('Social mention processed and stored', {
+    logger.info({
       platform,
       text: text.substring(0, 100),
       author,
       url,
       sentiment,
       receivedAt: new Date().toISOString(),
-    });
+    }, 'Social mention processed and stored');
 
     // Trigger notifications for high-priority mentions
     if (this.isHighPriorityMention(mention)) {
@@ -566,7 +566,7 @@ export class SocialIntegrationService {
    */
   private async notifyAboutMention(mention: unknown): Promise<void> {
     // Create notification for important mention (would integrate with notification service)
-    logger.info('High priority social mention notification sent', {
+    logger.info({
       type: 'social_mention',
       priority: 'high',
       title: 'Important Social Media Mention',
@@ -577,7 +577,7 @@ export class SocialIntegrationService {
         authorId: mention.author.id,
         mentionId: mention.id,
       },
-    });
+    }, 'High priority social mention notification sent');
   }
 
   /**
@@ -586,10 +586,10 @@ export class SocialIntegrationService {
    */
   async generateImpactReport(start_date: Date, end_date: Date): Promise<any> {
     // Log report generation (would fetch actual metrics from database in production)
-    logger.info('Generating social media impact report', {
+    logger.info({
       start_date: start_date.toISOString(),
-      end_date: endDate.toISOString(),
-    });
+      end_date: end_date.toISOString(),
+    }, 'Generating social media impact report');
 
     // Return structured report data
     return {

@@ -3,7 +3,7 @@ import {
   ResultAdapter,
   withResultHandling} from '@server/infrastructure/error-handling';
 
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 
 import { 
   createDeploymentOrchestrator,
@@ -76,10 +76,10 @@ export class RepositoryDeploymentExecutor {
    */
   async executeDeployment(): AsyncServiceResult<DeploymentExecutionResult> {
     return withResultHandling(async () => {
-      logger.info('Starting repository deployment execution for task 5.6', {
+      logger.info({
         component: 'RepositoryDeploymentExecutor',
         config: this.config
-      });
+      }, 'Starting repository deployment execution for task 5.6');
 
       // Step 1: Initialize validation baseline
       await this.validator.initializeValidation();
@@ -120,14 +120,14 @@ export class RepositoryDeploymentExecutor {
         rollbackRequired
       };
 
-      logger.info('Repository deployment execution completed', {
+      logger.info({
         component: 'RepositoryDeploymentExecutor',
         result: {
           success: !rollbackRequired,
           requirementCompliance,
           recommendations: recommendations.length
         }
-      });
+      }, 'Repository deployment execution completed');
 
       return result;
     }, { service: 'RepositoryDeploymentExecutor', operation: 'executeDeployment' });
@@ -137,10 +137,10 @@ export class RepositoryDeploymentExecutor {
    * Execute parallel implementation deployment with detailed A/B testing
    */
   private async executeParallelDeployment(): Promise<DeploymentStatus> {
-    logger.info('Executing parallel implementation deployment', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor',
       rolloutPercentage: this.config.rolloutPercentage
-    });
+    }, 'Executing parallel implementation deployment');
 
     // Configure orchestrator for parallel deployment
     this.orchestrator.onRollback(async () => {
@@ -162,9 +162,9 @@ export class RepositoryDeploymentExecutor {
    * Run comprehensive validation suite covering all requirements
    */
   private async runComprehensiveValidation(): Promise<DeploymentExecutionResult['validationResults']> {
-    logger.info('Running comprehensive validation suite', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor'
-    });
+    }, 'Running comprehensive validation suite');
 
     const [
       performanceImprovement,
@@ -208,10 +208,10 @@ export class RepositoryDeploymentExecutor {
    * Perform statistical analysis with extended validation periods for larger sample sizes
    */
   private async performStatisticalAnalysis(): Promise<StatisticalAnalysisResult> {
-    logger.info('Performing statistical analysis with extended validation', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor',
       extendedValidation: this.config.extendedValidationPeriod
-    });
+    }, 'Performing statistical analysis with extended validation');
 
     if (this.config.extendedValidationPeriod) {
       // Wait for larger sample size
@@ -235,9 +235,9 @@ export class RepositoryDeploymentExecutor {
     validationResults: DeploymentExecutionResult['validationResults'],
     statisticalAnalysis: StatisticalAnalysisResult
   ): Promise<DeploymentExecutionResult['requirementCompliance']> {
-    logger.info('Validating requirement compliance', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor'
-    });
+    }, 'Validating requirement compliance');
 
     // Requirement 4.3: 15% performance improvement
     const requirement_4_3_performance = 
@@ -267,10 +267,10 @@ export class RepositoryDeploymentExecutor {
       requirement_4_6_parallel
     };
 
-    logger.info('Requirement compliance assessment completed', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor',
       compliance
-    });
+    }, 'Requirement compliance assessment completed');
 
     return compliance;
   }
@@ -347,10 +347,10 @@ export class RepositoryDeploymentExecutor {
    * Execute rollback procedure
    */
   private async executeRollback(reason: string): Promise<void> {
-    logger.error('Executing deployment rollback', {
+    logger.error({
       component: 'RepositoryDeploymentExecutor',
       reason
-    });
+    }, 'Executing deployment rollback');
 
     await this.orchestrator.triggerManualRollback(reason);
     await this.cleanupParallelImplementation();
@@ -360,9 +360,9 @@ export class RepositoryDeploymentExecutor {
    * Cleanup parallel implementation resources
    */
   private async cleanupParallelImplementation(): Promise<void> {
-    logger.info('Cleaning up parallel implementation resources', {
+    logger.info({
       component: 'RepositoryDeploymentExecutor'
-    });
+    }, 'Cleaning up parallel implementation resources');
 
     // In real implementation, this would:
     // - Reset feature flags to 0%
@@ -476,9 +476,9 @@ export function createRepositoryDeploymentExecutor(
  */
 export async function executeRepositoryDeploymentTask(): AsyncServiceResult<DeploymentExecutionResult> {
   return withResultHandling(async () => {
-    logger.info('Executing repository deployment task 5.6', {
+    logger.info({
       component: 'RepositoryDeploymentTask'
-    });
+    }, 'Executing repository deployment task 5.6');
 
     // Create executor with configuration optimized for task requirements
     const executor = createRepositoryDeploymentExecutor(25, {
@@ -493,11 +493,11 @@ export async function executeRepositoryDeploymentTask(): AsyncServiceResult<Depl
     // Generate final report
     const report = await executor.generateDeploymentReport();
     
-    logger.info('Repository deployment task 5.6 completed', {
+    logger.info({
       component: 'RepositoryDeploymentTask',
       success: !result.rollbackRequired,
       report: report.success ? report.data : null
-    });
+    }, 'Repository deployment task 5.6 completed');
 
     return result;
   }, { service: 'RepositoryDeploymentTask', operation: 'executeRepositoryDeploymentTask' });

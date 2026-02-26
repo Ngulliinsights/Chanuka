@@ -2,7 +2,7 @@ import { Redis } from 'ioredis';
 import { Pool } from 'pg';
 import type { InsertSocialShare, SocialShare } from '@server/infrastructure/schema';
 import { BaseStorage } from '../../../BaseStorage.d';
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 export declare class SocialShareStorage extends BaseStorage<SocialShare> { constructor(redis: Redis, pool: Pool);
     static initializeSchema(pool: Pool): Promise<void>;
     protected getCached<T>(key: string, fetchFn: () => Promise<T>): Promise<T>;

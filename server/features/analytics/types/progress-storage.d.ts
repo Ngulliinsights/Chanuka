@@ -1,4 +1,4 @@
-import { logger } from '@shared/core';
+import { logger } from '@server/infrastructure/observability';
 import { type InsertUserProgress, type UserProgress } from '@server/infrastructure/schema/platform_operations';
 import { Redis } from 'ioredis';
 import { Pool } from 'pg';
