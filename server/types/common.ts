@@ -1,6 +1,9 @@
 // Consolidated type definitions for the application
 // This file provides unified interfaces to replace duplicate and inconsistent type definitions
 
+// Import types needed for local use in this file
+import type { BillStatusValue } from '@shared/types';
+
 // ===== API RESPONSE TYPES =====
 
 export interface ApiResponse<T = unknown> {
@@ -47,47 +50,69 @@ export interface ErrorResponse {
 
 export type {
   User,
-  UserRole,
   UserProfile,
   UserPreferences,
-  AuthenticatedRequest,
   AuthenticatedUser,
+  AuthenticatedRequest,
+  CustomSession,
+  AuthResult,
   LoginRequest,
   RegisterRequest,
   AuthResponse,
-} from '@shared/core/types/auth.types';
+  SessionValidationResult,
+  AuthorizationContext,
+  PermissionCheckResult,
+  SessionConfig,
+  OAuthProvider,
+  SocialProfile,
+  CreateUserPayload,
+  UpdateUserPayload,
+} from '@shared/types/domains/authentication/user';
 
-// ===== BILL TYPES =====
+export {
+  UserRole,
+  UserStatus,
+  VerificationStatus,
+  AnonymityLevel,
+  ROLE_HIERARCHY,
+  isAuthenticated,
+  hasRole,
+  getUserId,
+  isUser,
+} from '@shared/types';
 
-export interface Bill {
-  id: number;
-  title: string;
-  number: string;
-  introduced_date: Date;
-  status: BillStatus;
-  summary?: string | null;
-  full_text?: string | null;
-  transparency_score?: number;
-  conflictIndicators?: ConflictIndicator[];
-  sections?: BillSection[];
-  sponsors?: Sponsor[];
-  coSponsors?: Sponsor[];
-  committees?: string[];
-  tags?: string[];
-  sourceUrl?: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
+// ===== BILL TYPES (re-exported from canonical source) =====
 
-export type BillStatus =
-  | 'introduced'
-  | 'in_committee'
-  | 'passed_committee'
-  | 'passed_house'
-  | 'passed_senate'
-  | 'signed_into_law'
-  | 'vetoed'
-  | 'failed';
+export type {
+  Bill,
+  ExtendedBill,
+  BillAction,
+  BillAmendment,
+  RelatedBill,
+  Sponsor,
+  Committee,
+  BillCommitteeAssignment,
+  BillEngagementMetrics,
+  ConstitutionalFlag,
+} from '@shared/types/domains/legislative/bill';
+
+export {
+  BillStatus,
+  BillPriority,
+  BillType,
+  Chamber,
+  type BillStatusValue,
+  type VoteType,
+  type VoteResult,
+  type SponsorRole,
+  type SponsorType,
+  type CommitteeType,
+  type AmendmentStatus,
+  type BillRelationship,
+  type ConstitutionalSeverity,
+} from '@shared/types';
+
+// ===== SERVER-SPECIFIC BILL TYPES =====
 
 export interface BillSection {
   number: string;
@@ -106,25 +131,7 @@ export interface ConflictIndicator {
   sponsor_id?: number;
 }
 
-// ===== SPONSOR TYPES =====
-
-export interface Sponsor {
-  id: number;
-  name: string;
-  email?: string;
-  party?: string;
-  constituency?: string;
-  role: 'primary' | 'co-sponsor';
-  sponsorshipDate: Date;
-  conflict_level?: 'low' | 'medium' | 'high' | 'critical';
-  financial_exposure?: number;
-  affiliations?: Affiliation[];
-  voting_alignment?: number;
-  transparency?: TransparencyInfo;
-  is_active: boolean;
-  created_at: Date;
-  updated_at: Date;
-}
+// ===== SPONSOR TYPES (Server-specific extensions) =====
 
 export interface Affiliation {
   organization: string;
@@ -220,7 +227,7 @@ export interface VerificationTask {
   id: number;
   analysis_id: number;
   expertId: number;
-  status: VerificationStatus;
+  status: 'pending' | 'in_progress' | 'approved' | 'rejected' | 'disputed';
   assignedAt: Date;
   completedAt?: Date;
   feedback?: string;
@@ -236,22 +243,27 @@ export interface VerificationRequest { bill_id: number;
   metadata?: Record<string, unknown>;
  }
 
-export type VerificationStatus = 'pending' | 'in_progress' | 'approved' | 'rejected' | 'disputed';
+// Note: VerificationStatus enum is exported from @shared/types above
 
-// ===== COMMENT TYPES =====
+// ===== COMMENT TYPES (re-exported from canonical source) =====
 
-export interface Comment { id: string;
-  bill_id: number;
-  user_id: number;
-  content: string;
-  parent_id?: number;
-  isExpert: boolean;
-  verification_status?: 'pending' | 'verified' | 'rejected';
-  upvotes: number;
-  downvotes: number;
-  created_at: Date;
-  updated_at: Date;
-  }
+export type {
+  Comment,
+  CommentEntity,
+  CommentThread,
+  CommentWithUser,
+  CreateCommentPayload,
+  CreateCommentInput,
+  UpdateCommentPayload,
+  UpdateCommentInput,
+} from '@shared/types/domains/legislative/comment';
+
+export {
+  CommentStatus,
+  ModerationStatus,
+  type CommentModerationStatus,
+  isComment,
+} from '@shared/types';
 
 // ===== NOTIFICATION TYPES =====
 
@@ -276,7 +288,7 @@ export type NotificationType =
 
 export interface SearchFilters {
   query?: string;
-  status?: BillStatus[];
+  status?: BillStatusValue[];
   category?: string[];
   sponsor?: number[];
   dateFrom?: Date;
@@ -342,5 +354,5 @@ export type DeepPartial<T> = {
 // ===== LEGACY TYPE ALIASES (for backward compatibility) =====
 
 export type ApiResponseType<T> = ApiResponse<T>;
-export type BillType = Bill;
+// BillType is already exported from @shared/types above
 export type ExpertType = Expert;

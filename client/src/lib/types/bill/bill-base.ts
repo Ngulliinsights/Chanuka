@@ -1,68 +1,63 @@
 /**
- * Bill Domain Types
+ * Bill Domain Types - Client Layer
  *
- * Comprehensive type definitions for Kenyan legislative bill management,
- * including sponsorship, status tracking, analysis, and search capabilities.
+ * Re-exports canonical Bill types from shared and adds client-specific extensions.
+ * 
+ * IMPORTANT: This file re-exports from @shared/types (canonical source).
+ * Do not redefine Bill, Sponsor, or other core types here.
  *
- * @module shared/types/bill
+ * @module client/lib/types/bill
  * @version 2.0.0
  */
 
 // ============================================================================
-// Imports & Re-exports
+// Re-exports from Canonical Source
 // ============================================================================
 
-import {
-  BillStatus,
-  UrgencyLevel,
-  ComplexityLevel,
-  Chamber,
-  type BillStatusValue,
-  type UrgencyLevelValue,
-  type ComplexityLevelValue,
-  type ChamberValue,
-} from '@shared/types';
+export type {
+  Bill,
+  ExtendedBill,
+  BillAction,
+  BillAmendment,
+  RelatedBill,
+  Sponsor,
+  Committee,
+  BillCommitteeAssignment,
+  BillEngagementMetrics,
+  ConstitutionalFlag,
+  BillTimelineEvent,
+} from '@shared/types/domains/legislative/bill';
 
 export {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
   Chamber,
+  BillType,
+  CommitteeStatus,
+  BillPriority,
   type BillStatusValue,
   type UrgencyLevelValue,
   type ComplexityLevelValue,
   type ChamberValue,
-};
+  type VoteType,
+  type VoteResult,
+  type SponsorRole,
+  type AmendmentStatus,
+  type BillRelationship,
+  type ConstitutionalSeverity,
+  type SentimentType,
+  type CommitteeType,
+  type LegislativeActionType,
+  type SponsorType,
+} from '@shared/types';
 
 // ============================================================================
-// Base Types
+// Client-Specific Type Aliases (for backward compatibility)
 // ============================================================================
-/** Supported chamber types in the Kenyan legislative system */
+
+/** @deprecated Use Chamber from @shared/types instead */
 export type ChamberType = 'House' | 'Senate' | 'Both';
-
-/** Vote types in legislative proceedings */
-export type VoteType = 'yea' | 'nay' | 'abstain' | 'present';
-
-/** Vote result types */
-export type VoteResult = 'passed' | 'failed' | 'pending';
-
-/** Sponsor role types */
-export type SponsorRole = 'primary' | 'co-sponsor';
-
-/** Amendment status types */
-export type AmendmentStatus = 'proposed' | 'accepted' | 'rejected' | 'withdrawn';
-
-/** Bill relationship types */
-export type BillRelationship = 'companion' | 'substitute' | 'similar' | 'conflicts';
-
-/** Constitutional flag severity levels */
-export type ConstitutionalSeverity = 'low' | 'medium' | 'high';
-
-/** Overall sentiment classification */
-export type SentimentType = 'positive' | 'neutral' | 'negative' | 'mixed';
-
-/** Committee assignment status */
-export type CommitteeStatus = 'assigned' | 'reviewed' | 'reported' | 'completed';
 
 // ============================================================================
 // Legacy Compatibility
@@ -70,8 +65,6 @@ export type CommitteeStatus = 'assigned' | 'reviewed' | 'reported' | 'completed'
 
 /**
  * Legacy status mapping for migration from US-style to Kenyan legislative process.
- * Maps old status values to canonical Kenyan legislative stages.
- *
  * @deprecated Use BillStatus enum directly for new implementations
  */
 export const LEGACY_STATUS_MAP: Record<string, BillStatus> = {
@@ -88,11 +81,15 @@ export const LEGACY_STATUS_MAP: Record<string, BillStatus> = {
 } as const;
 
 // ============================================================================
-// Bill Engagement & Metrics
+// Analysis & Impact Types (Client-Specific)
+// ============================================================================
+// ============================================================================
+// Analysis & Impact Types (Client-Specific)
 // ============================================================================
 
 /**
- * Bill engagement metrics and interaction statistics
+ * Bill engagement metrics (client-specific view)
+ * @deprecated Use BillEngagementMetrics from @shared/types instead
  */
 export interface BillEngagement {
   readonly views?: number;
@@ -100,24 +97,12 @@ export interface BillEngagement {
   readonly shares?: number;
   readonly comments?: number;
   readonly votes?: number;
-  /** @deprecated Use individual metrics instead */
   readonly engagement_score?: number;
 }
 
-// ============================================================================
-// Constitutional & Legal
-// ============================================================================
-
 /**
  * Constitutional concern flagged during bill review
- *
- * @example
- * {
- *   severity: 'high',
- *   description: 'Potential conflict with Article 43 on economic and social rights',
- *   affectedArticles: ['Article 43', 'Article 46'],
- *   expertAnalysis: 'Requires constitutional amendment or judicial review'
- * }
+ * @deprecated Use ConstitutionalFlag from @shared/types instead
  */
 export interface ConstitutionalFlag {
   readonly id?: string;
@@ -128,56 +113,27 @@ export interface ConstitutionalFlag {
   readonly expertAnalysis?: string;
 }
 
-// ============================================================================
-// Sponsors & Representatives
-// ============================================================================
-
 /**
  * Bill sponsor or co-sponsor information
- *
- * @example
- * {
- *   id: 12345,
- *   name: 'Hon. Jane Doe',
- *   party: 'Orange Democratic Movement',
- *   role: 'primary',
- *   district: 'Nairobi County',
- *   conflictOfInterest: false
- * }
+ * @deprecated Use Sponsor from @shared/types instead
  */
 export interface Sponsor {
   readonly id: string;
   readonly name: string;
-  /** @deprecated Use 'name' instead */
   readonly legislatorName?: string;
   readonly party: string;
   readonly role: SponsorRole;
-  /** @deprecated Use 'role' instead */
   readonly sponsorType?: 'primary' | 'cosponsor' | 'lead';
   readonly district?: string;
   readonly avatarUrl?: string;
   readonly state?: string;
-  /** @deprecated Use role === 'primary' instead */
   readonly isPrimary?: boolean;
   readonly conflictOfInterest?: boolean;
 }
 
-// ============================================================================
-// Bill Timeline & Actions
-// ============================================================================
-
 /**
  * Legislative action or event in the bill's lifecycle
- *
- * @example
- * {
- *   id: 789,
- *   billId: 12345,
- *   action: 'Passed Second Reading',
- *   date: '2025-01-20T14:30:00Z',
- *   chamber: 'House',
- *   result: 'passed'
- * }
+ * @deprecated Use BillAction from @shared/types instead
  */
 export interface BillAction {
   readonly id: string;
@@ -190,26 +146,9 @@ export interface BillAction {
   readonly notes?: string;
 }
 
-// ============================================================================
-// Bill Amendments
-// ============================================================================
-
 /**
  * Amendment proposed or applied to a bill
- *
- * @example
- * {
- *   id: 456,
- *   billId: 12345,
- *   number: 'AM-001',
- *   title: 'Amendment to Section 3(2)',
- *   description: 'Modifies funding allocation percentages',
- *   proposedBy: 'Hon. John Smith',
- *   status: 'accepted',
- *   dateProposed: '2025-01-18',
- *   dateResolved: '2025-01-20',
- *   impact: 'Increases education budget allocation by 5%'
- * }
+ * @deprecated Use BillAmendment from @shared/types instead
  */
 export interface BillAmendment {
   readonly id: string;
@@ -224,12 +163,9 @@ export interface BillAmendment {
   readonly impact?: string;
 }
 
-// ============================================================================
-// Related Bills
-// ============================================================================
-
 /**
  * Reference to a related bill
+ * @deprecated Use RelatedBill from @shared/types instead
  */
 export interface RelatedBill {
   readonly id: string;
@@ -239,102 +175,50 @@ export interface RelatedBill {
   readonly status: BillStatus;
 }
 
-// ============================================================================
-// Core Bill Type
-// ============================================================================
-
 /**
  * Core bill information and metadata
- *
- * @example
- * {
- *   id: '12345',
- *   billNumber: 'HB-2451',
- *   title: 'The Education Reform Act, 2025',
- *   summary: 'An Act to reform the education sector...',
- *   status: BillStatus.COMMITTEE_STAGE,
- *   urgency: UrgencyLevel.MEDIUM,
- *   complexity: ComplexityLevel.HIGH,
- *   introducedDate: '2025-01-15T00:00:00Z',
- *   lastActionDate: '2025-01-20T00:00:00Z',
- *   sponsors: [...],
- *   tags: ['education', 'reform', 'K-12'],
- *   policyAreas: ['Education', 'Youth Development']
- * }
+ * @deprecated Import Bill from @shared/types instead
  */
 export interface Bill {
-  // Core identifiers
   readonly id: string;
   readonly billNumber: string;
-
-  // Content
   readonly title: string;
   readonly summary: string;
   readonly fullText?: string;
   readonly billType?: string;
-
-  // Status & Classification
   readonly status: BillStatus;
   readonly urgency: UrgencyLevel;
   readonly complexity: ComplexityLevel;
-
-  // Dates
   readonly introducedDate: string;
-  /** @deprecated Use introducedDate instead */
   readonly introductionDate?: string;
   readonly lastActionDate: string;
-  /** @deprecated Use lastActionDate instead */
   readonly lastUpdated?: string;
-
-  // Relationships
   readonly sponsors: readonly Sponsor[];
   readonly tags: readonly string[];
   readonly policyAreas: readonly string[];
-
-  // Metrics
   readonly readingTime?: number;
   readonly trackingCount?: number;
   readonly viewCount?: number;
   readonly commentCount?: number;
-
-  // Constitutional & Impact
   readonly constitutionalIssues?: readonly string[];
   readonly constitutionalFlags?: readonly ConstitutionalFlag[];
   readonly financialImpact?: string;
   readonly governmentBodies?: readonly string[];
-
-  // Legislative context
   readonly chamber?: ChamberType;
   readonly session?: string;
-
-  // External references
   readonly url?: string;
-
-  // Engagement
   readonly engagement?: BillEngagement;
-
-  // Timeline
   readonly timeline?: readonly BillAction[];
-
-  // Legacy compatibility (snake_case)
-  /** @deprecated Use id instead */
   readonly bill_id?: string;
-  /** @deprecated Use billNumber instead */
   readonly bill_number?: string;
-  /** @deprecated Use introducedDate instead */
   readonly created_at?: string;
-  /** @deprecated Use lastActionDate instead */
   readonly updated_at?: string;
-  /** @deprecated Use introducedDate instead */
   readonly publication_date?: string;
 }
 
-// ============================================================================
-// Extended Bill Type
-// ============================================================================
-
 /**
  * Extended bill with comprehensive details, amendments, and relationships
+ * @deprecated Import ExtendedBill from @shared/types instead
  */
 export interface ExtendedBill extends Bill {
   readonly description?: string;
@@ -345,7 +229,7 @@ export interface ExtendedBill extends Bill {
 }
 
 // ============================================================================
-// Bill Analysis
+// Bill Analysis (Client-Specific)
 // ============================================================================
 
 /**

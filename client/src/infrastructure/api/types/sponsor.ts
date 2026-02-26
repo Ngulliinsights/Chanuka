@@ -1,19 +1,24 @@
 /**
- * Sponsor Types
+ * Sponsor Types - CANONICAL RE-EXPORT
  *
- * Type definitions for sponsors and stakeholder models
+ * Re-exports Sponsor types from the canonical source.
+ * All Sponsor type definitions should import from @shared/types.
+ * 
+ * @module client/infrastructure/api/types/sponsor
+ * @canonical @shared/types/domains/legislative/bill
  */
 
 // ============================================================================
-// Sponsor Model
+// Re-exports from Canonical Source
 // ============================================================================
 
-export interface Sponsor {
-  readonly id: number;
-  readonly name: string;
-  readonly party: string;
-  readonly district?: string;
-  readonly position: string;
-  readonly isPrimary?: boolean;
-  readonly state?: string;
-}
+export type {
+  Sponsor,
+  SponsorRole,
+  SponsorType,
+} from '@shared/types/domains/legislative/bill';
+
+export {
+  type SponsorRole as SponsorRoleType,
+  type SponsorType as SponsorTypeEnum,
+} from '@shared/types';
