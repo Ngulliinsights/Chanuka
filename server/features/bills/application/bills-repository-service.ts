@@ -13,7 +13,7 @@ import { BillDomainService } from '@shared/domain/services/bill-domain-service';
 import { BillNotificationService } from '@shared/domain/services/bill-notification-service';
 import { BillStatus, BillVoteType } from '@server/infrastructure/schema';
 
-import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
+import { NotificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 
 import type { IBillRepository } from '../../../../bill-repository.interface';
 import { UserService } from '../../users/application/user-service-direct';

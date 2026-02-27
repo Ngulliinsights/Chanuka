@@ -9,7 +9,7 @@ import { bills } from '@server/infrastructure/schema';
 import { and, eq, sql } from 'drizzle-orm';
 
 import { withTransaction } from '@server/infrastructure/database';
-import { NotificationChannelService } from '@/infrastructure/notifications/notification-channels';
+import { NotificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 
 import type { IBillRepository } from '@server/domain/interfaces/bill-repository.interface';
 import { UserService } from '../../users/application/user-service-direct';
@@ -438,7 +438,7 @@ export class BillsApplicationService {
 // Export singleton instance with dependencies
 import { InMemoryDomainEventPublisher } from '@server/features/bills/domain/events/bill-events';
 
-import { notificationChannelService } from '@/infrastructure/notifications/notification-channels';
+import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 
 import { UserService as UserServiceClass } from '../../users/application/user-service-direct';
 

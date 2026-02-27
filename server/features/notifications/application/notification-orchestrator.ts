@@ -1,9 +1,10 @@
-import { type BillTrackingPreferences as GlobalBillTrackingPreferences,type UserNotificationPreferences, userPreferencesService } from '@server/features/users/domain/user-preferences';
-import { type ChannelDeliveryRequest, type DeliveryResult,notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
-import { type FilterCriteria, type FilterResult,smartNotificationFilterService } from '@server/infrastructure/notifications/smart-notification-filter';
-import { CombinedBillTrackingPreferences } from '@server/infrastructure/notifications/types';
+import { type BillTrackingPreferences as GlobalBillTrackingPreferences, type UserNotificationPreferences, userPreferencesService } from '@server/features/users/domain/user-preferences';
+import { type ChannelDeliveryRequest, type DeliveryResult } from '@server/infrastructure/messaging/delivery/channel.service';
+import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
+import { type FilterCriteria, type FilterResult, smartNotificationFilterService } from '../domain/services/smart-notification-filter';
+import { CombinedBillTrackingPreferences } from '../domain/types';
 import { logger } from '@server/infrastructure/observability';
-import { database as db, readDatabase } from '@server/infrastructure/database';
+import { db } from '@server/infrastructure/database';
 import { bill_tracking_preferences, bills,notifications, users } from '@server/infrastructure/schema';
 import { and,eq } from 'drizzle-orm';
 
@@ -135,8 +136,8 @@ interface ServiceMetrics {
 // ============================================================================
 
 export class NotificationOrchestratorService {
-  // Database accessor using read replica when available
-  private get db() { return readDatabase; }
+  // Database accessor
+  private get database() { return db; }
 
   // Configuration with sensible defaults that can be overridden
   private readonly config: OrchestratorConfig = {
@@ -524,7 +525,7 @@ export class NotificationOrchestratorService {
       // Fetch per-bill preferences if a specific bill is referenced
       let perBillPrefs: typeof bill_tracking_preferences.$inferSelect | null = null;
       if (bill_id) {
-        const [result] = await this.db.select()
+        const [result] = await this.database.select()
           .from(bill_tracking_preferences)
           .where(and(
             eq(bill_tracking_preferences.user_id, user_id),

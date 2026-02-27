@@ -34,7 +34,7 @@ interface NotificationChannelService {
 
 import { cacheService } from '@server/infrastructure/cache';
 import { db } from '@server/infrastructure/database';
-import { notificationChannelService } from '@server/infrastructure/notifications/notification-channels';
+import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 import { user_profileservice } from '@/users/domain/user-profile';
 
 // ============================================================================

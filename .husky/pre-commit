@@ -13,4 +13,8 @@ cd client && npm run lint
 echo "🔍 Checking for circular dependencies in infrastructure..."
 npm run analyze:infrastructure:circular
 
+# Validate module boundaries
+echo "🔍 Validating module boundaries..."
+npm run validate:boundaries:infrastructure
+
 echo "✅ Pre-commit checks passed!"

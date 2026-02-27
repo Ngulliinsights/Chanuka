@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 26, 2026 at 11:24 PM
+**Generated:** February 27, 2026 at 09:05 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,785
+**Total Items:** 3,730
 
 ```
 .
@@ -583,13 +583,6 @@
 │   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
-│   │   │   ├── analytics/
-│   │   │   │   ├── AnalyticsIntegration.tsx
-│   │   │   │   ├── AnalyticsProvider.tsx
-│   │   │   │   ├── comprehensive-tracker.ts
-│   │   │   │   ├── data-retention-service.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── service.ts
 │   │   │   ├── api/
 │   │   │   │   ├── circuit-breaker/
 │   │   │   │   │   ├── core.ts
@@ -710,7 +703,8 @@
 │   │   │   │   └── useBrowserStatus.tsx
 │   │   │   ├── cache/
 │   │   │   │   ├── cache-invalidation.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── command-palette/
 │   │   │   │   ├── CommandPalette.tsx
 │   │   │   │   ├── commands.ts
@@ -737,13 +731,6 @@
 │   │   │   │   ├── rollback.ts
 │   │   │   │   ├── types.ts
 │   │   │   │   └── validation.ts
-│   │   │   ├── dashboard/
-│   │   │   │   ├── context.tsx
-│   │   │   │   ├── hooks.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── reducer.ts
-│   │   │   │   ├── utils.ts
-│   │   │   │   └── widgets.ts
 │   │   │   ├── error/
 │   │   │   │   ├── components/
 │   │   │   │   │   ├── utils/
@@ -790,42 +777,23 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── monitoring.tsx
 │   │   │   │   ├── rate-limiter.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── recovery.ts
 │   │   │   │   ├── reporting.ts
+│   │   │   │   ├── RESULT_MONAD_GUIDE.md
+│   │   │   │   ├── result.ts
+│   │   │   │   ├── serialization.ts
+│   │   │   │   ├── TASK_14_COMPLETION_SUMMARY.md
 │   │   │   │   ├── types.ts
+│   │   │   │   ├── UNIFIED_ERROR_MIGRATION.md
+│   │   │   │   ├── unified-factory.ts
+│   │   │   │   ├── unified-handler.ts
 │   │   │   │   └── unified-types.ts
 │   │   │   ├── events/
 │   │   │   │   ├── event-bus.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── hooks/
 │   │   │   │   └── index.ts
-│   │   │   ├── http/
-│   │   │   │   └── index.ts
-│   │   │   ├── loading/
-│   │   │   │   ├── components/
-│   │   │   │   │   ├── GlobalLoadingIndicator.tsx
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── LoadingProgress.tsx
-│   │   │   │   │   ├── LoadingSkeleton.tsx
-│   │   │   │   │   └── LoadingSpinner.tsx
-│   │   │   │   ├── examples/
-│   │   │   │   │   └── README.md
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── useOnlineStatus.ts
-│   │   │   │   │   └── useTimeoutAwareLoading.ts
-│   │   │   │   ├── utils/
-│   │   │   │   │   ├── connection-utils.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── loading-utils.ts
-│   │   │   │   │   ├── progress-utils.ts
-│   │   │   │   │   └── timeout-utils.ts
-│   │   │   │   ├── context.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
-│   │   │   │   ├── reducer.ts
-│   │   │   │   ├── utils.ts
-│   │   │   │   └── validation.ts
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
@@ -838,19 +806,6 @@
 │   │   │   │   ├── responsive-utils.ts
 │   │   │   │   ├── touch-handler.ts
 │   │   │   │   └── types.ts
-│   │   │   ├── monitoring/
-│   │   │   │   ├── cross-system-error-analytics.ts
-│   │   │   │   ├── development-dashboard.tsx
-│   │   │   │   ├── error-aggregation-service.ts
-│   │   │   │   ├── error-monitor.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── monitoring-init.ts
-│   │   │   │   ├── monitoring-integration.ts
-│   │   │   │   ├── performance-impact-monitor.ts
-│   │   │   │   ├── performance-monitor.ts
-│   │   │   │   ├── sentry-config.ts
-│   │   │   │   ├── trend-analysis-service.ts
-│   │   │   │   └── unified-error-monitoring-interface.ts
 │   │   │   ├── navigation/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -893,43 +848,11 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
-│   │   │   ├── performance/
-│   │   │   │   ├── alerts.ts
-│   │   │   │   ├── architecture-performance-monitor.ts
-│   │   │   │   ├── budgets.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── monitor.ts
-│   │   │   │   ├── types.ts
-│   │   │   │   └── web-vitals.ts
 │   │   │   ├── personalization/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── persona-detector.test.tsx
 │   │   │   │   ├── persona-detector.ts
 │   │   │   │   └── types.ts
-│   │   │   ├── realtime/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── types.ts
-│   │   │   │   │   ├── use-bill-tracking.ts
-│   │   │   │   │   ├── use-community-realtime.ts
-│   │   │   │   │   ├── use-realtime-engagement-legacy.ts
-│   │   │   │   │   └── use-websocket.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── bill-tracking.ts
-│   │   │   │   │   ├── community.ts
-│   │   │   │   │   ├── notifications.ts
-│   │   │   │   │   └── realtime-service.ts
-│   │   │   │   ├── types/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── utils/
-│   │   │   │   │   └── event-emitter.ts
-│   │   │   │   ├── config.ts
-│   │   │   │   ├── hub.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── manager.ts
-│   │   │   │   ├── optimization.ts
-│   │   │   │   ├── README.md
-│   │   │   │   ├── types.ts
-│   │   │   │   └── websocket-client.ts
 │   │   │   ├── recovery/
 │   │   │   │   ├── dashboard-recovery.ts
 │   │   │   │   └── index.ts
@@ -1014,21 +937,23 @@
 │   │   │   ├── system/
 │   │   │   │   ├── HealthCheck.tsx
 │   │   │   │   └── index.ts
-│   │   │   ├── telemetry/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── service.ts
-│   │   │   │   └── types.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── dashboard-validation.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── websocket/
-│   │   │   │   └── index.ts
+│   │   │   │   ├── form-helpers.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── sanitization.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── validator.ts
+│   │   │   │   └── validators.ts
 │   │   │   ├── workers/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── service-worker.ts
+│   │   │   ├── ARCHITECTURAL_LAYERS.md
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── core-monitoring.ts
 │   │   │   ├── index.ts
+│   │   │   ├── init.ts
 │   │   │   ├── integration-validator.ts
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── MODULE_VALIDATION_REPORT.md
@@ -1768,7 +1693,8 @@
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
-│   └── vitest.config.ts
+│   ├── vitest.config.ts
+│   └── vitest.setup.ts
 ├── deployment/
 │   ├── environment-configs/
 │   │   ├── development.env
@@ -2694,15 +2620,33 @@
 │   │   │   └── README.md
 │   │   ├── notifications/
 │   │   │   ├── application/
+│   │   │   │   ├── dto/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── alerting-service.ts
+│   │   │   │   │   └── notification.service.ts
+│   │   │   │   ├── use-cases/
 │   │   │   │   ├── notification-orchestrator.ts
 │   │   │   │   └── notification-scheduler.ts
+│   │   │   ├── docs/
+│   │   │   │   ├── integration_guide.md
+│   │   │   │   └── refactored_summary.md
 │   │   │   ├── domain/
-│   │   │   │   └── entities/
-│   │   │   │       └── notification.ts
+│   │   │   │   ├── entities/
+│   │   │   │   │   └── notification.ts
+│   │   │   │   ├── events/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── smart-notification-filter.ts
+│   │   │   │   ├── value-objects/
+│   │   │   │   └── types.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── external/
+│   │   │   │   └── persistence/
+│   │   │   ├── presentation/
+│   │   │   │   ├── http/
+│   │   │   │   │   └── notification-routes.ts
+│   │   │   │   └── websocket/
 │   │   │   ├── action-prompt-generator.ts
-│   │   │   ├── index.ts
-│   │   │   ├── notification-router.ts
-│   │   │   └── notification-service.ts
+│   │   │   └── index.ts
 │   │   ├── pretext-detection/
 │   │   │   ├── application/
 │   │   │   │   ├── pretext-detection.controller.ts
@@ -3075,6 +3019,7 @@
 │   │   │   ├── monitoring.ts
 │   │   │   ├── pool.ts
 │   │   │   └── repository-validation.ts
+│   │   ├── delivery/
 │   │   ├── error-handling/
 │   │   │   ├── error-factory.ts
 │   │   │   ├── external-api-error-handler.ts
@@ -3089,6 +3034,13 @@
 │   │   │   ├── external-api-manager.ts
 │   │   │   ├── index.ts
 │   │   │   └── types.ts
+│   │   ├── messaging/
+│   │   │   ├── delivery/
+│   │   │   │   └── channel.service.ts
+│   │   │   ├── email/
+│   │   │   │   └── email-service.ts
+│   │   │   ├── push/
+│   │   │   └── sms/
 │   │   ├── migration/
 │   │   │   ├── ab-testing.service.ts
 │   │   │   ├── dashboard.service.ts
@@ -3113,18 +3065,6 @@
 │   │   │   ├── rollback.service.ts
 │   │   │   └── validation.service.ts
 │   │   ├── notifications/
-│   │   │   ├── alerting-service.ts
-│   │   │   ├── email-service.ts
-│   │   │   ├── enhanced-notification.service.ts
-│   │   │   ├── index.ts
-│   │   │   ├── notification_integration_guide.md
-│   │   │   ├── notification-channels.ts
-│   │   │   ├── notification-routes.ts
-│   │   │   ├── notification-service.ts
-│   │   │   ├── notifications.ts
-│   │   │   ├── refactored_summary.md
-│   │   │   ├── smart-notification-filter.ts
-│   │   │   └── types.ts
 │   │   ├── observability/
 │   │   │   ├── core/
 │   │   │   │   ├── index.ts
@@ -3657,11 +3597,14 @@
 │   │   ├── branded-type-safety.property.test.ts
 │   │   ├── consistent-error-message-format.property.test.ts
 │   │   ├── date-validation.property.test.ts
+│   │   ├── dependency-graph-layering.property.integration.test.ts
+│   │   ├── dependency-injection-correctness.property.test.ts
 │   │   ├── error-context-enrichment.property.test.ts
 │   │   ├── error-logging-completeness.property.test.ts
 │   │   ├── error-structure-consistency.property.test.ts
 │   │   ├── import-path-consistency.property.test.ts
 │   │   ├── migration-integration-preservation.test.ts
+│   │   ├── module-boundary-enforcement.property.test.ts
 │   │   ├── module-count-reduction.property.test.ts
 │   │   ├── public-api-completeness.property.test.ts
 │   │   ├── round-trip-transformation.property.test.ts
@@ -3763,6 +3706,8 @@
 ├── MOCK_DATA_QUICKSTART.md
 ├── MOCK_DATA_STRATEGY.md
 ├── nginx.conf
+├── NOTIFICATION_MIGRATION_COMPLETE.md
+├── NOTIFICATION_MIGRATION_PLAN.md
 ├── nx.json
 ├── package.json
 ├── PHASE_2A_COMPLETE.md

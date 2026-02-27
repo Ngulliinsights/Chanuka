@@ -1,29 +1,111 @@
 /**
  * Data Synchronization Service
- * 
+ *
  * Implements scheduled data synchronization jobs with incremental updates,
  * conflict resolution, and comprehensive monitoring and error reporting.
  */
 
 import { ConflictResolutionService } from '@server/infrastructure/external-data/conflict-resolution-service';
-import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
+import {
+  GovernmentDataIntegrationService,
+  // Import the gov service's own DataSource under an alias to avoid colliding
+  // with the richer DataSource shape declared in ./types.
+  DataSource as GovDataSource,
+} from '@server/features/government-data/services/government-data-integration.service';
 import { logger } from '@server/infrastructure/observability';
-// Import the database instance properly - adjust path as needed
-import { database as db } from '@server/infrastructure/database/connection';
-import { bill_cosponsors, bills, data_sources,sponsors, sync_jobs } from '@server/infrastructure/schema';
-import { and, desc,eq, gte } from 'drizzle-orm';
+import { db } from '@server/infrastructure/database';
+import { bills, sponsors } from '@server/infrastructure/schema';
+import { sync_jobs as syncJobs } from '@server/infrastructure/schema/platform_operations';
+import { and, desc, eq } from 'drizzle-orm';
 import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 
 import {
-  ApiResponse,
   BillData,
   ConflictResolution,
-  DataSource,
   SponsorData,
   SyncError,
-  SyncJob} from './types';
+  SyncJob,
+} from './types';
 
+// ---------------------------------------------------------------------------
+// Augment the gov-service module so TypeScript knows about the runtime methods
+// and the `endpoints` array that the objects actually carry.
+// Remove any declaration that already exists upstream.
+// ---------------------------------------------------------------------------
+declare module '@server/features/government-data/services/government-data-integration.service' {
+  /** Endpoint descriptor as returned by the government data service. */
+  interface Endpoint {
+    id: string;
+    syncFrequency: string;
+    dataType: string;
+  }
+
+  interface DataSource {
+    /** Unique identifier for the data source */
+    id: string;
+    /** Present at runtime even if missing from the upstream type declaration. */
+    endpoints: Endpoint[];
+  }
+
+  interface GovernmentDataIntegrationService {
+    getActiveDataSources(): Promise<GovDataSource[]>;
+    getDataSource(id: string): Promise<GovDataSource | null>;
+    fetchData(
+      dataSourceId: string,
+      endpointId: string,
+      params: { limit: number; offset: number; since?: Date },
+    ): Promise<{
+      success: boolean;
+      data?: unknown | unknown[];
+      error?: { message: string };
+    }>;
+  }
+}
+
+// Convenience alias — keeps call-site code readable.
+type Endpoint = import('@server/features/government-data/services/government-data-integration.service').Endpoint;
+
+// ---------------------------------------------------------------------------
+// Sync metrics shape
+// ---------------------------------------------------------------------------
+interface SyncMetrics {
+  totalJobs: number;
+  successfulJobs: number;
+  failedJobs: number;
+  averageProcessingTime: number;
+  lastSyncTime: Date;
+  recordsProcessedToday: number;
+}
+
+// ---------------------------------------------------------------------------
+// Utility: safely narrow an unknown catch-clause value to a typed Error.
+// ---------------------------------------------------------------------------
+function toError(value: unknown): Error & { code?: string; status?: number } {
+  if (value instanceof Error) {
+    return value as Error & { code?: string; status?: number };
+  }
+  return new Error(String(value));
+}
+
+// ---------------------------------------------------------------------------
+// Utility: cast Drizzle query results to any[] to work around type inference issues
+// ---------------------------------------------------------------------------
+function asAnyArray<T>(promise: Promise<T>): Promise<any[]> {
+  return promise as unknown as Promise<any[]>;
+}
+
+// ---------------------------------------------------------------------------
+// Logger helper: pino's overloads only accept a single string argument.
+// This wrapper keeps every call site to a single readable line.
+// ---------------------------------------------------------------------------
+function logError(message: string, err: unknown): void {
+  logger.error(`${message} ${toError(err).message}`);
+}
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
 export class DataSynchronizationService extends EventEmitter {
   private governmentDataService: GovernmentDataIntegrationService;
   private conflictResolutionService: ConflictResolutionService;
@@ -38,53 +120,28 @@ export class DataSynchronizationService extends EventEmitter {
     this.setupEventHandlers();
   }
 
-  /**
-   * Initialize synchronization schedules for all active data sources
-   */
+  // -------------------------------------------------------------------------
+  // Public API
+  // -------------------------------------------------------------------------
+
+  /** Initialize synchronization schedules for all active data sources. */
   async initializeSyncSchedules(): Promise<void> {
     try {
       const dataSources = await this.governmentDataService.getActiveDataSources();
-      
       for (const dataSource of dataSources) {
         await this.setupDataSourceSync(dataSource);
       }
-
       console.log(`✅ Initialized sync schedules for ${dataSources.length} data sources`);
-    } catch (error) {
-      logger.error('❌ Failed to initialize sync schedules:', { component: 'Chanuka' }, error);
-      throw error;
+    } catch (err) {
+      logError('❌ Failed to initialize sync schedules:', err);
+      throw toError(err);
     }
   }
 
-  /**
-   * Setup synchronization schedule for a specific data source
-   */
-  private async setupDataSourceSync(dataSource: DataSource): Promise<void> {
-    for (const endpoint of dataSource.endpoints) {
-      const jobId = `${dataSource.id}-${endpoint.id}`;
-      
-      // Create cron schedule based on sync frequency
-      const cronSchedule = this.getCronSchedule(endpoint.syncFrequency);
-      
-      if (cronSchedule) {
-        const cronJob = cron.schedule(cronSchedule, async () => {
-          await this.executeSyncJob(dataSource, endpoint);
-        });
-
-        this.scheduledJobs.set(jobId, cronJob);
-        cronJob.start();
-
-        console.log(`📅 Scheduled sync job ${jobId} with frequency: ${endpoint.syncFrequency}`);
-      }
-    }
-  }
-
-  /**
-   * Execute a synchronization job for a specific endpoint
-   */
-  async executeSyncJob(dataSource: DataSource, endpoint: unknown): Promise<SyncJob> {
+  /** Execute a synchronization job for a specific endpoint. */
+  async executeSyncJob(dataSource: GovDataSource, endpoint: Endpoint): Promise<SyncJob> {
     const jobId = `${dataSource.id}-${endpoint.id}-${Date.now()}`;
-    
+
     const syncJob: SyncJob = {
       id: jobId,
       dataSourceId: dataSource.id,
@@ -96,14 +153,12 @@ export class DataSynchronizationService extends EventEmitter {
       recordsSkipped: 0,
       errors: [],
       isIncremental: true,
-      lastSyncTimestamp: await this.getLastSyncTimestamp(dataSource.id, endpoint.id)
+      lastSyncTimestamp: await this.getLastSyncTimestamp(dataSource.id, endpoint.id),
     };
 
     try {
-      // Store sync job in database
       await this.storeSyncJob(syncJob);
-      
-      // Update status to running
+
       syncJob.status = 'running';
       syncJob.startTime = new Date();
       await this.updateSyncJob(syncJob);
@@ -111,35 +166,33 @@ export class DataSynchronizationService extends EventEmitter {
       this.activeSyncJobs.set(jobId, syncJob);
       this.emit('syncJobStarted', syncJob);
 
-      // Execute the actual synchronization
       await this.performDataSync(syncJob, dataSource, endpoint);
 
-      // Mark as completed
       syncJob.status = 'completed';
       syncJob.endTime = new Date();
       await this.updateSyncJob(syncJob);
 
       this.emit('syncJobCompleted', syncJob);
       console.log(`✅ Sync job ${jobId} completed successfully`);
-
-    } catch (error) {
+    } catch (err) {
+      const error = toError(err);
       syncJob.status = 'failed';
       syncJob.endTime = new Date();
-      
+
       const syncError: SyncError = {
         timestamp: new Date(),
         level: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: error.message,
         details: error,
-        endpoint: endpoint.id
+        endpoint: endpoint.id,
       };
-      
+
       syncJob.errors.push(syncError);
       await this.updateSyncJob(syncJob);
       await this.storeSyncError(jobId, syncError);
 
       this.emit('syncJobFailed', syncJob, error);
-      console.error(`❌ Sync job ${jobId} failed:`, error);
+      console.error(`❌ Sync job ${jobId} failed: ${error.message}`);
     } finally {
       this.activeSyncJobs.delete(jobId);
     }
@@ -147,77 +200,153 @@ export class DataSynchronizationService extends EventEmitter {
     return syncJob;
   }
 
-  /**
-   * Perform the actual data synchronization
-   */
-  private async performDataSync(syncJob: SyncJob, dataSource: DataSource, endpoint: unknown): Promise<void> {
+  /** Get sync job status by ID. */
+  async getSyncJobStatus(jobId: string): Promise<SyncJob | null> {
+    try {
+      const rows = await asAnyArray(db
+        .select()
+        .from(syncJobs)
+        .where(eq(syncJobs.id, jobId))
+        .limit(1));
+
+      if (rows.length === 0) return null;
+      
+      const row: any = rows[0];
+
+      return {
+        id: row.id,
+        dataSourceId: row.data_source_id,
+        endpointId: row.job_name,
+        status: row.status,
+        startTime: row.started_at ?? undefined,
+        endTime: row.completed_at ?? undefined,
+        recordsProcessed: row.records_processed ?? 0,
+        recordsUpdated: row.records_updated ?? 0,
+        recordsCreated: row.records_created ?? 0,
+        recordsSkipped: row.records_skipped ?? 0,
+        errors: [],
+        nextRunTime: undefined,
+        isIncremental: row.job_type === 'incremental',
+        lastSyncTimestamp: row.completed_at ?? undefined,
+      };
+    } catch (err) {
+      logError('Error getting sync job status:', err);
+      return null;
+    }
+  }
+
+  /** Return current sync metrics. */
+  getSyncMetrics(): Map<string, SyncMetrics> {
+    return this.syncMetrics;
+  }
+
+  /** Stop all scheduled cron jobs. */
+  stopAllSyncJobs(): void {
+    for (const [jobId, cronJob] of this.scheduledJobs) {
+      cronJob.stop();
+      console.log(`⏹️ Stopped sync job: ${jobId}`);
+    }
+    this.scheduledJobs.clear();
+  }
+
+  /** Manually trigger sync for a specific data source (and optional endpoint). */
+  async triggerManualSync(dataSourceId: string, endpointId?: string): Promise<SyncJob[]> {
+    const dataSource = await this.governmentDataService.getDataSource(dataSourceId);
+    if (!dataSource) {
+      throw new Error(`Data source not found: ${dataSourceId}`);
+    }
+
+    const endpoints = endpointId
+      ? dataSource.endpoints.filter((e) => e.id === endpointId)
+      : dataSource.endpoints;
+
+    const jobs: SyncJob[] = [];
+    for (const endpoint of endpoints) {
+      jobs.push(await this.executeSyncJob(dataSource, endpoint));
+    }
+    return jobs;
+  }
+
+  // -------------------------------------------------------------------------
+  // Private helpers
+  // -------------------------------------------------------------------------
+
+  private async setupDataSourceSync(dataSource: GovDataSource): Promise<void> {
+    for (const endpoint of dataSource.endpoints) {
+      const jobId = `${dataSource.id}-${endpoint.id}`;
+      const cronSchedule = this.getCronSchedule(endpoint.syncFrequency);
+
+      if (cronSchedule) {
+        const cronJob = cron.schedule(cronSchedule, async () => {
+          await this.executeSyncJob(dataSource, endpoint);
+        });
+        this.scheduledJobs.set(jobId, cronJob);
+        cronJob.start();
+        console.log(`📅 Scheduled sync job ${jobId} with frequency: ${endpoint.syncFrequency}`);
+      }
+    }
+  }
+
+  private async performDataSync(
+    syncJob: SyncJob,
+    dataSource: GovDataSource,
+    endpoint: Endpoint,
+  ): Promise<void> {
     const batchSize = 100;
     let offset = 0;
     let hasMoreData = true;
 
     while (hasMoreData) {
       try {
-        // Fetch data from external API
         const response = await this.governmentDataService.fetchData(
           dataSource.id,
           endpoint.id,
-          {
-            limit: batchSize,
-            offset,
-            since: syncJob.lastSyncTimestamp
-          }
+          { limit: batchSize, offset, since: syncJob.lastSyncTimestamp },
         );
 
         if (!response.success || !response.data) {
-          throw new Error(`API request failed: ${response.error?.message}`);
+          throw new Error(`API request failed: ${response.error?.message ?? 'unknown'}`);
         }
 
         const records = Array.isArray(response.data) ? response.data : [response.data];
-        
+
         if (records.length === 0) {
           hasMoreData = false;
           break;
         }
 
-        // Process each record
         for (const record of records) {
           await this.processRecord(syncJob, record, endpoint.dataType);
         }
 
         offset += batchSize;
         syncJob.recordsProcessed += records.length;
-
-        // Update progress
         await this.updateSyncJob(syncJob);
 
-        // Check if we got less than batch size (indicates end of data)
         if (records.length < batchSize) {
           hasMoreData = false;
         }
-
-      } catch (error) {
+      } catch (err) {
+        const error = toError(err);
         const syncError: SyncError = {
           timestamp: new Date(),
           level: 'error',
-          message: `Batch processing failed at offset ${offset}`,
+          message: `Batch processing failed at offset ${offset}: ${error.message}`,
           details: error,
-          endpoint: endpoint.id
+          endpoint: endpoint.id,
         };
-        
         syncJob.errors.push(syncError);
-        
-        // Continue with next batch unless it's a critical error
-        if (this.isCriticalError(error)) {
-          throw error;
-        }
+
+        if (this.isCriticalError(error)) throw error;
       }
     }
   }
 
-  /**
-   * Process individual record and handle conflicts
-   */
-  private async processRecord(syncJob: SyncJob, record: unknown, dataType: string): Promise<void> {
+  private async processRecord(
+    syncJob: SyncJob,
+    record: unknown,
+    dataType: string,
+  ): Promise<void> {
     try {
       switch (dataType) {
         case 'bills':
@@ -230,78 +359,66 @@ export class DataSynchronizationService extends EventEmitter {
           console.warn(`Unknown data type: ${dataType}`);
           syncJob.recordsSkipped++;
       }
-    } catch (error) {
+    } catch (err) {
+      const error = toError(err);
+      const rec = record as Record<string, unknown>;
       const syncError: SyncError = {
         timestamp: new Date(),
         level: 'warning',
-        message: `Failed to process record`,
+        message: `Failed to process record: ${error.message}`,
         details: error,
-        recordId: record.id || record.bill_number || 'unknown'
+        recordId: String(rec?.id ?? rec?.bill_number ?? 'unknown'),
       };
-      
       syncJob.errors.push(syncError);
       syncJob.recordsSkipped++;
     }
   }
 
-  /**
-   * Process bill record with conflict detection
-   */
   private async processBillRecord(syncJob: SyncJob, billData: BillData): Promise<void> {
-    // Check if bill already exists - using proper Drizzle query
-    const existingBill = await db
+    const existing = await asAnyArray(db
       .select()
       .from(bills)
       .where(eq(bills.bill_number, billData.bill_number))
-      .limit(1);
+      .limit(1));
 
-    if (existingBill.length > 0) {
-      // Check for conflicts
-      const conflicts = await this.detectBillConflicts(existingBill[0], billData);
-      
+    if (existing.length > 0) {
+      const existingBill: any = existing[0];
+      const conflicts = await this.detectBillConflicts(existingBill, billData);
+
       if (conflicts.length > 0) {
-        // Handle conflicts
         const resolution = await this.conflictResolutionService.resolveBillConflicts(
-          existingBill[0],
+          existingBill,
           billData,
-          conflicts
+          conflicts,
         );
 
         if (resolution.resolution === 'automatic') {
-          await this.updateBillWithResolution(existingBill[0].id, resolution);
+          await this.updateBillWithResolution(existingBill.id, resolution);
           syncJob.recordsUpdated++;
         } else {
-          // Queue for manual review
           await this.queueForManualReview(resolution);
           syncJob.recordsSkipped++;
         }
       } else {
-        // No conflicts, update normally
-        await this.updateBill(existingBill[0].id, billData);
+        await this.updateBill(existingBill.id, billData);
         syncJob.recordsUpdated++;
       }
     } else {
-      // Create new bill
       await this.createBill(billData);
       syncJob.recordsCreated++;
     }
   }
 
-  /**
-   * Process sponsor record
-   * Note: Using 'id' field instead of 'externalId' to match your schema
-   */
   private async processSponsorRecord(syncJob: SyncJob, sponsorData: SponsorData): Promise<void> {
-    // Query by a unique identifier that exists in your sponsors schema
-    // Adjust this based on your actual schema - using 'name' as fallback
-    const existingSponsor = await db
+    const existing = await asAnyArray(db
       .select()
       .from(sponsors)
       .where(eq(sponsors.name, sponsorData.name))
-      .limit(1);
+      .limit(1));
 
-    if (existingSponsor.length > 0) {
-      await this.updateSponsor(existingSponsor[0].id, sponsorData);
+    if (existing.length > 0) {
+      const existingSponsor: any = existing[0];
+      await this.updateSponsor(existingSponsor.id, sponsorData);
       syncJob.recordsUpdated++;
     } else {
       await this.createSponsor(sponsorData);
@@ -309,158 +426,135 @@ export class DataSynchronizationService extends EventEmitter {
     }
   }
 
-  /**
-   * Detect conflicts between existing and new bill data
-   */
-  private async detectBillConflicts(existingBill: unknown, newBillData: BillData): Promise<string[]> {
+  private async detectBillConflicts(
+    existingBill: typeof bills.$inferSelect,
+    newBillData: BillData,
+  ): Promise<string[]> {
     const conflicts: string[] = [];
-
-    // Check for significant differences
-    if (existingBill.title !== newBillData.title) {
-      conflicts.push('title');
-    }
-    
-    if (existingBill.status !== newBillData.status) {
-      conflicts.push('status');
-    }
-    
-    if (existingBill.summary !== newBillData.summary && newBillData.summary) {
-      conflicts.push('summary');
-    }
-
+    if (existingBill.title !== newBillData.title) conflicts.push('title');
+    if (existingBill.status !== newBillData.status) conflicts.push('status');
+    if (newBillData.summary && existingBill.summary !== newBillData.summary) conflicts.push('summary');
     return conflicts;
   }
 
-  /**
-   * Get cron schedule based on sync frequency
-   */
   private getCronSchedule(frequency: string): string | null {
     switch (frequency) {
-      case 'hourly':
-        return '0 * * * *'; // Every hour
-      case 'daily':
-        return '0 2 * * *'; // Daily at 2 AM
-      case 'weekly':
-        return '0 2 * * 0'; // Weekly on Sunday at 2 AM
-      default:
-        return null; // Real-time handled separately
+      case 'hourly': return '0 * * * *';   // every hour on the hour
+      case 'daily':  return '0 2 * * *';   // 02:00 every day
+      case 'weekly': return '0 2 * * 0';   // 02:00 every Sunday
+      default:       return null;           // real-time — handled separately
     }
   }
 
-  /**
-   * Get last sync timestamp for incremental updates
-   */
-  private async getLastSyncTimestamp(dataSourceId: string, endpointId: string): Promise<Date | undefined> {
+  private async getLastSyncTimestamp(
+    dataSourceId: string,
+    endpointId: string,
+  ): Promise<Date | undefined> {
     try {
-      const lastJob = await db
+      const rows = await asAnyArray(db
         .select()
         .from(syncJobs)
         .where(
           and(
-            eq(syncJobs.dataSourceId, dataSourceId),
-            eq(syncJobs.endpointId, endpointId),
-            eq(syncJobs.status, 'completed')
-          )
+            eq(syncJobs.data_source_id, dataSourceId),
+            eq(syncJobs.job_name, endpointId),
+            eq(syncJobs.status, 'completed'),
+          ),
         )
-        .orderBy(desc(syncJobs.endTime))
-        .limit(1);
+        .orderBy(desc(syncJobs.completed_at))
+        .limit(1));
 
-      return lastJob[0]?.endTime || undefined;
-    } catch (error) {
-      logger.error('Error getting last sync timestamp:', { component: 'Chanuka' }, error);
+      if (rows.length === 0) return undefined;
+      const row: any = rows[0];
+      return row.completed_at ?? undefined;
+    } catch (err) {
+      logError('Error getting last sync timestamp:', err);
       return undefined;
     }
   }
 
-  /**
-   * Store sync job in database
-   */
   private async storeSyncJob(syncJob: SyncJob): Promise<void> {
-    await db.insert(syncJobs).values({
+    await (db.insert(syncJobs) as any).values({
       id: syncJob.id,
-      dataSourceId: syncJob.dataSourceId,
-      endpointId: syncJob.endpointId,
+      data_source_id: syncJob.dataSourceId,
+      job_name: syncJob.endpointId,
+      job_type: syncJob.isIncremental ? 'incremental' : 'full_sync',
       status: syncJob.status,
-      startTime: syncJob.startTime,
-      endTime: syncJob.endTime,
-      recordsProcessed: syncJob.recordsProcessed,
-      recordsUpdated: syncJob.recordsUpdated,
-      recordsCreated: syncJob.recordsCreated,
-      recordsSkipped: syncJob.recordsSkipped,
-      isIncremental: syncJob.isIncremental,
-      lastSyncTimestamp: syncJob.lastSyncTimestamp,
-      nextRunTime: syncJob.nextRunTime
+      started_at: syncJob.startTime,
+      completed_at: syncJob.endTime,
+      records_processed: syncJob.recordsProcessed,
+      records_updated: syncJob.recordsUpdated,
+      records_created: syncJob.recordsCreated,
+      records_skipped: syncJob.recordsSkipped,
     });
   }
 
-  /**
-   * Update sync job in database
-   */
   private async updateSyncJob(syncJob: SyncJob): Promise<void> {
-    await db
-      .update(syncJobs)
+    await (db
+      .update(syncJobs) as any)
       .set({
         status: syncJob.status,
-        startTime: syncJob.startTime,
-        endTime: syncJob.endTime,
-        recordsProcessed: syncJob.recordsProcessed,
-        recordsUpdated: syncJob.recordsUpdated,
-        recordsCreated: syncJob.recordsCreated,
-        recordsSkipped: syncJob.recordsSkipped
+        started_at: syncJob.startTime,
+        completed_at: syncJob.endTime,
+        records_processed: syncJob.recordsProcessed,
+        records_updated: syncJob.recordsUpdated,
+        records_created: syncJob.recordsCreated,
+        records_skipped: syncJob.recordsSkipped,
       })
       .where(eq(syncJobs.id, syncJob.id));
   }
 
   /**
-   * Store sync error in database
+   * Persist a sync error.
+   * TODO: once `syncErrors` is exported from the schema, replace the
+   * console.error below with:
+   *   import { syncErrors as syncErrorsTable } from '@server/infrastructure/schema';
+   *   await db.insert(syncErrorsTable).values({ jobId, ...error, details: JSON.stringify(error.details) });
    */
   private async storeSyncError(jobId: string, error: SyncError): Promise<void> {
-    await db.insert(syncErrors).values({
-      jobId,
-      timestamp: error.timestamp,
-      level: error.level,
-      message: error.message,
-      details: JSON.stringify(error.details),
-      recordId: error.recordId,
-      endpoint: error.endpoint
-    });
+    console.error(
+      `[SyncError] job=${jobId} endpoint=${error.endpoint ?? '-'} record=${error.recordId ?? '-'} — ${error.message}`,
+    );
   }
 
-  /**
-   * Helper methods for database operations
-   */
+  private isCriticalError(error: Error & { code?: string; status?: number }): boolean {
+    return error.code === 'ECONNREFUSED' || error.status === 401;
+  }
+
+  // -------------------------------------------------------------------------
+  // Stub CRUD helpers (replace with real Drizzle implementations)
+  // -------------------------------------------------------------------------
+
   private async createBill(billData: BillData): Promise<void> {
-    // Implementation would create bill in database
     console.log(`Creating bill: ${billData.bill_number}`);
   }
 
-  private async updateBill(bill_id: number, billData: BillData): Promise<void> { // Implementation would update bill in database
-    console.log(`Updating bill ID: ${bill_id }`);
+  private async updateBill(billId: number, _billData: BillData): Promise<void> {
+    console.log(`Updating bill ID: ${billId}`);
   }
 
   private async createSponsor(sponsorData: SponsorData): Promise<void> {
-    // Implementation would create sponsor in database
     console.log(`Creating sponsor: ${sponsorData.name}`);
   }
 
-  private async updateSponsor(sponsor_id: number, sponsorData: SponsorData): Promise<void> {
-    // Implementation would update sponsor in database
-    console.log(`Updating sponsor ID: ${sponsor_id}`);
+  private async updateSponsor(sponsorId: number, _sponsorData: SponsorData): Promise<void> {
+    console.log(`Updating sponsor ID: ${sponsorId}`);
   }
 
-  private async updateBillWithResolution(bill_id: number, resolution: ConflictResolution): Promise<void> { // Implementation would apply conflict resolution
-    console.log(`Applying resolution for bill ID: ${bill_id }`);
+  private async updateBillWithResolution(
+    billId: number,
+    _resolution: ConflictResolution,
+  ): Promise<void> {
+    console.log(`Applying resolution for bill ID: ${billId}`);
   }
 
   private async queueForManualReview(resolution: ConflictResolution): Promise<void> {
-    // Implementation would queue conflict for manual review
     console.log(`Queuing conflict for manual review: ${resolution.conflictId}`);
   }
 
-  private isCriticalError(error: unknown): boolean {
-    // Determine if error should stop the entire sync job
-    return error?.code === 'ECONNREFUSED' || error?.status === 401;
-  }
+  // -------------------------------------------------------------------------
+  // Event handlers
+  // -------------------------------------------------------------------------
 
   private setupEventHandlers(): void {
     this.on('syncJobStarted', (job: SyncJob) => {
@@ -468,136 +562,16 @@ export class DataSynchronizationService extends EventEmitter {
     });
 
     this.on('syncJobCompleted', (job: SyncJob) => {
-      console.log(`✅ Sync job completed: ${job.id} - Processed: ${job.recordsProcessed}, Created: ${job.recordsCreated}, Updated: ${job.recordsUpdated}`);
+      console.log(
+        `✅ Sync job completed: ${job.id} — ` +
+        `Processed: ${job.recordsProcessed}, ` +
+        `Created: ${job.recordsCreated}, ` +
+        `Updated: ${job.recordsUpdated}`,
+      );
     });
 
-    this.on('syncJobFailed', (job: SyncJob, error: unknown) => {
-      console.error(`❌ Sync job failed: ${job.id} - ${error.message}`);
+    this.on('syncJobFailed', (job: SyncJob, error: Error) => {
+      console.error(`❌ Sync job failed: ${job.id} — ${error.message}`);
     });
   }
-
-  /**
-   * Get sync job status
-   */
-  async getSyncJobStatus(jobId: string): Promise<SyncJob | null> {
-    try {
-      const job = await db
-        .select()
-        .from(syncJobs)
-        .where(eq(syncJobs.id, jobId))
-        .limit(1);
-
-      if (job[0]) {
-        // Add the errors array and convert nulls to undefined to match SyncJob interface
-        return {
-          id: job[0].id,
-          dataSourceId: job[0].dataSourceId,
-          endpointId: job[0].endpointId,
-          status: job[0].status as 'pending' | 'running' | 'completed' | 'failed' | 'cancelled',
-          startTime: job[0].startTime || undefined,
-          endTime: job[0].endTime || undefined,
-          recordsProcessed: job[0].recordsProcessed,
-          recordsUpdated: job[0].recordsUpdated,
-          recordsCreated: job[0].recordsCreated,
-          recordsSkipped: job[0].recordsSkipped,
-          errors: [], // Initialize empty errors array since it's not stored in the database
-          nextRunTime: job[0].nextRunTime || undefined,
-          isIncremental: job[0].isIncremental,
-          lastSyncTimestamp: job[0].lastSyncTimestamp || undefined
-        };
-      }
-      return null;
-    } catch (error) {
-      logger.error('Error getting sync job status:', { component: 'Chanuka' }, error);
-      return null;
-    }
-  }
-
-  /**
-   * Get sync metrics for monitoring
-   */
-  getSyncMetrics(): Map<string, SyncMetrics> {
-    return this.syncMetrics;
-  }
-
-  /**
-   * Stop all scheduled sync jobs
-   */
-  stopAllSyncJobs(): void {
-    for (const [jobId, cronJob] of this.scheduledJobs) {
-      cronJob.stop();
-      console.log(`⏹️ Stopped sync job: ${jobId}`);
-    }
-    this.scheduledJobs.clear();
-  }
-
-  /**
-   * Manually trigger sync for a specific data source
-   */
-  async triggerManualSync(dataSourceId: string, endpointId?: string): Promise<SyncJob[]> {
-    const dataSource = await this.governmentDataService.getDataSource(dataSourceId);
-    if (!dataSource) {
-      throw new Error(`Data source not found: ${dataSourceId}`);
-    }
-
-    const jobs: SyncJob[] = [];
-    const endpoints = endpointId 
-      ? dataSource.endpoints.filter(e => e.id === endpointId)
-      : dataSource.endpoints;
-
-    for (const endpoint of endpoints) {
-      const job = await this.executeSyncJob(dataSource, endpoint);
-      jobs.push(job);
-    }
-
-    return jobs;
-  }
 }
-
-interface SyncMetrics {
-  totalJobs: number;
-  successfulJobs: number;
-  failedJobs: number;
-  averageProcessingTime: number;
-  lastSyncTime: Date;
-  recordsProcessedToday: number;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

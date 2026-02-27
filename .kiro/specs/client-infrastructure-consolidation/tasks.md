@@ -363,7 +363,7 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
 
 ### Phase 3: Error Handling Integration (Weeks 5-7)
 
-- [-] 14. Integrate unified error handling system
+- [x] 14. Integrate unified error handling system
   - [x] 14.1 Create unified error type system
     - [x] 14.1.1 Align client error types with server StandardizedError
       - Use ErrorDomain from @shared/core (not ErrorCategory or ErrorClassification)
@@ -407,7 +407,7 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - Document when to use each pattern
       - _Requirements: 22.10_
   
-  - [ ] 14.3 Validate error handling integration
+  - [x] 14.3 Validate error handling integration
     - [x] 14.3.1 Test error serialization round-trip
       - Create server error → serialize → deserialize → client error
       - Verify no data loss
@@ -422,55 +422,55 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
       - Test error recovery strategies
       - _Requirements: 22.12_
     
-    - [-] 14.3.3 Update error handling documentation
+    - [x] 14.3.3 Update error handling documentation
       - Document unified error type system
       - Document factory function patterns
       - Document HTTP boundary serialization
       - Create migration guide from old patterns
       - _Requirements: 22.13_
 
-- [ ] 15. Implement dependency injection container
-  - [ ] 13.1 Create DI container core implementation
+- [x] 15. Implement dependency injection container
+  - [x] 13.1 Create DI container core implementation
     - Implement IDIContainer interface with register(), resolve(), resolveAll(), clear() methods
     - Create ServiceToken and ServiceFactory types
     - Implement service registry with Map data structure
     - Add singleton vs transient lifecycle management
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 13.2 Implement dependency resolution algorithm
+  - [x] 13.2 Implement dependency resolution algorithm
     - Create recursive dependency resolution function
     - Add circular dependency detection in service definitions
     - Implement dependency chain validation
     - Throw descriptive errors for circular dependencies
     - _Requirements: 6.4, 6.5_
   
-  - [ ]* 13.3 Write property test for dependency resolution
+  - [x] 13.3 Write property test for dependency resolution
     - **Property 6: Dependency Injection Correctness**
     - **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5**
     - Generate random service definitions
     - Verify dependencies are initialized in correct order
   
-  - [ ]* 13.4 Write unit tests for DI container
+  - [x] 13.4 Write unit tests for DI container
     - Test service registration and resolution
     - Test singleton lifecycle
     - Test transient lifecycle
     - Test circular dependency detection
     - _Requirements: 10.1, 10.2_
 
-- [ ] 14. Resolve circular dependencies using DI
-  - [ ] 14.1 Extract interfaces for circular dependencies
+- [x] 14. Resolve circular dependencies using DI
+  - [x] 14.1 Extract interfaces for circular dependencies
     - Identify all circular dependencies from analysis phase
     - Create interface files for shared contracts
     - Move interfaces to separate files (e.g., IMonitor, IErrorHandler)
     - _Requirements: 2.3_
   
-  - [ ] 14.2 Refactor modules to use interfaces
+  - [x] 14.2 Refactor modules to use interfaces
     - Update modules to depend on interfaces instead of concrete implementations
     - Use constructor injection for dependencies
     - Remove direct imports that cause circular dependencies
     - _Requirements: 2.3, 6.1_
   
-  - [ ] 14.3 Create infrastructure initialization module
+  - [x] 14.3 Create infrastructure initialization module
     - Create `infrastructure/init.ts` file
     - Implement initializeInfrastructure() function
     - Register core services (EventBus, Storage)
@@ -478,78 +478,78 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
     - Register business services (ErrorHandler, APIClient, Store)
     - _Requirements: 6.1, 6.2, 6.3_
   
-  - [ ] 14.4 Wire DI container into application entry point
+  - [x] 14.4 Wire DI container into application entry point
     - Update application entry point to call initializeInfrastructure()
     - Pass service registry to React app
     - Update components to use services from registry
     - _Requirements: 6.4_
   
-  - [ ]* 14.5 Write integration tests for infrastructure initialization
+  - [x] 14.5 Write integration tests for infrastructure initialization
     - Test complete initialization flow
     - Test service resolution order
     - Test service interactions
     - Verify no circular dependencies at runtime
     - _Requirements: 10.1, 10.2_
 
-- [ ] 15. Validate circular dependency elimination
-  - [ ] 15.1 Run circular dependency detection on final codebase
+- [x] 15. Validate circular dependency elimination
+  - [x] 15.1 Run circular dependency detection on final codebase
     - Use madge to detect any remaining circular dependencies
     - Generate dependency graph visualization
     - Verify zero circular dependencies exist
     - _Requirements: 2.4, 2.5_
   
-  - [ ]* 15.2 Write property test for acyclic dependency graph
+  - [x] 15.2 Write property test for acyclic dependency graph
     - **Property 1: Acyclic Dependency Graph**
     - **Validates: Requirements 1.5, 2.1, 2.4, 2.5, 17.4**
     - Build dependency graph from final codebase
     - Verify graph contains zero cycles
   
-  - [ ] 15.3 Document circular dependency resolution strategies
+  - [x] 15.3 Document circular dependency resolution strategies
     - Document each circular dependency that was resolved
     - Explain resolution strategy used (interface extraction, DI, restructuring)
     - Add examples to architecture documentation
     - _Requirements: 16.2, 16.3_
 
-- [ ] 16. Implement module boundary enforcement
-  - [ ] 16.1 Configure dependency-cruiser rules
+- [x] 16. Implement module boundary enforcement
+  - [x] 16.1 Configure dependency-cruiser rules
     - Create .dependency-cruiser.js configuration file
     - Define rules to enforce public API imports only
     - Define rules to prevent circular dependencies
     - Define rules to enforce architectural layering
     - _Requirements: 18.1, 18.2_
   
-  - [ ] 16.2 Add module boundary validation to build
+  - [x] 16.2 Add module boundary validation to build
     - Add dependency-cruiser to CI pipeline
     - Configure build to fail on boundary violations
     - Add pre-commit hook to check boundaries locally
     - _Requirements: 18.3, 18.4, 18.5_
   
-  - [ ]* 16.3 Write property test for module boundary enforcement
+  - [x] 16.3 Write property test for module boundary enforcement
     - **Property 11: Module Boundary Enforcement**
     - **Validates: Requirements 18.2, 18.3**
     - Generate random import attempts
     - Verify only public API imports are allowed
   
-  - [ ] 16.4 Validate no boundary violations exist
+  - [x] 16.4 Validate no boundary violations exist
     - Run dependency-cruiser on entire codebase
     - Fix any boundary violations found
     - Verify zero violations in final report
     - _Requirements: 18.4_
 
-- [ ] 17. Implement architectural layering validation
-  - [ ] 17.1 Define architectural layers
+- [x] 17. Implement architectural layering validation
+  - [x] 17.1 Define architectural layers
     - Define layer hierarchy (TYPES → PRIMITIVES → SERVICES → INTEGRATION → PRESENTATION)
     - Assign each module to appropriate layer
     - Document layer responsibilities
     - _Requirements: 17.1, 17.3_
   
-  - [ ] 17.2 Add layering rules to dependency-cruiser
+  - [x] 17.2 Add layering rules to dependency-cruiser
     - Configure rules to enforce downward dependencies only
     - Prevent higher layers from depending on lower layers
     - Add validation to CI pipeline
     - _Requirements: 17.3_
   
-  - [ ]* 17.3 Write property test for dependency graph layering
+  - [x] 17.3 Write property test for dependency graph layering
     - **Property 13: Dependency Graph Layering**
     - **Validates: Requirements 17.1, 17.3**
     - Verify all dependencies flow from higher to lower layers
@@ -567,104 +567,104 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
 
 ### Phase 4: Validation Integration and Documentation (Weeks 8-10)
 
-- [ ] 19. Integrate validation with error handling
-  - [ ] 19.1 Consolidate validation logic
+- [x] 19. Integrate validation with error handling
+  - [x] 19.1 Consolidate validation logic
     - Audit all validation code in client (scattered across components)
     - Move validation logic to `infrastructure/validation/` module
     - Create standard validation error format using unified error types
     - Integrate validation errors with ErrorHandler
     - _Requirements: 23.1, 23.2_
   
-  - [ ] 19.2 Create validation utilities
+  - [x] 19.2 Create validation utilities
     - Implement field validators (email, phone, required, etc.)
     - Create form validation helpers
     - Add async validation support
     - Integrate with React Hook Form or similar
     - _Requirements: 23.3_
   
-  - [ ] 19.3 Test validation integration
+  - [x] 19.3 Test validation integration
     - Test validation errors serialize correctly
     - Test validation errors display correctly in UI
     - Test validation error recovery
     - Verify validation errors tracked in observability
     - _Requirements: 23.4_
 
-- [ ] 20. Complete public API documentation
-  - [ ] 20.1 Generate JSDoc comments for all exports
+- [-] 20. Complete public API documentation
+  - [x] 20.1 Generate JSDoc comments for all exports
     - Add JSDoc comments to all public functions and classes
     - Document parameters, return types, and examples
     - Add @example tags with usage examples
     - _Requirements: 5.1, 5.2_
   
-  - [ ] 20.2 Create README.md for each module
+  - [x] 20.2 Create README.md for each module
     - Document module purpose and responsibilities
     - List all public exports with descriptions
     - Add usage examples and best practices
     - Document sub-module organization
     - _Requirements: 5.3, 16.4_
   
-  - [ ] 20.3 Generate TypeDoc API documentation
+  - [x] 20.3 Generate TypeDoc API documentation
     - Configure TypeDoc for all infrastructure modules
     - Generate HTML API documentation
     - Publish documentation to internal docs site
     - _Requirements: 5.5, 16.4_
   
-  - [ ] 20.4 Validate 100% public API coverage
+  - [x] 20.4 Validate 100% public API coverage
     - Run script to verify all exports have JSDoc comments
     - Verify all modules have README.md files
     - Generate coverage report
     - _Requirements: 5.3, 5.4_
 
 - [ ] 21. Complete property-based test suite
-  - [ ]* 21.1 Write property test for type safety enforcement
+  - [ ] 21.1 Write property test for type safety enforcement
     - **Property 8: Type Safety Enforcement**
     - **Validates: Requirements 1.2, 7.2, 7.5**
     - Verify build fails on type errors
     - Verify no type errors exist in codebase
   
-  - [ ]* 21.2 Write property test for circular dependency path documentation
+  - [ ] 21.2 Write property test for circular dependency path documentation
     - **Property 9: Circular Dependency Path Documentation**
     - **Validates: Requirements 2.2**
     - Generate circular dependencies
     - Verify complete dependency path is documented
   
-  - [ ]* 21.3 Write property test for test coverage preservation
+  - [ ] 21.3 Write property test for test coverage preservation
     - **Property 10: Test Coverage Preservation**
     - **Validates: Requirements 10.1, 10.2, 10.4**
     - Verify all migrated tests pass
     - Verify test coverage is at least 80%
   
-  - [ ]* 21.4 Write property test for rollback round-trip
+  - [ ] 21.4 Write property test for rollback round-trip
     - **Property 12: Rollback Round-Trip**
     - **Validates: Requirements 8.5, 19.1, 19.2, 19.3, 19.4, 19.5**
     - Perform consolidation, backup, and rollback
     - Verify system restores to exact pre-consolidation state
   
-  - [ ]* 21.5 Write property test for import name preservation
+  - [ ] 21.5 Write property test for import name preservation
     - **Property 14: Import Name Preservation**
     - **Validates: Requirements 14.3**
     - Verify imported names and aliases are preserved during migration
   
-  - [ ]* 21.6 Write property test for documentation update consistency
+  - [ ] 21.6 Write property test for documentation update consistency
     - **Property 15: Documentation Update Consistency**
     - **Validates: Requirements 16.2, 16.3, 16.5**
     - Verify documentation is updated for all consolidations and breaking changes
   
-  - [ ]* 21.7 Write property test for code splitting
+  - [ ] 21.7 Write property test for code splitting
     - **Property 16: Code Splitting for Large Modules**
     - **Validates: Requirements 15.4, 15.5**
     - Verify large modules use code splitting
     - Verify bundle size is at or below 500KB gzipped
 
 - [ ] 22. Complete integration test suite
-  - [ ]* 22.1 Write integration test for observability module
+  - [ ] 22.1 Write integration test for observability module
     - Test error tracking end-to-end
     - Test performance monitoring integration
     - Test analytics event tracking
     - Test telemetry data aggregation
     - _Requirements: 10.1, 10.2, 11.1, 11.2, 11.3, 11.4, 11.5_
   
-  - [ ]* 22.2 Write integration test for state management module
+  - [ ] 22.2 Write integration test for state management module
     - Test Redux store configuration
     - Test dashboard slice integration
     - Test navigation slice integration
@@ -672,35 +672,35 @@ This plan consolidates client infrastructure from 31 modules to ~20 modules, eli
     - Test state persistence and hydration
     - _Requirements: 10.1, 10.2, 12.1, 12.2, 12.3, 12.4, 12.5_
   
-  - [ ]* 22.3 Write integration test for API module
+  - [ ] 22.3 Write integration test for API module
     - Test HTTP client with real requests
     - Test WebSocket connection and messaging
     - Test realtime subscriptions
     - Test error handling and retry logic
     - _Requirements: 10.1, 10.2, 13.1, 13.2, 13.3, 13.4, 13.5_
   
-  - [ ]* 22.4 Write integration test for error handling
+  - [ ] 22.4 Write integration test for error handling
     - Test error creation with factory functions
     - Test error serialization across HTTP boundary
     - Test error handling with observability integration
     - Test error recovery strategies
     - _Requirements: 10.1, 10.2, 22.1-22.13_
   
-  - [ ]* 22.5 Write integration test for logging infrastructure
+  - [ ] 22.5 Write integration test for logging infrastructure
     - Test logger initialization and configuration
     - Test structured logging with context
     - Test log level filtering
     - Test integration with observability
     - _Requirements: 10.1, 10.2, 21.1-21.7_
   
-  - [ ]* 22.6 Write integration test for validation
+  - [ ] 22.6 Write integration test for validation
     - Test validation error creation
     - Test validation error serialization
     - Test validation error display in UI
     - Test validation integration with error handler
     - _Requirements: 10.1, 10.2, 23.1-23.4_
   
-  - [ ]* 22.7 Write integration test for full infrastructure initialization
+  - [ ] 22.7 Write integration test for full infrastructure initialization
     - Test complete DI container initialization
     - Test all services resolve correctly
     - Test service interactions

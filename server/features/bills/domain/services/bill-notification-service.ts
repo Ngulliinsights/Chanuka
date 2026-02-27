@@ -1,4 +1,4 @@
-import { NotificationChannelService } from '@server/infrastructure/notifications/notification-channels';
+import { NotificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 // UserRepository interface removed - using direct service calls
 import { logger } from '@server/infrastructure/observability';
 import { Bill } from '@shared/entities/bill';

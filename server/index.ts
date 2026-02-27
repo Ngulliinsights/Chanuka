@@ -32,8 +32,7 @@ import { router as verificationRouter } from '@server/features/users/application
 import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
 import { cacheCoordinator } from '@server/infrastructure/cache';
 import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
-import { notificationSchedulerService } from '@server/infrastructure/notifications';
-import { router as notificationsRouter } from '@server/infrastructure/notifications/notifications';
+import { notificationSchedulerService, notificationRoutes as notificationsRouter } from '@server/features/notifications';
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';

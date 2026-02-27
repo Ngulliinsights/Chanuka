@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { logger } from '@client/lib/utils/logger';
 
 import App from './App';
-
+import { initializeInfrastructure, type ServiceRegistry } from './infrastructure/init';
 
 import './index.css';
 
@@ -13,6 +13,35 @@ import './index.css';
 // ============================================================================
 
 const ROOT_ELEMENT_ID = 'root' as const;
+
+// ============================================================================
+// Service Registry Context
+// ============================================================================
+
+/**
+ * React context for the service registry
+ * This allows components to access infrastructure services throughout the app
+ */
+export const ServiceRegistryContext = React.createContext<ServiceRegistry | null>(null);
+
+/**
+ * Hook to access the service registry in React components
+ */
+export function useServiceRegistry(): ServiceRegistry {
+  const registry = React.useContext(ServiceRegistryContext);
+  if (!registry) {
+    throw new Error('useServiceRegistry must be used within a ServiceRegistryProvider');
+  }
+  return registry;
+}
+
+/**
+ * Hook to access a specific service from the registry
+ */
+export function useService<T>(serviceName: string): T | undefined {
+  const registry = useServiceRegistry();
+  return registry.get<T>(serviceName);
+}
 
 // ============================================================================
 // Environment Setup
@@ -90,10 +119,14 @@ function getRootElement(): HTMLElement {
 /**
  * Creates and mounts the React application root to the DOM.
  */
-function mountReactApp(rootElement: HTMLElement): void {
+function mountReactApp(rootElement: HTMLElement, serviceRegistry: ServiceRegistry): void {
   try {
     const reactRoot = createRoot(rootElement);
-    reactRoot.render(<App />);
+    reactRoot.render(
+      <ServiceRegistryContext.Provider value={serviceRegistry}>
+        <App />
+      </ServiceRegistryContext.Provider>
+    );
 
     logger.info('✅ React application mounted successfully', {
       component: 'Bootstrap',
@@ -118,9 +151,15 @@ async function initializeApplication(): Promise<void> {
     setupProcessEnvironment();
     suppressExtensionErrors();
 
-    // Mount React application
+    // Initialize infrastructure services using DI container
+    logger.info('🔧 Initializing infrastructure services...', {
+      component: 'Bootstrap',
+    });
+    const serviceRegistry = initializeInfrastructure();
+
+    // Mount React application with service registry
     const rootElement = getRootElement();
-    mountReactApp(rootElement);
+    mountReactApp(rootElement, serviceRegistry);
 
     logger.info('✅ Chanuka Platform initialized successfully', {
       component: 'Bootstrap',

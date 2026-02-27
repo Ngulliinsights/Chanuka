@@ -1,5 +1,5 @@
 import { encryptionService, securityAuditService } from '@server/features/security';
-import { getEmailService } from '@server/infrastructure/notifications/email-service';
+import { getEmailService } from '@server/infrastructure/messaging/email/email-service';
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@server/infrastructure/schema';

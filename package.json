@@ -115,6 +115,11 @@
     "analyze:infrastructure:graph": "madge --image analysis-results/infrastructure-graph.svg --extensions ts,tsx client/src/infrastructure",
     "analyze:infrastructure:deps": "dependency-cruiser --config .dependency-cruiser.cjs --output-type dot client/src/infrastructure | dot -T svg > analysis-results/infrastructure-deps.svg",
     "validate:infrastructure": "tsx --tsconfig scripts/tsconfig.json scripts/validate-infrastructure.ts",
+    "validate:boundaries": "dependency-cruiser --config .dependency-cruiser.cjs --output-type err client/src server shared",
+    "validate:boundaries:infrastructure": "dependency-cruiser --config .dependency-cruiser.cjs --output-type err client/src/infrastructure",
+    "validate:boundaries:json": "dependency-cruiser --config .dependency-cruiser.cjs --output-type json client/src server shared",
+    "validate:layers": "dependency-cruiser --config .dependency-cruiser.cjs --output-type err --focus '^client/src/infrastructure/' client/src/infrastructure",
+    "validate:layers:report": "dependency-cruiser --config .dependency-cruiser.cjs --output-type err-long --focus '^client/src/infrastructure/' client/src/infrastructure",
     "analyze:circular": "madge --circular --extensions ts,tsx --exclude 'dist|node_modules|.nx|server/infrastructure/schema' client/src server shared",
     "analyze:circular:check": "npm run analyze:circular && echo '✅ No circular dependencies found (excluding intentional schema patterns)!'",
     "analyze:duplication": "jscpd . --config .jscpd.json || true",
@@ -141,9 +146,14 @@
     "fix": "npm run format && npm run lint -- --fix",
     "// --- REPORTING ---": "",
     "report:quality": "npm run analyze:modern && cat analysis-results/unified-report.md",
+    "// --- DOCUMENTATION ---": "",
+    "docs:generate": "typedoc",
+    "docs:serve": "npx http-server docs/api -p 8080 -o",
+    "docs:watch": "typedoc --watch",
+    "docs:validate": "tsx --tsconfig client/tsconfig.json client/src/infrastructure/scripts/validate-api-documentation.ts",
     "// --- CI/CD HOOKS ---": "",
-    "precommit": "npm run analyze:modern && npm run quality:check:dev",
-    "prepush": "npm run analyze:modern && npm run quality:check:staging",
+    "precommit": "npm run analyze:modern && npm run quality:check:dev && npm run validate:layers",
+    "prepush": "npm run analyze:modern && npm run quality:check:staging && npm run validate:boundaries",
     "ci:quality": "npm run analyze:modern && npm run quality:check:prod",
     "// --- DEPLOYMENT ---": "",
     "deploy:production": "node scripts/deploy-production.js --environment production",
@@ -177,7 +187,8 @@
       "prettier --write"
     ],
     "client/src/infrastructure/**/*.{ts,tsx}": [
-      "npm run analyze:infrastructure:circular"
+      "npm run analyze:infrastructure:circular",
+      "npm run validate:layers"
     ]
   },
   "dependencies": {
@@ -300,6 +311,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.1",
+    "typedoc": "^0.28.17",
     "typescript": "5.6.3",
     "vite": "^5.4.15",
     "vitest": "^3.2.4",

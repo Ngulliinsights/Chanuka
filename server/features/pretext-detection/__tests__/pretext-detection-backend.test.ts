@@ -8,12 +8,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { PretextDetectionService } from '../application/pretext-detection.service';
 import { PretextRepository } from '../infrastructure/pretext-repository';
 import { PretextCache } from '../infrastructure/pretext-cache';
-import { EnhancedNotificationService } from '@server/infrastructure/notifications/enhanced-notification.service';
+import { NotificationService as EnhancedNotificationService } from '@server/features/notifications';
 
 // Mock dependencies
 vi.mock('../infrastructure/pretext-repository');
 vi.mock('../infrastructure/pretext-cache');
-vi.mock('@server/infrastructure/notifications/enhanced-notification.service');
+vi.mock('@server/features/notifications', () => ({
+  NotificationService: vi.fn()
+}));
 vi.mock('@server/features/monitoring/domain/integration-monitor.service', () => ({
   integrationMonitor: {
     recordMetrics: vi.fn(),

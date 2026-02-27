@@ -1,0 +1,822 @@
+{
+  "../features/auth/pages/login.tsx": [],
+  "../features/bills/pages/BillsPortalPage.tsx": [],
+  "../features/community/pages/community-input.tsx": [],
+  "../features/home/pages/core-home.tsx": [],
+  "../features/home/pages/enhanced-home.tsx": [],
+  "../features/home/pages/home.tsx": [
+    "../features/home/pages/core-home.tsx",
+    "../features/home/pages/enhanced-home.tsx"
+  ],
+  "../features/search/hooks/useIntelligentSearch.ts": [
+    "../features/search/services/intelligent-search.ts"
+  ],
+  "../features/search/hooks/useStreamingSearch.ts": [
+    "../features/search/services/streaming-search.ts"
+  ],
+  "../features/search/pages/universal-search.tsx": [],
+  "../features/search/services/api.ts": [
+    "api/client.ts"
+  ],
+  "../features/search/services/intelligent-search.ts": [],
+  "../features/search/services/streaming-search.ts": [],
+  "../features/search/ui/interface/IntelligentAutocomplete.tsx": [
+    "../features/search/services/intelligent-search.ts"
+  ],
+  "../features/users/pages/user-account.tsx": [],
+  "../lib/design-system/interactive/Command.tsx": [
+    "../lib/design-system/interactive/Dialog.tsx"
+  ],
+  "../lib/design-system/interactive/Dialog.tsx": [],
+  "../lib/design-system/utils/cn.ts": [],
+  "../lib/types/analytics.ts": [
+    "../lib/types/bill/bill-analytics.ts"
+  ],
+  "../lib/types/bill/bill-analytics.ts": [],
+  "api/auth.ts": [],
+  "api/authentication.ts": [
+    "api/types/interceptors.ts"
+  ],
+  "api/cache-manager.ts": [],
+  "api/circuit-breaker-monitor.ts": [
+    "api/circuit-breaker/core.ts"
+  ],
+  "api/circuit-breaker/core.ts": [],
+  "api/circuit-breaker/types.ts": [],
+  "api/client.ts": [
+    "api/cache-manager.ts",
+    "api/config.ts"
+  ],
+  "api/config.ts": [],
+  "api/contract-client.ts": [
+    "api/client.ts"
+  ],
+  "api/errors.ts": [],
+  "api/hooks/index.ts": [
+    "api/hooks/use-api-with-fallback.ts",
+    "api/hooks/use-safe-mutation.ts",
+    "api/hooks/use-safe-query.ts",
+    "api/hooks/useApiConnection.ts"
+  ],
+  "api/hooks/use-api-with-fallback.ts": [
+    "api/client.ts"
+  ],
+  "api/hooks/use-safe-mutation.ts": [
+    "api/index.ts"
+  ],
+  "api/hooks/use-safe-query.ts": [
+    "api/index.ts"
+  ],
+  "api/hooks/useApiConnection.ts": [
+    "api/index.ts"
+  ],
+  "api/hooks/useConnectionAware.tsx": [],
+  "api/hooks/useServiceStatus.ts": [],
+  "api/http/index.ts": [
+    "api/authentication.ts",
+    "api/cache-manager.ts",
+    "api/circuit-breaker-monitor.ts",
+    "api/client.ts",
+    "api/http/request-deduplicator.ts",
+    "api/retry.ts",
+    "api/types/interceptors.ts"
+  ],
+  "api/http/request-deduplicator.ts": [],
+  "api/index.ts": [
+    "api/authentication.ts",
+    "api/cache-manager.ts",
+    "api/circuit-breaker-monitor.ts",
+    "api/client.ts",
+    "api/contract-client.ts",
+    "api/errors.ts",
+    "api/http/request-deduplicator.ts",
+    "api/realtime/client.ts",
+    "api/retry.ts",
+    "api/types/realtime.ts",
+    "api/types/websocket.ts",
+    "api/websocket/client.ts",
+    "api/websocket/manager.ts"
+  ],
+  "api/interceptors.ts": [
+    "api/circuit-breaker-monitor.ts",
+    "api/circuit-breaker/core.ts"
+  ],
+  "api/notifications.ts": [
+    "api/client.ts",
+    "api/errors.ts"
+  ],
+  "api/performance.ts": [
+    "api/client.ts"
+  ],
+  "api/privacy.ts": [
+    "api/client.ts"
+  ],
+  "api/realtime/client.ts": [
+    "api/websocket/client.ts"
+  ],
+  "api/realtime/index.ts": [
+    "api/realtime/client.ts",
+    "api/types/realtime.ts"
+  ],
+  "api/registry.ts": [],
+  "api/retry.ts": [],
+  "api/serialization-interceptors.ts": [],
+  "api/services/bill.service.ts": [
+    "api/contract-client.ts"
+  ],
+  "api/services/index.ts": [
+    "api/services/bill.service.ts",
+    "api/services/user.service.ts"
+  ],
+  "api/services/user.service.ts": [
+    "api/contract-client.ts"
+  ],
+  "api/system.ts": [
+    "api/client.ts",
+    "api/errors.ts"
+  ],
+  "api/types/auth.ts": [],
+  "api/types/bill.ts": [],
+  "api/types/cache.ts": [],
+  "api/types/common.ts": [],
+  "api/types/community.ts": [],
+  "api/types/config.ts": [],
+  "api/types/engagement.ts": [],
+  "api/types/error-response.ts": [],
+  "api/types/index.ts": [
+    "api/auth.ts",
+    "api/types/auth.ts",
+    "api/types/bill.ts",
+    "api/types/cache.ts",
+    "api/types/common.ts",
+    "api/types/community.ts",
+    "api/types/config.ts",
+    "api/types/engagement.ts",
+    "api/types/interceptors.ts",
+    "api/types/performance.ts",
+    "api/types/preferences.ts",
+    "api/types/realtime.ts",
+    "api/types/service.ts",
+    "api/types/websocket.ts"
+  ],
+  "api/types/interceptors.ts": [],
+  "api/types/performance.ts": [],
+  "api/types/preferences.ts": [],
+  "api/types/realtime.ts": [],
+  "api/types/request.ts": [
+    "api/types/common.ts"
+  ],
+  "api/types/service.ts": [],
+  "api/types/shared-imports.ts": [],
+  "api/types/sponsor.ts": [],
+  "api/types/websocket.ts": [],
+  "api/websocket/client.ts": [],
+  "api/websocket/index.ts": [
+    "api/types/websocket.ts",
+    "api/websocket/client.ts",
+    "api/websocket/manager.ts"
+  ],
+  "api/websocket/manager.ts": [],
+  "asset-loading/AssetLoadingProvider.tsx": [],
+  "asset-loading/index.ts": [
+    "asset-loading/AssetLoadingProvider.tsx"
+  ],
+  "auth/config/auth-config.ts": [],
+  "auth/config/auth-init.ts": [
+    "auth/config/auth-config.ts",
+    "auth/services/auth-api-service.ts",
+    "auth/services/session-manager.ts",
+    "auth/services/token-manager.ts",
+    "error/constants.ts"
+  ],
+  "auth/constants/auth-constants.ts": [],
+  "auth/errors/auth-errors.ts": [
+    "error/constants.ts"
+  ],
+  "auth/hooks/use-auth.tsx": [
+    "auth/services/auth-api-service.ts",
+    "auth/services/session-manager.ts",
+    "auth/store/auth-slice.ts",
+    "auth/types.ts"
+  ],
+  "auth/http/authenticated-client.ts": [],
+  "auth/http/authentication-interceptors.ts": [],
+  "auth/index.ts": [
+    "auth/config/auth-config.ts",
+    "auth/config/auth-init.ts",
+    "auth/constants/auth-constants.ts",
+    "auth/errors/auth-errors.ts",
+    "auth/hooks/use-auth.tsx",
+    "auth/http/authenticated-client.ts",
+    "auth/http/authentication-interceptors.ts",
+    "auth/service.ts",
+    "auth/services/auth-api-service.ts",
+    "auth/services/session-manager.ts",
+    "auth/services/token-manager.ts",
+    "auth/store/auth-middleware.ts",
+    "auth/store/auth-slice.ts",
+    "auth/types.ts",
+    "auth/utils/permission-helpers.ts",
+    "auth/utils/security-helpers.ts",
+    "auth/utils/storage-helpers.ts",
+    "auth/utils/validation.ts"
+  ],
+  "auth/initialization.ts": [],
+  "auth/rbac.ts": [],
+  "auth/scripts/cleanup-old-auth.ts": [
+    "auth/index.ts"
+  ],
+  "auth/scripts/init-auth-system.ts": [
+    "auth/config/auth-init.ts",
+    "auth/index.ts"
+  ],
+  "auth/scripts/migration-helper.ts": [],
+  "auth/service.ts": [],
+  "auth/services/auth-api-service.ts": [
+    "error/constants.ts"
+  ],
+  "auth/services/session-manager.ts": [
+    "auth/constants/auth-constants.ts",
+    "error/constants.ts",
+    "storage/secure-storage.ts"
+  ],
+  "auth/services/token-manager.ts": [
+    "auth/constants/auth-constants.ts",
+    "error/constants.ts",
+    "storage/secure-storage.ts"
+  ],
+  "auth/store/auth-middleware.ts": [
+    "auth/services/auth-api-service.ts",
+    "auth/services/token-manager.ts",
+    "auth/store/auth-slice.ts"
+  ],
+  "auth/store/auth-slice.ts": [
+    "auth/services/auth-api-service.ts"
+  ],
+  "auth/types.ts": [],
+  "auth/utils/index.ts": [
+    "auth/utils/permission-helpers.ts",
+    "auth/utils/storage-helpers.ts"
+  ],
+  "auth/utils/permission-helpers.ts": [],
+  "auth/utils/security-helpers.ts": [],
+  "auth/utils/storage-helpers.ts": [],
+  "auth/utils/validation.ts": [],
+  "browser/BrowserCompatibilityChecker.tsx": [],
+  "browser/BrowserCompatibilityReport.tsx": [
+    "browser/BrowserCompatibilityTester.tsx"
+  ],
+  "browser/BrowserCompatibilityTester.tsx": [],
+  "browser/FeatureFallbacks.tsx": [],
+  "browser/browser-detector.ts": [
+    "browser/constants.ts",
+    "browser/environment.ts",
+    "browser/feature-detector.ts"
+  ],
+  "browser/compatibility-manager.ts": [
+    "browser/browser-detector.ts",
+    "browser/constants.ts",
+    "browser/polyfill-manager.ts"
+  ],
+  "browser/constants.ts": [],
+  "browser/environment.ts": [],
+  "browser/feature-detector.ts": [
+    "browser/constants.ts",
+    "browser/environment.ts"
+  ],
+  "browser/index.ts": [
+    "browser/browser-detector.ts",
+    "browser/compatibility-manager.ts",
+    "browser/constants.ts",
+    "browser/environment.ts",
+    "browser/feature-detector.ts",
+    "browser/polyfill-manager.ts",
+    "browser/types.ts"
+  ],
+  "browser/polyfill-manager.ts": [
+    "browser/feature-detector.ts"
+  ],
+  "browser/types.ts": [],
+  "browser/useBrowserStatus.tsx": [],
+  "cache/cache-invalidation.ts": [],
+  "cache/index.ts": [
+    "cache/cache-invalidation.ts"
+  ],
+  "command-palette/CommandPalette.tsx": [
+    "../lib/design-system/interactive/Command.tsx",
+    "../lib/design-system/utils/cn.ts",
+    "command-palette/Modal.tsx",
+    "command-palette/commands.ts",
+    "command-palette/types.ts"
+  ],
+  "command-palette/Modal.tsx": [
+    "../lib/design-system/utils/cn.ts"
+  ],
+  "command-palette/commands.ts": [],
+  "command-palette/index.ts": [
+    "command-palette/CommandPalette.tsx",
+    "command-palette/Modal.tsx",
+    "command-palette/commands.ts",
+    "command-palette/types.ts",
+    "command-palette/useCommandPalette.ts"
+  ],
+  "command-palette/types.ts": [],
+  "command-palette/useCommandPalette.ts": [],
+  "community/index.ts": [
+    "community/services/moderation.service.ts",
+    "community/services/state-sync.service.ts",
+    "community/types.ts"
+  ],
+  "community/services/moderation.service.ts": [
+    "api/client.ts"
+  ],
+  "community/services/state-sync.service.ts": [],
+  "community/types.ts": [],
+  "consolidation/consolidation-algorithm.ts": [
+    "consolidation/types.ts"
+  ],
+  "consolidation/di-container.ts": [],
+  "consolidation/index.ts": [
+    "consolidation/consolidation-algorithm.ts",
+    "consolidation/di-container.ts",
+    "consolidation/interface-extraction.ts",
+    "consolidation/mappings.ts",
+    "consolidation/migration-script.ts",
+    "consolidation/module-structure.ts",
+    "consolidation/rollback.ts",
+    "consolidation/types.ts",
+    "consolidation/validation.ts"
+  ],
+  "consolidation/interface-extraction.ts": [],
+  "consolidation/mappings.ts": [
+    "consolidation/types.ts"
+  ],
+  "consolidation/migration-script.ts": [],
+  "consolidation/module-structure.ts": [],
+  "consolidation/rollback.ts": [],
+  "consolidation/types.ts": [],
+  "consolidation/validation.ts": [],
+  "core-monitoring.ts": [],
+  "error/analytics.ts": [
+    "error/types.ts"
+  ],
+  "error/classes.ts": [
+    "error/constants.ts",
+    "error/types.ts"
+  ],
+  "error/components/CommunityErrorBoundary.tsx": [
+    "error/components/utils/shared-error-display.tsx"
+  ],
+  "error/components/ErrorBoundary.tsx": [],
+  "error/components/ErrorFallback.tsx": [],
+  "error/components/ErrorRecoveryManager.tsx": [],
+  "error/components/RecoveryUI.tsx": [],
+  "error/components/ServiceUnavailable.tsx": [],
+  "error/components/SimpleErrorBoundary.tsx": [
+    "error/components/utils/shared-error-display.tsx"
+  ],
+  "error/components/UnifiedErrorBoundary.tsx": [],
+  "error/components/example.tsx": [
+    "error/components/ErrorBoundary.tsx"
+  ],
+  "error/components/index.ts": [
+    "error/classes.ts",
+    "error/components/CommunityErrorBoundary.tsx",
+    "error/components/ErrorBoundary.tsx",
+    "error/components/ErrorFallback.tsx",
+    "error/components/ErrorRecoveryManager.tsx",
+    "error/components/RecoveryUI.tsx",
+    "error/components/ServiceUnavailable.tsx",
+    "error/components/SimpleErrorBoundary.tsx",
+    "error/components/utils/contextual-messages.ts",
+    "error/components/utils/error-icons.tsx",
+    "error/components/utils/error-normalizer.ts",
+    "error/components/utils/error-reporter.ts",
+    "error/constants.ts",
+    "error/types.ts"
+  ],
+  "error/components/types.ts": [
+    "error/types.ts"
+  ],
+  "error/components/utils/contextual-messages.ts": [
+    "error/classes.ts",
+    "error/constants.ts"
+  ],
+  "error/components/utils/error-icons.tsx": [
+    "error/classes.ts",
+    "error/constants.ts"
+  ],
+  "error/components/utils/error-normalizer.ts": [
+    "error/classes.ts",
+    "error/constants.ts"
+  ],
+  "error/components/utils/error-reporter.ts": [
+    "error/classes.ts",
+    "error/constants.ts"
+  ],
+  "error/components/utils/shared-error-display.tsx": [],
+  "error/constants.ts": [],
+  "error/dashboard-errors.ts": [
+    "error/classes.ts",
+    "error/constants.ts"
+  ],
+  "error/factory.ts": [
+    "error/constants.ts",
+    "error/types.ts"
+  ],
+  "error/handler.ts": [
+    "error/analytics.ts",
+    "error/constants.ts",
+    "error/rate-limiter.ts",
+    "error/reporting.ts",
+    "error/types.ts"
+  ],
+  "error/index.ts": [
+    "error/analytics.ts",
+    "error/classes.ts",
+    "error/components/types.ts",
+    "error/constants.ts",
+    "error/dashboard-errors.ts",
+    "error/factory.ts",
+    "error/handler.ts",
+    "error/rate-limiter.ts",
+    "error/recovery.ts",
+    "error/reporters/ApiReporter.ts",
+    "error/reporters/CompositeReporter.ts",
+    "error/reporters/ConsoleReporter.ts",
+    "error/reporters/SentryReporter.ts",
+    "error/reporting.ts",
+    "error/result.ts",
+    "error/serialization.ts",
+    "error/types.ts",
+    "error/unified-factory.ts",
+    "error/unified-handler.ts",
+    "error/unified-types.ts"
+  ],
+  "error/messages/error-message-formatter.ts": [
+    "error/constants.ts",
+    "error/messages/error-message-templates.ts",
+    "error/types.ts"
+  ],
+  "error/messages/error-message-templates.ts": [
+    "error/constants.ts"
+  ],
+  "error/messages/error-recovery-suggestions.ts": [
+    "error/constants.ts",
+    "error/types.ts"
+  ],
+  "error/messages/index.ts": [
+    "error/constants.ts",
+    "error/messages/error-message-formatter.ts",
+    "error/messages/error-message-templates.ts",
+    "error/messages/error-recovery-suggestions.ts",
+    "error/messages/use-error-messages.ts",
+    "error/types.ts"
+  ],
+  "error/messages/use-error-messages.ts": [
+    "error/messages/error-message-formatter.ts",
+    "error/messages/error-message-templates.ts",
+    "error/messages/error-recovery-suggestions.ts",
+    "error/types.ts"
+  ],
+  "error/middleware/hooks-middleware.ts": [
+    "error/index.ts"
+  ],
+  "error/middleware/index.ts": [
+    "error/middleware/hooks-middleware.ts",
+    "error/middleware/library-middleware.ts",
+    "error/middleware/security-middleware.ts",
+    "error/middleware/service-middleware.ts"
+  ],
+  "error/middleware/library-middleware.ts": [
+    "error/index.ts",
+    "error/types.ts"
+  ],
+  "error/middleware/security-middleware.ts": [
+    "error/index.ts"
+  ],
+  "error/middleware/service-middleware.ts": [
+    "error/index.ts",
+    "error/types.ts"
+  ],
+  "error/monitoring.tsx": [],
+  "error/rate-limiter.ts": [
+    "error/types.ts"
+  ],
+  "error/recovery.ts": [
+    "error/constants.ts",
+    "error/handler.ts",
+    "error/types.ts"
+  ],
+  "error/reporters/ApiReporter.ts": [
+    "error/types.ts"
+  ],
+  "error/reporters/CompositeReporter.ts": [
+    "error/types.ts"
+  ],
+  "error/reporters/ConsoleReporter.ts": [
+    "error/types.ts"
+  ],
+  "error/reporters/SentryReporter.ts": [
+    "error/types.ts"
+  ],
+  "error/reporting.ts": [
+    "error/types.ts"
+  ],
+  "error/result.ts": [],
+  "error/serialization.ts": [],
+  "error/types.ts": [
+    "error/constants.ts"
+  ],
+  "error/unified-factory.ts": [],
+  "error/unified-handler.ts": [],
+  "error/unified-types.ts": [],
+  "events/event-bus.ts": [],
+  "events/index.ts": [
+    "events/event-bus.ts"
+  ],
+  "hooks/index.ts": [
+    "api/hooks/useConnectionAware.tsx",
+    "api/hooks/useServiceStatus.ts"
+  ],
+  "index.ts": [
+    "integration-validator.ts",
+    "quality-optimizer.ts"
+  ],
+  "init.ts": [
+    "consolidation/di-container.ts"
+  ],
+  "integration-validator.ts": [],
+  "logging/index.ts": [],
+  "logging/types.ts": [],
+  "mobile/device-detector.ts": [],
+  "mobile/error-handler.ts": [
+    "mobile/device-detector.ts"
+  ],
+  "mobile/index.ts": [
+    "mobile/device-detector.ts",
+    "mobile/error-handler.ts",
+    "mobile/performance-optimizer.ts",
+    "mobile/responsive-utils.ts",
+    "mobile/types.ts"
+  ],
+  "mobile/performance-optimizer.ts": [
+    "mobile/device-detector.ts"
+  ],
+  "mobile/responsive-utils.ts": [],
+  "mobile/touch-handler.ts": [],
+  "mobile/types.ts": [],
+  "navigation/NavigationConsistency.tsx": [
+    "navigation/context.tsx"
+  ],
+  "navigation/NavigationPerformance.tsx": [
+    "../features/auth/pages/login.tsx",
+    "../features/bills/pages/BillsPortalPage.tsx",
+    "../features/community/pages/community-input.tsx",
+    "../features/home/pages/home.tsx",
+    "../features/search/pages/universal-search.tsx",
+    "../features/users/pages/user-account.tsx"
+  ],
+  "navigation/access-control.ts": [],
+  "navigation/analytics.ts": [],
+  "navigation/breadcrumbs.ts": [],
+  "navigation/context.tsx": [],
+  "navigation/hooks.ts": [
+    "navigation/context.tsx"
+  ],
+  "navigation/hooks/index.ts": [
+    "navigation/hooks.ts"
+  ],
+  "navigation/hooks/use-navigation-accessibility.ts": [],
+  "navigation/hooks/use-navigation-performance.ts": [],
+  "navigation/hooks/use-navigation-preferences.tsx": [],
+  "navigation/hooks/use-unified-navigation.ts": [
+    "navigation/context.tsx"
+  ],
+  "navigation/index.ts": [
+    "navigation/access-control.ts",
+    "navigation/analytics.ts",
+    "navigation/breadcrumbs.ts",
+    "navigation/context.tsx",
+    "navigation/hooks.ts",
+    "navigation/lookup.ts",
+    "navigation/persistence.ts",
+    "navigation/preferences.ts",
+    "navigation/route-preloading.ts",
+    "navigation/route-validation.ts",
+    "navigation/search.ts",
+    "navigation/types.ts",
+    "navigation/validation.ts"
+  ],
+  "navigation/lookup.ts": [
+    "navigation/types.ts"
+  ],
+  "navigation/navigation-service.ts": [],
+  "navigation/page-relationship-service.ts": [],
+  "navigation/persistence.ts": [
+    "navigation/types.ts"
+  ],
+  "navigation/preferences.ts": [
+    "navigation/types.ts"
+  ],
+  "navigation/route-preloading.ts": [],
+  "navigation/route-validation.ts": [],
+  "navigation/search.ts": [
+    "navigation/types.ts"
+  ],
+  "navigation/test-navigation.ts": [
+    "navigation/index.ts"
+  ],
+  "navigation/types.ts": [],
+  "navigation/utils.ts": [
+    "navigation/types.ts"
+  ],
+  "navigation/validation.ts": [
+    "navigation/types.ts"
+  ],
+  "observability/analytics/index.ts": [],
+  "observability/error-monitoring/index.ts": [],
+  "observability/index.ts": [
+    "observability/types.ts"
+  ],
+  "observability/performance/index.ts": [],
+  "observability/telemetry/index.ts": [],
+  "observability/types.ts": [],
+  "personalization/index.ts": [
+    "personalization/persona-detector.ts",
+    "personalization/types.ts"
+  ],
+  "personalization/persona-detector.ts": [],
+  "personalization/types.ts": [],
+  "quality-optimizer.ts": [],
+  "recovery/dashboard-recovery.ts": [],
+  "recovery/index.ts": [
+    "recovery/dashboard-recovery.ts"
+  ],
+  "scripts/validate-module-structure.ts": [],
+  "search/UnifiedSearchInterface.tsx": [
+    "../features/search/hooks/useIntelligentSearch.ts",
+    "../features/search/hooks/useStreamingSearch.ts",
+    "../features/search/services/api.ts",
+    "../features/search/services/intelligent-search.ts",
+    "../features/search/services/streaming-search.ts",
+    "../features/search/ui/interface/IntelligentAutocomplete.tsx",
+    "../lib/design-system/utils/cn.ts",
+    "search/search-strategy-selector.ts",
+    "search/types.ts"
+  ],
+  "search/index.ts": [
+    "search/UnifiedSearchInterface.tsx",
+    "search/search-strategy-selector.ts",
+    "search/types.ts"
+  ],
+  "search/search-strategy-selector.ts": [],
+  "search/types.ts": [],
+  "security/config/security-config.ts": [],
+  "security/csp-nonce.ts": [],
+  "security/csrf-protection.ts": [],
+  "security/headers/SecurityHeaders.ts": [],
+  "security/index.ts": [
+    "security/csrf-protection.ts",
+    "security/input-sanitizer.ts",
+    "security/rate-limiter.ts",
+    "security/security-monitor.ts",
+    "security/security-utils.ts",
+    "security/types.ts",
+    "security/unified/csp-manager.ts",
+    "security/vulnerability-scanner.ts"
+  ],
+  "security/input-sanitizer.ts": [],
+  "security/rate-limiter.ts": [],
+  "security/security-monitor.ts": [],
+  "security/security-monitoring.ts": [],
+  "security/security-service.ts": [
+    "security/csp-nonce.ts",
+    "security/csrf-protection.ts",
+    "security/input-sanitizer.ts",
+    "security/rate-limiter.ts",
+    "security/vulnerability-scanner.ts"
+  ],
+  "security/security-utils.ts": [],
+  "security/types.ts": [],
+  "security/ui/dashboard/SecureForm.tsx": [],
+  "security/ui/dashboard/SecurityDashboard.tsx": [],
+  "security/ui/dashboard/SecuritySettings.tsx": [],
+  "security/ui/icons/ChanukaIcons.tsx": [],
+  "security/ui/index.ts": [
+    "security/ui/dashboard/SecureForm.tsx",
+    "security/ui/dashboard/SecurityDashboard.tsx",
+    "security/ui/dashboard/SecuritySettings.tsx"
+  ],
+  "security/ui/privacy/CookieConsentBanner.tsx": [],
+  "security/ui/privacy/DataUsageReportDashboard.tsx": [
+    "security/ui/icons/ChanukaIcons.tsx"
+  ],
+  "security/ui/privacy/GDPRComplianceManager.tsx": [],
+  "security/ui/privacy/index.ts": [
+    "security/ui/privacy/CookieConsentBanner.tsx",
+    "security/ui/privacy/DataUsageReportDashboard.tsx",
+    "security/ui/privacy/GDPRComplianceManager.tsx"
+  ],
+  "security/ui/privacy/privacy-policy.tsx": [],
+  "security/unified/csp-config.ts": [
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/csp-manager.ts": [
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/error-handler.ts": [
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/error-middleware.ts": [
+    "security/unified/error-handler.ts",
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/index.ts": [
+    "security/unified/csp-config.ts",
+    "security/unified/csp-manager.ts",
+    "security/unified/error-handler.ts",
+    "security/unified/error-middleware.ts",
+    "security/unified/input-sanitizer.ts",
+    "security/unified/rate-limiter.ts",
+    "security/unified/security-interface.ts",
+    "security/unified/system.ts"
+  ],
+  "security/unified/input-sanitizer.ts": [
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/rate-limiter.ts": [
+    "security/unified/security-interface.ts"
+  ],
+  "security/unified/security-interface.ts": [],
+  "security/unified/system.ts": [
+    "security/unified/csp-config.ts",
+    "security/unified/csp-manager.ts",
+    "security/unified/error-handler.ts",
+    "security/unified/error-middleware.ts",
+    "security/unified/input-sanitizer.ts",
+    "security/unified/rate-limiter.ts",
+    "security/unified/security-interface.ts"
+  ],
+  "security/vulnerability-scanner.ts": [],
+  "security/window.d.ts": [],
+  "storage/cache-storage.ts": [
+    "storage/secure-storage.ts",
+    "storage/types.ts"
+  ],
+  "storage/index.ts": [
+    "auth/services/session-manager.ts",
+    "auth/services/token-manager.ts",
+    "storage/cache-storage.ts",
+    "storage/secure-storage.ts",
+    "storage/types.ts"
+  ],
+  "storage/offline-data-manager.ts": [],
+  "storage/secure-storage.ts": [
+    "storage/types.ts"
+  ],
+  "storage/types.ts": [],
+  "store/index.ts": [
+    "store/slices/errorHandlingSlice.ts",
+    "store/slices/loadingSlice.ts",
+    "store/slices/navigationSlice.ts",
+    "store/slices/sessionSlice.ts",
+    "store/slices/uiSlice.ts",
+    "store/slices/userDashboardSlice.ts"
+  ],
+  "store/middleware/apiMiddleware.ts": [],
+  "store/middleware/authMiddleware.ts": [
+    "store/slices/sessionSlice.ts"
+  ],
+  "store/middleware/errorHandlingMiddleware.ts": [],
+  "store/middleware/navigationPersistenceMiddleware.ts": [],
+  "store/middleware/webSocketMiddleware.ts": [
+    "store/slices/realTimeSlice.ts"
+  ],
+  "store/slices/discussionSlice.ts": [],
+  "store/slices/errorAnalyticsSlice.ts": [],
+  "store/slices/errorHandlingSlice.ts": [],
+  "store/slices/loadingSlice.ts": [],
+  "store/slices/navigationSlice.ts": [],
+  "store/slices/realTimeSlice.ts": [],
+  "store/slices/sessionSlice.ts": [],
+  "store/slices/uiSlice.ts": [],
+  "store/slices/userDashboardSlice.ts": [],
+  "store/store-types.ts": [],
+  "sync/background-sync-manager.ts": [],
+  "sync/index.ts": [
+    "sync/background-sync-manager.ts"
+  ],
+  "system/HealthCheck.tsx": [],
+  "system/index.ts": [
+    "system/HealthCheck.tsx"
+  ],
+  "validation/dashboard-validation.ts": [],
+  "validation/index.ts": [
+    "validation/dashboard-validation.ts"
+  ],
+  "workers/index.ts": [
+    "workers/service-worker.ts"
+  ],
+  "workers/service-worker.ts": []
+}

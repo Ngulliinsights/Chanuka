@@ -46,6 +46,11 @@ jobs:
           cd ..
           npm run analyze:infrastructure:circular
 
+      - name: Validate module boundaries
+        run: |
+          cd ..
+          npm run validate:boundaries
+
       - name: Validate dependency boundaries
         run: |
           cd ..

@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { integrationMonitor } from '@server/features/monitoring/domain/integration-monitor.service';
-import { EnhancedNotificationService } from '@server/infrastructure/notifications/enhanced-notification.service';
+import { NotificationService as EnhancedNotificationService } from '@server/features/notifications';
 import { PretextAnalysisService } from '../domain/pretext-analysis.service';
 import { PretextRepository } from '../infrastructure/pretext-repository';
 import { PretextCache } from '../infrastructure/pretext-cache';

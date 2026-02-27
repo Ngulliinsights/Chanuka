@@ -1,5 +1,5 @@
 // services/passwordReset.ts
-import { sendTemplatedEmail } from '@server/infrastructure/notifications/email-service';
+import { sendTemplatedEmail } from '@server/infrastructure/messaging/email/email-service';
 import { ValidationError } from '@shared/types/core/errors/errors/specialized-errors';
 import { database as db } from '@server/infrastructure/database';
 // Import specific tables and functions needed from the consolidated schema

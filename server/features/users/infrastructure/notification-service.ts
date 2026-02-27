@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
 
-import { NotificationData,notificationService } from '@server/infrastructure/notifications/notification-service';
+import { NotificationData, notificationService } from '@server/features/notifications';
 
 export interface UserNotificationData extends Omit<NotificationData, 'user_id'> { user_id: string;
  }

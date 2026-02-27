@@ -11,9 +11,9 @@
  * - Request batching and optimization
  */
 
-import { APICostMonitoringService, apiCostMonitoringService } from '@server/infrastructure/observability/api-cost-monitoring.service
+import { APICostMonitoringService } from '@server/infrastructure/observability/api-cost-monitoring.service';
 // Note: ioredis needs to be installed: npm install ioredis @types/ioredis
-import { ErrorSeverity, ExternalAPIErrorHandler } from '@server/services/external-api-error-handler';
+import type { ExternalAPIErrorHandler, ErrorSeverity } from '@server/infrastructure/error-handling/external-api-error-handler';
 import { logger } from '@server/infrastructure/observability';
 import { EventEmitter } from 'events';
 
@@ -158,9 +158,20 @@ interface APIRequestResult {
 }
 
 interface QueuedRequest {
-  resolve: Function;
-  reject: Function;
+  resolve: (value: APIRequestResult) => void;
+  reject: (reason: any) => void;
   request: any;
+}
+
+interface CostReport {
+  totalCost: number;
+  costBySource: Record<string, number>;
+  period: string;
+  alerts: Array<{
+    source: string;
+    message: string;
+    severity: string;
+  }>;
 }
 
 // ============================================================================
@@ -175,9 +186,8 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   private responseCache: Map<string, CacheEntry> = new Map();
   private circuitBreakers: Map<string, CircuitBreakerState> = new Map();
   private performanceBaselines: Map<string, PerformanceBaseline> = new Map();
-  private optimizationRules: Map<string, OptimizationRule> = new Map();
 
-  private errorHandler: ExternalAPIErrorHandler;
+  private errorHandler: ExternalAPIErrorHandler | null = null;
   private costMonitoring: APICostMonitoringService;
   // private redis: Redis; // Commented out until ioredis is installed
 
@@ -187,9 +197,14 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   private batchingTimers: Map<string, NodeJS.Timeout> = new Map();
   private cleanupIntervals: NodeJS.Timeout[] = [];
 
-  constructor(redisUrl?: string) {
+  constructor(errorHandler?: ExternalAPIErrorHandler) {
     super();
-    this.errorHandler = new ExternalAPIErrorHandler();
+    
+    // Initialize error handler if provided
+    if (errorHandler) {
+      this.errorHandler = errorHandler;
+    }
+    
     this.costMonitoring = new APICostMonitoringService();
     // this.redis = new Redis(redisUrl || process.env.REDIS_URL || 'redis://localhost:6379');
 
@@ -291,7 +306,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   addAPIConfiguration(config: APIConfiguration): void {
     this.configurations.set(config.source, config);
     this.initializeSourceManagement(config);
-    console.log(`✅ Configured API source: ${config.source}`);
+    logger.info(`✅ Configured API source: ${config.source}`);
   }
 
   private initializeSourceManagement(config: APIConfiguration): void {
@@ -304,14 +319,13 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     rateLimitMap.set('month', { requests: 0, resetTime: now + 2592000000, windowType: 'month' });
     this.rateLimiters.set(config.source, rateLimitMap);
 
-    // Initialize health status
+    // Initialize health status with proper numeric types
     this.healthStatuses.set(config.source, {
       source: config.source,
       status: 'healthy',
       responseTime: 0,
-      // successRate is a proportion (0-1) used throughout update logic
-      successRate: 1,
-      errorRate: 0,
+      successRate: 1.0,
+      errorRate: 0.0,
       last_checked: new Date(),
       uptime: 100,
       downtimeEvents: [],
@@ -630,7 +644,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   private updateRateLimit(source: string): void {
     const rateLimitMap = this.rateLimiters.get(source)!;
 
-    for (const [key, limiter] of Array.from(rateLimitMap.entries())) {
+    for (const limiter of rateLimitMap.values()) {
       limiter.requests++;
     }
   }
@@ -758,53 +772,63 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
         this.updateHealthStatus(source, responseTime, true);
       } else {
         this.updateHealthStatus(source, responseTime, false);
-        this.recordDowntimeEvent(source, `Health check failed: HTTP ${response.status}`, ErrorSeverity.MEDIUM);
+        this.recordDowntimeEvent(source, `Health check failed: HTTP ${response.status}`, 'MEDIUM' as ErrorSeverity);
       }
 
     } catch (error) {
       this.updateHealthStatus(source, 0, false);
-      this.recordDowntimeEvent(source, `Health check failed: ${error instanceof Error ? error.message : String(error)}`, ErrorSeverity.HIGH);
+      this.recordDowntimeEvent(
+        source, 
+        `Health check failed: ${error instanceof Error ? error.message : String(error)}`, 
+        'HIGH' as ErrorSeverity
+      );
     }
   }
 
   private updateHealthStatus(source: string, responseTime: number, success: boolean): void {
     let healthStatus = this.healthStatuses.get(source);
+    
     if (!healthStatus) {
-      // Lazily initialize a default health status if missing to avoid runtime errors
+      // Lazily initialize a default health status if missing
       healthStatus = {
         source,
         status: 'degraded',
         responseTime: responseTime || 0,
-        successRate: success ? 1 : 0,
-        errorRate: success ? 0 : 1,
+        successRate: success ? 1.0 : 0.0,
+        errorRate: success ? 0.0 : 1.0,
         last_checked: new Date(),
         uptime: 0,
         downtimeEvents: [],
         consecutiveFailures: success ? 0 : 1
-      } as APIHealthStatus;
+      };
       this.healthStatuses.set(source, healthStatus);
+      return;
     }
 
+    // Update response time with exponential moving average
     if (responseTime > 0) {
       healthStatus.responseTime = healthStatus.responseTime === 0
         ? responseTime
         : (healthStatus.responseTime * 0.8) + (responseTime * 0.2);
     }
 
-  // Ensure numeric values
-  healthStatus.successRate = typeof healthStatus.successRate === 'number' ? healthStatus.successRate : 0;
-  healthStatus.errorRate = typeof healthStatus.errorRate === 'number' ? healthStatus.errorRate : 0;
-  const totalChecks = healthStatus.successRate + healthStatus.errorRate;
+    // Ensure we're working with numbers, with fallback values
+    const currentSuccessRate: number = typeof healthStatus.successRate === 'number' ? healthStatus.successRate : 0;
+    const currentErrorRate: number = typeof healthStatus.errorRate === 'number' ? healthStatus.errorRate : 0;
+    const totalChecks = currentSuccessRate + currentErrorRate;
+
+    // Update success and error rates
     if (success) {
-      healthStatus.successRate = ((healthStatus.successRate * totalChecks) + 1) / (totalChecks + 1);
-      healthStatus.errorRate = (healthStatus.errorRate * totalChecks) / (totalChecks + 1);
+      healthStatus.successRate = ((currentSuccessRate * totalChecks) + 1) / (totalChecks + 1);
+      healthStatus.errorRate = (currentErrorRate * totalChecks) / (totalChecks + 1);
       healthStatus.consecutiveFailures = 0;
     } else {
-      healthStatus.errorRate = ((healthStatus.errorRate * totalChecks) + 1) / (totalChecks + 1);
-      healthStatus.successRate = (healthStatus.successRate * totalChecks) / (totalChecks + 1);
+      healthStatus.errorRate = ((currentErrorRate * totalChecks) + 1) / (totalChecks + 1);
+      healthStatus.successRate = (currentSuccessRate * totalChecks) / (totalChecks + 1);
       healthStatus.consecutiveFailures++;
     }
 
+    // Determine health status
     if (healthStatus.successRate >= 0.95) {
       healthStatus.status = 'healthy';
     } else if (healthStatus.successRate >= 0.8) {
@@ -821,7 +845,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   private recordDowntimeEvent(source: string, reason: string, severity: ErrorSeverity): void {
     let healthStatus = this.healthStatuses.get(source);
 
-    // If no health status exists for the source, initialize a minimal default to avoid crashes
+    // If no health status exists, initialize a minimal default
     if (!healthStatus) {
       logger.warn(`recordDowntimeEvent called for unregistered source '${source}'. Initializing default health status.`);
       healthStatus = {
@@ -834,12 +858,13 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
         uptime: 0,
         downtimeEvents: [],
         consecutiveFailures: 1
-      } as APIHealthStatus;
+      };
       this.healthStatuses.set(source, healthStatus);
     }
 
     const lastEvent = healthStatus.downtimeEvents[healthStatus.downtimeEvents.length - 1];
 
+    // Don't duplicate consecutive identical events
     if (lastEvent && !lastEvent.endTime && lastEvent.reason === reason) {
       return;
     }
@@ -850,6 +875,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       severity
     });
 
+    // Keep only the last 50 events
     if (healthStatus.downtimeEvents.length > 50) {
       healthStatus.downtimeEvents = healthStatus.downtimeEvents.slice(-50);
     }
@@ -888,8 +914,8 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       baseline.averageResponseTime = (baseline.averageResponseTime * (baseline.sampleSize - 1) + responseTime) / baseline.sampleSize;
 
       const sorted = [...baseline.responseTimes].sort((a, b) => a - b);
-      baseline.p95ResponseTime = sorted[Math.floor(sorted.length * 0.95)];
-      baseline.p99ResponseTime = sorted[Math.floor(sorted.length * 0.99)];
+      baseline.p95ResponseTime = sorted[Math.floor(sorted.length * 0.95)] || 0;
+      baseline.p99ResponseTime = sorted[Math.floor(sorted.length * 0.99)] || 0;
 
       baseline.successRate = success
         ? (baseline.successRate * (baseline.sampleSize - 1) + 100) / baseline.sampleSize
@@ -898,6 +924,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       baseline.lastUpdated = new Date();
     }
 
+    // Emit anomaly event if response time is significantly higher than baseline
     if (responseTime > baseline.p99ResponseTime * 1.5) {
       this.emit('performanceAnomaly', { source, endpoint, responseTime, baseline: baseline.p99ResponseTime });
     }
@@ -921,7 +948,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       if (fallbackHealth?.status === 'down') continue;
 
       try {
-        console.log(`🔄 Attempting failover from ${source} to ${fallbackSource}`);
+        logger.info(`🔄 Attempting failover from ${source} to ${fallbackSource}`);
 
         const result = await this.makeRequest(fallbackSource, endpoint, options);
 
@@ -930,7 +957,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
           return result;
         }
       } catch (error) {
-        console.error(`Failover to ${fallbackSource} failed:`, error);
+        logger.error(`Failover to ${fallbackSource} failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -1045,8 +1072,8 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     const hitRate = totalRequests > 0 ? (totalHits / totalRequests) * 100 : 0;
 
     const topCachedEndpoints = entries
-      .map(([key, cache]) => ({
-        key,
+      .map(([cacheKey, cache]) => ({
+        key: cacheKey,
         hits: cache.hits,
         size: cache.size,
         lastAccessed: cache.lastAccessed
@@ -1061,8 +1088,31 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     return this.costMonitoring;
   }
 
-  getCostReport() {
-    return this.costMonitoring.getCostReport();
+  /**
+   * Get cost report from the cost monitoring service
+   * This method provides a safe interface to access cost data
+   */
+  getCostReport(): CostReport {
+    // Check if the method exists on the cost monitoring service
+    if (typeof (this.costMonitoring as any).getCostReport === 'function') {
+      return (this.costMonitoring as any).getCostReport();
+    }
+    
+    // Fallback: generate basic cost report from usage metrics
+    const costBySource: Record<string, number> = {};
+    let totalCost = 0;
+
+    for (const [sourceKey, metrics] of this.usageMetrics.entries()) {
+      costBySource[sourceKey] = metrics.totalCost;
+      totalCost += metrics.totalCost;
+    }
+
+    return {
+      totalCost,
+      costBySource,
+      period: 'current',
+      alerts: []
+    };
   }
 
   // ========================================================================
@@ -1070,28 +1120,31 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   // ========================================================================
 
   private setupEventListeners(): void {
-    this.errorHandler.on('error', (error) => {
-      const metrics = this.usageMetrics.get(error.source);
-      if (metrics) {
-        metrics.errorBreakdown[error.type] = (metrics.errorBreakdown[error.type] || 0) + 1;
-      }
-    });
+    // Only setup error handler events if error handler exists
+    if (this.errorHandler) {
+      this.errorHandler.on('error', (errorEvent: { source: string; type: string }) => {
+        const metrics = this.usageMetrics.get(errorEvent.source);
+        if (metrics) {
+          metrics.errorBreakdown[errorEvent.type] = (metrics.errorBreakdown[errorEvent.type] || 0) + 1;
+        }
+      });
 
-    this.errorHandler.on('circuitBreakerOpen', ({ source }) => {
-      const healthStatus = this.healthStatuses.get(source);
-      if (healthStatus) {
-        healthStatus.status = 'down';
-        this.recordDowntimeEvent(source, 'Circuit breaker opened', ErrorSeverity.CRITICAL);
-      }
-    });
+      this.errorHandler.on('circuitBreakerOpen', ({ source }: { source: string }) => {
+        const healthStatus = this.healthStatuses.get(source);
+        if (healthStatus) {
+          healthStatus.status = 'down';
+          this.recordDowntimeEvent(source, 'Circuit breaker opened', 'CRITICAL' as ErrorSeverity);
+        }
+      });
+    }
 
-    this.costMonitoring.on('costAlert', (alert) => {
-      console.warn(`💰 Cost alert for ${alert.source}: ${alert.message}`);
+    this.costMonitoring.on('costAlert', (alert: any) => {
+      logger.warn(`💰 Cost alert for ${alert.source}: ${alert.message}`);
       this.emit('costAlert', alert);
     });
 
-    this.costMonitoring.on('budgetConfigUpdated', (event) => {
-      console.log(`💰 Budget configuration updated for ${event.source}`);
+    this.costMonitoring.on('budgetConfigUpdated', (event: any) => {
+      logger.info(`💰 Budget configuration updated for ${event.source}`);
       this.emit('budgetConfigUpdated', event);
     });
   }
@@ -1103,14 +1156,15 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   private setupCleanupIntervals(): void {
     this.clearCleanupIntervals();
 
+    // Cache cleanup interval
     const cacheCleanupInterval = setInterval(() => {
       const now = new Date();
       let expiredCount = 0;
 
-      for (const [key, cache] of Array.from(this.responseCache.entries())) {
+      for (const [cacheKey, cache] of Array.from(this.responseCache.entries())) {
         const age = now.getTime() - cache.timestamp.getTime();
         if (age > cache.ttl) {
-          this.responseCache.delete(key);
+          this.responseCache.delete(cacheKey);
           expiredCount++;
         }
       }
@@ -1118,20 +1172,21 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       if (expiredCount > 0) {
         this.emit('cacheExpired', { expiredCount });
       }
-    }, 300000);
+    }, 300000); // Every 5 minutes
 
+    // Rate limit cleanup interval
     const rateLimitCleanupInterval = setInterval(() => {
       const now = Date.now();
 
-      for (const [source, rateLimitMap] of Array.from(this.rateLimiters.entries())) {
-        for (const [window, limiter] of Array.from(rateLimitMap.entries())) {
+      for (const rateLimitMap of this.rateLimiters.values()) {
+        for (const limiter of rateLimitMap.values()) {
           if (now >= limiter.resetTime) {
             limiter.requests = 0;
             limiter.resetTime = now + this.getWindowDuration(limiter.windowType);
           }
         }
       }
-    }, 60000);
+    }, 60000); // Every minute
 
     this.cleanupIntervals.push(cacheCleanupInterval, rateLimitCleanupInterval);
   }
@@ -1177,6 +1232,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     // this.redis.disconnect(); // Uncomment when Redis is available
 
     this.emit('shutdown');
+    logger.info('External API Management Service shut down successfully');
   }
 
   // ========================================================================
@@ -1212,7 +1268,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
 // Exports
 // ============================================================================
 
-export {
+export type {
   APIQuota,
   APIHealthStatus,
   APIUsageMetrics,
@@ -1223,50 +1279,6 @@ export {
   PerformanceBaseline,
   OptimizationRule,
   APIRequestResult,
-  ErrorSeverity
+  ErrorSeverity,
+  CostReport
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

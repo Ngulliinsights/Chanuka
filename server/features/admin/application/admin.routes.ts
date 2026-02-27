@@ -1,4 +1,4 @@
-import { alertingService, notificationSchedulerService } from '@server/infrastructure/notifications/index';
+import { alertingService, notificationSchedulerService } from '@server/features/notifications';
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { and, count, desc, eq, gte,sql } from 'drizzle-orm';
