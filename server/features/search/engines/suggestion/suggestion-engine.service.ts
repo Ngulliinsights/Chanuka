@@ -1,6 +1,6 @@
 // Query builder service removed - using direct Drizzle queries
 import { logger } from '../../../../infrastructure/observability/core/logger';
-import { db } from '../../../../infrastructure/database/pool';
+import { readDatabase } from '../../../../infrastructure/database/connection';
 import * as schema from '@server/infrastructure/schema';
 import { and, count, desc, gte, like, or, sql } from "drizzle-orm";
 
@@ -110,7 +110,6 @@ const CONFIG = {
  * - Graceful degradation when queries fail
  */
 export class SuggestionEngineService {
-  private readonly db = db;
   
   // In-memory caches with LRU eviction support
   // These maintain user search patterns and popular terms
@@ -282,18 +281,20 @@ export class SuggestionEngineService {
   private async getBillTitleSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await this.db
-      .select({
-        id: schema.bills.id,
-        title: schema.bills.title,
-        status: schema.bills.status,
-        category: schema.bills.category,
-        sponsor_id: schema.bills.sponsor_id
-      })
-      .from(schema.bills)
-      .where(like(schema.bills.title, searchPattern))
-      .orderBy(desc(schema.bills.updated_at))
-      .limit(limit);
+    const results = await readDatabase(async (db) => {
+      return db
+        .select({
+          id: schema.bills.id,
+          title: schema.bills.title,
+          status: schema.bills.status,
+          category: schema.bills.category,
+          sponsor_id: schema.bills.sponsor_id
+        })
+        .from(schema.bills)
+        .where(like(schema.bills.title, searchPattern))
+        .orderBy(desc(schema.bills.updated_at))
+        .limit(limit);
+    });
 
     // Map database results to SearchSuggestion format with proper metadata
     // Each field in metadata provides context that helps users understand the suggestion
@@ -318,16 +319,18 @@ export class SuggestionEngineService {
   private async getCategorySuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await this.db
-      .select({
-        category: schema.bills.category,
-        count: count()
-      })
-      .from(schema.bills)
-      .where(like(schema.bills.category, searchPattern))
-      .groupBy(schema.bills.category)
-      .orderBy(desc(count()))
-      .limit(limit);
+    const results = await readDatabase(async (db) => {
+      return db
+        .select({
+          category: schema.bills.category,
+          count: count()
+        })
+        .from(schema.bills)
+        .where(like(schema.bills.category, searchPattern))
+        .groupBy(schema.bills.category)
+        .orderBy(desc(count()))
+        .limit(limit);
+    });
 
     // Map categories to SearchSuggestion format
     // The frequency here represents how many bills are in this category
@@ -351,17 +354,19 @@ export class SuggestionEngineService {
   private async getSponsorSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await this.db
-      .select({
-        sponsor: schema.bills.sponsor,
-        sponsor_id: schema.bills.sponsor_id,
-        count: count()
-      })
-      .from(schema.bills)
-      .where(like(schema.bills.sponsor, searchPattern))
-      .groupBy(schema.bills.sponsor, schema.bills.sponsor_id)
-      .orderBy(desc(count()))
-      .limit(limit);
+    const results = await readDatabase(async (db) => {
+      return db
+        .select({
+          sponsor: schema.bills.sponsor,
+          sponsor_id: schema.bills.sponsor_id,
+          count: count()
+        })
+        .from(schema.bills)
+        .where(like(schema.bills.sponsor, searchPattern))
+        .groupBy(schema.bills.sponsor, schema.bills.sponsor_id)
+        .orderBy(desc(count()))
+        .limit(limit);
+    });
 
     // Map sponsors to SearchSuggestion format with proper metadata
     return results.map(result => ({
@@ -385,16 +390,18 @@ export class SuggestionEngineService {
     const searchPattern = `%${query}%`;
 
     try {
-      const results = await this.db
-        .select({
-          tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
-          count: count()
-        })
-        .from(schema.bills)
-        .where(like(schema.bills.tags, searchPattern))
-        .groupBy(sql`unnest(string_to_array(${schema.bills.tags}, ','))`)
-        .orderBy(desc(count()))
-        .limit(limit);
+      const results = await readDatabase(async (db) => {
+        return db
+          .select({
+            tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
+            count: count()
+          })
+          .from(schema.bills)
+          .where(like(schema.bills.tags, searchPattern))
+          .groupBy(sql`unnest(string_to_array(${schema.bills.tags}, ','))`)
+          .orderBy(desc(count()))
+          .limit(limit);
+      });
 
       // Map tags to SearchSuggestion format
       return results.map(result => ({
@@ -422,20 +429,22 @@ export class SuggestionEngineService {
 
     try {
       // Fetch all relevant data in a single query for efficiency
-      const facetData = await this.db
-        .select({
-          category: schema.bills.category,
-          sponsor: schema.bills.sponsor,
-          sponsor_id: schema.bills.sponsor_id,
-          status: schema.bills.status
-        })
-        .from(schema.bills)
-        .where(
-          or(
-            like(schema.bills.title, searchPattern),
-            like(schema.bills.description, searchPattern)
-          )
-        );
+      const facetData = await readDatabase(async (db) => {
+        return db
+          .select({
+            category: schema.bills.category,
+            sponsor: schema.bills.sponsor,
+            sponsor_id: schema.bills.sponsor_id,
+            status: schema.bills.status
+          })
+          .from(schema.bills)
+          .where(
+            or(
+              like(schema.bills.title, searchPattern),
+              like(schema.bills.description, searchPattern)
+            )
+          );
+      });
 
       // Aggregate results by facet type using Maps for efficient counting
       const categoryMap = new Map<string, number>();
@@ -505,16 +514,18 @@ export class SuggestionEngineService {
    */
   private async getTagFacets(searchPattern: string) {
     try {
-      const results = await this.db
-        .select({
-          tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
-          count: count()
-        })
-        .from(schema.bills)
-        .where(like(schema.bills.tags, searchPattern))
-        .groupBy(sql`unnest(string_to_array(${schema.bills.tags}, ','))`)
-        .orderBy(desc(count()))
-        .limit(CONFIG.MAX_FACET_VALUES);
+      const results = await readDatabase(async (db) => {
+        return db
+          .select({
+            tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
+            count: count()
+          })
+          .from(schema.bills)
+          .where(like(schema.bills.tags, searchPattern))
+          .groupBy(sql`unnest(string_to_array(${schema.bills.tags}, ','))`)
+          .orderBy(desc(count()))
+          .limit(CONFIG.MAX_FACET_VALUES);
+      });
 
       return results.map(result => ({
         name: result.tag.trim(),
@@ -786,18 +797,20 @@ export class SuggestionEngineService {
         const start_date = new Date(now);
         start_date.setDate(start_date.getDate() - range.days);
 
-        const result = await this.db
-          .select({ count: count() })
-          .from(schema.bills)
-          .where(
-            and(
-              gte(schema.bills.created_at, start_date),
-              or(
-                like(schema.bills.title, searchPattern),
-                like(schema.bills.description, searchPattern)
+        const result = await readDatabase(async (db) => {
+          return db
+            .select({ count: count() })
+            .from(schema.bills)
+            .where(
+              and(
+                gte(schema.bills.created_at, start_date),
+                or(
+                  like(schema.bills.title, searchPattern),
+                  like(schema.bills.description, searchPattern)
+                )
               )
-            )
-          );
+            );
+        });
 
         return {
           value: range.value,
@@ -809,15 +822,17 @@ export class SuggestionEngineService {
       const rangeCounts = await Promise.all(countPromises);
 
       // Add "All time" facet
-      const allTimeCount = await this.db
-        .select({ count: count() })
-        .from(schema.bills)
-        .where(
-          or(
-            like(schema.bills.title, searchPattern),
-            like(schema.bills.description, searchPattern)
-          )
-        );
+      const allTimeCount = await readDatabase(async (db) => {
+        return db
+          .select({ count: count() })
+          .from(schema.bills)
+          .where(
+            or(
+              like(schema.bills.title, searchPattern),
+              like(schema.bills.description, searchPattern)
+            )
+          );
+      });
 
       rangeCounts.push({
         value: 'all_time',

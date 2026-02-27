@@ -3,8 +3,9 @@
 // ============================================================================
 // Script to populate the database with sample constitutional provisions and precedents
 
-import { pool as db } from '@server/infrastructure/database/pool';
+import { withTransaction } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
+import { sql } from 'drizzle-orm';
 
 /**
  * Sample constitutional provisions from Kenya's 2010 Constitution
@@ -184,40 +185,43 @@ const SAMPLE_PRECEDENTS = [
 async function populateProvisions(): Promise<void> {
   logger.info({ component: 'ConstitutionalAnalysis' }, 'Populating constitutional provisions...');
 
-  for (const provision of SAMPLE_PROVISIONS) {
-    try {
-      await db.query(`
-        INSERT INTO constitutional_provisions (
-          id, article_number, section_number, subsection_number, provision_text,
-          provision_summary, keywords, rights_category, constitutional_chapter,
-          enforcement_mechanisms, related_articles, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-        ON CONFLICT(id) DO UPDATE SET
-          provision_text = excluded.provision_text,
-          provision_summary = excluded.provision_summary,
-          keywords = excluded.keywords,
-          updated_at = excluded.updated_at
-      `, [
-        provision.id,
-        provision.article_number,
-        provision.section_number,
-        provision.subsection_number,
-        provision.provision_text,
-        provision.provision_summary,
-        JSON.stringify(provision.keywords),
-        provision.rights_category,
-        provision.constitutional_chapter,
-        JSON.stringify(provision.enforcement_mechanisms),
-        JSON.stringify(provision.related_articles),
-        provision.created_at,
-        provision.updated_at
-      ]);
+  await withTransaction(async (tx) => {
+    for (const provision of SAMPLE_PROVISIONS) {
+      try {
+        await tx.execute(sql`
+          INSERT INTO constitutional_provisions (
+            id, article_number, section_number, subsection_number, provision_text,
+            provision_summary, keywords, rights_category, constitutional_chapter,
+            enforcement_mechanisms, related_articles, created_at, updated_at
+          ) VALUES (
+            ${provision.id},
+            ${provision.article_number},
+            ${provision.section_number},
+            ${provision.subsection_number},
+            ${provision.provision_text},
+            ${provision.provision_summary},
+            ${JSON.stringify(provision.keywords)},
+            ${provision.rights_category},
+            ${provision.constitutional_chapter},
+            ${JSON.stringify(provision.enforcement_mechanisms)},
+            ${JSON.stringify(provision.related_articles)},
+            ${provision.created_at},
+            ${provision.updated_at}
+          )
+          ON CONFLICT(id) DO UPDATE SET
+            provision_text = excluded.provision_text,
+            provision_summary = excluded.provision_summary,
+            keywords = excluded.keywords,
+            updated_at = excluded.updated_at
+        `);
 
-      logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted provision: Article ${provision.article_number}`);
-    } catch (error) {
-      logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert provision ${provision.id}`);
+        logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted provision: Article ${provision.article_number}`);
+      } catch (error) {
+        logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert provision ${provision.id}`);
+        throw error; // Re-throw to rollback transaction
+      }
     }
-  }
+  });
 }
 
 /**
@@ -226,45 +230,48 @@ async function populateProvisions(): Promise<void> {
 async function populatePrecedents(): Promise<void> {
   logger.info({ component: 'ConstitutionalAnalysis' }, 'Populating legal precedents...');
 
-  for (const precedent of SAMPLE_PRECEDENTS) {
-    try {
-      await db.query(`
-        INSERT INTO legal_precedents (
-          id, case_name, case_number, court_level, judgment_date, judges,
-          holding, facts_summary, legal_principles, constitutional_provisions_cited,
-          citation_count, binding_precedent, relevance_score_percentage,
-          created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
-        ON CONFLICT(id) DO UPDATE SET
-          holding = excluded.holding,
-          facts_summary = excluded.facts_summary,
-          legal_principles = excluded.legal_principles,
-          citation_count = excluded.citation_count,
-          relevance_score_percentage = excluded.relevance_score_percentage,
-          updated_at = excluded.updated_at
-      `, [
-        precedent.id,
-        precedent.case_name,
-        precedent.case_number,
-        precedent.court_level,
-        precedent.judgment_date,
-        JSON.stringify(precedent.judges),
-        precedent.holding,
-        precedent.facts_summary,
-        JSON.stringify(precedent.legal_principles),
-        JSON.stringify(precedent.constitutional_provisions_cited),
-        precedent.citation_count,
-        precedent.binding_precedent,
-        precedent.relevance_score_percentage,
-        precedent.created_at,
-        precedent.updated_at
-      ]);
+  await withTransaction(async (tx) => {
+    for (const precedent of SAMPLE_PRECEDENTS) {
+      try {
+        await tx.execute(sql`
+          INSERT INTO legal_precedents (
+            id, case_name, case_number, court_level, judgment_date, judges,
+            holding, facts_summary, legal_principles, constitutional_provisions_cited,
+            citation_count, binding_precedent, relevance_score_percentage,
+            created_at, updated_at
+          ) VALUES (
+            ${precedent.id},
+            ${precedent.case_name},
+            ${precedent.case_number},
+            ${precedent.court_level},
+            ${precedent.judgment_date},
+            ${JSON.stringify(precedent.judges)},
+            ${precedent.holding},
+            ${precedent.facts_summary},
+            ${JSON.stringify(precedent.legal_principles)},
+            ${JSON.stringify(precedent.constitutional_provisions_cited)},
+            ${precedent.citation_count},
+            ${precedent.binding_precedent},
+            ${precedent.relevance_score_percentage},
+            ${precedent.created_at},
+            ${precedent.updated_at}
+          )
+          ON CONFLICT(id) DO UPDATE SET
+            holding = excluded.holding,
+            facts_summary = excluded.facts_summary,
+            legal_principles = excluded.legal_principles,
+            citation_count = excluded.citation_count,
+            relevance_score_percentage = excluded.relevance_score_percentage,
+            updated_at = excluded.updated_at
+        `);
 
-      logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted precedent: ${precedent.case_name}`);
-    } catch (error) {
-      logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert precedent ${precedent.id}`);
+        logger.info({ component: 'ConstitutionalAnalysis' }, `✅ Inserted precedent: ${precedent.case_name}`);
+      } catch (error) {
+        logger.error({ component: 'ConstitutionalAnalysis', error }, `❌ Failed to insert precedent ${precedent.id}`);
+        throw error; // Re-throw to rollback transaction
+      }
     }
-  }
+  });
 }
 
 /**

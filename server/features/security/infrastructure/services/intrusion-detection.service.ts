@@ -1,10 +1,10 @@
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
-import { desc,eq, gt, sql } from 'drizzle-orm';
-import { boolean,integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { desc, eq, gt, sql } from 'drizzle-orm';
+import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { Request } from 'express';
 
-import { securityAuditService } from './security-audit-service';
+import { securityAuditService } from './security-audit.service';
 
 // ----------------------------------------------------------------------
 // 1. Database Schema Definitions

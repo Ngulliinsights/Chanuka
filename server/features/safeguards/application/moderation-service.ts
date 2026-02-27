@@ -1,6 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { type DatabaseTransaction, withTransaction } from '@server/infrastructure/database/connection';
-import { readDb as readDatabase } from '@server/infrastructure/database/pool';
+import { type DatabaseTransaction, withTransaction, readDatabase } from '@server/infrastructure/database/connection';
 import {
   moderationAppeals,
   moderationDecisions,

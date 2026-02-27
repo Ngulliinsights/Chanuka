@@ -1,13 +1,11 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
 import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
 import { User } from '@shared/domain/entities/user';
 import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
-
-import { db } from '@server/infrastructure/database';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository
@@ -63,7 +61,7 @@ export class UserService {
 
   async findById(id: string): Promise<User | null> {
     try {
-      const result = await db
+      const result = await readDatabase
         .select()
         .from(users)
         .where(eq(users.id, id))
@@ -78,7 +76,7 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     try {
-      const result = await db
+      const result = await readDatabase
         .select()
         .from(users)
         .where(eq(users.email, email))
@@ -107,7 +105,9 @@ export class UserService {
         updated_at: userData.updated_at
       };
 
-      await db.insert(users).values(insertPayload);
+      await withTransaction(async (tx) => {
+        await tx.insert(users).values(insertPayload);
+      });
       
       logger.info('User saved successfully', { user_id: userData.id });
     } catch (error) {
@@ -120,17 +120,19 @@ export class UserService {
     try {
       const userData = user.toJSON();
 
-      await db
-        .update(users)
-        .set({
-          email: userData.email,
-          role: userData.role,
-          is_verified: userData.verification_status === 'verified',
-          is_active: userData.is_active,
-          last_login_at: userData.last_login_at,
-          updated_at: userData.updated_at
-        })
-        .where(eq(users.id, userData.id));
+      await withTransaction(async (tx) => {
+        await tx
+          .update(users)
+          .set({
+            email: userData.email,
+            role: userData.role,
+            is_verified: userData.verification_status === 'verified',
+            is_active: userData.is_active,
+            last_login_at: userData.last_login_at,
+            updated_at: userData.updated_at
+          })
+          .where(eq(users.id, userData.id));
+      });
 
       logger.info('User updated successfully', { user_id: userData.id });
     } catch (error) {
@@ -141,7 +143,9 @@ export class UserService {
 
   async delete(id: string): Promise<void> {
     try {
-      await db.delete(users).where(eq(users.id, id));
+      await withTransaction(async (tx) => {
+        await tx.delete(users).where(eq(users.id, id));
+      });
       logger.info('User deleted successfully', { user_id: id });
     } catch (error) {
       logger.error('Error deleting user', { user_id: id, error });
@@ -155,7 +159,7 @@ export class UserService {
 
   async findProfileByUserId(user_id: string): Promise<UserProfile | null> {
     try {
-      const result = await db
+      const result = await readDatabase
         .select()
         .from(user_profiles)
         .where(eq(user_profiles.user_id, user_id))
@@ -190,7 +194,9 @@ export class UserService {
         updated_at: profileData.updated_at
       };
 
-      await db.insert(user_profiles).values(insertPayload);
+      await withTransaction(async (tx) => {
+        await tx.insert(user_profiles).values(insertPayload);
+      });
       
       logger.info('User profile saved successfully', { user_id: profileData.user_id });
     } catch (error) {
@@ -203,23 +209,25 @@ export class UserService {
     try {
       const profileData = profile.toJSON();
 
-      await db
-        .update(user_profiles)
-        .set({
-          first_name: profileData.first_name,
-          last_name: profileData.last_name,
-          display_name: profileData.display_name,
-          bio: profileData.bio,
-          county: profileData.county,
-          constituency: profileData.constituency,
-          ward: profileData.ward,
-          avatar_url: profileData.avatar_url,
-          website: profileData.website,
-          preferences: profileData.preferences,
-          privacy_settings: profileData.privacy_settings,
-          updated_at: profileData.updated_at
-        })
-        .where(eq(user_profiles.user_id, profileData.user_id));
+      await withTransaction(async (tx) => {
+        await tx
+          .update(user_profiles)
+          .set({
+            first_name: profileData.first_name,
+            last_name: profileData.last_name,
+            display_name: profileData.display_name,
+            bio: profileData.bio,
+            county: profileData.county,
+            constituency: profileData.constituency,
+            ward: profileData.ward,
+            avatar_url: profileData.avatar_url,
+            website: profileData.website,
+            preferences: profileData.preferences,
+            privacy_settings: profileData.privacy_settings,
+            updated_at: profileData.updated_at
+          })
+          .where(eq(user_profiles.user_id, profileData.user_id));
+      });
 
       logger.info('User profile updated successfully', { user_id: profileData.user_id });
     } catch (error) {
@@ -234,7 +242,7 @@ export class UserService {
 
   async findUsersByRole(role: string): Promise<User[]> {
     try {
-      const results = await db
+      const results = await readDatabase
         .select()
         .from(users)
         .where(eq(users.role, role));
@@ -249,7 +257,7 @@ export class UserService {
   async findUsersByVerificationStatus(status: string): Promise<User[]> {
     try {
       const is_verified = status === 'verified';
-      const results = await db
+      const results = await readDatabase
         .select()
         .from(users)
         .where(eq(users.is_verified, is_verified));
@@ -264,7 +272,7 @@ export class UserService {
   async searchUsers(query: string, limit?: number): Promise<User[]> {
     try {
       const searchTerm = `%${query.toLowerCase()}%`;
-      const results = await db
+      const results = await readDatabase
         .select()
         .from(users)
         .where(
@@ -285,7 +293,7 @@ export class UserService {
 
   async countUsers(): Promise<number> {
     try {
-      const result = await db
+      const result = await readDatabase
         .select({ value: sql<number>`count(*)` })
         .from(users);
 
@@ -298,7 +306,7 @@ export class UserService {
 
   async countUsersByRole(): Promise<Record<string, number>> {
     try {
-      const results = await db
+      const results = await readDatabase
         .select({
           role: users.role,
           count: sql<number>`count(*)`
@@ -320,7 +328,7 @@ export class UserService {
 
   async countUsersByVerificationStatus(): Promise<Record<string, number>> {
     try {
-      const results = await db
+      const results = await readDatabase
         .select({
           status: sql<string>`CASE WHEN ${users.is_verified} THEN 'verified' ELSE 'pending' END`,
           count: sql<number>`count(*)`

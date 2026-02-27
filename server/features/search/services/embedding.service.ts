@@ -5,7 +5,7 @@
 // Supports batch processing and error handling with fallback mechanisms
 
 import { logger } from '../../../infrastructure/observability/core/logger';
-import { db as database } from '../../../infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '../../../infrastructure/database/connection';
 import { cacheService } from '../../../infrastructure/cache';
 import { contentEmbeddings, ContentType } from '../../../infrastructure/schema/search_system';
 import crypto from 'crypto';
@@ -201,16 +201,18 @@ export class EmbeddingService {
     ): Promise<void> {
         try {
             // Check if embedding already exists and is up to date
-            const existing = await database
-                .select()
-                .from(contentEmbeddings)
-                .where(
-                    and(
-                        eq(contentEmbeddings.content_type, contentType),
-                        eq(contentEmbeddings.content_id, contentId)
+            const existing = await readDatabase(async (db) => {
+                return db
+                    .select()
+                    .from(contentEmbeddings)
+                    .where(
+                        and(
+                            eq(contentEmbeddings.content_type, contentType),
+                            eq(contentEmbeddings.content_id, contentId)
+                        )
                     )
-                )
-                .limit(1) as Array<typeof contentEmbeddings.$inferSelect>;
+                    .limit(1);
+            }) as Array<typeof contentEmbeddings.$inferSelect>;
 
             const contentHash = this.createContentHash(content);
 
@@ -223,50 +225,53 @@ export class EmbeddingService {
                 }
             }
 
-            // Update status to processing
-            await database
-                .insert(contentEmbeddings)
-                .values({
-                    content_type: contentType,
-                    content_id: contentId,
-                    content_hash: contentHash,
-                    processing_status: 'processing',
-                    content_title: metadata?.title,
-                    content_summary: metadata?.summary,
-                    content_tags: metadata?.tags,
-                    processing_attempts: (existing.length > 0 && existing[0]) ? existing[0].processing_attempts + 1 : 1,
-                } as any)
-                .onConflictDoUpdate({
-                    target: [contentEmbeddings.content_type, contentEmbeddings.content_id],
-                    set: {
-                        processing_status: 'processing',
+            // Update status to processing and store embedding in transaction
+            await withTransaction(async (tx) => {
+                // Update status to processing
+                await tx
+                    .insert(contentEmbeddings)
+                    .values({
+                        content_type: contentType,
+                        content_id: contentId,
                         content_hash: contentHash,
+                        processing_status: 'processing',
                         content_title: metadata?.title,
                         content_summary: metadata?.summary,
                         content_tags: metadata?.tags,
-                        processing_attempts: sql`${contentEmbeddings.processing_attempts} + 1`,
-                        last_attempt_at: sql`NOW()`,
-                    },
-                } as any);
+                        processing_attempts: (existing.length > 0 && existing[0]) ? existing[0].processing_attempts + 1 : 1,
+                    } as any)
+                    .onConflictDoUpdate({
+                        target: [contentEmbeddings.content_type, contentEmbeddings.content_id],
+                        set: {
+                            processing_status: 'processing',
+                            content_hash: contentHash,
+                            content_title: metadata?.title,
+                            content_summary: metadata?.summary,
+                            content_tags: metadata?.tags,
+                            processing_attempts: sql`${contentEmbeddings.processing_attempts} + 1`,
+                            last_attempt_at: sql`NOW()`,
+                        },
+                    } as any);
 
-            // Generate embedding
-            const embeddingResult = await this.generateEmbedding(content);
+                // Generate embedding
+                const embeddingResult = await this.generateEmbedding(content);
 
-            // Store the embedding
-            await database
-                .update(contentEmbeddings)
-                .set({
-                    embedding: embeddingResult.embedding as any,
-                    processing_status: 'completed',
-                    model_version: embeddingResult.model,
-                    updated_at: sql`NOW()`,
-                } as any)
-                .where(
-                    and(
-                        eq(contentEmbeddings.content_type, contentType),
-                        eq(contentEmbeddings.content_id, contentId)
-                    )
-                );
+                // Store the embedding
+                await tx
+                    .update(contentEmbeddings)
+                    .set({
+                        embedding: embeddingResult.embedding as any,
+                        processing_status: 'completed',
+                        model_version: embeddingResult.model,
+                        updated_at: sql`NOW()`,
+                    } as any)
+                    .where(
+                        and(
+                            eq(contentEmbeddings.content_type, contentType),
+                            eq(contentEmbeddings.content_id, contentId)
+                        )
+                    );
+            });
 
             logger.debug({
                 contentType,
@@ -284,19 +289,21 @@ export class EmbeddingService {
             }, 'Failed to process content embedding');
 
             // Update status to failed
-            await database
-                .update(contentEmbeddings)
-                .set({
-                    processing_status: 'failed',
-                    error_message: errorMessage,
-                    updated_at: sql`NOW()`,
-                } as any)
-                .where(
-                    and(
-                        eq(contentEmbeddings.content_type, contentType),
-                        eq(contentEmbeddings.content_id, contentId)
-                    )
-                );
+            await withTransaction(async (tx) => {
+                await tx
+                    .update(contentEmbeddings)
+                    .set({
+                        processing_status: 'failed',
+                        error_message: errorMessage,
+                        updated_at: sql`NOW()`,
+                    } as any)
+                    .where(
+                        and(
+                            eq(contentEmbeddings.content_type, contentType),
+                            eq(contentEmbeddings.content_id, contentId)
+                        )
+                    );
+            });
 
             throw error;
         }
@@ -310,17 +317,19 @@ export class EmbeddingService {
         contentId: string
     ): Promise<number[] | null> {
         try {
-            const result = await database
-                .select()
-                .from(contentEmbeddings)
-                .where(
-                    and(
-                        eq(contentEmbeddings.content_type, contentType),
-                        eq(contentEmbeddings.content_id, contentId),
-                        eq(contentEmbeddings.processing_status, 'completed')
+            const result = await readDatabase(async (db) => {
+                return db
+                    .select()
+                    .from(contentEmbeddings)
+                    .where(
+                        and(
+                            eq(contentEmbeddings.content_type, contentType),
+                            eq(contentEmbeddings.content_id, contentId),
+                            eq(contentEmbeddings.processing_status, 'completed')
+                        )
                     )
-                )
-                .limit(1) as Array<typeof contentEmbeddings.$inferSelect>;
+                    .limit(1);
+            }) as Array<typeof contentEmbeddings.$inferSelect>;
 
             return result.length > 0 && result[0] ? result[0].embedding as number[] : null;
 

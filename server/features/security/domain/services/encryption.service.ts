@@ -9,6 +9,10 @@ interface KeyData {
   keyDerivationSalt: string;
 }
 
+/**
+ * Encryption Domain Service
+ * Handles cryptographic operations for data at rest
+ */
 export class EncryptionService {
   private readonly algorithm = 'aes-256-gcm';
   private readonly keyLength = 32;
@@ -43,13 +47,12 @@ export class EncryptionService {
       if (!this.isValidHex(envKey) || envKey.length !== this.keyLength * 2) {
         throw new Error(`Invalid ENCRYPTION_KEY: must be ${this.keyLength * 2} character hex string.`);
       }
-      if (!this.isValidHex(envSalt) || envSalt.length !== 64) { // 32 bytes * 2
+      if (!this.isValidHex(envSalt) || envSalt.length !== 64) {
         throw new Error(`Invalid KEY_DERIVATION_SALT: must be 64 character hex string.`);
       }
       masterKeyHex = envKey;
       saltHex = envSalt;
     } else {
-      // Load or generate keys for development to prevent data loss on restart
       const keyData = this.loadOrGenerateKeys();
       masterKeyHex = keyData.masterKey;
       saltHex = keyData.keyDerivationSalt;
@@ -69,7 +72,6 @@ export class EncryptionService {
       if (fs.existsSync(this.keyFilePath)) {
         const data = fs.readFileSync(this.keyFilePath, 'utf8');
         const keyData: KeyData = JSON.parse(data);
-        // Validate loaded keys
         if (!this.isValidHex(keyData.masterKey) || keyData.masterKey.length !== this.keyLength * 2) {
           throw new Error('Invalid master key in key file');
         }
@@ -82,7 +84,6 @@ export class EncryptionService {
       logger.warn('Failed to load keys from file, generating new ones', { component: 'EncryptionService', error });
     }
 
-    // Generate new keys
     const newKeys: KeyData = {
       masterKey: crypto.randomBytes(this.keyLength).toString('hex'),
       keyDerivationSalt: crypto.randomBytes(32).toString('hex'),
@@ -100,7 +101,13 @@ export class EncryptionService {
   }
 
   private deriveKey(context: string): Buffer {
-    return crypto.pbkdf2Sync(this.masterKey, Buffer.concat([this.keyDerivationSalt, Buffer.from(context)]), 100000, 32, 'sha256');
+    return crypto.pbkdf2Sync(
+      this.masterKey,
+      Buffer.concat([this.keyDerivationSalt, Buffer.from(context)]),
+      100000,
+      32,
+      'sha256'
+    );
   }
 
   async encryptData(plaintext: string, context: string = 'default'): Promise<string> {
@@ -161,4 +168,3 @@ export class EncryptionService {
 }
 
 export const encryptionService = new EncryptionService();
-

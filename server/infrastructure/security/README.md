@@ -2,6 +2,16 @@
 
 Low-level, reusable security utilities for the Chanuka platform.
 
+## ⚠️ DEPRECATION NOTICE
+
+Most security functionality has been migrated to `server/features/security` with proper DDD structure.
+
+**Migration Guide:**
+- Old: `import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder'`
+- New: `import { secureQueryBuilderService } from '@server/features/security'`
+
+The files in this directory now serve as backward-compatible wrappers.
+
 ## Purpose
 
 This directory contains **infrastructure-level** security utilities that are:
@@ -12,141 +22,128 @@ This directory contains **infrastructure-level** security utilities that are:
 
 ## Contents
 
-### Input Validation Service (`input-validation-service.ts`)
-Centralized input validation using Zod schemas.
+### Secure Query Builder (`secure-query-builder.ts`) - DEPRECATED
+**⚠️ This file is deprecated. Use `@server/features/security` instead.**
+
+Backward compatibility wrapper for parameterized query building.
+
+**New Location:** `server/features/security/application/services/secure-query-builder.service.ts`
 
 ```typescript
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
-
-// Validate request body
-const result = await inputValidationService.validateRequest(req, {
-  body: z.object({
-    email: z.string().email(),
-    password: z.string().min(8)
-  })
-});
-
-if (!result.isValid) {
-  return res.status(400).json({ errors: result.errors });
-}
-```
-
-**Features:**
-- Zod schema validation
-- File upload validation
-- SQL injection prevention
-- XSS prevention
-- Common validation schemas (email, phone, etc.)
-
-### Secure Query Builder (`secure-query-builder.ts`)
-Parameterized query building to prevent SQL injection.
-
-```typescript
+// Old (still works but deprecated)
 import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
 
-// Build secure parameterized query
-const query = secureQueryBuilder.buildQuery({
-  table: 'users',
-  where: { email: userEmail },
-  select: ['id', 'name', 'email']
-});
+// New (recommended)
+import { secureQueryBuilderService } from '@server/features/security';
 
-// Execute with automatic parameter binding
-const result = await db.execute(query.sql);
+// Build secure parameterized query
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM users WHERE email = ${email}',
+  { email: userEmail }
+);
 ```
 
-**Features:**
-- Automatic parameter binding
-- SQL injection prevention
-- Query validation
-- Audit logging
-- Type-safe query building
+## New DDD Structure
+
+The security functionality has been reorganized following Domain-Driven Design principles:
+
+```
+server/features/security/
+├── domain/
+│   ├── value-objects/
+│   │   ├── pagination-params.ts      # Pagination value object
+│   │   ├── secure-query.ts           # Secure query value object
+│   │   └── query-validation-result.ts # Validation result value object
+│   └── services/
+│       ├── input-sanitization.service.ts  # Input sanitization domain logic
+│       └── query-validation.service.ts    # Query validation domain logic
+└── application/
+    └── services/
+        └── secure-query-builder.service.ts # Application service
+```
 
 ## Architecture
 
 ### Infrastructure vs Features
 
 **This directory (`infrastructure/security`):**
-- ✅ Input validation (reusable across all features)
-- ✅ Secure query builder (database-level security)
-- ✅ Low-level security primitives
+- ⚠️ Deprecated backward-compatible wrappers
+- Legacy support for existing code
 
 **Features directory (`features/security`):**
+- ✅ DDD-structured security services
+- ✅ Domain value objects (PaginationParams, SecureQuery, QueryValidationResult)
+- ✅ Domain services (InputSanitization, QueryValidation)
+- ✅ Application services (SecureQueryBuilder)
 - ✅ Security audit services
 - ✅ Encryption services
 - ✅ Intrusion detection
 - ✅ Security event logging
-- ✅ Business-specific security logic
 
 ### Why This Separation?
 
-1. **Reusability** - Infrastructure utilities are used by multiple features
-2. **Performance** - Low-level utilities are optimized for speed
-3. **Testability** - Infrastructure can be tested independently
-4. **Maintainability** - Clear separation of concerns
+1. **Domain-Driven Design** - Proper separation of domain logic and application services
+2. **Maintainability** - Clear boundaries between layers
+3. **Testability** - Domain logic can be tested independently
+4. **Reusability** - Value objects and domain services are highly reusable
 
 ## Usage Examples
 
-### Validating API Requests
+### Building Secure Queries (New Way)
 
 ```typescript
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
-import { z } from 'zod';
+import { secureQueryBuilderService } from '@server/features/security';
 
-router.post('/api/users', async (req, res) => {
-  const schema = z.object({
-    name: z.string().min(2).max(100),
-    email: z.string().email(),
-    age: z.number().int().min(18)
-  });
-
-  const result = await inputValidationService.validate(req.body, schema);
-  
-  if (!result.isValid) {
-    return res.status(400).json({ errors: result.errors });
-  }
-
-  // Use validated data
-  const user = await createUser(result.data);
-  res.json(user);
-});
-```
-
-### Building Secure Queries
-
-```typescript
-import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
-
-// Instead of string concatenation (vulnerable to SQL injection)
-// const query = `SELECT * FROM users WHERE email = '${email}'`; // ❌ NEVER DO THIS
-
-// Use secure query builder
-const query = secureQueryBuilder.select('users')
-  .where({ email: userEmail })
-  .build();
+// Build parameterized query
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM users WHERE email = ${email}',
+  { email: userEmail }
+);
 
 const users = await db.execute(query.sql, query.params);
 ```
 
-### File Upload Validation
+### Using Value Objects
 
 ```typescript
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
+import { PaginationParams } from '@server/features/security';
 
-const fileValidation = {
-  maxSize: 5 * 1024 * 1024, // 5MB
-  allowedTypes: ['image/jpeg', 'image/png'],
-  allowedExtensions: ['.jpg', '.jpeg', '.png']
-};
+// Create pagination params
+const pagination = PaginationParams.create(req.query.page, req.query.limit);
 
-const result = inputValidationService.validateFile(
-  uploadedFile,
-  fileValidation
-);
+// Use in query
+const users = await db.query.users.findMany({
+  limit: pagination.limit,
+  offset: pagination.offset
+});
+```
 
-if (!result.isValid) {
-  return res.status(400).json({ errors: result.errors });
+### Input Sanitization
+
+```typescript
+import { inputSanitizationService } from '@server/features/security';
+
+// Sanitize string input
+const sanitized = inputSanitizationService.sanitizeString(userInput);
+
+// Create safe LIKE pattern
+const pattern = inputSanitizationService.createSafeLikePattern(searchTerm);
+```
+
+### Query Validation
+
+```typescript
+import { queryValidationService } from '@server/features/security';
+
+// Validate inputs
+const validation = queryValidationService.validateInputs([email, age, name]);
+
+if (validation.hasErrors()) {
+  throw new Error(validation.getErrorMessage());
 }
+
+// Use sanitized params
+const params = validation.sanitizedParams;
 ```
 
 ## Security Best Practices
@@ -155,7 +152,7 @@ if (!result.isValid) {
 1. **Always validate** - Never trust user input
 2. **Whitelist, don't blacklist** - Define what's allowed, not what's forbidden
 3. **Validate early** - Check input at the API boundary
-4. **Use schemas** - Define clear validation rules with Zod
+4. **Use value objects** - Encapsulate validation logic
 
 ### Query Security
 1. **Never concatenate** - Use parameterized queries
@@ -172,59 +169,30 @@ const query = `SELECT * FROM users WHERE id = ${userId}`;
 
 // Unvalidated input
 const user = await createUser(req.body);
-
-// Blacklist validation
-if (input.includes('DROP') || input.includes('DELETE')) {
-  throw new Error('Invalid input');
-}
 ```
 
 ✅ **DO:**
 ```typescript
-// Parameterized queries
-const query = secureQueryBuilder.select('users')
-  .where({ id: userId })
-  .build();
+// Parameterized queries with value objects
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM users WHERE id = ${id}',
+  { id: userId }
+);
 
-// Schema validation
-const validated = await inputValidationService.validate(req.body, userSchema);
-
-// Whitelist validation
-const schema = z.object({
-  name: z.string().regex(/^[a-zA-Z\s]+$/),
-  age: z.number().int().positive()
-});
+// Validated pagination
+const pagination = PaginationParams.create(req.query.page, req.query.limit);
 ```
 
-## Testing
+## Migration Checklist
 
-```typescript
-import { inputValidationService } from '@server/infrastructure/security/input-validation-service';
-import { z } from 'zod';
-
-describe('Input Validation', () => {
-  it('should validate valid input', async () => {
-    const schema = z.object({ email: z.string().email() });
-    const result = await inputValidationService.validate(
-      { email: 'test@example.com' },
-      schema
-    );
-    expect(result.isValid).toBe(true);
-  });
-
-  it('should reject invalid input', async () => {
-    const schema = z.object({ email: z.string().email() });
-    const result = await inputValidationService.validate(
-      { email: 'invalid' },
-      schema
-    );
-    expect(result.isValid).toBe(false);
-  });
-});
-```
+- [ ] Replace `secureQueryBuilder` imports with `secureQueryBuilderService`
+- [ ] Update method calls to use new service methods
+- [ ] Consider using value objects (PaginationParams, SecureQuery)
+- [ ] Update tests to use new imports
+- [ ] Remove deprecated imports once migration is complete
 
 ## Related Documentation
 
-- [Features Security](../../features/security/README.md)
+- [Features Security](../../features/security/README.md) - New DDD-structured security
 - [Authentication](../auth/README.md)
 - [Database](../database/README.md)

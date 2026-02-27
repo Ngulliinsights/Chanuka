@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import {
   alert_preferences,
   type Notification,
@@ -99,9 +99,7 @@ export interface AlertDeliveryLog {
  * smart filtering capabilities.
  */
 export class AlertPreferencesService {
-  private get database() {
-    return db;
-  }
+  // No need for database getter - use readDatabase/writeDatabase directly
 
   // ============================================================================
   // ALERT PREFERENCE OPERATIONS
@@ -120,42 +118,44 @@ export class AlertPreferencesService {
     logger.debug('Saving alert preference', logContext);
 
     try {
-      // Get current user preferences
-      const [user] = await this.database
-        .select({ preferences: users.preferences })
-        .from(users)
-        .where(eq(users.id, preference.user_id))
-        .limit(1);
+      await withTransaction(async (tx) => {
+        // Get current user preferences
+        const [user] = await tx
+          .select({ preferences: users.preferences })
+          .from(users)
+          .where(eq(users.id, preference.user_id))
+          .limit(1);
 
-      if (!user) {
-        throw new Error(`User ${preference.user_id} not found`);
-      }
+        if (!user) {
+          throw new Error(`User ${preference.user_id} not found`);
+        }
 
-      const currentPreferences = (user.preferences as any) || {};
-      const alertPreferences = currentPreferences.alertPreferences || [];
+        const currentPreferences = (user.preferences as any) || {};
+        const alertPreferences = currentPreferences.alertPreferences || [];
 
-      // Serialize the preference
-      const preferenceData = this.serializePreference(preference);
+        // Serialize the preference
+        const preferenceData = this.serializePreference(preference);
 
-      // Add or update the preference
-      const existingIndex = alertPreferences.findIndex((p: unknown) => p.id === preference.id);
-      if (existingIndex >= 0) {
-        alertPreferences[existingIndex] = preferenceData;
-      } else {
-        alertPreferences.push(preferenceData);
-      }
+        // Add or update the preference
+        const existingIndex = alertPreferences.findIndex((p: unknown) => p.id === preference.id);
+        if (existingIndex >= 0) {
+          alertPreferences[existingIndex] = preferenceData;
+        } else {
+          alertPreferences.push(preferenceData);
+        }
 
-      // Update the database
-      await this.database
-        .update(users)
-        .set({
-          preferences: {
-            ...currentPreferences,
-            alertPreferences
-          },
-          updated_at: new Date()
-        })
-        .where(eq(users.id, preference.user_id));
+        // Update the database
+        await tx
+          .update(users)
+          .set({
+            preferences: {
+              ...currentPreferences,
+              alertPreferences
+            },
+            updated_at: new Date()
+          })
+          .where(eq(users.id, preference.user_id));
+      });
 
       logger.info('✅ Alert preference saved successfully', { 
         ...logContext, 
@@ -207,7 +207,7 @@ export class AlertPreferencesService {
     logger.debug('Finding alert preferences for user', logContext);
 
     try {
-      const [user] = await this.database
+      const [user] = await readDatabase
         .select({ preferences: users.preferences })
         .from(users)
         .where(eq(users.id, user_id))
@@ -270,33 +270,35 @@ export class AlertPreferencesService {
     logger.debug('Deleting alert preference', logContext);
 
     try {
-      const [user] = await this.database
-        .select({ preferences: users.preferences })
-        .from(users)
-        .where(eq(users.id, user_id))
-        .limit(1);
+      await withTransaction(async (tx) => {
+        const [user] = await tx
+          .select({ preferences: users.preferences })
+          .from(users)
+          .where(eq(users.id, user_id))
+          .limit(1);
 
-      if (!user) {
-        throw new Error(`User ${user_id} not found`);
-      }
+        if (!user) {
+          throw new Error(`User ${user_id} not found`);
+        }
 
-      const currentPreferences = (user.preferences as any) || {};
-      const alertPreferences = currentPreferences.alertPreferences || [];
+        const currentPreferences = (user.preferences as any) || {};
+        const alertPreferences = currentPreferences.alertPreferences || [];
 
-      // Filter out the preference
-      const updatedPreferences = alertPreferences.filter((p: unknown) => p.id !== id);
+        // Filter out the preference
+        const updatedPreferences = alertPreferences.filter((p: unknown) => p.id !== id);
 
-      // Update the database
-      await this.database
-        .update(users)
-        .set({
-          preferences: {
-            ...currentPreferences,
-            alertPreferences: updatedPreferences
-          },
-          updated_at: new Date()
-        })
-        .where(eq(users.id, user_id));
+        // Update the database
+        await tx
+          .update(users)
+          .set({
+            preferences: {
+              ...currentPreferences,
+              alertPreferences: updatedPreferences
+            },
+            updated_at: new Date()
+          })
+          .where(eq(users.id, user_id));
+      });
 
       logger.info('✅ Alert preference deleted successfully', logContext);
     } catch (error) {
@@ -352,26 +354,28 @@ export class AlertPreferencesService {
     try {
       // For now, we'll store delivery logs in the notifications table
       // In a full implementation, you might want a separate delivery_logs table
-      await this.database
-        .insert(notifications)
-        .values({
-          id: log.id,
-          user_id: log.user_id,
-          type: log.alert_type,
-          title: `Alert: ${log.alert_type}`,
-          message: `Alert delivered via ${log.channel}`,
-          data: {
-            alert_preference_id: log.alert_preference_id,
-            channel: log.channel,
-            status: log.status,
-            delivery_time: log.delivery_time,
-            failure_reason: log.failure_reason,
-            metadata: log.metadata
-          },
-          is_read: false,
-          created_at: log.created_at,
-          updated_at: log.created_at
-        });
+      await withTransaction(async (tx) => {
+        await tx
+          .insert(notifications)
+          .values({
+            id: log.id,
+            user_id: log.user_id,
+            type: log.alert_type,
+            title: `Alert: ${log.alert_type}`,
+            message: `Alert delivered via ${log.channel}`,
+            data: {
+              alert_preference_id: log.alert_preference_id,
+              channel: log.channel,
+              status: log.status,
+              delivery_time: log.delivery_time,
+              failure_reason: log.failure_reason,
+              metadata: log.metadata
+            },
+            is_read: false,
+            created_at: log.created_at,
+            updated_at: log.created_at
+          });
+      });
 
       logger.info('✅ Delivery log saved successfully', logContext);
     } catch (error) {
@@ -428,7 +432,7 @@ export class AlertPreferencesService {
       }
 
       // Get total count
-      const [totalResult] = await this.database
+      const [totalResult] = await readDatabase
         .select({ count: count() })
         .from(notifications)
         .where(and(...conditions));
@@ -436,7 +440,7 @@ export class AlertPreferencesService {
       const total = totalResult.count;
 
       // Get paginated results
-      const results = await this.database
+      const results = await readDatabase
         .select()
         .from(notifications)
         .where(and(...conditions))
@@ -502,7 +506,7 @@ export class AlertPreferencesService {
 
     try {
       // Get basic statistics from notifications
-      const [basicStats] = await this.database
+      const [basicStats] = await readDatabase
         .select({
           total: count(),
           successful: sql<number>`COUNT(*) FILTER (WHERE (data->>'status')::text = 'sent')`,
@@ -513,7 +517,7 @@ export class AlertPreferencesService {
         .where(eq(notifications.user_id, user_id));
 
       // Get channel statistics
-      const channelResults = await this.database
+      const channelResults = await readDatabase
         .select({
           channel: sql<string>`(data->>'channel')::text`,
           total: count(),
@@ -638,7 +642,7 @@ export class AlertPreferencesService {
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
       // Simple query to test database connectivity
-      await this.database.select({ count: count() }).from(users).limit(1);
+      await readDatabase.select({ count: count() }).from(users).limit(1);
       
       return {
         status: 'healthy',

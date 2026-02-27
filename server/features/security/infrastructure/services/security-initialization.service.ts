@@ -3,12 +3,12 @@ import { Express } from 'express';
 import fs from 'fs';
 import https from 'https';
 
-import { encryptionService } from './encryption-service';
-import { securityAuditService } from './security-audit-service';
-import { tlsConfigService } from './tls-config-service';
+import { encryptionService } from '../../encryption-services/encryption.service';
+import { securityAuditService } from '../../security-audit-service';
+import { tlsConfigService } from '../../tls-config-services/tls-config.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { secureSessionService } from '@server/infrastructure/auth/secure-session-service';
-import { securityMiddleware } from './security-middleware';
+import { securityMiddleware } from '../../security-middlewareware';
 
 /**
  * Security initialization service that sets up all security components

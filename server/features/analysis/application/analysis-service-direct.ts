@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import {
   bill_engagement,
   bills,
@@ -84,9 +84,7 @@ export interface StakeholderAnalysis {
  * stakeholder impact assessment, and transparency scoring using direct Drizzle ORM queries.
  */
 export class AnalysisService {
-  private get database() {
-    return db;
-  }
+
 
   // ============================================================================
   // COMPREHENSIVE ANALYSIS OPERATIONS
@@ -106,28 +104,32 @@ export class AnalysisService {
 
     try {
       // Verify bill exists before creating analysis
-      const [bill] = await this.database
-        .select()
-        .from(bills)
-        .where(eq(bills.id, analysis.bill_id))
-        .limit(1);
+      const [bill] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(bills)
+          .where(eq(bills.id, analysis.bill_id))
+          .limit(1);
+      });
 
       if (!bill) {
         throw new Error(`Bill ${analysis.bill_id} not found`);
       }
 
       // Check for existing non-superseded analysis of this type
-      const [existing] = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(
-          and(
-            eq(constitutional_analyses.bill_id, analysis.bill_id),
-            eq(constitutional_analyses.analysis_type, `comprehensive_v${analysis.version}`),
-            sql`${constitutional_analyses.superseded_by} IS NULL`
+      const [existing] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(
+            and(
+              eq(constitutional_analyses.bill_id, analysis.bill_id),
+              eq(constitutional_analyses.analysis_type, `comprehensive_v${analysis.version}`),
+              sql`${constitutional_analyses.superseded_by} IS NULL`
+            )
           )
-        )
-        .limit(1);
+          .limit(1);
+      });
 
       let savedAnalysis: ConstitutionalAnalysis;
 
@@ -160,29 +162,33 @@ export class AnalysisService {
 
       if (existing) {
         // Create new analysis and mark the old one as superseded
-        const [newAnalysis] = await this.database
-          .insert(constitutional_analyses)
-          .values(analysisData)
-          .returning();
+        savedAnalysis = await withTransaction(async (tx) => {
+          const [newAnalysis] = await tx
+            .insert(constitutional_analyses)
+            .values(analysisData)
+            .returning();
 
-        // Update the old analysis to reference the new one
-        await this.database
-          .update(constitutional_analyses)
-          .set({
-            superseded_by: newAnalysis.id,
-            updated_at: new Date()
-          })
-          .where(eq(constitutional_analyses.id, existing.id));
+          // Update the old analysis to reference the new one
+          await tx
+            .update(constitutional_analyses)
+            .set({
+              superseded_by: newAnalysis.id,
+              updated_at: new Date()
+            })
+            .where(eq(constitutional_analyses.id, existing.id));
 
-        savedAnalysis = newAnalysis;
+          return newAnalysis;
+        });
       } else {
         // Create brand new analysis
-        const [newAnalysis] = await this.database
-          .insert(constitutional_analyses)
-          .values(analysisData)
-          .returning();
+        savedAnalysis = await withTransaction(async (tx) => {
+          const [newAnalysis] = await tx
+            .insert(constitutional_analyses)
+            .values(analysisData)
+            .returning();
 
-        savedAnalysis = newAnalysis;
+          return newAnalysis;
+        });
       }
 
       logger.info('✅ Analysis saved successfully', { 
@@ -210,17 +216,19 @@ export class AnalysisService {
     logger.debug('Finding latest analysis for bill', logContext);
 
     try {
-      const [analysis] = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(
-          and(
-            eq(constitutional_analyses.bill_id, bill_id),
-            sql`${constitutional_analyses.superseded_by} IS NULL`
+      const [analysis] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(
+            and(
+              eq(constitutional_analyses.bill_id, bill_id),
+              sql`${constitutional_analyses.superseded_by} IS NULL`
+            )
           )
-        )
-        .orderBy(desc(constitutional_analyses.created_at))
-        .limit(1);
+          .orderBy(desc(constitutional_analyses.created_at))
+          .limit(1);
+      });
 
       if (!analysis) {
         logger.debug('No analysis found for bill', logContext);
@@ -248,12 +256,14 @@ export class AnalysisService {
     logger.debug('Finding analysis history for bill', logContext);
 
     try {
-      const analyses = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(eq(constitutional_analyses.bill_id, bill_id))
-        .orderBy(desc(constitutional_analyses.created_at))
-        .limit(limit);
+      const analyses = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(eq(constitutional_analyses.bill_id, bill_id))
+          .orderBy(desc(constitutional_analyses.created_at))
+          .limit(limit);
+      });
 
       logger.debug('Analysis history retrieved', { ...logContext, count: analyses.length });
       return analyses;
@@ -275,11 +285,13 @@ export class AnalysisService {
     logger.debug('Finding analysis by ID', logContext);
 
     try {
-      const [analysis] = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(eq(constitutional_analyses.id, analysis_id))
-        .limit(1);
+      const [analysis] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(eq(constitutional_analyses.id, analysis_id))
+          .limit(1);
+      });
 
       if (!analysis) {
         logger.debug('Analysis not found', logContext);
@@ -309,33 +321,35 @@ export class AnalysisService {
       const errorMessage = errorDetails instanceof Error ? errorDetails.message : String(errorDetails);
       const errorStack = errorDetails instanceof Error ? errorDetails.stack : undefined;
 
-      await this.database
-        .insert(constitutional_analyses)
-        .values({
-          id: crypto.randomUUID(),
-          bill_id: bill_id,
-          analysis_type: 'comprehensive_failed',
-          confidence_score: 0,
-          constitutional_provisions_cited: [],
-          potential_violations: {
-            error: errorMessage,
-            stack: errorStack,
-            timestamp: new Date().toISOString()
-          },
-          constitutional_alignment: 'unknown',
-          executive_summary: `Analysis failed for Bill ${bill_id}`,
-          detailed_analysis: JSON.stringify({
-            error: errorMessage,
-            stack: errorStack,
-            failureTime: new Date()
-          }),
-          recommendations: 'Manual review required due to analysis failure',
-          requires_expert_review: true,
-          expert_reviewed: false,
-          analysis_version: 1,
-          created_at: new Date(),
-          updated_at: new Date()
-        });
+      await withTransaction(async (tx) => {
+        await tx
+          .insert(constitutional_analyses)
+          .values({
+            id: crypto.randomUUID(),
+            bill_id: bill_id,
+            analysis_type: 'comprehensive_failed',
+            confidence_score: 0,
+            constitutional_provisions_cited: [],
+            potential_violations: {
+              error: errorMessage,
+              stack: errorStack,
+              timestamp: new Date().toISOString()
+            },
+            constitutional_alignment: 'unknown',
+            executive_summary: `Analysis failed for Bill ${bill_id}`,
+            detailed_analysis: JSON.stringify({
+              error: errorMessage,
+              stack: errorStack,
+              failureTime: new Date()
+            }),
+            recommendations: 'Manual review required due to analysis failure',
+            requires_expert_review: true,
+            expert_reviewed: false,
+            analysis_version: 1,
+            created_at: new Date(),
+            updated_at: new Date()
+          });
+      });
 
       logger.info('Failed analysis recorded', logContext);
     } catch (error) {
@@ -361,37 +375,43 @@ export class AnalysisService {
 
     try {
       // Calculate engagement statistics with weighted scoring
-      const engagementStats = await this.database
-        .select({
-          totalEngagement: count(),
-          avgEngagement: sql<number>`AVG(CASE 
-            WHEN ${bill_engagement.engagement_type} = 'view' THEN 1
-            WHEN ${bill_engagement.engagement_type} = 'comment' THEN 3
-            WHEN ${bill_engagement.engagement_type} = 'vote' THEN 2
-            ELSE 1 END)`
-        })
-        .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, bill_id));
+      const engagementStats = await readDatabase(async (db) => {
+        return db
+          .select({
+            totalEngagement: count(),
+            avgEngagement: sql<number>`AVG(CASE 
+              WHEN ${bill_engagement.engagement_type} = 'view' THEN 1
+              WHEN ${bill_engagement.engagement_type} = 'comment' THEN 3
+              WHEN ${bill_engagement.engagement_type} = 'vote' THEN 2
+              ELSE 1 END)`
+          })
+          .from(bill_engagement)
+          .where(eq(bill_engagement.bill_id, bill_id));
+      });
 
       // Calculate comment volume and sentiment indicators
-      const commentStats = await this.database
-        .select({
-          comment_count: count(),
-          avgSentiment: sql<number>`AVG(CASE 
-            WHEN ${comments.content} ILIKE '%support%' OR ${comments.content} ILIKE '%agree%' THEN 1
-            WHEN ${comments.content} ILIKE '%oppose%' OR ${comments.content} ILIKE '%disagree%' THEN -1
-            ELSE 0 END)`
-        })
-        .from(comments)
-        .where(eq(comments.bill_id, bill_id));
+      const commentStats = await readDatabase(async (db) => {
+        return db
+          .select({
+            comment_count: count(),
+            avgSentiment: sql<number>`AVG(CASE 
+              WHEN ${comments.content} ILIKE '%support%' OR ${comments.content} ILIKE '%agree%' THEN 1
+              WHEN ${comments.content} ILIKE '%oppose%' OR ${comments.content} ILIKE '%disagree%' THEN -1
+              ELSE 0 END)`
+          })
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id));
+      });
 
       // Measure stakeholder diversity through unique user participation
-      const diversityStats = await this.database
-        .select({
-          uniqueUsers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`
-        })
-        .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, bill_id));
+      const diversityStats = await readDatabase(async (db) => {
+        return db
+          .select({
+            uniqueUsers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`
+          })
+          .from(bill_engagement)
+          .where(eq(bill_engagement.bill_id, bill_id));
+      });
 
       const engagement = engagementStats[0];
       const commentMetrics = commentStats[0];
@@ -444,15 +464,17 @@ export class AnalysisService {
 
     try {
       // Retrieve comment data with user information for stakeholder segmentation
-      const stakeholderData = await this.database
-        .select({
-          user_id: comments.user_id,
-          content: comments.content,
-          created_at: comments.created_at
-        })
-        .from(comments)
-        .where(eq(comments.bill_id, bill_id))
-        .orderBy(desc(comments.created_at));
+      const stakeholderData = await readDatabase(async (db) => {
+        return db
+          .select({
+            user_id: comments.user_id,
+            content: comments.content,
+            created_at: comments.created_at
+          })
+          .from(comments)
+          .where(eq(comments.bill_id, bill_id))
+          .orderBy(desc(comments.created_at));
+      });
 
       // Group stakeholders by sentiment and engagement patterns
       const stakeholderGroups = this.groupStakeholders(stakeholderData);
@@ -498,11 +520,13 @@ export class AnalysisService {
 
     try {
       // Retrieve bill information for transparency assessment
-      const [bill] = await this.database
-        .select()
-        .from(bills)
-        .where(eq(bills.id, bill_id))
-        .limit(1);
+      const [bill] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(bills)
+          .where(eq(bills.id, bill_id))
+          .limit(1);
+      });
 
       if (!bill) {
         throw new Error(`Bill ${bill_id} not found`);
@@ -527,20 +551,24 @@ export class AnalysisService {
 
       // Sponsor information (20 points) - accountability and attribution
       if (bill.sponsor_id) {
-        const [sponsor] = await this.database
-          .select()
-          .from(sponsors)
-          .where(eq(sponsors.id, bill.sponsor_id))
-          .limit(1);
+        const [sponsor] = await readDatabase(async (db) => {
+          return db
+            .select()
+            .from(sponsors)
+            .where(eq(sponsors.id, bill.sponsor_id))
+            .limit(1);
+        });
         
         if (sponsor) score += 20;
       }
 
       // Public engagement (30 points) - indicates accessibility and awareness
-      const engagementCount = await this.database
-        .select({ count: count() })
-        .from(bill_engagement)
-        .where(eq(bill_engagement.bill_id, bill_id));
+      const engagementCount = await readDatabase(async (db) => {
+        return db
+          .select({ count: count() })
+          .from(bill_engagement)
+          .where(eq(bill_engagement.bill_id, bill_id));
+      });
 
       const engagement = engagementCount[0]?.count || 0;
       if (engagement > 100) {
@@ -735,7 +763,9 @@ export class AnalysisService {
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
       // Test database connectivity with a simple query
-      await this.database.select({ count: count() }).from(bills).limit(1);
+      await readDatabase(async (db) => {
+        return db.select({ count: count() }).from(bills).limit(1);
+      });
       
       return {
         status: 'healthy',

@@ -2,24 +2,10 @@ import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import {
   audit_payloads,
-  system_audit_log} from '@server/infrastructure/schema/integrity_operations';
-import { and, count, desc, eq, gte, inArray, lte, type SQL,sql } from 'drizzle-orm';
+  system_audit_log
+} from '@server/infrastructure/schema/integrity_operations';
+import { and, count, desc, eq, gte, inArray, lte, type SQL, sql } from 'drizzle-orm';
 import type { Request } from 'express';
-
-// Import tables from integrity operations schema directly
-
-/**
- * SecurityAuditService - The System's Black Box Recorder
- * 
- * This service has ONE job: faithfully record all security-relevant events
- * in the system. It does not make decisions about what's suspicious, it does
- * not trigger alerts, and it does not take defensive actions. It simply writes
- * everything down with complete accuracy.
- * 
- * Think of this as the flight recorder on an airplane. It captures every detail
- * so that later analysis (by the monitoring service) can reconstruct what happened
- * and identify patterns or problems.
- */
 
 type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
 
@@ -154,24 +140,17 @@ interface CountResult {
   count: number;
 }
 
-/**
- * Type guard to check if value is a non-null record
- */
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 /**
- * Pure audit logging service - records events without judgment or action
+ * Security Audit Infrastructure Service
+ * Records security events to the audit trail
  */
 export class SecurityAuditService {
-  /**
-   * Core logging method - records any security event to the audit trail
-   * This is the foundation method that all other logging methods use
-   */
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
-      // Insert into system_audit_log
       const auditLogResult = await db
         .insert(system_audit_log)
         .values({
@@ -189,14 +168,12 @@ export class SecurityAuditService {
         })
         .returning({ id: system_audit_log.id });
 
-      // Type-safe extraction of audit log ID
       const firstResult = auditLogResult[0] as AuditLogInsertResult | undefined;
       if (!firstResult) {
         throw new Error('Failed to insert audit log entry');
       }
       const auditLogId = firstResult.id;
 
-      // Insert payload data into audit_payloads table for vertical partitioning
       const payloadInserts: Array<{
         audit_log_id: string;
         payload_type: string;
@@ -211,7 +188,6 @@ export class SecurityAuditService {
         });
       }
 
-      // Check for resource_usage in details (backward compatibility)
       const resourceUsageData = event.details?.resource_usage;
       if (resourceUsageData && isRecord(resourceUsageData)) {
         payloadInserts.push({
@@ -221,15 +197,11 @@ export class SecurityAuditService {
         });
       }
 
-      // Insert all payloads if any exist
       if (payloadInserts.length > 0) {
-        await db
-          .insert(audit_payloads)
-          .values(payloadInserts);
+        await db.insert(audit_payloads).values(payloadInserts);
       }
 
     } catch (error) {
-      // Audit logging failures should be logged but should never crash the application
       logger.error('CRITICAL: Audit logging failed', { component: 'SecurityAudit' }, {
         error: error instanceof Error ? error.message : 'Unknown error',
         event_type: event.event_type,
@@ -239,9 +211,6 @@ export class SecurityAuditService {
     }
   }
 
-  /**
-   * Log authentication events - login attempts, logouts, password changes
-   */
   async logAuthEvent(
     event_type: AuthEventType,
     req: Request | undefined,
@@ -268,9 +237,6 @@ export class SecurityAuditService {
     });
   }
 
-  /**
-   * Log data access events - reads, writes, exports, deletes
-   */
   async logDataAccess(
     resource: string,
     action: DataAccessAction,
@@ -301,9 +267,6 @@ export class SecurityAuditService {
     });
   }
 
-  /**
-   * Log administrative actions
-   */
   async logAdminAction(
     action: string,
     req: Request | undefined,
@@ -329,9 +292,6 @@ export class SecurityAuditService {
     });
   }
 
-  /**
-   * Log security system events
-   */
   async logSecuritySystemEvent(
     event_type: string,
     action: string,
@@ -352,9 +312,6 @@ export class SecurityAuditService {
     });
   }
 
-  /**
-   * Query audit logs with flexible filtering
-   */
   async queryAuditLogs(options: AuditQueryOptions): Promise<AuditLogRow[]> {
     try {
       const whereConditions: SQL[] = [];
@@ -381,7 +338,6 @@ export class SecurityAuditService {
         whereConditions.push(lte(system_audit_log.created_at, options.end_date));
       }
 
-      // Build the base query
       let query = db
         .select({
           id: system_audit_log.id,
@@ -422,12 +378,10 @@ export class SecurityAuditService {
         })
         .from(system_audit_log);
 
-      // Apply where conditions if any exist
       if (whereConditions.length > 0) {
         query = query.where(whereConditions.length === 1 ? whereConditions[0]! : and(...whereConditions)!);
       }
 
-      // Apply ordering and pagination
       query = query.orderBy(desc(system_audit_log.created_at));
 
       if (options.limit) {
@@ -439,7 +393,6 @@ export class SecurityAuditService {
 
       const results = await query;
 
-      // Transform the results with proper typing
       return results.map((row: QueryResultRow): AuditLogRow => {
         const actionDetails = isRecord(row.action_details) ? row.action_details : {};
         const resourceUsage = isRecord(row.resource_usage) ? row.resource_usage : {};
@@ -459,9 +412,6 @@ export class SecurityAuditService {
     }
   }
 
-  /**
-   * Get event count for a specific query
-   */
   async getEventCount(options: AuditQueryOptions): Promise<number> {
     try {
       const whereConditions: SQL[] = [];
@@ -499,9 +449,6 @@ export class SecurityAuditService {
     }
   }
 
-  /**
-   * Generate a comprehensive audit report for a time period
-   */
   async generateAuditReport(start_date: Date, end_date: Date): Promise<AuditReport> {
     try {
       const events = await this.queryAuditLogs({
@@ -540,9 +487,6 @@ export class SecurityAuditService {
     }
   }
 
-  /**
-   * Get recent failed login attempts for a user or IP
-   */
   async getRecentFailedLogins(
     user_idOrIP: string,
     since: Date,
@@ -555,10 +499,6 @@ export class SecurityAuditService {
     });
   }
 
-  /**
-   * Get recent data access volume for a user
-   * Used to detect potential data exfiltration attempts
-   */
   async getRecentDataAccessVolume(user_id: string, since: Date): Promise<number> {
     const events = await this.queryAuditLogs({
       user_id,
@@ -571,10 +511,6 @@ export class SecurityAuditService {
       return total + (typeof recordCount === 'number' ? recordCount : 0);
     }, 0);
   }
-
-  /**
-   * Private helper methods
-   */
 
   private determineAuthSeverity(event_type: string, success: boolean): SeverityLevel {
     if (!success) {
@@ -649,6 +585,4 @@ export class SecurityAuditService {
   }
 }
 
-// Export singleton instance
 export const securityAuditService = new SecurityAuditService();
-

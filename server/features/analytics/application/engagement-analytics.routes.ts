@@ -1,5 +1,5 @@
 // Security Services
-import { dataPrivacyService } from '@server/features/security/services/data-privacy-service';
+import { dataPrivacyService } from '@server/features/security/infrastructure/services/data-privacy.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { bill_engagement,comments as comments_cp } from '@server/infrastructure/schema';
 import { logger } from '@server/infrastructure/observability';

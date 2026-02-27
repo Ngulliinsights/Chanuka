@@ -1,18 +1,41 @@
-// Security Feature Domain
+// Security Feature - DDD Architecture
 // Centralized exports for security-related functionality
 
 // Routes
 export { default as securityMonitoringRouter } from './security-monitoring';
 
-// Services
-export { SecurityAuditService, securityAuditService } from './security-audit-service';
-export { SecurityInitializationService } from './security-initialization-service';
-export { SecurityMonitoringService } from './security-monitoring-service';
-export { IntrusionDetectionService } from './intrusion-detection-service';
-export { PrivacyService } from './privacy-service';
-export { EncryptionService, encryptionService } from './encryption-service';
-export { TLSConfigService } from './tls-config-service';
-export { DataPrivacyService, dataPrivacyService } from './services/data-privacy-service';
+// Domain Services (Pure business logic)
+export {
+  InputSanitizationService,./infrastructure/services/security-initialization.service
+  inputSanitizationService,./infrastructure/services/security-monitoring.service
+  QueryValidationService,
+  queryValidationService,./infrastructure/services/privacy.service
+  EncryptionService,
+  encryptionService,
+  TLSConfigService,./infrastructure/services/data-privacy.service
+  tlsConfigService
+} from './domain/services';
+
+// Domain Value Objects (Immutable domain concepts)
+export { PaginationParams, SecureQuery, QueryValidationResult } from './domain/value-objects';
+
+// Application Services (Use case orchestration)
+export { SecureQueryBuilderService, secureQueryBuilderService } from './application/services';
+
+// Infrastructure Services (Technical concerns)
+export {
+  SecurityAuditService,
+  securityAuditService,
+  IntrusionDetectionService,
+  intrusionDetectionService,
+  SecurityMonitoringService,
+  getSecurityMonitoringService,
+  PrivacyService,
+  SecurityInitializationService,
+  createSecurityInitializationService,
+  DataPrivacyService,
+  dataPrivacyService
+} from './infrastructure/services';
 
 
 

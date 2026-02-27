@@ -12,7 +12,6 @@ import { CampaignDomainService } from '@server/features/advocacy/domain/services
 // Repository implementations removed - using direct service calls
 import { NotificationService } from '@server/features/advocacy/infrastructure/services/notification-service';
 import { RepresentativeContactService } from '@server/features/advocacy/infrastructure/services/representative-contact-service';
-import { pool as db } from '@server/infrastructure/database/pool';
 
 export interface AdvocacyServiceDependencies {
   campaignService: CampaignService;

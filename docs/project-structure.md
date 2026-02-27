@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 27, 2026 at 09:05 AM
+**Generated:** February 27, 2026 at 10:33 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,730
+**Total Items:** 3,744
 
 ```
 .
@@ -607,6 +607,7 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── user.service.ts
 │   │   │   │   ├── types/
+│   │   │   │   │   ├── auth-types.ts
 │   │   │   │   │   ├── auth.ts
 │   │   │   │   │   ├── bill.ts
 │   │   │   │   │   ├── cache.ts
@@ -650,7 +651,8 @@
 │   │   │   │   └── WEBSOCKET_API_README.md
 │   │   │   ├── asset-loading/
 │   │   │   │   ├── AssetLoadingProvider.tsx
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── auth/
 │   │   │   │   ├── config/
 │   │   │   │   │   ├── auth-config.ts
@@ -699,6 +701,7 @@
 │   │   │   │   ├── FeatureFallbacks.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── polyfill-manager.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── types.ts
 │   │   │   │   └── useBrowserStatus.tsx
 │   │   │   ├── cache/
@@ -710,6 +713,7 @@
 │   │   │   │   ├── commands.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── Modal.tsx
+│   │   │   │   ├── README.md
 │   │   │   │   ├── types.ts
 │   │   │   │   └── useCommandPalette.ts
 │   │   │   ├── community/
@@ -718,6 +722,7 @@
 │   │   │   │   │   ├── moderation.service.ts
 │   │   │   │   │   └── state-sync.service.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
 │   │   │   ├── consolidation/
 │   │   │   │   ├── consolidation-algorithm.ts
@@ -791,9 +796,11 @@
 │   │   │   │   └── unified-types.ts
 │   │   │   ├── events/
 │   │   │   │   ├── event-bus.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── hooks/
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
@@ -803,6 +810,7 @@
 │   │   │   │   ├── error-handler.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── performance-optimizer.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── responsive-utils.ts
 │   │   │   │   ├── touch-handler.ts
 │   │   │   │   └── types.ts
@@ -828,6 +836,7 @@
 │   │   │   │   ├── page-relationship-service.ts
 │   │   │   │   ├── persistence.ts
 │   │   │   │   ├── preferences.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── route-preloading.ts
 │   │   │   │   ├── route-validation.ts
 │   │   │   │   ├── search.ts
@@ -852,14 +861,22 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── persona-detector.test.tsx
 │   │   │   │   ├── persona-detector.ts
+│   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
 │   │   │   ├── recovery/
 │   │   │   │   ├── dashboard-recovery.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── scripts/
+│   │   │   │   ├── analyze-internal-imports.sh
+│   │   │   │   ├── check-jsdoc-coverage.ts
+│   │   │   │   ├── check-jsdoc.sh
+│   │   │   │   ├── fix-internal-imports.sh
+│   │   │   │   ├── validate-api-documentation.ts
 │   │   │   │   └── validate-module-structure.ts
 │   │   │   ├── search/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── search-strategy-selector.ts
 │   │   │   │   ├── types.ts
 │   │   │   │   ├── UnifiedSearchInterface.test.tsx
@@ -899,6 +916,7 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── input-sanitizer.ts
 │   │   │   │   ├── rate-limiter.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── security-monitor.ts
 │   │   │   │   ├── security-monitoring.ts
 │   │   │   │   ├── security-service.ts
@@ -910,6 +928,7 @@
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── offline-data-manager.ts
+│   │   │   │   ├── README.md
 │   │   │   │   ├── secure-storage.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── store/
@@ -930,13 +949,16 @@
 │   │   │   │   │   ├── uiSlice.ts
 │   │   │   │   │   └── userDashboardSlice.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
 │   │   │   │   └── store-types.ts
 │   │   │   ├── sync/
 │   │   │   │   ├── background-sync-manager.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── system/
 │   │   │   │   ├── HealthCheck.tsx
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── validation/
 │   │   │   │   ├── dashboard-validation.ts
 │   │   │   │   ├── form-helpers.ts
@@ -948,7 +970,9 @@
 │   │   │   │   └── validators.ts
 │   │   │   ├── workers/
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── README.md
 │   │   │   │   └── service-worker.ts
+│   │   │   ├── API_DOCUMENTATION_SUMMARY.md
 │   │   │   ├── ARCHITECTURAL_LAYERS.md
 │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   ├── core-monitoring.ts
@@ -957,7 +981,8 @@
 │   │   │   ├── integration-validator.ts
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── MODULE_VALIDATION_REPORT.md
-│   │   │   └── quality-optimizer.ts
+│   │   │   ├── quality-optimizer.ts
+│   │   │   └── TYPEDOC_SETUP.md
 │   │   ├── lib/
 │   │   │   ├── components/
 │   │   │   │   ├── home/
@@ -1898,19 +1923,11 @@
 │   │   ├── constitutional-intelligence.md
 │   │   └── README.md
 │   ├── plans/
-│   │   ├── COMMIT-SUCCESS-SUMMARY.md
 │   │   ├── ERROR-FIXING-EXECUTION-PLAN.md
 │   │   ├── IMMEDIATE-EXECUTION-PLAN.md
 │   │   ├── INFRASTRUCTURE-CHANGES-REVIEW.md
 │   │   ├── monitoring-fsd-restructure.md
-│   │   ├── PHASE1-COMPLETION-SUMMARY.md
 │   │   ├── phase1-type-consolidation-tracker.md
-│   │   ├── PHASE2-COMPLETION-SUMMARY.md
-│   │   ├── PHASE3-COMPLETION-SUMMARY.md
-│   │   ├── PHASE4-COMPLETION-SUMMARY.md
-│   │   ├── PHASE5-COMPLETION-SUMMARY.md
-│   │   ├── PHASES-1-5-VALIDATION-SUMMARY.md
-│   │   ├── SESSION-SUMMARY-2026-02-26.md
 │   │   ├── TYPE-CONSOLIDATION-AUDIT-AND-NEXT-STEPS.md
 │   │   ├── TYPE-CONSOLIDATION-FINAL-REPORT.md
 │   │   ├── TYPE-CONSOLIDATION-PROGRESS.md
@@ -1983,61 +2000,32 @@
 │   │   ├── CODEBASE_CONTEXT.md
 │   │   ├── docs-module.md
 │   │   ├── IMPORT_PATH_GOVERNANCE.md
-│   │   ├── MIGRATION_LOG.md
 │   │   ├── race-condition-analysis.md
 │   │   └── schema-domain-relationships.md
 │   ├── ADR-001-DDD-Feature-Structure.md
 │   ├── ADR-002-Facade-Pattern-For-Middleware.md
 │   ├── api-client-guide.md
-│   ├── ARCHITECTURE_100_PERCENT_COMPLETE_2026-02-24.md
-│   ├── ARCHITECTURE_FINAL_STATUS_2026-02-24.md
-│   ├── ARCHITECTURE_MIGRATION_2026-02-24.md
-│   ├── ARCHITECTURE_MIGRATION_COMPLETE_2026-02-24.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
-│   ├── BUILD_FIX_PLAN.md
-│   ├── BUILD_FIX_PROGRESS.md
-│   ├── BUILD_FIX_SUMMARY.md
-│   ├── CLEANUP_EXECUTIVE_SUMMARY.md
-│   ├── CLEANUP_SUMMARY_2026-02-24.md
-│   ├── cleanup-verification-checklist.md
-│   ├── client-src-consistency-analysis.md
-│   ├── CONSOLIDATION_VISUAL_MAP.md
-│   ├── deprecated-cleanup-summary.md
-│   ├── deprecated-directories-cleanup.md
+│   ├── DESIGN_DECISIONS.md
 │   ├── DEVELOPER_GUIDE_Feature_Creation.md
 │   ├── DEVELOPER_ONBOARDING.md
 │   ├── DEVELOPMENT_WORKFLOW.md
-│   ├── FINAL_CLEANUP_2026-02-24.md
+│   ├── DOCUMENTATION_CLEANUP_SUMMARY.md
+│   ├── DOCUMENTATION_INVENTORY.md
 │   ├── FSD_IMPORT_GUIDE.md
-│   ├── INTERNAL_CONSISTENCY_ANALYSIS_2026-02-24.md
-│   ├── MIGRATION_COMPLETE_2026-02-24.md
-│   ├── MIGRATION_STATUS_2026-02-24.md
+│   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
+│   ├── MIGRATION_DOCS_CLEANUP_PLAN.md
 │   ├── migration-examples.md
 │   ├── MVP Data Strategy for NLP Training.md
+│   ├── NOTIFICATION_SYSTEM_CONSOLIDATION.md
 │   ├── PATH_ALIAS_RESOLUTION.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
-│   ├── PHASE_1_3_COMPLETION.md
-│   ├── project-structure-analysis.md
 │   ├── project-structure.md
 │   ├── README_ARCHITECTURE_DOCS.md
 │   ├── ROUTING_EXPLANATION.md
-│   ├── SCHEMA_CIRCULAR_DEPENDENCY_FIX.md
-│   ├── scripts-cleanup-completion.md
-│   ├── scripts-cleanup-summary.md
-│   ├── scripts-tools-cleanup-implementation.md
 │   ├── scripts-tools-strategic-analysis.md
-│   ├── scripts-tools-strategic-audit.md
-│   ├── SECURITY_CONSOLIDATION.md
-│   ├── SERVER_MIGRATION_2026-02-24.md
-│   ├── SERVER_PHASE2_MIGRATION_2026-02-24.md
-│   ├── server-consistency-analysis.md
-│   ├── server-strategic-implementation-audit.md
-│   ├── specs-plans-obsolete-assessment.md
-│   ├── specs-plans-relevance-assessment.md
-│   ├── STRATEGIC_ARCHITECTURE_ANALYSIS.md
-│   ├── strategic-implementation-audit.md
-│   └── TASK_COMPLETION_SUMMARY.md
+│   └── scripts-tools-strategic-audit.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2164,6 +2152,7 @@
 │   ├── check-db-status.ts
 │   ├── check-thresholds.js
 │   ├── CLASSIFICATION.md
+│   ├── cleanup-alert-preferences.ts
 │   ├── db-fresh-start.sql
 │   ├── dependency-cruiser.js
 │   ├── deploy-production.js
@@ -2178,6 +2167,7 @@
 │   ├── immediate-memory-cleanup.cjs
 │   ├── jscpd.json
 │   ├── LIFECYCLE.md
+│   ├── migrate-alert-preferences.ts
 │   ├── modern-project-analyzer.ts
 │   ├── performance-budget-enforcer.cjs
 │   ├── performance-regression-detector.js
@@ -2300,6 +2290,8 @@
 │   │   │   │       ├── priority.ts
 │   │   │   │       └── smart-filtering-config.ts
 │   │   │   ├── alert_system_docs.md
+│   │   │   ├── compatibility-layer.ts
+│   │   │   ├── DEPRECATION_NOTICE.md
 │   │   │   └── unified-alert-routes.ts
 │   │   ├── analysis/
 │   │   │   ├── application/
@@ -2622,19 +2614,25 @@
 │   │   │   ├── application/
 │   │   │   │   ├── dto/
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── alert-delivery.service.ts
+│   │   │   │   │   ├── alert-preference-management.service.ts
 │   │   │   │   │   ├── alerting-service.ts
 │   │   │   │   │   └── notification.service.ts
 │   │   │   │   ├── use-cases/
 │   │   │   │   ├── notification-orchestrator.ts
 │   │   │   │   └── notification-scheduler.ts
 │   │   │   ├── docs/
+│   │   │   │   ├── alert-preferences-integration.md
 │   │   │   │   ├── integration_guide.md
 │   │   │   │   └── refactored_summary.md
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
+│   │   │   │   │   ├── alert-preference.ts
 │   │   │   │   │   └── notification.ts
 │   │   │   │   ├── events/
 │   │   │   │   ├── services/
+│   │   │   │   │   ├── alert-preference-domain.service.ts
+│   │   │   │   │   ├── alert-preference.service.ts
 │   │   │   │   │   └── smart-notification-filter.ts
 │   │   │   │   ├── value-objects/
 │   │   │   │   └── types.ts
@@ -2643,10 +2641,12 @@
 │   │   │   │   └── persistence/
 │   │   │   ├── presentation/
 │   │   │   │   ├── http/
+│   │   │   │   │   ├── alert-preference-routes.ts
 │   │   │   │   │   └── notification-routes.ts
 │   │   │   │   └── websocket/
 │   │   │   ├── action-prompt-generator.ts
-│   │   │   └── index.ts
+│   │   │   ├── index.ts
+│   │   │   └── README.md
 │   │   ├── pretext-detection/
 │   │   │   ├── application/
 │   │   │   │   ├── pretext-detection.controller.ts
@@ -2902,7 +2902,6 @@
 │   │   │   ├── cache-wrappers.ts
 │   │   │   ├── caching-service.test.ts
 │   │   │   ├── caching-service.ts
-│   │   │   ├── CONSOLIDATION_REPORT.md
 │   │   │   ├── decorators.ts
 │   │   │   ├── factory.test.ts
 │   │   │   ├── factory.ts
@@ -3064,7 +3063,6 @@
 │   │   │   ├── repository-deployment.service.ts
 │   │   │   ├── rollback.service.ts
 │   │   │   └── validation.service.ts
-│   │   ├── notifications/
 │   │   ├── observability/
 │   │   │   ├── core/
 │   │   │   │   ├── index.ts
@@ -3322,7 +3320,8 @@
 │   ├── project.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
-│   └── vite.ts
+│   ├── vite.ts
+│   └── vitest.config.ts
 ├── shared/
 │   ├── constants/
 │   │   ├── error-codes.ts
@@ -3582,6 +3581,7 @@
 │   │   ├── error-scenarios.integration.test.ts
 │   │   ├── graph-module.integration.test.ts
 │   │   ├── index.ts
+│   │   ├── notification-e2e.test.ts
 │   │   ├── phase1-integration.test.ts
 │   │   ├── README.md
 │   │   ├── transformation-pipeline.integration.test.ts
@@ -3614,6 +3614,7 @@
 │   │   ├── shared-layer-single-source-of-truth.property.test.ts
 │   │   ├── telemetry-service-contracts.property.test.ts
 │   │   ├── transformation-pipeline-correctness.property.test.ts
+│   │   ├── type-safety-enforcement.property.test.ts
 │   │   ├── vitest.config.ts
 │   │   └── websocket-message-batching.property.test.ts
 │   ├── setup/
@@ -3669,6 +3670,7 @@
 │   ├── global-setup.ts
 │   ├── global-teardown.ts
 │   ├── migration-integration.test.ts
+│   ├── notification-test-suite.ts
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
@@ -3678,6 +3680,7 @@
 ├── CODEBASE_CLEANUP_COMPLETE.md
 ├── COMPLETE_CLEANUP_SUMMARY.md
 ├── CONFLICT_RESOLVED.md
+├── CONSOLIDATION_SUMMARY.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
 ├── DATABASE_CONSISTENCY_ANALYSIS.md
@@ -3696,6 +3699,13 @@
 ├── generate-structure.mjs
 ├── git-history.txt
 ├── IMPORT_VALIDATION_REPORT.md
+├── INTEGRATION_ANALYSIS.md
+├── INTEGRATION_CHECKLIST.md
+├── INTEGRATION_COMPLETE_SUMMARY.md
+├── INTEGRATION_COMPLETE.md
+├── INTEGRATION_PROGRESS.md
+├── INTEGRATION_QUICKSTART.md
+├── INTEGRATION_README.md
 ├── knip.config.ts
 ├── MIGRATION_COMPLETE.md
 ├── MIGRATION_EXECUTION_GUIDE.md
@@ -3707,7 +3717,9 @@
 ├── MOCK_DATA_STRATEGY.md
 ├── nginx.conf
 ├── NOTIFICATION_MIGRATION_COMPLETE.md
+├── NOTIFICATION_MIGRATION_FINAL.md
 ├── NOTIFICATION_MIGRATION_PLAN.md
+├── NOTIFICATION_SYSTEM_COMPLETE.md
 ├── nx.json
 ├── package.json
 ├── PHASE_2A_COMPLETE.md
@@ -3720,6 +3732,7 @@
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
 ├── QUICK_CLEANUP_SUMMARY.md
+├── README_INTEGRATION.md
 ├── README.md
 ├── READY_TO_EXECUTE.md
 ├── SCHEMA_CONFLICTS_RESOLUTION.md
@@ -3732,6 +3745,7 @@
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
+├── typedoc.json
 ├── TYPESCRIPT_FIXES_SUMMARY.md
 ├── vitest.setup.ts
 ├── vitest.workspace.ts

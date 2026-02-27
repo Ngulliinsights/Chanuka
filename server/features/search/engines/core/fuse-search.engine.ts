@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
-import { db as database } from '../../../../infrastructure/database/pool';
+import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
 import { sql, and, eq } from 'drizzle-orm';
 import Fuse from 'fuse.js';
@@ -130,17 +130,19 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${bills.chamber} = ANY(${query.filters.chamber})`);
     }
 
-    const billsData = await database
-      .select({
-        id: bills.id,
-        title: bills.title,
-        summary: bills.summary,
-        status: bills.status,
-        chamber: bills.chamber,
-        created_at: bills.created_at
-      })
-      .from(bills)
-      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    const billsData = await readDatabase(async (db) => {
+      return db
+        .select({
+          id: bills.id,
+          title: bills.title,
+          summary: bills.summary,
+          status: bills.status,
+          chamber: bills.chamber,
+          created_at: bills.created_at
+        })
+        .from(bills)
+        .where(conditions.length > 0 ? and(...conditions) : undefined);
+    });
 
     const searchableBills: SearchableBill[] = billsData.map((bill: any) => ({
       id: bill.id.toString(),
@@ -189,17 +191,19 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${sponsors.county} = ANY(${query.filters.county})`);
     }
 
-    const sponsorsData = await database
-      .select({
-        id: sponsors.id,
-        name: sponsors.name,
-        party: sponsors.party,
-        county: sponsors.county,
-        chamber: sponsors.chamber,
-        bio: sponsors.bio
-      })
-      .from(sponsors)
-      .where(and(...conditions));
+    const sponsorsData = await readDatabase(async (db) => {
+      return db
+        .select({
+          id: sponsors.id,
+          name: sponsors.name,
+          party: sponsors.party,
+          county: sponsors.county,
+          chamber: sponsors.chamber,
+          bio: sponsors.bio
+        })
+        .from(sponsors)
+        .where(and(...conditions));
+    });
 
     const searchableSponsors: SearchableSponsor[] = sponsorsData.map((sponsor: any) => ({
       id: sponsor.id.toString(),
@@ -248,17 +252,19 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${comments.created_at} <= ${query.filters.dateRange.end}`);
     }
 
-    const commentsData = await database
-      .select({
-        id: comments.id,
-        content: comments.comment_text,
-        bill_id: comments.bill_id,
-        created_at: comments.created_at,
-        user_name: users.email
-      })
-      .from(comments)
-      .innerJoin(users, eq(comments.user_id, users.id))
-      .where(conditions.length > 0 ? and(...conditions) : undefined);
+    const commentsData = await readDatabase(async (db) => {
+      return db
+        .select({
+          id: comments.id,
+          content: comments.comment_text,
+          bill_id: comments.bill_id,
+          created_at: comments.created_at,
+          user_name: users.email
+        })
+        .from(comments)
+        .innerJoin(users, eq(comments.user_id, users.id))
+        .where(conditions.length > 0 ? and(...conditions) : undefined);
+    });
 
     const searchableComments: SearchableComment[] = commentsData.map((comment: any) => ({
       id: comment.id.toString(),

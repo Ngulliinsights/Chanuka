@@ -4,7 +4,7 @@ import { and, desc, eq, gte, type SQL, sql } from 'drizzle-orm';
 import { jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Request } from 'express';
 
-import type { ThreatDetectionResult } from './intrusion-detection-service';
+import type { ThreatDetectionResult } from './intrusion-detection.service';
 
 /**
  * SecurityMonitoringService - The Active Intelligence Layer
@@ -490,8 +490,8 @@ export async function getSecurityMonitoringService(): Promise<SecurityMonitoring
   if (!productionInstance) {
     // Dynamic import to avoid circular dependencies
     const [{ intrusionDetectionService }, { securityAuditService }] = await Promise.all([
-      import('./intrusion-detection-service'),
-      import('./security-audit-service')
+      import('./intrusion-detection.service'),
+      import('../../security-audit-service')
     ]);
 
     productionInstance = SecurityMonitoringService.getInstance(

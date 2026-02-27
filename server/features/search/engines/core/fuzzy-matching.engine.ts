@@ -4,7 +4,7 @@
 // Typo-tolerant search using PostgreSQL's pg_trgm extension for similarity matching
 
 import { SearchQuery, SearchResult } from '../types/search.types';
-import { db as database } from '../../../../infrastructure/database/pool';
+import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills } from '@server/infrastructure/schema';
 import { sql } from 'drizzle-orm';
 
@@ -21,21 +21,23 @@ export class FuzzyMatchingEngine {
 
     try {
       // Use PostgreSQL similarity function for fuzzy matching
-      const results = await database
-        .select({
-          id: bills.id,
-          title: bills.title,
-          description: bills.description,
-          status: bills.status,
-          chamber: bills.chamber,
-          created_at: bills.created_at,
-          similarity: sql<number>`similarity(${bills.title}, ${query.query})`
-        })
-        .from(bills)
-        .where(sql`similarity(${bills.title}, ${query.query}) > 0.3`)
-        .orderBy(sql`similarity(${bills.title}, ${query.query}) DESC`)
-        .limit(limit)
-        .offset(offset);
+      const results = await readDatabase(async (db) => {
+        return db
+          .select({
+            id: bills.id,
+            title: bills.title,
+            description: bills.description,
+            status: bills.status,
+            chamber: bills.chamber,
+            created_at: bills.created_at,
+            similarity: sql<number>`similarity(${bills.title}, ${query.query})`
+          })
+          .from(bills)
+          .where(sql`similarity(${bills.title}, ${query.query}) > 0.3`)
+          .orderBy(sql`similarity(${bills.title}, ${query.query}) DESC`)
+          .limit(limit)
+          .offset(offset);
+      });
 
       return results.map(bill => ({
         id: bill.id.toString(),

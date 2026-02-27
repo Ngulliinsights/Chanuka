@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
 import { performanceMonitor } from '@server/infrastructure/observability/monitoring';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import {
   type Argument,
   argument_relationships,
@@ -83,9 +83,7 @@ export interface StoredBrief {
  * and brief generation capabilities.
  */
 export class ArgumentIntelligenceService {
-  private get database() {
-    return db;
-  }
+
 
   // ============================================================================
   // ARGUMENT OPERATIONS
@@ -101,14 +99,16 @@ export class ArgumentIntelligenceService {
 
     try {
       const now = new Date();
-      const [newArgument] = await this.database
-        .insert(argumentTable)
-        .values({
-          ...argumentData,
-          created_at: now,
-          updated_at: now
-        })
-        .returning();
+      const [newArgument] = await withTransaction(async (tx) => {
+        return tx
+          .insert(argumentTable)
+          .values({
+            ...argumentData,
+            created_at: now,
+            updated_at: now
+          })
+          .returning();
+      });
 
       logger.info('✅ Argument stored successfully', {
         ...logContext,
@@ -134,11 +134,13 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching arguments for bill', logContext);
 
     try {
-      const results = await this.database
-        .select()
-        .from(argumentTable)
-        .where(eq(argumentTable.bill_id, bill_id))
-        .orderBy(desc(argumentTable.created_at));
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(argumentTable)
+          .where(eq(argumentTable.bill_id, bill_id))
+          .orderBy(desc(argumentTable.created_at));
+      });
 
       logger.debug('✅ Arguments retrieved', { ...logContext, count: results.length });
       return results;
@@ -162,17 +164,19 @@ export class ArgumentIntelligenceService {
 
     try {
       const searchPattern = `%${searchText}%`;
-      const results = await this.database
-        .select()
-        .from(argumentTable)
-        .where(
-          or(
-            like(argumentTable.content, searchPattern),
-            like(argumentTable.summary, searchPattern)
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(argumentTable)
+          .where(
+            or(
+              like(argumentTable.content, searchPattern),
+              like(argumentTable.summary, searchPattern)
+            )
           )
-        )
-        .limit(limit)
-        .orderBy(desc(argumentTable.created_at));
+          .limit(limit)
+          .orderBy(desc(argumentTable.created_at));
+      });
 
       logger.debug('✅ Argument search completed', { ...logContext, count: results.length });
       return results;
@@ -206,10 +210,12 @@ export class ArgumentIntelligenceService {
         updated_at: now
       }));
 
-      const newClaims = await this.database
-        .insert(claims)
-        .values(claimsWithTimestamps)
-        .returning();
+      const newClaims = await withTransaction(async (tx) => {
+        return tx
+          .insert(claims)
+          .values(claimsWithTimestamps)
+          .returning();
+      });
 
       logger.info('✅ Claims stored successfully', {
         ...logContext,
@@ -235,11 +241,13 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching claims for argument', logContext);
 
     try {
-      const results = await this.database
-        .select()
-        .from(claims)
-        .where(eq(claims.argument_id, argumentId))
-        .orderBy(asc(claims.position));
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(claims)
+          .where(eq(claims.argument_id, argumentId))
+          .orderBy(asc(claims.position));
+      });
 
       logger.debug('✅ Claims retrieved', { ...logContext, count: results.length });
       return results;
@@ -273,10 +281,12 @@ export class ArgumentIntelligenceService {
         updated_at: now
       }));
 
-      const newEvidence = await this.database
-        .insert(evidence)
-        .values(evidenceWithTimestamps)
-        .returning();
+      const newEvidence = await withTransaction(async (tx) => {
+        return tx
+          .insert(evidence)
+          .values(evidenceWithTimestamps)
+          .returning();
+      });
 
       logger.info('✅ Evidence stored successfully', {
         ...logContext,
@@ -302,11 +312,13 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching evidence for claim', logContext);
 
     try {
-      const results = await this.database
-        .select()
-        .from(evidence)
-        .where(eq(evidence.claim_id, claimId))
-        .orderBy(desc(evidence.credibility_score));
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(evidence)
+          .where(eq(evidence.claim_id, claimId))
+          .orderBy(desc(evidence.credibility_score));
+      });
 
       logger.debug('✅ Evidence retrieved', { ...logContext, count: results.length });
       return results;
@@ -334,14 +346,16 @@ export class ArgumentIntelligenceService {
 
     try {
       const now = new Date();
-      const [newBrief] = await this.database
-        .insert(legislative_briefs)
-        .values({
-          ...briefData,
-          created_at: now,
-          updated_at: now
-        })
-        .returning();
+      const [newBrief] = await withTransaction(async (tx) => {
+        return tx
+          .insert(legislative_briefs)
+          .values({
+            ...briefData,
+            created_at: now,
+            updated_at: now
+          })
+          .returning();
+      });
 
       logger.info('✅ Legislative brief stored successfully', {
         ...logContext,
@@ -367,11 +381,13 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching briefs for bill', logContext);
 
     try {
-      const results = await this.database
-        .select()
-        .from(legislative_briefs)
-        .where(eq(legislative_briefs.bill_id, bill_id))
-        .orderBy(desc(legislative_briefs.created_at));
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(legislative_briefs)
+          .where(eq(legislative_briefs.bill_id, bill_id))
+          .orderBy(desc(legislative_briefs.created_at));
+      });
 
       logger.debug('✅ Briefs retrieved', { ...logContext, count: results.length });
       return results;
@@ -393,11 +409,13 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching brief by ID', logContext);
 
     try {
-      const [brief] = await this.database
-        .select()
-        .from(legislative_briefs)
-        .where(eq(legislative_briefs.id, briefId))
-        .limit(1);
+      const [brief] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(legislative_briefs)
+          .where(eq(legislative_briefs.id, briefId))
+          .limit(1);
+      });
 
       if (!brief) {
         logger.debug('Brief not found', logContext);
@@ -427,25 +445,27 @@ export class ArgumentIntelligenceService {
 
     try {
       const now = new Date();
-      await this.database
-        .insert(synthesis_jobs)
-        .values({
-          id: `synthesis_${synthesis.bill_id}_${Date.now()}`,
-          bill_id: synthesis.bill_id,
-          job_type: 'bill_synthesis',
-          status: 'completed',
-          input_data: JSON.stringify({
-            majorClaims: synthesis.majorClaims,
-            evidenceBase: synthesis.evidenceBase,
-            stakeholderPositions: synthesis.stakeholderPositions,
-            consensusAreas: synthesis.consensusAreas,
-            controversialPoints: synthesis.controversialPoints
-          }),
-          output_data: synthesis.legislativeBrief,
-          created_at: now,
-          updated_at: now,
-          completed_at: synthesis.lastUpdated
-        });
+      await withTransaction(async (tx) => {
+        await tx
+          .insert(synthesis_jobs)
+          .values({
+            id: `synthesis_${synthesis.bill_id}_${Date.now()}`,
+            bill_id: synthesis.bill_id,
+            job_type: 'bill_synthesis',
+            status: 'completed',
+            input_data: JSON.stringify({
+              majorClaims: synthesis.majorClaims,
+              evidenceBase: synthesis.evidenceBase,
+              stakeholderPositions: synthesis.stakeholderPositions,
+              consensusAreas: synthesis.consensusAreas,
+              controversialPoints: synthesis.controversialPoints
+            }),
+            output_data: synthesis.legislativeBrief,
+            created_at: now,
+            updated_at: now,
+            completed_at: synthesis.lastUpdated
+          });
+      });
 
       logger.info('✅ Bill synthesis stored successfully', logContext);
     } catch (error) {
@@ -466,18 +486,20 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching bill synthesis', logContext);
 
     try {
-      const [synthesis] = await this.database
-        .select()
-        .from(synthesis_jobs)
-        .where(
-          and(
-            eq(synthesis_jobs.bill_id, bill_id),
-            eq(synthesis_jobs.job_type, 'bill_synthesis'),
-            eq(synthesis_jobs.status, 'completed')
+      const [synthesis] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(synthesis_jobs)
+          .where(
+            and(
+              eq(synthesis_jobs.bill_id, bill_id),
+              eq(synthesis_jobs.job_type, 'bill_synthesis'),
+              eq(synthesis_jobs.status, 'completed')
+            )
           )
-        )
-        .orderBy(desc(synthesis_jobs.completed_at))
-        .limit(1);
+          .orderBy(desc(synthesis_jobs.completed_at))
+          .limit(1);
+      });
 
       if (!synthesis) {
         logger.debug('Bill synthesis not found', logContext);
@@ -526,10 +548,12 @@ export class ArgumentIntelligenceService {
         updated_at: now
       }));
 
-      const newRelationships = await this.database
-        .insert(argument_relationships)
-        .values(relationshipsWithTimestamps)
-        .returning();
+      const newRelationships = await withTransaction(async (tx) => {
+        return tx
+          .insert(argument_relationships)
+          .values(relationshipsWithTimestamps)
+          .returning();
+      });
 
       logger.info('✅ Argument relationships stored successfully', {
         ...logContext,
@@ -556,21 +580,23 @@ export class ArgumentIntelligenceService {
     logger.debug('Fetching related arguments', logContext);
 
     try {
-      let query = this.database
-        .select()
-        .from(argument_relationships)
-        .where(
-          or(
-            eq(argument_relationships.source_argument_id, argumentId),
-            eq(argument_relationships.target_argument_id, argumentId)
-          )
-        );
+      const results = await readDatabase(async (db) => {
+        let query = db
+          .select()
+          .from(argument_relationships)
+          .where(
+            or(
+              eq(argument_relationships.source_argument_id, argumentId),
+              eq(argument_relationships.target_argument_id, argumentId)
+            )
+          );
 
-      if (relationshipType) {
-        query = query.where(eq(argument_relationships.relationship_type, relationshipType));
-      }
+        if (relationshipType) {
+          query = query.where(eq(argument_relationships.relationship_type, relationshipType));
+        }
 
-      const results = await query.orderBy(desc(argument_relationships.strength));
+        return query.orderBy(desc(argument_relationships.strength));
+      });
 
       logger.debug('✅ Related arguments retrieved', { ...logContext, count: results.length });
       return results;
@@ -597,45 +623,53 @@ export class ArgumentIntelligenceService {
     logger.debug('Calculating argument statistics', logContext);
 
     try {
-      const [stats] = await this.database
-        .select({
-          totalArguments: count(),
-          avgConfidenceScore: sql<number>`AVG(${argumentTable.confidence_score})`,
-          avgSentimentScore: sql<number>`AVG(${argumentTable.sentiment_score})`
-        })
-        .from(argumentTable)
-        .where(eq(argumentTable.bill_id, bill_id));
+      const [stats, claimStats, evidenceStats] = await readDatabase(async (db) => {
+        const statsPromise = db
+          .select({
+            totalArguments: count(),
+            avgConfidenceScore: sql<number>`AVG(${argumentTable.confidence_score})`,
+            avgSentimentScore: sql<number>`AVG(${argumentTable.sentiment_score})`
+          })
+          .from(argumentTable)
+          .where(eq(argumentTable.bill_id, bill_id));
 
-      const [claimStats] = await this.database
-        .select({
-          totalClaims: count()
-        })
-        .from(claims)
-        .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
-        .where(eq(argumentTable.bill_id, bill_id));
+        const claimStatsPromise = db
+          .select({
+            totalClaims: count()
+          })
+          .from(claims)
+          .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
+          .where(eq(argumentTable.bill_id, bill_id));
 
-      const [evidenceStats] = await this.database
-        .select({
-          totalEvidence: count(),
-          avgCredibilityScore: sql<number>`AVG(${evidence.credibility_score})`
-        })
-        .from(evidence)
-        .innerJoin(claims, eq(evidence.claim_id, claims.id))
-        .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
-        .where(eq(argumentTable.bill_id, bill_id));
+        const evidenceStatsPromise = db
+          .select({
+            totalEvidence: count(),
+            avgCredibilityScore: sql<number>`AVG(${evidence.credibility_score})`
+          })
+          .from(evidence)
+          .innerJoin(claims, eq(evidence.claim_id, claims.id))
+          .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
+          .where(eq(argumentTable.bill_id, bill_id));
+
+        return Promise.all([statsPromise, claimStatsPromise, evidenceStatsPromise]);
+      });
+
+      const [statsResult] = stats;
+      const [claimStatsResult] = claimStats;
+      const [evidenceStatsResult] = evidenceStats;
 
       const statistics = {
         arguments: {
-          total: stats.totalArguments,
-          avgConfidenceScore: stats.avgConfidenceScore,
-          avgSentimentScore: stats.avgSentimentScore
+          total: statsResult.totalArguments,
+          avgConfidenceScore: statsResult.avgConfidenceScore,
+          avgSentimentScore: statsResult.avgSentimentScore
         },
         claims: {
-          total: claimStats.totalClaims
+          total: claimStatsResult.totalClaims
         },
         evidence: {
-          total: evidenceStats.totalEvidence,
-          avgCredibilityScore: evidenceStats.avgCredibilityScore
+          total: evidenceStatsResult.totalEvidence,
+          avgCredibilityScore: evidenceStatsResult.avgCredibilityScore
         }
       };
 
@@ -953,7 +987,9 @@ export class ArgumentIntelligenceService {
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
       // Simple query to test database connectivity
-      await this.database.select({ count: count() }).from(argumentTable).limit(1);
+      await readDatabase(async (db) => {
+        return db.select({ count: count() }).from(argumentTable).limit(1);
+      });
 
       return {
         status: 'healthy',

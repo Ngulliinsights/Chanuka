@@ -159,8 +159,7 @@ function mapSectionConflict(r: z.infer<typeof dbSectionConflictRowSchema>): { se
  * - Batch-loads sponsor transparency and affiliations to avoid N+1
  * - Maps DB (snake_case) -> camelCase DTOs at the repository boundary
  */
-export async function getSponsorshipsByBill(bill_id: number, type?: 'primary' | 'co-sponsor'):
-  Promise<SponsorshipData[]> {
+export async function getSponsorshipsByBill(bill_id: number, type?: 'primary' | 'co-sponsor'): Promise<SponsorshipData[]> {
   // Primary read path
   const rows = await readDatabase.select({
     sponsorshipId: bill_sponsorships.id,

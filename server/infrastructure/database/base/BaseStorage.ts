@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase } from '@server/infrastructure/database/connection';
 
 export interface StorageConfig {
   prefix?: string;
@@ -35,7 +35,7 @@ export abstract class BaseStorage<T> {
    * Access to the Unified Drizzle Instance
    */
   protected get db() {
-    return db;
+    return readDatabase;
   }
 
   /**

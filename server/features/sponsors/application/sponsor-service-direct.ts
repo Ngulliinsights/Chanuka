@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import {
   bill_sponsorships,
   type Sponsor,
@@ -55,9 +55,7 @@ export interface SponsorWithRelations extends Sponsor {
 // ============================================================================
 
 export class SponsorService {
-  private get database() {
-    return db;
-  }
+  // No need for database getter - use readDatabase/writeDatabase directly
 
   // ============================================================================
   // BASIC CRUD OPERATIONS
@@ -68,7 +66,7 @@ export class SponsorService {
     logger.debug(logContext, "Fetching sponsor by ID");
 
     try {
-      const result = await this.database
+      const result = await readDatabase
         .select()
         .from(sponsors)
         .where(eq(sponsors.id, id))
@@ -93,14 +91,16 @@ export class SponsorService {
 
     try {
       const now = new Date();
-      const result = await this.database
-        .insert(sponsors)
-        .values({
-          ...sponsorData,
-          created_at: now,
-          updated_at: now
-        } as any)
-        .returning();
+      const result = await withTransaction(async (tx) => {
+        return await tx
+          .insert(sponsors)
+          .values({
+            ...sponsorData,
+            created_at: now,
+            updated_at: now
+          } as any)
+          .returning();
+      });
 
       const newSponsor = Array.isArray(result) ? result[0] : result;
 
@@ -122,14 +122,16 @@ export class SponsorService {
     logger.debug(logContext, "Updating sponsor");
 
     try {
-      const result = await this.database
-        .update(sponsors)
-        .set({
-          ...updateData,
-          updated_at: new Date()
-        } as any)
-        .where(eq(sponsors.id, id))
-        .returning();
+      const result = await withTransaction(async (tx) => {
+        return await tx
+          .update(sponsors)
+          .set({
+            ...updateData,
+            updated_at: new Date()
+          } as any)
+          .where(eq(sponsors.id, id))
+          .returning();
+      });
 
       const updatedSponsor = Array.isArray(result) ? result[0] : undefined;
 
@@ -177,7 +179,7 @@ export class SponsorService {
     logger.debug(logContext, "Listing sponsors");
 
     try {
-      let query = this.database.select().from(sponsors) as any;
+      let query = readDatabase.select().from(sponsors) as any;
 
       const conditions = [];
       if (options.party) conditions.push(eq(sponsors.party, options.party));
@@ -223,7 +225,7 @@ export class SponsorService {
         like(sponsors.constituency, searchPattern)
       ];
 
-      let dbQuery = this.database
+      let dbQuery = readDatabase
         .select()
         .from(sponsors)
         .where(or(...searchConditions)) as any;
@@ -270,7 +272,7 @@ export class SponsorService {
     }
 
     try {
-      const results = await this.database
+      const results = await readDatabase
         .select()
         .from(sponsors)
         .where(inArray(sponsors.id, ids));
@@ -293,7 +295,7 @@ export class SponsorService {
     logger.debug(logContext, "Counting active sponsors");
 
     try {
-      const result = await this.database
+      const result = await readDatabase
         .select({ count: count() })
         .from(sponsors)
         .where(eq(sponsors.is_active, true));
@@ -313,7 +315,7 @@ export class SponsorService {
     logger.debug(logContext, "Fetching unique parties");
 
     try {
-      const results = await this.database
+      const results = await readDatabase
         .selectDistinct({ party: sponsors.party })
         .from(sponsors)
         .where(and(
@@ -380,7 +382,7 @@ export class SponsorService {
     logger.debug(logContext, "Getting sponsor statistics");
 
     try {
-      const totalResult = await this.database
+      const totalResult = await readDatabase
         .select({ count: count() })
         .from(sponsors);
 
@@ -417,7 +419,7 @@ export class SponsorService {
     logger.debug(logContext, "Fetching bill sponsorships initiated by sponsor");
 
     try {
-      let query = this.database
+      let query = readDatabase
         .select()
         .from(bill_sponsorships)
         .where(eq(bill_sponsorships.sponsor_id, sponsor_id)) as any;
@@ -446,7 +448,7 @@ export class SponsorService {
     logger.debug(logContext, "Fetching all sponsors for a bill");
 
     try {
-      let query = this.database
+      let query = readDatabase
         .select()
         .from(bill_sponsorships)
         .where(eq(bill_sponsorships.bill_id, bill_id)) as any;
@@ -482,18 +484,20 @@ export class SponsorService {
 
     try {
       const now = new Date();
-      const result = await this.database
-        .insert(bill_sponsorships)
-        .values({
-          sponsor_id,
-          bill_id,
-          sponsorship_type: sponsorshipType,
-          sponsorship_date: sponsorshipDate || now,
-          is_active: true,
-          created_at: now,
-          updated_at: now
-        } as any)
-        .returning();
+      const result = await withTransaction(async (tx) => {
+        return await tx
+          .insert(bill_sponsorships)
+          .values({
+            sponsor_id,
+            bill_id,
+            sponsorship_type: sponsorshipType,
+            sponsorship_date: sponsorshipDate || now,
+            is_active: true,
+            created_at: now,
+            updated_at: now
+          } as any)
+          .returning();
+      });
 
       const newSponsorship = Array.isArray(result) ? result[0] : result;
 

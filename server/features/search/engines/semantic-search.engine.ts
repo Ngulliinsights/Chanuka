@@ -13,7 +13,7 @@
 // SQL with an explicit generic row shape. This is idiomatic for vector workloads.
 
 import { logger } from '../../../infrastructure/observability/core/logger';
-import { db as database } from '../../../infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '../../../infrastructure/database/connection';
 import {
   searchQueries,
   ContentType,
@@ -203,9 +203,10 @@ export class SemanticSearchEngine {
         : blendedExpr;
 
       // 4. Main results query — typed via the SearchRow generic.
-      //    Using database.execute bypasses drizzle's builder inference, which
+      //    Using readDatabase with execute bypasses drizzle's builder inference, which
       //    collapses to `unknown` when pgvector SQL expressions enter .where().
-      const rowsResult = await database.execute(sql`
+      const rowsResult = await readDatabase(async (db) => {
+        return db.execute(sql`
         SELECT
           content_id                            AS id,
           content_type,
@@ -232,10 +233,12 @@ export class SemanticSearchEngine {
         LIMIT  ${limit}
         OFFSET ${offset}
       `);
+      });
       const rows = rowsResult.rows as unknown as SearchRow[];
 
       // 5. Separate count query for accurate pagination.
-      const countResult = await database.execute(sql`
+      const countResult = await readDatabase(async (db) => {
+        return db.execute(sql`
         SELECT count(*)::text AS total
         FROM content_embeddings
         WHERE (${semanticExpr}) > ${minSimilarity}
@@ -245,6 +248,7 @@ export class SemanticSearchEngine {
           ${dateEndClause}
           AND processing_status = 'completed'
       `);
+      });
       
       const countRows = countResult.rows as unknown as CountRow[];
       const countRow = countRows[0];
@@ -320,8 +324,9 @@ export class SemanticSearchEngine {
     dayEnd.setHours(23, 59, 59, 999);
 
     try {
-      // Using execute avoids drizzle builder collapse on and(gte(...), lte(...)).
-      const statsResult = await database.execute(sql`
+      // Using readDatabase with execute avoids drizzle builder collapse on and(gte(...), lte(...)).
+      const statsResult = await readDatabase(async (db) => {
+        return db.execute(sql`
         SELECT
           count(*)::text                 AS total_queries,
           avg(processing_time_ms)::text  AS avg_processing_ms,
@@ -331,6 +336,7 @@ export class SemanticSearchEngine {
         WHERE created_at >= ${dayStart}
           AND created_at <= ${dayEnd}
       `);
+      });
       
       const statsRows = statsResult.rows as unknown as AnalyticsRow[];
       const stats = statsRows[0];
@@ -384,7 +390,8 @@ export class SemanticSearchEngine {
     // which satisfies drizzle's jsonb column typing without an unsafe cast.
     const filtersJson = JSON.parse(JSON.stringify(params.filters)) as Record<string, unknown>;
 
-    await database.insert(searchQueries).values({
+    await withTransaction(async (tx) => {
+      await tx.insert(searchQueries).values({
       query_text:         params.query,
       query_type:         params.searchType,
       user_id:            params.userId    ?? null,
@@ -395,6 +402,7 @@ export class SemanticSearchEngine {
       results_displayed:  params.resultsDisplayed,
       embedding:          params.embedding,
       cache_hit:          0, // Embedding-level cache hits tracked inside embeddingService
+    });
     });
   }
 }

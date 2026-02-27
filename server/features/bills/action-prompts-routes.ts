@@ -1,11 +1,8 @@
 import { Router, Request, Response } from 'express';
 import { actionPromptGenerator } from '../notifications/action-prompt-generator';
-import { pool } from '../../infrastructure/database/pool';
+import { readDatabase } from '../../infrastructure/database';
 import { bills } from '../../infrastructure/schema/foundation';
 import { eq } from 'drizzle-orm';
-import { drizzle } from 'drizzle-orm/node-postgres';
-
-const db = drizzle(pool);
 
 export const actionPromptsRouter: Router = Router();
 
@@ -24,7 +21,7 @@ actionPromptsRouter.get('/:billId/action-prompts', async (req: Request, res: Res
     const userId = (req as any).user?.id; // Assuming auth middleware sets req.user
 
     // Fetch bill
-    const [bill] = await db
+    const [bill] = await readDatabase
       .select()
       .from(bills)
       .where(eq(bills.id, billId))

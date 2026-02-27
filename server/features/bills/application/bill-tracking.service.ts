@@ -1,12 +1,13 @@
-// Bill Tracking Service - Final Corrected Version
+// Bill Tracking Service - Refactored with Repository Pattern
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, withTransaction } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import type { Bill } from '@server/infrastructure/schema';
-import { and, asc, count as drizzleCount, desc, eq, or, sql } from 'drizzle-orm';
+import { and, count as drizzleCount, desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { cacheService } from '@server/infrastructure/cache';
+import type { BillRepository } from '../domain/repositories/bill.repository';
 
 // ============================================================================
 // IMPORTANT: Table Name Configuration
@@ -141,10 +142,18 @@ export interface TrackedBillWithDetails extends schema.Bill {
 
 /**
  * Service for managing user bill tracking preferences and related operations.
+ * 
+ * REFACTORED WITH REPOSITORY PATTERN:
+ * - Uses BillRepository for bill data access
+ * - Maintains tracking-specific logic (user preferences, analytics)
  */
 export class BillTrackingService {
+  constructor(
+    private readonly billRepository: BillRepository
+  ) {}
+
   private get db() {
-    return readDatabase;
+    return readDatabase as any;
   }
 
   /**
@@ -280,6 +289,8 @@ export class BillTrackingService {
 
   /**
    * Get a paginated list of bills actively tracked by the user.
+   * 
+   * REFACTORED: Now uses BillRepository for bill queries
    */
   async getUserTrackedBills(
     user_id: string,
@@ -315,79 +326,78 @@ export class BillTrackingService {
     logger.debug(`Cache miss for tracked bills: ${cacheKey}`);
 
     try {
-      const baseConditions = [
+      // Step 1: Get tracking preferences for user
+      const trackingConditions = [
         eq(TRACKING_TABLE.user_id, user_id),
         eq(TRACKING_TABLE.is_active, true),
       ];
-      if (options.category) baseConditions.push(eq(schema.bills.category, options.category));
-      if (options.status) baseConditions.push(eq(schema.bills.status, options.status));
 
-      const [countResult] = await this.db
-        .select({ count: drizzleCount() })
-        .from(TRACKING_TABLE)
-        .innerJoin(
-          schema.bills,
-          eq(TRACKING_TABLE.bill_id, schema.bills.id)
-        )
-        .where(and(...baseConditions));
-
-      const total = Number(countResult?.count ?? 0);
-
-      if (total === 0) {
-        return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
-      }
-
-      let sortColumn;
-      switch (sortBy) {
-        case 'last_updated':
-          sortColumn = schema.bills.updated_at;
-          break;
-        case 'engagement':
-          sortColumn = schema.bill_engagement.engagement_score;
-          break;
-        case 'date_tracked':
-        default:
-          sortColumn = TRACKING_TABLE.updated_at;
-      }
-      const orderFunction = sortOrder === 'asc' ? asc : desc;
-
-      const results = await this.db
+      const trackingResults = await this.db
         .select({
-          bill: schema.bills,
-          engagement: schema.bill_engagement,
+          bill_id: TRACKING_TABLE.bill_id,
           trackingPreferences: TRACKING_TABLE,
         })
         .from(TRACKING_TABLE)
-        .innerJoin(
-          schema.bills,
-          eq(TRACKING_TABLE.bill_id, schema.bills.id)
-        )
-        .leftJoin(
-          schema.bill_engagement,
-          and(
-            eq(TRACKING_TABLE.bill_id, schema.bill_engagement.bill_id),
-            eq(TRACKING_TABLE.user_id, schema.bill_engagement.user_id)
-          )
-        )
-        .where(and(...baseConditions))
-        .orderBy(orderFunction(sortColumn))
-        .limit(limit)
-        .offset(offset);
+        .where(and(...trackingConditions));
 
+      if (trackingResults.length === 0) {
+        return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
+      }
+
+      const trackedBillIds = trackingResults.map((t: any) => t.bill_id);
+      const trackingMap = new Map(
+        trackingResults.map((t: any) => [t.bill_id, t.trackingPreferences])
+      );
+
+      // Step 2: Use repository to fetch bills with filters
+      const billsResult = await this.billRepository.findByIds(trackedBillIds, {
+        category: options.category,
+        status: options.status as any,
+        sortBy: sortBy === 'date_tracked' ? 'updated_at' : (sortBy === 'last_updated' ? 'updated_at' : undefined),
+        sortOrder: sortOrder as 'asc' | 'desc',
+      });
+
+      if (billsResult.isErr) {
+        logger.error(`Error fetching bills: ${billsResult.error.message}`);
+        return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
+      }
+
+      let bills = billsResult.value;
+
+      // Step 3: Apply pagination
+      const total = bills.length;
+      const paginatedBills = bills.slice(offset, offset + limit);
+
+      // Step 4: Enhance with engagement data and tracking preferences
       const enhancedBills: TrackedBillWithDetails[] = await Promise.all(
-        results.map(async (res: any) => {
-          const recentUpdates = await this.getBillRecentUpdates(res.bill.id);
-          const engagement_data = res.engagement || {
+        paginatedBills.map(async (bill: any) => {
+          const recentUpdates = await this.getBillRecentUpdates(bill.id);
+          
+          // Get engagement data
+          const [engagement] = await this.db
+            .select()
+            .from(schema.bill_engagement)
+            .where(
+              and(
+                eq(schema.bill_engagement.bill_id, bill.id),
+                eq(schema.bill_engagement.user_id, user_id)
+              )
+            )
+            .limit(1);
+
+          const engagement_data = engagement || {
             view_count: 0,
             comment_count: 0,
             share_count: 0,
             engagement_score: '0',
-            last_engaged_at: res.trackingPreferences.created_at,
+            last_engaged_at: new Date(),
           };
+
+          const trackingPreferences = trackingMap.get(bill.id);
           
           return {
-            ...res.bill,
-            trackingPreferences: res.trackingPreferences as BillTrackingPreference,
+            ...bill,
+            trackingPreferences: trackingPreferences as BillTrackingPreference,
             engagement: {
               view_count: engagement_data.view_count,
               comment_count: engagement_data.comment_count,
@@ -660,6 +670,9 @@ export class BillTrackingService {
 
   /**
    * Recommend bills for tracking based on user interests.
+   * 
+   * PARTIALLY REFACTORED: Uses BillRepository for bill queries
+   * TODO: Move recommendation logic to domain service
    */
   async getRecommendedBillsForTracking(
     user_id: string,
@@ -691,59 +704,43 @@ export class BillTrackingService {
 
       const recommendations: schema.Bill[] = [];
 
-      // Strategy 1: Find untracked bills matching user interests
+      // Strategy 1: Find untracked bills matching user interests by category
       if (interests.length > 0) {
-        const interestConditions = or(
-          ...interests.map((interest: string) =>
-            sql`LOWER(${schema.bills.category}) = ${interest}`
-          ),
-          sql`EXISTS (
-            SELECT 1 FROM ${schema.bill_tags}
-            WHERE ${schema.bill_tags.bill_id} = ${schema.bills.id}
-            AND LOWER(${schema.bill_tags.tag}) IN (${sql.raw(interests.map((i: string) => `'${i}'`).join(','))})
-          )`
-        );
-
-        const interestBasedRecs = await this.db
-          .select()
-          .from(schema.bills)
-          .where(
-            and(
-              interestConditions,
-              trackedBillIds.length > 0
-                ? sql`${schema.bills.id} NOT IN (${sql.raw(trackedBillIds.join(','))})`
-                : sql`1=1`
-            )
-          )
-          .orderBy(desc(schema.bills.view_count))
-          .limit(limit);
-        recommendations.push(...interestBasedRecs);
+        for (const interest of interests) {
+          if (recommendations.length >= limit) break;
+          
+          const categoryResult = await this.billRepository.findByCategory(
+            interest,
+            { limit: limit - recommendations.length }
+          );
+          
+          if (categoryResult.isOk) {
+            // Filter out already tracked bills
+            const untrackedBills = categoryResult.value.filter(
+              bill => !trackedBillIds.includes(bill.id)
+            );
+            recommendations.push(...untrackedBills);
+          }
+        }
       }
 
       // Strategy 2: Add popular untracked bills if needed
       if (recommendations.length < limit) {
-        const remainingLimit = limit - recommendations.length;
-        const popularUntracked = await this.db
-          .select()
-          .from(schema.bills)
-          .where(
-            trackedBillIds.length > 0
-              ? sql`${schema.bills.id} NOT IN (${sql.raw(trackedBillIds.join(','))})`
-              : sql`1=1`
-          )
-          .orderBy(desc(schema.bills.view_count))
-          .limit(remainingLimit + recommendations.length);
-
-        const currentRecIds = new Set(recommendations.map((r) => r.id));
-        popularUntracked.forEach((bill: any) => {
-          if (recommendations.length < limit && !currentRecIds.has(bill.id)) {
-            recommendations.push(bill);
-          }
+        const popularResult = await this.billRepository.findPopular({
+          limit: limit - recommendations.length,
+          excludeIds: [...trackedBillIds, ...recommendations.map(r => r.id)]
         });
+
+        if (popularResult.isOk) {
+          recommendations.push(...popularResult.value);
+        }
       }
 
-      await cacheService.set(cacheKey, recommendations, CACHE_TTL.LONG);
-      return recommendations;
+      // Limit to requested amount
+      const finalRecommendations = recommendations.slice(0, limit);
+      
+      await cacheService.set(cacheKey, finalRecommendations, CACHE_TTL.LONG);
+      return finalRecommendations;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error(`Error getting recommended bills: ${errorMessage}`);
@@ -753,6 +750,11 @@ export class BillTrackingService {
 
   // --- Helper Methods ---
 
+  /**
+   * Validate bill exists using repository
+   * 
+   * REFACTORED: Now uses BillRepository instead of direct database access
+   */
   private async validateBillExists(
     bill_id: number
   ): Promise<Pick<Bill, 'id' | 'title'> | null> {
@@ -760,24 +762,24 @@ export class BillTrackingService {
       throw new Error('Invalid Bill ID provided.');
     }
 
-    const cacheKey = `bill:exists:${bill_id}`;
-    const cachedExists = await cacheService.get(cacheKey);
-    
-    if (cachedExists !== null && cachedExists !== undefined) {
-      return cachedExists
-        ? ({ id: bill_id, title: 'Cached Title' } as Pick<Bill, 'id' | 'title'>)
-        : null;
-    }
-
     try {
-      const [bill] = await this.db
-        .select({ id: schema.bills.id, title: schema.bills.title })
-        .from(schema.bills)
-        .where(eq(schema.bills.id, bill_id))
-        .limit(1);
+      // Use repository to find bill by ID
+      const result = await this.billRepository.findById(bill_id);
+      
+      if (result.isErr) {
+        logger.error(`Error finding bill ${bill_id}: ${result.error.message}`);
+        throw result.error;
+      }
 
-      await cacheService.set(cacheKey, !!bill, CACHE_TTL.LONG);
-      return bill || null;
+      if (result.value === null) {
+        return null;
+      }
+
+      // Return only id and title
+      return {
+        id: result.value.id,
+        title: result.value.title,
+      };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       logger.error(`Error validating bill existence: ${errorMessage}`);
@@ -819,26 +821,34 @@ export class BillTrackingService {
     }
   }
 
+  /**
+   * Get recent updates for a bill
+   * 
+   * REFACTORED: Now uses BillRepository instead of direct database access
+   */
   private async getBillRecentUpdates(
     bill_id: number
   ): Promise<TrackedBillWithDetails['recentUpdates']> {
     try {
-      const [bill] = await this.db
-        .select({ status: schema.bills.status, updated_at: schema.bills.updated_at })
-        .from(schema.bills)
-        .where(eq(schema.bills.id, bill_id));
+      // Use repository to get bill
+      const billResult = await this.billRepository.findById(bill_id);
+      
+      if (billResult.isErr) {
+        logger.error(`Error fetching bill ${bill_id}: ${billResult.error.message}`);
+        return [];
+      }
 
       const updates: TrackedBillWithDetails['recentUpdates'] = [];
       
-      if (bill) {
+      if (billResult.value) {
         updates.push({
           type: 'status_change',
-          timestamp: bill.updated_at,
-          description: `Bill status is now "${bill.status}"`,
+          timestamp: billResult.value.updated_at,
+          description: `Bill status is now "${billResult.value.status}"`,
         });
       }
 
-      // Add recent comments
+      // Add recent comments (still using direct query as comments aren't in bill repository)
       const comments = await this.db
         .select({ content: schema.comments.content, created_at: schema.comments.created_at })
         .from(schema.comments)
@@ -903,5 +913,6 @@ export class BillTrackingService {
   }
 }
 
-// Export singleton instance
-export const billTrackingService = new BillTrackingService();
+// NOTE: Singleton instance now created in bill.factory.ts with dependency injection
+// Export class for factory usage
+// export const billTrackingService = new BillTrackingService();

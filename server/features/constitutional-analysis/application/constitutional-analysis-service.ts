@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database/pool';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import {
   analysis_audit_trail,
   constitutional_analyses,
@@ -68,9 +68,7 @@ export interface PrecedentSearchOptions {
  * - Audit trail logging for compliance
  */
 export class ConstitutionalAnalysisServiceComplete {
-  private get database() {
-    return db;
-  }
+
 
   // ============================================================================
   // CONSTITUTIONAL PROVISIONS OPERATIONS
@@ -89,11 +87,13 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Finding constitutional provision by ID', logContext);
 
     try {
-      const rows = await this.database
-        .select()
-        .from(constitutional_provisions)
-        .where(eq(constitutional_provisions.id, id))
-        .limit(1);
+      const rows = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_provisions)
+          .where(eq(constitutional_provisions.id, id))
+          .limit(1);
+      });
 
       const provision = rows[0] as ConstitutionalProvision | undefined;
       return provision || null;
@@ -119,43 +119,45 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Searching constitutional provisions', logContext);
 
     try {
-      let query = this.database.select().from(constitutional_provisions);
+      const results = await readDatabase(async (db) => {
+        let query = db.select().from(constitutional_provisions);
 
-      // Build dynamic where conditions based on provided options
-      const conditions = [];
-      
-      if (searchTerm) {
-        conditions.push(
-          or(
-            like(constitutional_provisions.title, `%${searchTerm}%`),
-            // schema uses `full_text` for provision body
-            like(constitutional_provisions.full_text, `%${searchTerm}%`)
-          )
-        );
-      }
-
-      if (article !== undefined && article !== null && article !== '') {
-        // Accept numeric or human strings like "Article 1" or "Article I". Try to extract digits.
-        let articleNum: number | undefined;
-        if (typeof article === 'number') {
-          articleNum = article;
-        } else if (typeof article === 'string') {
-          const digits = article.replace(/[^0-9]/g, '');
-          if (digits) articleNum = parseInt(digits, 10);
+        // Build dynamic where conditions based on provided options
+        const conditions = [];
+        
+        if (searchTerm) {
+          conditions.push(
+            or(
+              like(constitutional_provisions.title, `%${searchTerm}%`),
+              // schema uses `full_text` for provision body
+              like(constitutional_provisions.full_text, `%${searchTerm}%`)
+            )
+          );
         }
 
-        if (articleNum !== undefined && !Number.isNaN(articleNum)) {
-          conditions.push(eq(constitutional_provisions.article_number, articleNum));
+        if (article !== undefined && article !== null && article !== '') {
+          // Accept numeric or human strings like "Article 1" or "Article I". Try to extract digits.
+          let articleNum: number | undefined;
+          if (typeof article === 'number') {
+            articleNum = article;
+          } else if (typeof article === 'string') {
+            const digits = article.replace(/[^0-9]/g, '');
+            if (digits) articleNum = parseInt(digits, 10);
+          }
+
+          if (articleNum !== undefined && !Number.isNaN(articleNum)) {
+            conditions.push(eq(constitutional_provisions.article_number, articleNum));
+          }
         }
-      }
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as typeof query;
-      }
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions)) as typeof query;
+        }
 
-      const results = await query
-        .orderBy(asc(constitutional_provisions.article_number))
-        .limit(limit);
+        return query
+          .orderBy(asc(constitutional_provisions.article_number))
+          .limit(limit);
+      });
 
       logger.debug('Constitutional provisions search completed', { 
         ...logContext, 
@@ -194,11 +196,13 @@ export class ConstitutionalAnalysisServiceComplete {
         return [];
       }
 
-      const results = await this.database
-        .select()
-        .from(constitutional_provisions)
-        .where(eq(constitutional_provisions.article_number, articleNum))
-        .orderBy(asc(constitutional_provisions.section_number));
+      const results = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_provisions)
+          .where(eq(constitutional_provisions.article_number, articleNum))
+          .orderBy(asc(constitutional_provisions.section_number));
+      });
 
       logger.debug('Found provisions by article', { ...logContext, count: results.length });
       return results;
@@ -224,11 +228,13 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Finding legal precedent by ID', logContext);
 
     try {
-      const rows = await this.database
-        .select()
-        .from(legal_precedents)
-        .where(eq(legal_precedents.id, id))
-        .limit(1);
+      const rows = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(legal_precedents)
+          .where(eq(legal_precedents.id, id))
+          .limit(1);
+      });
 
       const precedent = rows[0] as LegalPrecedent | undefined;
       return precedent || null;
@@ -268,59 +274,61 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Searching for legal precedents', logContext);
 
     try {
-      let query = this.database.select().from(legal_precedents);
-      
-      const conditions = [];
+      const results = await readDatabase(async (db) => {
+        let query = db.select().from(legal_precedents);
+        
+        const conditions = [];
 
-      // Filter by constitutional provisions if specified
-      if (provisionIds.length > 0) {
-        // schema column: `constitutional_provisions_involved`
-        conditions.push(
-          sql`${legal_precedents.constitutional_provisions_involved} && ARRAY[${sql.raw(provisionIds.map(id => `'${id}'`).join(','))}]::uuid[]`
-        );
-      }
-
-      // Filter by binding status -> schema uses `precedent_strength` (values like 'binding','persuasive')
-      if (isBinding) {
-        conditions.push(eq(legal_precedents.precedent_strength, 'binding'));
-      }
-
-      // Filter by minimum relevance score (map to precedent_strength heuristically)
-      if (minRelevanceScore && minRelevanceScore > 0) {
-        if (minRelevanceScore >= 0.8) {
-          conditions.push(eq(legal_precedents.precedent_strength, 'binding'));
-        } else if (minRelevanceScore >= 0.6) {
-          const bindingOrPersuasive = or(
-            eq(legal_precedents.precedent_strength, 'binding'), 
-            eq(legal_precedents.precedent_strength, 'persuasive')
+        // Filter by constitutional provisions if specified
+        if (provisionIds.length > 0) {
+          // schema column: `constitutional_provisions_involved`
+          conditions.push(
+            sql`${legal_precedents.constitutional_provisions_involved} && ARRAY[${sql.raw(provisionIds.map(id => `'${id}'`).join(','))}]::uuid[]`
           );
-          if (bindingOrPersuasive) {
-            conditions.push(bindingOrPersuasive);
-          }
         }
-        // For lower thresholds we don't add a filter since schema lacks a numeric relevance_score
-      }
 
-      // Filter by keywords in case name, principle, or summary
-      if (keywords.length > 0) {
-        const keywordConditions = keywords.map(keyword =>
-          or(
-            like(legal_precedents.case_name, `%${keyword}%`),
-            like(legal_precedents.legal_principle, `%${keyword}%`),
-            like(legal_precedents.case_summary, `%${keyword}%`)
-          )
-        );
-        conditions.push(or(...keywordConditions));
-      }
+        // Filter by binding status -> schema uses `precedent_strength` (values like 'binding','persuasive')
+        if (isBinding) {
+          conditions.push(eq(legal_precedents.precedent_strength, 'binding'));
+        }
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions)) as typeof query;
-      }
+        // Filter by minimum relevance score (map to precedent_strength heuristically)
+        if (minRelevanceScore && minRelevanceScore > 0) {
+          if (minRelevanceScore >= 0.8) {
+            conditions.push(eq(legal_precedents.precedent_strength, 'binding'));
+          } else if (minRelevanceScore >= 0.6) {
+            const bindingOrPersuasive = or(
+              eq(legal_precedents.precedent_strength, 'binding'), 
+              eq(legal_precedents.precedent_strength, 'persuasive')
+            );
+            if (bindingOrPersuasive) {
+              conditions.push(bindingOrPersuasive);
+            }
+          }
+          // For lower thresholds we don't add a filter since schema lacks a numeric relevance_score
+        }
 
-      const results = await query
-        // Order by judgment date (most recent first) and case name as secondary
-        .orderBy(desc(legal_precedents.judgment_date), desc(legal_precedents.case_name))
-        .limit(limit);
+        // Filter by keywords in case name, principle, or summary
+        if (keywords.length > 0) {
+          const keywordConditions = keywords.map(keyword =>
+            or(
+              like(legal_precedents.case_name, `%${keyword}%`),
+              like(legal_precedents.legal_principle, `%${keyword}%`),
+              like(legal_precedents.case_summary, `%${keyword}%`)
+            )
+          );
+          conditions.push(or(...keywordConditions));
+        }
+
+        if (conditions.length > 0) {
+          query = query.where(and(...conditions)) as typeof query;
+        }
+
+        return query
+          // Order by judgment date (most recent first) and case name as secondary
+          .orderBy(desc(legal_precedents.judgment_date), desc(legal_precedents.case_name))
+          .limit(limit);
+      });
 
       logger.debug('Found legal precedents', { ...logContext, count: results.length });
       return results;
@@ -431,19 +439,21 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Finding constitutional analyses for bill', logContext);
 
     try {
-      const analyses = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(
-          and(
-            eq(constitutional_analyses.bill_id, bill_id),
-            eq(constitutional_analyses.is_superseded, false)
+      const analyses = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(
+            and(
+              eq(constitutional_analyses.bill_id, bill_id),
+              eq(constitutional_analyses.is_superseded, false)
+            )
           )
-        )
-        .orderBy(
-          desc(constitutional_analyses.confidence_score),
-          desc(constitutional_analyses.created_at)
-        );
+          .orderBy(
+            desc(constitutional_analyses.confidence_score),
+            desc(constitutional_analyses.created_at)
+          );
+      });
 
       logger.debug('Found analyses for bill', { ...logContext, count: analyses.length });
       return analyses;
@@ -465,11 +475,13 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Finding constitutional analysis by ID', logContext);
 
     try {
-      const [analysis] = await this.database
-        .select()
-        .from(constitutional_analyses)
-        .where(eq(constitutional_analyses.id, id))
-        .limit(1);
+      const [analysis] = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(constitutional_analyses)
+          .where(eq(constitutional_analyses.id, id))
+          .limit(1);
+      });
 
       return analysis || null;
     } catch (error) {
@@ -502,11 +514,13 @@ export class ConstitutionalAnalysisServiceComplete {
 
     try {
       // Prevent duplicate queue entries
-      const existingRows = await this.database
-        .select()
-        .from(expert_review_queue)
-        .where(eq(expert_review_queue.analysis_id, request.analysis_id))
-        .limit(1);
+      const existingRows = await readDatabase(async (db) => {
+        return db
+          .select()
+          .from(expert_review_queue)
+          .where(eq(expert_review_queue.analysis_id, request.analysis_id))
+          .limit(1);
+      });
 
       const existing = existingRows[0];
 
@@ -520,18 +534,20 @@ export class ConstitutionalAnalysisServiceComplete {
       // Map complexity score to priority_level and record uncertainty flags in review_notes
       const priority = request.complexity_score >= 90 ? 'high' : request.complexity_score >= 70 ? 'high' : request.complexity_score >= 50 ? 'medium' : 'low';
 
-      await this.database
-        .insert(expert_review_queue)
-        .values({
-          analysis_id: request.analysis_id,
-          bill_id: request.bill_id,
-          review_reason: request.review_reason,
-          priority_level: priority,
-          review_notes: JSON.stringify({ uncertainty_flags: request.uncertainty_flags, estimated_review_time: request.estimated_review_time, recommended_expertise: request.recommended_expertise }),
-          status: 'pending',
-          created_at: new Date(),
-          updated_at: new Date()
-        });
+      await withTransaction(async (tx) => {
+        await tx
+          .insert(expert_review_queue)
+          .values({
+            analysis_id: request.analysis_id,
+            bill_id: request.bill_id,
+            review_reason: request.review_reason,
+            priority_level: priority,
+            review_notes: JSON.stringify({ uncertainty_flags: request.uncertainty_flags, estimated_review_time: request.estimated_review_time, recommended_expertise: request.recommended_expertise }),
+            status: 'pending',
+            created_at: new Date(),
+            updated_at: new Date()
+          });
+      });
 
       logger.info('✅ Queued analysis for expert review', { 
         ...logContext,
@@ -556,13 +572,15 @@ export class ConstitutionalAnalysisServiceComplete {
     logger.debug('Getting expert review queue status', logContext);
 
     try {
-      const results = await this.database
-        .select({
-          pendingCount: sql<number>`count(*) filter (where ${expert_review_queue.status} = 'pending')`,
-          highPriorityCount: sql<number>`count(*) filter (where ${expert_review_queue.status} = 'pending' AND ${expert_review_queue.priority_level} = 'high')`,
-          avgWaitHours: sql<number>`avg(extract(epoch from (now() - ${expert_review_queue.created_at})) / 3600) filter (where ${expert_review_queue.status} = 'pending')`
-        })
-        .from(expert_review_queue);
+      const results = await readDatabase(async (db) => {
+        return db
+          .select({
+            pendingCount: sql<number>`count(*) filter (where ${expert_review_queue.status} = 'pending')`,
+            highPriorityCount: sql<number>`count(*) filter (where ${expert_review_queue.status} = 'pending' AND ${expert_review_queue.priority_level} = 'high')`,
+            avgWaitHours: sql<number>`avg(extract(epoch from (now() - ${expert_review_queue.created_at})) / 3600) filter (where ${expert_review_queue.status} = 'pending')`
+          })
+          .from(expert_review_queue);
+      });
 
       const statusResult = results[0];
 
@@ -593,18 +611,20 @@ export class ConstitutionalAnalysisServiceComplete {
     provisionId: string,
     analysisType: string
   ): Promise<ConstitutionalAnalysis | null> {
-    const rows = await this.database
-      .select()
-      .from(constitutional_analyses)
-      .where(
-        and(
-          eq(constitutional_analyses.bill_id, bill_id),
-          eq(constitutional_analyses.provision_id, provisionId),
-          eq(constitutional_analyses.analysis_type, analysisType),
-          eq(constitutional_analyses.is_superseded, false)
+    const rows = await readDatabase(async (db) => {
+      return db
+        .select()
+        .from(constitutional_analyses)
+        .where(
+          and(
+            eq(constitutional_analyses.bill_id, bill_id),
+            eq(constitutional_analyses.provision_id, provisionId),
+            eq(constitutional_analyses.analysis_type, analysisType),
+            eq(constitutional_analyses.is_superseded, false)
+          )
         )
-      )
-      .limit(1);
+        .limit(1);
+    });
 
     const existing = rows[0] as ConstitutionalAnalysis | undefined;
     return existing || null;
@@ -614,14 +634,16 @@ export class ConstitutionalAnalysisServiceComplete {
    * Inserts a new analysis record into the database.
    */
   private async insertNewAnalysis(analysis: ConstitutionalAnalysis): Promise<ConstitutionalAnalysis> {
-    const rows = await this.database
-      .insert(constitutional_analyses)
-      .values({
-        ...analysis,
-        created_at: new Date(),
-        updated_at: new Date()
-      })
-      .returning();
+    const rows = await withTransaction(async (tx) => {
+      return tx
+        .insert(constitutional_analyses)
+        .values({
+          ...analysis,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .returning();
+    });
 
     return rows[0] as ConstitutionalAnalysis;
   }
@@ -631,15 +653,17 @@ export class ConstitutionalAnalysisServiceComplete {
    * This maintains our version history without deleting old analyses.
    */
   private async markAsSuperseded(analysis_id: string, supersededById: string): Promise<void> {
-    await this.database
-      .update(constitutional_analyses)
-      .set({
-        is_superseded: true,
-        superseded_by_id: supersededById,
-        superseded_at: new Date(),
-        updated_at: new Date()
-      })
-      .where(eq(constitutional_analyses.id, analysis_id));
+    await withTransaction(async (tx) => {
+      await tx
+        .update(constitutional_analyses)
+        .set({
+          is_superseded: true,
+          superseded_by_id: supersededById,
+          superseded_at: new Date(),
+          updated_at: new Date()
+        })
+        .where(eq(constitutional_analyses.id, analysis_id));
+    });
   }
 
   /**
@@ -652,16 +676,18 @@ export class ConstitutionalAnalysisServiceComplete {
     metadata: Record<string, unknown>
   ): Promise<void> {
     try {
-      await this.database
-        .insert(analysis_audit_trail)
-        .values({
-          analysis_id: analysis_id,
-          action_type: changeType,
-          actor_type: 'system',
-          // schema column is `changes_made` not `metadata`
-          changes_made: metadata,
-          created_at: new Date()
-        });
+      await withTransaction(async (tx) => {
+        await tx
+          .insert(analysis_audit_trail)
+          .values({
+            analysis_id: analysis_id,
+            action_type: changeType,
+            actor_type: 'system',
+            // schema column is `changes_made` not `metadata`
+            changes_made: metadata,
+            created_at: new Date()
+          });
+      });
     } catch (error) {
       // Audit trail failures shouldn't break the main operation
       logger.warn('Failed to log audit trail', { analysis_id, changeType, error });

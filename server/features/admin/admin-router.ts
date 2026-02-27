@@ -13,7 +13,7 @@
 
 import { securityAuditService } from '@server/features/security/security-audit-service';
 import { commonSchemas, inputValidationService } from '@server/infrastructure/validation/input-validation-service';
-import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
+import { secureQueryBuilderService, PaginationParams } from '@server/features/security';
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
@@ -240,7 +240,7 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res: Respons
       ]);
     }
 
-    const { page: pageNum, limit: limitNum, offset } = secureQueryBuilder.validatePaginationParams(
+    const pagination = PaginationParams.create(
       page as string,
       limit as string
     );
@@ -283,8 +283,8 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res: Respons
     const conditions = and(
       validatedRole ? eq(users.role, validatedRole) : undefined,
       sanitizedSearch ? or(
-        ilike(users.name, secureQueryBuilder.createSafeLikePattern(sanitizedSearch)),
-        ilike(users.email, secureQueryBuilder.createSafeLikePattern(sanitizedSearch))
+        ilike(users.name, secureQueryBuilderService.createSafeLikePattern(sanitizedSearch)),
+        ilike(users.email, secureQueryBuilderService.createSafeLikePattern(sanitizedSearch))
       ) : undefined
     );
 
@@ -304,8 +304,8 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res: Respons
         .from(users)
         .where(conditions)
         .orderBy(desc(users.created_at))
-        .limit(limitNum)
-        .offset(offset),
+        .limit(pagination.limit)
+        .offset(pagination.offset),
 
       // Count query for pagination - same conditions but just counting
       db
@@ -315,18 +315,18 @@ router.get('/users', asyncHandler(async (req: AuthenticatedRequest, res: Respons
     ]);
 
     const total = totalResult[0]?.count ?? 0;
-    const totalPages = Math.ceil(total / limitNum);
+    const totalPages = Math.ceil(total / pagination.limit);
 
     // Sanitize output data to remove sensitive information
     const sanitizedUsers = userResults.map(user =>
-      secureQueryBuilder.sanitizeOutput(user)
+      secureQueryBuilderService.sanitizeOutput(user)
     );
 
     res.json({
       users: sanitizedUsers,
       pagination: {
-        page: pageNum,
-        limit: limitNum,
+        page: pagination.page,
+        limit: pagination.limit,
         total,
         totalPages,
         hasNext: pageNum < totalPages,

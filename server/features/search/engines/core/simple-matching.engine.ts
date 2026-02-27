@@ -5,7 +5,7 @@
 // Replaces basic LIKE queries with proper full-text search capabilities
 
 import { SearchQuery, SearchResult } from '../types/search.types';
-import { db as database } from '../../../../infrastructure/database/pool';
+import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills } from '@server/infrastructure/schema';
 import { desc, ilike, or } from 'drizzle-orm';
 import { logger } from '@server/infrastructure/observability';
@@ -175,26 +175,28 @@ export class SimpleMatchingEngine {
     const offset = (page - 1) * limit;
 
     // Search bills using ILIKE for simple matching
-    const billResults = await database
-      .select({
-        id: bills.id,
-        title: bills.title,
-        description: bills.description,
-        status: bills.status,
-        chamber: bills.chamber,
-        created_at: bills.created_at
-      })
-      .from(bills)
-      .where(
-        or(
-          ilike(bills.title, searchTerm),
-          ilike(bills.description, searchTerm),
-          ilike(bills.summary, searchTerm)
+    const billResults = await readDatabase(async (db) => {
+      return db
+        .select({
+          id: bills.id,
+          title: bills.title,
+          description: bills.description,
+          status: bills.status,
+          chamber: bills.chamber,
+          created_at: bills.created_at
+        })
+        .from(bills)
+        .where(
+          or(
+            ilike(bills.title, searchTerm),
+            ilike(bills.description, searchTerm),
+            ilike(bills.summary, searchTerm)
+          )
         )
-      )
-      .orderBy(desc(bills.created_at))
-      .limit(limit)
-      .offset(offset);
+        .orderBy(desc(bills.created_at))
+        .limit(limit)
+        .offset(offset);
+    });
 
     // Convert to SearchResult format
     return billResults.map(bill => ({

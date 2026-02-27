@@ -1,4 +1,4 @@
-import { securityAuditService } from '../security-audit-service';
+import { securityAuditService } from '../../security-audit-service';
 import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 

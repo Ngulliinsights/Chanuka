@@ -17,15 +17,15 @@ import {
   validateRepositoryInput,
   validateSearchParams
 } from '@server/infrastructure/database/repository-validation';
-import type { Maybe,Result } from '@shared/core';
-import { Err, none,Ok, some } from '@shared/core';
+import type { Maybe, Result } from '@shared/core';
+import { Err, Ok } from '@shared/core';
 import type { User } from '@server/infrastructure/schema';
 import type { NewUser, NewUserProfile, UserProfile } from '@server/infrastructure/schema/foundation';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import type { SQLWrapper } from 'drizzle-orm';
 import { and, desc, eq, inArray,or, sql } from 'drizzle-orm';
 import type { PgDatabase } from 'drizzle-orm/pg-core';
-import { userDbToDomain, userProfileDbToDomain } from '@shared/utils/transformers';
+import { userDbToDomain } from '@shared/utils/transformers';
 
 
 export class DrizzleUserRepository implements IUserRepository {
@@ -150,7 +150,9 @@ export class DrizzleUserRepository implements IUserRepository {
         return new Err(validation.error);
       }
 
-      const result = await databaseLogger.logOperation(
+      let createdUser: User;
+      
+      await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'user')
           .operation('create')
           .build(),
@@ -163,17 +165,18 @@ export class DrizzleUserRepository implements IUserRepository {
             return dbUser;
           });
 
+          createdUser = userDbToDomain.transform(newUser); // Transform DB → Domain
+          
           return {
             success: true,
             duration: 0, // Will be set by logger
             recordCount: 1,
             affectedIds: [newUser.id],
-            data: userDbToDomain.transform(newUser) // Transform DB → Domain
           };
         }
       );
 
-      return new Ok(result.data);
+      return new Ok(createdUser as User);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to create user'));
     }
@@ -187,7 +190,7 @@ export class DrizzleUserRepository implements IUserRepository {
         .where(eq(users.id, id))
         .limit(1);
 
-      return new Ok(dbUser ? some(userDbToDomain.transform(dbUser)) : none);
+      return new Ok(dbUser ? userDbToDomain.transform(dbUser) : null);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find user by ID'));
     }
@@ -201,7 +204,7 @@ export class DrizzleUserRepository implements IUserRepository {
         .where(eq(users.email, email))
         .limit(1);
 
-      return new Ok(dbUser ? some(userDbToDomain.transform(dbUser)) : none);
+      return new Ok(dbUser ? userDbToDomain.transform(dbUser) : null);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to find user by email'));
     }
@@ -286,9 +289,11 @@ export class DrizzleUserRepository implements IUserRepository {
     try {
       // Get the current user for audit logging
       const currentUserResult = await this.findById(id);
-      const currentUser = currentUserResult.isOk() ? currentUserResult.value : null;
+      const currentUser = currentUserResult.isOk ? currentUserResult.value : null;
 
-      const result = await databaseLogger.logOperation(
+      let updatedUser: User;
+      
+      await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'user')
           .operation('update')
           .entityId(id)
@@ -311,9 +316,11 @@ export class DrizzleUserRepository implements IUserRepository {
             return dbUser;
           });
 
+          updatedUser = userDbToDomain.transform(updatedDbUser as any); // Transform DB → Domain
+
           // Log audit trail for sensitive user updates
-          if (currentUser && currentUser.isSome()) {
-            const user = currentUser.value;
+          if (currentUser !== null) {
+            const user = currentUser;
             const changes: Record<string, { old: unknown; new: unknown }> = {};
             if (updates.role !== undefined && updates.role !== user.role) {
               changes.role = { old: user.role, new: updates.role };
@@ -342,12 +349,11 @@ export class DrizzleUserRepository implements IUserRepository {
             duration: 0,
             recordCount: 1,
             affectedIds: [updatedDbUser.id],
-            data: userDbToDomain.transform(updatedDbUser as any) // Transform DB → Domain
           };
         }
       );
 
-      return new Ok(result.data);
+      return new Ok(updatedUser as User);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to update user'));
     }
@@ -393,7 +399,7 @@ export class DrizzleUserRepository implements IUserRepository {
         return updatedProfile;
       });
 
-      return new Ok(userProfileDbToDomain.transform(dbProfile));
+      return new Ok(dbProfile as UserProfile);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to update user profile'));
     }
@@ -407,7 +413,7 @@ export class DrizzleUserRepository implements IUserRepository {
         .where(eq(user_profiles.user_id, userId))
         .limit(1);
 
-      return new Ok(dbProfile ? some(userProfileDbToDomain.transform(dbProfile)) : none);
+      return new Ok(dbProfile ? (dbProfile as UserProfile) : null);
     } catch (error) {
       return new Err(error instanceof Error ? error : new Error('Failed to get user profile'));
     }
@@ -496,7 +502,7 @@ export class DrizzleUserRepository implements IUserRepository {
     try {
       // Get current security settings for audit logging
       const currentUserResult = await this.findById(id);
-      const currentUser = currentUserResult.isOk() ? currentUserResult.value : null;
+      const currentUser = currentUserResult.isOk ? currentUserResult.value : null;
 
       await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'security')
@@ -520,8 +526,8 @@ export class DrizzleUserRepository implements IUserRepository {
           });
 
           // Log audit trail for security settings changes
-          if (currentUser && currentUser.isSome()) {
-            const user = currentUser.value;
+          if (currentUser !== null) {
+            const user = currentUser;
             const changes: Record<string, { old: unknown; new: unknown }> = {};
             if (security.two_factor_enabled !== undefined && security.two_factor_enabled !== user.two_factor_enabled) {
               changes.two_factor_enabled = { old: user.two_factor_enabled, new: security.two_factor_enabled };
@@ -564,7 +570,7 @@ export class DrizzleUserRepository implements IUserRepository {
     try {
       // Get user info for audit logging before deletion
       const userResult = await this.findById(id);
-      const userToDelete = userResult.isOk() ? userResult.value : null;
+      const userToDelete = userResult.isOk ? userResult.value : null;
 
       await databaseLogger.logOperation(
         databaseLogger.createContextBuilder('users', 'user')
@@ -589,8 +595,8 @@ export class DrizzleUserRepository implements IUserRepository {
           });
 
           // Log audit trail for user deletion
-          if (userToDelete && userToDelete.isSome()) {
-            const user = userToDelete.value;
+          if (userToDelete !== null) {
+            const user = userToDelete;
             databaseLogger.logAudit({
               action: 'user_delete',
               entityType: 'user',
@@ -808,7 +814,7 @@ export class DrizzleUserRepository implements IUserRepository {
                   return new Err(new Error('User profile not found'));
                 }
 
-                return new Ok(userProfileDbToDomain.transform(dbProfile));
+                return new Ok(dbProfile as UserProfile);
               },
               { userId: dbUser.id }
             );

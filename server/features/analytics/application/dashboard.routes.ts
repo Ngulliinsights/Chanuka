@@ -1,6 +1,6 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 // Security Services
-import { dataPrivacyService } from '@server/features/security/services/data-privacy-service';
+import { dataPrivacyService } from '@server/features/security/infrastructure/services/data-privacy.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
