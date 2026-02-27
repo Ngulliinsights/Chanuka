@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { AnalyticsProvider } from '@client/infrastructure/analytics/AnalyticsProvider';
 import { useConnectionAware } from '@client/infrastructure/api/hooks/useConnectionAware';
 import { useAuth } from '@client/infrastructure/auth';
-import { SimpleErrorBoundary } from '@client/infrastructure/error/components/SimpleErrorBoundary';
+import { SimpleErrorBoundary } from '@client/infrastructure/error';
 import { LoadingProvider } from '@client/infrastructure/loading';
 import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';

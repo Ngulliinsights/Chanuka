@@ -4,7 +4,7 @@
  * Specialized error classes for authentication-related errors
  */
 
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { ErrorDomain, ErrorSeverity } from '../../error';
 
 /**
  * Base authentication error class

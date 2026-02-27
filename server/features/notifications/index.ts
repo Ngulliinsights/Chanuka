@@ -6,12 +6,29 @@
  * - Application: Use cases, orchestrators, application services
  * - Presentation: HTTP routes, WebSocket handlers
  * - Infrastructure: External integrations (moved to server/infrastructure/messaging)
+ * 
+ * INTEGRATION NOTE: This module now includes alert preference management,
+ * consolidating functionality from the deprecated alert-preferences feature.
  */
 
 // ===== DOMAIN EXPORTS =====
 
 // Domain entities
 export { Notification } from './domain/entities/notification';
+export {
+  AlertPreferenceEntity,
+  type AlertPreference,
+  type AlertType,
+  type ChannelType,
+  type Priority,
+  type DeliveryStatus,
+  type AlertChannel,
+  type AlertConditions,
+  type SmartFilteringConfig,
+  type FrequencyConfig,
+  type AlertDeliveryLog,
+  type SmartFilteringResult
+} from './domain/entities/alert-preference';
 
 // Domain services
 export {
@@ -21,6 +38,10 @@ export {
   type UserEngagementProfile,
   type FilterResult
 } from './domain/services/smart-notification-filter';
+
+export {
+  alertPreferenceDomainService
+} from './domain/services/alert-preference-domain.service';
 
 // Domain types
 export type { CombinedBillTrackingPreferences } from './domain/types';
@@ -40,6 +61,18 @@ export {
   type NotificationResult,
   type BulkNotificationResult
 } from './application/services/notification.service';
+
+export {
+  AlertPreferenceManagementService,
+  alertPreferenceManagementService
+} from './application/services/alert-preference-management.service';
+
+export {
+  AlertDeliveryService,
+  alertDeliveryService,
+  type AlertDeliveryRequest,
+  type AlertDeliveryResult
+} from './application/services/alert-delivery.service';
 
 export {
   alertingService,
@@ -66,6 +99,7 @@ export {
 
 // HTTP routes
 export { router as notificationRoutes } from './presentation/http/notification-routes';
+export { router as alertPreferenceRoutes } from './presentation/http/alert-preference-routes';
 
 // ===== INFRASTRUCTURE EXPORTS (Re-exported for convenience) =====
 

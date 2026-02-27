@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Suspense } from 'react';
 import React from 'react';
 
-import { ErrorBoundary } from '@client/infrastructure/error/components/ErrorBoundary';
+import { ErrorBoundary } from '@client/infrastructure/error';
 import { Button } from '@client/lib/design-system';
 import { LoadingSpinner } from '@client/lib/design-system';
 

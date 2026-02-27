@@ -18,7 +18,7 @@ import {
   selectShouldShowGlobalLoader,
   type LoadingStateData,
   type ExtendedLoadingOperation,
-} from '@client/infrastructure/store/slices/loadingSlice';
+} from '@client/infrastructure/store';
 import { LoadingOperation, LoadingPriority } from '@client/lib/types/loading';
 
 // ============================================================================

@@ -31,7 +31,7 @@ import {
   setActiveTab,
   updateFilters,
   type DashboardFilters,
-} from '@client/infrastructure/store/slices/errorAnalyticsSlice';
+} from '@client/infrastructure/store';
 import type { ErrorPattern } from '@client/lib/services';
 
 type ActiveTab = 'overview' | 'trends' | 'patterns' | 'recovery' | 'realtime';

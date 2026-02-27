@@ -12,7 +12,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { renderHook } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { NetworkError, ValidationError, ServerError } from '@client/infrastructure/api/errors';
+import { NetworkError, ValidationError, ServerError } from '@client/infrastructure/api';
 import { useApiConnection } from '@client/infrastructure/api/hooks/useApiConnection';
 import { useAuth } from '@client/infrastructure/auth/hooks/use-auth';
 

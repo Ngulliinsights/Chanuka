@@ -3,7 +3,7 @@ import { Star, Bell, Eye, Share2, MessageSquare, TrendingUp, Calendar, User } fr
 import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';

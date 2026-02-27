@@ -11,7 +11,7 @@ import {
 import { useState } from 'react';
 import React from 'react';
 
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 import {
   Badge,
   Button,

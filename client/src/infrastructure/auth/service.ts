@@ -9,12 +9,10 @@
 
 import { authApiService } from '@client/infrastructure/api/auth';
 import type { AuthUser } from '@client/infrastructure/api/auth';
-import { tokenManager } from '@client/infrastructure/auth';
-import type { AuthTokens as JWTTokens } from '@client/infrastructure/auth';
+import { tokenManager } from '@client/infrastructure/auth/services/token-manager';
+import type { AuthTokens as JWTTokens } from '@client/infrastructure/auth/types';
 import { rbacManager } from '@client/infrastructure/auth/rbac';
-import { getStore } from '@client/infrastructure/store';
-import type { SessionInfo } from '@client/infrastructure/store/slices/sessionSlice';
-import { setCurrentSession } from '@client/infrastructure/store/slices/sessionSlice';
+import { getStore, type SessionInfo, setCurrentSession } from '@client/infrastructure/store';
 import { logger } from '@client/lib/utils/logger';
 import { securityMonitor, validatePassword } from '@client/lib/utils/security';
 

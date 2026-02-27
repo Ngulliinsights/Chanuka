@@ -7,9 +7,9 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { BaseError } from '@client/infrastructure/error/classes';
-import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error/constants';
-import { coreErrorHandler } from '@client/infrastructure/error/handler';
+import { BaseError } from '@client/infrastructure/error';
+import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
+import { coreErrorHandler } from '@client/infrastructure/error';
 import { AppError, ErrorContext, ErrorMetadata } from '@client/infrastructure/error/types';
 
 // Mock the error handler

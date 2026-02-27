@@ -5,8 +5,7 @@
  */
 
 import { z } from 'zod';
-import { ErrorFactory } from '../error/factory';
-import { coreErrorHandler } from '../error/handler';
+import { ErrorFactory, coreErrorHandler } from '../error';
 import type {
   FieldValidationRules,
   FormValidationSchema,

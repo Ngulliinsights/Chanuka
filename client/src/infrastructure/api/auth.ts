@@ -5,49 +5,34 @@
  */
 
 import { logger } from '@client/lib/utils/logger';
-import type { 
-  DataExportResponse, 
-  DataDeletionResponse 
-} from '@shared/validation/schemas/analytics.schema';
 import { UserRole } from '@shared/types/core/enums';
 import type { PermissionCheckResult } from '@shared/core/types/auth.types';
 
 import type { UnifiedApiClient, UnknownError, AxiosErrorResponse } from './types';
+import type {
+  LoginCredentials,
+  RegisterData,
+  AuthUser,
+  AuthTokens,
+  UserPreferences,
+  NotificationPreferences,
+  PrivacySettings,
+  DataExportResponse,
+  DataDeletionResponse,
+} from './types/auth-types';
 
-// ============================================================================
-// Core Authentication Types
-// ============================================================================
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-  rememberMe?: boolean;
-  twoFactorToken?: string;
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  name: string;
-  confirmPassword: string;
-  acceptTerms: boolean;
-}
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  name: string;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  role: 'citizen' | 'expert' | 'official' | 'admin' | 'moderator';
-  verified: boolean;
-  twoFactorEnabled: boolean;
-  avatar_url?: string;
-  preferences: UserPreferences;
-  permissions: string[];
-  lastLogin: string;
-  createdAt: string;
+// Re-export types for convenience
+export type {
+  LoginCredentials,
+  RegisterData,
+  AuthUser,
+  AuthTokens,
+  UserPreferences,
+  NotificationPreferences,
+  PrivacySettings,
+  DataExportResponse,
+  DataDeletionResponse,
+};
   verification_status?: 'pending' | 'verified' | 'rejected';
   expertise?: string | string[];
   is_active?: boolean;
@@ -63,20 +48,7 @@ export interface AuthUser {
   data_retention_preference?: DataRetentionPreference;
 }
 
-export interface UserPreferences {
-  notifications: boolean;
-  emailAlerts: boolean;
-  theme: 'light' | 'dark' | 'system';
-  language: string;
-}
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken: string;
-  expiresIn: number;
-  tokenType: 'Bearer';
-}
-
+// Additional auth types not in auth-types.ts
 export interface AuthSession {
   user: AuthUser;
   tokens: AuthTokens;

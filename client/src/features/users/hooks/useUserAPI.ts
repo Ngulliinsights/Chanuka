@@ -9,7 +9,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { useCallback, useEffect } from 'react';
 
 import { useAuth } from '@client/infrastructure/auth';
-import { useUserDashboardStore } from '@client/infrastructure/store/slices/userDashboardSlice';
+import { useUserDashboardStore } from '@client/infrastructure/store';
 import { userService as userBackendService } from '@client/lib/services/userService';
 import type { UserProfile, NotificationPreferences } from '@client/lib/services/userService';
 import type {

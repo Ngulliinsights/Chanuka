@@ -12,7 +12,7 @@ import {
   setCurrentPath,
   addToRecentPages,
   setUserRole,
-} from '@client/infrastructure/store/slices/navigationSlice';
+} from '@client/infrastructure/store';
 import { LogoPattern } from '@client/lib/design-system/layout/LogoPattern';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@client/lib/ui/navigation/BreadcrumbNavigation';

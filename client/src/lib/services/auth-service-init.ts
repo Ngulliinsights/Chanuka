@@ -4,7 +4,7 @@
  */
 
 import { createAuthApiService } from '@client/infrastructure/api/auth';
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 
 // Create the auth service instance
 export const authService = createAuthApiService(globalApiClient);

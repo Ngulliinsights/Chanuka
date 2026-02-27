@@ -18,7 +18,7 @@ import React from 'react';
  * Shows real-time status of Tier 1 integrations and system health
  */
 
-import { ErrorBoundary } from '@client/infrastructure/error/components/ErrorBoundary';
+import { ErrorBoundary } from '@client/infrastructure/error';
 import {
   Card,
   CardContent,

@@ -1,27 +1,53 @@
 /**
- * Unified Logger - Optimal Direction
+ * Unified Logger - Cycle-Free Version
  *
- * This combines the best of logger-unified.ts with shared module integration
- * and addresses the 1,421-line complexity issue identified in the analysis.
+ * This logger provides structured logging without importing from infrastructure/error
+ * to break the circular dependency cycle.
  *
  * ARCHITECTURE DECISION:
- * - Use logger-unified.ts as the foundation (135 lines, maintainable)
- * - Integrate with shared module browser logger for advanced features
- * - Provide backward compatibility for existing imports
- * - Enable gradual migration from the complex logger.ts
+ * - Remove imports from @client/infrastructure/error (breaks cycle)
+ * - Define minimal types locally
+ * - Infrastructure modules can import this logger safely
+ * - Error infrastructure can use this logger without cycles
  */
 
-// Import error types from our local error system to avoid circular dependencies
-import { ErrorSeverity, ErrorDomain, BaseError } from '@client/infrastructure/error';
 import { PerformanceAlertsManager } from '@client/infrastructure/performance/alerts';
 import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
 import { PerformanceMetric } from '@client/infrastructure/performance/types';
 
-// Re-export error types for backward compatibility
-export { ErrorSeverity, ErrorDomain, BaseError };
+// ============================================================================
+// LOCAL TYPE DEFINITIONS (to avoid importing from error infrastructure)
+// ============================================================================
+
+// Minimal error types defined locally to break cycle
+export enum ErrorSeverity {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical',
+}
+
+export enum ErrorDomain {
+  VALIDATION = 'validation',
+  NETWORK = 'network',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  BUSINESS = 'business',
+  SYSTEM = 'system',
+  UNKNOWN = 'unknown',
+}
+
+export interface BaseError {
+  domain: ErrorDomain;
+  severity: ErrorSeverity;
+  message: string;
+  code?: string;
+  timestamp: Date;
+  context?: Record<string, unknown>;
+}
 
 // ============================================================================
-// CORE LOGGER INTERFACES (Integrated from logger-unified)
+// CORE LOGGER INTERFACES
 // ============================================================================
 
 export interface LogContext {

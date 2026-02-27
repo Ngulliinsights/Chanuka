@@ -21,7 +21,7 @@ import {
   updatePreferences,
   addToRecentPages,
   clearPersistedState,
-} from '@client/infrastructure/store/slices/navigationSlice';
+} from '@client/infrastructure/store';
 import { UserRole } from '@client/lib/types/navigation';
 
 import { NavigationContextValue, BreadcrumbItem, RelatedPage } from '@client/infrastructure/navigation/types';

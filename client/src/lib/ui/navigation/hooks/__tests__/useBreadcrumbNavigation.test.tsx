@@ -10,7 +10,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import navigationReducer from '@client/infrastructure/store/slices/navigationSlice';
+import { navigationReducer } from '@client/infrastructure/store';
 import type { BreadcrumbItem } from '@client/lib/types/navigation';
 
 import {

@@ -2,6 +2,8 @@
 
 Comprehensive notification system with multi-channel delivery, smart filtering, and real-time updates.
 
+> **📢 Integration Notice**: The `alert-preferences` feature is being consolidated into this notification system. See [Alert Preferences Integration Plan](./docs/alert-preferences-integration.md) for details.
+
 ## Architecture
 
 The notification system follows Domain-Driven Design (DDD) principles with clear separation of concerns:

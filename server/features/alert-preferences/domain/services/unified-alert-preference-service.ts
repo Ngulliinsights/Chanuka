@@ -1,9 +1,12 @@
-import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
-import * as schema from '@server/infrastructure/schema';
-import { and, desc, eq, inArray,sql } from 'drizzle-orm';
-import { z } from 'zod';
-import { emailSchema } from '@shared/validation';
+/**
+ * @deprecated This file is deprecated. Use @server/features/notifications instead.
+ * 
+ * This file now exports the compatibility layer which redirects to the new
+ * unified notification system.
+ */
+
+export * from './compatibility-layer';
+
 
 // Type augmentation for schema.users.preferences
 interface UserPreferencesData {

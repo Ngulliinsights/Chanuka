@@ -10,8 +10,7 @@
 import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { createError, ErrorDomain, ErrorSeverity } from '../../error';
 import type {
   User,
   LoginCredentials,

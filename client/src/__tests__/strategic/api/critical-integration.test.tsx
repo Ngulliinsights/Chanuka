@@ -14,7 +14,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { ApiError, NetworkError } from '@client/infrastructure/api/errors';
+import { ApiError, NetworkError } from '@client/infrastructure/api';
 import { useApiConnection } from '@client/infrastructure/api/hooks';
 import { AuthProvider } from '@client/infrastructure/auth';
 import { useAuth } from '@client/infrastructure/auth/hooks/use-auth';

@@ -7,8 +7,7 @@
 import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { createError, ErrorDomain, ErrorSeverity } from '../../error';
 import { AuthApiService, setAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
 import { tokenManager } from '../services/token-manager';

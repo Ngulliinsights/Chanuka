@@ -32,7 +32,7 @@ import { router as verificationRouter } from '@server/features/users/application
 import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
 import { cacheCoordinator } from '@server/infrastructure/cache';
 import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
-import { notificationSchedulerService, notificationRoutes as notificationsRouter } from '@server/features/notifications';
+import { notificationSchedulerService, notificationRoutes as notificationsRouter, alertPreferenceRoutes } from '@server/features/notifications';
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
@@ -333,6 +333,7 @@ app.use('/api/sponsors', sponsorsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/community', communityRouter);
 app.use('/api/notifications', notificationsRouter);
+app.use('/api/notifications/preferences', alertPreferenceRoutes);
 app.use('/api/search', searchRouter);
 app.use('/api/privacy', privacyRouter);
 app.use('/api/cache', cacheRouter);

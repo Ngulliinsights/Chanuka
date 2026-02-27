@@ -3,13 +3,14 @@
  *
  * This module provides comprehensive storage functionality including:
  * - Secure encrypted storage with AES-GCM
- * - Session lifecycle management
- * - Token handling with automatic refresh
  * - Intelligent caching with eviction policies
  * - Cross-storage backend support
+ * 
+ * Note: Session and token management have been moved to the auth module.
+ * Import from @client/infrastructure/auth instead.
  */
 
-// Core storage types (excluding cache types to avoid duplication with api/cache-manager)
+// Core storage types
 export {
   type StorageOptions,
   type SessionInfo,
@@ -26,8 +27,14 @@ export {
 // Secure storage
 export { SecureStorage } from './secure-storage';
 
-// Session management (re-exported from consolidated auth module)
-export { SessionManager, sessionManager } from '../auth/services/session-manager';
+// Cache storage
+export { CacheStorage } from './cache-storage';
+
+// Offline data management
+export { OfflineDataManager } from './offline-data-manager';
+
+// NOTE: SessionManager and TokenManager have been moved to auth module
+// Import from: @client/infrastructure/auth
 
 // Token management (re-exported from consolidated auth module)
 export { TokenManager, tokenManager } from '../auth/services/token-manager';

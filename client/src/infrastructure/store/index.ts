@@ -73,5 +73,113 @@ export function getStore() {
   return store;
 }
 
-// Remove duplicate export - keep only the default export
-// export default store;
+// ============================================================================
+// PUBLIC API - Selectors (to avoid direct slice imports)
+// ============================================================================
+
+// Re-export commonly used selectors from slices
+export {
+  selectBreadcrumbs,
+  selectNavigationPreferences,
+  selectNavigationUIState,
+} from './slices/navigationSlice';
+
+export {
+  selectLoadingState,
+  selectIsLoading,
+  selectLoadingOperations,
+  startLoadingOperation,
+  completeLoadingOperation,
+  selectLoadingOperation,
+  selectOperationsByPriority,
+  selectActiveOperationsCount,
+  selectShouldShowGlobalLoader,
+} from './slices/loadingSlice';
+
+export type { SessionInfo } from './slices/sessionSlice';
+
+// ============================================================================
+// PUBLIC API - Actions (to avoid direct slice imports)
+// ============================================================================
+
+// Re-export commonly used actions from slices
+export {
+  addToRecentPages,
+  clearPersistedState,
+  setUserRole,
+  setCurrentPath,
+  updateBreadcrumbs,
+  updateRelatedPages,
+  setCurrentSection,
+  toggleSidebar,
+  toggleMobileMenu,
+  setMobile,
+  setSidebarCollapsed,
+  setMounted,
+  updatePreferences,
+} from './slices/navigationSlice';
+
+export {
+  setCurrentSession,
+} from './slices/sessionSlice';
+
+export {
+  startLoading,
+  stopLoading,
+  setLoadingProgress,
+} from './slices/loadingSlice';
+
+// ============================================================================
+// PUBLIC API - Hooks (custom hooks for common patterns)
+// ============================================================================
+
+export { useUserDashboardStore } from './slices/userDashboardSlice';
+
+// ============================================================================
+// PUBLIC API - Reducers (for testing)
+// ============================================================================
+
+// Only export reducers for testing purposes
+export { default as navigationReducer } from './slices/navigationSlice';
+export { default as loadingReducer } from './slices/loadingSlice';
+export { default as sessionReducer } from './slices/sessionSlice';
+export { default as userDashboardReducer } from './slices/userDashboardSlice';
+export { default as uiReducer } from './slices/uiSlice';
+export { default as errorHandlingReducer } from './slices/errorHandlingSlice';
+
+// ============================================================================
+// PUBLIC API - Types
+// ============================================================================
+
+export type {
+  LoadingState,
+  LoadingStateData,
+  ExtendedLoadingOperation,
+} from './slices/loadingSlice';
+
+export type { DashboardFilters } from './slices/errorAnalyticsSlice';
+
+// Re-export error analytics slice exports
+export {
+  fetchOverviewMetrics,
+  fetchPatterns,
+  fetchRecoveryAnalytics,
+  fetchRealTimeMetrics,
+  fetchTrendData,
+  refreshData,
+  selectActiveTab,
+  selectConnectionStatus,
+  selectError,
+  selectFilters,
+  selectIsLoading,
+  selectIsRealTimeEnabled,
+  selectLastRefresh,
+  selectOverviewMetrics,
+  selectPatterns,
+  selectRealTimeMetrics,
+  selectRecoveryAnalytics,
+  selectTrendData,
+  setActiveTab,
+  updateFilters,
+} from './slices/errorAnalyticsSlice';
+

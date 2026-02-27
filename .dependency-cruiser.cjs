@@ -85,12 +85,16 @@ module.exports = {
     {
       name: 'infrastructure-internal-imports',
       severity: 'error',
-      comment: 'Infrastructure modules should import from sibling modules through public API only',
+      comment: 'Infrastructure modules should import from sibling modules through public API only (same-module and test imports allowed)',
       from: {
-        path: '^client/src/infrastructure/([^/]+)/'
+        path: '^client/src/infrastructure/([^/]+)/',
+        pathNot: [
+          // Allow test files to import internals for testing
+          '^client/src/infrastructure/([^/]+)/__tests__/'
+        ]
       },
       to: {
-        path: '^client/src/infrastructure/([^/]+)/.+',
+        path: '^client/src/infrastructure/(?!$1/)([^/]+)/.+',
         pathNot: [
           '^client/src/infrastructure/([^/]+)/index\\.ts$',
           '^client/src/infrastructure/([^/]+)/types\\.ts$',

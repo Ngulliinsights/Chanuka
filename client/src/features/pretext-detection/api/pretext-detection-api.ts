@@ -4,7 +4,7 @@
  * API client for pretext detection endpoints
  */
 
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 
 export interface AnalyzeRequest {
   billId: string;

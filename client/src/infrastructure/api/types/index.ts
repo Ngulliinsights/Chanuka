@@ -89,7 +89,7 @@ export type {
   PrivacySettings,
   DataExportResponse,
   DataDeletionResponse,
-} from '../auth';
+} from './auth-types';
 
 // Preferences types
 export type {

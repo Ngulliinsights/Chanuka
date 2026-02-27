@@ -12,8 +12,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { createError, ErrorDomain, ErrorSeverity } from '../../error';
 import { SecureStorage } from '../../storage/secure-storage';
 import {
   SESSION_KEY,

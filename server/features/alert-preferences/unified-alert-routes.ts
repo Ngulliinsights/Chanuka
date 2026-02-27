@@ -1,12 +1,30 @@
-import { logger } from '@server/infrastructure/observability';
-import {   ApiError,
-  ApiResponseWrapper,
-ApiSuccess,
-  ApiValidationError } from '@shared/types/api';
-import { Router } from 'express';
-import { z } from 'zod';
+/**
+ * @deprecated This file is deprecated. Use @server/features/notifications/presentation/http/alert-preference-routes.ts instead.
+ * 
+ * This file is kept for reference only and should not be imported.
+ * All functionality has been moved to the unified notifications system.
+ * 
+ * See: server/features/alert-preferences/DEPRECATION_NOTICE.md
+ */
 
-import { AuthenticatedRequest,authenticateToken } from '@/middleware/auth';
+// This file is intentionally left mostly empty as a deprecation marker
+// The actual routes are now at: server/features/notifications/presentation/http/alert-preference-routes.ts
+
+import { Router } from 'express';
+
+export const router = Router();
+
+// Redirect to deprecation notice
+router.all('*', (req, res) => {
+  res.status(410).json({
+    error: 'DEPRECATED',
+    message: 'This API endpoint has been deprecated. Use /api/notifications/preferences instead.',
+    newEndpoint: req.path.replace('/api/alert-preferences', '/api/notifications/preferences'),
+    documentation: 'See server/features/alert-preferences/DEPRECATION_NOTICE.md'
+  });
+});
+
+export default router;
 
 import {
   alertPreferenceSchema,

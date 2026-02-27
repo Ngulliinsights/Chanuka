@@ -15,7 +15,7 @@ import {
   updateBreadcrumbs,
   selectBreadcrumbs,
   selectNavigationPreferences,
-} from '@client/infrastructure/store/slices/navigationSlice';
+} from '@client/infrastructure/store';
 import type { BreadcrumbItem } from '@client/lib/types/navigation';
 
 interface UseBreadcrumbNavigationOptions {

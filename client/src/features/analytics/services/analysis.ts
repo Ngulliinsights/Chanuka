@@ -6,7 +6,7 @@
  * transparency rating, and stakeholder impact analysis.
  */
 
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 import { logger } from '@client/lib/utils/logger';
 import { billAnalysisSchema } from '@shared/validation/schemas/analytics.schema';
 import type { BillAnalysis } from '@shared/validation/schemas/analytics.schema';

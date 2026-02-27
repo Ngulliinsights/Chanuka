@@ -9,8 +9,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { createError } from '../../error';
-import { ErrorDomain, ErrorSeverity } from '../../error/constants';
+import { createError, ErrorDomain, ErrorSeverity } from '../../error';
 import { SecureStorage } from '../../storage/secure-storage';
 import { TOKEN_KEY, TOKEN_STORAGE_NAMESPACE } from '../constants/auth-constants';
 import type { AuthTokens, TokenInfo } from '../types';

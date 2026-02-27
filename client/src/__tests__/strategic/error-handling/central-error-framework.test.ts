@@ -20,13 +20,13 @@ import {
   NavigationAccessDeniedError,
   NavigationValidationError,
   NavigationConfigurationError,
-} from '@client/infrastructure/error/classes';
+} from '@client/infrastructure/error';
 import {
   ErrorDomain,
   ErrorSeverity,
   RecoveryAction,
-} from '@client/infrastructure/error/constants';
-import { coreErrorHandler } from '@client/infrastructure/error/handler';
+} from '@client/infrastructure/error';
+import { coreErrorHandler } from '@client/infrastructure/error';
 import { AppError, ErrorContext, ErrorMetadata } from '@client/infrastructure/error/types';
 
 // Mock the error handler to avoid side effects in tests

@@ -5,7 +5,7 @@
 
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
-import { globalApiClient } from '@client/infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api';
 import { logger } from '@client/lib/utils/logger';
 
 // Types

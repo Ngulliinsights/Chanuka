@@ -7,8 +7,8 @@
 
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
-import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/infrastructure/error/constants';
-import { coreErrorHandler } from '@client/infrastructure/error/handler';
+import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/infrastructure/error';
+import { coreErrorHandler } from '@client/infrastructure/error';
 import {
   networkRetryStrategy,
   cacheClearStrategy,
@@ -26,7 +26,7 @@ import {
   executeRecovery,
   isRecoverable,
   registerDefaultRecoveryStrategies,
-} from '@client/infrastructure/error/recovery';
+} from '@client/infrastructure/error';
 import { AppError } from '@client/infrastructure/error/types';
 
 // Mock dependencies

@@ -5,7 +5,7 @@
  * Features improved type safety, caching, efficient data processing, and comprehensive analytics.
  */
 
-import { coreErrorHandler } from '@client/infrastructure/error/handler';
+import { coreErrorHandler } from '@client/infrastructure/error';
 import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error/types';
 
 // ============================================================================
