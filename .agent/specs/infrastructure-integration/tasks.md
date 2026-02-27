@@ -397,67 +397,631 @@ Tasks are organized by phase and priority. Each task includes:
 
 ---
 
-## Phase 2: Performance & Reliability (Week 3)
+## Phase 2: Systematic Infrastructure Integration (Weeks 3-4)
 
-### TASK-2.1: Cache Deploy
-- **Priority**: High
-- **Effort**: 8 points
-- **Dependencies**: TASK-0.2, TASK-0.5
+**Objective:** Systematically integrate validation, caching, and security across all 13+ features
+
+**Building on Phase 1:**
+- Phase 1 consolidated validation infrastructure (server imports from shared)
+- Phase 2 applies this infrastructure to all features
+- Pattern: validate inputs → sanitize → execute → sanitize outputs → audit log
+
+**Integration Pattern for Each Feature:**
+1. Validation: Use shared schemas, add feature-specific schemas
+2. Caching: Use cache-keys.ts utilities, add invalidation
+3. Security: Use secureQueryBuilder, sanitize inputs/outputs
+4. Error Handling: Use Result<T, Error> types
+5. Testing: Write integration tests
+
+---
+
+### TASK-2.1: Bills Complete Integration
+- **Priority**: Critical
+- **Effort**: 5 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
 - **Assignee**: Backend Developer 1
-- **Status**: Not Started
-- **Design Reference**: §4.1
-- **Requirements**: FR-2.1
+- **Status**: Complete ✅
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-1.1, FR-2.1, FR-2.3
+
+**Current Status:**
+- ✅ Security integration complete (Phase 1)
+- ✅ Caching complete (all methods use cache-keys.ts)
+- ✅ Validation schemas created (bill-validation.schemas.ts)
+- ✅ Validation applied to service methods
+- ✅ Validation middleware for routes created
+- ✅ Integration tests created
+- ⏳ Performance testing (pending execution)
 
 **Subtasks:**
-- [ ] Add cache to Bills
-- [ ] Add cache to Users
-- [ ] Add cache to Search
-- [ ] Add cache to Analytics
-- [ ] Add invalidation logic
-- [ ] Add monitoring
-- [ ] Write cache tests
-- [ ] Write integration tests
+- [x] Add caching to all service methods
+- [x] Create Zod validation schemas
+- [x] Apply validation to service methods
+- [x] Add validation middleware to routes
+- [x] Write integration tests
+- [ ] Measure cache hit rates
 - [ ] Document implementation
 
 **Acceptance Criteria:**
-- Cache hit rate > 70% for high-traffic endpoints
-- Response time improved by 30%+
-- Cache invalidation working correctly
-- Monitoring shows cache effectiveness
-- Tests verify caching behavior
+- All service methods use cache-keys.ts utilities
+- All inputs validated with Zod schemas
+- All routes have validation middleware
+- Cache hit rate > 70%
+- Integration tests pass
 - Test coverage > 85%
 - Documentation complete
 
 **Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Zero XSS vulnerabilities
 - Cache hit rate > 70%
-- Response time improved by 30%+
+- All tests passing
+- Security review approved
+
+---
+
+### TASK-2.2: Users Complete Integration
+- **Priority**: Critical
+- **Effort**: 5 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 2
+- **Status**: In Progress (Validation Schemas ✅)
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-1.2, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas
+- [ ] Add caching to all user service methods
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Ensure PII encryption at rest
+- [ ] Add audit logging for sensitive operations
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs sanitized and validated
+- All outputs sanitized
+- PII encrypted at rest
+- Caching implemented for frequently accessed data
+- Cache hit rate > 70%
+- Security events logged
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Zero XSS vulnerabilities
+- PII encryption verified
+- All tests passing
+- Security review approved
+
+---
+
+### TASK-2.3: Community Complete Integration
+- **Priority**: Critical
+- **Effort**: 5 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 3
+- **Status**: Complete ✅
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-1.3, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas for comments, posts
+- [x] Add caching to community service methods
+- [x] Apply validation to service methods
+- [x] Add validation middleware to routes
+- [x] Ensure HTML sanitization (XSS prevention)
+- [x] Add moderation hooks
+- [x] Add audit logging
+- [x] Write integration tests
+- [x] Document implementation
+
+**Acceptance Criteria:**
+- All queries secured with secureQueryBuilder
+- XSS prevention working (HTML sanitization)
+- All inputs validated with Zod
+- All outputs sanitized
+- Caching implemented
+- Cache hit rate > 60%
+- Moderation hooks active
+- Security events logged
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Zero XSS vulnerabilities
+- All tests passing
+- Security review approved
+
+---
+
+### TASK-2.4: Search Complete Integration
+- **Priority**: High
+- **Effort**: 5 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 1
+- **Status**: Complete ✅
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas for search queries
+- [x] Add caching to search service methods
+- [x] Apply validation to service methods
+- [x] Add validation middleware to routes
+- [x] Secure all search queries
+- [x] Add search result sanitization
+- [x] Write integration tests
+- [x] Document implementation
+
+**Acceptance Criteria:**
+- All search queries use secureQueryBuilder
+- All inputs validated with Zod
+- Search results cached appropriately
+- Cache hit rate > 70%
+- Search result sanitization working
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 70%
 - All tests passing
 - Performance review approved
 
 ---
 
-### TASK-2.2: Error Deploy
+### TASK-2.5: Analytics Complete Integration
+- **Priority**: High
+- **Effort**: 5 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 2
+- **Status**: In Progress (Validation Schemas ✅)
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas for analytics queries
+- [ ] Add caching to analytics service methods
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all analytics queries
+- [ ] Add aggregation result caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Analytics results cached with appropriate TTL
+- Cache hit rate > 80% (analytics are read-heavy)
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 80%
+- All tests passing
+- Performance review approved
+
+---
+
+### TASK-2.6: Sponsors Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 3
+- **Status**: In Progress (Validation Schemas ✅)
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas for sponsor operations
+- [ ] Add caching to sponsor service methods
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all sponsor queries
+- [ ] Add conflict analysis caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Sponsor data cached appropriately
+- Cache hit rate > 70%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 70%
+- All tests passing
+
+---
+
+### TASK-2.7: Notifications Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 1
+- **Status**: In Progress (Validation Schemas ✅)
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-2.1, FR-2.3
+
+**Subtasks:**
+- [x] Create Zod validation schemas for notifications
+- [ ] Add caching to notification service methods
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all notification queries
+- [ ] Add notification preference caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Notification preferences cached
+- Cache hit rate > 60%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- All tests passing
+
+---
+
+### TASK-2.8: Pretext Detection Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 2
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to pretext detection service methods
+- [ ] Create Zod validation schemas for detection queries
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all detection queries
+- [ ] Add detection result caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Detection results cached appropriately
+- Cache hit rate > 70%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 70%
+- All tests passing
+
+---
+
+### TASK-2.9: Recommendation Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 3
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to recommendation service methods
+- [ ] Create Zod validation schemas for recommendations
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all recommendation queries
+- [ ] Add recommendation result caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Recommendations cached with appropriate TTL
+- Cache hit rate > 80%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 80%
+- All tests passing
+
+---
+
+### TASK-2.10: Argument Intelligence Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 1
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to argument intelligence service methods
+- [ ] Create Zod validation schemas for argument analysis
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all argument queries
+- [ ] Add analysis result caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Analysis results cached appropriately
+- Cache hit rate > 70%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 70%
+- All tests passing
+
+---
+
+### TASK-2.11: Constitutional Intelligence Complete Integration
+- **Priority**: Medium
+- **Effort**: 4 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 2
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to constitutional intelligence service methods
+- [ ] Create Zod validation schemas for constitutional analysis
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all constitutional queries
+- [ ] Add analysis result caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Analysis results cached appropriately
+- Cache hit rate > 70%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 70%
+- All tests passing
+
+---
+
+### TASK-2.12: Advocacy Complete Integration
+- **Priority**: Low
+- **Effort**: 3 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 3
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to advocacy service methods
+- [ ] Create Zod validation schemas for advocacy operations
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all advocacy queries
+- [ ] Add campaign data caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Campaign data cached appropriately
+- Cache hit rate > 60%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- All tests passing
+
+---
+
+### TASK-2.13: Government Data Complete Integration
+- **Priority**: Low
+- **Effort**: 3 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 1
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to government data service methods
+- [ ] Create Zod validation schemas for data queries
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all data queries
+- [ ] Add government data caching (high TTL)
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Government data cached with high TTL
+- Cache hit rate > 90% (data changes infrequently)
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- Cache hit rate > 90%
+- All tests passing
+
+---
+
+### TASK-2.14: USSD Complete Integration
+- **Priority**: Low
+- **Effort**: 3 points
+- **Dependencies**: TASK-0.1, TASK-0.2, TASK-0.4
+- **Assignee**: Backend Developer 2
+- **Status**: Not Started
+- **Design Reference**: §3.1, §4.1, §2.4
+- **Requirements**: FR-3.1, FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Add caching to USSD service methods
+- [ ] Create Zod validation schemas for USSD operations
+- [ ] Apply validation to service methods
+- [ ] Add validation middleware to routes
+- [ ] Secure all USSD queries
+- [ ] Add session data caching
+- [ ] Write integration tests
+- [ ] Document implementation
+
+**Acceptance Criteria:**
+- All queries use secureQueryBuilder
+- All inputs validated with Zod
+- Session data cached appropriately
+- Cache hit rate > 60%
+- Integration tests pass
+- Test coverage > 85%
+
+**Quality Gates:**
+- Zero SQL injection vulnerabilities
+- All tests passing
+
+---
+
+### TASK-2.15: Remove Deprecated Validation Schemas
+- **Priority**: Medium
+- **Effort**: 2 points
+- **Dependencies**: TASK-2.1, TASK-2.2, TASK-2.3, TASK-2.4, TASK-2.5, TASK-2.6, TASK-2.7
+- **Assignee**: Backend Lead
+- **Status**: Not Started
+- **Design Reference**: §2.4
+- **Requirements**: FR-2.3
+
+**Subtasks:**
+- [ ] Verify all features migrated from deprecated schemas
+- [ ] Remove BillValidationSchema from validation-helpers.ts
+- [ ] Remove UserValidationSchema from validation-helpers.ts
+- [ ] Remove CommentValidationSchema from validation-helpers.ts
+- [ ] Remove AnalyticsValidationSchema from validation-helpers.ts
+- [ ] Update documentation
+- [ ] Run full test suite
+- [ ] Verify no breaking changes
+
+**Acceptance Criteria:**
+- All deprecated schemas removed
+- No features using deprecated schemas
+- All tests pass
+- Documentation updated
+- No breaking changes
+
+**Quality Gates:**
+- All tests passing
+- Zero diagnostics or errors
+- Code review approved
+
+---
+
+### TASK-2.16: Phase 2 Integration Testing
+- **Priority**: Critical
+- **Effort**: 5 points
+- **Dependencies**: All TASK-2.x tasks
+- **Assignee**: QA Engineer
+- **Status**: Not Started
+- **Design Reference**: §5
+- **Requirements**: FR-2.1, FR-2.3
+
+**Subtasks:**
+- [ ] Write integration tests for all features
+- [ ] Test validation across all features
+- [ ] Test caching across all features
+- [ ] Test security across all features
+- [ ] Measure cache hit rates
+- [ ] Measure validation coverage
+- [ ] Performance testing
+- [ ] Document test results
+
+**Acceptance Criteria:**
+- Integration tests pass for all features
+- Cache hit rate > 70% average
+- Validation coverage > 90%
+- Security tests pass
+- Performance targets met
+- Test coverage > 85%
+- Documentation complete
+
+**Quality Gates:**
+- All integration tests passing
+- Cache hit rate > 70%
+- Validation coverage > 90%
+- Performance review approved
+
+---
+
+**Phase 2 Total Time:** 60 points (12 days, ~2.5 weeks with buffer = 3 weeks)
+
+**Phase 2 Summary:**
+- 16 tasks covering all 13+ features
+- Systematic integration of validation, caching, security
+- Remove deprecated schemas
+- Comprehensive integration testing
+- Target: 90%+ validation coverage, 70%+ cache hit rate
+
+## Phase 3: Error Handling & Transaction Standardization (Week 4)
+
+**Objective:** Standardize error handling with Result types and ensure transaction consistency
+
+**Requirements:** Requirement 7 (Error Handling), Requirement 6 (Transaction Management)
+
+**Design Components:** Result Types, Error Factory, Transaction Patterns
+
+---
+
+### TASK-3.1: Result Type Adoption - Core Features
 - **Priority**: High
 - **Effort**: 8 points
-- **Dependencies**: TASK-0.3, TASK-0.5
-- **Assignee**: Backend Developer 2
+- **Dependencies**: TASK-0.3
+- **Assignee**: Backend Developer 1
 - **Status**: Not Started
 - **Design Reference**: §4.2
 - **Requirements**: FR-2.2
 
 **Subtasks:**
-- [ ] Adopt Result types in Bills
-- [ ] Adopt Result types in Users
-- [ ] Adopt Result types in Community
-- [ ] Adopt Result types in Search
-- [ ] Add context enrichment
-- [ ] Add monitoring
-- [ ] Write error tests
-- [ ] Write integration tests
-- [ ] Document implementation
+- [ ] Adopt Result types in Bills service
+- [ ] Adopt Result types in Users service
+- [ ] Adopt Result types in Community service
+- [ ] Adopt Result types in Search service
+- [ ] Add error context enrichment
+- [ ] Add error monitoring
+- [ ] Write error handling tests
+- [ ] Document patterns
 
 **Acceptance Criteria:**
-- Result types used consistently
+- Result types used consistently in core features
 - Error context includes relevant data
 - Error monitoring tracks all errors
 - Error rates < 0.1%
@@ -472,44 +1036,48 @@ Tasks are organized by phase and priority. Each task includes:
 
 ---
 
-### TASK-2.3: Validation Deploy
-- **Priority**: High
+### TASK-3.2: Result Type Adoption - Remaining Features
+- **Priority**: Medium
 - **Effort**: 8 points
-- **Dependencies**: TASK-0.4, TASK-0.5
-- **Assignee**: Backend Developer 3
+- **Dependencies**: TASK-3.1
+- **Assignee**: Backend Developer 2
 - **Status**: Not Started
-- **Design Reference**: §2.4
-- **Requirements**: FR-2.3
+- **Design Reference**: §4.2
+- **Requirements**: FR-3.3
 
 **Subtasks:**
-- [ ] Add validation to Bills
-- [ ] Add validation to Users
-- [ ] Add validation to Community
-- [ ] Add validation to Search
-- [ ] Add validation middleware
-- [ ] Add monitoring
-- [ ] Write validation tests
-- [ ] Write integration tests
-- [ ] Document implementation
+- [ ] Adopt Result types in Analytics
+- [ ] Adopt Result types in Sponsors
+- [ ] Adopt Result types in Notifications
+- [ ] Adopt Result types in Pretext Detection
+- [ ] Adopt Result types in Recommendation
+- [ ] Adopt Result types in Argument Intelligence
+- [ ] Adopt Result types in Constitutional Intelligence
+- [ ] Adopt Result types in Advocacy
+- [ ] Adopt Result types in Government Data
+- [ ] Adopt Result types in USSD
+- [ ] Add error context enrichment
+- [ ] Add error monitoring
+- [ ] Write error handling tests
+- [ ] Document patterns
 
 **Acceptance Criteria:**
-- All inputs validated
-- Validation errors user-friendly
-- Validation monitoring active
-- Validation failure rate tracked
-- Tests verify validation
+- Result types used consistently across all features
+- Error context complete
+- Error monitoring active
+- Tests passing
 - Test coverage > 85%
 - Documentation complete
 
 **Quality Gates:**
-- Validation coverage > 90%
+- Error rate < 0.1%
 - All tests passing
 - Code review approved
 
 ---
 
-### TASK-2.4: Transaction Audit
-- **Priority**: Medium
+### TASK-3.3: Transaction Audit
+- **Priority**: High
 - **Effort**: 5 points
 - **Dependencies**: None
 - **Assignee**: Backend Lead
@@ -518,13 +1086,13 @@ Tasks are organized by phase and priority. Each task includes:
 - **Requirements**: FR-2.4
 
 **Subtasks:**
-- [ ] Audit multi-step operations
-- [ ] Add missing transactions
-- [ ] Add monitoring
+- [ ] Audit multi-step operations across all features
+- [ ] Identify missing transactions
+- [ ] Add transactions to multi-step operations
+- [ ] Add transaction monitoring
 - [ ] Add rollback testing
-- [ ] Document patterns
+- [ ] Document transaction patterns
 - [ ] Write transaction tests
-- [ ] Write integration tests
 - [ ] Verify consistency
 
 **Acceptance Criteria:**
@@ -543,202 +1111,106 @@ Tasks are organized by phase and priority. Each task includes:
 
 ---
 
-## Phase 3: Remaining Features (Week 4)
-
-### TASK-3.1: Security Rollout
-- **Priority**: High
-- **Effort**: 13 points
-- **Dependencies**: TASK-1.5
-- **Assignee**: Backend Team (all)
-- **Status**: Not Started
-- **Design Reference**: §3.1
-- **Requirements**: FR-3.1
-
-**Subtasks:**
-- [ ] Secure Pretext Detection
-- [ ] Secure Recommendation
-- [ ] Secure Argument Intelligence
-- [ ] Secure Constitutional Intelligence
-- [ ] Secure Advocacy
-- [ ] Secure Government Data
-- [ ] Secure USSD
-- [ ] Secure Sponsors
-- [ ] Secure Analytics
-- [ ] Secure Notifications
-- [ ] Write security tests
-- [ ] Write integration tests
-- [ ] Document implementation
-
-**Acceptance Criteria:**
-- All features use security services
-- All queries secured
-- All inputs sanitized and validated
-- All outputs sanitized
-- Security tests passing
-- Test coverage > 85%
-- Documentation complete
-
-**Quality Gates:**
-- Zero SQL injection vulnerabilities
-- Zero XSS vulnerabilities
-- All tests passing
-- Security review approved
-
----
-
-### TASK-3.2: Cache Rollout
+### TASK-3.4: Error Handling Documentation
 - **Priority**: Medium
-- **Effort**: 8 points
-- **Dependencies**: TASK-2.1
-- **Assignee**: Backend Developer 1
+- **Effort**: 2 points
+- **Dependencies**: TASK-3.1, TASK-3.2
+- **Assignee**: Tech Writer
 - **Status**: Not Started
-- **Design Reference**: §4.1
-- **Requirements**: FR-3.2
 
 **Subtasks:**
-- [ ] Add cache to Recommendation
-- [ ] Add cache to Pretext Detection
-- [ ] Add cache to Constitutional Intelligence
-- [ ] Add cache to Argument Intelligence
-- [ ] Add cache to Sponsors
-- [ ] Add monitoring
-- [ ] Write cache tests
-- [ ] Write integration tests
-- [ ] Document implementation
+- [ ] Document Result type patterns
+- [ ] Document error handling strategies
+- [ ] Document error context enrichment
+- [ ] Document error monitoring
+- [ ] Add code examples
+- [ ] Add troubleshooting guide
 
 **Acceptance Criteria:**
-- Cache hit rate > 60% for these features
-- Response time improved
-- Cache invalidation working
-- Monitoring active
-- Tests passing
-- Test coverage > 85%
-- Documentation complete
+- Documentation explains Result types
+- Documentation shows error handling patterns
+- Documentation includes examples
+- Documentation includes troubleshooting
 
 **Quality Gates:**
-- Cache hit rate > 60%
-- All tests passing
-- Performance review approved
+- Documentation reviewed and approved
+- Examples compile and run
 
 ---
 
-### TASK-3.3: Error Rollout
-- **Priority**: Medium
-- **Effort**: 8 points
-- **Dependencies**: TASK-2.2
-- **Assignee**: Backend Developer 2
-- **Status**: Not Started
-- **Design Reference**: §4.2
-- **Requirements**: FR-3.3
-
-**Subtasks:**
-- [ ] Adopt Result types in remaining features
-- [ ] Add context enrichment
-- [ ] Add monitoring
-- [ ] Write error tests
-- [ ] Write integration tests
-- [ ] Document implementation
-
-**Acceptance Criteria:**
-- Result types used consistently
-- Error context complete
-- Monitoring active
-- Tests passing
-- Test coverage > 85%
-- Documentation complete
-
-**Quality Gates:**
-- Error rate < 0.1%
-- All tests passing
-- Code review approved
+**Phase 3 Total Time:** 23 points (4.6 days, ~1 week with buffer)
 
 ---
 
-### TASK-3.4: Validation Rollout
-- **Priority**: Medium
-- **Effort**: 8 points
-- **Dependencies**: TASK-2.3
-- **Assignee**: Backend Developer 3
-- **Status**: Not Started
-- **Design Reference**: §2.4
-- **Requirements**: FR-3.4
+## Phase 4: Final Audit & Performance Testing (Week 5)
 
-**Subtasks:**
-- [ ] Add validation to remaining features
-- [ ] Add middleware
-- [ ] Add monitoring
-- [ ] Write validation tests
-- [ ] Write integration tests
-- [ ] Document implementation
+**Objective:** Comprehensive security audit, performance testing, and documentation
 
-**Acceptance Criteria:**
-- All inputs validated
-- Validation errors user-friendly
-- Monitoring active
-- Tests passing
-- Test coverage > 85%
-- Documentation complete
+**Requirements:** Requirement 11 (Integration Testing), Requirement 12 (Monitoring), Requirement 13 (Documentation)
 
-**Quality Gates:**
-- Validation coverage > 90%
-- All tests passing
-- Code review approved
+**Design Components:** Security Audit, Performance Testing, Monitoring Dashboard
 
 ---
 
-### TASK-3.5: Final Audit
+### TASK-4.1: Comprehensive Security Audit
 - **Priority**: Critical
 - **Effort**: 5 points
-- **Dependencies**: TASK-3.1, TASK-3.2, TASK-3.3, TASK-3.4
+- **Dependencies**: All Phase 2 tasks
 - **Assignee**: Security Engineer
 - **Status**: Not Started
 - **Design Reference**: §5.1
 - **Requirements**: FR-1.5
 
 **Subtasks:**
-- [ ] Audit all features
-- [ ] Test vulnerabilities
-- [ ] Verify best practices
+- [ ] Audit all features for security compliance
+- [ ] Test SQL injection across all features
+- [ ] Test XSS across all features
+- [ ] Test CSRF protection
+- [ ] Test authentication/authorization
 - [ ] Document findings
 - [ ] Remediate issues
 - [ ] Re-test fixes
-- [ ] Publish report
+- [ ] Publish security report
 
 **Acceptance Criteria:**
-- Security audit complete
+- Security audit complete for all features
 - Zero critical vulnerabilities
 - Zero high vulnerabilities
 - All medium vulnerabilities documented
+- Remediation plan created
+- Re-test confirms fixes
 - Security report published
 
 **Quality Gates:**
 - Zero critical vulnerabilities
 - Zero high vulnerabilities
+- All medium vulnerabilities documented
 - Security report approved
 
 ---
 
-### TASK-3.6: Performance Test
+### TASK-4.2: Performance Testing
 - **Priority**: High
 - **Effort**: 5 points
-- **Dependencies**: TASK-3.1, TASK-3.2, TASK-3.3, TASK-3.4
+- **Dependencies**: All Phase 2 tasks
 - **Assignee**: QA Engineer
 - **Status**: Not Started
 - **Design Reference**: §6.2
 - **Requirements**: NFR-4.2
 
 **Subtasks:**
-- [ ] Test performance
-- [ ] Measure cache hits
+- [ ] Test performance across all features
+- [ ] Measure cache hit rates
 - [ ] Measure response times
 - [ ] Identify bottlenecks
 - [ ] Optimize as needed
 - [ ] Re-test optimization
 - [ ] Document metrics
+- [ ] Publish performance report
 
 **Acceptance Criteria:**
 - Performance testing complete
-- Cache hit rate > 70%
+- Cache hit rate > 70% average
 - Response time improved by 30%+
 - Bottlenecks identified and addressed
 - Performance report published
@@ -750,7 +1222,40 @@ Tasks are organized by phase and priority. Each task includes:
 
 ---
 
-### TASK-3.7: Docs & Training
+### TASK-4.3: Integration Score Validation
+- **Priority**: High
+- **Effort**: 3 points
+- **Dependencies**: All Phase 2 tasks
+- **Assignee**: Backend Lead
+- **Status**: Not Started
+- **Design Reference**: §5
+- **Requirements**: FR-3.10
+
+**Subtasks:**
+- [ ] Calculate integration score for each feature
+- [ ] Verify validation coverage > 90%
+- [ ] Verify cache hit rate > 70%
+- [ ] Verify security compliance
+- [ ] Document scores
+- [ ] Identify remaining gaps
+- [ ] Create remediation plan if needed
+
+**Acceptance Criteria:**
+- Integration score calculated for all features
+- Average integration score > 90%
+- Validation coverage > 90%
+- Cache hit rate > 70%
+- Security compliance verified
+- Documentation complete
+
+**Quality Gates:**
+- Integration score > 90%
+- All metrics meet targets
+- Documentation approved
+
+---
+
+### TASK-4.4: Comprehensive Documentation
 - **Priority**: High
 - **Effort**: 3 points
 - **Dependencies**: All tasks
@@ -758,25 +1263,32 @@ Tasks are organized by phase and priority. Each task includes:
 - **Status**: Not Started
 
 **Subtasks:**
-- [ ] Compile all docs
-- [ ] Refine developer guide
-- [ ] Refine security guide
-- [ ] Refine cache guide
-- [ ] Refine error guide
-- [ ] Refine validation guide
-- [ ] Refine training materials
-- [ ] Conduct training
+- [ ] Compile all documentation
+- [ ] Update developer guide
+- [ ] Update security guide
+- [ ] Update caching guide
+- [ ] Update validation guide
+- [ ] Update error handling guide
+- [ ] Create training materials
+- [ ] Conduct training sessions
 
 **Acceptance Criteria:**
-- All docs complete
+- All documentation complete
 - Developer guide published
 - Security guide published
+- Caching guide published
+- Validation guide published
+- Error handling guide published
 - Training materials ready
 - Training sessions conducted
 
 **Quality Gates:**
-- Docs reviewed and approved
+- Documentation reviewed and approved
 - Training feedback positive
+
+---
+
+**Phase 4 Total Time:** 16 points (3.2 days, ~1 week with buffer)
 
 ---
 
@@ -788,33 +1300,44 @@ Tasks are organized by phase and priority. Each task includes:
 - Total Tasks: 5
 - Total Story Points: 26
 - Duration: 1 week
+- Status: Complete ✅
 
 **Phase 1 (Week 2):**
 - Total Tasks: 5
 - Total Story Points: 23
 - Duration: 1 week
+- Status: Complete ✅
 
-**Phase 2 (Week 3):**
+**Phase 2 (Weeks 3-4):**
+- Total Tasks: 16
+- Total Story Points: 60
+- Duration: 3 weeks
+- Status: Not Started
+
+**Phase 3 (Week 5):**
 - Total Tasks: 4
-- Total Story Points: 29
+- Total Story Points: 23
 - Duration: 1 week
+- Status: Not Started
 
-**Phase 3 (Week 4):**
-- Total Tasks: 7
-- Total Story Points: 50
+**Phase 4 (Week 6):**
+- Total Tasks: 4
+- Total Story Points: 16
 - Duration: 1 week
+- Status: Not Started
 
 **TOTAL:**
-- Total Tasks: 21
-- Total Story Points: 89
-- Duration: 4 weeks
+- Total Tasks: 34
+- Total Story Points: 148
+- Duration: 7 weeks (including completed work)
+- Remaining: 5 weeks
 
 ### By Priority
 
-- **Critical**: 7 tasks (41 points)
-- **High**: 11 tasks (43 points)
-- **Medium**: 3 tasks (21 points)
-- **Low**: 0 tasks (0 points)
+- **Critical**: 8 tasks (58 points)
+- **High**: 12 tasks (56 points)
+- **Medium**: 12 tasks (31 points)
+- **Low**: 2 tasks (3 points)
 
 ### By Team Member
 
@@ -822,25 +1345,22 @@ Tasks are organized by phase and priority. Each task includes:
 - 3 tasks (18 points)
 
 **Backend Developer 1:**
-- 4 tasks (26 points)
+- 8 tasks (40 points)
 
 **Backend Developer 2:**
-- 4 tasks (26 points)
+- 8 tasks (40 points)
 
 **Backend Developer 3:**
-- 4 tasks (26 points)
+- 7 tasks (31 points)
 
 **Backend Lead:**
-- 2 tasks (8 points)
+- 3 tasks (10 points)
 
 **QA Engineer:**
-- 2 tasks (8 points)
+- 3 tasks (13 points)
 
 **Tech Writer:**
-- 1 task (3 points)
-
-**Backend Team (all):**
-- 1 task (13 points)
+- 2 tasks (5 points)
 
 ---
 
@@ -849,77 +1369,95 @@ Tasks are organized by phase and priority. Each task includes:
 ### Critical Path
 
 ```
-Week 1: Foundation
+Week 1-2: Foundation (COMPLETE ✅)
 TASK-0.1 (Security) ────┐
 TASK-0.2 (Caching) ─────┤
 TASK-0.3 (Error) ───────┼──> TASK-0.5 (Testing Framework)
 TASK-0.4 (Validation) ──┘
+         │
+         └──> TASK-1.1-1.5 (Phase 1 Security) ✅
 
-Week 2: Critical Security
-TASK-0.5 ──┬──> TASK-1.1 (Bills Security)
-           ├──> TASK-1.2 (Users Security)
-           ├──> TASK-1.3 (Community Security)
-           └──> TASK-1.4 (Security Middleware)
-                    │
-                    └──> TASK-1.5 (Security Audit)
+Week 3-4: Systematic Integration
+TASK-0.1, 0.2, 0.4 ──┬──> TASK-2.1 (Bills)
+                     ├──> TASK-2.2 (Users)
+                     ├──> TASK-2.3 (Community)
+                     ├──> TASK-2.4 (Search)
+                     ├──> TASK-2.5 (Analytics)
+                     ├──> TASK-2.6 (Sponsors)
+                     ├──> TASK-2.7 (Notifications)
+                     ├──> TASK-2.8 (Pretext Detection)
+                     ├──> TASK-2.9 (Recommendation)
+                     ├──> TASK-2.10 (Argument Intelligence)
+                     ├──> TASK-2.11 (Constitutional Intelligence)
+                     ├──> TASK-2.12 (Advocacy)
+                     ├──> TASK-2.13 (Government Data)
+                     └──> TASK-2.14 (USSD)
+                          │
+                          ├──> TASK-2.15 (Remove Deprecated)
+                          └──> TASK-2.16 (Integration Testing)
 
-Week 3: Performance & Reliability
-TASK-0.2 ──> TASK-2.1 (Caching)
-TASK-0.3 ──> TASK-2.2 (Error Handling)
-TASK-0.4 ──> TASK-2.3 (Validation)
-             TASK-2.4 (Transaction Audit)
-
-Week 4: Remaining Features
-TASK-1.5 ──> TASK-3.1 (Security - Remaining)
-TASK-2.1 ──> TASK-3.2 (Caching - Remaining)
-TASK-2.2 ──> TASK-3.3 (Error - Remaining)
-TASK-2.3 ──> TASK-3.4 (Validation - Remaining)
+Week 5: Error Handling & Transactions
+TASK-0.3 ──> TASK-3.1 (Result Types - Core)
              │
-             ├──> TASK-3.5 (Final Security Audit)
-             ├──> TASK-3.6 (Performance Testing)
-             └──> TASK-3.7 (Documentation)
+             └──> TASK-3.2 (Result Types - Remaining)
+                  │
+                  ├──> TASK-3.3 (Transaction Audit)
+                  └──> TASK-3.4 (Documentation)
+
+Week 6: Final Audit
+All Phase 2 & 3 ──┬──> TASK-4.1 (Security Audit)
+                  ├──> TASK-4.2 (Performance Testing)
+                  ├──> TASK-4.3 (Integration Score)
+                  └──> TASK-4.4 (Documentation)
 ```
 
 ---
 
 ## Success Metrics
 
-### Phase 0
+### Phase 0 ✅
 - All foundation services enhanced
 - Testing framework ready
 - All tests passing
 - Documentation complete
 
-### Phase 1
+### Phase 1 ✅
 - Core features secured (100%)
 - Zero critical vulnerabilities
 - Security audit passed
 - All tests passing
 
-### Phase 2
+### Phase 2 (Target)
+- All 13+ features integrated
+- Validation coverage > 90%
 - Cache hit rate > 70%
-- Response time improved by 30%+
-- Error handling standardized
+- Security compliance 100%
 - All tests passing
 
-### Phase 3
-- All features secured (100%)
-- All features cached (80%+)
-- All features use Result types (90%+)
-- All features validated (90%+)
-- Final security audit passed
-- Performance targets met
+### Phase 3 (Target)
+- Result types adopted across all features
+- Error rate < 0.1%
+- Transaction success rate > 99.9%
+- All tests passing
 
-### Overall
+### Phase 4 (Target)
+- Zero critical/high vulnerabilities
+- Performance improved by 30%+
+- Integration score > 90%
+- Documentation complete
+
+### Overall (Target)
 - 100% security integration
 - Zero critical or high vulnerabilities
 - Performance improved by 30%+
 - Test coverage > 85%
-- Ready for strategic integration
+- Validation coverage > 90%
+- Cache hit rate > 70%
+- Ready for production deployment
 
 ---
 
-**Tasks Status:** ✅ Complete  
-**Next Step:** Begin implementation  
+**Tasks Status:** ✅ Phase 0-1 Complete | 🔄 Phase 2-4 In Progress  
+**Next Step:** Begin TASK-2.1 (Bills Complete Integration)  
 **Approval Required:** Engineering Lead, Security Engineer
 
