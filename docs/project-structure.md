@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 28, 2026 at 09:32 AM
+**Generated:** February 28, 2026 at 11:57 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,851
+**Total Items:** 3,864
 
 ```
 .
@@ -2033,6 +2033,8 @@
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
 │   ├── project-structure.md
 │   ├── README_ARCHITECTURE_DOCS.md
+│   ├── REPOSITORY_PATTERN_DECISION_MATRIX.md
+│   ├── REPOSITORY_PATTERN_IMPLEMENTATION_GUIDE.md
 │   ├── REPOSITORY_PATTERN.md
 │   ├── REQUIREMENTS_AUDIT_ASSESSMENT.md
 │   ├── ROUTING_EXPLANATION.md
@@ -2681,6 +2683,7 @@
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── external/
 │   │   │   │   └── persistence/
+│   │   │   │       └── NotificationRepository.ts
 │   │   │   ├── presentation/
 │   │   │   │   ├── http/
 │   │   │   │   │   ├── alert-preference-routes.ts
@@ -2918,7 +2921,8 @@
 │   │   │   │   ├── government-data-service.ts
 │   │   │   │   ├── notification-service.ts
 │   │   │   │   ├── user-storage.d.ts
-│   │   │   │   └── user-storage.ts
+│   │   │   │   ├── user-storage.ts
+│   │   │   │   └── UserRepository.ts
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
 │   │   │   │       └── user-validation.middleware.ts
@@ -3128,6 +3132,8 @@
 │   │   │   ├── resilience.ts
 │   │   │   ├── result-types.ts
 │   │   │   └── types.ts
+│   │   ├── errors/
+│   │   │   └── error-types.ts
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
@@ -3142,7 +3148,10 @@
 │   │   │   ├── email/
 │   │   │   │   └── email-service.ts
 │   │   │   ├── push/
-│   │   │   └── sms/
+│   │   │   │   └── push-service.ts
+│   │   │   ├── sms/
+│   │   │   │   └── sms-service.ts
+│   │   │   └── ARCHITECTURE.md
 │   │   ├── migration/
 │   │   │   ├── ab-testing.service.ts
 │   │   │   ├── dashboard.service.ts
@@ -3360,6 +3369,7 @@
 │   │   ├── fix-shared-core-imports.ts
 │   │   ├── fix-shared-imports.js
 │   │   ├── legacy-websocket-cleanup.ts
+│   │   ├── migrate-database-access.ts
 │   │   ├── migration-runner.ts
 │   │   ├── run-websocket-validation.ts
 │   │   ├── simple-websocket-validation.ts
@@ -3702,7 +3712,9 @@
 │   │   ├── analytics-service-contracts.property.test.ts
 │   │   ├── api-retry-logic.property.test.ts
 │   │   ├── branded-type-safety.property.test.ts
+│   │   ├── cache-invalidation.property.test.ts
 │   │   ├── consistent-error-message-format.property.test.ts
+│   │   ├── database-connection-routing.property.test.ts
 │   │   ├── date-validation.property.test.ts
 │   │   ├── dependency-graph-layering.property.integration.test.ts
 │   │   ├── dependency-injection-correctness.property.test.ts
@@ -3722,6 +3734,7 @@
 │   │   ├── telemetry-service-contracts.property.test.ts
 │   │   ├── transformation-pipeline-correctness.property.test.ts
 │   │   ├── type-safety-enforcement.property.test.ts
+│   │   ├── validation-round-trip.property.test.ts
 │   │   ├── vitest.config.ts
 │   │   └── websocket-message-batching.property.test.ts
 │   ├── setup/

@@ -12,6 +12,8 @@ import { InputSanitizationService, securityAuditService } from '@server/features
 import { cacheKeys, CACHE_TTL, createCacheInvalidation } from '@server/infrastructure/cache/cache-keys';
 import { cacheService } from '@server/infrastructure/cache';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
+import { BillRepository } from '../domain/repositories/bill.repository';
+import type { InsertBill as RepositoryInsertBill } from '../domain/repositories/bill.repository';
 import {
   CreateBillSchema,
   UpdateBillSchema,
@@ -103,18 +105,13 @@ function validateStringInputs(values: string[]): void {
  * performance optimisation. Provides a multi-layer caching strategy with
  * automatic invalidation and fallback support.
  *
- * NOTE: `withTransaction` uses implicit transaction context (AsyncLocalStorage).
- * All database calls inside a `withTransaction` callback use the module-level
- * `db` instance directly — no `tx` argument is passed to the callback.
+ * Uses BillRepository for data access operations.
  */
 export class CachedBillService {
+  private readonly repository: BillRepository;
 
-  // --------------------------------------------------------------------------
-  // Database Access
-  // --------------------------------------------------------------------------
-
-  private get database() {
-    return db;
+  constructor() {
+    this.repository = new BillRepository();
   }
 
   // --------------------------------------------------------------------------
@@ -176,7 +173,7 @@ export class CachedBillService {
 
       try {
         // @ts-ignore - Drizzle ORM query builder type issues
-        const billResults = (await this.database
+        const billResults = (await readDatabase
           .select({
             id: bills.id,
             title: bills.title,
@@ -343,7 +340,7 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const updatedBillResults = (await this.database
+      const updatedBillResults = (await writeDatabase
         .update(bills)
         .set({ ...sanitizedUpdates, updated_at: new Date() })
         .where(eq(bills.id, sanitizedId))
@@ -521,7 +518,7 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await this.database
+      const results = (await readDatabase
         .select()
         .from(bills)
         .where(eq(bills.status, status))
@@ -545,7 +542,7 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await this.database
+      const results = (await readDatabase
         .select()
         .from(bills)
         .where(eq(bills.category, category))
@@ -569,7 +566,7 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await this.database
+      const results = (await readDatabase
         .select()
         .from(bills)
         .where(eq(bills.sponsor_id, sponsor_id))
@@ -588,7 +585,7 @@ export class CachedBillService {
       if (ids.length === 0) return [];
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await this.database
+      const results = (await readDatabase
         .select()
         .from(bills)
         .where(inArray(bills.id, ids))
@@ -650,7 +647,7 @@ export class CachedBillService {
       const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const totalResults = (await this.database
+      const totalResults = (await readDatabase
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .where(whereClause)) as any[];
@@ -662,7 +659,7 @@ export class CachedBillService {
       const orderExpr = validatedPagination.sortOrder === 'asc' ? sortColumn : desc(sortColumn);
 
       // @ts-ignore - Drizzle ORM query builder type issues
-      const billResults = (await this.database
+      const billResults = (await readDatabase
         .select({
           id: bills.id,
           title: bills.title,
@@ -724,20 +721,20 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const totalResults = (await this.database
+      const totalResults = (await readDatabase
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)) as any[];
 
       const totalResult = totalResults[0];
 
       // @ts-ignore - Drizzle ORM query builder type issues
-      const statusResults = (await this.database
+      const statusResults = (await readDatabase
         .select({ status: bills.status, count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .groupBy(bills.status)) as any[];
 
       // @ts-ignore - Drizzle ORM query builder type issues
-      const categoryResults = (await this.database
+      const categoryResults = (await readDatabase
         .select({ category: bills.category, count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .groupBy(bills.category)) as any[];
@@ -788,7 +785,7 @@ export class CachedBillService {
       }
 
       // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const countResults = (await this.database
+      const countResults = (await readDatabase
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .where(conditions.length > 0 ? and(...conditions) : undefined)) as any[];

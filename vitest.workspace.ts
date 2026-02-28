@@ -442,6 +442,7 @@ export default defineWorkspace([
       alias: {
         '@': resolve(__dirname, './client/src'),
         '@client': resolve(__dirname, './client/src'),
+        '@server': resolve(__dirname, './server'),
         '@shared': resolve(__dirname, './shared'),
         '@workspace': resolve(__dirname, './shared'),
         '@workspace/types': resolve(__dirname, './shared/types'),

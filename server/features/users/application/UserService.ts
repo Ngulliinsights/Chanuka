@@ -10,13 +10,12 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { withTransaction } from '@server/infrastructure/database';
 import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
 import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
 import { User } from '@shared/domain/entities/user';
 import { UserInterest, UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles, users } from '@server/infrastructure/schema';
-import { eq, like, or, sql } from 'drizzle-orm';
 
 // Infrastructure imports
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
@@ -34,6 +33,9 @@ import {
   type SearchUsersInput,
 } from './user-validation.schemas';
 
+// Repository import
+import { UserRepository } from '../infrastructure/UserRepository';
+
 // PII encryption (placeholder - implement with actual encryption library)
 import crypto from 'crypto';
 
@@ -46,6 +48,7 @@ const ENCRYPTION_ALGORITHM = 'aes-256-gcm';
 export class UserService {
   private inputSanitizer = new InputSanitizationService();
   private cacheInvalidation = createCacheInvalidation(cacheService);
+  private userRepository = new UserRepository();
 
   // ============================================================================
   // PII Encryption/Decryption
@@ -129,24 +132,26 @@ export class UserService {
       const encryptedEmail = await this.encryptPII(sanitizedEmail);
       const encryptedPhone = sanitizedPhone ? await this.encryptPII(sanitizedPhone) : null;
 
-      // 4. Execute with transaction
-      const user = await withTransaction(async () => {
-        // Create user
-        const [newUser] = await db
-          .insert(users)
-          .values({
-            email: encryptedEmail,
-            password_hash: passwordHash,
-            role: validatedData.role || 'user',
-            is_verified: false,
-            is_active: true,
-            created_at: new Date(),
-            updated_at: new Date(),
-          })
-          .returning();
+      // 4. Execute with transaction using repository
+      const createResult = await this.userRepository.create({
+        email: encryptedEmail,
+        password_hash: passwordHash,
+        role: validatedData.role || 'citizen',
+        is_verified: false,
+        is_active: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
 
-        // Create default profile
-        await db
+      if (!createResult.isOk) {
+        throw createResult.error;
+      }
+
+      const newUser = createResult.value;
+
+      // Create default profile using withTransaction
+      await withTransaction(async (tx) => {
+        await tx
           .insert(user_profiles)
           .values({
             user_id: newUser.id,
@@ -156,18 +161,18 @@ export class UserService {
             created_at: new Date(),
             updated_at: new Date(),
           });
+      });
 
-        return User.create({
-          id: newUser.id,
-          email: sanitizedEmail, // Return decrypted for use
-          name: sanitizedName,
-          role: newUser.role,
-          verification_status: 'pending',
-          is_active: newUser.is_active,
-          created_at: newUser.created_at,
-          updated_at: newUser.updated_at,
-          reputation_score: 0,
-        });
+      const user = User.create({
+        id: newUser.id,
+        email: sanitizedEmail, // Return decrypted for use
+        name: sanitizedName,
+        role: newUser.role,
+        verification_status: 'pending',
+        is_active: newUser.is_active,
+        created_at: newUser.created_at,
+        updated_at: newUser.updated_at,
+        reputation_score: 0,
       });
 
       // 5. Audit log
@@ -185,9 +190,6 @@ export class UserService {
           role: user.role,
         },
       });
-
-      // 6. Invalidate caches
-      await this.invalidateUserCaches(user.id);
 
       logger.info('User created successfully', { user_id: user.id });
 
@@ -207,24 +209,17 @@ export class UserService {
 
       const sanitizedId = this.inputSanitizer.sanitizeString(id);
 
-      // 2. Check cache
-      const cacheKey = cacheKeys.entity('user', sanitizedId);
-      const cached = await cacheService.get<User>(cacheKey);
-      if (cached) {
-        logger.debug({ cacheKey }, 'Cache hit for user');
-        return cached;
+      // 2. Query using repository (caching handled by repository)
+      const result = await this.userRepository.findById(sanitizedId);
+
+      if (!result.isOk) {
+        throw result.error;
       }
 
-      // 3. Query database
-      const [userRow] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, sanitizedId))
-        .limit(1);
-
+      const userRow = result.value;
       if (!userRow) return null;
 
-      // 4. Decrypt PII
+      // 3. Decrypt PII
       const decryptedEmail = await this.decryptPII(userRow.email);
 
       const user = User.create({
@@ -240,10 +235,7 @@ export class UserService {
         reputation_score: 0,
       });
 
-      // 5. Cache result
-      await cacheService.set(cacheKey, user, CACHE_TTL.USERS);
-
-      // 6. Audit log
+      // 4. Audit log
       await securityAuditService.logSecurityEvent({
         event_type: 'user_accessed',
         severity: 'low',
@@ -274,31 +266,25 @@ export class UserService {
       const sanitizedId = this.inputSanitizer.sanitizeString(id);
 
       // 2. Sanitize and encrypt if needed
-      const updateData: any = { updated_at: new Date() };
+      const updateData: any = {};
 
       if (validatedUpdates.email) {
         const sanitizedEmail = this.inputSanitizer.sanitizeString(validatedUpdates.email);
         updateData.email = await this.encryptPII(sanitizedEmail);
       }
 
-      if (validatedUpdates.name) {
-        updateData.display_name = this.inputSanitizer.sanitizeString(validatedUpdates.name);
-      }
-
       if (validatedUpdates.role) {
         updateData.role = validatedUpdates.role;
       }
 
-      // 3. Execute update
-      const [updatedUser] = await db
-        .update(users)
-        .set(updateData)
-        .where(eq(users.id, sanitizedId))
-        .returning();
+      // 3. Execute update using repository
+      const result = await this.userRepository.update(sanitizedId, updateData);
 
-      if (!updatedUser) {
-        throw new Error('User not found');
+      if (!result.isOk) {
+        throw result.error;
       }
+
+      const updatedUser = result.value;
 
       // 4. Decrypt for return
       const decryptedEmail = await this.decryptPII(updatedUser.email);
@@ -331,9 +317,6 @@ export class UserService {
         },
       });
 
-      // 6. Invalidate caches
-      await this.invalidateUserCaches(sanitizedId);
-
       return user;
     }, { service: 'UserService', operation: 'updateUser' });
   }
@@ -352,43 +335,21 @@ export class UserService {
       const validatedInput = validation.data!;
       const sanitizedQuery = this.inputSanitizer.sanitizeString(validatedInput.query);
 
-      // 2. Check cache
-      const cacheKey = cacheKeys.search(sanitizedQuery, { 
-        role: validatedInput.role,
-        verification_status: validatedInput.verification_status,
+      // 2. Execute search using repository (caching handled by repository)
+      const result = await this.userRepository.searchUsers(sanitizedQuery, {
+        role: validatedInput.role as any,
+        is_verified: validatedInput.verification_status === 'verified',
+        limit: validatedInput.limit ? parseInt(validatedInput.limit) : 20,
+        page: validatedInput.page ? parseInt(validatedInput.page) : undefined,
       });
-      const cached = await cacheService.get<User[]>(cacheKey);
-      if (cached) {
-        logger.debug({ cacheKey }, 'Cache hit for user search');
-        return cached;
+
+      if (!result.isOk) {
+        throw result.error;
       }
 
-      // 3. Build query
-      const searchPattern = `%${sanitizedQuery.toLowerCase()}%`;
-      let query = readDatabase.select().from(users);
+      const results = result.value;
 
-      // Apply filters
-      const conditions = [
-        or(
-          sql`LOWER(${users.email}) LIKE ${searchPattern}`,
-        ),
-      ];
-
-      if (validatedInput.role) {
-        conditions.push(eq(users.role, validatedInput.role));
-      }
-
-      if (validatedInput.verification_status) {
-        const isVerified = validatedInput.verification_status === 'verified';
-        conditions.push(eq(users.is_verified, isVerified));
-      }
-
-      // 4. Execute query
-      const results = await query
-        .where(sql`${sql.join(conditions, sql` AND `)}`)
-        .limit(validatedInput.limit ? parseInt(validatedInput.limit) : 20);
-
-      // 5. Decrypt PII and map to domain entities
+      // 3. Decrypt PII and map to domain entities
       const usersWithDecryptedPII = await Promise.all(
         results.map(async (row) => {
           const decryptedEmail = await this.decryptPII(row.email);
@@ -407,10 +368,7 @@ export class UserService {
         })
       );
 
-      // 6. Cache results
-      await cacheService.set(cacheKey, usersWithDecryptedPII, CACHE_TTL.SEARCH);
-
-      // 7. Audit log
+      // 4. Audit log
       await securityAuditService.logSecurityEvent({
         event_type: 'user_search',
         severity: 'low',
@@ -440,21 +398,14 @@ export class UserService {
     return safeAsync(async () => {
       const sanitizedId = this.inputSanitizer.sanitizeString(userId);
 
-      // 1. Check cache
-      const cacheKey = cacheKeys.entity('user-profile', sanitizedId);
-      const cached = await cacheService.get<UserProfile>(cacheKey);
-      if (cached) {
-        logger.debug({ cacheKey }, 'Cache hit for user profile');
-        return cached;
+      // 1. Query using repository (caching handled by repository)
+      const result = await this.userRepository.getUserProfile(sanitizedId);
+
+      if (!result.isOk) {
+        throw result.error;
       }
 
-      // 2. Query database
-      const [profileRow] = await db
-        .select()
-        .from(user_profiles)
-        .where(eq(user_profiles.user_id, sanitizedId))
-        .limit(1);
-
+      const profileRow = result.value;
       if (!profileRow) return null;
 
       const profile = UserProfile.create({
@@ -475,9 +426,6 @@ export class UserService {
         updated_at: profileRow.updated_at,
       });
 
-      // 3. Cache result
-      await cacheService.set(cacheKey, profile, CACHE_TTL.USERS);
-
       return profile;
     }, { service: 'UserService', operation: 'getUserProfile' });
   }
@@ -497,7 +445,7 @@ export class UserService {
       const sanitizedId = this.inputSanitizer.sanitizeString(userId);
 
       // 2. Sanitize inputs
-      const updateData: any = { updated_at: new Date() };
+      const updateData: any = {};
 
       if (validatedUpdates.bio) {
         updateData.bio = this.inputSanitizer.sanitizeHtml(validatedUpdates.bio);
@@ -521,16 +469,14 @@ export class UserService {
         updateData.privacy_settings = { profile_visibility: validatedUpdates.is_public ? 'public' : 'private' };
       }
 
-      // 3. Execute update
-      const [updatedProfile] = await db
-        .update(user_profiles)
-        .set(updateData)
-        .where(eq(user_profiles.user_id, sanitizedId))
-        .returning();
+      // 3. Execute update using repository
+      const result = await this.userRepository.updateProfile(sanitizedId, updateData);
 
-      if (!updatedProfile) {
-        throw new Error('Profile not found');
+      if (!result.isOk) {
+        throw result.error;
       }
+
+      const updatedProfile = result.value;
 
       const profile = UserProfile.create({
         id: updatedProfile.id,
@@ -564,9 +510,6 @@ export class UserService {
           updated_fields: Object.keys(validatedUpdates),
         },
       });
-
-      // 5. Invalidate caches
-      await this.invalidateUserCaches(sanitizedId);
 
       return profile;
     }, { service: 'UserService', operation: 'updateUserProfile' });

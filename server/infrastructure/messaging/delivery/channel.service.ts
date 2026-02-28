@@ -6,8 +6,8 @@
  * Owns:
  *   • In-app  — database insert + optional WebSocket push
  *   • Email   — via EmailService (SMTP / mock)
- *   • SMS     — AWS SNS (production) or mock (development)
- *   • Push    — Firebase Admin SDK (production) or mock (development)
+ *   • SMS     — via SMSService (AWS SNS / Twilio / mock)
+ *   • Push    — via PushService (Firebase / OneSignal / mock)
  *
  * Does NOT:
  *   • Decide whether a notification should be sent
@@ -15,16 +15,9 @@
  *   • Schedule, batch, or template notifications
  *
  * Consumed by: notification-service.ts
- * Depends on:  email-service.ts, @server/infrastructure/database
+ * Depends on:  email-service.ts, sms-service.ts, push-service.ts
  */
 
-import { PublishCommand, SNSClient } from '@aws-sdk/client-sns';
-import type {
-  AndroidConfig,
-  ApnsConfig,
-  WebpushConfig,
-} from 'firebase-admin/messaging';
-import * as admin from 'firebase-admin';
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 
@@ -32,10 +25,11 @@ import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import { notifications, user_profiles, users } from '@server/infrastructure/schema';
 import { getEmailService } from '@server/infrastructure/messaging/email/email-service';
+import { smsService } from '@server/infrastructure/messaging/sms/sms-service';
+import { pushService } from '@server/infrastructure/messaging/push/push-service';
 
 // ---------------------------------------------------------------------------
-// Logger helper — this project's logger accepts a single string argument.
-// Embed context as a JSON suffix to avoid pino overload errors.
+// Logger helper
 // ---------------------------------------------------------------------------
 function log(
   level: 'info' | 'warn' | 'error' | 'debug',
@@ -47,15 +41,13 @@ function log(
 }
 
 // ---------------------------------------------------------------------------
-// Optional WebSocket helper — non-fatal if @shared/websocket is unavailable.
+// Optional WebSocket helper
 // ---------------------------------------------------------------------------
 async function tryWebSocketNotify(
   userId: string,
   payload: Record<string, unknown>,
 ): Promise<void> {
   try {
-    // Dynamic import so the channel service still compiles / works when the
-    // websocket package is not yet available in the project.
     // @ts-expect-error - @shared/websocket is optional and may not exist
     const mod = await import('@shared/websocket').catch(() => null);
     if (mod?.webSocketService) {
@@ -115,7 +107,7 @@ export interface DeliveryResult {
   deliveredAt?: Date;
 }
 
-// Kept for consumers that import these (e.g. notification-service.ts)
+// Kept for backward compatibility with consumers
 export interface SMSProviderConfig {
   provider: 'twilio' | 'aws-sns' | 'mock';
   accountSid?: string;
@@ -130,148 +122,18 @@ export interface PushProviderConfig {
 }
 
 // ---------------------------------------------------------------------------
-// Internal push payload — typed against firebase-admin's MulticastMessage
-// ---------------------------------------------------------------------------
-interface PushPayload {
-  title: string;
-  body: string;
-  data?: Record<string, string>;
-  android?: AndroidConfig;
-  apns?: ApnsConfig;
-  webpush?: WebpushConfig;
-}
-
-// ---------------------------------------------------------------------------
-// Internal provider config
-// ---------------------------------------------------------------------------
-interface ProviderConfig {
-  aws: {
-    region: string;
-    accessKeyId?: string;
-    secretAccessKey?: string;
-  };
-  firebase: {
-    projectId: string;
-    privateKey?: string;
-    clientEmail?: string;
-    databaseURL?: string;
-  };
-  /** Silently fall back to mock delivery when cloud credentials are absent. */
-  fallbackToMock: boolean;
-}
-
-// ---------------------------------------------------------------------------
 // Service
 // ---------------------------------------------------------------------------
 
 export class NotificationChannelService {
-  private snsClient: SNSClient | null = null;
-  private firebaseApp: admin.app.App | null = null;
   private emailServicePromise: Promise<any>;
-
-  private readonly smsConfig: SMSProviderConfig;
-  private readonly pushConfig: PushProviderConfig;
   private readonly deliveryAttempts = new Map<string, number>();
   private readonly MAX_RETRY_ATTEMPTS = 3;
-  private readonly providerCfg: ProviderConfig;
 
   constructor() {
     this.emailServicePromise = getEmailService();
     
-    this.smsConfig = {
-      provider:   (process.env.SMS_PROVIDER  as SMSProviderConfig['provider']) || 'mock',
-      accountSid: process.env.TWILIO_ACCOUNT_SID ?? '',
-      authToken:  process.env.TWILIO_AUTH_TOKEN  ?? '',
-      fromNumber: process.env.TWILIO_FROM_NUMBER ?? '',
-    };
-
-    this.pushConfig = {
-      provider:  (process.env.PUSH_PROVIDER as PushProviderConfig['provider']) || 'mock',
-      serverKey: process.env.FIREBASE_SERVER_KEY ?? process.env.ONESIGNAL_API_KEY ?? '',
-      appId:     process.env.FIREBASE_APP_ID     ?? process.env.ONESIGNAL_APP_ID  ?? '',
-    };
-
-    this.providerCfg = {
-      aws: {
-        region:          process.env.AWS_REGION            ?? 'us-east-1',
-        accessKeyId:     process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      },
-      firebase: {
-        projectId:   process.env.FIREBASE_PROJECT_ID ?? '',
-        privateKey:  process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        databaseURL: process.env.FIREBASE_DATABASE_URL,
-      },
-      fallbackToMock:
-        process.env.NODE_ENV === 'development' ||
-        process.env.NOTIFICATION_MOCK === 'true',
-    };
-
-    // Non-blocking — failures are logged, not thrown
-    this.initProviders().catch((err: unknown) =>
-      log('error', 'Provider initialisation failed', { err: String(err) }),
-    );
-
-    log('info', '✅ NotificationChannelService created', {
-      smsProvider:  this.smsConfig.provider,
-      pushProvider: this.pushConfig.provider,
-      fallback:     this.providerCfg.fallbackToMock,
-    });
-  }
-
-  // -------------------------------------------------------------------------
-  // Provider initialisation
-  // -------------------------------------------------------------------------
-
-  private async initProviders(): Promise<void> {
-    await Promise.all([this.initAWSSNS(), this.initFirebase()]);
-  }
-
-  private async initAWSSNS(): Promise<void> {
-    const { region, accessKeyId, secretAccessKey } = this.providerCfg.aws;
-
-    if (!accessKeyId || !secretAccessKey) {
-      if (!this.providerCfg.fallbackToMock) {
-        log('warn', '⚠️  AWS credentials missing — SMS will use mock');
-      }
-      return;
-    }
-
-    try {
-      this.snsClient = new SNSClient({
-        region,
-        credentials: { accessKeyId, secretAccessKey },
-      });
-      log('info', '✅ AWS SNS client initialised');
-    } catch (err: unknown) {
-      log('error', '❌ AWS SNS initialisation failed', { err: String(err) });
-    }
-  }
-
-  private async initFirebase(): Promise<void> {
-    const { projectId, privateKey, clientEmail, databaseURL } = this.providerCfg.firebase;
-
-    if (!projectId || !privateKey || !clientEmail) {
-      if (!this.providerCfg.fallbackToMock) {
-        log('warn', '⚠️  Firebase credentials missing — push will use mock');
-      }
-      return;
-    }
-
-    try {
-      try {
-        this.firebaseApp = admin.app();
-      } catch {
-        this.firebaseApp = admin.initializeApp({
-          credential: admin.credential.cert({ projectId, privateKey, clientEmail }),
-          databaseURL,
-        });
-      }
-      log('info', '✅ Firebase Admin SDK initialised');
-    } catch (err: unknown) {
-      log('error', '❌ Firebase initialisation failed', { err: String(err) });
-    }
+    log('info', '✅ NotificationChannelService created');
   }
 
   // -------------------------------------------------------------------------
@@ -351,24 +213,10 @@ export class NotificationChannelService {
     aws:      { connected: boolean; error?: string };
     firebase: { connected: boolean; error?: string };
   }> {
-    const aws:      { connected: boolean; error?: string } = { connected: false };
-    const firebase: { connected: boolean; error?: string } = { connected: false };
-
-    if (this.snsClient) {
-      aws.connected = true; // Valid SNSClient instance implies credentials parsed OK
-    } else {
-      aws.error = 'SNS client not initialised';
-    }
-
-    if (this.firebaseApp) {
-      try {
-        firebase.connected = !!admin.messaging(this.firebaseApp);
-      } catch (err: unknown) {
-        firebase.error = err instanceof Error ? err.message : String(err);
-      }
-    } else {
-      firebase.error = 'Firebase app not initialised';
-    }
+    const [aws, firebase] = await Promise.all([
+      smsService.testConnectivity(),
+      pushService.testConnectivity(),
+    ]);
 
     return { aws, firebase };
   }
@@ -383,22 +231,25 @@ export class NotificationChannelService {
     fallbackMode:        boolean;
     pendingRetries:      number;
   } {
+    const smsStatus = smsService.getStatus();
+    const pushStatus = pushService.getStatus();
+
     return {
-      smsProvider:         this.smsConfig.provider,
-      smsConfigured:       this.snsClient !== null || this.smsConfig.provider === 'mock',
-      pushProvider:        this.pushConfig.provider,
-      pushConfigured:      this.firebaseApp !== null || this.pushConfig.provider === 'mock',
-      awsInitialised:      this.snsClient !== null,
-      firebaseInitialised: this.firebaseApp !== null,
-      fallbackMode:        this.providerCfg.fallbackToMock,
+      smsProvider:         smsStatus.provider,
+      smsConfigured:       smsStatus.configured,
+      pushProvider:        pushStatus.provider,
+      pushConfigured:      pushStatus.configured,
+      awsInitialised:      smsStatus.awsInitialized,
+      firebaseInitialised: pushStatus.firebaseInitialized,
+      fallbackMode:        smsStatus.fallbackMode || pushStatus.fallbackMode,
       pendingRetries:      this.deliveryAttempts.size,
     };
   }
 
   cleanup(): void {
     this.deliveryAttempts.clear();
-    this.snsClient   = null;
-    this.firebaseApp = null;
+    smsService.cleanup();
+    pushService.cleanup();
     log('info', '✅ NotificationChannelService cleanup complete');
   }
 
@@ -408,7 +259,6 @@ export class NotificationChannelService {
 
   /**
    * In-app: writes to the notifications table, then fires a WebSocket event.
-   * WebSocket failure is non-fatal — the notification is still persisted.
    */
   private async sendInApp(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
@@ -428,7 +278,7 @@ export class NotificationChannelService {
         created_at:        new Date(),
       });
 
-      // Fire-and-forget — do not await; WebSocket errors are swallowed inside
+      // Fire-and-forget WebSocket notification
       void tryWebSocketNotify(request.user_id, {
         type:    request.metadata?.category ?? 'notification',
         title:   request.content.title,
@@ -447,67 +297,66 @@ export class NotificationChannelService {
    * Email: resolves user address + display name, then delegates to EmailService.
    */
   private async sendEmail(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
-      try {
-        const userRows = await db
-          .select({ id: users.id, email: users.email })
-          .from(users)
-          .where(eq(users.id, request.user_id))
-          .limit(1) as any[];
+    try {
+      const userRows = await db
+        .select({ id: users.id, email: users.email })
+        .from(users)
+        .where(eq(users.id, request.user_id))
+        .limit(1) as any[];
 
-        const user = userRows[0];
-        if (!user)       throw new Error(`User not found: ${request.user_id}`);
-        if (!user.email) throw new Error(`No email address for user: ${request.user_id}`);
-        if (!this.isValidEmail(user.email)) throw new Error(`Invalid email: ${user.email}`);
+      const user = userRows[0];
+      if (!user)       throw new Error(`User not found: ${request.user_id}`);
+      if (!user.email) throw new Error(`No email address for user: ${request.user_id}`);
+      if (!this.isValidEmail(user.email)) throw new Error(`Invalid email: ${user.email}`);
 
-        const profileRows = await db
-          .select({
-            display_name: user_profiles.display_name,
-            first_name:   user_profiles.first_name,
-            last_name:    user_profiles.last_name,
-          })
-          .from(user_profiles)
-          .where(eq(user_profiles.user_id, request.user_id))
-          .limit(1) as any[];
+      const profileRows = await db
+        .select({
+          display_name: user_profiles.display_name,
+          first_name:   user_profiles.first_name,
+          last_name:    user_profiles.last_name,
+        })
+        .from(user_profiles)
+        .where(eq(user_profiles.user_id, request.user_id))
+        .limit(1) as any[];
 
-        const profile = profileRows[0];
+      const profile = profileRows[0];
 
-        const name =
-          profile?.display_name ??
-          (profile?.first_name && profile?.last_name
-            ? `${profile.first_name} ${profile.last_name}`
-            : profile?.first_name) ??
-          'User';
+      const name =
+        profile?.display_name ??
+        (profile?.first_name && profile?.last_name
+          ? `${profile.first_name} ${profile.last_name}`
+          : profile?.first_name) ??
+        'User';
 
-        const { text, html } = this.formatEmailContent(request, name);
+      const { text, html } = this.formatEmailContent(request, name);
 
-        const emailService = await this.emailServicePromise;
-        await emailService.sendEmail({
-          to:      user.email,
-          subject: request.content.title,
-          text,
-          html,
-          metadata: {
-            userId:        request.user_id,
-            category:      (request.metadata?.category as string | undefined) ?? 'notification',
-            relatedBillId: request.metadata?.relatedBillId,
-          },
-        });
+      const emailService = await this.emailServicePromise;
+      await emailService.sendEmail({
+        to:      user.email,
+        subject: request.content.title,
+        text,
+        html,
+        metadata: {
+          userId:        request.user_id,
+          category:      (request.metadata?.category as string | undefined) ?? 'notification',
+          relatedBillId: request.metadata?.relatedBillId,
+        },
+      });
 
-        return { success: true, channel: 'email', deliveredAt: new Date() };
+      return { success: true, channel: 'email', deliveredAt: new Date() };
 
-      } catch (err: unknown) {
-        throw new Error(`Email delivery failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
+    } catch (err: unknown) {
+      throw new Error(`Email delivery failed: ${err instanceof Error ? err.message : String(err)}`);
     }
+  }
 
   /**
-   * SMS: routes to AWS SNS, Twilio (stub), or mock.
-   * Phone numbers are not yet in the user schema — a dev placeholder is used.
+   * SMS: delegates to SMSService.
    */
   private async sendSMS(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
-      const phone =
-        process.env.NODE_ENV === 'development' ? '+254700000000' : null;
+      // TODO: Get phone number from user schema once available
+      const phone = process.env.NODE_ENV === 'development' ? '+254700000000' : null;
 
       if (!phone) {
         throw new Error(
@@ -516,17 +365,27 @@ export class NotificationChannelService {
       }
 
       const message = this.formatSMSMessage(request);
-      let messageId: string;
+      
+      const result = await smsService.sendSMS({
+        phoneNumber: phone,
+        message,
+        priority: request.metadata?.priority,
+        metadata: {
+          userId: request.user_id,
+          category: request.metadata?.category as string | undefined,
+        },
+      });
 
-      if (this.snsClient) {
-        messageId = await this.sendViaAWSSNS(phone, message);
-      } else if (this.smsConfig.provider === 'twilio') {
-        messageId = await this.sendViaTwilio(phone, message);
-      } else {
-        messageId = this.sendViaMockSMS(phone, message);
+      if (!result.success) {
+        throw new Error(result.error ?? 'SMS delivery failed');
       }
 
-      return { success: true, channel: 'sms', messageId, deliveredAt: new Date() };
+      return {
+        success: true,
+        channel: 'sms',
+        messageId: result.messageId,
+        deliveredAt: result.deliveredAt,
+      };
 
     } catch (err: unknown) {
       throw new Error(`SMS delivery failed: ${err instanceof Error ? err.message : String(err)}`);
@@ -534,11 +393,11 @@ export class NotificationChannelService {
   }
 
   /**
-   * Push: routes to Firebase, OneSignal (stub), or mock.
-   * Push tokens will come from a user_devices table once that schema exists.
+   * Push: delegates to PushService.
    */
   private async sendPush(request: ChannelDeliveryRequest): Promise<DeliveryResult> {
     try {
+      // TODO: Get push tokens from user_devices table once available
       const tokens =
         process.env.NODE_ENV === 'development'
           ? [`mock-token-${request.user_id}`]
@@ -549,136 +408,33 @@ export class NotificationChannelService {
       }
 
       const payload = this.formatPushPayload(request);
-      let messageId: string;
+      
+      const result = await pushService.sendPush({
+        tokens,
+        title: payload.title,
+        body: payload.body,
+        data: payload.data,
+        priority: request.metadata?.priority,
+        config: request.config?.push,
+        android: payload.android,
+        apns: payload.apns,
+        webpush: payload.webpush,
+      });
 
-      if (this.firebaseApp) {
-        messageId = await this.sendViaFirebase(tokens, payload);
-      } else if (this.pushConfig.provider === 'onesignal') {
-        messageId = await this.sendViaOneSignal(tokens);
-      } else {
-        messageId = this.sendViaMockPush(tokens, payload);
+      if (!result.success) {
+        throw new Error(result.error ?? 'Push delivery failed');
       }
 
-      return { success: true, channel: 'push', messageId, deliveredAt: new Date() };
+      return {
+        success: true,
+        channel: 'push',
+        messageId: result.messageId,
+        deliveredAt: result.deliveredAt,
+      };
 
     } catch (err: unknown) {
       throw new Error(`Push delivery failed: ${err instanceof Error ? err.message : String(err)}`);
     }
-  }
-
-  // -------------------------------------------------------------------------
-  // Provider implementations (no circular imports)
-  // -------------------------------------------------------------------------
-
-  private async sendViaAWSSNS(phoneNumber: string, message: string): Promise<string> {
-    if (!this.snsClient) {
-      log('info', '📱 AWS SNS unavailable — falling back to mock SMS');
-      return this.sendViaMockSMS(phoneNumber, message);
-    }
-
-    try {
-      const e164 = this.normalisePhoneNumber(phoneNumber);
-
-      const result = await this.snsClient.send(
-        new PublishCommand({
-          Message:     message,
-          PhoneNumber: e164,
-          MessageAttributes: {
-            'AWS.SNS.SMS.SenderID': { DataType: 'String', StringValue: 'Chanuka' },
-            'AWS.SNS.SMS.SMSType':  { DataType: 'String', StringValue: 'Transactional' },
-          },
-        }),
-      );
-
-      const messageId = result.MessageId ?? `sns-${Date.now()}`;
-      log('info', '✅ SMS sent via AWS SNS', { messageId, phone: this.maskPhone(e164) });
-      return messageId;
-
-    } catch (err: unknown) {
-      if (this.isAWSRetryable(err)) throw err;
-      if (this.providerCfg.fallbackToMock) {
-        log('warn', '⚠️  AWS SNS error — falling back to mock');
-        return this.sendViaMockSMS(phoneNumber, message);
-      }
-      throw new Error(`AWS SNS failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  private async sendViaFirebase(tokens: string[], payload: PushPayload): Promise<string> {
-    if (!this.firebaseApp) {
-      log('info', '📱 Firebase unavailable — falling back to mock push');
-      return this.sendViaMockPush(tokens, payload);
-    }
-
-    try {
-      const messaging = admin.messaging(this.firebaseApp);
-      const validTokens = tokens.filter((t) => !t.startsWith('mock-token-'));
-
-      if (validTokens.length === 0) {
-        if (this.providerCfg.fallbackToMock) return this.sendViaMockPush(tokens, payload);
-        throw new Error('No valid FCM tokens provided');
-      }
-
-      const response = await messaging.sendEachForMulticast({
-        notification: { title: payload.title, body: payload.body },
-        data:         payload.data ?? {},
-        android:      payload.android,
-        apns:         payload.apns,
-        webpush:      payload.webpush,
-        tokens:       validTokens,
-      });
-
-      log('info', '✅ Push sent via Firebase', {
-        successCount: response.successCount,
-        failureCount: response.failureCount,
-      });
-
-      if (response.failureCount > 0) {
-        response.responses.forEach((r, i) => {
-          if (!r.success) {
-            log('warn', `FCM token[${i}] failed`, { err: r.error?.message ?? 'unknown' });
-          }
-        });
-      }
-
-      return response.responses.find((r) => r.success)?.messageId ?? `fcm-${Date.now()}`;
-
-    } catch (err: unknown) {
-      if (this.isFirebaseRetryable(err)) throw err;
-      if (this.providerCfg.fallbackToMock) {
-        log('warn', '⚠️  Firebase error — falling back to mock');
-        return this.sendViaMockPush(tokens, payload);
-      }
-      throw new Error(`Firebase failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  }
-
-  private async sendViaTwilio(phoneNumber: string, _message: string): Promise<string> {
-    // TODO: install `twilio` and replace stub:
-    // const client = twilio(this.smsConfig.accountSid, this.smsConfig.authToken);
-    // const result = await client.messages.create({ body: _message, from: this.smsConfig.fromNumber, to: phoneNumber });
-    // return result.sid;
-    log('info', `[TWILIO STUB] To: ${this.maskPhone(phoneNumber)}`);
-    return `twilio-stub-${Date.now()}`;
-  }
-
-  private sendViaMockSMS(phoneNumber: string, message: string): string {
-    log('info', `[MOCK SMS] To: ${this.maskPhone(phoneNumber)} | ${message.slice(0, 60)}`);
-    return `mock-sms-${Date.now()}`;
-  }
-
-  private async sendViaOneSignal(_tokens: string[]): Promise<string> {
-    // TODO: install `onesignal-node` and replace stub:
-    // const client = new OneSignal.Client(this.pushConfig.appId, this.pushConfig.serverKey);
-    // const result = await client.createNotification({ include_player_ids: _tokens, ... });
-    // return result.id;
-    log('info', `[ONESIGNAL STUB] Tokens: ${_tokens.length}`);
-    return `onesignal-stub-${Date.now()}`;
-  }
-
-  private sendViaMockPush(tokens: string[], payload: PushPayload): string {
-    log('info', `[MOCK PUSH] Tokens: ${tokens.length} | ${payload.title}`);
-    return `mock-push-${Date.now()}`;
   }
 
   // -------------------------------------------------------------------------
@@ -750,7 +506,14 @@ export class NotificationChannelService {
     return sms;
   }
 
-  private formatPushPayload(request: ChannelDeliveryRequest): PushPayload {
+  private formatPushPayload(request: ChannelDeliveryRequest): {
+    title: string;
+    body: string;
+    data?: Record<string, string>;
+    android?: any;
+    apns?: any;
+    webpush?: any;
+  } {
     const { title, message } = request.content;
     const { priority, actionUrl, relatedBillId, category } = request.metadata ?? {};
     const cfg = request.config?.push ?? {};
@@ -795,19 +558,6 @@ export class NotificationChannelService {
   // Utility helpers
   // -------------------------------------------------------------------------
 
-  private normalisePhoneNumber(phone: string): string {
-    const digits = phone.replace(/\D/g, '');
-    if (digits.startsWith('254'))                    return `+${digits}`;
-    if (digits.startsWith('0') && digits.length === 10) return `+254${digits.slice(1)}`;
-    if (digits.length === 9)                         return `+254${digits}`;
-    return phone.startsWith('+') ? phone : `+${digits}`;
-  }
-
-  private maskPhone(phone: string): string {
-    if (phone.length <= 4) return phone;
-    return `${phone.slice(0, 4)}***${phone.slice(-2)}`;
-  }
-
   private isValidEmail(email: string): boolean {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
@@ -828,28 +578,6 @@ export class NotificationChannelService {
   private isRetryableError(err: unknown): boolean {
     const patterns = ['ETIMEDOUT', 'ECONNRESET', 'ECONNREFUSED', 'ENOTFOUND', 'timeout', 'network'];
     return patterns.some((p) => String(err).toLowerCase().includes(p));
-  }
-
-  private isAWSRetryable(err: unknown): boolean {
-    const retryable = ['Throttling', 'ServiceUnavailable', 'InternalError', 'RequestTimeout', 'NetworkingError'];
-    const s = String(
-      (err as { name?: string })?.name ??
-      (err as { code?: string })?.code ??
-      (err as { message?: string })?.message ??
-      err,
-    ).toLowerCase();
-    return retryable.some((p) => s.includes(p.toLowerCase()));
-  }
-
-  private isFirebaseRetryable(err: unknown): boolean {
-    const retryable = [
-      'messaging/internal-error',
-      'messaging/server-unavailable',
-      'messaging/timeout',
-      'messaging/quota-exceeded',
-    ];
-    const code = (err as { code?: string })?.code ?? '';
-    return retryable.some((p) => code.includes(p));
   }
 
   private delay(ms: number): Promise<void> {

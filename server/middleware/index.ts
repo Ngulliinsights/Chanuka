@@ -44,19 +44,21 @@ export {
   createValidationMiddlewareWithParamsAndQuery,
 } from './api-contract-validation';
 
-// Error handling
-export {
-  boomErrorMiddleware,
-  asyncErrorHandler,
-  errorContextMiddleware,
-} from './boom-error-middleware';
-
+// Error handling (unified)
 export {
   correlationIdMiddleware,
   createUnifiedErrorMiddleware,
   asyncHandler,
   validationErrorHandler,
 } from './error-management';
+
+// Legacy Boom middleware (DEPRECATED - use createUnifiedErrorMiddleware)
+// @deprecated Use createUnifiedErrorMiddleware() instead
+export {
+  boomErrorMiddleware,
+  asyncErrorHandler,
+  errorContextMiddleware,
+} from './boom-error-middleware';
 
 // Privacy
 export {

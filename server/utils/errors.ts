@@ -1,5 +1,7 @@
 /**
- * Server Error Utilities
+ * Server Error Utilities (DEPRECATED)
+ * 
+ * ⚠️ THIS FILE IS DEPRECATED AND WILL BE REMOVED IN FUTURE VERSIONS ⚠️
  * 
  * @deprecated This file contains legacy error classes.
  * New code should use @server/infrastructure/error-handling
@@ -8,9 +10,21 @@
  * - Use createError() from @server/infrastructure/error-handling/error-factory
  * - Use ErrorCategory enum for error types
  * - Use StandardizedError interface for error handling
+ * - Use AsyncServiceResult for service methods
+ * 
+ * See docs/ERROR_HANDLING_MIGRATION_GUIDE.md for complete migration instructions.
  */
 
 import type { NextFunction, Request, Response } from 'express';
+
+// Runtime deprecation warning
+if (process.env.NODE_ENV === 'development') {
+  console.warn(
+    '⚠️  DEPRECATION WARNING: server/utils/errors.ts is deprecated.\n' +
+    '   Use @server/infrastructure/error-handling instead.\n' +
+    '   See docs/ERROR_HANDLING_MIGRATION_GUIDE.md for migration guide.'
+  );
+}
 
 // Re-export shared error types for backward compatibility
 export { 
@@ -26,6 +40,7 @@ export { ErrorContextBuilder } from '@shared/utils/errors/context';
 /**
  * Base error class for application errors
  * @deprecated Use createError() from error-factory instead
+ * Migration: new BaseError(msg, opts) → createSystemError(new Error(msg), context)
  */
 export class BaseError extends Error {
   public readonly statusCode: number;

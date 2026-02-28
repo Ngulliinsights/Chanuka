@@ -12,6 +12,24 @@ import { createConnectionManager, closeConnectionManager } from '@server/infrast
 import { createHealthMonitor, stopHealthMonitor } from '@server/infrastructure/database/core/health-monitor';
 
 // ============================================================================
+// NEW DATABASE SERVICE (Phase 4)
+// ============================================================================
+
+export {
+  // Database service (new architecture)
+  DatabaseService,
+  createDatabaseService,
+  getDatabaseService,
+  initializeDatabaseService,
+  shutdownDatabaseService,
+  
+  // Types
+  type DatabaseServiceConfig,
+  type DatabaseStatus,
+  type DatabaseMetrics,
+} from './database-service';
+
+// ============================================================================
 // CONNECTION MANAGEMENT
 // ============================================================================
 

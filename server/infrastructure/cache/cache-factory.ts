@@ -11,8 +11,8 @@ import type {
   CacheAdapter,
   CacheMetrics,
   CacheHealthStatus
-} from '../cache';
-import { Result, ok, err } from '../primitives/types/result';
+} from './core/interfaces';
+import { Result, ok, err } from '@shared/core/primitives/types/result';
 
 import { BrowserAdapter } from './adapters/browser-adapter';
 import { MemoryAdapter } from './adapters/memory-adapter';
@@ -26,6 +26,11 @@ import type {
   CompressionOptions,
   SerializationOptions
 } from './types';
+
+// Import strategies
+import { CompressionStrategy } from './strategies/compression-strategy';
+import { TaggingStrategy } from './strategies/tagging-strategy';
+import { CircuitBreakerStrategy } from './strategies/circuit-breaker-strategy';
 
 // Import adapters
 
@@ -424,34 +429,10 @@ export class UnifiedCacheFactory extends EventEmitter {
     }
   }
 
-  private async createRedisAdapter(): Promise<Result<RedisAdapter, Error>> {
-    try {
-      const config = this.config.redisConfig;
-      if (!config?.redisUrl) {
-        return err(new Error('Redis URL is required for Redis adapter'));
-      }
-
-      const adapterConfig: any = {
-        redisUrl: config.redisUrl,
-        maxRetries: config.maxRetries || 3,
-        retryDelayOnFailover: config.retryDelayOnFailover || 100,
-        enableOfflineQueue: config.enableOfflineQueue ?? false,
-        lazyConnect: config.lazyConnect ?? true,
-        keepAlive: config.keepAlive || 30000,
-        family: config.family || 4,
-        db: config.db || 0,
-        defaultTtlSec: config.defaultTtlSec || this.config.defaultTtlSec,
-      };
-      const keyPrefix = config.keyPrefix || this.config.keyPrefix;
-      if (keyPrefix !== undefined) {
-        adapterConfig.keyPrefix = keyPrefix;
-      }
-      const adapter = new RedisAdapter(adapterConfig);
-
-      return ok(adapter);
-    } catch (error) {
-      return err(error instanceof Error ? error : new Error(String(error)));
-    }
+  private async createRedisAdapter(): Promise<Result<CacheAdapter, Error>> {
+    // Note: RedisAdapter is not yet implemented
+    // This method is kept for future implementation
+    return err(new Error('Redis adapter is not yet implemented. Use memory or multi-tier provider.'));
   }
 
   private async createBrowserAdapter(): Promise<Result<BrowserAdapter, Error>> {
@@ -500,24 +481,35 @@ export class UnifiedCacheFactory extends EventEmitter {
   }
 
   private async enhanceAdapter(adapter: CacheAdapter, name: string): Promise<CacheAdapter> {
+    // Create strategies
+    const compressionStrategy = this.config.enableCompression
+      ? new CompressionStrategy(this.compressor)
+      : undefined;
+
+    const taggingStrategy = new TaggingStrategy(this.tagManager, name);
+
+    const circuitBreakerStrategy = this.config.enableCircuitBreaker
+      ? new CircuitBreakerStrategy({
+          threshold: this.config.circuitBreakerThreshold || 5,
+          timeout: this.config.circuitBreakerTimeout || 60000,
+          resetTimeout: this.config.circuitBreakerResetTimeout || 300000,
+        })
+      : undefined;
+
     // Wrap with compression if enabled
-    if (this.config.enableCompression) {
-      adapter = new CompressedCacheAdapter(adapter, this.compressor);
+    if (compressionStrategy) {
+      adapter = new CompressedCacheAdapter(adapter, compressionStrategy);
     }
 
     // Wrap with tagging support
-    adapter = new TaggedCacheAdapter(adapter, this.tagManager, name);
+    adapter = new TaggedCacheAdapter(adapter, taggingStrategy);
 
     // Wrap with metrics collection
     adapter = new MetricsCacheAdapter(adapter, this.metricsCollector, name);
 
     // Wrap with circuit breaker if enabled
-    if (this.config.enableCircuitBreaker) {
-      adapter = new CircuitBreakerCacheAdapter(adapter, {
-        threshold: this.config.circuitBreakerThreshold || 5,
-        timeout: this.config.circuitBreakerTimeout || 60000,
-        resetTimeout: this.config.circuitBreakerResetTimeout || 300000,
-      });
+    if (circuitBreakerStrategy) {
+      adapter = new CircuitBreakerCacheAdapter(adapter, circuitBreakerStrategy);
     }
 
     // Wrap with clustering if enabled
@@ -557,7 +549,7 @@ class CompressedCacheAdapter implements CacheAdapter {
 
   constructor(
     private adapter: CacheAdapter,
-    private compressor: CacheCompressor
+    private compressionStrategy: CompressionStrategy
   ) {
     this.name = adapter.name || 'compressed-wrapper';
     this.version = adapter.version || '1.0.0';
@@ -569,13 +561,13 @@ class CompressedCacheAdapter implements CacheAdapter {
     if (result === null) return null;
 
     // Decompress if needed
-    const decompressed = await this.compressor.decompress(result);
+    const decompressed = await this.compressionStrategy.decompress(result);
     return decompressed;
   }
 
   async set<T>(key: string, value: T, ttl?: number): Promise<void> {
     // Compress if needed
-    const compressed = await this.compressor.compress(value);
+    const compressed = await this.compressionStrategy.compress(value);
     await this.adapter.set(key, compressed, ttl);
   }
 
@@ -649,8 +641,7 @@ class TaggedCacheAdapter implements CacheAdapter {
 
   constructor(
     private adapter: CacheAdapter,
-    private tagManager: CacheTagManager,
-    private cacheName: string
+    private taggingStrategy: TaggingStrategy
   ) {
     this.name = adapter.name || 'tagged-wrapper';
     this.version = adapter.version || '1.0.0';
@@ -668,7 +659,7 @@ class TaggedCacheAdapter implements CacheAdapter {
   async del(key: string): Promise<boolean> {
     const result = await this.adapter.del ? await this.adapter.del(key) : false;
     if (result) {
-      await this.tagManager.removeKey(this.cacheName, key);
+      this.taggingStrategy.removeKey(key);
     }
     return result;
   }
@@ -877,17 +868,9 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
   readonly version: string;
   readonly config: any;
 
-  private failures = 0;
-  private lastFailure = 0;
-  private state: 'closed' | 'open' | 'half-open' = 'closed';
-
   constructor(
     private adapter: CacheAdapter,
-    private circuitConfig: {
-      threshold: number;
-      timeout: number;
-      resetTimeout: number;
-    }
+    private circuitBreakerStrategy: CircuitBreakerStrategy
   ) {
     this.name = adapter.name || 'circuit-breaker-wrapper';
     this.version = adapter.version || '1.0.0';
@@ -895,68 +878,15 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
   }
 
   async get<T>(key: string): Promise<T | null> {
-    if (this.state === 'open') {
-      if (Date.now() - this.lastFailure > this.circuitConfig.resetTimeout) {
-        this.state = 'half-open';
-      } else {
-        throw new Error('Circuit breaker is open');
-      }
-    }
-
-    try {
-      const result = await this.adapter.get<T>(key);
-
-      if (this.state === 'half-open') {
-        this.state = 'closed';
-        this.failures = 0;
-      }
-
-      return result;
-    } catch (error) {
-      this.recordFailure();
-      throw error;
-    }
+    return this.circuitBreakerStrategy.execute(() => this.adapter.get<T>(key));
   }
 
   async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
-    if (this.state === 'open') {
-      throw new Error('Circuit breaker is open');
-    }
-
-    try {
-      await this.adapter.set(key, value, ttlSeconds);
-
-      if (this.state === 'half-open') {
-        this.state = 'closed';
-        this.failures = 0;
-      }
-    } catch (error) {
-      this.recordFailure();
-      throw error;
-    }
+    return this.circuitBreakerStrategy.execute(() => this.adapter.set(key, value, ttlSeconds));
   }
 
   async del(key: string): Promise<boolean> {
-    if (this.state === 'open') {
-      throw new Error('Circuit breaker is open');
-    }
-
-    try {
-      const result = await this.adapter.del(key);
-      return result;
-    } catch (error) {
-      this.recordFailure();
-      throw error;
-    }
-  }
-
-  private recordFailure(): void {
-    this.failures++;
-    this.lastFailure = Date.now();
-
-    if (this.failures >= this.circuitConfig.threshold) {
-      this.state = 'open';
-    }
+    return this.circuitBreakerStrategy.execute(() => this.adapter.del(key));
   }
 
   // Delegate other methods
@@ -1026,8 +956,7 @@ class CircuitBreakerCacheAdapter implements CacheAdapter {
 
 // Export convenience functions
 
-export function createUnifiedCache(config: unknown): Promise<any> {
-  // Create a simple factory instance for now
+export function createUnifiedCache(config: UnifiedCacheConfig): Promise<Result<CacheAdapter, Error>> {
   const factory = new UnifiedCacheFactory(config);
   return factory.createCache('default');
 }

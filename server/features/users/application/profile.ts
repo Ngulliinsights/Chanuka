@@ -1,5 +1,4 @@
 import { logger } from '@server/infrastructure/observability';
-import { user_profileservice } from '@shared/domain/user-profile';
 import { Router, Response } from 'express';
 import { z } from 'zod';
 
@@ -8,10 +7,9 @@ import {
   authenticateToken
 } from '../../../../AuthAlert';
 import { asyncHandler } from '@/middleware/error-management';
-import { BaseError, ValidationError } from '@shared/types/core/errors';
-import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
-import { createErrorContext } from '@server/infrastructure/observability';
-import { userDomainToApi } from '@shared/utils/transformers';
+import { ValidationError } from '@shared/types/core/errors';
+import { userProfileService } from './UserProfileService';
+import { boomFromStandardized } from '@server/infrastructure/error-handling';
 
 export const router = Router();
 
@@ -82,72 +80,58 @@ function formatZodErrors(zodErrors: z.ZodIssue[]): Array<{ field: string; messag
  * GET /me - Retrieve the authenticated user's profile
  */
 router.get('/me', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const context = createErrorContext(req, 'GET /api/users/me');
-
-  try {
-    const user_id = req.user!.id;
-    const profile = await user_profileservice.getUserProfile(user_id);
-
-    res.json(profile);
-  } catch (error) {
-    logger.error('Error fetching profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to fetch profile', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'profile-routes', userId: req.user?.id }
-    });
+  const userId = req.user!.id;
+  
+  const result = await userProfileService.getUserProfile(userId);
+  
+  if (result.isErr()) {
+    throw boomFromStandardized(result.error);
   }
+
+  res.json(result.value);
 }));
 
 /**
  * PATCH /me - Update the authenticated user's profile
  */
 router.patch('/me', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const context = createErrorContext(req, 'PATCH /api/users/me');
-
-  try {
-    const user_id = req.user!.id;
-    const profileData = updateProfileSchema.parse(req.body);
-
-    const updatedProfile = await user_profileservice.updateUserProfile(user_id, profileData);
-
-    res.json(updatedProfile);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw new ValidationError('Invalid profile data', formatZodErrors(error.errors));
-    }
-
-    logger.error('Error updating profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to update profile', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'profile-routes', userId: req.user?.id }
-    });
+  const userId = req.user!.id;
+  
+  // Validate request body
+  const parseResult = updateProfileSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    throw new ValidationError('Invalid profile data', formatZodErrors(parseResult.error.errors));
   }
+
+  const result = await userProfileService.updateUserProfile(userId, parseResult.data);
+  
+  if (result.isErr()) {
+    throw boomFromStandardized(result.error);
+  }
+
+  res.json(result.value);
 }));
 
 /**
  * PATCH /me/basic - Update basic user information
  */
 router.patch('/me/basic', authenticateToken, asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
-  const context = createErrorContext(req, 'PATCH /api/users/me/basic');
+  const userId = req.user!.id;
+  
+  // Validate request body
+  const parseResult = updateBasicInfoSchema.safeParse(req.body);
+  if (!parseResult.success) {
+    throw new ValidationError('Invalid basic info', formatZodErrors(parseResult.error.errors));
+  }
 
-  try {
-    const user_id = req.user!.id;
-    const basicInfo = updateBasicInfoSchema.parse(req.body);
+  const result = await userProfileService.updateUserBasicInfo(userId, parseResult.data);
+  
+  if (result.isErr()) {
+    throw boomFromStandardized(result.error);
+  }
 
-    const updatedProfile = await user_profileservice.updateUserBasicInfo(user_id, basicInfo);
-
-    res.json(updatedProfile);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      throw new ValidationError('Invalid basic info', formatZodErrors(error.errors));
+  res.json(result.value);
+}));
     }
 
     logger.error('Error updating basic info:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);

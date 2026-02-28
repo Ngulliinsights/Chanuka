@@ -17,17 +17,9 @@ import { asyncHandler } from '../../middleware/error-management';
 import { authenticateToken, requireRole } from '../../middleware/auth';
 import { ErrorSeverity } from '../../infrastructure/error-handling';
 import { ERROR_CODES } from '@shared/constants';
+import { createErrorContext } from '@server/utils/createErrorContext';
 
-// Helper to create error context from request
-function createErrorContext(req: Request, endpoint: string) {
-  return {
-    endpoint,
-    method: req.method,
-    path: req.path,
-    query: req.query,
-    ip: req.ip,
-  };
-}
+const router = Router();
 
 // Custom error classes for better error handling
 class ValidationError extends Error {

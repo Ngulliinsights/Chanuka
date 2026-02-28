@@ -35,6 +35,42 @@ import { BaseDatabaseScript } from './utils/base-script';
 // Core Infrastructure Exports
 // ============================================================================
 
+// NEW: Database Service (Phase 4 - Recommended)
+export {
+  DatabaseService,
+  createDatabaseService,
+  getDatabaseService,
+  initializeDatabaseService,
+  shutdownDatabaseService,
+  type DatabaseServiceConfig,
+} from './core/database-service';
+
+// NEW: Connection Components (Phase 2)
+export {
+  PoolManager,
+  TransactionManager,
+  ConnectionRouter,
+  createProductionPoolManager,
+  createTestPoolManager,
+} from './connections';
+
+// NEW: Monitoring Components (Phase 3)
+export {
+  MetricsCollector,
+  HealthChecker,
+  QueryLogger,
+  createProductionMetricsCollector,
+  createProductionHealthChecker,
+  createProductionQueryLogger,
+} from './monitoring';
+
+// NEW: Strategies (Phase 1)
+export {
+  RetryStrategy,
+  RoutingStrategy,
+  CircuitBreakerStrategy,
+} from './strategies';
+
 // Configuration Management
 export {
   DatabaseConfigManager,
@@ -44,7 +80,7 @@ export {
   type FeatureConfig,
 } from './core/unified-config';
 
-// Database Orchestration
+// Database Orchestration (Legacy - use DatabaseService instead)
 export {
   DatabaseOrchestrator,
   getDatabaseOrchestrator,
@@ -53,7 +89,7 @@ export {
   type DatabaseMetrics,
 } from './core/database-orchestrator';
 
-// Connection Management (re-export existing)
+// Connection Management (Legacy - use DatabaseService instead)
 export {
   UnifiedConnectionManager,
   closeConnectionManager,
