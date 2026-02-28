@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import express from 'express';
 
 import { ResponseHelper } from '../../../shared/core/src/utils/response-helpers';
-import { database as db } from '../../../shared/database/index';
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { errorTracker } from '../../core/errors/error-tracker';
 import { schemaValidationService } from '../../core/validation/schema-validation-service';
 import { validationMetricsCollector } from '../../core/validation/validation-metrics';
@@ -47,7 +47,7 @@ export function setupSystemRoutes(app: express.Router): void {
   app.get('/schema', async (_req: express.Request, res: express.Response) => {
     try {
       // Query the information schema to get comprehensive table structure details
-      const tableInfo = await db.execute(sql`
+      const tableInfo = await readDatabase.execute(sql`
         SELECT table_name, column_name, data_type, is_nullable, column_default
         FROM information_schema.columns
         WHERE table_schema = 'public'
@@ -118,7 +118,7 @@ export function setupSystemRoutes(app: express.Router): void {
       // Query PostgreSQL statistics for user tables
       // Note: "schemaname" and "tablename" are PostgreSQL's actual column names (not typos)
       // cspell:disable-next-line
-      const tableStats = await db.execute(sql`
+      const tableStats = await readDatabase.execute(sql`
         SELECT 
           schemaname,
           tablename,
@@ -184,7 +184,7 @@ export function setupSystemRoutes(app: express.Router): void {
       const issues: SchemaIssue[] = [];
 
       // Retrieve all public schema tables
-      const tables = await db.execute(sql`
+      const tables = await readDatabase.execute(sql`
         SELECT table_name FROM information_schema.tables 
         WHERE table_schema = 'public'
       `);
@@ -212,7 +212,7 @@ export function setupSystemRoutes(app: express.Router): void {
 
       // Verify ID column type consistency for users table
       if (tableNames.includes('users')) {
-        const userIdType = await db.execute(sql`
+        const userIdType = await readDatabase.execute(sql`
           SELECT data_type FROM information_schema.columns 
           WHERE table_name = 'users' AND column_name = 'id'
         `);
@@ -259,7 +259,7 @@ export function setupSystemRoutes(app: express.Router): void {
   app.get('/health', async (_req: express.Request, res: express.Response<HealthCheckResponse>) => {
     try {
       // Simple database ping to verify connectivity
-      await db.execute(sql`SELECT 1`);
+      await readDatabase.execute(sql`SELECT 1`);
 
       const healthResponse: HealthCheckResponse = {
         status: 'healthy',

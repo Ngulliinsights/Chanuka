@@ -6,7 +6,7 @@
 
 import { ContentAnalytics } from '@server/features/admin/moderation/types';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bill, 
   comments, 
   content_report, 
@@ -121,8 +121,8 @@ export class ModerationAnalyticsService {
   async getContentAnalytics(): Promise<ContentAnalytics> {
     try {
       // Get total content across the platform
-      const [totalBills] = await db.select({ count: count() }).from(bill);
-      const [totalComments] = await db.select({ count: count() }).from(comments);
+      const [totalBills] = await readDatabase.select({ count: count() }).from(bill);
+      const [totalComments] = await readDatabase.select({ count: count() }).from(comments);
       const totalContent = Number(totalBills.count) + Number(totalComments.count);
 
       // Get report counts by status

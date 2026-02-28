@@ -60,6 +60,8 @@
     "db:seed:secondary": "tsx --tsconfig scripts/tsconfig.json scripts/seeds/secondary-seed-aligned.ts",
     "db:seed:validate": "tsx --tsconfig scripts/tsconfig.json scripts/seeds/validate-seed-data.ts",
     "// --- FEATURE MIGRATIONS ---": "",
+    "migrate:database-access": "tsx --tsconfig server/tsconfig.json server/scripts/migrate-database-access.ts",
+    "migrate:database-access:dry-run": "tsx --tsconfig server/tsconfig.json server/scripts/migrate-database-access.ts --dry-run",
     "migrate:alert-preferences": "tsx --tsconfig scripts/tsconfig.json scripts/migrate-alert-preferences.ts",
     "migrate:alert-preferences:dry-run": "tsx --tsconfig scripts/tsconfig.json scripts/migrate-alert-preferences.ts --dry-run",
     "migrate:alert-preferences:verbose": "tsx --tsconfig scripts/tsconfig.json scripts/migrate-alert-preferences.ts --verbose",

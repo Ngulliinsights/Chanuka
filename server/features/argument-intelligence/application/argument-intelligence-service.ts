@@ -988,7 +988,7 @@ export class ArgumentIntelligenceService {
     try {
       // Simple query to test database connectivity
       await readDatabase(async (db) => {
-        return db.select({ count: count() }).from(argumentTable).limit(1);
+        return readDatabase.select({ count: count() }).from(argumentTable).limit(1);
       });
 
       return {

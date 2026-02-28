@@ -6,6 +6,7 @@ import { User } from '@shared/domain/entities/user';
 import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
+import { inputSanitizationService, queryValidationService, securityAuditService } from '@server/features/security';
 
 /**
  * UserService - Direct Drizzle implementation replacing UserRepository
@@ -61,13 +62,38 @@ export class UserService {
 
   async findById(id: string): Promise<User | null> {
     try {
+      // 1. Validate input
+      const validation = queryValidationService.validateInputs([id]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid user ID: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize input
+      const sanitizedId = inputSanitizationService.sanitizeString(id);
+
       const result = await readDatabase
         .select()
         .from(users)
-        .where(eq(users.id, id))
+        .where(eq(users.id, sanitizedId))
         .limit(1);
 
-      return result[0] ? this.mapToUser(result[0]) : null;
+      const user = result[0] ? this.mapToUser(result[0]) : null;
+
+      // 3. Audit log
+      if (user) {
+        await securityAuditService.logSecurityEvent({
+          eventType: 'user_accessed',
+          userId: sanitizedId,
+          ipAddress: 'internal',
+          userAgent: 'user-service',
+          resource: `user:${sanitizedId}`,
+          action: 'read',
+          timestamp: new Date(),
+          metadata: { operation: 'findById' }
+        });
+      }
+
+      return user;
     } catch (error) {
       logger.error('Error finding user by ID', { id, error });
       throw error;
@@ -76,13 +102,36 @@ export class UserService {
 
   async findByEmail(email: string): Promise<User | null> {
     try {
+      // 1. Validate input
+      const validation = queryValidationService.validateInputs([email]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid email: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize input
+      const sanitizedEmail = inputSanitizationService.sanitizeString(email);
+
       const result = await readDatabase
         .select()
         .from(users)
-        .where(eq(users.email, email))
+        .where(eq(users.email, sanitizedEmail))
         .limit(1);
 
-      return result[0] ? this.mapToUser(result[0]) : null;
+      const user = result[0] ? this.mapToUser(result[0]) : null;
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'user_lookup',
+        userId: undefined,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: 'users',
+        action: 'search',
+        timestamp: new Date(),
+        metadata: { operation: 'findByEmail', found: !!user }
+      });
+
+      return user;
     } catch (error) {
       logger.error('Error finding user by email', { email, error });
       throw error;
@@ -93,9 +142,21 @@ export class UserService {
     try {
       const userData = user.toJSON();
 
+      // 1. Validate inputs
+      const validation = queryValidationService.validateInputs([
+        userData.id,
+        userData.email
+      ]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid user data: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize inputs
+      const sanitizedEmail = inputSanitizationService.sanitizeString(userData.email);
+
       const insertPayload = {
         id: userData.id,
-        email: userData.email,
+        email: sanitizedEmail,
         password_hash: password_hash || '',
         role: userData.role,
         is_verified: userData.verification_status === 'verified',
@@ -109,6 +170,22 @@ export class UserService {
         await tx.insert(users).values(insertPayload);
       });
       
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'user_created',
+        userId: userData.id,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: `user:${userData.id}`,
+        action: 'create',
+        timestamp: new Date(),
+        metadata: { 
+          operation: 'save',
+          email: sanitizedEmail,
+          role: userData.role
+        }
+      });
+
       logger.info('User saved successfully', { user_id: userData.id });
     } catch (error) {
       logger.error('Error saving user', { user_id: user.id, error });
@@ -120,11 +197,23 @@ export class UserService {
     try {
       const userData = user.toJSON();
 
+      // 1. Validate inputs
+      const validation = queryValidationService.validateInputs([
+        userData.id,
+        userData.email
+      ]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid user data: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize inputs
+      const sanitizedEmail = inputSanitizationService.sanitizeString(userData.email);
+
       await withTransaction(async (tx) => {
         await tx
           .update(users)
           .set({
-            email: userData.email,
+            email: sanitizedEmail,
             role: userData.role,
             is_verified: userData.verification_status === 'verified',
             is_active: userData.is_active,
@@ -132,6 +221,21 @@ export class UserService {
             updated_at: userData.updated_at
           })
           .where(eq(users.id, userData.id));
+      });
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'user_updated',
+        userId: userData.id,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: `user:${userData.id}`,
+        action: 'update',
+        timestamp: new Date(),
+        metadata: { 
+          operation: 'update',
+          email: sanitizedEmail
+        }
       });
 
       logger.info('User updated successfully', { user_id: userData.id });
@@ -143,10 +247,32 @@ export class UserService {
 
   async delete(id: string): Promise<void> {
     try {
+      // 1. Validate input
+      const validation = queryValidationService.validateInputs([id]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid user ID: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize input
+      const sanitizedId = inputSanitizationService.sanitizeString(id);
+
       await withTransaction(async (tx) => {
-        await tx.delete(users).where(eq(users.id, id));
+        await tx.delete(users).where(eq(users.id, sanitizedId));
       });
-      logger.info('User deleted successfully', { user_id: id });
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'user_deleted',
+        userId: sanitizedId,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: `user:${sanitizedId}`,
+        action: 'delete',
+        timestamp: new Date(),
+        metadata: { operation: 'delete' }
+      });
+
+      logger.info('User deleted successfully', { user_id: sanitizedId });
     } catch (error) {
       logger.error('Error deleting user', { user_id: id, error });
       throw error;
@@ -176,16 +302,26 @@ export class UserService {
     try {
       const profileData = profile.toJSON();
 
-      const insertPayload = {
+      // 1. Validate inputs
+      const validation = queryValidationService.validateInputs([
+        profileData.id,
+        profileData.user_id
+      ]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid profile data: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize inputs
+      const sanitizedData = {
         id: profileData.id,
         user_id: profileData.user_id,
-        first_name: profileData.first_name,
-        last_name: profileData.last_name,
-        display_name: profileData.display_name,
-        bio: profileData.bio,
-        county: profileData.county,
-        constituency: profileData.constituency,
-        ward: profileData.ward,
+        first_name: profileData.first_name ? inputSanitizationService.sanitizeString(profileData.first_name) : undefined,
+        last_name: profileData.last_name ? inputSanitizationService.sanitizeString(profileData.last_name) : undefined,
+        display_name: profileData.display_name ? inputSanitizationService.sanitizeString(profileData.display_name) : undefined,
+        bio: profileData.bio ? inputSanitizationService.sanitizeHtml(profileData.bio) : undefined,
+        county: profileData.county ? inputSanitizationService.sanitizeString(profileData.county) : undefined,
+        constituency: profileData.constituency ? inputSanitizationService.sanitizeString(profileData.constituency) : undefined,
+        ward: profileData.ward ? inputSanitizationService.sanitizeString(profileData.ward) : undefined,
         avatar_url: profileData.avatar_url,
         website: profileData.website,
         preferences: profileData.preferences,
@@ -195,9 +331,21 @@ export class UserService {
       };
 
       await withTransaction(async (tx) => {
-        await tx.insert(user_profiles).values(insertPayload);
+        await tx.insert(user_profiles).values(sanitizedData);
       });
       
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'profile_created',
+        userId: profileData.user_id,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: `profile:${profileData.user_id}`,
+        action: 'create',
+        timestamp: new Date(),
+        metadata: { operation: 'saveProfile' }
+      });
+
       logger.info('User profile saved successfully', { user_id: profileData.user_id });
     } catch (error) {
       logger.error('Error saving user profile', { user_id: profile.user_id, error });
@@ -209,24 +357,45 @@ export class UserService {
     try {
       const profileData = profile.toJSON();
 
+      // 1. Validate inputs
+      const validation = queryValidationService.validateInputs([profileData.user_id]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid profile data: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize inputs
+      const sanitizedData = {
+        first_name: profileData.first_name ? inputSanitizationService.sanitizeString(profileData.first_name) : undefined,
+        last_name: profileData.last_name ? inputSanitizationService.sanitizeString(profileData.last_name) : undefined,
+        display_name: profileData.display_name ? inputSanitizationService.sanitizeString(profileData.display_name) : undefined,
+        bio: profileData.bio ? inputSanitizationService.sanitizeHtml(profileData.bio) : undefined,
+        county: profileData.county ? inputSanitizationService.sanitizeString(profileData.county) : undefined,
+        constituency: profileData.constituency ? inputSanitizationService.sanitizeString(profileData.constituency) : undefined,
+        ward: profileData.ward ? inputSanitizationService.sanitizeString(profileData.ward) : undefined,
+        avatar_url: profileData.avatar_url,
+        website: profileData.website,
+        preferences: profileData.preferences,
+        privacy_settings: profileData.privacy_settings,
+        updated_at: profileData.updated_at
+      };
+
       await withTransaction(async (tx) => {
         await tx
           .update(user_profiles)
-          .set({
-            first_name: profileData.first_name,
-            last_name: profileData.last_name,
-            display_name: profileData.display_name,
-            bio: profileData.bio,
-            county: profileData.county,
-            constituency: profileData.constituency,
-            ward: profileData.ward,
-            avatar_url: profileData.avatar_url,
-            website: profileData.website,
-            preferences: profileData.preferences,
-            privacy_settings: profileData.privacy_settings,
-            updated_at: profileData.updated_at
-          })
+          .set(sanitizedData)
           .where(eq(user_profiles.user_id, profileData.user_id));
+      });
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'profile_updated',
+        userId: profileData.user_id,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: `profile:${profileData.user_id}`,
+        action: 'update',
+        timestamp: new Date(),
+        metadata: { operation: 'updateProfile' }
       });
 
       logger.info('User profile updated successfully', { user_id: profileData.user_id });
@@ -271,7 +440,17 @@ export class UserService {
 
   async searchUsers(query: string, limit?: number): Promise<User[]> {
     try {
-      const searchTerm = `%${query.toLowerCase()}%`;
+      // 1. Validate input
+      const validation = queryValidationService.validateInputs([query]);
+      if (validation.hasErrors()) {
+        throw new Error(`Invalid search query: ${validation.getErrorMessage()}`);
+      }
+
+      // 2. Sanitize input and create safe LIKE pattern
+      const sanitizedQuery = inputSanitizationService.sanitizeString(query);
+      const safePattern = inputSanitizationService.createSafeLikePattern(sanitizedQuery);
+      const searchTerm = `%${safePattern.toLowerCase()}%`;
+
       const results = await readDatabase
         .select()
         .from(users)
@@ -279,6 +458,22 @@ export class UserService {
           sql`LOWER(${users.email}) LIKE ${searchTerm}`
         )
         .limit(limit || 10);
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'user_search',
+        userId: undefined,
+        ipAddress: 'internal',
+        userAgent: 'user-service',
+        resource: 'users',
+        action: 'search',
+        timestamp: new Date(),
+        metadata: { 
+          operation: 'searchUsers',
+          query: sanitizedQuery,
+          result_count: results.length
+        }
+      });
 
       return results.map(result => this.mapToUser(result));
     } catch (error) {

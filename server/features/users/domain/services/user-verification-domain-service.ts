@@ -1,6 +1,6 @@
 // Using repository pattern with Drizzle-based implementation for decoupling
 import { UserAggregate } from '@shared/aggregates/user-aggregate';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from '@shared/entities/value-objects';
 import { user_verification } from '@server/infrastructure/schema';
@@ -178,7 +178,7 @@ export class UserVerificationDomainService {
       });
 
       // Store verification directly in user_verification table
-      await db.insert(user_verification).values({
+      await writeDatabase.insert(user_verification).values({
         id: verification.id,
         user_id: verification.citizenId,
         verification_type: verification.verification_type,

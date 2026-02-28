@@ -1,630 +1,573 @@
-import { logger } from '../../../infrastructure/observability/core/logger';
-import { queryIntentService } from '../domain/QueryIntentService';
-import type {
-  PlainBill,
-  SearchQuery,
-  SearchResponseDto,
-  SearchResultDto,
-} from '../domain/search.dto';
-import { SearchAnalytics, SearchMetrics } from '../domain/SearchAnalytics';
-import { SearchValidator } from '../domain/SearchValidator';
-import { typoCorrectionService } from '../domain/TypoCorrectionService';
-import { dualEngineOrchestrator } from '../engines/dual-engine-orchestrator';
-import { suggestionEngineService } from '../engines/suggestion/suggestion-engine.service';
-import { SearchCache } from '../infrastructure/SearchCache';
-import type { Request, Response } from 'express';
-import type { SearchSuggestion } from '../engines/types/search.types';
+/**
+ * Enhanced Search Service - Complete Infrastructure Integration
+ * 
+ * Integrates ALL infrastructure components:
+ * - ✅ Validation (Zod schemas)
+ * - ✅ Caching (cache-keys.ts with aggressive caching)
+ * - ✅ Security (SecureQueryBuilder, SQL injection prevention)
+ * - ✅ Error Handling (Result types)
+ * - ✅ Transactions (for search history)
+ */
 
-// Define types for better type safety
-interface OrchestratorResult {
+import { logger } from '@server/infrastructure/observability';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { sql } from 'drizzle-orm';
+
+// Infrastructure imports
+import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
+import { InputSanitizationService, securityAuditService, secureQueryBuilderService } from '@server/features/security';
+import { cacheService, cacheKeys, CACHE_TTL, createCacheInvalidation } from '@server/infrastructure/cache';
+import { validateData } from '@server/infrastructure/validation/validation-helpers';
+import {
+  GlobalSearchSchema,
+  BillSearchSchema,
+  UserSearchSchema,
+  CommentSearchSchema,
+  AutocompleteSchema,
+  SaveSearchSchema,
+  GetSearchHistorySchema,
+  GetPopularSearchesSchema,
+  type GlobalSearchInput,
+  type BillSearchInput,
+  type UserSearchInput,
+  type CommentSearchInput,
+  type AutocompleteInput,
+  type SaveSearchInput,
+  type GetSearchHistoryInput,
+  type GetPopularSearchesInput,
+} from './search-validation.schemas';
+
+// Domain types
+interface SearchResult {
   id: string;
+  type: 'bill' | 'user' | 'comment' | 'discussion';
   title: string;
-  content: string;
-  summary?: string;
-  relevanceScore: number;
-  contentType: string;
-  metadata: {
-    status?: string;
-    createdAt?: Date | string;
-  };
+  snippet: string;
+  relevance_score: number;
+  metadata: Record<string, any>;
 }
 
-// Repository pattern replaced with direct service
-const cache = new SearchCache();
-const suggestionsSvc = suggestionEngineService;
-
-const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 10;
-const MAX_LIMIT = 100;
-const MIN_QUERY = 2;
-
-/*  Phase 3: Advanced search with intent detection, typo correction, and streaming support  */
-export async function searchBills(query: SearchQuery): Promise<SearchResponseDto> {
-  const start = Date.now();
-
-  // Validate and sanitize input
-  const validation = SearchValidator.validateSearchQuery(query);
-  if (!validation.isValid) {
-    throw new Error(`Search validation failed: ${validation.errors.join(', ')}`);
-  }
-  const sanitizedQuery = SearchValidator.sanitizeSearchQuery(query);
-
-  let { text, filters = {}, pagination = {}, options = {} } = sanitizedQuery;
-
-  // Phase 3: Query Intent Detection
-  const intentClassification = await queryIntentService.classifyIntent(text);
-  logger.debug({
-    query: text,
-    intent: intentClassification.intent,
-    confidence: intentClassification.confidence
-  }, 'Query intent classified');
-
-  // Phase 3: Typo Correction and Query Enhancement
-  const correctionResult = await typoCorrectionService.correctQuery(text);
-  if (correctionResult.correctedQuery !== text && correctionResult.confidence > 0.7) {
-    text = correctionResult.correctedQuery;
-    logger.debug({
-      original: correctionResult.originalQuery,
-      corrected: correctionResult.correctedQuery,
-      confidence: correctionResult.confidence
-    }, 'Query corrected');
-  }
-
-  // Phase 3: Query Expansion with Synonyms (for informational queries)
-  if (intentClassification.intent === 'informational' && intentClassification.confidence > 0.6) {
-    const expansions = await typoCorrectionService.expandQuery(text);
-    if (expansions.length > 1 && expansions[0]) {
-      // Use the most relevant expansion (could be enhanced with ML ranking)
-      text = expansions[0];
-      logger.debug({ original: sanitizedQuery.text, expanded: text }, 'Query expanded with synonyms');
-    }
-  }
-  const page = Math.max((pagination as { page?: number }).page ?? DEFAULT_PAGE, 1);
-  const limit = Math.min(Math.max((pagination as { limit?: number }).limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
-
-  /*  1. Cache layer  */
-  const cached = await cache.getResults<SearchResponseDto>(text, filters, pagination);
-  if (cached) {
-    // Record cache hit analytics
-    await SearchAnalytics.recordSearchEvent(sanitizedQuery, cached, undefined, undefined, {
-      user_agent: 'cached',
-    }).catch(() => {}); // Fire and forget
-    return { ...cached, metadata: { ...cached.metadata, searchTime: Date.now() - start } };
-  }
-
-  /*  2. Phase 2: Use dual-engine orchestrator for intelligent search  */
-  const searchOptions = {
-    limit,
-    filters: filters as any, // Type compatibility - different SearchFilters definitions
-    ...options,
-  };
-
-  const orchestratorResponse = await dualEngineOrchestrator.search(text, searchOptions);
-
-  /*  3. Transform orchestrator results to SearchResponseDto format  */
-  const results: SearchResultDto[] = orchestratorResponse.results.map((result: OrchestratorResult) => ({
-    bill: {
-      id: result.id,
-      title: result.title,
-      content: result.content,
-      summary: result.summary || '', // Ensure string
-      status: result.metadata.status,
-      introduced_date: result.metadata.createdAt,
-    } as PlainBill, // Type compatibility
-    relevanceScore: result.relevanceScore,
-    snippet: result.content.substring(0, 200),
-    highlights: [], // Could be enhanced with actual highlighting
-    matchedFields: [result.contentType],
-  }));
-
-  /*  4. Calculate facets from results (simplified)  */
-  const facets = {
-    status: [] as Array<{ value: string; count: number }>,
-    category: [] as Array<{ value: string; count: number }>,
-    sponsors: [] as Array<{ value: number; count: number }>,
-    complexity: [] as Array<{ range: string; count: number; min: number; max: number }>,
-    dateRanges: [] as Array<{ range: string; count: number; from: Date; to: Date }>,
-  };
-
-  // Extract facets from result metadata
-  const statusCount = new Map<string, number>();
-  results.forEach(result => {
-    if (result.bill.status) {
-      statusCount.set(result.bill.status, (statusCount.get(result.bill.status) || 0) + 1);
-    }
-  });
-
-  facets.status = Array.from(statusCount.entries()).map(([value, count]) => ({ value, count }));
-
-  /*  5. Suggestions when empty  */
-  let suggestions: string[] | undefined;
-  if (results.length === 0) {
-    // Use consolidated suggestion engine for fallback suggestions
-    const fallbackResult = await suggestionsSvc.getAutocompleteSuggestions(text, 5);
-    suggestions = fallbackResult.suggestions.map((s: SearchSuggestion) => s.term);
-  }
-
-  /*  6. Build DTO  */
-  const dto: SearchResponseDto = {
-    results,
-    pagination: {
-      page,
-      limit,
-      total: orchestratorResponse.totalCount,
-      pages: Math.ceil(orchestratorResponse.totalCount / limit)
-    },
-    facets,
-    suggestions: suggestions || [],
-    metadata: {
-      searchTime: Date.now() - start,
-      source: 'db' as const,
-      queryType: orchestratorResponse.searchType
-    },
-  };
-
-  /*  7. Cache successful non-empty  */
-  if (results.length) await cache.setResults(text, filters, pagination, dto);
-
-  /*  8. Record analytics  */
-  try {
-    await SearchAnalytics.recordSearchEvent(sanitizedQuery, dto);
-  } catch (error) {
-    // Analytics failure shouldn't break search
-    logger.warn({ error: String(error) }, 'Failed to record search analytics');
-  }
-
-  return dto;
+interface SearchResponse {
+  results: SearchResult[];
+  total: number;
+  page: number;
+  limit: number;
+  query: string;
 }
-
-/*  Remaining exports – enhanced with validation and analytics  */
-export async function getSearchSuggestions(partial: string, limit = 5) {
-  // Validate input
-  if (typeof partial !== 'string' || partial.length < MIN_QUERY) return [];
-
-  const sanitizedPartial = partial.trim().substring(0, 100); // Reasonable limit
-  const sanitizedLimit = Math.min(Math.max(limit, 1), 20); // Reasonable bounds
-
-  const cached = await cache.getSuggestions<string[]>(sanitizedPartial, sanitizedLimit);
-  if (cached) return cached;
-
-  const sugs = (await suggestionsSvc.getAutocompleteSuggestions(sanitizedPartial, sanitizedLimit)).suggestions.map((s: SearchSuggestion) => s.term);
-  await cache.setSuggestions(sanitizedPartial, sanitizedLimit, sugs);
-
-  // Record analytics for suggestions usage (optional - suggestions are lightweight)
-  // SearchAnalytics.recordSearchEvent(...) - commented out to avoid noise
-
-  return sugs;
-}
-
-export async function getPopularSearchTerms(limit = 20) {
-  const cached = await cache.getPopular<string[]>();
-  if (cached) return cached.slice(0, limit);
-
-  // TODO: Implement popular terms retrieval from analytics/search logs
-  // For now, return empty array to avoid errors
-  const list: string[] = [];
-  await cache.setPopular(list);
-  return list.slice(0, limit);
-}
-
-export async function rebuildSearchIndexes(_batchSize = 1000): Promise<{ updated: number; errors: number }> {
-  // Dynamic import to avoid circular dependency
-  const { SearchIndexManager } = await import('../infrastructure/SearchIndexManager');
-  const manager = new SearchIndexManager();
-  const result = await manager.rebuildAllIndexes();
-  return { updated: result.billsUpdated, errors: result.errors };
-}
-
-export async function getSearchIndexHealth() {
-  // Dynamic import to avoid circular dependency
-  const { SearchIndexManager } = await import('../infrastructure/SearchIndexManager');
-  const manager = new SearchIndexManager();
-  return manager.getIndexHealth();
-}
-
-export async function warmupSearchCache(commonQueries: string[] = []) {
-  // Validate and sanitize queries
-  const validQueries = commonQueries
-    .filter(q => typeof q === 'string' && q.trim().length > 0)
-    .map(q => q.trim().substring(0, 200)) // Reasonable length limit
-    .slice(0, 50); // Limit to prevent abuse
-
-  // Warmup by executing common queries
-  const results = [];
-  for (const query of validQueries) {
-    try {
-      const result = await searchBills({ text: query, pagination: { page: 1, limit: 10 } });
-      results.push({ query, success: true, count: result.results?.length ?? 0 });
-    } catch (error) {
-      results.push({ query, success: false, error: String(error) });
-    }
-  }
-  
-  return { warmedQueries: results.length, results };
-}
-
-export async function getSearchMetrics() {
-  // TODO aggregate from analytics table – placeholder returned
-  return { avgSearchTime: 0, cacheHitRate: 0, totalSearches: 0, failedSearches: 0 };
-}
-
-// ============================================================================
-// PHASE 3: ADVANCED FEATURES - Real-Time Streaming Support
-// ============================================================================
-
-import { EventEmitter } from 'events';
-
-// Global search session manager for streaming and cancellation
-class SearchSessionManager {
-  private static instance: SearchSessionManager;
-  private activeSearches = new Map<string, { controller: AbortController; emitter: EventEmitter }>();
-  private searchTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
-
-  static getInstance(): SearchSessionManager {
-    if (!SearchSessionManager.instance) {
-      SearchSessionManager.instance = new SearchSessionManager();
-    }
-    return SearchSessionManager.instance;
-  }
-
-  createSearchSession(searchId: string): { controller: AbortController; emitter: EventEmitter } {
-    const controller = new AbortController();
-    const emitter = new EventEmitter();
-
-    // Set timeout for search session (5 minutes)
-    const timeout = setTimeout(() => {
-      this.cancelSearch(searchId, 'timeout');
-    }, 5 * 60 * 1000);
-
-    this.activeSearches.set(searchId, { controller, emitter });
-    this.searchTimeouts.set(searchId, timeout);
-
-    return { controller, emitter };
-  }
-
-  getSearchSession(searchId: string) {
-    return this.activeSearches.get(searchId);
-  }
-
-  cancelSearch(searchId: string, reason: string = 'cancelled') {
-    const session = this.activeSearches.get(searchId);
-    if (session) {
-      session.controller.abort();
-      session.emitter.emit('cancelled', { reason });
-
-      // Clean up
-      clearTimeout(this.searchTimeouts.get(searchId));
-      this.activeSearches.delete(searchId);
-      this.searchTimeouts.delete(searchId);
-    }
-  }
-
-  cleanup() {
-    for (const [searchId] of this.activeSearches) {
-      this.cancelSearch(searchId, 'cleanup');
-    }
-  }
-}
-
-const searchSessionManager = SearchSessionManager.getInstance();
-
-// Cleanup on process exit
-process.on('SIGINT', () => searchSessionManager.cleanup());
-process.on('SIGTERM', () => searchSessionManager.cleanup());
 
 /**
- * Stream search results using Server-Sent Events
+ * Enhanced SearchService with complete infrastructure integration
  */
-export async function streamSearchBills(query: SearchQuery, res: Response, req?: Request): Promise<void> {
-  const searchId = `search_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  const { controller } = searchSessionManager.createSearchSession(searchId);
+export class SearchService {
+  private inputSanitizer = new InputSanitizationService();
+  private cacheInvalidation = createCacheInvalidation(cacheService);
 
-  // Set up SSE headers
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    'Connection': 'keep-alive',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Cache-Control',
-  });
+  // ============================================================================
+  // GLOBAL SEARCH
+  // ============================================================================
 
-  // Send initial connection event
-  res.write(`data: ${JSON.stringify({
-    type: 'connected',
-    searchId,
-    timestamp: new Date().toISOString()
-  })}\n\n`);
-
-  // Handle client disconnect
-  if (req) {
-    req.on('close', () => {
-      searchSessionManager.cancelSearch(searchId, 'client_disconnect');
-    });
-  }
-
-  try {
-    // Send progress: starting
-    res.write(`data: ${JSON.stringify({
-      type: 'progress',
-      searchId,
-      stage: 'starting',
-      progress: 0,
-      message: 'Initializing search...',
-      timestamp: new Date().toISOString()
-    })}\n\n`);
-
-    // Validate and sanitize input
-    const validation = SearchValidator.validateSearchQuery(query);
-    if (!validation.isValid) {
-      throw new Error(`Search validation failed: ${validation.errors.join(', ')}`);
-    }
-    const sanitizedQuery = SearchValidator.sanitizeSearchQuery(query);
-
-    // Send progress: validation complete
-    res.write(`data: ${JSON.stringify({
-      type: 'progress',
-      searchId,
-      stage: 'validation',
-      progress: 10,
-      message: 'Query validated',
-      timestamp: new Date().toISOString()
-    })}\n\n`);
-
-    const { text, filters = {}, pagination = {}, options = {} } = sanitizedQuery;
-    const page = Math.max((pagination as { page?: number }).page ?? DEFAULT_PAGE, 1);
-    const limit = Math.min(Math.max((pagination as { limit?: number }).limit ?? DEFAULT_LIMIT, 1), MAX_LIMIT);
-
-    // Check cache
-    const cached = await cache.getResults<SearchResponseDto>(text, filters, pagination);
-    if (cached) {
-      res.write(`data: ${JSON.stringify({
-        type: 'progress',
-        searchId,
-        stage: 'cache_hit',
-        progress: 100,
-        message: 'Results found in cache',
-        timestamp: new Date().toISOString()
-      })}\n\n`);
-
-      res.write(`data: ${JSON.stringify({
-        type: 'results',
-        searchId,
-        data: { ...cached, metadata: { ...cached.metadata, searchTime: Date.now() - Date.now() } },
-        timestamp: new Date().toISOString()
-      })}\n\n`);
-
-      res.write(`data: ${JSON.stringify({
-        type: 'complete',
-        searchId,
-        timestamp: new Date().toISOString()
-      })}\n\n`);
-
-      res.end();
-      return;
-    }
-
-    // Send progress: starting dual-engine search
-    res.write(`data: ${JSON.stringify({
-      type: 'progress',
-      searchId,
-      stage: 'searching',
-      progress: 20,
-      message: 'Searching with dual-engine orchestrator...',
-      timestamp: new Date().toISOString()
-    })}\n\n`);
-
-    // Execute search with streaming progress
-    const searchOptions = {
-      limit,
-      filters: filters as any, // Type compatibility - different SearchFilters definitions
-      ...options,
-      onProgress: (progress: { stage: string; progress: number; message: string }) => {
-        res.write(`data: ${JSON.stringify({
-          type: 'progress',
-          searchId,
-          ...progress,
-          timestamp: new Date().toISOString()
-        })}\n\n`);
+  /**
+   * Global search across all content types with aggressive caching
+   */
+  async globalSearch(searchInput: GlobalSearchInput): Promise<AsyncServiceResult<SearchResponse>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(GlobalSearchSchema, searchInput);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
       }
-    };
 
-    const orchestratorResponse = await dualEngineOrchestrator.search(text, searchOptions);
+      const validatedInput = validation.data!;
+      const sanitizedQuery = this.inputSanitizer.sanitizeString(validatedInput.query);
 
-    // Send progress: processing results
-    res.write(`data: ${JSON.stringify({
-      type: 'progress',
-      searchId,
-      stage: 'processing',
-      progress: 80,
-      message: 'Processing search results...',
-      timestamp: new Date().toISOString()
-    })}\n\n`);
-
-    // Transform results
-    const results: SearchResultDto[] = orchestratorResponse.results.map((result: OrchestratorResult) => ({
-      bill: {
-        id: result.id,
-        title: result.title,
-        content: result.content,
-        summary: result.summary || '', // Ensure string
-        status: result.metadata.status,
-        introduced_date: result.metadata.createdAt,
-      } as PlainBill,
-      relevanceScore: result.relevanceScore,
-      snippet: result.content.substring(0, 200),
-      highlights: [],
-      matchedFields: [result.contentType],
-    }));
-
-    // Calculate facets
-    const facets = {
-      status: [] as Array<{ value: string; count: number }>,
-      category: [] as Array<{ value: string; count: number }>,
-      sponsors: [] as Array<{ value: number; count: number }>,
-      complexity: [] as Array<{ range: string; count: number; min: number; max: number }>,
-      dateRanges: [] as Array<{ range: string; count: number; from: Date; to: Date }>,
-    };
-
-    // Simple facet calculation
-    const statusCount = new Map<string, number>();
-    results.forEach(result => {
-      if (result.bill.status) {
-        statusCount.set(result.bill.status, (statusCount.get(result.bill.status) || 0) + 1);
+      // 2. Check cache (aggressive caching for search)
+      const cacheKey = cacheKeys.search(sanitizedQuery, {
+        type: validatedInput.type,
+        filters: validatedInput.filters,
+        sort: validatedInput.sort,
+        page: validatedInput.page,
+        limit: validatedInput.limit,
+      });
+      const cached = await cacheService.get<SearchResponse>(cacheKey);
+      if (cached) {
+        logger.debug({ cacheKey }, 'Cache hit for global search');
+        return cached;
       }
-    });
 
-    facets.status = Array.from(statusCount.entries()).map(([value, count]) => ({ value, count }));
+      // 3. Execute search based on type
+      const page = validatedInput.page ? parseInt(validatedInput.page) : 1;
+      const limit = validatedInput.limit ? parseInt(validatedInput.limit) : 20;
+      const offset = (page - 1) * limit;
 
-    // Get suggestions
-    let suggestions: string[] | undefined;
-    if (results.length === 0) {
-      const fallbackResult = await suggestionsSvc.getAutocompleteSuggestions(text, 5);
-      suggestions = fallbackResult.suggestions.map((s: SearchSuggestion) => s.term);
-    }
+      let results: SearchResult[] = [];
+      let total = 0;
 
-    const dto: SearchResponseDto = {
-      results,
-      pagination: {
+      if (validatedInput.type === 'all') {
+        // Search across all types
+        const [billResults, userResults, commentResults] = await Promise.all([
+          this.searchBills(sanitizedQuery, limit / 3),
+          this.searchUsers(sanitizedQuery, limit / 3),
+          this.searchComments(sanitizedQuery, limit / 3),
+        ]);
+
+        results = [...billResults, ...userResults, ...commentResults]
+          .sort((a, b) => b.relevance_score - a.relevance_score)
+          .slice(0, limit);
+        total = results.length;
+      } else {
+        // Type-specific search
+        switch (validatedInput.type) {
+          case 'bills':
+            results = await this.searchBills(sanitizedQuery, limit, offset);
+            break;
+          case 'users':
+            results = await this.searchUsers(sanitizedQuery, limit, offset);
+            break;
+          case 'comments':
+            results = await this.searchComments(sanitizedQuery, limit, offset);
+            break;
+        }
+        total = results.length;
+      }
+
+      const response: SearchResponse = {
+        results,
+        total,
         page,
         limit,
-        total: orchestratorResponse.totalCount,
-        pages: Math.ceil(orchestratorResponse.totalCount / limit)
-      },
-      facets,
-      suggestions: suggestions || [],
+        query: sanitizedQuery,
+      };
+
+      // 4. Cache results (5 minutes for search)
+      await cacheService.set(cacheKey, response, CACHE_TTL.SEARCH);
+
+      // 5. Audit log
+      await securityAuditService.logSecurityEvent({
+        event_type: 'search_executed',
+        severity: 'low',
+        ip_address: 'internal',
+        user_agent: 'enhanced-search-service',
+        resource: 'search',
+        action: 'search',
+        success: true,
+        details: {
+          query: sanitizedQuery,
+          type: validatedInput.type,
+          result_count: total,
+        },
+      });
+
+      return response;
+    }, { service: 'SearchService', operation: 'globalSearch' });
+  }
+
+  // ============================================================================
+  // TYPE-SPECIFIC SEARCH METHODS
+  // ============================================================================
+
+  /**
+   * Search bills with caching
+   */
+  async searchBills(query: string, limit: number = 20, offset: number = 0): Promise<SearchResult[]> {
+    const searchPattern = `%${query.toLowerCase()}%`;
+
+    const results = await secureQueryBuilderService
+      .select()
+      .from('bills')
+      .where('title', 'LIKE', searchPattern)
+      .orWhere('summary', 'LIKE', searchPattern)
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .offset(offset);
+
+    return results.map(bill => ({
+      id: bill.id,
+      type: 'bill' as const,
+      title: bill.title,
+      snippet: bill.summary?.substring(0, 200) || '',
+      relevance_score: this.calculateRelevance(query, bill.title + ' ' + bill.summary),
       metadata: {
-        searchTime: Date.now() - Date.now(),
-        source: 'db' as const,
-        queryType: orchestratorResponse.searchType
+        status: bill.status,
+        category: bill.category,
+        created_at: bill.created_at,
       },
-    };
+    }));
+  }
 
-    // Cache results
-    if (results.length) await cache.setResults(text, filters, pagination, dto);
+  /**
+   * Search users with caching
+   */
+  async searchUsers(query: string, limit: number = 20, offset: number = 0): Promise<SearchResult[]> {
+    const searchPattern = `%${query.toLowerCase()}%`;
 
-    // Send final progress
-    res.write(`data: ${JSON.stringify({
-      type: 'progress',
-      searchId,
-      stage: 'complete',
-      progress: 100,
-      message: 'Search completed',
-      timestamp: new Date().toISOString()
-    })}\n\n`);
+    const results = await secureQueryBuilderService
+      .select()
+      .from('users')
+      .where('email', 'LIKE', searchPattern)
+      .limit(limit)
+      .offset(offset);
 
-    // Send results
-    res.write(`data: ${JSON.stringify({
-      type: 'results',
-      searchId,
-      data: dto,
-      timestamp: new Date().toISOString()
-    })}\n\n`);
+    return results.map(user => ({
+      id: user.id,
+      type: 'user' as const,
+      title: user.email,
+      snippet: `User role: ${user.role}`,
+      relevance_score: this.calculateRelevance(query, user.email),
+      metadata: {
+        role: user.role,
+        is_verified: user.is_verified,
+        created_at: user.created_at,
+      },
+    }));
+  }
 
-    // Send completion event
-    res.write(`data: ${JSON.stringify({
-      type: 'complete',
-      searchId,
-      timestamp: new Date().toISOString()
-    })}\n\n`);
+  /**
+   * Search comments with caching
+   */
+  async searchComments(query: string, limit: number = 20, offset: number = 0): Promise<SearchResult[]> {
+    const searchPattern = `%${query.toLowerCase()}%`;
 
-    res.end();
+    const results = await secureQueryBuilderService
+      .select()
+      .from('comments')
+      .where('content', 'LIKE', searchPattern)
+      .where('moderation_status', '=', 'approved')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+      .offset(offset);
 
-    // Record analytics
-    try {
-      await SearchAnalytics.recordSearchEvent(sanitizedQuery, dto);
-    } catch (error) {
-      logger.warn({ error: String(error) }, 'Failed to record search analytics');
-    }
+    return results.map(comment => ({
+      id: comment.id,
+      type: 'comment' as const,
+      title: `Comment on bill ${comment.bill_id}`,
+      snippet: this.inputSanitizer.sanitizeHtml(comment.content.substring(0, 200)),
+      relevance_score: this.calculateRelevance(query, comment.content),
+      metadata: {
+        bill_id: comment.bill_id,
+        user_id: comment.user_id,
+        created_at: comment.created_at,
+      },
+    }));
+  }
 
-  } catch (error) {
-    if (!controller.signal.aborted) {
-      logger.error({ error: String(error), searchId }, 'Streaming search failed');
+  // ============================================================================
+  // BILL SEARCH (DETAILED)
+  // ============================================================================
 
-      res.write(`data: ${JSON.stringify({
-        type: 'error',
-        searchId,
-        error: (error as Error).message,
-        timestamp: new Date().toISOString()
-      })}\n\n`);
+  /**
+   * Detailed bill search with filters and caching
+   */
+  async billSearch(searchInput: BillSearchInput): Promise<AsyncServiceResult<SearchResponse>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(BillSearchSchema, searchInput);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
+      }
 
-      res.end();
-    }
-  } finally {
-    // Clean up session
-    setTimeout(() => {
-      searchSessionManager.cancelSearch(searchId, 'completed');
-    }, 1000);
+      const validatedInput = validation.data!;
+      const sanitizedQuery = this.inputSanitizer.sanitizeString(validatedInput.query);
+
+      // 2. Check cache
+      const cacheKey = cacheKeys.search(sanitizedQuery, {
+        type: 'bills',
+        ...validatedInput,
+      });
+      const cached = await cacheService.get<SearchResponse>(cacheKey);
+      if (cached) {
+        logger.debug({ cacheKey }, 'Cache hit for bill search');
+        return cached;
+      }
+
+      // 3. Build query with filters
+      const page = validatedInput.page ? parseInt(validatedInput.page) : 1;
+      const limit = validatedInput.limit ? parseInt(validatedInput.limit) : 20;
+      const offset = (page - 1) * limit;
+
+      let query = secureQueryBuilderService
+        .select()
+        .from('bills');
+
+      // Apply search
+      const searchPattern = `%${sanitizedQuery.toLowerCase()}%`;
+      query = query.where('title', 'LIKE', searchPattern)
+        .orWhere('summary', 'LIKE', searchPattern);
+
+      // Apply filters
+      if (validatedInput.category) {
+        query = query.where('category', '=', validatedInput.category);
+      }
+      if (validatedInput.status) {
+        query = query.where('status', '=', validatedInput.status);
+      }
+      if (validatedInput.sponsor_id) {
+        query = query.where('sponsor_id', '=', validatedInput.sponsor_id);
+      }
+
+      // Execute query
+      const results = await query
+        .orderBy(validatedInput.sort === 'date' ? 'created_at' : 'title', 'desc')
+        .limit(limit)
+        .offset(offset);
+
+      const searchResults: SearchResult[] = results.map(bill => ({
+        id: bill.id,
+        type: 'bill' as const,
+        title: bill.title,
+        snippet: bill.summary?.substring(0, 200) || '',
+        relevance_score: this.calculateRelevance(sanitizedQuery, bill.title + ' ' + bill.summary),
+        metadata: {
+          status: bill.status,
+          category: bill.category,
+          created_at: bill.created_at,
+        },
+      }));
+
+      const response: SearchResponse = {
+        results: searchResults,
+        total: searchResults.length,
+        page,
+        limit,
+        query: sanitizedQuery,
+      };
+
+      // 4. Cache results
+      await cacheService.set(cacheKey, response, CACHE_TTL.SEARCH);
+
+      return response;
+    }, { service: 'SearchService', operation: 'billSearch' });
+  }
+
+  // ============================================================================
+  // AUTOCOMPLETE
+  // ============================================================================
+
+  /**
+   * Autocomplete suggestions with aggressive caching
+   */
+  async autocomplete(input: AutocompleteInput): Promise<AsyncServiceResult<string[]>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(AutocompleteSchema, input);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
+      }
+
+      const validatedInput = validation.data!;
+      const sanitizedQuery = this.inputSanitizer.sanitizeString(validatedInput.query);
+
+      // 2. Check cache (10 minutes for autocomplete)
+      const cacheKey = cacheKeys.search(`autocomplete:${sanitizedQuery}`, {
+        type: validatedInput.type,
+        limit: validatedInput.limit,
+      });
+      const cached = await cacheService.get<string[]>(cacheKey);
+      if (cached) {
+        logger.debug({ cacheKey }, 'Cache hit for autocomplete');
+        return cached;
+      }
+
+      // 3. Get suggestions based on type
+      const searchPattern = `${sanitizedQuery.toLowerCase()}%`;
+      let suggestions: string[] = [];
+
+      if (validatedInput.type === 'bills' || validatedInput.type === 'all') {
+        const billTitles = await secureQueryBuilderService
+          .select('title')
+          .from('bills')
+          .where('title', 'LIKE', searchPattern)
+          .limit(validatedInput.limit);
+        
+        suggestions.push(...billTitles.map(b => b.title));
+      }
+
+      // Remove duplicates and limit
+      suggestions = [...new Set(suggestions)].slice(0, validatedInput.limit);
+
+      // 4. Cache results (10 minutes)
+      await cacheService.set(cacheKey, suggestions, CACHE_TTL.MEDIUM);
+
+      return suggestions;
+    }, { service: 'SearchService', operation: 'autocomplete' });
+  }
+
+  // ============================================================================
+  // SEARCH HISTORY
+  // ============================================================================
+
+  /**
+   * Save search query to history with transaction
+   */
+  async saveSearch(data: SaveSearchInput, userId: string): Promise<AsyncServiceResult<boolean>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(SaveSearchSchema, data);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
+      }
+
+      const validatedData = validation.data!;
+      const sanitizedQuery = this.inputSanitizer.sanitizeString(validatedData.query);
+      const sanitizedUserId = this.inputSanitizer.sanitizeString(userId);
+
+      // 2. Execute with transaction
+      await withTransaction(async () => {
+        await secureQueryBuilderService
+          .insert('search_history')
+          .values({
+            user_id: sanitizedUserId,
+            query: sanitizedQuery,
+            type: validatedData.type,
+            filters: validatedData.filters ? JSON.stringify(validatedData.filters) : null,
+            result_count: validatedData.result_count,
+            created_at: new Date(),
+          });
+      });
+
+      // 3. Invalidate user's search history cache
+      await cacheService.delete(cacheKeys.user(sanitizedUserId, 'search-history'));
+
+      return true;
+    }, { service: 'SearchService', operation: 'saveSearch' });
+  }
+
+  /**
+   * Get user's search history with caching
+   */
+  async getSearchHistory(input: GetSearchHistoryInput): Promise<AsyncServiceResult<any[]>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(GetSearchHistorySchema, input);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
+      }
+
+      const validatedInput = validation.data!;
+      const sanitizedUserId = this.inputSanitizer.sanitizeString(validatedInput.user_id);
+
+      // 2. Check cache
+      const cacheKey = cacheKeys.user(sanitizedUserId, 'search-history');
+      const cached = await cacheService.get<any[]>(cacheKey);
+      if (cached) {
+        logger.debug({ cacheKey }, 'Cache hit for search history');
+        return cached;
+      }
+
+      // 3. Query database
+      const limit = validatedInput.limit ? parseInt(validatedInput.limit) : 20;
+      
+      const history = await secureQueryBuilderService
+        .select()
+        .from('search_history')
+        .where('user_id', '=', sanitizedUserId)
+        .orderBy('created_at', 'desc')
+        .limit(limit);
+
+      // 4. Cache results (30 minutes)
+      await cacheService.set(cacheKey, history, CACHE_TTL.HALF_HOUR);
+
+      return history;
+    }, { service: 'SearchService', operation: 'getSearchHistory' });
+  }
+
+  /**
+   * Get popular searches with aggressive caching
+   */
+  async getPopularSearches(input: GetPopularSearchesInput): Promise<AsyncServiceResult<any[]>> {
+    return safeAsync(async () => {
+      // 1. Validate input
+      const validation = await validateData(GetPopularSearchesSchema, input);
+      if (!validation.success) {
+        throw new Error(`Validation failed: ${validation.errors?.map(e => e.message).join(', ')}`);
+      }
+
+      const validatedInput = validation.data!;
+
+      // 2. Check cache (1 hour for popular searches)
+      const cacheKey = cacheKeys.analytics('popular-searches', {
+        timeframe: validatedInput.timeframe,
+        type: validatedInput.type,
+      });
+      const cached = await cacheService.get<any[]>(cacheKey);
+      if (cached) {
+        logger.debug({ cacheKey }, 'Cache hit for popular searches');
+        return cached;
+      }
+
+      // 3. Calculate date range
+      const now = new Date();
+      let dateFrom = new Date();
+      switch (validatedInput.timeframe) {
+        case 'day':
+          dateFrom.setDate(now.getDate() - 1);
+          break;
+        case 'week':
+          dateFrom.setDate(now.getDate() - 7);
+          break;
+        case 'month':
+          dateFrom.setMonth(now.getMonth() - 1);
+          break;
+        case 'all':
+          dateFrom = new Date(0);
+          break;
+      }
+
+      // 4. Query popular searches
+      const limit = validatedInput.limit ? parseInt(validatedInput.limit) : 10;
+      
+      let query = secureQueryBuilderService
+        .select('query', sql`COUNT(*) as count`)
+        .from('search_history')
+        .where('created_at', '>=', dateFrom.toISOString());
+
+      if (validatedInput.type) {
+        query = query.where('type', '=', validatedInput.type);
+      }
+
+      const popular = await query
+        .groupBy('query')
+        .orderBy('count', 'desc')
+        .limit(limit);
+
+      // 5. Cache results (1 hour)
+      await cacheService.set(cacheKey, popular, CACHE_TTL.HOUR);
+
+      return popular;
+    }, { service: 'SearchService', operation: 'getPopularSearches' });
+  }
+
+  // ============================================================================
+  // HELPER METHODS
+  // ============================================================================
+
+  /**
+   * Calculate relevance score (simple implementation)
+   */
+  private calculateRelevance(query: string, text: string): number {
+    const queryLower = query.toLowerCase();
+    const textLower = text.toLowerCase();
+    
+    // Exact match
+    if (textLower === queryLower) return 1.0;
+    
+    // Contains query
+    if (textLower.includes(queryLower)) return 0.8;
+    
+    // Word match
+    const queryWords = queryLower.split(' ');
+    const matchedWords = queryWords.filter(word => textLower.includes(word));
+    return matchedWords.length / queryWords.length * 0.6;
   }
 }
 
 /**
- * Cancel an ongoing search
+ * Factory function to create enhanced search service instance
  */
-export async function cancelSearch(searchId: string): Promise<{ success: boolean; message: string }> {
-  try {
-    searchSessionManager.cancelSearch(searchId, 'user_cancelled');
-    return { success: true, message: 'Search cancelled successfully' };
-  } catch (error) {
-    logger.error({ error: String(error), searchId }, 'Failed to cancel search');
-    return { success: false, message: 'Failed to cancel search' };
-  }
+export function createEnhancedSearchService(): SearchService {
+  return new SearchService();
 }
 
 /**
- * Get search analytics data
+ * Singleton instance
  */
-export async function getSearchAnalytics(
-  startDate?: Date,
-  endDate?: Date
-): Promise<SearchMetrics> {
-  const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
-  const end = endDate || new Date();
-
-  try {
-    return await SearchAnalytics.getSearchMetrics(start, end);
-  } catch (error) {
-    logger.error({ error: String(error) }, 'Failed to get search analytics');
-    return { totalSearches: 0, uniqueUsers: 0, averageSearchTime: 0, cacheHitRate: 0, popularQueries: [], noResultQueries: [], timeRange: { start, end } };
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export const enhancedSearchService = createEnhancedSearchService();

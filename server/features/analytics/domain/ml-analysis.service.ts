@@ -1,6 +1,6 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bills } from '@server/infrastructure/schema';
 import { argumentTable } from '@server/infrastructure/schema/argument_intelligence';
 import { desc,eq } from 'drizzle-orm';

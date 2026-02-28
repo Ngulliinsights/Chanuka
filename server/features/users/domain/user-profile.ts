@@ -1,6 +1,6 @@
 import { cacheKeys, cacheService } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
-import { database as db, withTransaction } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import {
   bill_engagement,
   bills,

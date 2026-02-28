@@ -5,7 +5,7 @@ import BrandedLoadingScreen from '@client/lib/ui/loading/BrandedLoadingScreen';
 
 // Lazy load both implementations
 const CoreHomePage = React.lazy(() => import('./core-home'));
-const EnhancedHomePage = React.lazy(() => import('./enhanced-home'));
+const EnhancedHomePage = React.lazy(() => import('./HomePage'));
 
 /**
  * Smart Home Page Selector

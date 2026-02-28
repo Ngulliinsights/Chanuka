@@ -1,7 +1,7 @@
 
 import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database/connection';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { 
   bills,
   type InsertSocialShare,
@@ -94,7 +94,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
     });
   }
 
-  async getBillShares(bill_id: number): Promise<SocialShare[]> { return this.getCached(`billShares:${bill_id }`, async () => { return await db.select().from(social_shares)
+  async getBillShares(bill_id: number): Promise<SocialShare[]> { return this.getCached(`billShares:${bill_id }`, async () => { return await readDatabase.select().from(social_shares)
         .where(eq(social_shares.bill_id, bill_id))
         .orderBy(desc(social_shares.created_at));
      });
@@ -103,7 +103,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
   // Optional: Add pagination methods if needed
   async getRecentShares(limit: number = 10): Promise<SocialShare[]> {
     return this.getCached(`recentShares:${limit}`, async () => {
-      return await db.select().from(social_shares)
+      return await readDatabase.select().from(social_shares)
         .orderBy(desc(social_shares.created_at))
         .limit(limit);
     });

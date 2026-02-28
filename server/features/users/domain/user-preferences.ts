@@ -328,7 +328,7 @@ export class UserPreferencesService {
     logger.info("Calculating global preference statistics.", logContext);
     try {
       // Fetch preferences for all users (consider performance for very large user bases)
-  const allUsersPrefs = await this.db.select({ preferences: user_profiles.preferences }).from(user_profiles);
+  const allUsersPrefs = await this.readDatabase.select({ preferences: user_profiles.preferences }).from(user_profiles);
 
       let immediateBillNotifications = 0;
       let emailBillChannelEnabled = 0;

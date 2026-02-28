@@ -94,7 +94,7 @@ export class CommentVotingService {
       if (existingVote) {
         if (existingVote.vote_type === vote_type) {
           // Same vote — toggle off
-          await db.delete(comment_votes).where(eq(comment_votes.id, existingVote.id));
+          await writeDatabase.delete(comment_votes).where(eq(comment_votes.id, existingVote.id));
           upvoteChange = vote_type === 'upvote' ? -1 : 0;
           downvoteChange = vote_type === 'downvote' ? -1 : 0;
           finalVoteType = null;
@@ -109,7 +109,7 @@ export class CommentVotingService {
         }
       } else {
         // New vote
-        await db.insert(comment_votes).values({ comment_id, user_id, vote_type });
+        await writeDatabase.insert(comment_votes).values({ comment_id, user_id, vote_type });
         upvoteChange = vote_type === 'upvote' ? 1 : 0;
         downvoteChange = vote_type === 'downvote' ? 1 : 0;
       }

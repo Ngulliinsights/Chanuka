@@ -1,5 +1,5 @@
 import { type BillTrackingPreferences,userPreferencesService } from '@server/features/users/domain/user-preferences';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bill_engagement,bills, notifications, users } from '@server/infrastructure/schema';
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
@@ -417,7 +417,7 @@ export class NotificationSchedulerService {
 
   // Helper methods
   private async getUsersWithDigestEnabled(): Promise<Array<{ user_id: string; preferences: any  }>> {
-    const allUsers = await db.select({ id: users.id, preferences: users.preferences }).from(user);
+    const allUsers = await readDatabase.select({ id: users.id, preferences: users.preferences }).from(user);
     
     return allUsers
       .map(userData => ({ user_id: userData.id,

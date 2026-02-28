@@ -3,7 +3,7 @@ import { errorTracker } from '@server/infrastructure/observability/monitoring/er
 import { dataPrivacyService } from '@server/features/security/infrastructure/services/data-privacy.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bills } from '@server/infrastructure/schema';
 import { argumentTable } from '@server/infrastructure/schema/argument_intelligence';
 import type { DepartmentStat, RadarDatum } from '@server/infrastructure/schema/platform_operations';

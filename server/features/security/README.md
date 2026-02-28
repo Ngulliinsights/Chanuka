@@ -1,82 +1,103 @@
-# Security Features
+# Security Feature Documentation
 
-This directory contains all security-related business logic and features for the Chanuka platform, organized following Domain-Driven Design (DDD) principles.
+## Overview
 
-## Directory Structure
+The Security feature provides comprehensive protection against common web vulnerabilities including SQL injection, XSS attacks, and other security threats. It implements a defense-in-depth strategy using multiple layers of protection.
 
-```
-server/features/security/
-├── domain/                            # Domain layer (business logic)
-│   ├── value-objects/                # Immutable value objects
-│   │   ├── pagination-params.ts     # Pagination parameters
-│   │   ├── secure-query.ts          # Secure query representation
-│   │   └── query-validation-result.ts # Validation result
-│   └── services/                     # Domain services
-│       ├── input-sanitization.service.ts # Input sanitization logic
-│       └── query-validation.service.ts   # Query validation logic
-├── application/                       # Application layer (use cases)
-│   └── services/                     # Application services
-│       └── secure-query-builder.service.ts # Query building orchestration
-├── services/                          # Legacy services (to be refactored)
-│   └── data-privacy-service.ts       # Data privacy and anonymization
-├── encryption-service.ts              # Encryption/decryption utilities
-├── intrusion-detection-service.ts    # Intrusion detection and prevention
-├── privacy-service.ts                 # Privacy controls and compliance
-├── security-audit-service.ts          # Security audit logging
-├── security-event-logger.ts           # Security event logging
-├── security-initialization-service.ts # Security initialization
-├── security-middleware.ts             # Security middleware
-├── security-monitoring-service.ts     # Security monitoring
-├── security-monitoring.ts             # Security monitoring utilities
-├── security-policy.ts                 # Security policies
-├── tls-config-service.ts             # TLS configuration
-└── index.ts                           # Public exports
-```
+## Architecture
 
-## DDD Architecture
+### Core Components
 
-### Domain Layer
-Contains core business logic and rules that are independent of infrastructure concerns.
+1. **Secure Query Builder Service** - Parameterized query construction with validation
+2. **Input Sanitization Service** - Input cleaning and validation
+3. **Query Validation Service** - SQL injection pattern detection
+4. **Security Middleware** - Request/response security layer
+5. **Security Audit Service** - Security event logging
 
-**Value Objects:**
-- `PaginationParams` - Immutable pagination parameters with validation
-- `SecureQuery` - Represents a validated, parameterized database query
-- `QueryValidationResult` - Encapsulates validation results
+## Usage Guide
 
-**Domain Services:**
-- `InputSanitizationService` - Sanitizes and validates input data
-- `QueryValidationService` - Validates query parameters and sanitizes output
+### 1. Secure Query Builder
 
-### Application Layer
-Orchestrates domain objects and services to implement use cases.
+The `SecureQueryBuilderService` provides safe database query construction using parameterized queries.
 
-**Application Services:**
-- `SecureQueryBuilderService` - Builds secure parameterized queries using domain services
-
-### Infrastructure Layer
-Located in `server/infrastructure/security/` - provides backward compatibility wrappers.
-
-## Core Services
-
-### Secure Query Builder (NEW DDD Structure)
+#### Basic Parameterized Query
 
 ```typescript
-import { secureQueryBuilderService, PaginationParams } from '@server/features/security';
+import { secureQueryBuilderService } from '@server/features/security';
 
-// Build parameterized query
+// Build a simple parameterized query
 const query = secureQueryBuilderService.buildParameterizedQuery(
-  'SELECT * FROM users WHERE email = ${email}',
-  { email: userEmail }
+  'SELECT * FROM users WHERE id = ${id}',
+  { id: userId }
 );
 
-// Execute query
-const users = await db.execute(query.sql, query.params);
-
-// Use pagination value object
-const pagination = PaginationParams.create(req.query.page, req.query.limit);
+// Execute with Drizzle
+const result = await db.execute(query.sql);
 ```
 
-### Input Sanitization
+#### Complex Queries with JOINs
+
+```typescript
+const query = secureQueryBuilderService.buildJoinQuery(
+  'users',
+  [
+    { table: 'profiles', on: 'users.id = profiles.user_id', type: 'INNER' },
+    { table: 'settings', on: 'users.id = settings.user_id', type: 'LEFT' }
+  ],
+  { 'users.active': true },
+  ['users.name', 'profiles.bio', 'settings.theme']
+);
+```
+
+#### Subqueries
+
+```typescript
+const query = secureQueryBuilderService.buildSubquery(
+  'SELECT * FROM users WHERE id IN {{SUBQUERY}}',
+  'SELECT user_id FROM orders WHERE total > 100',
+  {}
+);
+```
+
+#### Common Table Expressions (CTEs)
+
+```typescript
+const query = secureQueryBuilderService.buildCTEQuery(
+  [
+    { name: 'active_users', query: 'SELECT * FROM users WHERE active = true' },
+    { name: 'recent_orders', query: 'SELECT * FROM orders WHERE created_at > NOW() - INTERVAL \'30 days\'' }
+  ],
+  'SELECT * FROM active_users JOIN recent_orders ON active_users.id = recent_orders.user_id',
+  {}
+);
+```
+
+#### Bulk Operations
+
+```typescript
+const items = [
+  { name: 'User 1', email: 'user1@example.com' },
+  { name: 'User 2', email: 'user2@example.com' }
+];
+
+const result = await secureQueryBuilderService.executeBulkOperation(
+  items,
+  async (item) => {
+    return await db.insert(users).values(item);
+  },
+  {
+    batchSize: 100,
+    validateEach: true,
+    continueOnError: false
+  }
+);
+
+console.log(`Processed: ${result.totalProcessed}`);
+console.log(`Successful: ${result.successful.length}`);
+console.log(`Failed: ${result.failed.length}`);
+```
+
+### 2. Input Sanitization
 
 ```typescript
 import { inputSanitizationService } from '@server/features/security';
@@ -84,393 +105,434 @@ import { inputSanitizationService } from '@server/features/security';
 // Sanitize string input
 const sanitized = inputSanitizationService.sanitizeString(userInput);
 
-// Sanitize HTML output
-const safe = inputSanitizationService.sanitizeHtml(htmlContent);
+// Sanitize HTML content
+const safeHtml = inputSanitizationService.sanitizeHtml(htmlContent);
 
-// Create safe LIKE pattern
+// Create safe LIKE pattern for search
 const pattern = inputSanitizationService.createSafeLikePattern(searchTerm);
-
-// Check for sensitive fields
-if (inputSanitizationService.isSensitiveField('password')) {
-  // Handle sensitive data
-}
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM bills WHERE title ILIKE ${pattern}',
+  { pattern }
+);
 ```
 
-### Query Validation
+### 3. Security Middleware
+
+Apply security middleware to protect routes:
 
 ```typescript
-import { queryValidationService } from '@server/features/security';
+import { securityMiddleware } from '@server/middleware/security.middleware';
 
-// Validate query inputs
-const validation = queryValidationService.validateInputs([email, age, name]);
+// Apply to all routes
+app.use(securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    maxRequests: 100
+  },
+  auditLog: true
+}));
 
-if (validation.hasErrors()) {
-  throw new Error(validation.getErrorMessage());
-}
-
-// Use sanitized parameters
-const params = validation.sanitizedParams;
-
-// Sanitize output data
-const sanitizedData = queryValidationService.sanitizeOutput(userData);
+// Apply stricter limits to sensitive routes
+app.use('/api/admin', securityMiddleware.create({
+  rateLimit: {
+    windowMs: 15 * 60 * 1000,
+    maxRequests: 20
+  },
+  auditLog: true
+}));
 ```
 
-### Encryption Service
+### 4. Pagination
 
 ```typescript
-import { encryptionService } from '@server/features/security';
+// Validate and sanitize pagination parameters
+const pagination = secureQueryBuilderService.validatePaginationParams(
+  req.query.page,
+  req.query.limit
+);
 
-const encrypted = await encryptionService.encrypt(sensitiveData);
-const decrypted = await encryptionService.decrypt(encrypted);
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM bills LIMIT ${limit} OFFSET ${offset}',
+  {
+    limit: pagination.limit,
+    offset: pagination.offset
+  }
+);
 ```
 
-### Security Audit Service
+### 5. Output Sanitization
 
 ```typescript
-import { securityAuditService } from '@server/features/security';
+// Sanitize output data to prevent data leakage
+const sanitized = secureQueryBuilderService.sanitizeOutput(userData);
 
-await securityAuditService.logSecurityEvent({
-  type: 'authentication_failure',
-  user_id: userId,
-  ip: req.ip,
-  description: 'Failed login attempt'
-});
-```
-
-### Security Event Logger
-
-```typescript
-import { emitSecurityEvent } from '@server/infrastructure/observability';
-
-emitSecurityEvent({
-  type: 'unauthorized_access',
-  severity: 'high',
-  user_id: userId,
-  ip: req.ip,
-  description: 'Attempted access to admin endpoint'
-});
-```
-
-### Data Privacy Service
-
-```typescript
-import { dataPrivacyService } from '@server/features/security/services/data-privacy-service';
-
-const anonymized = await dataPrivacyService.anonymizeUserData(userData);
-```
-
-## Value Objects
-
-### PaginationParams
-
-Immutable value object representing validated pagination parameters.
-
-```typescript
-import { PaginationParams } from '@server/features/security';
-
-// Create from query strings
-const pagination = PaginationParams.create(req.query.page, req.query.limit);
-
-// Create from numbers
-const pagination = PaginationParams.fromNumbers(1, 20);
-
-// Access properties
-console.log(pagination.page);    // 1
-console.log(pagination.limit);   // 20
-console.log(pagination.offset);  // 0
-```
-
-### SecureQuery
-
-Represents a validated, parameterized database query.
-
-```typescript
-import { SecureQuery } from '@server/features/security';
-
-const query = SecureQuery.create(sql, params, queryId);
-
-// Access properties
-console.log(query.sql);      // SQL template
-console.log(query.params);   // Sanitized parameters
-console.log(query.queryId);  // Unique query identifier
-```
-
-### QueryValidationResult
-
-Encapsulates the result of query parameter validation.
-
-```typescript
-import { QueryValidationResult } from '@server/features/security';
-
-// Create valid result
-const valid = QueryValidationResult.valid(sanitizedParams);
-
-// Create invalid result
-const invalid = QueryValidationResult.invalid(['Error 1', 'Error 2']);
-
-// Check for errors
-if (result.hasErrors()) {
-  console.log(result.getErrorMessage());
-}
-```
-
-## Architecture Principles
-
-### Features vs Infrastructure
-
-**This directory (`features/security`)** contains:
-- ✅ Domain-driven design structure
-- ✅ Business logic for security features
-- ✅ Value objects and domain services
-- ✅ Application services
-- ✅ Security audit services
-- ✅ Encryption services
-- ✅ Intrusion detection
-- ✅ Privacy services
-- ✅ Security event logging
-
-**Infrastructure layer (`infrastructure/security`)** contains:
-- ⚠️ Deprecated backward-compatible wrappers
-- Legacy support for existing code
-
-### Why DDD?
-
-1. **Separation of Concerns** - Clear boundaries between domain, application, and infrastructure
-2. **Testability** - Domain logic can be tested independently
-3. **Maintainability** - Business rules are centralized in domain layer
-4. **Reusability** - Value objects and domain services are highly reusable
-5. **Type Safety** - Value objects provide compile-time guarantees
-
-## Import Guidelines
-
-### DO:
-```typescript
-// Security features (new DDD structure)
-import { 
-  secureQueryBuilderService,
-  PaginationParams,
-  SecureQuery,
-  QueryValidationResult,
-  inputSanitizationService,
-  queryValidationService
-} from '@server/features/security';
-
-// Legacy services
-import { encryptionService, securityAuditService } from '@server/features/security';
-
-// Security event logging (via observability barrel)
-import { emitSecurityEvent, isSensitiveEndpoint } from '@server/infrastructure/observability';
-```
-
-### DON'T:
-```typescript
-// ❌ Don't use deprecated infrastructure imports
-import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
-
-// ❌ Don't bypass the barrel exports
-import { SecureQueryBuilderService } from '@server/features/security/application/services/secure-query-builder.service';
+// This removes sensitive fields like passwords, tokens, etc.
+res.json(sanitized);
 ```
 
 ## Security Best Practices
 
-1. **Always validate input** - Use `inputValidationService` for all user input
-2. **Use parameterized queries** - Use `secureQueryBuilder` for database queries
-3. **Log security events** - Use `emitSecurityEvent` for security-relevant actions
-4. **Encrypt sensitive data** - Use `encryptionService` for PII and secrets
-5. **Audit sensitive operations** - Use `securityAuditService` for compliance
+### 1. Always Use Parameterized Queries
 
-## Related Documentation
-
-- [Infrastructure Security](../../infrastructure/security/README.md)
-- [Observability](../../infrastructure/observability/README.md)
-- [Authentication](../../infrastructure/auth/README.md)
-
-
-## Security Best Practices
-
-### Input Validation
-1. **Always validate** - Never trust user input
-2. **Use value objects** - Encapsulate validation logic in domain objects
-3. **Validate early** - Check input at the API boundary
-4. **Sanitize consistently** - Use domain services for sanitization
-
-### Query Security
-1. **Never concatenate** - Use parameterized queries via SecureQueryBuilderService
-2. **Use value objects** - Leverage SecureQuery and PaginationParams
-3. **Validate parameters** - Use QueryValidationService before building queries
-4. **Audit queries** - Log all database operations
-
-### Domain-Driven Design
-1. **Immutable value objects** - Use value objects for validated data
-2. **Domain services** - Centralize business logic in domain services
-3. **Application services** - Orchestrate domain objects in application layer
-4. **Clear boundaries** - Maintain separation between layers
-
-### Common Pitfalls
-
-❌ **DON'T:**
+❌ **NEVER do this:**
 ```typescript
-// String concatenation (SQL injection risk)
 const query = `SELECT * FROM users WHERE id = ${userId}`;
-
-// Unvalidated input
-const user = await createUser(req.body);
-
-// Direct primitive usage
-const page = parseInt(req.query.page);
-const limit = parseInt(req.query.limit);
 ```
 
-✅ **DO:**
+✅ **ALWAYS do this:**
 ```typescript
-// Parameterized queries with value objects
 const query = secureQueryBuilderService.buildParameterizedQuery(
   'SELECT * FROM users WHERE id = ${id}',
   { id: userId }
 );
+```
 
-// Validated input with domain services
-const validation = queryValidationService.validateInputs([req.body]);
+### 2. Sanitize User Inputs
+
+```typescript
+// Sanitize before using in queries
+const sanitizedName = inputSanitizationService.sanitizeString(req.body.name);
+
+const query = secureQueryBuilderService.buildParameterizedQuery(
+  'SELECT * FROM users WHERE name = ${name}',
+  { name: sanitizedName }
+);
+```
+
+### 3. Validate Inputs
+
+```typescript
+// Validate inputs before processing
+const validation = secureQueryBuilderService.validateInputs([
+  userId,
+  userName,
+  userEmail
+]);
+
 if (validation.hasErrors()) {
-  throw new Error(validation.getErrorMessage());
+  return res.status(400).json({
+    error: validation.getErrorMessage()
+  });
 }
+```
 
-// Value objects for validated data
-const pagination = PaginationParams.create(req.query.page, req.query.limit);
+### 4. Sanitize Outputs
+
+```typescript
+// Remove sensitive data before sending to client
+const sanitized = secureQueryBuilderService.sanitizeOutput(user);
+res.json(sanitized);
+```
+
+### 5. Use Security Middleware
+
+```typescript
+// Protect all routes with security middleware
+app.use(securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: { windowMs: 15 * 60 * 1000, maxRequests: 100 },
+  auditLog: true
+}));
+```
+
+## Performance Monitoring
+
+The Secure Query Builder includes built-in performance monitoring:
+
+```typescript
+// Get performance metrics
+const metrics = secureQueryBuilderService.getPerformanceMetrics();
+
+console.log(`Average query build time: ${metrics.averageDuration}ms`);
+console.log(`Max query build time: ${metrics.maxDuration}ms`);
+console.log(`Total queries built: ${metrics.totalQueries}`);
+console.log(`Recent queries:`, metrics.recentMetrics);
+
+// Clear metrics
+secureQueryBuilderService.clearPerformanceMetrics();
 ```
 
 ## Testing
 
-### Testing Value Objects
-
-```typescript
-import { PaginationParams, QueryValidationResult } from '@server/features/security';
-
-describe('PaginationParams', () => {
-  it('should create valid pagination params', () => {
-    const params = PaginationParams.create('2', '50');
-    expect(params.page).toBe(2);
-    expect(params.limit).toBe(50);
-    expect(params.offset).toBe(50);
-  });
-
-  it('should enforce max limit', () => {
-    const params = PaginationParams.create('1', '200');
-    expect(params.limit).toBe(100); // Max limit
-  });
-});
-
-describe('QueryValidationResult', () => {
-  it('should create valid result', () => {
-    const result = QueryValidationResult.valid({ key: 'value' });
-    expect(result.isValid).toBe(true);
-    expect(result.hasErrors()).toBe(false);
-  });
-
-  it('should create invalid result', () => {
-    const result = QueryValidationResult.invalid(['Error 1']);
-    expect(result.isValid).toBe(false);
-    expect(result.hasErrors()).toBe(true);
-    expect(result.getErrorMessage()).toBe('Error 1');
-  });
-});
-```
-
-### Testing Domain Services
-
-```typescript
-import { inputSanitizationService, queryValidationService } from '@server/features/security';
-
-describe('InputSanitizationService', () => {
-  it('should sanitize string input', () => {
-    const input = 'test--comment';
-    const sanitized = inputSanitizationService.sanitizeString(input);
-    expect(sanitized).not.toContain('--');
-  });
-
-  it('should create safe LIKE pattern', () => {
-    const pattern = inputSanitizationService.createSafeLikePattern('test%');
-    expect(pattern).toBe('%test\\%%');
-  });
-});
-
-describe('QueryValidationService', () => {
-  it('should validate valid inputs', () => {
-    const result = queryValidationService.validateInputs(['test', 123, true]);
-    expect(result.isValid).toBe(true);
-  });
-
-  it('should reject invalid inputs', () => {
-    const result = queryValidationService.validateInputs([NaN]);
-    expect(result.isValid).toBe(false);
-  });
-});
-```
-
-### Testing Application Services
+### Unit Tests
 
 ```typescript
 import { secureQueryBuilderService } from '@server/features/security';
 
-describe('SecureQueryBuilderService', () => {
-  it('should build parameterized query', () => {
+describe('Security Tests', () => {
+  it('should prevent SQL injection', () => {
+    const maliciousInput = "'; DROP TABLE users;--";
+    
     const query = secureQueryBuilderService.buildParameterizedQuery(
-      'SELECT * FROM users WHERE email = ${email}',
-      { email: 'test@example.com' }
+      'SELECT * FROM users WHERE name = ${name}',
+      { name: maliciousInput }
     );
     
-    expect(query.sql).toBeDefined();
-    expect(query.params).toHaveProperty('email');
-    expect(query.queryId).toBeDefined();
-  });
-
-  it('should validate pagination params', () => {
-    const params = secureQueryBuilderService.validatePaginationParams('2', '30');
-    expect(params.page).toBe(2);
-    expect(params.limit).toBe(30);
-    expect(params.offset).toBe(30);
+    // Query should be built safely
+    expect(query).toBeDefined();
   });
 });
 ```
 
-## Migration from Infrastructure Layer
+### Integration Tests
 
-If you're migrating from the old infrastructure layer:
+```typescript
+import {
+  testSQLInjection,
+  testXSSProtection,
+  SQL_INJECTION_PATTERNS,
+  XSS_PATTERNS
+} from '@server/features/security/__tests__/test-utilities';
 
-1. **Update imports:**
-   ```typescript
-   // Old
-   import { secureQueryBuilder } from '@server/infrastructure/security/secure-query-builder';
-   
-   // New
-   import { secureQueryBuilderService } from '@server/features/security';
-   ```
+describe('Security Integration Tests', () => {
+  it('should protect against SQL injection patterns', () => {
+    for (const pattern of SQL_INJECTION_PATTERNS) {
+      const result = testSQLInjection(pattern.input);
+      expect(result.passed).toBe(true);
+    }
+  });
+  
+  it('should protect against XSS patterns', () => {
+    for (const pattern of XSS_PATTERNS) {
+      const result = testXSSProtection(pattern.input);
+      expect(result.passed).toBe(true);
+    }
+  });
+});
+```
 
-2. **Use value objects:**
-   ```typescript
-   // Old
-   const { page, limit, offset } = secureQueryBuilder.validatePaginationParams(
-     req.query.page,
-     req.query.limit
-   );
-   
-   // New
-   const pagination = PaginationParams.create(req.query.page, req.query.limit);
-   // Access: pagination.page, pagination.limit, pagination.offset
-   ```
+## Security Headers
 
-3. **Update method calls:**
-   ```typescript
-   // Old
-   const query = secureQueryBuilder.buildParameterizedQuery(template, params);
-   
-   // New (same API)
-   const query = secureQueryBuilderService.buildParameterizedQuery(template, params);
-   ```
+The security middleware automatically sets the following headers:
 
-## Related Documentation
+- `X-Frame-Options: DENY` - Prevents clickjacking
+- `X-Content-Type-Options: nosniff` - Prevents MIME type sniffing
+- `X-XSS-Protection: 1; mode=block` - Enables XSS protection
+- `Strict-Transport-Security: max-age=31536000; includeSubDomains` - Enforces HTTPS
+- `Content-Security-Policy: default-src 'self'` - Restricts resource loading
+- `Referrer-Policy: strict-origin-when-cross-origin` - Controls referrer information
+- `Permissions-Policy: geolocation=(), microphone=(), camera=()` - Restricts browser features
 
-- [Infrastructure Security](../../infrastructure/security/README.md) - Deprecated wrappers
-- [Observability](../../infrastructure/observability/README.md)
-- [Authentication](../../infrastructure/auth/README.md)
-- [DDD Patterns](../../ARCHITECTURE.md)
+## Rate Limiting
+
+The security middleware includes built-in rate limiting:
+
+```typescript
+app.use(securityMiddleware.create({
+  rateLimit: {
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    maxRequests: 100 // Max 100 requests per window
+  }
+}));
+```
+
+When rate limit is exceeded, the middleware returns:
+- Status: `429 Too Many Requests`
+- Response: `{ error: 'Too many requests', retryAfter: <seconds> }`
+
+## Security Audit Logging
+
+All security events are logged for audit purposes:
+
+```typescript
+import { securityAuditService } from '@server/features/security';
+
+// Log security event
+await securityAuditService.logSecurityEvent({
+  eventType: 'user_login',
+  userId: user.id,
+  ipAddress: req.ip,
+  userAgent: req.get('user-agent'),
+  resource: '/api/auth/login',
+  action: 'POST',
+  timestamp: new Date(),
+  metadata: {
+    success: true
+  }
+});
+```
+
+## Common Patterns
+
+### Pattern 1: Secure Search
+
+```typescript
+async function searchBills(searchTerm: string, page: string, limit: string) {
+  // 1. Validate pagination
+  const pagination = secureQueryBuilderService.validatePaginationParams(page, limit);
+  
+  // 2. Sanitize search term
+  const sanitized = inputSanitizationService.sanitizeString(searchTerm);
+  
+  // 3. Create safe LIKE pattern
+  const pattern = inputSanitizationService.createSafeLikePattern(sanitized);
+  
+  // 4. Build secure query
+  const query = secureQueryBuilderService.buildParameterizedQuery(
+    'SELECT * FROM bills WHERE title ILIKE ${pattern} LIMIT ${limit} OFFSET ${offset}',
+    {
+      pattern,
+      limit: pagination.limit,
+      offset: pagination.offset
+    }
+  );
+  
+  // 5. Execute and sanitize output
+  const bills = await db.execute(query.sql);
+  return secureQueryBuilderService.sanitizeOutput(bills);
+}
+```
+
+### Pattern 2: Secure Create
+
+```typescript
+async function createBill(billData: CreateBillDTO, userId: string) {
+  // 1. Sanitize inputs
+  const sanitizedTitle = inputSanitizationService.sanitizeString(billData.title);
+  const sanitizedText = inputSanitizationService.sanitizeHtml(billData.text);
+  
+  // 2. Validate inputs
+  const validation = secureQueryBuilderService.validateInputs([
+    sanitizedTitle,
+    sanitizedText,
+    userId
+  ]);
+  
+  if (validation.hasErrors()) {
+    throw new Error(validation.getErrorMessage());
+  }
+  
+  // 3. Create with sanitized data
+  const bill = await db.insert(bills).values({
+    title: sanitizedTitle,
+    text: sanitizedText,
+    created_by: userId
+  });
+  
+  // 4. Audit log
+  await securityAuditService.logSecurityEvent({
+    eventType: 'bill_created',
+    userId,
+    resource: '/api/bills',
+    action: 'POST',
+    metadata: { billId: bill.id }
+  });
+  
+  return bill;
+}
+```
+
+### Pattern 3: Secure Update with Cache Invalidation
+
+```typescript
+async function updateBill(billId: string, updates: Partial<Bill>) {
+  // 1. Sanitize inputs
+  const sanitized = {
+    title: updates.title ? inputSanitizationService.sanitizeString(updates.title) : undefined,
+    text: updates.text ? inputSanitizationService.sanitizeHtml(updates.text) : undefined
+  };
+  
+  // 2. Update
+  const bill = await db.update(bills)
+    .set(sanitized)
+    .where(eq(bills.id, billId));
+  
+  // 3. Invalidate cache
+  await cacheInvalidation.onEntityUpdate('bill', billId);
+  
+  // 4. Audit log
+  await securityAuditService.logSecurityEvent({
+    eventType: 'bill_updated',
+    resource: `/api/bills/${billId}`,
+    action: 'PUT',
+    metadata: { updates: Object.keys(sanitized) }
+  });
+  
+  return bill;
+}
+```
+
+## Troubleshooting
+
+### Issue: Query validation fails
+
+**Problem:** `Query validation failed: Invalid input detected`
+
+**Solution:** Check that all inputs are properly sanitized before passing to the query builder.
+
+```typescript
+// Sanitize first
+const sanitized = inputSanitizationService.sanitizeString(input);
+
+// Then build query
+const query = secureQueryBuilderService.buildParameterizedQuery(template, { input: sanitized });
+```
+
+### Issue: Rate limit exceeded
+
+**Problem:** `429 Too Many Requests`
+
+**Solution:** Adjust rate limit settings or implement user-specific rate limiting.
+
+```typescript
+app.use(securityMiddleware.create({
+  rateLimit: {
+    windowMs: 15 * 60 * 1000,
+    maxRequests: 200 // Increase limit
+  }
+}));
+```
+
+### Issue: Performance overhead
+
+**Problem:** Security checks adding latency
+
+**Solution:** Monitor performance metrics and optimize as needed.
+
+```typescript
+const metrics = secureQueryBuilderService.getPerformanceMetrics();
+if (metrics.averageDuration > 50) {
+  // Investigate slow queries
+  console.log('Slow queries:', metrics.recentMetrics.filter(m => m.duration > 50));
+}
+```
+
+## API Reference
+
+### SecureQueryBuilderService
+
+- `buildParameterizedQuery(template, params)` - Build parameterized query
+- `buildJoinQuery(baseTable, joins, where, select?)` - Build JOIN query
+- `buildSubquery(outerQuery, subquery, params)` - Build subquery
+- `buildCTEQuery(ctes, mainQuery, params)` - Build CTE query
+- `executeBulkOperation(items, operation, options?)` - Execute bulk operations
+- `validateInputs(inputs)` - Validate inputs
+- `sanitizeOutput(data)` - Sanitize output
+- `createSafeLikePattern(searchTerm)` - Create safe LIKE pattern
+- `validatePaginationParams(page?, limit?)` - Validate pagination
+- `getPerformanceMetrics()` - Get performance metrics
+- `clearPerformanceMetrics()` - Clear metrics
+
+### SecurityMiddleware
+
+- `create(options?)` - Create security middleware
+- `cleanupRateLimits()` - Clean up old rate limit records
+
+## Support
+
+For security issues or questions:
+- Review this documentation
+- Check the test files for examples
+- Consult the security team
+
+## Version History
+
+- **v1.0.0** - Initial release with core security features
+  - Parameterized query builder
+  - Input sanitization
+  - Security middleware
+  - Rate limiting
+  - Audit logging

@@ -20,7 +20,7 @@ import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
 import { NextFunction, Request, Response, Router } from 'express';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bills, users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, ilike, or, sql } from 'drizzle-orm';
 

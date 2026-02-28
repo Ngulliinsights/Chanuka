@@ -11,7 +11,7 @@ import { conflictSeverityAnalyzerService } from '@server/features/analytics/conf
 import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service';
 import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache } from '@server/infrastructure/cache/index';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { eq } from 'drizzle-orm';
 
 import {

@@ -1,5 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
-import { comments, database as db, notifications,sessions, users } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
+import { comments, notifications, sessions, users } from '@server/infrastructure/schema';
 import bcrypt from 'bcrypt';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
@@ -398,8 +399,8 @@ export class UserManagementService {
 
       // Calculate summary statistics in parallel for efficiency
       const [totalCountResult, activeCountResult] = await Promise.all([
-        db.select({ value: count() }).from(users),
-        db.select({ value: count() }).from(users).where(eq(users.is_active, true))
+        readDatabase.select({ value: count() }).from(users),
+        readDatabase.select({ value: count() }).from(users).where(eq(users.is_active, true))
       ]);
 
       return {
@@ -511,8 +512,8 @@ export class UserManagementService {
     try {
       // Execute all stat queries in parallel to minimize latency
       const [commentsResult, notificationsResult, lastCommentResult] = await Promise.all([
-        db.select({ value: count() }).from(comments).where(eq(comments.user_id, user_id)),
-        db.select({ value: count() }).from(notifications).where(eq(notifications.user_id, user_id)),
+        readDatabase.select({ value: count() }).from(comments).where(eq(comments.user_id, user_id)),
+        readDatabase.select({ value: count() }).from(notifications).where(eq(notifications.user_id, user_id)),
         db
           .select({ created_at: comments.created_at })
           .from(comments)

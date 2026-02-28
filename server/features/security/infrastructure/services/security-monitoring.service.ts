@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { and, desc, eq, gte, type SQL, sql } from 'drizzle-orm';
 import { jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Request } from 'express';

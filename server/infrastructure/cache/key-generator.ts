@@ -2,18 +2,27 @@
  * Cache Key Generator
  * 
  * Centralized cache key generation for consistent naming across the application
- * Based on existing patterns from server/cache/CacheService.ts
+ * Standardized format: {prefix}:{feature}:{entity}:{id}:{variant}
  */
 
-import { logger as _logger } from '../observability';
-
+import { logger } from '../observability';
 import type { CacheKeyGenerator } from './types';
+
+export interface KeyComponents {
+  feature: string;
+  entity: string;
+  id?: string | number;
+  variant?: string;
+  metadata?: Record<string, string>;
+}
 
 export class CacheKeys implements CacheKeyGenerator {
   private static instance: CacheKeys;
   private keyPrefix: string;
+  private readonly MAX_KEY_LENGTH = 250;
+  private readonly KEY_SEPARATOR = ':';
 
-  constructor(keyPrefix: string = '') {
+  constructor(keyPrefix: string = 'app') {
     this.keyPrefix = keyPrefix;
   }
 
@@ -22,6 +31,44 @@ export class CacheKeys implements CacheKeyGenerator {
       CacheKeys.instance = new CacheKeys(keyPrefix);
     }
     return CacheKeys.instance;
+  }
+
+  /**
+   * Build standardized cache key from components
+   */
+  buildKey(components: KeyComponents): string {
+    const parts = [this.keyPrefix, components.feature, components.entity];
+    
+    if (components.id !== undefined) {
+      parts.push(String(components.id));
+    }
+    
+    if (components.variant) {
+      parts.push(components.variant);
+    }
+    
+    if (components.metadata) {
+      Object.entries(components.metadata).forEach(([key, value]) => {
+        parts.push(`${key}=${value}`);
+      });
+    }
+    
+    const key = parts.join(this.KEY_SEPARATOR);
+    
+    if (!this.validateKey(key)) {
+      logger.warn({ key, components }, 'Generated invalid cache key');
+      throw new Error(`Invalid cache key: ${key}`);
+    }
+    
+    return key;
+  }
+
+  /**
+   * Hash long values for cache keys
+   */
+  private hashValue(value: string): string {
+    if (value.length <= 50) return value;
+    return Buffer.from(value).toString('base64').substring(0, 50);
   }
 
   /**

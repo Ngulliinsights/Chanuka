@@ -198,7 +198,7 @@ export class SecurityAuditService {
       }
 
       if (payloadInserts.length > 0) {
-        await db.insert(audit_payloads).values(payloadInserts);
+        await writeDatabase.insert(audit_payloads).values(payloadInserts);
       }
 
     } catch (error) {

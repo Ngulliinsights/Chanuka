@@ -6,13 +6,13 @@ export { default as securityMonitoringRouter } from './security-monitoring';
 
 // Domain Services (Pure business logic)
 export {
-  InputSanitizationService,./infrastructure/services/security-initialization.service
-  inputSanitizationService,./infrastructure/services/security-monitoring.service
+  InputSanitizationService,
+  inputSanitizationService,
   QueryValidationService,
-  queryValidationService,./infrastructure/services/privacy.service
+  queryValidationService,
   EncryptionService,
   encryptionService,
-  TLSConfigService,./infrastructure/services/data-privacy.service
+  TLSConfigService,
   tlsConfigService
 } from './domain/services';
 

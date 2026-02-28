@@ -24,7 +24,7 @@ export class FeatureFlagRepository {
   // ============================================================================
 
   async create(data: NewFeatureFlag): Promise<FeatureFlag> {
-    const [flag] = await this.db.insert(featureFlags).values(data).returning();
+    const [flag] = await this.writeDatabase.insert(featureFlags).values(data).returning();
     return flag;
   }
 
@@ -47,7 +47,7 @@ export class FeatureFlagRepository {
   }
 
   async findAll(): Promise<FeatureFlag[]> {
-    return await this.db.select().from(featureFlags);
+    return await this.readDatabase.select().from(featureFlags);
   }
 
   async findEnabled(): Promise<FeatureFlag[]> {

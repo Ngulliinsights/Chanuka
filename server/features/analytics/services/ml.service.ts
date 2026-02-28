@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import type {
   AnalysisResult,
   ComprehensiveAnalysisResult,

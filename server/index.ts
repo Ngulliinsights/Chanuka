@@ -36,6 +36,7 @@ import { notificationSchedulerService, notificationRoutes as notificationsRouter
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
+import { securityMiddleware } from '@server/middleware/security.middleware';
 import { webSocketService } from '@server/utils/missing-modules-fallback';
 import { setupVite } from '@server/vite';
 import { logger } from '@server/infrastructure/observability';
@@ -95,6 +96,17 @@ const isDevelopment = config.server.nodeEnv === 'development';
 
 // Configure middleware
 configureAppMiddleware(app);
+
+// Apply security middleware globally
+app.use(securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: {
+    windowMs: 60000, // 1 minute
+    maxRequests: 100
+  },
+  auditLog: true
+}));
 
 // Root API endpoint
 app.get('/api', (_req: Request, res: Response) => {
@@ -314,6 +326,37 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
 });
 
 // Security-sensitive endpoints with additional rate limiting
+// Apply stricter security middleware to sensitive routes
+app.use('/api/admin', securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: {
+    windowMs: 60000, // 1 minute
+    maxRequests: 20 // Stricter limit for admin routes
+  },
+  auditLog: true
+}));
+
+app.use('/api/auth', securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: {
+    windowMs: 60000, // 1 minute
+    maxRequests: 30 // Stricter limit for auth routes
+  },
+  auditLog: true
+}));
+
+app.use('/api/verification', securityMiddleware.create({
+  validateInput: true,
+  sanitizeOutput: true,
+  rateLimit: {
+    windowMs: 60000, // 1 minute
+    maxRequests: 30 // Stricter limit for verification routes
+  },
+  auditLog: true
+}));
+
 app.use('/api/auth', standardRateLimits.auth, authRouter);
 
 app.use('/api/admin', standardRateLimits.api, adminRouter);

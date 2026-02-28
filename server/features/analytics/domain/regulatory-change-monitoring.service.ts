@@ -1,7 +1,7 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { cacheService } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database/connection';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { and, count, desc, eq, gt, gte, lte,or, sql } from "drizzle-orm";
 
 import {

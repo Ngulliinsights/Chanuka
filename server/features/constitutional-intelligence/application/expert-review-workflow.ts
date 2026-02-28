@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 // Database import commented out - not used yet
-// import { database as db } from '@server/infrastructure/database';
+// import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 
 export interface ExpertReview {
   id: string;
@@ -67,7 +67,7 @@ export class ExpertReviewWorkflow {
         reviews.push(review);
 
         // In a real implementation, would save to database
-        // await db.insert(expert_reviews).values(review);
+        // await writeDatabase.insert(expert_reviews).values(review);
       }
 
       logger.info({
@@ -113,7 +113,7 @@ export class ExpertReviewWorkflow {
       };
 
       // In a real implementation, would save to database
-      // await db.insert(expert_reviews).values(review);
+      // await writeDatabase.insert(expert_reviews).values(review);
 
       logger.info({
         message: 'Expert review submitted',
@@ -139,7 +139,7 @@ export class ExpertReviewWorkflow {
   async getReviewsForAnalysis(_analysisId: string): Promise<ExpertReview[]> {
     try {
       // In a real implementation, would query from database
-      // const reviews = await db.select().from(expert_reviews).where(eq(expert_reviews.analysisId, analysisId));
+      // const reviews = await readDatabase.select().from(expert_reviews).where(eq(expert_reviews.analysisId, analysisId));
       
       return [];
     } catch (error) {

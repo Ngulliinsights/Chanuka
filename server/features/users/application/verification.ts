@@ -1,7 +1,7 @@
 import { Response, Router } from 'express';
 import { desc, eq, sql } from 'drizzle-orm';
 
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { user_verification, users } from '@server/infrastructure/schema';
 import { asyncHandler } from '@/middleware/error-management';
 import { BaseError, ValidationError } from '@shared/types/core/errors';

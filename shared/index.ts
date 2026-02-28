@@ -20,8 +20,9 @@ export * from './types/index';
 // which causes TS "ambiguous re-export" errors. Instead we selectively
 // export only the items from ./core that are NOT already covered by ./types.
 
-// Error enums — canonical definitions live in shared/core/index.ts
-export { ErrorDomain, ErrorSeverity } from './core/index';
+// Error enums — canonical definitions live in shared/types/index.ts
+// Note: ErrorDomain and ErrorSeverity are already exported via export * from './types/index'
+// so we don't need to re-export them here to avoid duplication
 
 // Core utility functions & types not covered by ./types
 // NOTE: security-utils, data-utils, and type-guards are intentionally

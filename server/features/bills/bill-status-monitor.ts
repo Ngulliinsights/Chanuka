@@ -205,7 +205,7 @@ export class BillStatusMonitorService {
           // Try to fetch commenter details to make notifications more informative
           let commenterName = 'A user';
           try {
-            const userRes = await this.db.select({
+            const userRes = await this.readDatabase.select({
               id: schema.users.id,
               email: schema.users.email
             })

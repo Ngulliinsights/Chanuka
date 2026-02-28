@@ -85,7 +85,7 @@ export class TransparencyAnalysisService {
         if (!sponsor_id) return 50; // Neutral score if no specific sponsor
 
         try {
-            const [sponsor] = await this.db.select({ transparency_score: schema.sponsors.transparency_score })
+            const [sponsor] = await this.readDatabase.select({ transparency_score: schema.sponsors.transparency_score })
                 .from(schema.sponsors)
                 .where(eq(schema.sponsors.id, sponsor_id));
 

@@ -35,7 +35,7 @@ export class LedgerService {
     // Ensure evidence is an array for the JSONB column
     const evidenceLinks = Array.isArray(details.evidence) ? details.evidence : [];
 
-    const result = await db.insert(shadow_ledger_entries).values({
+    const result = await writeDatabase.insert(shadow_ledger_entries).values({
       entry_number: entryNumber,
       entity_name: actor,
       violation_type: (action as any) || 'bribery', // Cast to enum type needed if not validating strict enums upstream

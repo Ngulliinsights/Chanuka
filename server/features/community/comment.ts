@@ -1,7 +1,7 @@
 import { cacheService } from '@server/infrastructure/cache';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bills, comments, user_profiles, users } from '@server/infrastructure/schema';
 import {
   and,
@@ -14,6 +14,7 @@ import {
   or,
   sql,
 } from 'drizzle-orm';
+import { inputSanitizationService, queryValidationService, securityAuditService } from '@server/features/security';
 
 // ---------------------------------------------------------------------------
 // Public interfaces
@@ -355,6 +356,22 @@ export class CommentService {
   async createComment(data: CreateCommentData): Promise<CommentWithUser> {
     this.validateCommentData(data);
 
+    // 1. Validate inputs
+    const validation = queryValidationService.validateInputs([
+      String(data.bill_id),
+      data.user_id,
+      data.content
+    ]);
+    if (validation.hasErrors()) {
+      throw new Error(`Invalid comment data: ${validation.getErrorMessage()}`);
+    }
+
+    // 2. Sanitize inputs - CRITICAL for XSS prevention
+    const sanitizedContent = inputSanitizationService.sanitizeHtml(data.content.trim());
+    const sanitizedCommentType = data.commentType 
+      ? inputSanitizationService.sanitizeString(data.commentType)
+      : 'general';
+
     if (data.parent_id) {
       await this.validateParentComment(data.parent_id, data.bill_id);
     }
@@ -365,8 +382,8 @@ export class CommentService {
         .values({
           bill_id: data.bill_id,
           user_id: data.user_id,
-          content: data.content.trim(),
-          commentType: data.commentType ?? 'general',
+          content: sanitizedContent,
+          commentType: sanitizedCommentType,
           parent_id: data.parent_id ?? null,
           upvotes: 0,
           downvotes: 0,
@@ -375,6 +392,22 @@ export class CommentService {
         .returning();
 
       const userInfo = await this.getUserInfo(data.user_id);
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'comment_created',
+        userId: data.user_id,
+        ipAddress: 'internal',
+        userAgent: 'comment-service',
+        resource: `comment:${newComment.id}`,
+        action: 'create',
+        timestamp: new Date(),
+        metadata: { 
+          bill_id: data.bill_id,
+          comment_type: sanitizedCommentType,
+          has_parent: !!data.parent_id
+        }
+      });
 
       // Process comment through argument intelligence pipeline (async, non-blocking)
       this.processCommentArguments(newComment, userInfo).catch((error) =>
@@ -483,11 +516,25 @@ export class CommentService {
     user_id: string,
     data: UpdateCommentData,
   ): Promise<CommentWithUser | null> {
+    // 1. Validate inputs
+    const validation = queryValidationService.validateInputs([
+      String(comment_id),
+      user_id
+    ]);
+    if (validation.hasErrors()) {
+      throw new Error(`Invalid comment update data: ${validation.getErrorMessage()}`);
+    }
+
+    // 2. Sanitize inputs
     if (data.content !== undefined) {
       const trimmed = data.content.trim();
       if (trimmed.length === 0) throw new Error('Comment content cannot be empty');
       if (trimmed.length > 5000) throw new Error('Comment content exceeds maximum length');
-      data.content = trimmed;
+      data.content = inputSanitizationService.sanitizeHtml(trimmed);
+    }
+
+    if (data.commentType !== undefined) {
+      data.commentType = inputSanitizationService.sanitizeString(data.commentType);
     }
 
     try {
@@ -503,6 +550,22 @@ export class CommentService {
         this.getUserInfo(user_id),
         this.getReplyCount(comment_id),
       ]);
+
+      // 3. Audit log
+      await securityAuditService.logSecurityEvent({
+        eventType: 'comment_updated',
+        userId: user_id,
+        ipAddress: 'internal',
+        userAgent: 'comment-service',
+        resource: `comment:${comment_id}`,
+        action: 'update',
+        timestamp: new Date(),
+        metadata: { 
+          comment_id,
+          bill_id: updatedComment.bill_id,
+          updated_fields: Object.keys(data)
+        }
+      });
 
       this.clearCommentCaches(updatedComment.bill_id).catch((error) =>
         logger.error('Error clearing comment caches after update', { error }),
@@ -531,6 +594,15 @@ export class CommentService {
    * Hard-delete a comment owned by the given user.
    */
   async deleteComment(comment_id: number, user_id: string): Promise<boolean> {
+    // 1. Validate inputs
+    const validation = queryValidationService.validateInputs([
+      String(comment_id),
+      user_id
+    ]);
+    if (validation.hasErrors()) {
+      throw new Error(`Invalid comment deletion data: ${validation.getErrorMessage()}`);
+    }
+
     const comment = await this.findCommentById(comment_id);
     if (!comment) return false;
 
@@ -542,6 +614,21 @@ export class CommentService {
       const deleted = (result.rowCount ?? 0) > 0;
 
       if (deleted) {
+        // 2. Audit log
+        await securityAuditService.logSecurityEvent({
+          eventType: 'comment_deleted',
+          userId: user_id,
+          ipAddress: 'internal',
+          userAgent: 'comment-service',
+          resource: `comment:${comment_id}`,
+          action: 'delete',
+          timestamp: new Date(),
+          metadata: { 
+            comment_id,
+            bill_id: comment.bill_id
+          }
+        });
+
         this.clearCommentCaches(comment.bill_id).catch((error) =>
           logger.error('Error clearing comment caches after delete', { error }),
         );

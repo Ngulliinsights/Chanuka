@@ -7,7 +7,7 @@
 import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service';
 import { ContentModerationFilters, ModerationItem, PaginationInfo } from '@server/features/admin/moderation/types';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bill, 
   comments, 
   content_report, 

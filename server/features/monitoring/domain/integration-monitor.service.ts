@@ -9,7 +9,7 @@
  * - Logging
  */
 
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { logger } from '@server/infrastructure/observability';
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { performanceMonitor } from '@server/infrastructure/observability/monitoring/performance-monitor';
@@ -173,7 +173,7 @@ export class IntegrationMonitorService {
         errorCount: usage.failedRequests,
       };
 
-      await db.insert(featureMetrics).values(metrics);
+      await writeDatabase.insert(featureMetrics).values(metrics);
 
       // Check alert rules
       await this.checkAlertRules(featureId, metrics);
@@ -206,7 +206,7 @@ export class IntegrationMonitorService {
         details: result.details,
       };
 
-      const [check] = await db.insert(healthChecks).values(healthCheck).returning();
+      const [check] = await writeDatabase.insert(healthChecks).values(healthCheck).returning();
 
       // Update feature health status
       await db
@@ -243,7 +243,7 @@ export class IntegrationMonitorService {
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
       };
 
-      const [check] = await db.insert(healthChecks).values(healthCheck).returning();
+      const [check] = await writeDatabase.insert(healthChecks).values(healthCheck).returning();
 
       // Update feature health status
       await db
@@ -361,7 +361,7 @@ export class IntegrationMonitorService {
    */
   async addAlertRule(rule: NewAlertRule): Promise<AlertRule> {
     try {
-      const [newRule] = await db.insert(alertRules).values(rule).returning();
+      const [newRule] = await writeDatabase.insert(alertRules).values(rule).returning();
 
       logger.info({
         message: 'Alert rule created',
@@ -500,7 +500,7 @@ export class IntegrationMonitorService {
         requestId,
       };
 
-      await db.insert(integrationLogs).values(log);
+      await writeDatabase.insert(integrationLogs).values(log);
     } catch (error) {
       // Don't throw on logging errors, just log to console
       logger.error({ error }, 'Failed to log integration event');
@@ -513,7 +513,7 @@ export class IntegrationMonitorService {
   async getDashboardData(): Promise<MonitoringDashboardData> {
     try {
       // Get all features with their latest metrics
-      const features = await db.select().from(integrationFeatures);
+      const features = await readDatabase.select().from(integrationFeatures);
 
       const featureData = await Promise.all(
         features.map(async (feature) => {

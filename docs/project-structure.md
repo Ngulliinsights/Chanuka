@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 27, 2026 at 07:53 PM
+**Generated:** February 28, 2026 at 09:32 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,806
+**Total Items:** 3,851
 
 ```
 .
@@ -368,8 +368,8 @@
 │   │   │   │       ├── careers.tsx
 │   │   │   │       ├── contact.tsx
 │   │   │   │       ├── core-home.tsx
-│   │   │   │       ├── enhanced-home.tsx
 │   │   │   │       ├── home.tsx
+│   │   │   │       ├── HomePage.tsx
 │   │   │   │       ├── press.tsx
 │   │   │   │       └── support.tsx
 │   │   │   ├── legal/
@@ -1742,6 +1742,10 @@
 │   │   ├── ADR-009-graph-module-refactoring.md
 │   │   ├── ADR-010-government-data-consolidation.md
 │   │   ├── ADR-011-type-system-single-source.md
+│   │   ├── ADR-012-infrastructure-security-pattern.md
+│   │   ├── ADR-013-caching-strategy.md
+│   │   ├── ADR-014-error-handling-pattern.md
+│   │   ├── ADR-015-intelligent-bill-pipeline.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -2004,6 +2008,7 @@
 │   │   └── schema-domain-relationships.md
 │   ├── ADR-001-DDD-Feature-Structure.md
 │   ├── ADR-002-Facade-Pattern-For-Middleware.md
+│   ├── ANALYTICS_VS_ANALYSIS_AUDIT.md
 │   ├── api-client-guide.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
 │   ├── DESIGN_DECISIONS.md
@@ -2014,6 +2019,7 @@
 │   ├── DOCUMENTATION_INVENTORY.md
 │   ├── FEATURE_MODERNIZATION_AUDIT.md
 │   ├── FSD_IMPORT_GUIDE.md
+│   ├── INFRASTRUCTURE_ARCHITECTURE_AUDIT.md
 │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
 │   ├── INFRASTRUCTURE_FEATURE_INTEGRATION_ANALYSIS.md
 │   ├── MIGRATION_DOCS_CLEANUP_PLAN.md
@@ -2028,6 +2034,7 @@
 │   ├── project-structure.md
 │   ├── README_ARCHITECTURE_DOCS.md
 │   ├── REPOSITORY_PATTERN.md
+│   ├── REQUIREMENTS_AUDIT_ASSESSMENT.md
 │   ├── ROUTING_EXPLANATION.md
 │   ├── scripts-tools-strategic-analysis.md
 │   ├── scripts-tools-strategic-audit.md
@@ -2242,8 +2249,10 @@
 │   │   ├── advocacy/
 │   │   │   ├── application/
 │   │   │   │   ├── action-coordinator.ts
+│   │   │   │   ├── advocacy-validation.schemas.ts
 │   │   │   │   ├── campaign-service.ts
 │   │   │   │   ├── coalition-builder.ts
+│   │   │   │   ├── enhanced-advocacy-service.ts
 │   │   │   │   ├── impact-tracker.ts
 │   │   │   │   └── monitoring-integration.ts
 │   │   │   ├── config/
@@ -2325,9 +2334,11 @@
 │   │   │   ├── application/
 │   │   │   │   ├── analytics-routes-integrated.ts
 │   │   │   │   ├── analytics-service-integrated.ts
+│   │   │   │   ├── analytics-validation.schemas.ts
 │   │   │   │   ├── analytics.routes.ts
 │   │   │   │   ├── dashboard.routes.ts
 │   │   │   │   ├── engagement-analytics.routes.ts
+│   │   │   │   ├── enhanced-analytics-service.ts
 │   │   │   │   └── transparency-dashboard.routes.ts
 │   │   │   ├── config/
 │   │   │   │   ├── analytics.config.ts
@@ -2406,10 +2417,12 @@
 │   │   │   ├── application/
 │   │   │   │   ├── argument-intelligence-service.ts
 │   │   │   │   ├── argument-processor.ts
+│   │   │   │   ├── argument-validation.schemas.ts
 │   │   │   │   ├── brief-generator.ts
 │   │   │   │   ├── clustering-service.ts
 │   │   │   │   ├── coalition-finder.ts
 │   │   │   │   ├── comment-integration.ts
+│   │   │   │   ├── enhanced-argument-intelligence-service.ts
 │   │   │   │   ├── evidence-validator.ts
 │   │   │   │   ├── nlp-pipeline-config.ts
 │   │   │   │   ├── power-balancer.ts
@@ -2436,6 +2449,7 @@
 │   │   │   │   ├── bill-service-adapter.ts
 │   │   │   │   ├── bill-service.ts
 │   │   │   │   ├── bill-tracking.service.ts
+│   │   │   │   ├── bill-validation.schemas.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── sponsorship-analysis.service.ts
 │   │   │   ├── domain/
@@ -2457,6 +2471,9 @@
 │   │   │   │   ├── repositories/
 │   │   │   │   ├── bill-storage.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── presentation/
+│   │   │   │   └── http/
+│   │   │   │       └── bill-validation.middleware.ts
 │   │   │   ├── repositories/
 │   │   │   │   └── sponsorship-repository.ts
 │   │   │   ├── services/
@@ -2490,6 +2507,8 @@
 │   │   │   │   ├── use-cases/
 │   │   │   │   │   ├── create-comment.use-case.ts
 │   │   │   │   │   └── vote-on-comment.use-case.ts
+│   │   │   │   ├── community-validation.schemas.ts
+│   │   │   │   ├── enhanced-community-service.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
@@ -2502,6 +2521,9 @@
 │   │   │   │   │   ├── engagement-score.ts
 │   │   │   │   │   └── trending-score.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── presentation/
+│   │   │   │   └── http/
+│   │   │   │       └── community-validation.middleware.ts
 │   │   │   ├── comment-voting.ts
 │   │   │   ├── comment.ts
 │   │   │   ├── community.ts
@@ -2544,6 +2566,8 @@
 │   │   │   │   ├── use-cases/
 │   │   │   │   │   └── analyze-bill-constitutionality.use-case.ts
 │   │   │   │   ├── constitutional-service.ts
+│   │   │   │   ├── constitutional-validation.schemas.ts
+│   │   │   │   ├── enhanced-constitutional-intelligence-service.ts
 │   │   │   │   ├── expert-review-workflow.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── monitoring-integration.ts
@@ -2575,6 +2599,8 @@
 │   │   │   └── verify-implementation.ts
 │   │   ├── government-data/
 │   │   │   ├── application/
+│   │   │   │   ├── enhanced-government-data-service.ts
+│   │   │   │   ├── government-data-validation.schemas.ts
 │   │   │   │   └── managed-integration.service.ts
 │   │   │   ├── services/
 │   │   │   │   ├── api-integrations.service.ts
@@ -2634,7 +2660,9 @@
 │   │   │   │   │   └── notification.service.ts
 │   │   │   │   ├── use-cases/
 │   │   │   │   ├── notification-orchestrator.ts
-│   │   │   │   └── notification-scheduler.ts
+│   │   │   │   ├── notification-scheduler.ts
+│   │   │   │   ├── notifications-validation.schemas.ts
+│   │   │   │   └── NotificationsService.ts
 │   │   │   ├── docs/
 │   │   │   │   ├── alert-preferences-integration.md
 │   │   │   │   ├── integration_guide.md
@@ -2665,7 +2693,9 @@
 │   │   │   ├── application/
 │   │   │   │   ├── pretext-detection.controller.ts
 │   │   │   │   ├── pretext-detection.routes.ts
-│   │   │   │   └── pretext-detection.service.ts
+│   │   │   │   ├── pretext-detection.service.ts
+│   │   │   │   ├── pretext-validation.schemas.ts
+│   │   │   │   └── PretextService.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── pretext-analysis.service.ts
 │   │   │   │   └── types.ts
@@ -2691,6 +2721,7 @@
 │   │   ├── recommendation/
 │   │   │   ├── application/
 │   │   │   │   ├── EngagementTracker.ts
+│   │   │   │   ├── recommendation-validation.schemas.ts
 │   │   │   │   ├── recommendation.routes.ts
 │   │   │   │   └── RecommendationService.ts
 │   │   │   ├── domain/
@@ -2721,6 +2752,7 @@
 │   │   │       └── safeguard-jobs.ts
 │   │   ├── search/
 │   │   │   ├── application/
+│   │   │   │   ├── search-validation.schemas.ts
 │   │   │   │   └── SearchService.ts
 │   │   │   ├── deployment/
 │   │   │   │   ├── search-deployment-orchestrator.ts
@@ -2757,6 +2789,9 @@
 │   │   │   │   └── SearchRepository.ts
 │   │   │   ├── monitoring/
 │   │   │   │   └── search-performance-monitor.ts
+│   │   │   ├── presentation/
+│   │   │   │   └── http/
+│   │   │   │       └── search-validation.middleware.ts
 │   │   │   ├── services/
 │   │   │   │   ├── embedding.service.ts
 │   │   │   │   └── history-cleanup.service.ts
@@ -2804,7 +2839,9 @@
 │   │   ├── sponsors/
 │   │   │   ├── application/
 │   │   │   │   ├── sponsor-conflict-analysis.service.ts
-│   │   │   │   └── sponsor-service-direct.ts
+│   │   │   │   ├── sponsor-service-direct.ts
+│   │   │   │   ├── sponsors-validation.schemas.ts
+│   │   │   │   └── SponsorsService.ts
 │   │   │   ├── domain/
 │   │   │   │   └── repositories/
 │   │   │   │       └── sponsor.repository.ts
@@ -2819,6 +2856,9 @@
 │   │   │   ├── SPONSORS_MODULE_COMPLETE.md
 │   │   │   └── sponsors.routes.ts
 │   │   ├── universal_access/
+│   │   │   ├── application/
+│   │   │   │   ├── ussd-validation.schemas.ts
+│   │   │   │   └── UssdService.ts
 │   │   │   ├── index.ts
 │   │   │   ├── README.md
 │   │   │   ├── ussd.analytics.ts
@@ -2847,7 +2887,9 @@
 │   │   │   │   ├── profile.ts
 │   │   │   │   ├── user-application-service.ts
 │   │   │   │   ├── user-service-direct.ts
+│   │   │   │   ├── user-validation.schemas.ts
 │   │   │   │   ├── users.ts
+│   │   │   │   ├── UserService.ts
 │   │   │   │   └── verification.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── aggregates/
@@ -2877,6 +2919,9 @@
 │   │   │   │   ├── notification-service.ts
 │   │   │   │   ├── user-storage.d.ts
 │   │   │   │   └── user-storage.ts
+│   │   │   ├── presentation/
+│   │   │   │   └── http/
+│   │   │   │       └── user-validation.middleware.ts
 │   │   │   ├── types/
 │   │   │   │   └── index.ts
 │   │   │   ├── index.ts

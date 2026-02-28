@@ -7,7 +7,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache } from '@server/infrastructure/cache/index';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
 
 import {

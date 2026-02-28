@@ -1,6 +1,6 @@
 import { auditLogger } from '@server/infrastructure/monitoring/index';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import {
   bill_engagement,
   comment_votes,

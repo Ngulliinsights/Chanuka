@@ -120,7 +120,7 @@ export class ConstitutionalAnalysisServiceComplete {
 
     try {
       const results = await readDatabase(async (db) => {
-        let query = db.select().from(constitutional_provisions);
+        let query = readDatabase.select().from(constitutional_provisions);
 
         // Build dynamic where conditions based on provided options
         const conditions = [];
@@ -275,7 +275,7 @@ export class ConstitutionalAnalysisServiceComplete {
 
     try {
       const results = await readDatabase(async (db) => {
-        let query = db.select().from(legal_precedents);
+        let query = readDatabase.select().from(legal_precedents);
         
         const conditions = [];
 

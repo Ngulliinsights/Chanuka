@@ -1,5 +1,5 @@
 
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { user_verification,users } from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
@@ -319,7 +319,7 @@ export class CitizenVerificationService {
   private async storeVerification(verification: CitizenVerification): Promise<void> {
     // Map our domain model into the shared user_verification table.
     // We store bill-specific fields inside verification_data JSONB to avoid schema mismatch.
-    await db.insert(user_verification).values({
+    await writeDatabase.insert(user_verification).values({
       id: verification.id,
       user_id: verification.citizenId,
       verification_type: verification.verification_type,
@@ -361,7 +361,7 @@ export class CitizenVerificationService {
 
   private async recordEndorsement(verification_id: string, _citizenId: string): Promise<void> {
     // Increment endorsements counter stored in verification_data JSONB
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
+    const row = await readDatabase.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     
@@ -382,7 +382,7 @@ export class CitizenVerificationService {
     counterEvidence?: Evidence[]
   ): Promise<void> {
     // Record dispute and update count
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
+    const row = await readDatabase.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     
@@ -401,7 +401,7 @@ export class CitizenVerificationService {
   }
 
   private async recalculateVerificationConfidence(verification_id: string): Promise<void> {
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
+    const row = await readDatabase.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     
@@ -425,7 +425,7 @@ export class CitizenVerificationService {
   }
 
   private async updateVerificationStatus(verification_id: string): Promise<void> {
-    const row = await db.select().from(user_verification).where(eq(user_verification.id, verification_id));
+    const row = await readDatabase.select().from(user_verification).where(eq(user_verification.id, verification_id));
     const existing = row[0];
     if (!existing) return;
     

@@ -1,6 +1,6 @@
 import { alertingService, notificationSchedulerService } from '@server/features/notifications';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { and, count, desc, eq, gte,sql } from 'drizzle-orm';
 
 import { analysis, bill, comments, notification,users  } from '@server/infrastructure/schema';
@@ -42,9 +42,9 @@ export class AdminService {
       const systemMetrics = { api: { errorRate: 5 } };
 
       // User statistics
-      const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(user);
-      const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
-      const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
+      const [totalUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user);
+      const [activeUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
+      const [newUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
 
       const usersByRole = await db
         .select({
@@ -55,8 +55,8 @@ export class AdminService {
         .groupBy(users.role);
 
       // Bill statistics
-       const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bill);
-       const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
+       const [totalBills] = await readDatabase.select({ count: sql<number>`count(*)` }).from(bill);
+       const [newBills] = await readDatabase.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
 
        const billsByStatus = await db
          .select({
@@ -67,8 +67,8 @@ export class AdminService {
          .groupBy(bills.status);
 
       // Engagement statistics
-       const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(comments);
-       const [totalAnalyses] = await db.select({ count: sql<number>`count(*)` }).from(analysis);
+       const [totalComments] = await readDatabase.select({ count: sql<number>`count(*)` }).from(comments);
+       const [totalAnalyses] = await readDatabase.select({ count: sql<number>`count(*)` }).from(analysis);
 
       // Active users (users who have engaged in the last week)
        const [recentlyActiveUsers] = await db
@@ -106,12 +106,12 @@ export class AdminService {
 
       try {
         // Try to get basic stats without system health
-        const [totalUsers] = await db.select({ count: sql<number>`count(*)` }).from(user);
-        const [activeUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
-        const [newUsers] = await db.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
-        const [totalBills] = await db.select({ count: sql<number>`count(*)` }).from(bill);
-        const [newBills] = await db.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
-        const [totalComments] = await db.select({ count: sql<number>`count(*)` }).from(comments);
+        const [totalUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user);
+        const [activeUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user).where(eq(users.is_active, true));
+        const [newUsers] = await readDatabase.select({ count: sql<number>`count(*)` }).from(user).where(gte(users.created_at, oneWeekAgo));
+        const [totalBills] = await readDatabase.select({ count: sql<number>`count(*)` }).from(bill);
+        const [newBills] = await readDatabase.select({ count: sql<number>`count(*)` }).from(bill).where(gte(bills.created_at, oneWeekAgo));
+        const [totalComments] = await readDatabase.select({ count: sql<number>`count(*)` }).from(comments);
 
         return {
           users: {
@@ -188,7 +188,7 @@ export class AdminService {
         .offset(offset);
 
       // Get total count
-      let countQuery = db.select({ count: sql<number>`count(*)` }).from(user);
+      let countQuery = readDatabase.select({ count: sql<number>`count(*)` }).from(user);
       if (conditions.length > 0) {
         countQuery = countQuery.where(and(...conditions));
       }

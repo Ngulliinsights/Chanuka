@@ -108,7 +108,7 @@ export class BillComprehensiveAnalysisService {
      private async analyzeSponsorConflictsForBill(bill_id: number): Promise<ConflictSummary> { logger.debug(`Analyzing sponsor conflicts related to bill ${bill_id }.`);
          try {
              // 1. Find active sponsors for the bill
-             const billSponsors = await this.db.select({ sponsor_id: schema.bill_sponsorships.sponsor_id })
+             const billSponsors = await this.readDatabase.select({ sponsor_id: schema.bill_sponsorships.sponsor_id })
                  .from(schema.bill_sponsorships)
                  .where(and(eq(schema.bill_sponsorships.bill_id, bill_id), eq(schema.bill_sponsorships.is_active, true)));
 
@@ -242,7 +242,7 @@ export class BillComprehensiveAnalysisService {
                 // Default is_approved to false, requires manual review maybe?
                  is_approved: false,
              };
-             await this.db.insert(schema.analysis).values(insertData)
+             await this.writeDatabase.insert(schema.analysis).values(insertData)
                 .onConflictDoUpdate({ // Update if analysis for this bill+type exists
                     target: [schema.analysis.bill_id, schema.analysis.analysis_type],
                     set: {

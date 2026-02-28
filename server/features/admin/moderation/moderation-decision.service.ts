@@ -6,7 +6,7 @@
 
 import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service';
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { comments, 
   content_report, 
   moderation_action,
@@ -73,7 +73,7 @@ export class ModerationDecisionService {
         .where(eq(content_report.id, report_id));
 
       // Record the moderation action
-      await db.insert(moderation_action).values({
+      await writeDatabase.insert(moderation_action).values({
         content_type: report.content_type,
         content_id: report.content_id,
         actionType: actionType,
@@ -155,7 +155,7 @@ export class ModerationDecisionService {
 
           // Record action
           const actionType = operation.action === 'delete' ? 'delete' : 'hide';
-          await db.insert(moderation_action).values({
+          await writeDatabase.insert(moderation_action).values({
             content_type: report.content_type,
             content_id: report.content_id,
             actionType: actionType,

@@ -21,7 +21,7 @@ export class MarketService {
       ? location.trim() 
       : 'nairobi';
 
-    await db.insert(market_signals).values({
+    await writeDatabase.insert(market_signals).values({
       commodity_id: productId, // Mapped to commodity_id
       price_reported: price.toString(),
       location_county: sanitizedLocation, // Default or sanitized

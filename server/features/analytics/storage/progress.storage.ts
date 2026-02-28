@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database/connection';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import {
   type InsertUserProgress,
   user_progress,
@@ -35,7 +35,7 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
   async getUserProgress(user_id: string): Promise<UserProgress[]> {
     const cacheKey = `${CACHE_PREFIX}${ user_id }`;
 
-    return this.getCached(cacheKey, async () => { return await db.select().from(user_progress)
+    return this.getCached(cacheKey, async () => { return await readDatabase.select().from(user_progress)
         .where(eq(user_progress.user_id, user_id))
         .orderBy(desc(user_progress.created_at));
      });

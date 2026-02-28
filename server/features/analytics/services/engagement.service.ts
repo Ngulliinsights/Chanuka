@@ -8,7 +8,7 @@ import { cache, cacheKeys } from '@server/infrastructure/cache';
 import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse   } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';
 import { ApiResponseWrapper  } from '@shared/types/api';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import type {
   BillEngagementMetrics,
   CommentEngagementTrends,

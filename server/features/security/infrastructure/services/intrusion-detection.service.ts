@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { desc, eq, gt, sql } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { Request } from 'express';
@@ -193,7 +193,7 @@ export class IntrusionDetectionService {
 
     // Log to Threat Intelligence DB
     try {
-      await db.insert(threatIntelligence).values({
+      await writeDatabase.insert(threatIntelligence).values({
         ip_address: ip,
         threatType: threatType,
         severity: 'critical',
@@ -250,7 +250,7 @@ export class IntrusionDetectionService {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - days);
 
-      const stats = await db.select({
+      const stats = await readDatabase.select({
         count: sql<number>`count(*)`.mapWith(Number),
         threatType: threatIntelligence.threatType,
         severity: threatIntelligence.severity

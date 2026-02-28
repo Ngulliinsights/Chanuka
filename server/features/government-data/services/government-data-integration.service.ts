@@ -3,7 +3,7 @@
 // ============================================================================
 // Handles data scarcity and API limitations with multiple fallback mechanisms
 
-import { withTransaction, database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
 import { cache } from '@server/infrastructure/cache';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@server/infrastructure/schema';
@@ -813,14 +813,14 @@ export class GovernmentDataIntegrationService {
 
       try {
         // Find or create sponsor
-        let sponsor = await db.select()
+        let sponsor = await readDatabase.select()
           .from(sponsors)
           .where(eq(sponsors.name, sponsorInfo.name))
           .limit(1);
 
         if (sponsor.length === 0) {
           // Create sponsor if doesn't exist
-          const [newSponsor] = await db.insert(sponsors).values({
+          const [newSponsor] = await writeDatabase.insert(sponsors).values({
             name: sponsorInfo.name,
             role: sponsorInfo.role || 'Unknown',
             party: sponsorInfo.party || null,
@@ -831,7 +831,7 @@ export class GovernmentDataIntegrationService {
         }
 
         // Create or update sponsorship record
-        const existingSponsorship = await db.select()
+        const existingSponsorship = await readDatabase.select()
           .from(bill_cosponsors)
           .where(and(
             eq(bill_cosponsors.bill_id, bill_id),
@@ -840,7 +840,7 @@ export class GovernmentDataIntegrationService {
           .limit(1);
 
         if (existingSponsorship.length === 0) {
-          await db.insert(bill_cosponsors).values({
+          await writeDatabase.insert(bill_cosponsors).values({
             bill_id,
             sponsor_id: sponsor[0].id,
             sponsorshipType: sponsorInfo.sponsorshipType || 'primary',
@@ -1262,7 +1262,7 @@ export class GovernmentDataIntegrationService {
 
     for (const affiliation of affiliations) {
       try {
-        const existingAffiliation = await db.select()
+        const existingAffiliation = await readDatabase.select()
           .from(sponsorAffiliations)
           .where(and(
             eq(sponsorAffiliations.sponsor_id, sponsor_id),
@@ -1272,7 +1272,7 @@ export class GovernmentDataIntegrationService {
           .limit(1);
 
         if (existingAffiliation.length === 0) {
-          await db.insert(sponsorAffiliations).values({
+          await writeDatabase.insert(sponsorAffiliations).values({
             sponsor_id,
             organization: affiliation.organization,
             role: affiliation.role || null,
@@ -1339,14 +1339,14 @@ export class GovernmentDataIntegrationService {
       if (!sponsorInfo.name) continue; // Skip if name is missing
 
       // Find or create sponsor
-      let sponsor = await db.select()
+      let sponsor = await readDatabase.select()
         .from(sponsors)
         .where(eq(sponsors.name, sponsorInfo.name))
         .limit(1);
 
       if (sponsor.length === 0) {
         // Create sponsor if doesn't exist
-        const [newSponsor] = await db.insert(sponsors).values({
+        const [newSponsor] = await writeDatabase.insert(sponsors).values({
           name: sponsorInfo.name,
           role: sponsorInfo.role || 'Unknown',
           party: sponsorInfo.party || null,
@@ -1357,7 +1357,7 @@ export class GovernmentDataIntegrationService {
       }
 
       // Create or update sponsorship record
-      const existingSponsorship = await db.select()
+      const existingSponsorship = await readDatabase.select()
         .from(bill_cosponsors)
         .where(and(
           eq(bill_cosponsors.bill_id, bill_id),
@@ -1366,7 +1366,7 @@ export class GovernmentDataIntegrationService {
         .limit(1);
 
       if (existingSponsorship.length === 0) {
-        await db.insert(bill_cosponsors).values({
+        await writeDatabase.insert(bill_cosponsors).values({
           bill_id,
           sponsor_id: sponsor[0].id,
           sponsorshipType: sponsorInfo.sponsorshipType || 'primary',
@@ -1385,7 +1385,7 @@ export class GovernmentDataIntegrationService {
     if (!affiliations) return;
 
     for (const affiliation of affiliations) {
-      const existingAffiliation = await db.select()
+      const existingAffiliation = await readDatabase.select()
         .from(sponsorAffiliations)
         .where(and(
           eq(sponsorAffiliations.sponsor_id, sponsor_id),
@@ -1395,7 +1395,7 @@ export class GovernmentDataIntegrationService {
         .limit(1);
 
       if (existingAffiliation.length === 0) {
-        await db.insert(sponsorAffiliations).values({
+        await writeDatabase.insert(sponsorAffiliations).values({
           sponsor_id,
           organization: affiliation.organization,
           role: affiliation.role || null,

@@ -38,7 +38,7 @@ export class RecommendationRepository {
   async getBillsByIds(ids: number[]): Promise<PlainBill[]> {
     if (!ids.length) return [];
   const db = readDatabase;
-    const rows = await db.select().from(bills).where(inArray(bills.id, ids));
+    const rows = await readDatabase.select().from(bills).where(inArray(bills.id, ids));
     return rows.map(r => this.toPlain(r));
   }
 
@@ -50,7 +50,7 @@ export class RecommendationRepository {
       .where(inArray(bill_tags.tag, tags));
     const bill_ids = [...new Set(tagRows.map(r => r.bill_id as number))].filter((id: unknown) => !excludeIds.includes(id as number));
     if (!bill_ids.length) return [];
-    const rows = await db.select().from(bills).where(inArray(bills.id, bill_ids));
+    const rows = await readDatabase.select().from(bills).where(inArray(bills.id, bill_ids));
     return rows.map(r => this.toPlain(r));
   }
 
@@ -133,7 +133,7 @@ export class RecommendationRepository {
     } else { const view_count = type === 'view' ? 1 : 0;
       const comment_count = type === 'comment' ? 1 : 0;
       const share_count = type === 'share' ? 1 : 0;
-      await db.insert(bill_engagement).values({
+      await writeDatabase.insert(bill_engagement).values({
         user_id,
         bill_id,
         view_count,
@@ -150,7 +150,7 @@ export class RecommendationRepository {
   /*  ==========  Tag helpers  ==========  */
   async getTagsForBill(bill_id: number): Promise<string[]> {
   const db = readDatabase;
-    const rows = await db.select({ tag: bill_tags.tag }).from(bill_tags).where(eq(bill_tags.bill_id, bill_id));
+    const rows = await readDatabase.select({ tag: bill_tags.tag }).from(bill_tags).where(eq(bill_tags.bill_id, bill_id));
     return rows.map(r => r.tag);
   }
 

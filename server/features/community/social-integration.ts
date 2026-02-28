@@ -1,4 +1,4 @@
-import { database as db } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import type { User } from '@server/infrastructure/schema';
 
 import { logger } from '@server/infrastructure/observability';
@@ -318,7 +318,7 @@ export class SocialIntegrationService {
       const profileData = await this.fetchSocialProfile(platform, access_token);
 
       // Save the social profile connection to database
-      await db.insert(userSocialProfile).values({
+      await writeDatabase.insert(userSocialProfile).values({
         user_id: user_id as unknown, // UUID type
         provider: platform,
         providerId: profileData.id,

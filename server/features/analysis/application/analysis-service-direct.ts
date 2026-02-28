@@ -764,7 +764,7 @@ export class AnalysisService {
     try {
       // Test database connectivity with a simple query
       await readDatabase(async (db) => {
-        return db.select({ count: count() }).from(bills).limit(1);
+        return readDatabase.select({ count: count() }).from(bills).limit(1);
       });
       
       return {
