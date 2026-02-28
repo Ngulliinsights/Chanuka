@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 27, 2026 at 10:33 AM
+**Generated:** February 27, 2026 at 07:53 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,744
+**Total Items:** 3,806
 
 ```
 .
@@ -2012,9 +2012,13 @@
 │   ├── DEVELOPMENT_WORKFLOW.md
 │   ├── DOCUMENTATION_CLEANUP_SUMMARY.md
 │   ├── DOCUMENTATION_INVENTORY.md
+│   ├── FEATURE_MODERNIZATION_AUDIT.md
 │   ├── FSD_IMPORT_GUIDE.md
 │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
+│   ├── INFRASTRUCTURE_FEATURE_INTEGRATION_ANALYSIS.md
 │   ├── MIGRATION_DOCS_CLEANUP_PLAN.md
+│   ├── MIGRATION_STATUS_REPORT.md
+│   ├── MIGRATION_WEEK_1_SUMMARY.md
 │   ├── migration-examples.md
 │   ├── MVP Data Strategy for NLP Training.md
 │   ├── NOTIFICATION_SYSTEM_CONSOLIDATION.md
@@ -2023,9 +2027,14 @@
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
 │   ├── project-structure.md
 │   ├── README_ARCHITECTURE_DOCS.md
+│   ├── REPOSITORY_PATTERN.md
 │   ├── ROUTING_EXPLANATION.md
 │   ├── scripts-tools-strategic-analysis.md
-│   └── scripts-tools-strategic-audit.md
+│   ├── scripts-tools-strategic-audit.md
+│   ├── WEEK_1_COMPLETION_SUMMARY.md
+│   ├── WEEK_1_FINAL_STATUS.md
+│   ├── WEEK_1_PROGRESS.md
+│   └── WEEK_1_STANDARDIZATION_PLAN.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2314,6 +2323,8 @@
 │   │   │   └── architecture-analysis-report.md
 │   │   ├── analytics/
 │   │   │   ├── application/
+│   │   │   │   ├── analytics-routes-integrated.ts
+│   │   │   │   ├── analytics-service-integrated.ts
 │   │   │   │   ├── analytics.routes.ts
 │   │   │   │   ├── dashboard.routes.ts
 │   │   │   │   ├── engagement-analytics.routes.ts
@@ -2425,8 +2436,6 @@
 │   │   │   │   ├── bill-service-adapter.ts
 │   │   │   │   ├── bill-service.ts
 │   │   │   │   ├── bill-tracking.service.ts
-│   │   │   │   ├── bills-repository-service.ts
-│   │   │   │   ├── bills.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── sponsorship-analysis.service.ts
 │   │   │   ├── domain/
@@ -2436,13 +2445,16 @@
 │   │   │   │   │   └── bill-errors.ts
 │   │   │   │   ├── events/
 │   │   │   │   │   └── bill-events.ts
+│   │   │   │   ├── repositories/
+│   │   │   │   │   └── bill.repository.ts
 │   │   │   │   ├── services/
-│   │   │   │   │   ├── bill-domain-service.ts
 │   │   │   │   │   ├── bill-event-handler.ts
-│   │   │   │   │   └── bill-notification-service.ts
+│   │   │   │   │   ├── bill-notification-service.ts
+│   │   │   │   │   └── bill.domain.service.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── LegislativeStorageTypes.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── repositories/
 │   │   │   │   ├── bill-storage.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── repositories/
@@ -2459,11 +2471,13 @@
 │   │   │   ├── action-prompts-routes.ts
 │   │   │   ├── bill-status-monitor.ts
 │   │   │   ├── bill-tracking.routes.ts
+│   │   │   ├── bill.factory.ts
 │   │   │   ├── bill.js
 │   │   │   ├── BILLS_MIGRATION_ADAPTER.ts
 │   │   │   ├── bills-router-migrated.ts
 │   │   │   ├── bills-router.ts
 │   │   │   ├── index.ts
+│   │   │   ├── INTERNAL_CONSISTENCY_ANALYSIS.md
 │   │   │   ├── legislative-storage.ts
 │   │   │   ├── MIGRATION_SUMMARY.md
 │   │   │   ├── real-time-tracking.ts
@@ -2753,25 +2767,49 @@
 │   │   │   ├── index.ts
 │   │   │   └── SearchController.ts
 │   │   ├── security/
-│   │   │   ├── services/
-│   │   │   │   └── data-privacy-service.ts
-│   │   │   ├── encryption-service.ts
+│   │   │   ├── application/
+│   │   │   │   └── services/
+│   │   │   │       ├── index.ts
+│   │   │   │       └── secure-query-builder.service.ts
+│   │   │   ├── domain/
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── encryption.service.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── input-sanitization.service.ts
+│   │   │   │   │   ├── query-validation.service.ts
+│   │   │   │   │   └── tls-config.service.ts
+│   │   │   │   └── value-objects/
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── pagination-params.ts
+│   │   │   │       ├── query-validation-result.ts
+│   │   │   │       └── secure-query.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   └── services/
+│   │   │   │       ├── data-privacy.service.ts
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── intrusion-detection.service.ts
+│   │   │   │       ├── privacy.service.ts
+│   │   │   │       ├── security-audit.service.ts
+│   │   │   │       ├── security-initialization.service.ts
+│   │   │   │       └── security-monitoring.service.ts
+│   │   │   ├── ARCHITECTURE.md
+│   │   │   ├── DDD_MIGRATION_SUMMARY.md
 │   │   │   ├── index.ts
-│   │   │   ├── intrusion-detection-service.ts
-│   │   │   ├── privacy-service.ts
 │   │   │   ├── README.md
-│   │   │   ├── security-audit-service.ts
+│   │   │   ├── REFACTORING_COMPLETE.md
 │   │   │   ├── security-event-logger.ts
-│   │   │   ├── security-initialization-service.ts
 │   │   │   ├── security-middleware.ts
-│   │   │   ├── security-monitoring-service.ts
 │   │   │   ├── security-monitoring.ts
-│   │   │   ├── security-policy.ts
-│   │   │   └── tls-config-service.ts
+│   │   │   └── security-policy.ts
 │   │   ├── sponsors/
 │   │   │   ├── application/
 │   │   │   │   ├── sponsor-conflict-analysis.service.ts
 │   │   │   │   └── sponsor-service-direct.ts
+│   │   │   ├── domain/
+│   │   │   │   └── repositories/
+│   │   │   │       └── sponsor.repository.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   └── repositories/
 │   │   │   ├── types/
 │   │   │   │   ├── analysis.ts
 │   │   │   │   └── index.ts
@@ -2819,10 +2857,13 @@
 │   │   │   │   │   ├── user-profile.ts
 │   │   │   │   │   ├── user.ts
 │   │   │   │   │   └── value-objects.ts
+│   │   │   │   ├── repositories/
+│   │   │   │   │   └── user.repository.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── profile-domain-service.ts
 │   │   │   │   │   ├── user-management-domain-service.ts
 │   │   │   │   │   ├── user-verification-domain-service.ts
+│   │   │   │   │   ├── user.domain.service.ts
 │   │   │   │   │   └── verification-domain-service.ts
 │   │   │   │   ├── citizen-verification.ts
 │   │   │   │   ├── ExpertVerificationService.ts
@@ -2830,6 +2871,7 @@
 │   │   │   │   ├── user-preferences.ts
 │   │   │   │   └── user-profile.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── repositories/
 │   │   │   │   ├── email-service.ts
 │   │   │   │   ├── government-data-service.ts
 │   │   │   │   ├── notification-service.ts
@@ -2838,14 +2880,16 @@
 │   │   │   ├── types/
 │   │   │   │   └── index.ts
 │   │   │   ├── index.ts
-│   │   │   └── MIGRATION_SUMMARY.md
+│   │   │   ├── MIGRATION_SUMMARY.md
+│   │   │   └── user.factory.ts
 │   │   ├── CONTINUATION_SUMMARY.md
 │   │   ├── DDD_COMPLETION_SUMMARY.md
 │   │   ├── index.ts
 │   │   ├── LOGGING_STANDARDIZATION_SUMMARY.md
 │   │   ├── MODULES_REWRITE_SUMMARY.md
 │   │   ├── README.md
-│   │   └── search-suggestions.ts
+│   │   ├── search-suggestions.ts
+│   │   └── SECURITY_INTEGRATION_PHASE1_SUMMARY.md
 │   ├── infrastructure/
 │   │   ├── adapters/
 │   │   │   ├── mappings/
@@ -2880,9 +2924,11 @@
 │   │   │   │   ├── interfaces.ts
 │   │   │   │   └── key-generator.ts
 │   │   │   ├── monitoring/
+│   │   │   │   ├── index.ts
 │   │   │   │   └── metrics-collector.ts
 │   │   │   ├── patterns/
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── invalidation.ts
 │   │   │   ├── serialization/
 │   │   │   │   └── cache-serializer.ts
 │   │   │   ├── tagging/
@@ -2892,12 +2938,17 @@
 │   │   │   │   ├── cache-tag-manager.ts
 │   │   │   │   └── cache-warmer.ts
 │   │   │   ├── warming/
-│   │   │   │   └── cache-warmer.ts
+│   │   │   │   ├── cache-warmer.ts
+│   │   │   │   └── strategies.ts
 │   │   │   ├── ADAPTER_VERIFICATION_REPORT.md
 │   │   │   ├── adapters-factory-integration.test.ts
 │   │   │   ├── advanced-caching.service.ts
 │   │   │   ├── ai-cache.ts
+│   │   │   ├── CACHE_PATTERNS.md
+│   │   │   ├── cache-core.test.ts
 │   │   │   ├── cache-factory.ts
+│   │   │   ├── cache-integration.test.ts
+│   │   │   ├── cache-keys.ts
 │   │   │   ├── cache-wrappers.test.ts
 │   │   │   ├── cache-wrappers.ts
 │   │   │   ├── caching-service.test.ts
@@ -2919,6 +2970,7 @@
 │   │   │   ├── test-basic.ts
 │   │   │   ├── test-comprehensive.ts
 │   │   │   ├── test-performance.ts
+│   │   │   ├── test-utilities.ts
 │   │   │   ├── types.ts
 │   │   │   └── validation.ts
 │   │   ├── config/
@@ -3008,6 +3060,10 @@
 │   │   │   │   │   ├── hybrid-bill-repository.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── lazy-loader.ts
+│   │   │   ├── repository/
+│   │   │   │   ├── base-repository.ts
+│   │   │   │   ├── errors.ts
+│   │   │   │   └── test-utils.ts
 │   │   │   ├── utils/
 │   │   │   │   └── base-script.ts
 │   │   │   ├── connection.ts
@@ -3033,6 +3089,8 @@
 │   │   │   ├── external-api-manager.ts
 │   │   │   ├── index.ts
 │   │   │   └── types.ts
+│   │   ├── integration/
+│   │   │   └── feature-integration-helper.ts
 │   │   ├── messaging/
 │   │   │   ├── delivery/
 │   │   │   │   └── channel.service.ts
@@ -3154,6 +3212,7 @@
 │   │   │   ├── middleware.ts
 │   │   │   ├── schema-validation-service.ts
 │   │   │   ├── security-schemas.ts
+│   │   │   ├── validation-helpers.ts
 │   │   │   ├── validation-metrics.ts
 │   │   │   ├── validation-services-init.ts
 │   │   │   └── validation-utils.ts
@@ -3237,6 +3296,7 @@
 │   │   ├── rate-limit-config.ts
 │   │   ├── rate-limiter.ts
 │   │   ├── safeguards.ts
+│   │   ├── security.middleware.ts
 │   │   ├── service-availability.ts
 │   │   └── validation-middleware.ts
 │   ├── routes/
@@ -3377,7 +3437,9 @@
 │   │   │   ├── string-utils.ts
 │   │   │   ├── type-guards.test.ts
 │   │   │   └── type-guards.ts
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   ├── maybe.ts
+│   │   └── result.ts
 │   ├── docs/
 │   │   ├── database_architecture.md
 │   │   ├── GRAPH_DATABASE_IMPLEMENTATION_PHASE2.md

@@ -88,6 +88,12 @@ This directory contains Architecture Decision Records documenting significant ar
 **Date:** February 27, 2026  
 **Summary:** Adopts Result type pattern using neverthrow for type-safe, explicit error handling. Achieves 0.03% error rate, 99.97% transaction success, and 95% Result type coverage with rich error context across all features.
 
+### ADR-015: Intelligent Bill Pipeline Architecture
+**File:** [ADR-015-intelligent-bill-pipeline.md](./ADR-015-intelligent-bill-pipeline.md)  
+**Status:** 📋 Proposed  
+**Date:** February 27, 2026  
+**Summary:** Proposes event-driven pipeline that automatically processes every bill through all intelligence features (Pretext Detection, Constitutional Intelligence, Market Intelligence, ML Prediction). Provides comprehensive analysis, automated transparency, and timely user notifications.
+
 ## ADR Format
 
 Each ADR should follow this structure:

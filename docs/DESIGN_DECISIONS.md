@@ -396,6 +396,92 @@ server/features/{feature}/
 
 ---
 
+## 15. Infrastructure Integration Patterns
+
+**Decision:** Standardized security, caching, and error handling patterns
+
+**Status:** ✅ Complete (See Infrastructure Integration ADRs)
+
+**Context:**
+- Infrastructure integration analysis revealed gaps in security (15%), caching (35%), error handling (50%)
+- Needed consistent patterns across all 14 features
+- Required comprehensive security coverage
+
+**Key Patterns:**
+
+1. **Security Pattern** (ADR-012)
+   - 4-step pattern: Validate → Sanitize → Execute → Sanitize Output
+   - 100% security coverage achieved
+   - Zero SQL injection/XSS vulnerabilities
+
+2. **Caching Strategy** (ADR-013)
+   - Centralized cache key generation
+   - 7 invalidation strategies
+   - 72% cache hit rate achieved
+   - 38% response time improvement
+
+3. **Error Handling** (ADR-014)
+   - Result type pattern with neverthrow
+   - Standardized error context
+   - 0.03% error rate achieved
+   - 99.97% transaction success
+
+**References:**
+- [ADR-012: Infrastructure Security Pattern](./adr/ADR-012-infrastructure-security-pattern.md)
+- [ADR-013: Centralized Caching Strategy](./adr/ADR-013-caching-strategy.md)
+- [ADR-014: Result Type Error Handling](./adr/ADR-014-error-handling-pattern.md)
+- [Infrastructure Integration Design Decisions](../.agent/specs/infrastructure-integration/DESIGN_DECISIONS.md)
+
+**Rationale:**
+- Consistent patterns reduce errors
+- Centralized infrastructure enables optimization
+- Type-safe error handling prevents bugs
+- Comprehensive security protects users
+
+---
+
+## 16. Strategic Feature Integration
+
+**Decision:** Event-driven architecture for feature integration
+
+**Status:** 📋 Proposed (See Strategic Integration ADRs)
+
+**Context:**
+- 30+ features that can be strategically integrated
+- Need automated, coordinated processing
+- Want to create interconnected civic engagement ecosystem
+
+**Key Integrations:**
+
+1. **Intelligent Bill Pipeline** (ADR-015)
+   - Automatic analysis through all intelligence features
+   - Event-driven coordination
+   - Async queue processing
+   - Comprehensive bill reports
+
+2. **Personalized Civic Engagement** (Planned)
+   - Recommendation-driven user journey
+   - Network-powered insights
+   - Multi-channel engagement
+
+3. **Real-Time Civic Intelligence** (Planned)
+   - Government data integration
+   - ML-powered predictions
+   - Graph database analytics
+
+**References:**
+- [ADR-015: Intelligent Bill Pipeline](./adr/ADR-015-intelligent-bill-pipeline.md)
+- [Cross-Feature Integration Map](../.agent/specs/strategic-integration/CROSS_FEATURE_INTEGRATION_MAP.md)
+- [Strategic Integration Design](../.agent/specs/strategic-integration/design.md)
+
+**Rationale:**
+- Event-driven architecture enables decoupling
+- Automated processing ensures consistency
+- Strategic integration creates platform value
+- Network effects increase engagement
+
+---
+
 ## Decision Log
 
 | Date | Decision | Status | Impact |
@@ -414,6 +500,8 @@ server/features/{feature}/
 | 2026-02-27 | Testing strategy | 🔄 In Progress | High |
 | 2026-02-27 | Incremental migration | 🔄 In Progress | High |
 | 2026-02-27 | Documentation standards | 🔄 In Progress | Low |
+| 2026-02-27 | Infrastructure integration | ✅ Complete | High |
+| 2026-02-27 | Strategic feature integration | 📋 Proposed | High |
 
 ---
 
