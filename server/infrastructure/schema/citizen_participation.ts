@@ -237,6 +237,57 @@ export const comment_votes = pgTable("comment_votes", {
 }));
 
 // ============================================================================
+// ARGUMENT ANALYSIS - AI-powered argument quality assessment
+// ============================================================================
+
+export const argument_analysis = pgTable("argument_analysis", {
+  id: primaryKeyUuid(),
+  comment_id: uuid("comment_id").notNull().unique().references(() => comments.id, { onDelete: "cascade" }),
+
+  // Quality Metrics (0.0 to 1.0 scale, except overall_score which is 0-10)
+  quality_score: numeric("quality_score", { precision: 3, scale: 1 }).notNull(), // 0.0 to 10.0
+  evidence_strength: numeric("evidence_strength", { precision: 3, scale: 2 }), // 0.00 to 1.00
+  logical_validity: numeric("logical_validity", { precision: 3, scale: 2 }), // 0.00 to 1.00
+  clarity: numeric("clarity", { precision: 3, scale: 2 }), // 0.00 to 1.00
+  relevance: numeric("relevance", { precision: 3, scale: 2 }), // 0.00 to 1.00
+
+  // Structured Analysis (JSONB for flexibility)
+  detected_fallacies: jsonb("detected_fallacies").notNull().default(sql`'[]'::jsonb`),
+  claims: jsonb("claims").notNull().default(sql`'[]'::jsonb`),
+  evidence: jsonb("evidence").notNull().default(sql`'[]'::jsonb`),
+  suggested_improvements: jsonb("suggested_improvements").notNull().default(sql`'[]'::jsonb`),
+
+  // Metadata
+  reasoning_type: varchar("reasoning_type", { length: 50 }), // 'deductive', 'inductive', 'unclear'
+  coherence_score: numeric("coherence_score", { precision: 3, scale: 2 }), // 0.00 to 1.00
+
+  // Timestamps
+  analyzed_at: timestamp("analyzed_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => ({
+  // Primary lookup: Get analysis for a comment
+  commentIdIdx: index("idx_argument_analysis_comment_id").on(table.comment_id),
+
+  // Quality filtering: Find high-quality arguments
+  qualityScoreIdx: index("idx_argument_analysis_quality_score").on(table.quality_score.desc()),
+
+  // Evidence-based filtering
+  evidenceStrengthIdx: index("idx_argument_analysis_evidence_strength").on(table.evidence_strength.desc()),
+
+  // GIN indexes for JSONB queries
+  fallaciesGinIdx: index("idx_argument_analysis_fallacies").using("gin", table.detected_fallacies),
+  claimsGinIdx: index("idx_argument_analysis_claims").using("gin", table.claims),
+
+  // Data validation
+  qualityScoreCheck: check("quality_score_range", sql`${table.quality_score} BETWEEN 0 AND 10`),
+  evidenceCheck: check("evidence_range", sql`${table.evidence_strength} BETWEEN 0 AND 1`),
+  logicalCheck: check("logical_range", sql`${table.logical_validity} BETWEEN 0 AND 1`),
+  clarityCheck: check("clarity_range", sql`${table.clarity} BETWEEN 0 AND 1`),
+  relevanceCheck: check("relevance_range", sql`${table.relevance} BETWEEN 0 AND 1`),
+  coherenceCheck: check("coherence_range", sql`${table.coherence_score} BETWEEN 0 AND 1`),
+}));
+
+// ============================================================================
 // BILL VOTES - Direct democratic input on legislation
 // ============================================================================
 
@@ -623,6 +674,10 @@ export const commentsRelations = relations(comments, ({ one, many }) => ({
     relationName: "comment_thread",
   }),
   votes: many(comment_votes),
+  argumentAnalysis: one(argument_analysis, {
+    fields: [comments.id],
+    references: [argument_analysis.comment_id],
+  }),
   moderatedBy: one(users, {
     fields: [comments.moderated_by],
     references: [users.id],
@@ -639,6 +694,13 @@ export const commentVotesRelations = relations(comment_votes, ({ one }) => ({
   user: one(users, {
     fields: [comment_votes.user_id],
     references: [users.id],
+  }),
+}));
+
+export const argumentAnalysisRelations = relations(argument_analysis, ({ one }) => ({
+  comment: one(comments, {
+    fields: [argument_analysis.comment_id],
+    references: [comments.id],
   }),
 }));
 
@@ -722,6 +784,9 @@ export type NewComment = typeof comments.$inferInsert;
 
 export type CommentVote = typeof comment_votes.$inferSelect;
 export type NewCommentVote = typeof comment_votes.$inferInsert;
+
+export type ArgumentAnalysis = typeof argument_analysis.$inferSelect;
+export type NewArgumentAnalysis = typeof argument_analysis.$inferInsert;
 
 export type BillVote = typeof bill_votes.$inferSelect;
 export type NewBillVote = typeof bill_votes.$inferInsert;

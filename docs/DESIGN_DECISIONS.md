@@ -426,17 +426,41 @@ server/features/{feature}/
    - 0.03% error rate achieved
    - 99.97% transaction success
 
+4. **Naming Conventions** (ADR-016)
+   - No "Enhanced" prefixes
+   - PascalCase for files and classes
+   - Consistent export naming
+
+5. **Repository Pattern** (ADR-017)
+   - Clear data access pattern hierarchy
+   - Repository for complex queries
+   - Direct Drizzle for simple operations
+
+6. **Feature Boundaries** (ADR-018)
+   - Analytics → engagement-metrics
+   - Analysis → bill-assessment
+   - New: ml-intelligence, financial-oversight
+
+7. **Infrastructure Cleanup** (ADR-019)
+   - Remove orphaned components
+   - Deprecate facades
+   - Promote under-utilized infrastructure
+
 **References:**
 - [ADR-012: Infrastructure Security Pattern](./adr/ADR-012-infrastructure-security-pattern.md)
 - [ADR-013: Centralized Caching Strategy](./adr/ADR-013-caching-strategy.md)
 - [ADR-014: Result Type Error Handling](./adr/ADR-014-error-handling-pattern.md)
-- [Infrastructure Integration Design Decisions](../.agent/specs/infrastructure-integration/DESIGN_DECISIONS.md)
+- [ADR-016: Naming Convention Standardization](./adr/ADR-016-naming-conventions.md)
+- [ADR-017: Repository Pattern Standardization](./adr/ADR-017-repository-pattern-standardization.md)
+- [ADR-018: Analytics vs Analysis Separation](./adr/ADR-018-analytics-analysis-separation.md)
+- [ADR-019: Orphaned Infrastructure Cleanup](./adr/ADR-019-orphaned-infrastructure-cleanup.md)
 
 **Rationale:**
 - Consistent patterns reduce errors
 - Centralized infrastructure enables optimization
 - Type-safe error handling prevents bugs
 - Comprehensive security protects users
+- Clear boundaries improve maintainability
 
 ---
 

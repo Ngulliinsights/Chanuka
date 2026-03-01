@@ -512,7 +512,8 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     // Simulate API call - in real implementation, this would call the backend
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // Mock authentication logic
+        // Mock authentication logic - FOR DEVELOPMENT/TESTING ONLY
+        // TODO: Replace with actual backend API call
         if (credentials.email === 'test@example.com' && credentials.password === 'password123') {
           const user: AuthUser = {
             id: 'user_123',
@@ -840,7 +841,8 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   }
 
   private async verifyPassword(userId: string, password: string): Promise<boolean> {
-    // Mock password verification
+    // Mock password verification - FOR DEVELOPMENT/TESTING ONLY
+    // TODO: Replace with actual password hash verification
     return password === 'password123';
   }
 

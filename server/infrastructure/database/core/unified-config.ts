@@ -293,7 +293,9 @@ export class DatabaseConfigManager {
       port: 5432,
       database: 'chanuka_dev',
       user: 'postgres',
-      password: 'password',
+      password: process.env.DB_PASSWORD || (() => {
+        throw new Error('DB_PASSWORD environment variable is required for database connection');
+      })(),
       min: 2,
       max: 10,
       idleTimeoutMillis: 30000,

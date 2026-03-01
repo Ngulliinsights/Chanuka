@@ -7,6 +7,14 @@ import {
   generateSecurityTestData
 } from './test-utilities';
 
+/**
+ * Security Tests for SecureQueryBuilderService
+ * 
+ * NOTE: This file intentionally contains SQL injection patterns in test cases.
+ * These patterns are used to verify that the SecureQueryBuilderService properly
+ * prevents SQL injection attacks. The patterns are NOT vulnerabilities - they are
+ * test inputs that get sanitized by the service being tested.
+ */
 describe('SecureQueryBuilderService', () => {
   beforeEach(() => {
     secureQueryBuilderService.clearPerformanceMetrics();

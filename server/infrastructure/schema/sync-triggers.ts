@@ -469,21 +469,37 @@ export const initializeSyncTriggers = async <T extends { execute: (query: unknow
  * Drop all sync triggers (for cleanup/testing)
  */
 export const dropSyncTriggers = async <T extends { execute: (query: unknown) => Promise<unknown> }>(db: T) => {
-  const triggers = [
-    'users_sync_trigger', 'users_delete_trigger',
-    'sponsors_sync_trigger', 'sponsors_delete_trigger',
-    'governors_sync_trigger', 'governors_delete_trigger',
-    'bills_sync_trigger', 'bills_array_field_trigger', 'bills_delete_trigger',
-    'committees_sync_trigger', 'committees_delete_trigger',
-    'arguments_sync_trigger', 'arguments_array_field_trigger', 'arguments_delete_trigger',
-    'claims_sync_trigger', 'claims_array_field_trigger', 'claims_delete_trigger',
-    'parliamentary_sessions_sync_trigger', 'parliamentary_sessions_delete_trigger',
-    'parliamentary_sittings_sync_trigger', 'parliamentary_sittings_array_field_trigger', 'parliamentary_sittings_delete_trigger',
-  ];
+  // Map triggers to their respective tables
+  const triggerTableMap: Record<string, string> = {
+    'users_sync_trigger': 'users',
+    'users_delete_trigger': 'users',
+    'sponsors_sync_trigger': 'sponsors',
+    'sponsors_delete_trigger': 'sponsors',
+    'governors_sync_trigger': 'governors',
+    'governors_delete_trigger': 'governors',
+    'bills_sync_trigger': 'bills',
+    'bills_array_field_trigger': 'bills',
+    'bills_delete_trigger': 'bills',
+    'committees_sync_trigger': 'committees',
+    'committees_delete_trigger': 'committees',
+    'arguments_sync_trigger': 'arguments',
+    'arguments_array_field_trigger': 'arguments',
+    'arguments_delete_trigger': 'arguments',
+    'claims_sync_trigger': 'claims',
+    'claims_array_field_trigger': 'claims',
+    'claims_delete_trigger': 'claims',
+    'parliamentary_sessions_sync_trigger': 'parliamentary_sessions',
+    'parliamentary_sessions_delete_trigger': 'parliamentary_sessions',
+    'parliamentary_sittings_sync_trigger': 'parliamentary_sittings',
+    'parliamentary_sittings_array_field_trigger': 'parliamentary_sittings',
+    'parliamentary_sittings_delete_trigger': 'parliamentary_sittings',
+  };
 
-  for (const trigger of triggers) {
+  for (const [trigger, table] of Object.entries(triggerTableMap)) {
     try {
-      await db.execute(sql`DROP TRIGGER IF EXISTS ${sql.identifier(trigger)} ON ${sql.raw('users, sponsors, governors, bills, committees, arguments, claims, parliamentary_sessions, parliamentary_sittings')}`);
+      await db.execute(
+        sql`DROP TRIGGER IF EXISTS ${sql.identifier(trigger)} ON ${sql.identifier(table)}`
+      );
     } catch (error) {
       // Silently ignore errors
     }

@@ -1,6 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
-import { searchAnalytics,searchQueries } from '@server/infrastructure/schema/advanced_discovery';
+import { searchAnalytics, searchQueries } from '@server/infrastructure/schema/advanced_discovery';
+import { sql, and, like, gte, desc, eq, lt } from 'drizzle-orm';
 
 import type { SearchQuery, SearchResponseDto } from './search.dto';
 
@@ -89,29 +90,111 @@ export class SearchAnalytics {
    * Get search metrics for a time period
    */
   static async getSearchMetrics(
-    _startDate: Date,
-    _endDate: Date
+    startDate: Date,
+    endDate: Date
   ): Promise<SearchMetrics> {
-    // Placeholder implementation - in production this would query the database
-    // For now, return mock data to demonstrate the API structure
-    return {
-      totalSearches: 1250,
-      uniqueUsers: 340,
-      averageSearchTime: 245,
-      cacheHitRate: 0.75,
-      popularQueries: [
-        { query: 'healthcare reform', count: 45, averageResults: 12 },
-        { query: 'climate change', count: 38, averageResults: 15 },
-        { query: 'education funding', count: 32, averageResults: 8 },
-        { query: 'tax policy', count: 28, averageResults: 10 },
-        { query: 'infrastructure', count: 25, averageResults: 18 },
-      ],
-      noResultQueries: [
-        { query: 'nonexistent topic', count: 5 },
-        { query: 'invalid search', count: 3 },
-      ],
-      timeRange: { start: _startDate, end: _endDate },
-    };
+    try {
+      // Get total searches
+      const totalSearchesResult = await readDatabase
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(searchQueries)
+        .where(
+          and(
+            gte(searchQueries.createdAt, startDate),
+            lt(searchQueries.createdAt, endDate)
+          )
+        );
+
+      // Get unique users
+      const uniqueUsersResult = await readDatabase
+        .select({ count: sql<number>`COUNT(DISTINCT ${searchQueries.userId})` })
+        .from(searchQueries)
+        .where(
+          and(
+            gte(searchQueries.createdAt, startDate),
+            lt(searchQueries.createdAt, endDate),
+            sql`${searchQueries.userId} IS NOT NULL`
+          )
+        );
+
+      // Get average search time from analytics
+      const avgSearchTimeResult = await readDatabase
+        .select({ avg: sql<number>`AVG(${searchAnalytics.analyticsValue})` })
+        .from(searchAnalytics)
+        .innerJoin(searchQueries, eq(searchAnalytics.queryId, searchQueries.id))
+        .where(
+          and(
+            eq(searchAnalytics.analyticsType, 'search_performance'),
+            gte(searchQueries.createdAt, startDate),
+            lt(searchQueries.createdAt, endDate)
+          )
+        );
+
+      // Get popular queries
+      const popularQueriesResult = await readDatabase
+        .select({
+          query: searchQueries.queryText,
+          count: sql<number>`COUNT(*)`,
+          averageResults: sql<number>`AVG(${searchQueries.resultsReturned})`,
+        })
+        .from(searchQueries)
+        .where(
+          and(
+            gte(searchQueries.createdAt, startDate),
+            lt(searchQueries.createdAt, endDate)
+          )
+        )
+        .groupBy(searchQueries.queryText)
+        .orderBy(desc(sql`COUNT(*)`))
+        .limit(10);
+
+      // Get no-result queries
+      const noResultQueriesResult = await readDatabase
+        .select({
+          query: searchQueries.queryText,
+          count: sql<number>`COUNT(*)`,
+        })
+        .from(searchQueries)
+        .where(
+          and(
+            gte(searchQueries.createdAt, startDate),
+            lt(searchQueries.createdAt, endDate),
+            eq(searchQueries.resultsReturned, 0)
+          )
+        )
+        .groupBy(searchQueries.queryText)
+        .orderBy(desc(sql`COUNT(*)`))
+        .limit(10);
+
+      return {
+        totalSearches: totalSearchesResult[0]?.count || 0,
+        uniqueUsers: uniqueUsersResult[0]?.count || 0,
+        averageSearchTime: Math.round(avgSearchTimeResult[0]?.avg || 0),
+        cacheHitRate: 0, // TODO: Implement cache hit rate tracking
+        popularQueries: popularQueriesResult.map(row => ({
+          query: row.query,
+          count: row.count,
+          averageResults: Math.round(row.averageResults),
+        })),
+        noResultQueries: noResultQueriesResult.map(row => ({
+          query: row.query,
+          count: row.count,
+        })),
+        timeRange: { start: startDate, end: endDate },
+      };
+    } catch (error) {
+      logger.error({ error: String(error), startDate, endDate }, 'Failed to get search metrics');
+      // Return empty metrics on error
+      return {
+        totalSearches: 0,
+        uniqueUsers: 0,
+        averageSearchTime: 0,
+        cacheHitRate: 0,
+        popularQueries: [],
+        noResultQueries: [],
+        timeRange: { start: startDate, end: endDate },
+      };
+    }
   }
 
   /**
@@ -200,53 +283,110 @@ export class SearchAnalytics {
     eventId: string,
     bill_id: number,
     position: number
-  ): Promise<void> { // Placeholder - in real implementation, update database
-    console.log(`Recording click on bill ${bill_id} at position ${position} for event ${eventId}`);
+  ): Promise<void> {
+    try {
+      // Update the search analytics with click information
+      await readDatabase
+        .update(searchAnalytics)
+        .set({
+          analyticsMetadata: {
+            clickedBillId: bill_id,
+            clickPosition: position,
+            clickTimestamp: new Date(),
+          },
+        })
+        .where(eq(searchAnalytics.id, eventId));
+
+      logger.debug({ eventId, bill_id, position }, 'Recorded search result click');
+    } catch (error) {
+      logger.error({ error: String(error), eventId, bill_id }, 'Failed to record click event');
+      // Don't throw - analytics failures shouldn't break user experience
+    }
   }
 
   private static async getPopularQueriesStartingWith(
     prefix: string,
     limit: number
   ): Promise<Array<{ term: string; frequency: number; type: 'popular' | 'recent' | 'trending' }>> {
-    // Placeholder - return some example popular queries
-    const popular = [
-      'healthcare reform',
-      'climate change',
-      'education funding',
-      'tax policy',
-      'infrastructure',
-    ].filter(term => term.toLowerCase().startsWith(prefix.toLowerCase()));
+    try {
+      // Query database for popular queries matching prefix
+      const result = await readDatabase
+        .select({
+          term: searchQueries.queryText,
+          frequency: sql<number>`COUNT(*)`,
+        })
+        .from(searchQueries)
+        .where(
+          and(
+            like(searchQueries.queryText, `${prefix}%`),
+            gte(searchQueries.createdAt, sql`NOW() - INTERVAL '30 days'`)
+          )
+        )
+        .groupBy(searchQueries.queryText)
+        .orderBy(desc(sql`COUNT(*)`))
+        .limit(limit);
 
-    return popular.slice(0, limit).map(term => ({
-      term,
-      frequency: Math.floor(Math.random() * 100) + 10,
-      type: 'popular' as const,
-    }));
+      return result.map(row => ({
+        term: row.term,
+        frequency: row.frequency,
+        type: 'popular' as const,
+      }));
+    } catch (error) {
+      logger.error({ error: String(error), prefix }, 'Failed to get popular queries');
+      return [];
+    }
   }
 
   private static async getRecentQueriesStartingWith(
     prefix: string,
     limit: number
   ): Promise<Array<{ term: string; frequency: number; type: 'popular' | 'recent' | 'trending' }>> {
-    // Placeholder - return some example recent queries
-    const recent = [
-      'artificial intelligence',
-      'renewable energy',
-      'social security',
-      'voting rights',
-    ].filter(term => term.toLowerCase().startsWith(prefix.toLowerCase()));
+    try {
+      // Query database for recent queries matching prefix
+      const result = await readDatabase
+        .select({
+          term: searchQueries.queryText,
+          frequency: sql<number>`COUNT(*)`,
+        })
+        .from(searchQueries)
+        .where(
+          and(
+            like(searchQueries.queryText, `${prefix}%`),
+            gte(searchQueries.createdAt, sql`NOW() - INTERVAL '24 hours'`)
+          )
+        )
+        .groupBy(searchQueries.queryText)
+        .orderBy(desc(searchQueries.createdAt))
+        .limit(limit);
 
-    return recent.slice(0, limit).map(term => ({
-      term,
-      frequency: Math.floor(Math.random() * 20) + 1,
-      type: 'recent' as const,
-    }));
+      return result.map(row => ({
+        term: row.term,
+        frequency: row.frequency,
+        type: 'recent' as const,
+      }));
+    } catch (error) {
+      logger.error({ error: String(error), prefix }, 'Failed to get recent queries');
+      return [];
+    }
   }
 
   private static async deleteEventsOlderThan(cutoffDate: Date): Promise<number> {
-    // Placeholder - in real implementation, delete from database
-    console.log(`Cleaning up analytics data older than ${cutoffDate.toISOString()}`);
-    return 0;
+    try {
+      // Delete old search queries and their analytics
+      const result = await readDatabase
+        .delete(searchQueries)
+        .where(lt(searchQueries.createdAt, cutoffDate))
+        .returning({ id: searchQueries.id });
+
+      const deletedCount = result.length;
+      
+      logger.info({ deletedCount, cutoffDate }, 'Cleaned up old search analytics data');
+      
+      return deletedCount;
+    } catch (error) {
+      logger.error({ error: String(error), cutoffDate }, 'Failed to cleanup old analytics data');
+      return 0;
+    }
   }
 }
 

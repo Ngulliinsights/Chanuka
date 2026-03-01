@@ -245,7 +245,12 @@ export class BillRepository extends BaseRepository<Bill> {
 
         // Exclude specific IDs if provided
         if (options?.excludeIds && options.excludeIds.length > 0) {
-          baseQuery = baseQuery.where(sql`${bills.id} NOT IN (${sql.raw(options.excludeIds.join(','))})`);
+          // Use proper parameterization for array values
+          const idArray = sql.join(
+            options.excludeIds.map(id => sql`${id}`),
+            sql`, `
+          );
+          baseQuery = baseQuery.where(sql`${bills.id} NOT IN (${idArray})`);
         }
 
         // Sort by view count

@@ -27,8 +27,15 @@ interface BulkOperationResult<T> {
 
 /**
  * Secure Query Builder Application Service
- * Provides parameterized query building and input validation to prevent SQL injection
- * Enhanced with support for complex queries, bulk operations, and performance monitoring
+ * 
+ * @deprecated This version has critical SQL injection vulnerabilities.
+ * Use SecureQueryBuilderService V2 instead:
+ * @see server/features/security/application/services/secure-query-builder.service.v2.ts
+ * 
+ * SECURITY WARNING: This file uses sql.raw() which bypasses parameterization.
+ * It is kept for backward compatibility only and should not be used in new code.
+ * 
+ * Migration Guide: docs/SECURE_QUERY_BUILDER_MIGRATION_GUIDE.md
  */
 export class SecureQueryBuilderService {
   private static instance: SecureQueryBuilderService;

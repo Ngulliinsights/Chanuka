@@ -1,7 +1,6 @@
 import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
 import { readDatabase } from '@server/infrastructure/database/index';
 import { logger } from '@server/infrastructure/observability';
-import { sql } from 'drizzle-orm';
 
 export interface ValidationResult {
   tableName: string;
@@ -285,18 +284,17 @@ export class SchemaValidationService {
     try {
       const database = readDatabase;
       const result = await database.execute(
-        sql.raw(`
-          SELECT EXISTS (
-            SELECT FROM information_schema.tables
-            WHERE table_schema = 'public'
-            AND table_name = '${tableName}'
-          );
-        `) as unknown as string
+        `SELECT EXISTS (
+          SELECT FROM information_schema.tables
+          WHERE table_schema = 'public'
+          AND table_name = $1
+        );`,
+        [tableName]
       ) as { rows: Array<{ exists: boolean }> };
       
       return result.rows[0]?.exists === true;
     } catch (error) {
-      console.error(`Error checking if table ${tableName} exists:`, error);
+      logger.error({ error: String(error), tableName }, 'Error checking if table exists');
       return false;
     }
   }
@@ -305,18 +303,17 @@ export class SchemaValidationService {
     try {
       const database = readDatabase;
       const result = await database.execute(
-        sql.raw(`
-          SELECT column_name, data_type, is_nullable, column_default
-          FROM information_schema.columns
-          WHERE table_schema = 'public'
-          AND table_name = '${tableName}'
-          ORDER BY ordinal_position;
-        `) as unknown as string
+        `SELECT column_name, data_type, is_nullable, column_default
+        FROM information_schema.columns
+        WHERE table_schema = 'public'
+        AND table_name = $1
+        ORDER BY ordinal_position;`,
+        [tableName]
       ) as { rows: Array<{ column_name: string; data_type: string; is_nullable: string; column_default: string | null }> };
       
       return result.rows;
     } catch (error) {
-      console.error(`Error getting columns for table ${tableName}:`, error);
+      logger.error({ error: String(error), tableName }, 'Error getting columns for table');
       return [];
     }
   }
@@ -435,10 +432,8 @@ export class SchemaValidationService {
       try {
         const database = readDatabase;
         await database.execute(
-          sql.raw(`
-            ALTER TABLE compliance_checks
-            ADD COLUMN IF NOT EXISTS next_check TIMESTAMP;
-          `) as unknown as string
+          `ALTER TABLE compliance_checks
+          ADD COLUMN IF NOT EXISTS next_check TIMESTAMP;`
         );
         logger.info({ component: 'Chanuka' }, '✅ Added next_check column to compliance_checks table');
         return true;
@@ -452,10 +447,8 @@ export class SchemaValidationService {
       try {
         const database = readDatabase;
         await database.execute(
-          sql.raw(`
-            ALTER TABLE security_audit_logs
-            ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
-          `) as unknown as string
+          `ALTER TABLE security_audit_logs
+          ADD COLUMN IF NOT EXISTS timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP;`
         );
         logger.info({ component: 'Chanuka' }, '✅ Added timestamp column to security_audit_logs table');
         return true;
@@ -469,10 +462,8 @@ export class SchemaValidationService {
       try {
         const database = readDatabase;
         await database.execute(
-          sql.raw(`
-            ALTER TABLE threat_intelligence
-            ADD COLUMN IF NOT EXISTS ip_address TEXT NOT NULL DEFAULT '';
-          `) as unknown as string
+          `ALTER TABLE threat_intelligence
+          ADD COLUMN IF NOT EXISTS ip_address TEXT NOT NULL DEFAULT '';`
         );
         logger.info({ component: 'Chanuka' }, '✅ Added ip_address column to threat_intelligence table');
         return true;

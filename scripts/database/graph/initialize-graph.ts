@@ -20,7 +20,11 @@ async function main() {
   // Get configuration from environment
   const neo4jUri = process.env.NEO4J_URI || 'bolt://localhost:7687';
   const neo4jUsername = process.env.NEO4J_USERNAME || 'neo4j';
-  const neo4jPassword = process.env.NEO4J_PASSWORD || 'password';
+  const neo4jPassword = process.env.NEO4J_PASSWORD;
+  
+  if (!neo4jPassword) {
+    throw new Error('NEO4J_PASSWORD environment variable is required');
+  }
 
   console.log('Configuration:');
   console.log(`  URI: ${neo4jUri}`);

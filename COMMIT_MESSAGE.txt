@@ -1,0 +1,47 @@
+docs: Extract design decisions into ADRs and consolidate documentation
+
+## Summary
+Extracted design decisions from sprawling audit documents into proper Architecture Decision Records (ADRs) and consolidated documentation structure.
+
+## Changes
+
+### New ADRs Created (4)
+- ADR-016: Naming Convention Standardization
+  * Remove "Enhanced" prefixes, standardize to PascalCase
+- ADR-017: Repository Pattern Standardization
+  * Clear data access pattern hierarchy with decision matrix
+- ADR-018: Analytics vs Analysis Feature Separation
+  * Restructure into 4 focused features (engagement-metrics, bill-assessment, ml-intelligence, financial-oversight)
+- ADR-019: Orphaned Infrastructure Component Cleanup
+  * Remove orphaned components, deprecate facades, promote under-utilized infrastructure
+
+### ADRs Relocated (2)
+- Moved ADR-001 and ADR-002 from docs/ to docs/adr/
+
+### Documentation Archived (4)
+- Moved audit documents to docs/archive/audits-2026-03/
+  * ANALYTICS_VS_ANALYSIS_AUDIT.md
+  * INFRASTRUCTURE_ARCHITECTURE_AUDIT.md
+  * FEATURE_MODERNIZATION_AUDIT.md
+  * REQUIREMENTS_AUDIT_ASSESSMENT.md
+
+### Documentation Updated
+- Updated docs/adr/README.md with all new ADRs (now 19 total)
+- Updated docs/DESIGN_DECISIONS.md to reference new ADRs
+- Created archive README explaining extraction mapping
+
+## Benefits
+- Single source of truth for architectural decisions
+- Reduced documentation sprawl (4 large audits archived)
+- Better discoverability with clear ADR index
+- Historical context preserved in archive
+- Consistent ADR format across all decisions
+
+## Validation
+✅ All 4 new ADRs created and validated
+✅ All cross-references updated
+✅ No information loss
+✅ Clear structure and navigation
+
+Files changed: 18 created/modified, 4 archived
+ADR count: 15 → 19 (+4 new)

@@ -56,7 +56,8 @@ async function resetDatabase() {
     // Drop each table individually
     for (const table of tables) {
       try {
-        await db.execute(sql.raw(`DROP TABLE IF EXISTS "${table.tablename}" CASCADE`));
+        // Use sql.identifier() for table names even though they come from the database
+        await db.execute(sql`DROP TABLE IF EXISTS ${sql.identifier(table.tablename)} CASCADE`);
         console.log(`  ✅ Dropped table: ${table.tablename}`);
       } catch (error) {
         console.log(`  ⚠️  Could not drop table ${table.tablename}: ${error}`);

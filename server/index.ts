@@ -18,7 +18,7 @@ import { translationRouter } from '@server/features/bills/translation-routes';
 import { actionPromptsRouter } from '@server/features/bills/action-prompts-routes';
 import { router as communityRouter } from '@server/features/community/community';
 import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/constitutional-analysis-router';
-import coverageRouter from '@server/features/coverage/coverage-routes';
+import coverageRouter from '@server/features/bills/presentation/http/coverage-routes';
 import { default as pretextDetectionRouter } from '@server/features/pretext-detection/application/pretext-detection.routes';
 import { router as privacyRouter } from '@server/features/privacy/application/privacy.routes';
 import { privacySchedulerService } from '@server/features/privacy/application/privacy-scheduler';

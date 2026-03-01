@@ -1,64 +1,38 @@
-import { billComprehensiveAnalysisService } from '@shared/application/bill-comprehensive-analysis.service';
-import { analysisService } from '@shared/application/analysis-service-direct';
-import { BaseError, ValidationError } from '@shared/core/errors';
-import { ErrorCode, ErrorDomain, ErrorSeverity  } from '@shared/core';
+import { analysisApplicationService } from './application/AnalysisApplicationService';
 import { logger } from '@server/infrastructure/observability';
-import { authenticateToken, requireAuth } from '../../../../AuthAlert';
+import { requireAuth } from '../../../../AuthAlert';
 import express, { Response } from 'express';
 import { asyncHandler } from '@server/middleware';
-import { createErrorContext } from '@server/infrastructure/error-handling';
 
 const router = express.Router();
 
 /**
  * GET /api/analysis/bills/:bill_id/comprehensive
  * Retrieve the latest comprehensive analysis result for a specific bill.
- * This endpoint triggers the analysis on-demand.
+ * This endpoint triggers the analysis on-demand with caching.
  */
 router.get('/bills/:bill_id/comprehensive', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /bills/:bill_id/comprehensive');
-  try {
-    const bill_id_str = req.params.bill_id;
-    if (!bill_id_str) {
-      throw new ValidationError('Bill ID is required', {
-        field: 'bill_id',
-        message: 'Bill ID route parameter is required'
-      });
-    }
-
-    const bill_id = parseInt(bill_id_str, 10);
-    if (isNaN(bill_id) || bill_id <= 0) {
-      throw new ValidationError('Invalid bill ID format', {
-        field: 'bill_id',
-        message: 'Bill ID must be a positive integer'
-      });
-    }
-
-    logger.info(`Request received for comprehensive analysis of bill ${bill_id}`, {
-      component: 'AnalysisRoutes',
-      context
+  const bill_id = parseInt(req.params.bill_id, 10);
+  
+  const result = await analysisApplicationService.analyzeBill({
+    bill_id,
+    force_reanalysis: req.query.force === 'true',
+    analysis_type: 'comprehensive',
+  });
+  
+  if (result.success) {
+    res.json({
+      success: true,
+      data: result.data,
+      metadata: {
+        source: 'analysis_service',
+        timestamp: new Date().toISOString(),
+      },
     });
-
-    const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
-
-    const metadata = {
-      source: 'live_analysis',
-      timestamp: new Date().toISOString(),
-      durationMs: Date.now() - req.startTime
-    };
-    res.json({ data: analysisResult, metadata });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) throw error;
-    logger.error('Failed to retrieve comprehensive analysis', {
-      component: 'AnalysisRoutes',
-      context
-    }, error as Error);
-    throw new BaseError('Failed to retrieve comprehensive analysis', {
-      statusCode: 500,
-      code: ErrorCode.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { bill_id: req.params.bill_id }
+  } else {
+    res.status(400).json({
+      success: false,
+      error: result.error,
     });
   }
 }));
@@ -69,69 +43,39 @@ router.get('/bills/:bill_id/comprehensive', asyncHandler(async (req, res: Respon
  * Requires admin role.
  */
 router.post('/bills/:bill_id/comprehensive/run', requireAuth, asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'POST /bills/:bill_id/comprehensive/run');
-  try {
-    // Authorization check
-    if (req.user?.role !== 'admin') {
-      logger.warn(`Unauthorized analysis trigger attempt by user ${req.user?.id}`, {
-        component: 'AnalysisRoutes',
-        context
-      });
-      throw new BaseError('Insufficient permissions to trigger analysis', {
-        statusCode: 403,
-        code: ErrorCode.ACCESS_DENIED,
-        domain: ErrorDomain.AUTHORIZATION,
-        severity: ErrorSeverity.MEDIUM,
-        details: { required_role: 'admin', user_id: req.user?.id }
-      });
-    }
-
-    const bill_id_str = req.params.bill_id;
-    if (!bill_id_str) {
-      throw new ValidationError('Bill ID is required', {
-        field: 'bill_id',
-        message: 'Bill ID route parameter is required'
-      });
-    }
-
-    const bill_id = parseInt(bill_id_str, 10);
-    if (isNaN(bill_id) || bill_id <= 0) {
-      throw new ValidationError('Invalid bill ID format', {
-        field: 'bill_id',
-        message: 'Bill ID must be a positive integer'
-      });
-    }
-
-    logger.info(`Admin trigger for comprehensive analysis of bill ${bill_id} by user ${req.user?.id}`, {
-      component: 'AnalysisRoutes',
-      context
+  // Authorization check
+  if (req.user?.role !== 'admin') {
+    logger.warn(`Unauthorized analysis trigger attempt by user ${req.user?.id}`);
+    return res.status(403).json({
+      success: false,
+      error: 'Insufficient permissions to trigger analysis',
     });
+  }
 
-    const analysisResult = await billComprehensiveAnalysisService.analyzeBill(bill_id);
-
-    const metadata = {
-      source: 'manual_trigger',
-      triggered_by: req.user?.id,
-      timestamp: new Date().toISOString()
-    };
+  const bill_id = parseInt(req.params.bill_id, 10);
+  
+  const result = await analysisApplicationService.triggerAnalysis({
+    bill_id,
+    analysis_type: 'comprehensive',
+    priority: req.body.priority || 'normal',
+    notify_on_complete: req.body.notify_on_complete || false,
+  });
+  
+  if (result.success) {
     res.status(201).json({
+      success: true,
       message: 'Analysis re-run completed successfully',
-      data: analysisResult,
-      metadata
+      data: result.data,
+      metadata: {
+        source: 'manual_trigger',
+        triggered_by: req.user?.id,
+        timestamp: new Date().toISOString(),
+      },
     });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) throw error;
-    logger.error('Analysis trigger failed', {
-      component: 'AnalysisRoutes',
-      context,
-      user_id: req.user?.id
-    }, error as Error);
-    throw new BaseError('Analysis trigger failed', {
-      statusCode: 500,
-      code: ErrorCode.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { bill_id: req.params.bill_id, user_id: req.user?.id }
+  } else {
+    res.status(400).json({
+      success: false,
+      error: result.error,
     });
   }
 }));
@@ -141,77 +85,33 @@ router.post('/bills/:bill_id/comprehensive/run', requireAuth, asyncHandler(async
  * Retrieve historical comprehensive analysis runs for a bill.
  */
 router.get('/bills/:bill_id/history', asyncHandler(async (req, res: Response) => {
-  const context = createErrorContext(req, 'GET /bills/:bill_id/history');
-  try {
-    const bill_id_str = req.params.bill_id;
-    if (!bill_id_str) {
-      throw new ValidationError('Bill ID is required', {
-        field: 'bill_id',
-        message: 'Bill ID route parameter is required'
-      });
-    }
-
-    const bill_id = parseInt(bill_id_str, 10);
-    if (isNaN(bill_id) || bill_id <= 0) {
-      throw new ValidationError('Invalid bill ID format', {
-        field: 'bill_id',
-        message: 'Bill ID must be a positive integer'
-      });
-    }
-
-    // Validate limit query parameter
-    let limit = 10; // Default limit
-    if (req.query.limit) {
-      const limitParam = req.query.limit as string;
-      const parsedLimit = parseInt(limitParam, 10);
-      if (isNaN(parsedLimit) || parsedLimit <= 0 || parsedLimit > 50) {
-        throw new ValidationError('Invalid limit parameter', {
-          field: 'limit',
-          message: 'Limit must be an integer between 1 and 50'
-        });
-      }
-      limit = parsedLimit;
-    }
-
-    const historyRecords = await analysisService.findHistoryByBillId(bill_id, limit);
-
-    // Transform results for frontend consumption
-    const historyResults = historyRecords.map((record: unknown) => {
-      const resultsData = record.results as unknown;
-      return {
-        dbId: record.id,
-        analysis_id: resultsData?.analysis_id,
-        timestamp: record.created_at,
-        version: resultsData?.version || record.analysis_type,
-        overallConfidence: parseFloat(record.confidence ?? '0'),
-        status: resultsData?.status || 'unknown',
-        scores: {
-          publicInterest: resultsData?.publicInterestScore?.score,
-          transparency: resultsData?.transparency_score?.overall,
-          constitutional: resultsData?.constitutionalAnalysis?.constitutionalityScore
-        }
-      };
+  const bill_id = parseInt(req.params.bill_id, 10);
+  const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 10;
+  const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
+  
+  const result = await analysisApplicationService.getAnalysisHistory({
+    bill_id,
+    limit,
+    offset,
+    analysis_type: (req.query.type as any) || 'all',
+  });
+  
+  if (result.success) {
+    res.json({
+      success: true,
+      data: {
+        history: result.data,
+        count: result.data.length,
+      },
+      metadata: {
+        source: 'database',
+        timestamp: new Date().toISOString(),
+      },
     });
-
-    const metadata = {
-      source: 'database',
-      timestamp: new Date().toISOString(),
-      count: historyResults.length
-    };
-    res.json({ data: { history: historyResults, count: historyResults.length }, metadata });
-  } catch (error) {
-    if (error instanceof ValidationError || error instanceof BaseError) throw error;
-    logger.error('Failed to retrieve analysis history', {
-      component: 'AnalysisRoutes',
-      context,
-      bill_id: req.params.bill_id
-    }, error as Error);
-    throw new BaseError('Failed to retrieve analysis history', {
-      statusCode: 500,
-      code: ErrorCode.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { bill_id: req.params.bill_id }
+  } else {
+    res.status(400).json({
+      success: false,
+      error: result.error,
     });
   }
 }));

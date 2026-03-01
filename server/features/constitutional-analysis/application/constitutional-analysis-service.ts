@@ -282,8 +282,13 @@ export class ConstitutionalAnalysisServiceComplete {
         // Filter by constitutional provisions if specified
         if (provisionIds.length > 0) {
           // schema column: `constitutional_provisions_involved`
+          // Use proper parameterization for array values
+          const provisionArray = sql.join(
+            provisionIds.map(id => sql`${id}::uuid`),
+            sql`, `
+          );
           conditions.push(
-            sql`${legal_precedents.constitutional_provisions_involved} && ARRAY[${sql.raw(provisionIds.map(id => `'${id}'`).join(','))}]::uuid[]`
+            sql`${legal_precedents.constitutional_provisions_involved} && ARRAY[${provisionArray}]`
           );
         }
 

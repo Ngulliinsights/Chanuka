@@ -1,189 +1,264 @@
 /**
  * Community Feature - Validation Schemas
+ * Integrated with Argument Intelligence
  * 
- * Zod schemas for validating community-related inputs (comments, posts, discussions).
- * Uses common schemas from validation helpers for consistency.
+ * Zod schemas for validating community interactions including
+ * comments, discussions, votes, and AI-powered argument analysis.
  */
 
 import { z } from 'zod';
 import { CommonSchemas } from '@server/infrastructure/validation/validation-helpers';
 
 // ============================================================================
-// Comment and Post Type Enums
-// ============================================================================
-
-export const CommentTypeSchema = z.enum([
-  'comment',
-  'reply',
-  'discussion',
-  'question',
-  'answer'
-]);
-
-export const ModerationStatusSchema = z.enum([
-  'pending',
-  'approved',
-  'rejected',
-  'flagged',
-  'removed'
-]);
-
-export const FlagReasonSchema = z.enum([
-  'spam',
-  'harassment',
-  'misinformation',
-  'off_topic',
-  'inappropriate',
-  'other'
-]);
-
-// ============================================================================
-// Comment Creation and Update Schemas
+// COMMENT SCHEMAS
 // ============================================================================
 
 export const CreateCommentSchema = z.object({
   bill_id: CommonSchemas.id,
-  content: z.string().min(1).max(5000).trim(),
+  content: z.string().min(10).max(5000),
   parent_id: CommonSchemas.id.optional(),
-  comment_type: CommentTypeSchema.default('comment'),
-  is_anonymous: z.boolean().default(false),
+  analyze_argument: z.boolean().default(true), // Enable AI analysis
 });
 
 export const UpdateCommentSchema = z.object({
-  content: z.string().min(1).max(5000).trim(),
+  comment_id: CommonSchemas.id,
+  content: z.string().min(10).max(5000),
+  reanalyze: z.boolean().default(true), // Re-run AI analysis
 });
 
 export const DeleteCommentSchema = z.object({
+  comment_id: CommonSchemas.id,
   reason: z.string().max(500).optional(),
 });
 
-// ============================================================================
-// Comment Interaction Schemas
-// ============================================================================
-
-export const LikeCommentSchema = z.object({
+export const GetCommentSchema = z.object({
   comment_id: CommonSchemas.id,
+  include_analysis: z.boolean().default(true),
+  include_related: z.boolean().default(true),
+  include_counter_arguments: z.boolean().default(true),
 });
-
-export const UnlikeCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-});
-
-export const EndorseCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-  endorsement_type: z.enum(['helpful', 'insightful', 'well_sourced', 'constructive']).optional(),
-});
-
-export const FlagCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-  reason: FlagReasonSchema,
-  details: z.string().max(1000).optional(),
-});
-
-// ============================================================================
-// Moderation Schemas
-// ============================================================================
-
-export const ModerateCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-  status: ModerationStatusSchema,
-  moderator_notes: z.string().max(1000).optional(),
-});
-
-export const HighlightCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-  highlight_reason: z.string().max(500).optional(),
-});
-
-export const UnhighlightCommentSchema = z.object({
-  comment_id: CommonSchemas.id,
-});
-
-// ============================================================================
-// Discussion Thread Schemas
-// ============================================================================
-
-export const CreateDiscussionSchema = z.object({
-  bill_id: CommonSchemas.id,
-  title: CommonSchemas.title,
-  content: z.string().min(10).max(10000).trim(),
-  tags: z.array(z.string().min(1).max(50)).max(10).optional(),
-  is_pinned: z.boolean().default(false),
-});
-
-export const UpdateDiscussionSchema = z.object({
-  title: CommonSchemas.title.optional(),
-  content: z.string().min(10).max(10000).trim().optional(),
-  tags: z.array(z.string().min(1).max(50)).max(10).optional(),
-  is_pinned: z.boolean().optional(),
-});
-
-// ============================================================================
-// Query and Filter Schemas
-// ============================================================================
 
 export const GetCommentsSchema = z.object({
   bill_id: CommonSchemas.id,
   parent_id: CommonSchemas.id.optional(),
-  comment_type: CommentTypeSchema.optional(),
-  highlighted: z.enum(['true', 'false']).transform(val => val === 'true').optional(),
-  sortBy: z.enum(['recent', 'popular', 'endorsements', 'controversial']).default('recent'),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
+  sort_by: z.enum(['recent', 'popular', 'quality', 'controversial']).default('quality'),
+  limit: CommonSchemas.limit.default(50),
+  offset: CommonSchemas.offset,
+  min_quality_score: z.number().min(0).max(10).optional(),
 });
 
-export const GetRepliesSchema = z.object({
+// ============================================================================
+// VOTING SCHEMAS
+// ============================================================================
+
+export const VoteCommentSchema = z.object({
   comment_id: CommonSchemas.id,
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
+  vote: z.enum(['up', 'down', 'remove']),
+  reason: z.string().max(200).optional(), // Helps AI learn
 });
 
-export const SearchCommentsSchema = z.object({
-  query: CommonSchemas.searchQuery,
-  bill_id: CommonSchemas.id.optional(),
-  user_id: CommonSchemas.id.optional(),
-  comment_type: CommentTypeSchema.optional(),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
+export const GetVoteStatsSchema = z.object({
+  comment_id: CommonSchemas.id,
 });
 
 // ============================================================================
-// Analytics Schemas
+// ARGUMENT ANALYSIS SCHEMAS
 // ============================================================================
 
-export const GetCommentStatsSchema = z.object({
-  bill_id: CommonSchemas.id.optional(),
-  user_id: CommonSchemas.id.optional(),
-  start_date: z.string().datetime().optional(),
-  end_date: z.string().datetime().optional(),
+export const ArgumentClaimSchema = z.object({
+  text: z.string().min(5).max(500),
+  type: z.enum(['factual', 'value', 'policy']),
+  confidence: z.number().min(0).max(1),
 });
 
-export const GetTrendingDiscussionsSchema = z.object({
-  timeframe: z.enum(['day', 'week', 'month', 'all']).default('week'),
-  limit: CommonSchemas.limit.optional(),
+export const ArgumentEvidenceSchema = z.object({
+  text: z.string().min(10).max(1000),
+  source: z.string().max(500).optional(),
+  source_type: z.enum(['citation', 'data', 'expert', 'anecdote', 'none']),
+  strength: z.number().min(0).max(1),
+  verified: z.boolean().default(false),
+});
+
+export const ArgumentFallacySchema = z.object({
+  type: z.enum([
+    'ad_hominem',
+    'straw_man',
+    'false_dichotomy',
+    'slippery_slope',
+    'appeal_to_authority',
+    'appeal_to_emotion',
+    'hasty_generalization',
+    'circular_reasoning',
+    'red_herring',
+    'false_cause',
+    'none'
+  ]),
+  description: z.string().max(500),
+  severity: z.enum(['low', 'medium', 'high']),
+  location: z.string().max(200), // Where in the comment
+});
+
+export const ArgumentStructureSchema = z.object({
+  claims: z.array(ArgumentClaimSchema),
+  evidence: z.array(ArgumentEvidenceSchema),
+  fallacies: z.array(ArgumentFallacySchema),
+  reasoning_type: z.enum(['deductive', 'inductive', 'abductive', 'analogical', 'unclear']),
+  coherence_score: z.number().min(0).max(1),
+});
+
+export const ArgumentQualityMetricsSchema = z.object({
+  overall_score: z.number().min(0).max(10),
+  evidence_strength: z.number().min(0).max(1),
+  logical_validity: z.number().min(0).max(1),
+  clarity: z.number().min(0).max(1),
+  relevance: z.number().min(0).max(1),
+  fallacy_penalty: z.number().min(0).max(1),
+});
+
+export const ArgumentAnalysisSchema = z.object({
+  comment_id: CommonSchemas.id,
+  structure: ArgumentStructureSchema,
+  quality_metrics: ArgumentQualityMetricsSchema,
+  related_arguments: z.array(CommonSchemas.id),
+  counter_arguments: z.array(CommonSchemas.id),
+  suggested_improvements: z.array(z.string().max(200)),
+  analyzed_at: z.date(),
 });
 
 // ============================================================================
-// Type Exports
+// ARGUMENT INTELLIGENCE OPERATIONS
+// ============================================================================
+
+export const AnalyzeCommentSchema = z.object({
+  comment_id: CommonSchemas.id,
+  force_reanalysis: z.boolean().default(false),
+});
+
+export const FindRelatedArgumentsSchema = z.object({
+  comment_id: CommonSchemas.id,
+  similarity_threshold: z.number().min(0).max(1).default(0.7),
+  limit: CommonSchemas.limit.default(10),
+});
+
+export const FindCounterArgumentsSchema = z.object({
+  comment_id: CommonSchemas.id,
+  limit: CommonSchemas.limit.default(5),
+});
+
+export const GetArgumentClustersSchema = z.object({
+  bill_id: CommonSchemas.id,
+  min_cluster_size: z.number().int().min(2).default(3),
+  max_clusters: z.number().int().min(1).max(20).default(10),
+});
+
+// ============================================================================
+// DEBATE QUALITY SCHEMAS
+// ============================================================================
+
+export const GetDebateQualitySchema = z.object({
+  bill_id: CommonSchemas.id,
+  time_period: z.enum(['day', 'week', 'month', 'all']).default('all'),
+});
+
+export const DebateQualityMetricsSchema = z.object({
+  bill_id: CommonSchemas.id,
+  total_comments: z.number().int().min(0),
+  average_quality_score: z.number().min(0).max(10),
+  evidence_rate: z.number().min(0).max(1), // % with evidence
+  fallacy_rate: z.number().min(0).max(1), // % with fallacies
+  engagement_rate: z.number().min(0).max(1), // replies/comments
+  quality_distribution: z.object({
+    high: z.number().int().min(0), // 8-10
+    medium: z.number().int().min(0), // 5-7
+    low: z.number().int().min(0), // 0-4
+  }),
+  top_fallacies: z.array(z.object({
+    type: z.string(),
+    count: z.number().int().min(0),
+  })),
+  calculated_at: z.date(),
+});
+
+// ============================================================================
+// MODERATION SCHEMAS
+// ============================================================================
+
+export const FlagCommentSchema = z.object({
+  comment_id: CommonSchemas.id,
+  reason: z.enum([
+    'spam',
+    'harassment',
+    'misinformation',
+    'off_topic',
+    'inappropriate',
+    'other'
+  ]),
+  description: z.string().max(500).optional(),
+});
+
+export const GetFlaggedCommentsSchema = z.object({
+  status: z.enum(['pending', 'reviewed', 'resolved', 'all']).default('pending'),
+  limit: CommonSchemas.limit,
+  offset: CommonSchemas.offset,
+});
+
+// ============================================================================
+// DISCUSSION THREAD SCHEMAS
+// ============================================================================
+
+export const GetDiscussionThreadSchema = z.object({
+  comment_id: CommonSchemas.id, // Root comment
+  max_depth: z.number().int().min(1).max(10).default(5),
+  include_analysis: z.boolean().default(true),
+});
+
+export const GetDiscussionStatsSchema = z.object({
+  bill_id: CommonSchemas.id,
+});
+
+// ============================================================================
+// USER ENGAGEMENT SCHEMAS
+// ============================================================================
+
+export const GetUserCommentsSchema = z.object({
+  user_id: CommonSchemas.id,
+  limit: CommonSchemas.limit,
+  offset: CommonSchemas.offset,
+  include_analysis: z.boolean().default(false),
+});
+
+export const GetUserArgumentQualitySchema = z.object({
+  user_id: CommonSchemas.id,
+  time_period: z.enum(['week', 'month', 'year', 'all']).default('all'),
+});
+
+// ============================================================================
+// TYPE EXPORTS
 // ============================================================================
 
 export type CreateCommentInput = z.infer<typeof CreateCommentSchema>;
 export type UpdateCommentInput = z.infer<typeof UpdateCommentSchema>;
 export type DeleteCommentInput = z.infer<typeof DeleteCommentSchema>;
-export type LikeCommentInput = z.infer<typeof LikeCommentSchema>;
-export type UnlikeCommentInput = z.infer<typeof UnlikeCommentSchema>;
-export type EndorseCommentInput = z.infer<typeof EndorseCommentSchema>;
-export type FlagCommentInput = z.infer<typeof FlagCommentSchema>;
-export type ModerateCommentInput = z.infer<typeof ModerateCommentSchema>;
-export type HighlightCommentInput = z.infer<typeof HighlightCommentSchema>;
-export type UnhighlightCommentInput = z.infer<typeof UnhighlightCommentSchema>;
-export type CreateDiscussionInput = z.infer<typeof CreateDiscussionSchema>;
-export type UpdateDiscussionInput = z.infer<typeof UpdateDiscussionSchema>;
+export type GetCommentInput = z.infer<typeof GetCommentSchema>;
 export type GetCommentsInput = z.infer<typeof GetCommentsSchema>;
-export type GetRepliesInput = z.infer<typeof GetRepliesSchema>;
-export type SearchCommentsInput = z.infer<typeof SearchCommentsSchema>;
-export type GetCommentStatsInput = z.infer<typeof GetCommentStatsSchema>;
-export type GetTrendingDiscussionsInput = z.infer<typeof GetTrendingDiscussionsSchema>;
-export type CommentType = z.infer<typeof CommentTypeSchema>;
-export type ModerationStatus = z.infer<typeof ModerationStatusSchema>;
-export type FlagReason = z.infer<typeof FlagReasonSchema>;
+export type VoteCommentInput = z.infer<typeof VoteCommentSchema>;
+export type GetVoteStatsInput = z.infer<typeof GetVoteStatsSchema>;
+export type AnalyzeCommentInput = z.infer<typeof AnalyzeCommentSchema>;
+export type FindRelatedArgumentsInput = z.infer<typeof FindRelatedArgumentsSchema>;
+export type FindCounterArgumentsInput = z.infer<typeof FindCounterArgumentsSchema>;
+export type GetArgumentClustersInput = z.infer<typeof GetArgumentClustersSchema>;
+export type GetDebateQualityInput = z.infer<typeof GetDebateQualitySchema>;
+export type FlagCommentInput = z.infer<typeof FlagCommentSchema>;
+export type GetFlaggedCommentsInput = z.infer<typeof GetFlaggedCommentsSchema>;
+export type GetDiscussionThreadInput = z.infer<typeof GetDiscussionThreadSchema>;
+export type GetDiscussionStatsInput = z.infer<typeof GetDiscussionStatsSchema>;
+export type GetUserCommentsInput = z.infer<typeof GetUserCommentsSchema>;
+export type GetUserArgumentQualityInput = z.infer<typeof GetUserArgumentQualitySchema>;
+
+export type ArgumentClaim = z.infer<typeof ArgumentClaimSchema>;
+export type ArgumentEvidence = z.infer<typeof ArgumentEvidenceSchema>;
+export type ArgumentFallacy = z.infer<typeof ArgumentFallacySchema>;
+export type ArgumentStructure = z.infer<typeof ArgumentStructureSchema>;
+export type ArgumentQualityMetrics = z.infer<typeof ArgumentQualityMetricsSchema>;
+export type ArgumentAnalysis = z.infer<typeof ArgumentAnalysisSchema>;
+export type DebateQualityMetrics = z.infer<typeof DebateQualityMetricsSchema>;

@@ -94,6 +94,30 @@ This directory contains Architecture Decision Records documenting significant ar
 **Date:** February 27, 2026  
 **Summary:** Proposes event-driven pipeline that automatically processes every bill through all intelligence features (Pretext Detection, Constitutional Intelligence, Market Intelligence, ML Prediction). Provides comprehensive analysis, automated transparency, and timely user notifications.
 
+### ADR-016: Naming Convention Standardization
+**File:** [ADR-016-naming-conventions.md](./ADR-016-naming-conventions.md)  
+**Status:** ✅ Accepted  
+**Date:** March 1, 2026  
+**Summary:** Establishes standardized naming conventions across all features. Removes "Enhanced" prefixes, standardizes file naming to PascalCase, and enforces consistent class/export naming patterns.
+
+### ADR-017: Repository Pattern Standardization
+**File:** [ADR-017-repository-pattern-standardization.md](./ADR-017-repository-pattern-standardization.md)  
+**Status:** ✅ Accepted  
+**Date:** March 1, 2026  
+**Summary:** Defines clear data access pattern hierarchy with decision matrix. Standardizes on Repository pattern for complex queries and direct Drizzle for simple operations. Deprecates Storage and Adapter patterns.
+
+### ADR-018: Analytics vs Analysis Feature Separation
+**File:** [ADR-018-analytics-analysis-separation.md](./ADR-018-analytics-analysis-separation.md)  
+**Status:** ✅ Accepted  
+**Date:** March 1, 2026  
+**Summary:** Restructures overlapping analytics/analysis features into four focused features: engagement-metrics (quantitative tracking), bill-assessment (qualitative evaluation), ml-intelligence (ML predictions), and financial-oversight (conflict detection).
+
+### ADR-019: Orphaned Infrastructure Component Cleanup
+**File:** [ADR-019-orphaned-infrastructure-cleanup.md](./ADR-019-orphaned-infrastructure-cleanup.md)  
+**Status:** ✅ Accepted  
+**Date:** March 1, 2026  
+**Summary:** Removes orphaned infrastructure components, deprecates misplaced facades, and promotes under-utilized infrastructure. Establishes clear component purposes and correct dependency direction.
+
 ## ADR Format
 
 Each ADR should follow this structure:

@@ -61,7 +61,14 @@ export class PretextDetectionService {
       const result = await this.analysisService.analyzeBill(input);
 
       // Save to database
-      await this.repository.saveAnalysis(result);
+      const saveResult = await this.repository.saveAnalysis(result);
+      if (saveResult.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: saveResult.error
+        }, 'Failed to save analysis');
+        // Continue - save failure shouldn't fail the analysis
+      }
 
       // Cache result
       await this.cache.set(input.billId, result);
@@ -131,7 +138,17 @@ export class PretextDetectionService {
    */
   async getAlerts(filters?: { status?: string; limit?: number }): Promise<PretextAlert[]> {
     try {
-      const alerts = await this.repository.getAlerts(filters);
+      const result = await this.repository.getAlerts(filters);
+      
+      if (result.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: result.error
+        }, 'Failed to get alerts');
+        throw result.error;
+      }
+
+      const alerts = result.value;
 
       await integrationMonitor.logEvent(
         'pretext-detection',
@@ -159,12 +176,20 @@ export class PretextDetectionService {
    */
   async reviewAlert(input: PretextReviewInput): Promise<void> {
     try {
-      await this.repository.updateAlertStatus(
+      const result = await this.repository.updateAlertStatus(
         input.alertId,
         input.status,
         input.reviewedBy,
         input.notes
       );
+
+      if (result.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: result.error
+        }, 'Failed to update alert status');
+        throw result.error;
+      }
 
       await integrationMonitor.logEvent(
         'pretext-detection',
@@ -194,12 +219,23 @@ export class PretextDetectionService {
    */
   private async createAlert(result: PretextAnalysisResult): Promise<void> {
     try {
-      const alert = await this.repository.createAlert({
+      const alertResult = await this.repository.createAlert({
         billId: result.billId,
         detections: result.detections,
         score: result.score,
         status: 'pending'
       });
+
+      if (alertResult.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: alertResult.error
+        }, 'Failed to create alert');
+        // Don't throw - alert creation failure shouldn't fail the analysis
+        return;
+      }
+
+      const alert = alertResult.value;
 
       logger.info({
         component: 'PretextDetectionService',
@@ -227,25 +263,34 @@ export class PretextDetectionService {
       const severity = this.getAlertSeverity(result.score);
       
       // Get admin users from repository
-      const adminUsers = await this.repository.getAdminUsers();
+      const adminResult = await this.repository.getAdminUsers();
+      if (adminResult.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: adminResult.error
+        }, 'Failed to get admin users');
+        return;
+      }
+      
+      const adminUsers = adminResult.value;
       
       // Send notification to each admin
       for (const adminUser of adminUsers) {
         await this.notificationService.send({
-          id: `pretext-alert-${alert.id}-${adminUser.id}`,
-          userId: adminUser.id,
-          type: 'in-app',
+          user_id: adminUser.id,
+          type: 'system_alert',
           title: `Pretext Detection Alert: ${severity.toUpperCase()} Risk`,
           message: `Bill ${billId} has been flagged with a risk score of ${result.score}. ${result.detections.length} potential issues detected.`,
-          data: {
+          priority: severity === 'critical' ? 'urgent' : severity === 'high' ? 'high' : 'medium',
+          relatedBillId: parseInt(billId),
+          metadata: {
             alertId: alert.id,
             billId,
             score: result.score,
             severity,
             detectionsCount: result.detections.length,
             detections: result.detections
-          },
-          priority: severity === 'critical' ? 'urgent' : severity === 'high' ? 'high' : 'medium'
+          }
         });
       }
 
@@ -271,7 +316,16 @@ export class PretextDetectionService {
   private async sendReviewNotification(input: PretextReviewInput): Promise<void> {
     try {
       // Get the alert details
-      const alert = await this.repository.getAlertById(input.alertId);
+      const alertResult = await this.repository.getAlertById(input.alertId);
+      if (alertResult.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: alertResult.error
+        }, 'Failed to get alert for review notification');
+        return;
+      }
+
+      const alert = alertResult.value;
       if (!alert) {
         logger.warn({
           component: 'PretextDetectionService',
@@ -281,24 +335,33 @@ export class PretextDetectionService {
       }
 
       // Get users who should be notified about the review
-      const interestedUsers = await this.repository.getUsersInterestedInBill(alert.billId);
+      const usersResult = await this.repository.getUsersInterestedInBill(alert.billId);
+      if (usersResult.isErr) {
+        logger.error({
+          component: 'PretextDetectionService',
+          error: usersResult.error
+        }, 'Failed to get interested users');
+        return;
+      }
+
+      const interestedUsers = usersResult.value;
       
       // Send notification to interested users
       for (const user of interestedUsers) {
         await this.notificationService.send({
-          id: `pretext-review-${input.alertId}-${user.id}`,
-          userId: user.id,
-          type: 'in-app',
+          user_id: user.id,
+          type: 'system_alert',
           title: `Pretext Alert ${input.status === 'approved' ? 'Confirmed' : 'Dismissed'}`,
           message: `A pretext detection alert for Bill ${alert.billId} has been ${input.status} by an administrator.${input.notes ? ` Note: ${input.notes}` : ''}`,
-          data: {
+          priority: input.status === 'approved' ? 'high' : 'medium',
+          relatedBillId: parseInt(alert.billId),
+          metadata: {
             alertId: input.alertId,
             billId: alert.billId,
             status: input.status,
             reviewedBy: input.reviewedBy,
             notes: input.notes
-          },
-          priority: input.status === 'approved' ? 'high' : 'medium'
+          }
         });
       }
 
