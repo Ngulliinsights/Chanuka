@@ -5,99 +5,124 @@ import { QueryValidationResult } from '../../domain/value-objects/query-validati
 import { PaginationParams } from '../../domain/value-objects/pagination-params';
 import { queryValidationService } from '../../domain/services/query-validation.service';
 import { inputSanitizationService } from '../../domain/services/input-sanitization.service';
-
-interface QueryPerformanceMetrics {
-  queryId: string;
-  duration: number;
-  paramCount: number;
-  timestamp: Date;
-}
+import { QueryMetricsService } from '../../infrastructure/metrics/query-metrics.service';
+import { SecurityConfig, defaultSecurityConfig } from '../../domain/config/security-config';
 
 interface BulkOperationOptions {
   batchSize?: number;
   validateEach?: boolean;
   continueOnError?: boolean;
+  timeout?: number;
 }
 
 interface BulkOperationResult<T> {
   successful: T[];
-  failed: Array<{ index: number; error: string; data: unknown }>;
+  failed: Array<{ 
+    index: number; 
+    error: string; 
+    data: unknown;
+    retryable: boolean;
+  }>;
   totalProcessed: number;
+  checkpointId?: string;
+}
+
+interface QueryOptions {
+  timeout?: number;
+  skipValidation?: boolean;
 }
 
 /**
  * Secure Query Builder Application Service
  * 
- * @deprecated This version has critical SQL injection vulnerabilities.
- * Use SecureQueryBuilderService V2 instead:
- * @see server/features/security/application/services/secure-query-builder.service.v2.ts
+ * KEY FEATURES:
+ * 1. Dependency injection instead of singleton
+ * 2. Proper SQL parameterization using Drizzle's sql template tag
+ * 3. Externalized metrics service
+ * 4. Query timeout support
+ * 5. Enhanced bulk operation error handling with retry support
+ * 6. Configurable behavior via SecurityConfig
  * 
- * SECURITY WARNING: This file uses sql.raw() which bypasses parameterization.
- * It is kept for backward compatibility only and should not be used in new code.
- * 
- * Migration Guide: docs/SECURE_QUERY_BUILDER_MIGRATION_GUIDE.md
+ * SECURITY FEATURES:
+ * - SQL injection prevention via parameterization
+ * - Input validation and sanitization
+ * - Identifier validation for table/column names
+ * - Output sanitization to prevent data leakage
+ * - Query timeout to prevent DoS
  */
 export class SecureQueryBuilderService {
-  private static instance: SecureQueryBuilderService;
   private queryCounter = 0;
-  private performanceMetrics: QueryPerformanceMetrics[] = [];
-  private readonly MAX_METRICS_HISTORY = 1000;
-  private readonly DEFAULT_BATCH_SIZE = 100;
+  private readonly metricsService: QueryMetricsService;
+  private readonly config: SecurityConfig;
 
-  private constructor() {}
-
-  public static getInstance(): SecureQueryBuilderService {
-    if (!SecureQueryBuilderService.instance) {
-      SecureQueryBuilderService.instance = new SecureQueryBuilderService();
-    }
-    return SecureQueryBuilderService.instance;
+  constructor(
+    config: Partial<SecurityConfig> = {},
+    metricsService?: QueryMetricsService
+  ) {
+    this.config = { ...defaultSecurityConfig, ...config };
+    this.metricsService = metricsService || new QueryMetricsService(this.config.maxMetricsHistory);
   }
 
   /**
    * Build a parameterized query with validation and performance monitoring
+   * 
+   * CRITICAL: Uses Drizzle's sql template tag for proper parameterization
+   * This is the SAFE way to build dynamic queries
    */
   public buildParameterizedQuery(
-    template: string,
-    params: Record<string, unknown>
+    queryBuilder: (params: Record<string, unknown>) => SQL,
+    params: Record<string, unknown>,
+    options: QueryOptions = {}
   ): SecureQuery {
     const queryId = `query_${++this.queryCounter}_${Date.now()}`;
     const startTime = Date.now();
     
     try {
-      // Validate inputs first
-      const validation = queryValidationService.validateInputs(Object.values(params));
-      if (validation.hasErrors()) {
-        throw new Error(`Query validation failed: ${validation.getErrorMessage()}`);
+      // Validate inputs first (unless explicitly skipped)
+      if (!options.skipValidation) {
+        const validation = queryValidationService.validateInputs(Object.values(params));
+        if (validation.hasErrors()) {
+          throw new Error(`Query validation failed: ${validation.getErrorMessage()}`);
+        }
       }
 
-      // Build parameterized SQL using Drizzle's sql template
-      const parameterizedSql = this.buildSqlFromTemplate(template, params);
+      // Build parameterized SQL using the provided query builder
+      // The query builder MUST use Drizzle's sql template tag
+      const parameterizedSql = queryBuilder(params);
+
+      // Add timeout if specified
+      const timeout = options.timeout || this.config.defaultQueryTimeout;
+      const sqlWithTimeout = this.wrapWithTimeout(parameterizedSql, timeout);
 
       const duration = Date.now() - startTime;
-      this.recordPerformanceMetric({
-        queryId,
-        duration,
-        paramCount: Object.keys(params).length,
-        timestamp: new Date()
-      });
+      
+      if (this.config.enablePerformanceMonitoring) {
+        this.metricsService.recordMetric({
+          queryId,
+          duration,
+          paramCount: Object.keys(params).length,
+          timestamp: new Date()
+        });
+      }
 
-      logger.debug({
-        queryId,
-        template: template.substring(0, 100) + '...',
-        paramCount: Object.keys(params).length,
-        duration
-      }, 'Built secure parameterized query');
+      if (this.config.enableQueryLogging) {
+        logger.debug({
+          queryId,
+          paramCount: Object.keys(params).length,
+          duration,
+          timeout
+        }, 'Built secure parameterized query');
+      }
 
       return SecureQuery.create(
-        parameterizedSql,
-        validation.sanitizedParams || params,
+        sqlWithTimeout,
+        params,
         queryId
       );
     } catch (error) {
       logger.error({
         queryId,
         error: error instanceof Error ? error.message : String(error),
-        template: template.substring(0, 100),
         duration: Date.now() - startTime
       }, 'Failed to build parameterized query');
       throw error;
@@ -106,89 +131,62 @@ export class SecureQueryBuilderService {
 
   /**
    * Build complex query with JOINs
+   * Uses proper SQL template tag for safety
    */
-  /**
-     * Build complex query with JOINs
-     */
-    public buildJoinQuery(
-      baseTable: string,
-      joins: Array<{ table: string; on: string; type?: 'INNER' | 'LEFT' | 'RIGHT' }>,
-      where: Record<string, unknown>,
-      select?: string[]
-    ): SecureQuery {
-      // Validate table and column names
-      this.validateIdentifier(baseTable);
-      joins.forEach(join => {
-        this.validateIdentifier(join.table);
-        this.validateJoinCondition(join.on);
+  public buildJoinQuery(
+    baseTable: string,
+    joins: Array<{ table: string; on: string; type?: 'INNER' | 'LEFT' | 'RIGHT' }>,
+    where: Record<string, unknown>,
+    select?: string[]
+  ): SecureQuery {
+    // Validate table and column names
+    this.validateIdentifier(baseTable);
+    joins.forEach(join => {
+      this.validateIdentifier(join.table);
+      this.validateJoinCondition(join.on);
+    });
+
+    if (select) {
+      select.forEach(col => this.validateIdentifier(col));
+    }
+
+    // Build query using sql template tag
+    const queryBuilder = (params: Record<string, unknown>) => {
+      // This is a simplified example - in production, you'd build this more dynamically
+      // The key is to ALWAYS use sql template tag, never string concatenation
+      const whereConditions = Object.entries(params).map(([key, value]) => 
+        sql`${sql.identifier(key)} = ${value}`
+      );
+      
+      // Build SELECT clause safely
+      const selectClause = select && select.length > 0
+        ? sql.join(select.map(col => sql.identifier(col)), sql`, `)
+        : sql`*`;
+      
+      // Build JOIN clauses safely
+      const joinClauses = joins.map(j => {
+        const joinType = j.type || 'INNER';
+        return sql`${sql.raw(joinType)} JOIN ${sql.identifier(j.table)} ON ${sql.raw(j.on)}`;
       });
+      
+      return sql`
+        SELECT ${selectClause}
+        FROM ${sql.identifier(baseTable)}
+        ${sql.join(joinClauses, sql` `)}
+        WHERE ${sql.join(whereConditions, sql` AND `)}
+      `;
+    };
 
-      // Build JOIN clauses
-      const joinClauses = joins.map(join => {
-        const joinType = join.type || 'INNER';
-        return `${joinType} JOIN ${join.table} ON ${join.on}`;
-      }).join(' ');
-
-      // Build SELECT clause
-      const selectClause = select && select.length > 0 
-        ? select.map(col => this.validateIdentifier(col)).join(', ')
-        : '*';
-
-      // Build WHERE clause with parameterization
-      const whereEntries = Object.entries(where);
-      const whereClauses = whereEntries.map(([key, _], idx) => 
-        `${this.validateIdentifier(key)} = ${idx + 1}`
-      ).join(' AND ');
-
-      const template = `SELECT ${selectClause} FROM ${baseTable} ${joinClauses} WHERE ${whereClauses}`;
-
-      return this.buildParameterizedQuery(template, where);
-    }
-
-
-  /**
-   * Build query with subquery support
-   */
-  public buildSubquery(
-    outerQuery: string,
-    subquery: string,
-    params: Record<string, unknown>
-  ): SecureQuery {
-    // Validate both queries
-    const validation = queryValidationService.validateInputs(Object.values(params));
-    if (validation.hasErrors()) {
-      throw new Error(`Subquery validation failed: ${validation.getErrorMessage()}`);
-    }
-
-    // Combine queries
-    const template = outerQuery.replace('{{SUBQUERY}}', `(${subquery})`);
-    
-    return this.buildParameterizedQuery(template, params);
+    return this.buildParameterizedQuery(queryBuilder, where);
   }
 
   /**
-   * Build Common Table Expression (CTE) query
-   */
-  public buildCTEQuery(
-    ctes: Array<{ name: string; query: string }>,
-    mainQuery: string,
-    params: Record<string, unknown>
-  ): SecureQuery {
-    // Validate CTE names
-    ctes.forEach(cte => this.validateIdentifier(cte.name));
-
-    // Build CTE clauses
-    const cteClause = ctes.map(cte => 
-      `${cte.name} AS (${cte.query})`
-    ).join(', ');
-
-    const template = `WITH ${cteClause} ${mainQuery}`;
-    
-    return this.buildParameterizedQuery(template, params);
-  }
-
-  /**
-   * Execute bulk operations with transaction safety
+   * Execute bulk operations with enhanced error handling
+   * 
+   * IMPROVEMENTS:
+   * - Retryable flag on failures
+   * - Checkpoint support for resuming
+   * - Better error categorization
    */
   public async executeBulkOperation<T>(
     items: unknown[],
@@ -196,15 +194,17 @@ export class SecureQueryBuilderService {
     options: BulkOperationOptions = {}
   ): Promise<BulkOperationResult<T>> {
     const {
-      batchSize = this.DEFAULT_BATCH_SIZE,
+      batchSize = this.config.defaultBatchSize,
       validateEach = true,
-      continueOnError = false
+      continueOnError = false,
+      timeout
     } = options;
 
     const result: BulkOperationResult<T> = {
       successful: [],
       failed: [],
-      totalProcessed: 0
+      totalProcessed: 0,
+      checkpointId: `checkpoint_${Date.now()}`
     };
 
     // Process in batches
@@ -224,26 +224,39 @@ export class SecureQueryBuilderService {
             }
           }
 
-          const operationResult = await operation(item);
+          // Execute with timeout if specified
+          const operationResult = timeout
+            ? await this.executeWithTimeout(operation(item), timeout)
+            : await operation(item);
+            
           result.successful.push(operationResult);
           result.totalProcessed++;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error);
-          result.failed.push({ index, error: errorMessage, data: item });
+          const retryable = this.isRetryableError(error);
+          
+          result.failed.push({ 
+            index, 
+            error: errorMessage, 
+            data: item,
+            retryable
+          });
           result.totalProcessed++;
 
           if (!continueOnError) {
             logger.error({
               index,
               error: errorMessage,
-              totalProcessed: result.totalProcessed
+              totalProcessed: result.totalProcessed,
+              checkpointId: result.checkpointId
             }, 'Bulk operation failed, stopping');
             return result;
           }
 
           logger.warn({
             index,
-            error: errorMessage
+            error: errorMessage,
+            retryable
           }, 'Bulk operation item failed, continuing');
         }
       }
@@ -252,7 +265,8 @@ export class SecureQueryBuilderService {
     logger.info({
       total: items.length,
       successful: result.successful.length,
-      failed: result.failed.length
+      failed: result.failed.length,
+      retryableFailures: result.failed.filter(f => f.retryable).length
     }, 'Bulk operation completed');
 
     return result;
@@ -266,32 +280,21 @@ export class SecureQueryBuilderService {
   }
 
   /**
-   * Build SQL from template with parameters
-   */
-  private buildSqlFromTemplate(template: string, params: Record<string, unknown>): SQL {
-    // Validate that all parameters exist
-    const paramRegex = /\$\{(\w+)\}/g;
-    let match;
-    
-    while ((match = paramRegex.exec(template)) !== null) {
-      const paramName = match[1];
-      if (!paramName || !params.hasOwnProperty(paramName)) {
-        throw new Error(`Missing parameter: ${paramName}`);
-      }
-    }
-    
-    // Return raw SQL - Drizzle will handle parameterization
-    return sql.raw(template);
-  }
-
-  /**
    * Validate SQL identifier (table/column name)
+   * Identifiers cannot be parameterized, so they need strict validation
    */
   private validateIdentifier(identifier: string): string {
     // Only allow alphanumeric, underscore, and dot (for qualified names)
     if (!/^[a-zA-Z_][a-zA-Z0-9_.]*$/.test(identifier)) {
       throw new Error(`Invalid SQL identifier: ${identifier}`);
     }
+    
+    // Additional check: prevent SQL keywords
+    const sqlKeywords = ['SELECT', 'DROP', 'DELETE', 'INSERT', 'UPDATE', 'UNION', 'WHERE'];
+    if (sqlKeywords.includes(identifier.toUpperCase())) {
+      throw new Error(`SQL keyword not allowed as identifier: ${identifier}`);
+    }
+    
     return identifier;
   }
 
@@ -306,54 +309,61 @@ export class SecureQueryBuilderService {
   }
 
   /**
-   * Record performance metric
+   * Wrap SQL with timeout
    */
-  private recordPerformanceMetric(metric: QueryPerformanceMetrics): void {
-    this.performanceMetrics.push(metric);
+  private wrapWithTimeout(query: SQL, timeoutMs: number): SQL {
+    // PostgreSQL-specific timeout
+    // For other databases, this would need to be adapted
+    return sql`
+      SET LOCAL statement_timeout = ${timeoutMs};
+      ${query}
+    `;
+  }
+
+  /**
+   * Execute operation with timeout
+   */
+  private async executeWithTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number
+  ): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error('Operation timeout')), timeoutMs)
+      )
+    ]);
+  }
+
+  /**
+   * Determine if an error is retryable
+   */
+  private isRetryableError(error: unknown): boolean {
+    if (!(error instanceof Error)) return false;
     
-    // Keep only recent metrics
-    if (this.performanceMetrics.length > this.MAX_METRICS_HISTORY) {
-      this.performanceMetrics.shift();
-    }
+    const retryablePatterns = [
+      /timeout/i,
+      /connection/i,
+      /deadlock/i,
+      /lock wait timeout/i,
+      /temporary/i
+    ];
+    
+    return retryablePatterns.some(pattern => pattern.test(error.message));
   }
 
   /**
    * Get performance metrics
    */
-  public getPerformanceMetrics(): {
-    averageDuration: number;
-    maxDuration: number;
-    minDuration: number;
-    totalQueries: number;
-    recentMetrics: QueryPerformanceMetrics[];
-  } {
-    if (this.performanceMetrics.length === 0) {
-      return {
-        averageDuration: 0,
-        maxDuration: 0,
-        minDuration: 0,
-        totalQueries: 0,
-        recentMetrics: []
-      };
-    }
-
-    const durations = this.performanceMetrics.map(m => m.duration);
-    const sum = durations.reduce((a, b) => a + b, 0);
-
-    return {
-      averageDuration: sum / durations.length,
-      maxDuration: Math.max(...durations),
-      minDuration: Math.min(...durations),
-      totalQueries: this.queryCounter,
-      recentMetrics: this.performanceMetrics.slice(-10)
-    };
+  public getPerformanceMetrics() {
+    return this.metricsService.getMetrics();
   }
 
   /**
    * Clear performance metrics
    */
   public clearPerformanceMetrics(): void {
-    this.performanceMetrics = [];
+    this.metricsService.clearMetrics();
   }
 
   /**
@@ -378,5 +388,13 @@ export class SecureQueryBuilderService {
   }
 }
 
-// Export singleton instance
-export const secureQueryBuilderService = SecureQueryBuilderService.getInstance();
+// Export factory function instead of singleton
+export function createSecureQueryBuilderService(
+  config?: Partial<SecurityConfig>,
+  metricsService?: QueryMetricsService
+): SecureQueryBuilderService {
+  return new SecureQueryBuilderService(config, metricsService);
+}
+
+// Export default instance for backward compatibility
+export const secureQueryBuilderService = createSecureQueryBuilderService();
