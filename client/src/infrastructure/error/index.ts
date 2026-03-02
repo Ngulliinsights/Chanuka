@@ -28,7 +28,7 @@ export type {
 
 // Unified error types (aligned with server StandardizedError)
 export type {
-  BaseError,
+  BaseError as UnifiedBaseError,
   ClientError,
   ApiErrorResponse,
   RecoveryStrategy as UnifiedRecoveryStrategy,
@@ -84,7 +84,10 @@ export {
   DashboardActionError,
   DashboardTopicError,
   DashboardConfigurationError,
+  getRecoveryStrategy as getDashboardRecoveryStrategy,
+  executeRecovery as executeDashboardRecovery,
 } from './dashboard-errors';
+export type { RecoveryContext as DashboardRecoveryContext, RecoveryStrategy as DashboardRecoveryStrategy } from './dashboard-errors';
 
 // ============================================================================
 // Core Services

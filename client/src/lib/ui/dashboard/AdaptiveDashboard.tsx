@@ -2,7 +2,7 @@ import type {
   PersonaType,
   PersonaClassification,
   PersonaPreferences,
-} from '@client/infrastructure/personalization/types';
+} from '@client/infrastructure/observability/personalization';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
 import React from 'react';

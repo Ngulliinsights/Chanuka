@@ -1,4 +1,4 @@
-import { backgroundSyncManager } from '@client/infrastructure/sync/background-sync-manager';
+import { backgroundSyncManager } from '@client/infrastructure/storage/sync/background-sync-manager';
 import { cacheInvalidationManager as cacheInvalidation } from '@client/infrastructure/cache/cache-invalidation';
 import { offlineAnalyticsManager as offlineAnalytics } from '@client/features/analytics/model/offline-analytics';
 import { offlineDataManager } from '@client/infrastructure/storage/offline-data-manager';

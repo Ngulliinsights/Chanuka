@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { UserRole } from '@shared/types/core/enums';
 
 import { Button } from '@client/lib/design-system';
 import {
@@ -129,10 +130,10 @@ export function NavigationSliceDemo() {
             >
               Set Admin Section
             </Button>
-            <Button onClick={() => navigation.setUserRole('admin')} variant="outline" size="sm">
+            <Button onClick={() => navigation.setUserRole(UserRole.Admin)} variant="outline" size="sm">
               Set Admin Role
             </Button>
-            <Button onClick={() => navigation.setUserRole('public')} variant="outline" size="sm">
+            <Button onClick={() => navigation.setUserRole(UserRole.Public)} variant="outline" size="sm">
               Set Public Role
             </Button>
           </div>

@@ -22,12 +22,15 @@ export * from './error-monitoring';
 export * from './performance';
 export * from './telemetry';
 export * from './analytics';
+export * from './logging';
+export * from './personalization';
+export * from './system';
 
 // Import sub-module functions
-import { trackError as trackErrorImpl } from './error-monitoring';
-import { trackPerformance as trackPerformanceImpl } from './performance';
-import { trackEvent as trackEventImpl } from './analytics';
-import { sendTelemetry as sendTelemetryImpl } from './telemetry';
+import { trackError as trackErrorImpl, initializeErrorMonitoring } from './error-monitoring';
+import { trackPerformance as trackPerformanceImpl, initializePerformanceMonitoring } from './performance';
+import { trackEvent as trackEventImpl, initializeAnalyticsTracking } from './analytics';
+import { sendTelemetry as sendTelemetryImpl, initializeTelemetry } from './telemetry';
 import type { ErrorContext, PerformanceMetric, AnalyticsEvent, TelemetryData, ObservabilityMetrics } from './types';
 
 /**
@@ -115,22 +118,18 @@ export function initializeObservability(config: {
 }): void {
   // Initialize sub-modules
   if (config.errorMonitoring) {
-    const { initializeErrorMonitoring } = require('./error-monitoring');
     initializeErrorMonitoring(config.errorMonitoring);
   }
 
   if (config.performance) {
-    const { initializePerformanceMonitoring } = require('./performance');
     initializePerformanceMonitoring(config.performance);
   }
 
   if (config.analytics) {
-    const { initializeAnalyticsTracking } = require('./analytics');
     initializeAnalyticsTracking(config.analytics);
   }
 
   if (config.telemetry) {
-    const { initializeTelemetry } = require('./telemetry');
     initializeTelemetry(config.telemetry);
   }
 

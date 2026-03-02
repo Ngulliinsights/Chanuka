@@ -42,7 +42,7 @@ import {
 import {
   ComprehensiveAnalyticsTracker,
   AnalyticsDashboardData,
-} from '@client/infrastructure/analytics/comprehensive-tracker';
+} from '@client/infrastructure/observability/analytics';
 import {
   Card,
   CardContent,

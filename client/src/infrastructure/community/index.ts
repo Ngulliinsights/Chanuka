@@ -4,7 +4,7 @@
  * DEPRECATED: This module is being migrated to features/community
  * Community is a business domain, not infrastructure
  * 
- * For WebSocket functionality, use @client/infrastructure/realtime
+ * For WebSocket functionality, use @client/infrastructure/api/realtime
  * For community business logic, use @client/features/community
  */
 

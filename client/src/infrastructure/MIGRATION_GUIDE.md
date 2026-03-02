@@ -28,7 +28,7 @@ import { useWebSocket } from './hooks/use-websocket';
 import { useRealTimeEngagement } from './hooks/use-realtime-engagement';
 
 // ✅ New way
-import { useWebSocket, useBillTracking, useCommunityRealTime } from '@client/infrastructure/realtime';
+import { useWebSocket, useBillTracking, useCommunityRealTime } from '@client/infrastructure/api/realtime';
 ```
 
 ### 3. Replace Hook Usage
@@ -60,7 +60,7 @@ const { typingIndicators, sendTypingIndicator } = useCommunityRealTime();
 import { webSocketService } from './services/webSocketService';
 
 // ✅ New way
-import { realTimeService } from '@client/infrastructure/realtime';
+import { realTimeService } from '@client/infrastructure/api/realtime';
 const wsManager = realTimeService.getWebSocketManager();
 const billService = realTimeService.getBillTrackingService();
 ```
@@ -77,7 +77,7 @@ const wsConfig = {
 };
 
 // ✅ New way
-import { getRealTimeConfig } from '@client/infrastructure/realtime';
+import { getRealTimeConfig } from '@client/infrastructure/api/realtime';
 const config = getRealTimeConfig();
 ```
 
@@ -119,7 +119,7 @@ function BillTracker({ billId }) {
 ```typescript
 // Component using consolidated real-time module
 import React, { useEffect } from 'react';
-import { useBillTracking, useCommunityRealTime } from '@client/infrastructure/realtime';
+import { useBillTracking, useCommunityRealTime } from '@client/infrastructure/api/realtime';
 
 function BillTracker({ billId }) {
   const {
@@ -180,7 +180,7 @@ vitest.mock('../hooks/use-websocket', () => ({
 }));
 
 // ✅ New mock
-vitest.mock('@client/infrastructure/realtime', () => ({
+vitest.mock('@client/infrastructure/api/realtime', () => ({
   useBillTracking: vitest.fn(() => ({
     isConnected: true,
     subscribeToBill: vitest.fn(),
@@ -217,7 +217,7 @@ expect(useBillTracking).toHaveBeenCalled();
 ### Common Issues
 
 1. **Import Path Errors**
-   - Ensure `@client/infrastructure/realtime` is correctly configured in your module resolution
+   - Ensure `@client/infrastructure/api/realtime` is correctly configured in your module resolution
 
 2. **Hook Not Found**
    - Verify the hook is exported from the main index file

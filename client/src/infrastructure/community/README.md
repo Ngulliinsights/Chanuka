@@ -6,7 +6,7 @@
 
 ## Migration Notice
 
-- **WebSocket functionality**: Use `@client/infrastructure/realtime`
+- **WebSocket functionality**: Use `@client/infrastructure/api/realtime`
 - **Community business logic**: Use `@client/features/community`
 - **Community hooks**: Moved to `@client/features/community`
 

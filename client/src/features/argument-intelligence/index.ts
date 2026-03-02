@@ -17,7 +17,7 @@ export type {
   ArgumentMapNode,
   ArgumentMapEdge,
   ArgumentMap,
-  ArgumentFilters,
+  ArgumentFilters as IArgumentFilters,
   ArgumentSearchResult,
 } from './types';
 

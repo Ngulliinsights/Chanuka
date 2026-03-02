@@ -5,7 +5,7 @@
  * and provides insights into how the classification was determined.
  */
 
-import type { PersonaClassification } from '@client/infrastructure/personalization/types';
+import type { PersonaClassification } from '@client/infrastructure/observability/personalization';
 import { User, TrendingUp, Award, HelpCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { useState } from 'react';
 import React from 'react';

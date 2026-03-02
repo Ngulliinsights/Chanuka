@@ -11,9 +11,8 @@
  * - Error infrastructure can use this logger without cycles
  */
 
-import { PerformanceAlertsManager } from '@client/infrastructure/performance/alerts';
-import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
-import { PerformanceMetric } from '@client/infrastructure/performance/types';
+// Note: Performance monitoring imports removed to break circular dependency cycles
+// Performance tracking is handled directly via console logging in development mode
 
 // ============================================================================
 // LOCAL TYPE DEFINITIONS (to avoid importing from error infrastructure)
@@ -139,19 +138,15 @@ class SimpleRenderTracker {
 
   trackPerformanceImpact(data: PerformanceImpactData): void {
     const { component, renderDuration } = data;
-    const performanceMonitor = PerformanceMonitor.getInstance();
-    const alertsManager = PerformanceAlertsManager.getInstance();
-
-    const metric: PerformanceMetric = {
-      name: 'component-render-duration',
-      value: renderDuration,
-      timestamp: new Date(data.timestamp),
-      category: 'custom',
-      metadata: { component },
-    };
-
-    performanceMonitor.recordCustomMetric(metric);
-    alertsManager.checkMetric(metric);
+    // Performance impact tracking can be extended here
+    // Currently logging render duration for monitoring
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('Performance impact', {
+        component,
+        renderDuration,
+        timestamp: new Date(data.timestamp),
+      });
+    }
   }
 
   detectInfiniteRender(component: string, threshold = 50): boolean {

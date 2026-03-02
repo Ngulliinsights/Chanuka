@@ -269,43 +269,43 @@ class WebSocketConsolidationMigrator {
       // WebSocket service imports - update to use new consolidated services
       {
         from: /from ['"]@client\/services\/webSocketService['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
       {
         from: /from ['"]@client\/services\/CommunityWebSocketManager['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
       {
         from: /from ['"]@client\/services\/community-websocket-extension['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
 
       // Hook imports - update to use new consolidated hooks
       {
         from: /from ['"]@client\/hooks\/use-websocket['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
       {
         from: /from ['"]@client\/hooks\/useRealTimeEngagement['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
 
       // Utility imports
       {
         from: /from ['"]@client\/utils\/realtime-optimizer['"];?/g,
-        to: "from '@client/infrastructure/realtime/utils/optimizer';",
+        to: "from '@client/infrastructure/api/realtime/utils/optimizer';",
       },
 
       // Core API WebSocket imports
       {
         from: /from ['"]@client\/core\/api\/websocket['"];?/g,
-        to: "from '@client/infrastructure/realtime';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
 
       // Type imports - update to use consolidated types
       {
         from: /from ['"]@client\/types\/realtime['"];?/g,
-        to: "from '@client/infrastructure/realtime/types';",
+        to: "from '@client/infrastructure/api/realtime';",
       },
 
       // Store slice imports

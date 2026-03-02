@@ -73,7 +73,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
   const nonce = crypto.randomBytes(16).toString('base64')
 
   // CSP policies
-  const baseCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
+  const baseCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
 
   const devCSP = baseCSP.replace("script-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'")
   const prodCSP = baseCSP.replace("script-src 'self'", `script-src 'self' 'nonce-${nonce}'`)
@@ -244,8 +244,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Development needs looser policies for hot module replacement
       headers: {
         'Content-Security-Policy': isDevelopment
-          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
-          : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; connect-src 'self'; worker-src 'self' blob:; child-src 'self' blob:;",
+          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
+          : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; worker-src 'self' blob:; child-src 'self' blob:;",
       },
 
       // Hot Module Replacement keeps your app state while updating code
@@ -300,7 +300,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         output: {
           // Manual chunk splitting is the most important optimization for load performance
           // Good chunking strategy balances parallel loading with caching efficiency
-          manualChunks: (id: string) => {
+          manualChunks: (id: string): string | undefined => {
             if (id.includes('node_modules')) {
               // React core is used everywhere, so it gets its own chunk
               // This chunk is highly cacheable since React updates infrequently
@@ -400,6 +400,9 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
               return 'app'
             }
+
+            // Default to undefined to let Vite handle the rest
+            return undefined
           },
 
           // Hash-based filenames ensure browsers never serve stale cached files
@@ -409,7 +412,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
 
           // Organized asset structure makes debugging and deployment easier
           // Different asset types go to different folders for clarity
-          assetFileNames: (assetInfo: unknown) => {
+          assetFileNames: (assetInfo: { name?: string }) => {
             const name = assetInfo.name || ''
 
             if (/\.(png|jpe?g|svg|gif|webp|avif|tiff|bmp|ico)$/i.test(name)) {
@@ -447,7 +450,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
         },
 
         // Warning filtering keeps your build output clean and actionable
-        onwarn(warning: unknown, warn: unknown) {
+        onwarn(warning, warn) {
           // Circular dependencies are common in React apps and usually harmless
           if (warning.code === 'CIRCULAR_DEPENDENCY') return
           // This warning appears with some libraries but doesn't affect functionality

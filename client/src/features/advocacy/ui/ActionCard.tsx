@@ -9,7 +9,7 @@ import { Clock, Flag, CheckCircle, Play } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
-import type { ActionItem } from '../hooks/use-advocacyy';
+import type { ActionItem } from '../hooks/use-advocacy';
 
 interface ActionCardProps {
   action: ActionItem;

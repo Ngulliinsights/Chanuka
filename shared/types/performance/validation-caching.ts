@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 import { createValidatedType } from '../core/validation';
-import { Result, ValidationError } from '../core/errors';
+import { Result, ValidationError, Ok, Err } from '../core/errors';
 
 // ============================================================================
 // Validation Cache Types
@@ -441,7 +441,7 @@ export function createCachedValidator<T>(
 
           return {
             fromCache: true,
-            result: { success: true, data: cachedEntry.result },
+            result: new Ok(cachedEntry.result),
             cacheMetadata: cachedEntry.metadata ?? {},
             performance: perf,
           };

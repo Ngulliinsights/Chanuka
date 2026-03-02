@@ -1,0 +1,86 @@
+client/src/features/admin/pages/analytics-dashboard.tsx:import { useComprehensiveAnalytics } from '@client/infrastructure/analytics/comprehensive-tracker';
+client/src/features/analytics/hooks/use-comprehensive-analytics.ts:} from '@client/infrastructure/analytics/comprehensive-tracker';
+client/src/features/analytics/index.ts: * For core tracking infrastructure, see @client/infrastructure/analytics
+client/src/features/analytics/ui/dashboard/AnalyticsDashboard.tsx:} from '@client/infrastructure/analytics/comprehensive-tracker';
+client/src/features/argument-intelligence/pages/argument-intelligence.tsx:import { analyticsService } from '@client/infrastructure/analytics/service';
+client/src/features/bills/ui/BillRealTimeIndicator.tsx:import { BillRealTimeUpdate } from '@client/infrastructure/realtime/types';
+client/src/features/bills/ui/tracking/real-time-tracker.tsx:import { useWebSocket } from '@client/infrastructure/realtime/hooks/use-websocket';
+client/src/features/community/services/backend.ts:import { realTimeService } from '@client/infrastructure/realtime';
+client/src/features/pretext-detection/pages/pretext-detection.tsx:import { analyticsService } from '@client/infrastructure/analytics/service';
+client/src/features/pretext-detection/__tests__/PretextDetectionPage.test.tsx:vi.mock('@client/infrastructure/analytics/service', () => ({
+client/src/features/pretext-detection/__tests__/PretextDetectionPage.test.tsx:    const { analyticsService } = require('@client/infrastructure/analytics/service');
+client/src/features/pretext-detection/__tests__/PretextDetectionPage.test.tsx:    const { analyticsService } = require('@client/infrastructure/analytics/service');
+client/src/infrastructure/community/index.ts: * For WebSocket functionality, use @client/infrastructure/realtime
+client/src/infrastructure/community/README.md:- **WebSocket functionality**: Use `@client/infrastructure/realtime`
+client/src/infrastructure/MIGRATION_GUIDE.md:import { useWebSocket, useBillTracking, useCommunityRealTime } from '@client/infrastructure/realtime';
+client/src/infrastructure/MIGRATION_GUIDE.md:import { realTimeService } from '@client/infrastructure/realtime';
+client/src/infrastructure/MIGRATION_GUIDE.md:import { getRealTimeConfig } from '@client/infrastructure/realtime';
+client/src/infrastructure/MIGRATION_GUIDE.md:import { useBillTracking, useCommunityRealTime } from '@client/infrastructure/realtime';
+client/src/infrastructure/MIGRATION_GUIDE.md:vitest.mock('@client/infrastructure/realtime', () => ({
+client/src/infrastructure/MIGRATION_GUIDE.md:   - Ensure `@client/infrastructure/realtime` is correctly configured in your module resolution
+client/src/infrastructure/observability/analytics/index.ts:} from '@client/infrastructure/analytics';
+client/src/infrastructure/observability/analytics/index.ts:} from '@client/infrastructure/analytics';
+client/src/infrastructure/observability/analytics/index.ts:} from '@client/infrastructure/analytics/comprehensive-tracker';
+client/src/infrastructure/observability/telemetry/index.ts:import { telemetryService } from '@client/infrastructure/telemetry/service';
+client/src/infrastructure/observability/telemetry/index.ts:} from '@client/infrastructure/telemetry/service';
+client/src/infrastructure/observability/telemetry/index.ts:} from '@client/infrastructure/telemetry/service';
+client/src/infrastructure/observability/telemetry/index.ts:} from '@client/infrastructure/telemetry/types';
+client/src/infrastructure/store/middleware/webSocketMiddleware.ts:import { realTimeService } from '@client/infrastructure/realtime';
+client/src/infrastructure/store/middleware/webSocketMiddleware.ts:import { WebSocketSubscription } from '@client/infrastructure/realtime/types';
+client/src/infrastructure/store/middleware/webSocketMiddleware.ts:} from '@client/infrastructure/realtime/types';
+client/src/infrastructure/store/slices/realTimeSlice.ts:} from '@client/infrastructure/realtime/types';
+client/src/lib/hooks/use-offline-capabilities.ts:import { cacheInvalidationManager as cacheInvalidation } from '@client/infrastructure/cache/cache-invalidation';
+client/src/lib/services/index.ts:} from '@client/infrastructure/analytics/data-retention-service';
+client/src/lib/ui/dashboard/hooks/useDashboard.ts:import { getRecoveryStrategy, executeRecovery } from '@client/infrastructure/recovery';
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime/utils/optimizer';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime';",
+client/src/scripts/consolidate-websocket-migration.ts:        to: "from '@client/infrastructure/realtime/types';",
+client/src/scripts/validate-websocket-consolidation.ts:    console.log("  import { realTimeService, useWebSocket } from '@client/infrastructure/realtime';");
+client/src/__tests__/strategic/analytics/telemetry.test.ts:vi.mock('@client/infrastructure/analytics/service', () => ({
+client/src/__tests__/strategic/analytics/telemetry.test.ts:vi.mock('@client/infrastructure/telemetry/service', () => ({
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { analyticsService } = await import('@client/infrastructure/analytics/service');
+client/src/__tests__/strategic/analytics/telemetry.test.ts:      const { telemetryService } = await import('@client/infrastructure/telemetry/service');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:vi.mock('@client/infrastructure/cache/manager', () => ({
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/api/data-synchronization.test.ts:      const { cacheManager } = await import('@client/infrastructure/cache/manager');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:vi.mock('@client/infrastructure/realtime/websocket', () => ({
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');
+client/src/__tests__/strategic/realtime/critical-features.test.ts:      const { websocketService } = await import('@client/infrastructure/realtime/websocket');

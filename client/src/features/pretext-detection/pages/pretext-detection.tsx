@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+
 import { AlertTriangle, Shield, TrendingUp, Clock } from 'lucide-react';
 import { PretextDetectionPanel } from '../ui/PretextDetectionPanel';
 import { usePretextAlerts, usePretextAnalytics } from '../hooks/usePretextDetectionApi';
@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@clie
 import { Badge } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
-import { analyticsService } from '@client/infrastructure/analytics/service';
+import { analyticsService } from '@client/infrastructure/observability/analytics';
 
 /**
  * Pretext Detection Page Component
@@ -49,13 +49,6 @@ export function PretextDetectionPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Pretext Detection - Chanuka</title>
-        <meta 
-          name="description" 
-          content="Detect and analyze potential pretext bills using advanced pattern recognition and network analysis." 
-        />
-      </Helmet>
 
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

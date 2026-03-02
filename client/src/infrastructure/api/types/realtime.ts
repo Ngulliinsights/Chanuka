@@ -5,7 +5,6 @@
  * within the unified API module.
  */
 
-import { WebSocketMessage } from '@shared/types/api/websocket';
 
 /**
  * Realtime subscription handle
@@ -24,7 +23,7 @@ export interface Subscription {
 /**
  * Event handler function type
  */
-export type EventHandler<T = unknown> = (data: T) => void;
+export type EventHandler<T = any> = (data: T) => void;
 
 /**
  * Realtime client interface
@@ -39,8 +38,15 @@ export interface IRealtimeClient {
    * @param handler - Event handler function
    * @returns Subscription handle
    */
-  subscribe<T = unknown>(topic: string, handler: EventHandler<T>): Subscription;
+  subscribe<T = any>(topic: string, handler: EventHandler<T>): Subscription;
   
+  /**
+   * Register an event listener (legacy style)
+   * @param event - Event name
+   * @param handler - Event handler function
+   */
+  on<T = any>(event: string, handler: EventHandler<T>): void;
+
   /**
    * Unsubscribe from a subscription
    * @param subscription - Subscription to cancel
@@ -70,6 +76,11 @@ export interface IRealtimeClient {
    * Clear all subscriptions
    */
   clearSubscriptions(): void;
+
+  /**
+   * Get community service (legacy compatibility)
+   */
+  getCommunityService?(): any;
 }
 
 /**
@@ -134,3 +145,33 @@ export interface RealtimeHubState {
   /** Reconnection attempts */
   reconnectAttempts: number;
 }
+
+// ============================================================================
+// Legacy Compatibility Types (for bill tracking and community)
+// ============================================================================
+
+export type BillRealTimeUpdate = {
+  billId: string;
+  status: string;
+  timestamp: number;
+  changes?: Record<string, unknown>;
+};
+
+export type WebSocketSubscription = Subscription;
+
+export type useWebSocket = () => {
+  connected: boolean;
+  error: Error | null;
+  send: (data: unknown) => void;
+  subscribe: (topic: string, handler: EventHandler) => Subscription;
+};
+
+export type useBillTracking = () => {
+  isTracking: boolean;
+  updates: BillRealTimeUpdate[];
+};
+
+export type useCommunityRealTime = () => {
+  onlineUsers: number;
+  activeTopics: string[];
+};

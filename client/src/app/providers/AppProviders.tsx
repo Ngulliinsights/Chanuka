@@ -4,24 +4,19 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Provider as ReduxProvider } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { AnalyticsProvider } from '@client/infrastructure/analytics/AnalyticsProvider';
-import { useConnectionAware } from '@client/infrastructure/api/hooks/useConnectionAware';
 import { useAuth } from '@client/infrastructure/auth';
-import { SimpleErrorBoundary } from '@client/infrastructure/error';
-import { LoadingProvider } from '@client/infrastructure/loading';
+import { SimpleErrorBoundary } from '@client/infrastructure/error/components/SimpleErrorBoundary';
 import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { CommunityUIProvider } from '@client/features/community/store/slices/communitySlice';
-import { AuthProvider } from '@client/features/users/hooks';
+import { AuthProvider } from '@client/infrastructure/auth';
 import { KenyanContextProvider } from '@client/lib/contexts/KenyanContextProvider';
 import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
 import { ChanukaProviders } from '@client/lib/design-system';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { I18nProvider } from '@client/lib/hooks/use-i18n';
-import { useOfflineDetection } from '@client/lib/hooks/useOfflineDetection';
 import { initializeStore } from '@client/infrastructure/store';
 import { AccessibilityProvider } from '@client/lib/ui/accessibility/accessibility-manager';
 import { OfflineProvider } from '@client/lib/ui/offline/offline-manager';
-import { assetLoadingManager } from '@client/lib/utils/assets';
 
 import { defaultQueryClient } from './queryClient';
 
@@ -162,43 +157,6 @@ if (import.meta.hot) {
     }
   });
 }
-
-// =============================================================================
-// LOADING PROVIDER WITH DEPENDENCIES
-// =============================================================================
-
-/**
- * Wraps LoadingProvider with connection-aware and offline detection hooks.
- * Transforms app-level connection state into the format expected by LoadingProvider.
- */
-const LoadingProviderWithDeps = React.memo<{ children: React.ReactNode }>(({ children }) => {
-  const connectionInfo = useConnectionAware();
-  const { isOnline } = useOfflineDetection();
-
-  const connectionAdapter = useMemo(
-    () => ({
-      type: (connectionInfo.connectionType ?? 'fast') as 'slow' | 'fast' | 'unknown',
-      effectiveType: connectionInfo.effectiveType as '2g' | '3g' | '4g' | '5g' | undefined,
-      downlink: connectionInfo.downlink,
-      rtt: connectionInfo.rtt,
-      saveData: false,
-      online: isOnline,
-    }),
-    [connectionInfo]
-  );
-
-  return (
-    <LoadingProvider
-      useConnectionAware={() => connectionAdapter}
-      useOnlineStatus={() => isOnline}
-      assetLoadingManager={assetLoadingManager}
-    >
-      {children}
-    </LoadingProvider>
-  );
-});
-
-LoadingProviderWithDeps.displayName = 'LoadingProviderWithDeps';
 
 // =============================================================================
 // NAVIGATION PROVIDER
@@ -408,8 +366,6 @@ const PROVIDERS: readonly ProviderConfig[] = [
   { name: 'AuthProvider', component: AuthProvider },
   { name: 'CommunityUIProvider', component: CommunityUIProvider },
   { name: 'ThemeProvider', component: ThemeProvider },
-  { name: 'AnalyticsProvider', component: AnalyticsProvider },
-  { name: 'LoadingProvider', component: LoadingProviderWithDeps },
   { name: 'AccessibilityProvider', component: AccessibilityProvider },
   { name: 'OfflineProvider', component: OfflineProvider },
 ] as const;

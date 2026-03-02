@@ -7,15 +7,11 @@
 
 import {
   AlertTriangle,
-  CheckCircle,
-  Clock,
-  TrendingUp,
   FileText,
-  ExternalLink,
   Calendar,
   Target,
 } from 'lucide-react';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -31,9 +27,8 @@ import {
   Cell,
 } from 'recharts';
 
-import { ImplementationWorkaround, ConflictAnalysis } from '@client/features/analysis/types';
+import { ConflictAnalysis } from '@client/features/analysis/types';
 import { Badge } from '@client/lib/design-system';
-import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
@@ -61,7 +56,6 @@ interface ImplementationWorkaroundsTrackerProps {
 }
 
 export function ImplementationWorkaroundsTracker({
-  conflictAnalysis,
   workarounds = [],
 }: ImplementationWorkaroundsTrackerProps) {
   // Generate mock workaround data if none provided
@@ -121,6 +115,13 @@ export function ImplementationWorkaroundsTracker({
       low: allWorkarounds.filter(w => (w.effectiveness || 0) < 0.4),
     };
 
+    interface InterestGroup {
+      interest: string;
+      workarounds: WorkaroundDisplay[];
+      avgEffectiveness: number;
+      totalWorkarounds: number;
+    }
+
     // Group by related interests
     const interestGroups = allWorkarounds.reduce(
       (acc, workaround) => {
@@ -138,14 +139,14 @@ export function ImplementationWorkaroundsTracker({
         });
         return acc;
       },
-      {} as Record<string, unknown>
+      {} as Record<string, InterestGroup>
     );
 
     // Calculate average effectiveness by interest
-    Object.values(interestGroups).forEach((group: unknown) => {
+    Object.values(interestGroups).forEach((group) => {
       group.avgEffectiveness =
         group.workarounds.reduce(
-          (sum: number, w: ImplementationWorkaround) => sum + (w.effectiveness || 0),
+          (sum: number, w: WorkaroundDisplay) => sum + (w.effectiveness || 0),
           0
         ) / group.workarounds.length;
     });
@@ -181,7 +182,7 @@ export function ImplementationWorkaroundsTracker({
     return {
       effectivenessGroups,
       interestGroups: Object.values(interestGroups).sort(
-        (a: unknown, b: unknown) => b.totalWorkarounds - a.totalWorkarounds
+        (a, b) => b.totalWorkarounds - a.totalWorkarounds
       ),
       timelineData,
       riskMetrics,
@@ -524,7 +525,7 @@ export function ImplementationWorkaroundsTracker({
 
               {/* Interest Details */}
               <div className="mt-6 space-y-3">
-                {analysisData.interestGroups.map((group: unknown, index: number) => (
+                {analysisData.interestGroups.map((group, index: number) => (
                   <div key={index} className="p-4 border rounded-lg">
                     <div className="flex items-center justify-between mb-3">
                       <div>
@@ -571,7 +572,7 @@ export function ImplementationWorkaroundsTracker({
               <div className="space-y-4">
                 {allWorkarounds
                   .sort((a, b) => (b.effectiveness ?? 0) - (a.effectiveness ?? 0))
-                  .map((workaround, index) => (
+                  .map((workaround) => (
                     <div key={workaround.id} className="p-4 border rounded-lg">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">

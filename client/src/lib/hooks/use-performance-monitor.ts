@@ -8,8 +8,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { logger } from '../utils/logger';
-import { PerformanceMonitor } from '@client/infrastructure/performance/monitor';
-import { PerformanceMetric } from '@client/infrastructure/performance/types';
+import { PerformanceMonitor } from '@client/infrastructure/observability/performance/index';
+import { PerformanceMetric } from '@client/infrastructure/observability/performance/index';
 
 const monitor = PerformanceMonitor.getInstance();
 
@@ -177,6 +177,7 @@ export function usePerformanceMonitor(
         cancelAnimationFrame(rafId);
       };
     }
+    return undefined;
   });
 
   return {
@@ -227,13 +228,13 @@ export function usePerformanceBudget(
 
       const hasViolations = failingMetrics.length > 0;
       setIsWithinBudget(!hasViolations);
-      setViolations(failingMetrics.map(m => `${m.metric}: ${m.value.toFixed(2)} > ${m.budget}`));
+      setViolations(failingMetrics.map((m: any) => `${m.metric}: ${m.value.toFixed(2)} > ${m.budget}`));
       setLastCheckTime(Date.now());
 
       if (enableAlerts && hasViolations) {
         logger.warn(`Performance budget violations detected in ${componentName}`, {
           violations: failingMetrics.length,
-          metrics: failingMetrics.map(m => m.metric)
+          metrics: failingMetrics.map((m: any) => m.metric)
         });
       }
     } catch (error) {
@@ -278,7 +279,7 @@ export function useCoreWebVitals(): UseCoreWebVitalsReturn {
   useEffect(() => {
     const checkMetrics = () => {
       const webVitals = monitor.getWebVitalsMetrics();
-      const metricsMap = webVitals.reduce((acc, m) => {
+      const metricsMap = webVitals.reduce((acc: any, m: any) => {
         acc[m.name.toLowerCase()] = m.value;
         return acc;
       }, {} as Record<string, number>);
@@ -408,6 +409,8 @@ export function useLazyLoading(options: UseLazyLoadingOptions = {}): UseLazyLoad
     const observer = new IntersectionObserver(
       entries => {
         const entry = entries[0];
+        if (!entry) return;
+
         setIsIntersecting(entry.isIntersecting);
 
         if (entry.isIntersecting && triggerOnce && !hasTriggered) {

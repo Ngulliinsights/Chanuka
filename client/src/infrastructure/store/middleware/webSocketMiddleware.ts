@@ -9,15 +9,15 @@
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
 import { ConnectionState } from '@shared/types/api/websocket';
 
-import { realTimeService } from '@client/infrastructure/realtime';
-import { WebSocketSubscription } from '@client/infrastructure/realtime/types';
+import { realTimeService } from '@client/infrastructure/api/realtime';
+import { WebSocketSubscription } from '@client/infrastructure/api/realtime';
 import {
   CivicWebSocketState,
   PollingFallbackConfig,
   RealTimeHandlers,
   BillRealTimeUpdate,
   RealTimeNotification,
-} from '@client/infrastructure/realtime/types';
+} from '@client/infrastructure/api/realtime';
 import { logger } from '@client/lib/utils/logger';
 
 import { updateConnectionState, addBillUpdate, addNotification } from '../slices/realTimeSlice';

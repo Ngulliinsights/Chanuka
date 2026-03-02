@@ -51,6 +51,7 @@ export { useStrategyManager, useDynamicStrategyManager, useConditionalStrategy }
 // Core Hooks - Direct exports from this directory
 // export { useToast } from './use-toast';
 export { useErrorRecovery, useAutoRecovery, usePredictiveRecovery } from './use-error-recovery';
+export { useLoading } from './use-loading';
 export { useOfflineDetection } from './use-offline-detection';
 export { useOfflineCapabilities } from './use-offline-capabilities';
 // export { useSystem } from './use-system'; // Invalid

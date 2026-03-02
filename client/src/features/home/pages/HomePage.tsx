@@ -564,25 +564,23 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
   return (
     <section 
-      className="relative overflow-hidden min-h-[80vh] flex items-center py-24 diagonal-accent"
+      className="relative overflow-hidden min-h-[80vh] flex items-center py-24 diagonal-accent bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold"
     >
       {/* Background Image with Overlay - Restored */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="/Chanuka_hero_parliament.png" 
+          src="/chanuka-hero-parliament.png" 
           alt="Parliament Building" 
-          className="w-full h-full object-cover opacity-20"
+          className="w-full h-full object-cover mix-blend-overlay opacity-30"
           style={{ objectPosition: 'center 30%' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/60 via-white/80 to-[#fef6ed]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-transparent to-slate-900/40" />
       </div>
 
       {/* Noise texture for depth */}
       <div className="noise-overlay" />
 
-
-
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 relative z-10 text-white">
         <div className="text-center max-w-6xl mx-auto">
 
 
@@ -607,7 +605,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
           {/* Main Headline */}
           <h1 
-            className="text-6xl md:text-7xl font-display font-bold mb-6 leading-tight"
+            className="text-6xl md:text-7xl font-display font-bold mb-6 leading-tight drop-shadow-2xl text-white"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.8s ease-out 0.4s both',
             }}
@@ -615,17 +613,17 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
             <span 
               className="bg-clip-text text-transparent block"
               style={{ 
-                backgroundImage: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary}, ${COLORS.accent})`,
+                backgroundImage: `linear-gradient(135deg, #fff, ${COLORS.accent}, ${COLORS.accentHover})`,
                 backgroundSize: '200% auto',
               }}
             >
               Democracy
             </span>
-            <span style={{ color: COLORS.primary }}>in Your Hands</span>
+            <span className="text-white">in Your Hands</span>
           </h1>
 
           <p 
-            className="text-xl font-body text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed font-light"
+            className="text-xl font-body text-gray-100 max-w-3xl mx-auto mb-10 leading-relaxed font-light drop-shadow-lg"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeIn 0.6s ease-out 0.6s both',
             }}

@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix Result type usage (needs refactor from {success, data} to ok/err pattern)
 /**
  * API Type Factories
  * Factory functions for creating consistent API request and response types
@@ -8,35 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ApiRequest, PaginatedApiRequest, FileUploadRequest, GraphQLRequest, WebSocketRequest, RequestFactoryOptions } from './request-types';
 import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, ResponseFactoryOptions, HttpStatusCode } from './response-types';
 import { ApiError, ApiErrorContext, ApiErrorFactory } from './error-types';
-import { Result, ValidationError } from '../core/errors';
-
-/**
- * Result Helper Functions
- * Helper functions to create Result instances with ok/err pattern
- */
-const ResultHelpers = {
-  ok: <T, E>(value: T): Result<T, E> => ({
-    isOk: () => true,
-    isErr: () => false,
-    unwrap: () => value,
-    unwrapErr: () => { throw new Error('Called unwrapErr on Ok value'); },
-    map: <U>(fn: (value: T) => U) => ResultHelpers.ok<U, E>(fn(value)),
-    mapErr: <F>(_fn: (error: E) => F) => ResultHelpers.ok<T, F>(value),
-    andThen: <U>(fn: (value: T) => Result<U, E>) => fn(value),
-    orElse: <F>(_fn: (error: E) => Result<T, F>) => ResultHelpers.ok<T, F>(value),
-  }),
-
-  err: <T, E>(error: E): Result<T, E> => ({
-    isOk: () => false,
-    isErr: () => true,
-    unwrap: () => { throw new Error('Called unwrap on Err value'); },
-    unwrapErr: () => error,
-    map: <U>(_fn: (value: T) => U) => ResultHelpers.err<U, E>(error),
-    mapErr: <F>(fn: (error: E) => F) => ResultHelpers.err<T, F>(fn(error)),
-    andThen: <U>(_fn: (value: T) => Result<U, E>) => ResultHelpers.err<U, E>(error),
-    orElse: <F>(fn: (error: E) => Result<T, F>) => fn(error),
-  }),
-};
+import { Result, Ok, Err, ValidationError } from '../core/errors';
 
 /**
  * Request Factory
@@ -196,10 +167,15 @@ export class ApiRequestFactory {
    */
   static validateRequest(request: unknown): Result<ApiRequest<unknown>, ValidationError> {
     if (!request || typeof request !== 'object') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid request: must be an object',
-          { source: 'request', operation: 'validateRequest' } as ErrorContext,
+          {
+            operation: 'validateRequest',
+            layer: 'api',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
@@ -208,36 +184,55 @@ export class ApiRequestFactory {
     const req = request as Partial<ApiRequest<unknown>>;
 
     if (!req.endpoint || typeof req.endpoint !== 'string') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid request: endpoint is required and must be a string',
-          { source: 'endpoint', operation: 'validateRequest' } as ErrorContext,
+          {
+            operation: 'validateRequest',
+            layer: 'api',
+            field: 'endpoint',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
     if (!req.method || !['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS'].includes(req.method)) {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid request: method is required and must be a valid HTTP method',
-          { source: 'method', operation: 'validateRequest' } as ErrorContext,
+          {
+            operation: 'validateRequest',
+            layer: 'api',
+            field: 'method',
+            value: req.method,
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
     if (!req.requestId || typeof req.requestId !== 'string') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid request: requestId is required and must be a string',
-          { source: 'requestId', operation: 'validateRequest' } as ErrorContext,
+          {
+            operation: 'validateRequest',
+            layer: 'api',
+            field: 'requestId',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
-    return ResultHelpers.ok(request as ApiRequest<unknown>);
+    return new Ok(request as ApiRequest<unknown>);
   }
 }
 
@@ -543,10 +538,15 @@ export class ApiResponseFactory {
    */
   static validateResponse(response: unknown): Result<ApiResponse<unknown>, ValidationError> {
     if (!response || typeof response !== 'object') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid response: must be an object',
-          { source: 'response', operation: 'validateResponse' } as ErrorContext,
+          {
+            operation: 'validateResponse',
+            layer: 'api',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
@@ -555,36 +555,55 @@ export class ApiResponseFactory {
     const res = response as Partial<ApiResponse<unknown>>;
 
     if (!res.responseId || typeof res.responseId !== 'string') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid response: responseId is required and must be a string',
-          { source: 'responseId', operation: 'validateResponse' } as ErrorContext,
+          {
+            operation: 'validateResponse',
+            layer: 'api',
+            field: 'responseId',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
     if (!res.requestId || typeof res.requestId !== 'string') {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid response: requestId is required and must be a string',
-          { source: 'requestId', operation: 'validateResponse' } as ErrorContext,
+          {
+            operation: 'validateResponse',
+            layer: 'api',
+            field: 'requestId',
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
     if (!res.status || !['success', 'error', 'warning', 'info', 'redirect'].includes(res.status)) {
-      return ResultHelpers.err(
+      return new Err(
         new ValidationError(
           'Invalid response: status is required and must be a valid response status',
-          { source: 'status', operation: 'validateResponse' } as ErrorContext,
+          {
+            operation: 'validateResponse',
+            layer: 'api',
+            field: 'status',
+            value: res.status,
+            timestamp: new Date(),
+            severity: 'high',
+          },
           []
         )
       );
     }
 
-    return ResultHelpers.ok(response as ApiResponse<unknown>);
+    return new Ok(response as ApiResponse<unknown>);
   }
 }
 

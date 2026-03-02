@@ -219,7 +219,7 @@ If you were using the old separate modules:
 ### From `monitoring`
 ```typescript
 // Old
-import { ErrorMonitor } from '@/infrastructure/monitoring';
+import { ErrorMonitor } from '@/infrastructure/observability/error-monitoring';
 ErrorMonitor.trackError(error);
 
 // New
@@ -230,7 +230,7 @@ observability.trackError(error, context);
 ### From `performance`
 ```typescript
 // Old
-import { recordMetric } from '@/infrastructure/performance';
+import { recordMetric } from '@/infrastructure/observability/performance';
 recordMetric(metric);
 
 // New

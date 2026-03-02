@@ -1,3 +1,15 @@
+export interface OfflineEvent {
+  id: string;
+  type: string;
+  timestamp: number;
+  data: Record<string, unknown>;
+  userAgent: string;
+  url: string;
+  session_id: string;
+  connectionType?: string;
+  isOffline: boolean;
+}
+
 export interface OfflineAnalyticsReport {
   period: {
     start: number;

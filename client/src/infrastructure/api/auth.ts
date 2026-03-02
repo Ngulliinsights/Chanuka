@@ -15,8 +15,6 @@ import type {
   AuthUser,
   AuthTokens,
   UserPreferences,
-  NotificationPreferences,
-  PrivacySettings,
   DataExportResponse,
   DataDeletionResponse,
 } from './types/auth-types';
@@ -28,25 +26,9 @@ export type {
   AuthUser,
   AuthTokens,
   UserPreferences,
-  NotificationPreferences,
-  PrivacySettings,
   DataExportResponse,
   DataDeletionResponse,
 };
-  verification_status?: 'pending' | 'verified' | 'rejected';
-  expertise?: string | string[];
-  is_active?: boolean;
-  reputation?: number;
-  two_factor_enabled?: boolean;
-  last_login?: string;
-  login_count?: number;
-  account_locked?: boolean;
-  locked_until?: string | null;
-  password_changed_at?: string;
-  privacy_settings?: PrivacySettings;
-  consent_given?: ConsentRecord[];
-  data_retention_preference?: DataRetentionPreference;
-}
 
 // Additional auth types not in auth-types.ts
 export interface AuthSession {
@@ -255,8 +237,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/login`,
-        credentials,
-        { skipCache: true }
+        credentials
       );
 
       logger.info('User login successful', {
@@ -292,8 +273,7 @@ export class AuthApiService {
 
       const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/register`,
-        data,
-        { skipCache: true }
+        data
       );
 
       logger.info('User registration successful', {
@@ -314,7 +294,7 @@ export class AuthApiService {
    */
   async logout(): Promise<void> {
     try {
-      await this.apiClient.post(`${this.authEndpoint}/logout`, {}, { skipCache: true });
+      await this.apiClient.post(`${this.authEndpoint}/logout`, {});
 
       logger.info('User logout successful');
     } catch (error) {
@@ -351,8 +331,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.patch<AuthUser>(
         `${this.authEndpoint}/profile`,
-        updates,
-        { skipCache: true }
+        updates
       );
 
       logger.info('Profile updated successfully', {
@@ -374,9 +353,7 @@ export class AuthApiService {
    */
   async updatePrivacySettings(settings: PrivacySettings): Promise<void> {
     try {
-      await this.apiClient.post(`${this.authEndpoint}/privacy-settings`, settings, {
-        skipCache: true,
-      });
+      await this.apiClient.post(`${this.authEndpoint}/privacy-settings`, settings);
 
       logger.info('Privacy settings updated successfully');
     } catch (error) {
@@ -395,8 +372,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post(
         `${this.authEndpoint}/data-export`,
-        {},
-        { skipCache: true }
+        {}
       );
 
       logger.info('Data export requested successfully');
@@ -417,8 +393,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post(
         `${this.authEndpoint}/data-deletion`,
-        {},
-        { skipCache: true }
+        {}
       );
 
       logger.info('Data deletion requested successfully');
@@ -450,8 +425,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<{ valid: boolean }>(
         `${this.authEndpoint}/validate-tokens`,
-        {},
-        { skipCache: true }
+        {}
       );
 
       return response.data?.valid ?? false;
@@ -474,8 +448,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<AuthTokens>(
         `${this.authEndpoint}/refresh`,
-        {},
-        { skipCache: true }
+        {}
       );
 
       logger.info('Tokens refreshed successfully');
@@ -503,8 +476,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/oauth/callback`,
-        { code, state },
-        { skipCache: true }
+        { code, state }
       );
 
       logger.info('OAuth login processed successfully');
@@ -530,8 +502,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<TwoFactorSetup>(
         `${this.authEndpoint}/2fa/setup`,
-        {},
-        { skipCache: true }
+        {}
       );
 
       logger.info('2FA setup initiated successfully');
@@ -553,8 +524,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<AuthResponse>(
         `${this.authEndpoint}/2fa/enable`,
-        { token },
-        { skipCache: true }
+        { token }
       );
 
       logger.info('2FA enabled successfully');
@@ -574,7 +544,7 @@ export class AuthApiService {
    */
   async disableTwoFactor(token: string): Promise<void> {
     try {
-      await this.apiClient.post(`${this.authEndpoint}/2fa/disable`, { token }, { skipCache: true });
+      await this.apiClient.post(`${this.authEndpoint}/2fa/disable`, { token });
 
       logger.info('2FA disabled successfully');
     } catch (error) {
@@ -594,8 +564,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<AuthSession>(
         `${this.authEndpoint}/2fa/verify`,
-        { token },
-        { skipCache: true }
+        { token }
       );
 
       logger.info('2FA verification successful');
@@ -616,8 +585,7 @@ export class AuthApiService {
     try {
       await this.apiClient.post(
         `${this.authEndpoint}/verify-email`,
-        { token },
-        { skipCache: true }
+        { token }
       );
 
       logger.info('Email verification successful');
@@ -643,8 +611,7 @@ export class AuthApiService {
     try {
       await this.apiClient.post(
         `${this.authEndpoint}/password/change`,
-        { currentPassword, newPassword },
-        { skipCache: true }
+        { currentPassword, newPassword }
       );
 
       logger.info('Password changed successfully');
@@ -662,9 +629,7 @@ export class AuthApiService {
    */
   async requestPasswordReset(request: PasswordResetRequest): Promise<void> {
     try {
-      await this.apiClient.post(`${this.authEndpoint}/password/reset-request`, request, {
-        skipCache: true,
-      });
+      await this.apiClient.post(`${this.authEndpoint}/password/reset-request`, request);
 
       logger.info('Password reset requested', { email: request.email });
     } catch (error) {
@@ -685,7 +650,7 @@ export class AuthApiService {
         throw new Error('Passwords do not match');
       }
 
-      await this.apiClient.post(`${this.authEndpoint}/password/reset`, reset, { skipCache: true });
+      await this.apiClient.post(`${this.authEndpoint}/password/reset`, reset);
 
       logger.info('Password reset completed successfully');
     } catch (error) {
@@ -704,7 +669,7 @@ export class AuthApiService {
    */
   async extendSession(): Promise<void> {
     try {
-      await this.apiClient.post(`${this.authEndpoint}/session/extend`, {}, { skipCache: true });
+      await this.apiClient.post(`${this.authEndpoint}/session/extend`, {});
 
       logger.debug('Session extended successfully');
     } catch (error) {
@@ -738,9 +703,7 @@ export class AuthApiService {
    */
   async terminateSession(sessionId: string): Promise<void> {
     try {
-      await this.apiClient.delete(`${this.authEndpoint}/sessions/${sessionId}`, {
-        skipCache: true,
-      });
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/${sessionId}`);
 
       logger.info('Session revoked successfully', { sessionId });
     } catch (error) {
@@ -755,7 +718,7 @@ export class AuthApiService {
    */
   async terminateAllOtherSessions(): Promise<void> {
     try {
-      await this.apiClient.delete(`${this.authEndpoint}/sessions/others`, { skipCache: true });
+      await this.apiClient.delete(`${this.authEndpoint}/sessions/others`);
 
       logger.info('All other sessions revoked successfully');
     } catch (error) {
@@ -771,10 +734,7 @@ export class AuthApiService {
     return this.terminateSession(sessionId);
   }
 
-  /**
-   * Revoke all sessions except void> {
-    return this.terminateSession(sessionId);
-  }
+  // Removed duplicate/broken revoke session method
 
   /**
    * Revoke all sessions except the current one (alias for terminateAllOtherSessions).
@@ -817,8 +777,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<PermissionCheckResult>(
         `${this.authEndpoint}/check-permission`,
-        context,
-        { skipCache: true }
+        context
       );
 
       return response.data?.granted ?? false;
@@ -902,8 +861,7 @@ export class AuthApiService {
     try {
       const response = await this.apiClient.post<SecurityIncidentReport>(
         `${this.authEndpoint}/security-incidents`,
-        incident,
-        { skipCache: true }
+        incident
       );
 
       logger.info('Security incident reported successfully', {

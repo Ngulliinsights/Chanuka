@@ -34,7 +34,7 @@
 export {
   dataRetentionService,
   retentionUtils,
-} from '@client/infrastructure/analytics/data-retention-service';
+} from '@client/infrastructure/observability/analytics/data-retention-service';
 export {
   navigationService,
   BrowserNavigationService,

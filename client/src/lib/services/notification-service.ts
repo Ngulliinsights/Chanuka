@@ -5,7 +5,15 @@
 
 export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'comment' | 'bill_update' | 'recommendation' | 'system';
 
-export interface NotificationData extends Notification {}
+export interface NotificationData {
+  id: string;
+  type?: NotificationType;
+  title?: string;
+  message?: string;
+  read?: boolean;
+  timestamp?: Date;
+  [key: string]: any;
+}
 
 export class NotificationService {
   private notifications: NotificationData[] = [];

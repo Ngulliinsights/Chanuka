@@ -375,3 +375,4 @@ class OfflineDataManager {
 }
 
 export const offlineDataManager = new OfflineDataManager();
+export { OfflineDataManager };

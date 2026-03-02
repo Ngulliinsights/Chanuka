@@ -9,7 +9,7 @@ import { QueryClient } from '@tanstack/react-query';
 
 import type { UnifiedComment, UnifiedThread } from '../types';
 
-import { WebSocketManager } from './websocket-manager';
+import { type WebSocketManager } from './websocket-manager';
 
 export class StateSyncService {
   constructor(

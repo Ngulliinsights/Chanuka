@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@clie
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
-import type { Campaign } from '../hooks/use-advocacyy';
+import type { Campaign } from '../hooks/use-advocacy';
 
 interface CampaignCardProps {
   campaign: Campaign;

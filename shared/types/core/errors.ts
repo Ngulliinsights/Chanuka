@@ -9,8 +9,8 @@ import { ERROR_CODES, type ErrorCode } from '@shared/constants';
 
 // Re-export commonly used error types from other modules
 export { ValidationError, TransformationError, NetworkError } from '../../utils/errors/types';
-export type { Result, Ok, Err } from '../../core/primitives/types/result';
-export { ok, err, isOk, isErr } from '../../core/primitives/types/result';
+export type { Result } from '../../core/primitives/types/result';
+export { Ok, Err, ok, err, isOk, isErr } from '../../core/primitives/types/result';
 // Re-export ErrorCode type (different from ErrorCode enum in enums.ts)
 export type { ErrorCode };
 

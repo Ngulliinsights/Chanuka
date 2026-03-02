@@ -5,7 +5,8 @@
  * and trust indicators.
  */
 
-import { Mail, Share2 } from 'lucide-react';
+// @ts-ignore - Brand icons are present at runtime but may be missing from types
+import { Mail, Twitter, Facebook, Linkedin, Github } from 'lucide-react';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -61,10 +62,10 @@ const footerSections: FooterSection[] = [
 ];
 
 const socialLinks = [
-  { icon: Share2, href: 'https://twitter.com/chanuka', label: 'Twitter' },
-  { icon: Share2, href: 'https://facebook.com/chanuka', label: 'Facebook' },
-  { icon: Share2, href: 'https://linkedin.com/company/chanuka', label: 'LinkedIn' },
-  { icon: Share2, href: 'https://github.com/chanuka', label: 'GitHub' },
+  { icon: Twitter, href: 'https://twitter.com/chanuka', label: 'Twitter' },
+  { icon: Facebook, href: 'https://facebook.com/chanuka', label: 'Facebook' },
+  { icon: Linkedin, href: 'https://linkedin.com/company/chanuka', label: 'LinkedIn' },
+  { icon: Github, href: 'https://github.com/chanuka', label: 'GitHub' },
   { icon: Mail, href: 'mailto:hello@chanuka.org', label: 'Email' },
 ];
 

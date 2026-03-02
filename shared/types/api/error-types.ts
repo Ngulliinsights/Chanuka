@@ -1,4 +1,3 @@
-// @ts-nocheck - TODO: Fix ApiError subclass type assignments
 /**
  * API Error Types
  * Standardized error handling for API operations
@@ -514,93 +513,124 @@ export class ApiUnknownError extends ApiError {
 }
 
 /**
+ * Error Factory Configuration
+ * Maps error codes to HTTP status codes to reduce duplication
+ */
+const ERROR_CODE_STATUS_MAP: Readonly<Record<ApiErrorCode, number>> = {
+  // 4xx Client Errors
+  API_BAD_REQUEST: 400,
+  API_UNAUTHORIZED: 401,
+  API_FORBIDDEN: 403,
+  API_NOT_FOUND: 404,
+  API_METHOD_NOT_ALLOWED: 405,
+  API_NOT_ACCEPTABLE: 406,
+  API_REQUEST_TIMEOUT: 408,
+  API_CONFLICT: 409,
+  API_GONE: 410,
+  API_LENGTH_REQUIRED: 411,
+  API_PRECONDITION_FAILED: 412,
+  API_PAYLOAD_TOO_LARGE: 413,
+  API_URI_TOO_LONG: 414,
+  API_UNSUPPORTED_MEDIA_TYPE: 415,
+  API_RANGE_NOT_SATISFIABLE: 416,
+  API_EXPECTATION_FAILED: 417,
+  API_I_AM_A_TEAPOT: 418,
+  API_UNPROCESSABLE_ENTITY: 422,
+  API_TOO_MANY_REQUESTS: 429,
+  // 5xx Server Errors
+  API_INTERNAL_SERVER_ERROR: 500,
+  API_NOT_IMPLEMENTED: 501,
+  API_BAD_GATEWAY: 502,
+  API_SERVICE_UNAVAILABLE: 503,
+  API_GATEWAY_TIMEOUT: 504,
+  API_HTTP_VERSION_NOT_SUPPORTED: 505,
+  // Logical Codes (not direct HTTP status)
+  API_NETWORK_AUTHENTICATION_REQUIRED: 511,
+  API_VALIDATION_ERROR: 400,
+  API_AUTHENTICATION_ERROR: 401,
+  API_PERMISSION_ERROR: 403,
+  API_RATE_LIMIT_ERROR: 429,
+  API_DATABASE_ERROR: 500,
+  API_CONFIGURATION_ERROR: 500,
+  API_SERIALIZATION_ERROR: 500,
+  API_DESERIALIZATION_ERROR: 400,
+  API_PARSING_ERROR: 400,
+  API_CONNECTION_ERROR: 503,
+  API_TIMEOUT_ERROR: 408,
+  API_UNKNOWN_ERROR: 500,
+};
+
+/**
+ * HTTP Status to Error ClassFactory Map
+ * Determines which error class to instantiate based on HTTP status
+ */
+const HTTP_STATUS_TO_ERROR_CLASS: Readonly<Record<number, new (msg: string, ctx: ApiErrorContext) => ApiError>> = {
+  400: ApiBadRequestError,
+  401: ApiUnauthorizedError,
+  403: ApiForbiddenError,
+  404: ApiNotFoundError,
+  405: ApiMethodNotAllowedError,
+  408: ApiRequestTimeoutError,
+  409: ApiConflictError,
+  429: ApiTooManyRequestsError,
+  500: ApiInternalServerError,
+  503: ApiServiceUnavailableError,
+  504: ApiGatewayTimeoutError,
+};
+
+/**
  * API Error Factory
  * Factory for creating API errors from various sources
  */
 export class ApiErrorFactory {
   /**
    * Create API error from HTTP status code
+   * Reduced complexity: delegates to status-to-class map
    */
   static fromHttpStatus(
     httpStatus: number,
     message: string,
     apiContext: ApiErrorContext
   ): ApiError {
-    switch (httpStatus) {
-      case 400:
-        return new ApiBadRequestError(message, apiContext);
-      case 401:
-        return new ApiUnauthorizedError(message, apiContext);
-      case 403:
-        return new ApiForbiddenError(message, apiContext);
-      case 404:
-        return new ApiNotFoundError(message, apiContext);
-      case 405:
-        return new ApiMethodNotAllowedError(message, apiContext);
-      case 408:
-        return new ApiRequestTimeoutError(message, apiContext);
-      case 409:
-        return new ApiConflictError(message, apiContext);
-      case 429:
-        return new ApiTooManyRequestsError(message, apiContext);
-      case 500:
-        return new ApiInternalServerError(message, apiContext);
-      case 503:
-        return new ApiServiceUnavailableError(message, apiContext);
-      case 504:
-        return new ApiGatewayTimeoutError(message, apiContext);
-      default:
-        return new ApiUnknownError(message, apiContext);
-    }
+    const ErrorClass = HTTP_STATUS_TO_ERROR_CLASS[httpStatus];
+    return ErrorClass ? new ErrorClass(message, apiContext) : new ApiUnknownError(message, apiContext);
   }
 
   /**
    * Create API error from error code
+   * Reduced complexity: maps code to status, then uses fromHttpStatus
    */
   static fromErrorCode(
     errorCode: ApiErrorCode,
     message: string,
     apiContext: ApiErrorContext
   ): ApiError {
-    switch (errorCode) {
-      case 'API_BAD_REQUEST':
-        return new ApiBadRequestError(message, apiContext);
-      case 'API_UNAUTHORIZED':
-        return new ApiUnauthorizedError(message, apiContext);
-      case 'API_FORBIDDEN':
-        return new ApiForbiddenError(message, apiContext);
-      case 'API_NOT_FOUND':
-        return new ApiNotFoundError(message, apiContext);
-      case 'API_METHOD_NOT_ALLOWED':
-        return new ApiMethodNotAllowedError(message, apiContext);
-      case 'API_REQUEST_TIMEOUT':
-        return new ApiRequestTimeoutError(message, apiContext);
-      case 'API_CONFLICT':
-        return new ApiConflictError(message, apiContext);
-      case 'API_TOO_MANY_REQUESTS':
-        return new ApiTooManyRequestsError(message, apiContext);
-      case 'API_INTERNAL_SERVER_ERROR':
-        return new ApiInternalServerError(message, apiContext);
-      case 'API_SERVICE_UNAVAILABLE':
-        return new ApiServiceUnavailableError(message, apiContext);
-      case 'API_GATEWAY_TIMEOUT':
-        return new ApiGatewayTimeoutError(message, apiContext);
-      case 'API_VALIDATION_ERROR':
-        return new ApiValidationError(message, apiContext, []);
-      case 'API_AUTHENTICATION_ERROR':
-        return new ApiAuthenticationError(message, apiContext);
-      case 'API_PERMISSION_ERROR':
-        return new ApiPermissionError(message, apiContext);
-      case 'API_RATE_LIMIT_ERROR':
-        return new ApiRateLimitError(message, apiContext);
-      case 'API_SERIALIZATION_ERROR':
-        return new ApiSerializationError(message, apiContext);
-      case 'API_DESERIALIZATION_ERROR':
-        return new ApiDeserializationError(message, apiContext);
-      case 'API_UNKNOWN_ERROR':
-      default:
-        return new ApiUnknownError(message, apiContext);
+    // Handle specialized error codes with extra parameters
+    if (errorCode === 'API_VALIDATION_ERROR') {
+      return new ApiValidationError(message, apiContext, []);
     }
+    if (errorCode === 'API_AUTHENTICATION_ERROR') {
+      return new ApiAuthenticationError(message, apiContext);
+    }
+    if (errorCode === 'API_PERMISSION_ERROR') {
+      return new ApiPermissionError(message, apiContext);
+    }
+    if (errorCode === 'API_RATE_LIMIT_ERROR') {
+      return new ApiRateLimitError(message, apiContext);
+    }
+    if (errorCode === 'API_SERIALIZATION_ERROR') {
+      return new ApiSerializationError(message, apiContext);
+    }
+    if (errorCode === 'API_DESERIALIZATION_ERROR') {
+      return new ApiDeserializationError(message, apiContext);
+    }
+    if (errorCode === 'API_UNKNOWN_ERROR') {
+      return new ApiUnknownError(message, apiContext);
+    }
+
+    // Map other codes to HTTP status and delegate
+    const httpStatus = ERROR_CODE_STATUS_MAP[errorCode] || 500;
+    return this.fromHttpStatus(httpStatus, message, apiContext);
   }
 
   /**

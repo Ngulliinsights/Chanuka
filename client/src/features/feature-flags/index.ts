@@ -6,7 +6,7 @@ export { FeatureFlagsPage } from './pages/feature-flags';
 export { FlagList } from './ui/FlagList';
 export { FlagEditor } from './ui/FlagEditor';
 export { RolloutControls } from './ui/RolloutControls';
-export { FlagAnalyticsDashboard } from './ui/FlagAnalyticsDashboard';
+export { AnalyticsDashboard as FlagAnalyticsDashboard } from './ui/FlagAnalyticsDashboard';
 
 export {
   useFeatureFlags,

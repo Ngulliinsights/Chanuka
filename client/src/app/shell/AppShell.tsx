@@ -2,7 +2,7 @@ import React, { Suspense, useEffect, useState, useCallback, useMemo } from 'reac
 import { useDispatch } from 'react-redux';
 import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 
-import { AuthProvider, useAuth } from '@client/infrastructure/auth';
+import { useAuth } from '@client/infrastructure/auth';
 import { ErrorBoundary } from '@client/infrastructure/error/components';
 import { createNavigationProvider } from '@client/infrastructure/navigation/context';
 import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
@@ -13,6 +13,7 @@ import {
   addToRecentPages,
   setUserRole,
 } from '@client/infrastructure/store';
+import { UserRole } from '@shared/types/core/enums';
 import { LogoPattern } from '@client/lib/design-system/layout/LogoPattern';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { BreadcrumbNavigation } from '@client/lib/ui/navigation/BreadcrumbNavigation';
@@ -20,7 +21,6 @@ import { useBreadcrumbNavigation } from '@client/lib/ui/navigation/hooks/useBrea
 import { OfflineProvider } from '@client/lib/ui/offline';
 import { logger } from '@client/lib/utils/logger';
 
-import { AnalyticsIntegration } from '../../infrastructure/analytics/AnalyticsIntegration';
 import { NavigationConsistency } from '../../infrastructure/navigation/NavigationConsistency';
 import { NavigationPerformance } from '../../infrastructure/navigation/NavigationPerformance';
 
@@ -183,7 +183,7 @@ function NavigationTracker({ children }: { children: React.ReactNode }) {
     if (user?.role) {
       dispatch(setUserRole(user.role));
     } else {
-      dispatch(setUserRole('public'));
+      dispatch(setUserRole(UserRole.Public));
     }
   }, [user?.role, dispatch]);
 
@@ -282,7 +282,7 @@ export function AppShell({
    * This callback is invoked when the ErrorBoundary catches an error.
    * We use it to log detailed error information for debugging.
    */
-  const handleError = useCallback((error: Error, errorInfo: { componentStack?: string | null }) => {
+  const handleError = useCallback((error: any, errorInfo: any) => {
     logger.error(
       'AppShell error boundary caught error:',
       {
@@ -308,7 +308,7 @@ export function AppShell({
         <ErrorBoundary onError={handleError}>
           <NavigationWrapper>
             <NavigationTracker>
-              <AnalyticsIntegration>
+              {/* <AnalyticsIntegration> */}
                 {/* <RouteProfiler> */}
                 <NavigationConsistency>
                   <NavigationPerformance>
@@ -359,7 +359,7 @@ export function AppShell({
                   </NavigationPerformance>
                 </NavigationConsistency>
                 {/* </RouteProfiler> */}
-              </AnalyticsIntegration>
+              {/* </AnalyticsIntegration> */}
             </NavigationTracker>
           </NavigationWrapper>
         </ErrorBoundary>
@@ -383,9 +383,7 @@ export function AppShell({
   const wrappedContent = useMemo(() => {
     let content = appContent;
 
-    // Layer 4: Wrap with authentication provider
-    // This makes auth state available throughout the app
-    content = <AuthProvider>{content}</AuthProvider>;
+    // Note: AuthProvider is now mounted in AppProviders.tsx to prevent duplication
 
     // Layer 3: Wrap with offline provider if enabled
     // This monitors network connectivity

@@ -99,7 +99,10 @@ export function useBreadcrumbNavigation(
 
       // Mark the new last item as active
       if (newBreadcrumbs.length > 0) {
-        newBreadcrumbs[newBreadcrumbs.length - 1].isActive = true;
+        const lastItem = newBreadcrumbs[newBreadcrumbs.length - 1];
+        if (lastItem) {
+          lastItem.isActive = true;
+        }
       }
 
       dispatch(updateBreadcrumbs(newBreadcrumbs));

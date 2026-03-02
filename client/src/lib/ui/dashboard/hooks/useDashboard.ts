@@ -10,8 +10,13 @@ import {
   DashboardDataFetchError,
   DashboardActionError,
   DashboardTopicError,
+  getDashboardRecoveryStrategy,
+  executeDashboardRecovery,
 } from '@client/infrastructure/error';
-import { getRecoveryStrategy, executeRecovery } from '@client/infrastructure/recovery';
+import type {
+  DashboardRecoveryContext,
+  DashboardRecoveryStrategy,
+} from '@client/infrastructure/error';
 import {
   validateDashboardData,
   validateActionItem,
@@ -249,7 +254,7 @@ export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboard
   // Recovery functionality
   const recovery = {
     canRecover: error
-      ? getRecoveryStrategy({
+      ? getDashboardRecoveryStrategy({
           error,
           data: dashboardData,
           config: dashboardConfig,
@@ -259,7 +264,7 @@ export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboard
       : false,
 
     suggestions: error
-      ? getRecoveryStrategy({
+      ? getDashboardRecoveryStrategy({
           error,
           data: dashboardData,
           config: dashboardConfig,
@@ -271,7 +276,7 @@ export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboard
     recover: async (): Promise<boolean> => {
       if (!error) return true;
 
-      const strategy = getRecoveryStrategy({
+      const strategy = getDashboardRecoveryStrategy({
         error,
         data: dashboardData,
         config: dashboardConfig,
@@ -279,7 +284,7 @@ export function useDashboard(config?: Partial<DashboardAppConfig>): UseDashboard
         lastSuccessfulFetch: lastRefresh || undefined,
       });
 
-      const recovered = await executeRecovery(strategy, {
+      const recovered = await executeDashboardRecovery(strategy, {
         error,
         data: dashboardData,
         config: dashboardConfig,

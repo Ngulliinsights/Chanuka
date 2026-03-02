@@ -591,3 +591,5 @@ export class CacheStorageManager {
     // Don't clear cache on shutdown, just stop the timer
   }
 }
+
+export { CacheStorageManager as CacheStorage };

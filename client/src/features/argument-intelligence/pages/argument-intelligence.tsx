@@ -6,7 +6,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+
 import { Brain, TrendingUp, Users, Target } from 'lucide-react';
 import { ArgumentClusterDisplay } from '../ui/ArgumentClusterDisplay';
 import { SentimentHeatmap } from '../ui/SentimentHeatmap';
@@ -14,7 +14,7 @@ import { useArgumentIntelligence } from '../hooks/useArgumentIntelligence';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
-import { analyticsService } from '@client/infrastructure/analytics/service';
+import { analyticsService } from '@client/infrastructure/observability/analytics';
 
 /**
  * Argument Intelligence Page Component
@@ -59,14 +59,6 @@ export function ArgumentIntelligencePage() {
 
   return (
     <>
-      <Helmet>
-        <title>Argument Intelligence - Chanuka</title>
-        <meta 
-          name="description" 
-          content="Analyze and visualize arguments using AI-powered clustering, sentiment analysis, and quality metrics." 
-        />
-      </Helmet>
-
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}

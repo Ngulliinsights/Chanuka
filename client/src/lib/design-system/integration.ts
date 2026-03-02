@@ -6,7 +6,7 @@
  */
 
 import type { ErrorContext } from '@client/infrastructure/error';
-import type { PerformanceMetric } from '@client/infrastructure/performance';
+import type { PerformanceMetric } from '@client/infrastructure/observability/performance';
 
 /**
  * Integration points between design system and core modules

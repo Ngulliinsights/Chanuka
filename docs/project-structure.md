@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** February 28, 2026 at 11:57 AM
+**Generated:** March 2, 2026 at 07:59 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,864
+**Total Items:** 4,011
 
 ```
 .
@@ -301,7 +301,8 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── backend.ts
-│   │   │   │   │   └── index.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── websocket-manager.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
 │   │   │   │   │       └── communitySlice.tsx
@@ -374,6 +375,7 @@
 │   │   │   │       └── support.tsx
 │   │   │   ├── legal/
 │   │   │   │   ├── hooks/
+│   │   │   │   │   ├── use-constitutional-analysis.ts
 │   │   │   │   │   ├── useConflicts.ts
 │   │   │   │   │   ├── useLegalRisks.ts
 │   │   │   │   │   └── usePrecedents.ts
@@ -441,6 +443,7 @@
 │   │   │   │   ├── api/
 │   │   │   │   │   └── pretext-detection-api.ts
 │   │   │   │   ├── hooks/
+│   │   │   │   │   ├── use-safe-query.ts
 │   │   │   │   │   ├── usePretextAnalysis.ts
 │   │   │   │   │   └── usePretextDetectionApi.ts
 │   │   │   │   ├── pages/
@@ -583,6 +586,12 @@
 │   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
+│   │   │   ├── analytics/
+│   │   │   │   ├── service/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── comprehensive-tracker.ts
+│   │   │   │   ├── data-retention-service.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── api/
 │   │   │   │   ├── circuit-breaker/
 │   │   │   │   │   ├── core.ts
@@ -720,7 +729,8 @@
 │   │   │   │   ├── hooks/
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── moderation.service.ts
-│   │   │   │   │   └── state-sync.service.ts
+│   │   │   │   │   ├── state-sync.service.ts
+│   │   │   │   │   └── websocket-manager.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
@@ -801,6 +811,10 @@
 │   │   │   ├── hooks/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── README.md
+│   │   │   ├── loading/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── logging/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
@@ -862,6 +876,13 @@
 │   │   │   │   ├── persona-detector.test.tsx
 │   │   │   │   ├── persona-detector.ts
 │   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
+│   │   │   ├── realtime/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── use-websocket.ts
+│   │   │   │   ├── optimization/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── recovery/
 │   │   │   │   ├── dashboard-recovery.ts
@@ -959,6 +980,9 @@
 │   │   │   │   ├── HealthCheck.tsx
 │   │   │   │   ├── index.ts
 │   │   │   │   └── README.md
+│   │   │   ├── telemetry/
+│   │   │   │   ├── service.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── dashboard-validation.ts
 │   │   │   │   ├── form-helpers.ts
@@ -982,6 +1006,7 @@
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── MODULE_VALIDATION_REPORT.md
 │   │   │   ├── quality-optimizer.ts
+│   │   │   ├── roleGuard.ts
 │   │   │   └── TYPEDOC_SETUP.md
 │   │   ├── lib/
 │   │   │   ├── components/
@@ -1253,7 +1278,8 @@
 │   │   │   │   ├── use-system.ts
 │   │   │   │   ├── use-toast.ts
 │   │   │   │   ├── use-validation.ts
-│   │   │   │   └── use-websocket.ts
+│   │   │   │   ├── use-websocket.ts
+│   │   │   │   └── useOfflineDetection.ts
 │   │   │   ├── interfaces/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-interfaces.ts
@@ -1690,6 +1716,9 @@
 │   │   │   ├── validate-home-page.ts
 │   │   │   ├── validate-migration.ts
 │   │   │   └── validate-websocket-consolidation.ts
+│   │   ├── services/
+│   │   │   ├── apiService.ts
+│   │   │   └── websocket-manager.ts
 │   │   ├── tests/
 │   │   │   ├── accessibility/
 │   │   │   │   └── home-page-accessibility.test.ts
@@ -1702,6 +1731,11 @@
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
 │   ├── index.html
+│   ├── legacy-imports.txt
+│   ├── missing.txt
+│   ├── missing4.txt
+│   ├── missing5.txt
+│   ├── missing6.txt
 │   ├── package-scripts.json
 │   ├── package.json
 │   ├── playwright.config.ts
@@ -1710,6 +1744,16 @@
 │   ├── project.json
 │   ├── README.md
 │   ├── tailwind.config.ts
+│   ├── ts_error_final.txt
+│   ├── ts_error_final2.txt
+│   ├── ts_errors.txt
+│   ├── ts_errors2.txt
+│   ├── ts_errors3.txt
+│   ├── ts_errors4.txt
+│   ├── ts_errors5.txt
+│   ├── tsc-errors-2.txt
+│   ├── tsc-errors-3.txt
+│   ├── tsc-errors.txt
 │   ├── tsconfig.json
 │   ├── tsconfig.test.json
 │   ├── tsconfig.tsbuildinfo
@@ -1732,7 +1776,9 @@
 ├── docs/
 │   ├── adr/
 │   │   ├── ADR-001-api-client-consolidation.md
+│   │   ├── ADR-001-DDD-Feature-Structure.md
 │   │   ├── ADR-002-client-api-architecture.md
+│   │   ├── ADR-002-Facade-Pattern-For-Middleware.md
 │   │   ├── ADR-003-dead-vs-unintegrated-code.md
 │   │   ├── ADR-004-feature-structure-convention.md
 │   │   ├── ADR-005-csp-manager-consolidation.md
@@ -1746,6 +1792,10 @@
 │   │   ├── ADR-013-caching-strategy.md
 │   │   ├── ADR-014-error-handling-pattern.md
 │   │   ├── ADR-015-intelligent-bill-pipeline.md
+│   │   ├── ADR-016-naming-conventions.md
+│   │   ├── ADR-017-repository-pattern-standardization.md
+│   │   ├── ADR-018-analytics-analysis-separation.md
+│   │   ├── ADR-019-orphaned-infrastructure-cleanup.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -1774,6 +1824,48 @@
 │   │   ├── SUSTAINABLE_APPROACH_ANALYSIS.md
 │   │   └── UNUSED_UTILITIES_ANALYSIS.md
 │   ├── archive/
+│   │   ├── action-plans-2026-03/
+│   │   │   ├── CRITICAL_ISSUES_ACTION_PLAN.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_TESTING_PLAN.md
+│   │   │   ├── MIGRATION_DOCS_CLEANUP_PLAN.md
+│   │   │   ├── PLACEHOLDER_REMEDIATION_PLAN.md
+│   │   │   └── WEEK_1_STANDARDIZATION_PLAN.md
+│   │   ├── audits-2026-03/
+│   │   │   ├── ANALYTICS_VS_ANALYSIS_AUDIT.md
+│   │   │   ├── AUDIT_RESULTS_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_CONSOLIDATION_AUDIT.md
+│   │   │   ├── FEATURE_MODERNIZATION_AUDIT.md
+│   │   │   ├── INFRASTRUCTURE_ARCHITECTURE_AUDIT.md
+│   │   │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
+│   │   │   ├── INFRASTRUCTURE_FEATURE_INTEGRATION_ANALYSIS.md
+│   │   │   ├── README.md
+│   │   │   ├── REQUIREMENTS_AUDIT_ASSESSMENT.md
+│   │   │   └── SQL_INJECTION_AUDIT_FINAL.md
+│   │   ├── completion-reports-2026-03/
+│   │   │   ├── AUDIT_IMPLEMENTATION_COMPLETE.md
+│   │   │   ├── DOCUMENTATION_CLEANUP_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_IMPLEMENTATION_PROGRESS.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2A_COMPLETE.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_DAY1_COMPLETE.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_DAY2_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_DAY3_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_FINAL_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_IMPLEMENTATION_STATUS.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_PROGRESS.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_SEARCH_COMPLETE.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_VERIFICATION_COMPLETE.md
+│   │   │   ├── ERROR_HANDLING_PHASE_2B_WEEK2_SUMMARY.md
+│   │   │   ├── ERROR_HANDLING_STATUS.md
+│   │   │   ├── FINAL_AUDIT_ASSESSMENT.md
+│   │   │   ├── FIXES_APPLIED_SESSION2.md
+│   │   │   ├── IMPROVEMENTS_SUMMARY.md
+│   │   │   ├── MIGRATION_STATUS_REPORT.md
+│   │   │   ├── MIGRATION_WEEK_1_SUMMARY.md
+│   │   │   ├── SECURITY_REMEDIATION_COMPLETE.md
+│   │   │   ├── SESSION_3_FIXES.md
+│   │   │   ├── WEEK_1_COMPLETION_SUMMARY.md
+│   │   │   ├── WEEK_1_FINAL_STATUS.md
+│   │   │   └── WEEK_1_PROGRESS.md
 │   │   ├── orphan-analysis-2025/
 │   │   │   ├── INTEGRATION_ROADMAP.csv
 │   │   │   ├── ORPHAN_VALUE_ANALYSIS.md
@@ -2006,44 +2098,52 @@
 │   │   ├── IMPORT_PATH_GOVERNANCE.md
 │   │   ├── race-condition-analysis.md
 │   │   └── schema-domain-relationships.md
-│   ├── ADR-001-DDD-Feature-Structure.md
-│   ├── ADR-002-Facade-Pattern-For-Middleware.md
-│   ├── ANALYTICS_VS_ANALYSIS_AUDIT.md
+│   ├── ADR_EXTRACTION_SUMMARY.md
 │   ├── api-client-guide.md
+│   ├── AUDIT_QUICK_START_GUIDE.md
+│   ├── AUDIT_SYSTEM_README.md
+│   ├── AUDIT_TRACKING_TEMPLATE.md
 │   ├── BRAND_COLOR_USAGE_GUIDE.md
+│   ├── CODE_QUALITY_DEEP_DIVE_SECURE_QUERY_BUILDER.md
+│   ├── COMPREHENSIVE_CONSOLIDATION_PLAN.md
+│   ├── CONSOLIDATION_COMPLETE.md
 │   ├── DESIGN_DECISIONS.md
 │   ├── DEVELOPER_GUIDE_Feature_Creation.md
 │   ├── DEVELOPER_ONBOARDING.md
 │   ├── DEVELOPMENT_WORKFLOW.md
-│   ├── DOCUMENTATION_CLEANUP_SUMMARY.md
+│   ├── DOCUMENTATION_CONSOLIDATION_COMPLETE.md
 │   ├── DOCUMENTATION_INVENTORY.md
-│   ├── FEATURE_MODERNIZATION_AUDIT.md
+│   ├── ERROR_HANDLING_MIGRATION_GUIDE.md
+│   ├── ERROR_HANDLING_SUMMARY.md
 │   ├── FSD_IMPORT_GUIDE.md
-│   ├── INFRASTRUCTURE_ARCHITECTURE_AUDIT.md
-│   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
-│   ├── INFRASTRUCTURE_FEATURE_INTEGRATION_ANALYSIS.md
-│   ├── MIGRATION_DOCS_CLEANUP_PLAN.md
-│   ├── MIGRATION_STATUS_REPORT.md
-│   ├── MIGRATION_WEEK_1_SUMMARY.md
+│   ├── INDEX_OPERATIONAL_MASTERY.md
+│   ├── INTEGRATION_ARCHITECTURE.md
+│   ├── INTEGRATION_CHECKLIST.md
+│   ├── INTEGRATION_SUMMARY.md
 │   ├── migration-examples.md
 │   ├── MVP Data Strategy for NLP Training.md
+│   ├── MVP_INTEGRATION_GUIDE.md
 │   ├── NOTIFICATION_SYSTEM_CONSOLIDATION.md
+│   ├── OPERATIONAL_BLINDSPOT_AUDIT_TEMPLATE.md
+│   ├── OPERATIONAL_MASTERY_DEMONSTRATION.md
 │   ├── PATH_ALIAS_RESOLUTION.md
 │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   ├── PERFORMANCE_QUICK_REFERENCE.md
+│   ├── PLACEHOLDER_DETECTION_GUIDE.md
 │   ├── project-structure.md
 │   ├── README_ARCHITECTURE_DOCS.md
+│   ├── README_AUDIT_SYSTEM.md
+│   ├── REMEDIATION_LOG.md
 │   ├── REPOSITORY_PATTERN_DECISION_MATRIX.md
 │   ├── REPOSITORY_PATTERN_IMPLEMENTATION_GUIDE.md
 │   ├── REPOSITORY_PATTERN.md
-│   ├── REQUIREMENTS_AUDIT_ASSESSMENT.md
 │   ├── ROUTING_EXPLANATION.md
 │   ├── scripts-tools-strategic-analysis.md
 │   ├── scripts-tools-strategic-audit.md
-│   ├── WEEK_1_COMPLETION_SUMMARY.md
-│   ├── WEEK_1_FINAL_STATUS.md
-│   ├── WEEK_1_PROGRESS.md
-│   └── WEEK_1_STANDARDIZATION_PLAN.md
+│   ├── SECURE_QUERY_BUILDER_MIGRATION_GUIDE.md
+│   ├── SERVER_CLIENT_INTEGRATION_GUIDE.md
+│   ├── SPEC_CONSOLIDATION_PLAN.md
+│   └── VALIDATION_REPORT.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2163,6 +2263,7 @@
 │   ├── analyze-dependencies.ts
 │   ├── analyze-infrastructure.ts
 │   ├── apply-schema-direct.ts
+│   ├── audit-codebase.ts
 │   ├── boundary-fix-phase2a.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
@@ -2178,6 +2279,8 @@
 │   ├── enum-alignment-audit.md
 │   ├── fix-config.json
 │   ├── fix-eslint-suppressions.ts
+│   ├── fix-remaining-sql-injection.ts
+│   ├── fix-sql-injection.ts
 │   ├── fix-templates.ts
 │   ├── fresh-db-push.sh
 │   ├── generate-bundle-report.js
@@ -2186,6 +2289,7 @@
 │   ├── jscpd.json
 │   ├── LIFECYCLE.md
 │   ├── migrate-alert-preferences.ts
+│   ├── migrate-community-mvp.ts
 │   ├── modern-project-analyzer.ts
 │   ├── performance-budget-enforcer.cjs
 │   ├── performance-regression-detector.js
@@ -2196,9 +2300,14 @@
 │   ├── scan-todos.ts
 │   ├── scan-type-violations.ts
 │   ├── setup-playwright.js
+│   ├── start-mvp.ps1
+│   ├── start-mvp.sh
+│   ├── test-mvp-endpoints.sh
+│   ├── test-mvp-integration.ts
 │   ├── track-progress.ts
 │   ├── tsconfig.json
 │   ├── validate-infrastructure.ts
+│   ├── validate-integration.ts
 │   ├── verify-api-contract-coverage.ts
 │   ├── verify-consistency.ts
 │   ├── verify-metrics.ts
@@ -2226,9 +2335,6 @@
 │   ├── examples/
 │   │   └── cached-routes-example.ts
 │   ├── features/
-│   │   ├── accountability/
-│   │   │   ├── ledger.controller.ts
-│   │   │   └── ledger.service.ts
 │   │   ├── admin/
 │   │   │   ├── application/
 │   │   │   │   ├── admin.routes.ts
@@ -2279,43 +2385,11 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy-factory.ts
 │   │   │   └── index.ts
-│   │   ├── ai-evaluation/
-│   │   │   └── application/
-│   │   │       └── evaluation-orchestrator.ts
-│   │   ├── alert-preferences/
-│   │   │   ├── application/
-│   │   │   │   ├── commands/
-│   │   │   │   │   └── create-alert-preference-command.ts
-│   │   │   │   ├── use-cases/
-│   │   │   │   │   └── create-alert-preference-use-case.ts
-│   │   │   │   ├── utils/
-│   │   │   │   │   └── alert-utilities.ts
-│   │   │   │   └── alert-preferences-service.ts
-│   │   │   ├── domain/
-│   │   │   │   ├── entities/
-│   │   │   │   │   ├── alert-delivery-log.ts
-│   │   │   │   │   └── alert-preference.ts
-│   │   │   │   ├── repositories/
-│   │   │   │   │   └── alert-preference-repository.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── alert-delivery-service.ts
-│   │   │   │   │   ├── smart-filtering-service.ts
-│   │   │   │   │   └── unified-alert-preference-service.ts
-│   │   │   │   └── value-objects/
-│   │   │   │       ├── alert-channel.ts
-│   │   │   │       ├── alert-conditions.ts
-│   │   │   │       ├── alert-type.ts
-│   │   │   │       ├── channel-type.ts
-│   │   │   │       ├── frequency-config.ts
-│   │   │   │       ├── priority.ts
-│   │   │   │       └── smart-filtering-config.ts
-│   │   │   ├── alert_system_docs.md
-│   │   │   ├── compatibility-layer.ts
-│   │   │   ├── DEPRECATION_NOTICE.md
-│   │   │   └── unified-alert-routes.ts
 │   │   ├── analysis/
 │   │   │   ├── application/
 │   │   │   │   ├── analysis-service-direct.ts
+│   │   │   │   ├── analysis-validation.schemas.ts
+│   │   │   │   ├── AnalysisApplicationService.ts
 │   │   │   │   ├── bill-comprehensive-analysis.service.ts
 │   │   │   │   ├── constitutional-analysis.service.ts
 │   │   │   │   ├── coverage-analyzer.service.ts
@@ -2475,7 +2549,8 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
-│   │   │   │       └── bill-validation.middleware.ts
+│   │   │   │       ├── bill-validation.middleware.ts
+│   │   │   │       └── coverage-routes.ts
 │   │   │   ├── repositories/
 │   │   │   │   └── sponsorship-repository.ts
 │   │   │   ├── services/
@@ -2510,12 +2585,16 @@
 │   │   │   │   │   ├── create-comment.use-case.ts
 │   │   │   │   │   └── vote-on-comment.use-case.ts
 │   │   │   │   ├── community-validation.schemas.ts
+│   │   │   │   ├── CommunityApplicationService.ts
 │   │   │   │   ├── enhanced-community-service.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── entities/
 │   │   │   │   │   ├── comment-vote.entity.ts
 │   │   │   │   │   └── comment.entity.ts
+│   │   │   │   ├── interfaces/
+│   │   │   │   │   ├── IArgumentAnalysisService.ts
+│   │   │   │   │   └── ICommentRepository.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── comment-moderation.service.ts
 │   │   │   │   │   └── comment-ranking.service.ts
@@ -2523,8 +2602,14 @@
 │   │   │   │   │   ├── engagement-score.ts
 │   │   │   │   │   └── trending-score.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   └── mock/
+│   │   │   │       ├── index.ts
+│   │   │   │       ├── MockArgumentAnalysisService.ts
+│   │   │   │       └── MockCommentRepository.ts
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
+│   │   │   │       ├── community-routes.ts
 │   │   │   │       └── community-validation.middleware.ts
 │   │   │   ├── comment-voting.ts
 │   │   │   ├── comment.ts
@@ -2589,6 +2674,8 @@
 │   │   ├── feature-flags/
 │   │   │   ├── application/
 │   │   │   │   ├── controller.ts
+│   │   │   │   ├── feature-flag-validation.schemas.ts
+│   │   │   │   ├── FeatureFlagApplicationService.ts
 │   │   │   │   ├── middleware.ts
 │   │   │   │   └── routes.ts
 │   │   │   ├── domain/
@@ -2600,6 +2687,9 @@
 │   │   │   ├── README.md
 │   │   │   └── verify-implementation.ts
 │   │   ├── government-data/
+│   │   │   ├── api/
+│   │   │   │   └── institutional/
+│   │   │   │       └── api-gateway-service.ts
 │   │   │   ├── application/
 │   │   │   │   ├── enhanced-government-data-service.ts
 │   │   │   │   ├── government-data-validation.schemas.ts
@@ -2611,14 +2701,13 @@
 │   │   │   │   └── web-scraping.service.ts
 │   │   │   ├── index.ts
 │   │   │   └── routes.ts
-│   │   ├── institutional-api/
-│   │   │   └── application/
-│   │   │       └── api-gateway-service.ts
 │   │   ├── market/
 │   │   │   ├── market.controller.ts
 │   │   │   ├── market.service.ts
 │   │   │   └── market.utils.ts
 │   │   ├── ml/
+│   │   │   ├── evaluation/
+│   │   │   │   └── evaluation-orchestrator.ts
 │   │   │   ├── models/
 │   │   │   │   ├── conflict-detector.ts
 │   │   │   │   ├── constitutional-analyzer.ts
@@ -2650,6 +2739,9 @@
 │   │   │   │   └── integration-monitor.service.ts
 │   │   │   ├── infrastructure/
 │   │   │   │   └── metrics-middleware.ts
+│   │   │   ├── regulatory/
+│   │   │   │   ├── index.ts
+│   │   │   │   └── regulatory-monitoring.routes.ts
 │   │   │   ├── index.ts
 │   │   │   └── README.md
 │   │   ├── notifications/
@@ -2697,8 +2789,7 @@
 │   │   │   │   ├── pretext-detection.controller.ts
 │   │   │   │   ├── pretext-detection.routes.ts
 │   │   │   │   ├── pretext-detection.service.ts
-│   │   │   │   ├── pretext-validation.schemas.ts
-│   │   │   │   └── PretextService.ts
+│   │   │   │   └── pretext-validation.schemas.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── pretext-analysis.service.ts
 │   │   │   │   └── types.ts
@@ -2716,6 +2807,7 @@
 │   │   ├── privacy/
 │   │   │   ├── application/
 │   │   │   │   ├── privacy-scheduler.ts
+│   │   │   │   ├── privacy-validation.schemas.ts
 │   │   │   │   └── privacy.routes.ts
 │   │   │   ├── domain/
 │   │   │   │   └── privacy-service.ts
@@ -2743,9 +2835,6 @@
 │   │   │   ├── README.md
 │   │   │   ├── RecommendationController.ts
 │   │   │   └── TASK-1.5-COMPLETION-SUMMARY.md
-│   │   ├── regulatory-monitoring/
-│   │   │   ├── index.ts
-│   │   │   └── regulatory-monitoring.routes.ts
 │   │   ├── safeguards/
 │   │   │   ├── application/
 │   │   │   │   ├── cib-detection-service.ts
@@ -2756,7 +2845,8 @@
 │   │   ├── search/
 │   │   │   ├── application/
 │   │   │   │   ├── search-validation.schemas.ts
-│   │   │   │   └── SearchService.ts
+│   │   │   │   ├── SearchService.ts
+│   │   │   │   └── SearchServiceWrapper.ts
 │   │   │   ├── deployment/
 │   │   │   │   ├── search-deployment-orchestrator.ts
 │   │   │   │   ├── search-deployment.service.ts
@@ -2803,6 +2893,7 @@
 │   │   │   │   └── search-syntax-parser.ts
 │   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   ├── index.ts
+│   │   │   ├── SearchController-migrated.ts
 │   │   │   └── SearchController.ts
 │   │   ├── security/
 │   │   │   ├── application/
@@ -2810,6 +2901,8 @@
 │   │   │   │       ├── index.ts
 │   │   │   │       └── secure-query-builder.service.ts
 │   │   │   ├── domain/
+│   │   │   │   ├── config/
+│   │   │   │   │   └── security-config.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── encryption.service.ts
 │   │   │   │   │   ├── index.ts
@@ -2822,6 +2915,8 @@
 │   │   │   │       ├── query-validation-result.ts
 │   │   │   │       └── secure-query.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── metrics/
+│   │   │   │   │   └── query-metrics.service.ts
 │   │   │   │   └── services/
 │   │   │   │       ├── data-privacy.service.ts
 │   │   │   │       ├── index.ts
@@ -2840,6 +2935,9 @@
 │   │   │   ├── security-monitoring.ts
 │   │   │   └── security-policy.ts
 │   │   ├── sponsors/
+│   │   │   ├── accountability/
+│   │   │   │   ├── ledger.controller.ts
+│   │   │   │   └── ledger.service.ts
 │   │   │   ├── application/
 │   │   │   │   ├── sponsor-conflict-analysis.service.ts
 │   │   │   │   ├── sponsor-service-direct.ts
@@ -2887,13 +2985,17 @@
 │   │   │   │   │   ├── profile-management-use-case.ts
 │   │   │   │   │   ├── user-registration-use-case.ts
 │   │   │   │   │   └── verification-operations-use-case.ts
+│   │   │   │   ├── profile-migrated.ts
 │   │   │   │   ├── profile.ts
 │   │   │   │   ├── user-application-service.ts
 │   │   │   │   ├── user-service-direct.ts
 │   │   │   │   ├── user-validation.schemas.ts
+│   │   │   │   ├── UserProfileService.ts
 │   │   │   │   ├── users.ts
 │   │   │   │   ├── UserService.ts
-│   │   │   │   └── verification.ts
+│   │   │   │   ├── verification-migrated.ts
+│   │   │   │   ├── verification.ts
+│   │   │   │   └── VerificationService.ts
 │   │   │   ├── domain/
 │   │   │   │   ├── aggregates/
 │   │   │   │   │   └── user-aggregate.ts
@@ -2980,6 +3082,11 @@
 │   │   │   │   └── invalidation.ts
 │   │   │   ├── serialization/
 │   │   │   │   └── cache-serializer.ts
+│   │   │   ├── strategies/
+│   │   │   │   ├── circuit-breaker-strategy.ts
+│   │   │   │   ├── compression-strategy.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── tagging-strategy.ts
 │   │   │   ├── tagging/
 │   │   │   │   └── tag-manager.ts
 │   │   │   ├── utilities/
@@ -2993,6 +3100,7 @@
 │   │   │   ├── adapters-factory-integration.test.ts
 │   │   │   ├── advanced-caching.service.ts
 │   │   │   ├── ai-cache.ts
+│   │   │   ├── ARCHITECTURE.md
 │   │   │   ├── CACHE_PATTERNS.md
 │   │   │   ├── cache-core.test.ts
 │   │   │   ├── cache-factory.ts
@@ -3012,7 +3120,10 @@
 │   │   │   ├── key-generator.ts
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── performance-benchmark.ts
+│   │   │   ├── PHASE1_COMPLETION_REPORT.md
+│   │   │   ├── PHASE1_FINAL_STATUS.md
 │   │   │   ├── README.md
+│   │   │   ├── REFACTORING_PLAN.md
 │   │   │   ├── server-cache-wrapper.ts
 │   │   │   ├── simple-factory.ts
 │   │   │   ├── single-flight-cache.ts
@@ -3034,10 +3145,16 @@
 │   │   ├── database/
 │   │   │   ├── base/
 │   │   │   │   └── BaseStorage.ts
+│   │   │   ├── connections/
+│   │   │   │   ├── connection-router.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── pool-manager.ts
+│   │   │   │   └── transaction-manager.ts
 │   │   │   ├── core/
 │   │   │   │   ├── config.ts
 │   │   │   │   ├── connection-manager.ts
 │   │   │   │   ├── database-orchestrator.ts
+│   │   │   │   ├── database-service.ts
 │   │   │   │   ├── health-monitor.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-config.ts
@@ -3100,7 +3217,15 @@
 │   │   │   │   └── REFACTORING_SUMMARY.md
 │   │   │   ├── migrations/
 │   │   │   │   ├── 20260224_feature_flags.sql
-│   │   │   │   └── 20260224_pretext_detection.sql
+│   │   │   │   ├── 20260224_pretext_detection.sql
+│   │   │   │   ├── 20260301_create_argument_analysis_table.sql
+│   │   │   │   ├── 20260301_create_comments_table.sql
+│   │   │   │   └── 20260301_seed_mock_community_data.sql
+│   │   │   ├── monitoring/
+│   │   │   │   ├── health-checker.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── metrics-collector.ts
+│   │   │   │   └── query-logger.ts
 │   │   │   ├── persistence/
 │   │   │   │   ├── drizzle/
 │   │   │   │   │   ├── drizzle-bill-repository.ts
@@ -3113,6 +3238,10 @@
 │   │   │   │   ├── base-repository.ts
 │   │   │   │   ├── errors.ts
 │   │   │   │   └── test-utils.ts
+│   │   │   ├── strategies/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── retry-strategy.ts
+│   │   │   │   └── routing-strategy.ts
 │   │   │   ├── utils/
 │   │   │   │   └── base-script.ts
 │   │   │   ├── connection.ts
@@ -3121,7 +3250,13 @@
 │   │   │   ├── index.ts
 │   │   │   ├── init.ts
 │   │   │   ├── monitoring.ts
+│   │   │   ├── PHASE1_COMPLETION_SUMMARY.md
+│   │   │   ├── PHASE2_COMPLETION_SUMMARY.md
+│   │   │   ├── PHASE3_COMPLETION_SUMMARY.md
+│   │   │   ├── PHASE4_COMPLETION_SUMMARY.md
 │   │   │   ├── pool.ts
+│   │   │   ├── REFACTORING_ANALYSIS.md
+│   │   │   ├── REFACTORING_COMPLETE.md
 │   │   │   └── repository-validation.ts
 │   │   ├── delivery/
 │   │   ├── error-handling/
@@ -3133,7 +3268,6 @@
 │   │   │   ├── result-types.ts
 │   │   │   └── types.ts
 │   │   ├── errors/
-│   │   │   └── error-types.ts
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
@@ -3419,6 +3553,7 @@
 │   │   ├── api-response.ts
 │   │   ├── api-utils.ts
 │   │   ├── cache-utils.ts
+│   │   ├── createErrorContext.ts
 │   │   ├── crypto.ts
 │   │   ├── db-helpers.ts
 │   │   ├── db-init.ts
@@ -3433,6 +3568,7 @@
 │   ├── index.ts
 │   ├── package.json
 │   ├── project.json
+│   ├── simple-server.ts
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   ├── vite.ts
@@ -3795,9 +3931,11 @@
 │   ├── playwright.config.ts
 │   └── README.md
 ├── ARCHITECTURE.md
+├── AUDIT_REPORT.md
 ├── BUILD_STATUS_FINAL.md
 ├── CHANGELOG.md
 ├── CODEBASE_CLEANUP_COMPLETE.md
+├── COMMIT_MESSAGE.txt
 ├── COMPLETE_CLEANUP_SUMMARY.md
 ├── CONFLICT_RESOLVED.md
 ├── CONSOLIDATION_SUMMARY.md
@@ -3827,6 +3965,7 @@
 ├── INTEGRATION_QUICKSTART.md
 ├── INTEGRATION_README.md
 ├── knip.config.ts
+├── local-test.png
 ├── MIGRATION_COMPLETE.md
 ├── MIGRATION_EXECUTION_GUIDE.md
 ├── migration-verification-report.json
@@ -3835,6 +3974,8 @@
 ├── MOCK_DATA_QUICK_START.md
 ├── MOCK_DATA_QUICKSTART.md
 ├── MOCK_DATA_STRATEGY.md
+├── MVP_INTEGRATION_PLAN.md
+├── MVP_INTEGRATION_SUMMARY.md
 ├── nginx.conf
 ├── NOTIFICATION_MIGRATION_COMPLETE.md
 ├── NOTIFICATION_MIGRATION_FINAL.md
@@ -3852,6 +3993,7 @@
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
 ├── QUICK_CLEANUP_SUMMARY.md
+├── QUICK_START.md
 ├── README_INTEGRATION.md
 ├── README.md
 ├── READY_TO_EXECUTE.md
@@ -3859,10 +4001,15 @@
 ├── SCHEMA_IMPORT_FIXES_NEEDED.md
 ├── SCHEMA_TABLES_NEEDED_ANALYSIS.md
 ├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
+├── SECURITY_STATUS.md
 ├── SEED_IMPLEMENTATION_SUMMARY.md
+├── SQL_INJECTION_FIX_PREVIEW.md
 ├── start-dev.js
 ├── STRATEGIC_FILE_DELETION_RATIONALE.md
 ├── tailwind.config.js
+├── test-results.txt
+├── test-vite.cjs
+├── test-vite.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json

@@ -4,8 +4,8 @@
  */
 
 import { createError } from '@client/infrastructure/error';
-import { CrossSystemErrorAnalytics } from '@client/infrastructure/monitoring/cross-system-error-analytics';
-import { ErrorAggregationService } from '@client/infrastructure/monitoring/error-aggregation-service';
+import { CrossSystemErrorAnalytics } from '@client/infrastructure/observability/error-monitoring/index';
+import { ErrorAggregationService } from '@client/infrastructure/observability/error-monitoring/index';
 import {
   UnifiedErrorMonitoring,
   ErrorMonitoringMiddleware,
@@ -17,7 +17,7 @@ import {
   AppError,
   ErrorDomain,
   ErrorSeverity
-} from '@client/infrastructure/monitoring/unified-error-monitoring-interface';
+} from '@client/infrastructure/observability/error-monitoring/index';
 
 class HooksMonitoring implements UnifiedErrorMonitoring {
   private static instance: HooksMonitoring;

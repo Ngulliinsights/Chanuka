@@ -1,0 +1,9 @@
+src/features/argument-intelligence/pages/argument-intelligence.tsx(9,24): error TS2307: Cannot find module 'react-helmet-async' or its corresponding type declarations.
+src/features/bills/ui/LegislativeBriefDisplay.tsx(14,37): error TS2307: Cannot find module '@/features/community' or its corresponding type declarations.
+src/features/pretext-detection/pages/pretext-detection.tsx(8,24): error TS2307: Cannot find module 'react-helmet-async' or its corresponding type declarations.
+src/lib/hooks/__tests__/useNavigationSlice.test.tsx(12,31): error TS2307: Cannot find module '../../../shared/infrastructure/store/slices/navigationSlice' or its corresponding type declarations.
+src/lib/ui/civic/CivicEducation.test.tsx(12,39): error TS2307: Cannot find module '../context/KenyanContextProvider' or its corresponding type declarations.
+src/lib/ui/dashboard/useDashboardData.ts(10,8): error TS2307: Cannot find module '../../infrastructure/store/slices/userDashboardSlice' or its corresponding type declarations.
+src/lib/ui/navigation/hooks/useNav.ts(6,29): error TS2307: Cannot find module '../../infrastructure/roleGuard' or its corresponding type declarations.
+src/scripts/fsd-migration.ts(8,24): error TS2307: Cannot find module '../../../shared/dist/core/observability/logging/logger' or its corresponding type declarations.
+src/tests/accessibility/home-page-accessibility.test.ts(8,24): error TS2307: Cannot find module '@axwright' or its corresponding type declarations.

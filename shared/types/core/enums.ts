@@ -953,3 +953,40 @@ export enum PayloadType {
   /** Resource usage payload */
   ResourceUsage = 'resource_usage',
 }
+
+// ============================================================================
+// Error Domain Enums
+// ============================================================================
+
+/**
+ * Error Domain - Categorizes the system component where an error originated
+ */
+export enum ErrorDomain {
+  SYSTEM = 'system',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  PERMISSION = 'permission',
+  DATABASE = 'database',
+  CACHE = 'cache',
+  NETWORK = 'network',
+  EXTERNAL_SERVICE = 'external_service',
+  BUSINESS_LOGIC = 'business_logic',
+  INFRASTRUCTURE = 'infrastructure',
+  SECURITY = 'security',
+  SESSION = 'session',
+  DATA = 'data',
+  INTEGRATION = 'integration',
+  RESOURCE = 'resource',
+  RATE_LIMITING = 'rate_limiting',
+  UI = 'ui',
+  HOOKS = 'hooks',
+  LIBRARY_SERVICES = 'library_services',
+  SERVICE_ARCHITECTURE = 'service_architecture',
+  CROSS_SYSTEM = 'cross_system',
+  USER_INPUT = 'user_input',
+  CONFIGURATION = 'configuration',
+  PERFORMANCE = 'performance',
+  FILE_SYSTEM = 'file_system',
+  UNKNOWN = 'unknown',
+}

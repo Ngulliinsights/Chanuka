@@ -94,3 +94,12 @@ export type {
 } from './types';
 
 export { z } from './types';
+
+// Dashboard validation
+export {
+  validateActionItem,
+  validateTrackedTopic,
+  validateDashboardData,
+  validateDashboardConfig,
+  safeValidateDashboardConfig,
+} from './dashboard-validation';

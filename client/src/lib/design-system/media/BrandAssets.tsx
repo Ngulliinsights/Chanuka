@@ -42,7 +42,7 @@ export const ChanukaFullLogo: React.FC<BrandAssetProps> = ({
 }) => {
   return (
     <img
-      src="/SVG/Chanuka_logo.svg"
+      src="/SVG/chanuka-logo.svg"
       alt={ariaLabel}
       className={`${sizeMap[size]} ${className}`}
       loading="lazy"
@@ -61,7 +61,7 @@ export const ChanukaSidemark: React.FC<BrandAssetProps> = ({
 }) => {
   return (
     <img
-      src="/SVG/CHANUKA_SIDEMARK.svg"
+      src="/SVG/chanuka-sidemark.svg"
       alt={ariaLabel}
       className={`${sizeMap[size]} ${className}`}
       loading="lazy"
@@ -99,7 +99,7 @@ export const DocumentShieldIcon: React.FC<BrandAssetProps> = ({
 }) => {
   return (
     <img
-      src="/SVG/doc_in_shield.svg"
+      src="/SVG/doc-in-shield.svg"
       alt={ariaLabel}
       className={`${sizeMap[size]} ${className}`}
       loading="lazy"
@@ -118,7 +118,7 @@ export const ChanukaSmallLogo: React.FC<BrandAssetProps> = ({
 }) => {
   return (
     <img
-      src="/SVG/alternative_small.svg"
+      src="/SVG/alternative-small.svg"
       alt={ariaLabel}
       className={`${sizeMap[size]} ${className}`}
       loading="lazy"

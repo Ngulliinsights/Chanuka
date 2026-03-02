@@ -63,6 +63,8 @@
       // Shared workspace modules
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"],
+      "@workspace": ["../shared"],
+      "@workspace/*": ["../shared/*"],
       
       // Server stubs for type-only imports
       "@server-stub/database": ["./src/stubs/database-stub.ts"],
@@ -70,7 +72,7 @@
     },
 
     // Type Definitions
-    "types": ["vite/client", "vitest/globals", "node"],
+    "types": ["vite/client", "node"],
     "typeRoots": ["./node_modules/@types", "../@types"]
   },
 
@@ -81,6 +83,10 @@
     "dist",
     "src/.cleanup-backup/**/*",
     "src/.design-system-backup/**/*",
-    "src/utils/archive/**/*"
+    "src/utils/archive/**/*",
+    "src/__tests__/**/*",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/scripts/**/*"
   ]
 }

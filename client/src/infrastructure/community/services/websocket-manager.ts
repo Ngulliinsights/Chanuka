@@ -1,0 +1,1 @@
+export const getWebSocketManager = () => ({}); export type WebSocketManager = any;

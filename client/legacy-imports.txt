@@ -1,0 +1,34 @@
+src/infrastructure/consolidation/mappings.ts:      from: '@/infrastructure/monitoring',
+src/infrastructure/consolidation/mappings.ts:      from: '@/infrastructure/performance',
+src/infrastructure/consolidation/README.md:  'client/src/infrastructure/monitoring/index.ts',
+src/infrastructure/consolidation/README.md:    path: 'client/src/infrastructure/monitoring',
+src/infrastructure/consolidation/README.md:    path: 'client/src/infrastructure/performance',
+src/infrastructure/consolidation/README.md:  '@/infrastructure/monitoring',
+src/infrastructure/consolidation/README.md:  '@/infrastructure/monitoring',
+src/infrastructure/consolidation/README.md:  { from: '@/infrastructure/monitoring', to: '@/infrastructure/observability/error-monitoring' },
+src/infrastructure/consolidation/README.md:  { from: '@/infrastructure/performance', to: '@/infrastructure/observability/performance' },
+src/infrastructure/consolidation/README.md:- `@/infrastructure/monitoring` → `@/infrastructure/observability/error-monitoring`
+src/infrastructure/consolidation/README.md:- `@/infrastructure/performance` → `@/infrastructure/observability/performance`
+src/infrastructure/consolidation/types.ts:  /** Source path or pattern (e.g., "@/infrastructure/monitoring") */
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func1 } from '@/infrastructure/monitoring';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func2 } from '@/infrastructure/performance';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func3 } from '@/infrastructure/monitoring';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:      const importingFiles = findFilesImportingFrom(project, '@/infrastructure/monitoring');
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func1 } from '@/infrastructure/monitoring/errors';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:      const importingFiles = findFilesImportingFrom(project, '@/infrastructure/monitoring');
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:      const importingFiles = findFilesImportingFrom(project, '@/infrastructure/monitoring');
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func1 } from '@/infrastructure/monitoring';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        '@/infrastructure/monitoring',
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func1 } from '@/infrastructure/monitoring/errors';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        '@/infrastructure/monitoring',
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        `import { func1, func2 as f2 } from '@/infrastructure/monitoring';`
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        '@/infrastructure/monitoring',
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        '@/infrastructure/monitoring',
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        import { func1 } from '@/infrastructure/monitoring';
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        import { func2 } from '@/infrastructure/monitoring/errors';
+src/infrastructure/consolidation/__tests__/migration-script.test.ts:        '@/infrastructure/monitoring',
+src/lib/services/index.ts: * - Monitoring services → features/monitoring/model/ & shared/infrastructure/monitoring/
+src/lib/services/index.ts: * ✅ enhanced-error-monitoring → shared/infrastructure/monitoring/error-monitor.ts
+src/lib/services/index.ts: * ✅ enhanced-performance-monitoring → shared/infrastructure/monitoring/performance-monitor.ts
+src/lib/services/index.ts: * ✅ enhanced-monitoring-integration → shared/infrastructure/monitoring/monitoring-integration.ts
+src/__tests__/strategic/monitoring/monitoring-init.test.ts:vi.mock('../../infrastructure/monitoring/error-monitor', () => ({

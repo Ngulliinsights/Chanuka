@@ -651,17 +651,17 @@ export default function CoreHomePage() {
       )}
 
       {/* Hero Section with Progressive Disclosure */}
-      <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center">
+      <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold">
         {/* Background Overlay */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/Chanuka_hero_parliament.png" 
+            src="/chanuka-hero-parliament.png" 
             alt="Parliament Building" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover mix-blend-overlay opacity-30"
           />
           {/* Brand Overlay - Navy tint for readability */}
-          <div className="absolute inset-0 bg-slate-900/80 mix-blend-multiply" />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/50" />
+          <div className="absolute inset-0 bg-slate-900/60 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/40" />
         </div>
 
         <div className="container mx-auto px-4 py-20 relative z-10">

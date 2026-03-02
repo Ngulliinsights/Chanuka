@@ -28,9 +28,9 @@ import { eventBus } from './events';
 import { secureStorage } from './storage';
 
 // Import foundation services
-import { logger } from './logging';
-import { cacheInvalidationManager } from './cache';
+import { logger } from './observability/logging';
 import { observability, initializeObservability } from './observability';
+import { cacheInvalidationManager } from './storage';
 
 // Import business services
 import { unifiedErrorHandler } from './error';
@@ -97,7 +97,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'Logger',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // Logger is already initialized, just return it
         return logger;
       },
@@ -112,7 +112,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'Cache',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // Cache manager is already initialized with storage
         return cacheInvalidationManager;
       },
@@ -127,7 +127,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'Observability',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // Initialize observability with configuration
         initializeObservability({
           errorMonitoring: {
@@ -164,7 +164,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'ErrorHandler',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // Error handler is already initialized with observability and logger
         return unifiedErrorHandler;
       },
@@ -183,7 +183,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'APIClient',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // API client is already initialized with cache and error handler
         return globalApiClient;
       },
@@ -202,7 +202,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
   factories.set(
     'Store',
     createServiceFactory(
-      (container: IDIContainer) => {
+      (_container: IDIContainer) => {
         // Redux store is already configured
         return store;
       },

@@ -14,7 +14,7 @@
 // Re-exports from Canonical Source
 // ============================================================================
 
-export type {
+import type {
   Bill,
   ExtendedBill,
   BillAction,
@@ -28,7 +28,21 @@ export type {
   BillTimelineEvent,
 } from '@shared/types/domains/legislative/bill';
 
-export {
+export type {
+  Bill,
+  ExtendedBill,
+  BillAction,
+  BillAmendment,
+  RelatedBill,
+  Sponsor,
+  Committee,
+  BillCommitteeAssignment,
+  BillEngagementMetrics,
+  ConstitutionalFlag,
+  BillTimelineEvent,
+};
+
+import {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
@@ -52,6 +66,30 @@ export {
   type SponsorType,
 } from '@shared/types';
 
+export {
+  BillStatus,
+  UrgencyLevel,
+  ComplexityLevel,
+  Chamber,
+  BillType,
+  CommitteeStatus,
+  BillPriority,
+  type BillStatusValue,
+  type UrgencyLevelValue,
+  type ComplexityLevelValue,
+  type ChamberValue,
+  type VoteType,
+  type VoteResult,
+  type SponsorRole,
+  type AmendmentStatus,
+  type BillRelationship,
+  type ConstitutionalSeverity,
+  type SentimentType,
+  type CommitteeType,
+  type LegislativeActionType,
+  type SponsorType,
+};
+
 // ============================================================================
 // Client-Specific Type Aliases (for backward compatibility)
 // ============================================================================
@@ -68,16 +106,16 @@ export type ChamberType = 'House' | 'Senate' | 'Both';
  * @deprecated Use BillStatus enum directly for new implementations
  */
 export const LEGACY_STATUS_MAP: Record<string, BillStatus> = {
-  introduced: BillStatus.FIRST_READING,
-  committee: BillStatus.COMMITTEE_STAGE,
-  floor_debate: BillStatus.SECOND_READING,
-  passed_house: BillStatus.THIRD_READING,
-  passed_senate: BillStatus.THIRD_READING,
-  passed: BillStatus.ENACTED,
-  failed: BillStatus.LOST,
-  signed: BillStatus.PRESIDENTIAL_ASSENT,
-  vetoed: BillStatus.WITHDRAWN,
-  override_attempt: BillStatus.THIRD_READING,
+  introduced: BillStatus.FirstReading,
+  committee: BillStatus.CommitteeStage,
+  floor_debate: BillStatus.SecondReading,
+  passed_house: BillStatus.ThirdReading,
+  passed_senate: BillStatus.ThirdReading,
+  passed: BillStatus.Enacted,
+  failed: BillStatus.Lost,
+  signed: BillStatus.PresidentialAssent,
+  vetoed: BillStatus.Withdrawn,
+  override_attempt: BillStatus.ThirdReading,
 } as const;
 
 // ============================================================================
@@ -100,137 +138,20 @@ export interface BillEngagement {
   readonly engagement_score?: number;
 }
 
-/**
- * Constitutional concern flagged during bill review
- * @deprecated Use ConstitutionalFlag from @shared/types instead
- */
-export interface ConstitutionalFlag {
-  readonly id?: string;
-  readonly type?: string;
-  readonly severity: ConstitutionalSeverity;
-  readonly description: string;
-  readonly affectedArticles?: readonly string[];
-  readonly expertAnalysis?: string;
-}
 
-/**
- * Bill sponsor or co-sponsor information
- * @deprecated Use Sponsor from @shared/types instead
- */
-export interface Sponsor {
-  readonly id: string;
-  readonly name: string;
-  readonly legislatorName?: string;
-  readonly party: string;
-  readonly role: SponsorRole;
-  readonly sponsorType?: 'primary' | 'cosponsor' | 'lead';
-  readonly district?: string;
-  readonly avatarUrl?: string;
-  readonly state?: string;
-  readonly isPrimary?: boolean;
-  readonly conflictOfInterest?: boolean;
-}
-
-/**
- * Legislative action or event in the bill's lifecycle
- * @deprecated Use BillAction from @shared/types instead
- */
-export interface BillAction {
-  readonly id: string;
-  readonly billId: string;
-  readonly action: string;
-  readonly date: string;
-  readonly chamber?: ChamberType;
-  readonly actor?: string;
-  readonly result?: VoteResult;
-  readonly notes?: string;
-}
-
-/**
- * Amendment proposed or applied to a bill
- * @deprecated Use BillAmendment from @shared/types instead
- */
-export interface BillAmendment {
-  readonly id: string;
-  readonly billId: string;
-  readonly number: string;
-  readonly title: string;
-  readonly description: string;
-  readonly proposedBy: string;
-  readonly status: AmendmentStatus;
-  readonly dateProposed: string;
-  readonly dateResolved?: string;
-  readonly impact?: string;
-}
-
-/**
- * Reference to a related bill
- * @deprecated Use RelatedBill from @shared/types instead
- */
-export interface RelatedBill {
-  readonly id: string;
-  readonly billNumber: string;
-  readonly title: string;
-  readonly relationship: BillRelationship;
-  readonly status: BillStatus;
-}
-
-/**
- * Core bill information and metadata
- * @deprecated Import Bill from @shared/types instead
- */
-export interface Bill {
-  readonly id: string;
-  readonly billNumber: string;
-  readonly title: string;
-  readonly summary: string;
-  readonly fullText?: string;
-  readonly billType?: string;
-  readonly status: BillStatus;
-  readonly urgency: UrgencyLevel;
-  readonly complexity: ComplexityLevel;
-  readonly introducedDate: string;
-  readonly introductionDate?: string;
-  readonly lastActionDate: string;
-  readonly lastUpdated?: string;
-  readonly sponsors: readonly Sponsor[];
-  readonly tags: readonly string[];
-  readonly policyAreas: readonly string[];
-  readonly readingTime?: number;
-  readonly trackingCount?: number;
-  readonly viewCount?: number;
-  readonly commentCount?: number;
-  readonly constitutionalIssues?: readonly string[];
-  readonly constitutionalFlags?: readonly ConstitutionalFlag[];
-  readonly financialImpact?: string;
-  readonly governmentBodies?: readonly string[];
-  readonly chamber?: ChamberType;
-  readonly session?: string;
-  readonly url?: string;
-  readonly engagement?: BillEngagement;
-  readonly timeline?: readonly BillAction[];
-  readonly bill_id?: string;
-  readonly bill_number?: string;
-  readonly created_at?: string;
-  readonly updated_at?: string;
-  readonly publication_date?: string;
-}
-
-/**
- * Extended bill with comprehensive details, amendments, and relationships
- * @deprecated Import ExtendedBill from @shared/types instead
- */
-export interface ExtendedBill extends Bill {
-  readonly description?: string;
-  readonly detailedSummary?: string;
-  readonly historicalContext?: string;
-  readonly amendments?: readonly BillAmendment[];
-  readonly relatedBills?: readonly RelatedBill[];
-}
 
 // ============================================================================
 // Bill Analysis (Client-Specific)
 // ============================================================================
+
+export interface BillAnalysis {
+  readonly id: string;
+  readonly billId: number | string;
+  readonly summary: string;
+  readonly keyPoints: readonly string[];
+  readonly impact: ImpactAssessment;
+  readonly sentiment: SentimentAnalysis;
+}
 
 /**
  * Sentiment analysis results with confidence scoring

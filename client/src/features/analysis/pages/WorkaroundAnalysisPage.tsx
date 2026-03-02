@@ -6,7 +6,7 @@
  * drill-down capabilities to individual bill analysis.
  */
 
-import React, { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -293,10 +293,7 @@ const COLORS = {
   low: 'hsl(120, 50%, 50%)',
 };
 
-export default function WorkaroundAnalysisPage() {
-  const [selectedType, setSelectedType] = useState<string | null>(null);
-
-  // Compute statistics
+export default function WorkaroundAnalysisPage() {  // Compute statistics
   const stats = useMemo(() => {
     const byType = MOCK_WORKAROUNDS.reduce(
       (acc, w) => {
@@ -348,30 +345,35 @@ export default function WorkaroundAnalysisPage() {
     value: count,
   }));
 
-  const timelineData = MOCK_WORKAROUNDS.map(w => ({
-    date: w.createdAt.toISOString().split('T')[0],
-    similarity: w.similarity,
-    type: w.type,
-    title: w.billTitle.substring(0, 30) + '...',
-  })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  const timelineData = [...MOCK_WORKAROUNDS]
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    .map(w => ({
+      date: w.createdAt.toISOString().split('T')[0],
+      similarity: w.similarity,
+      type: w.type,
+      title: w.billTitle.substring(0, 30) + '...',
+    }));
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-orange-500" />
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold p-8 rounded-2xl text-white shadow-xl relative overflow-hidden">
+        {/* Subtle noise overlay for texture */}
+        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
+        
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold flex items-center gap-3 drop-shadow-md">
+            <AlertTriangle className="h-8 w-8 text-brand-gold" />
             Implementation Workaround Analysis
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-white/90 font-medium mt-2 text-lg">
             Strategic dashboard for tracking constitutional bypass patterns across Kenyan
             legislation
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="text-sm">
-            <Calendar className="h-3 w-3 mr-1" />
+        <div className="flex items-center gap-2 relative z-10">
+          <Badge variant="outline" className="text-sm bg-white/10 hover:bg-white/20 border-white/30 text-white backdrop-blur-sm py-1.5 px-3">
+            <Calendar className="h-4 w-4 mr-2" />
             Last Updated: {new Date().toLocaleDateString()}
           </Badge>
         </div>

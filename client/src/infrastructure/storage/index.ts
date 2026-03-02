@@ -33,6 +33,12 @@ export { CacheStorage } from './cache-storage';
 // Offline data management
 export { OfflineDataManager } from './offline-data-manager';
 
+// Background sync management
+export * from './sync';
+
+// Asset loading management
+export * from './asset-loading';
+
 // NOTE: SessionManager and TokenManager have been moved to auth module
 // Import from: @client/infrastructure/auth
 
@@ -48,6 +54,7 @@ import { TokenManager, tokenManager } from '../auth/services/token-manager';
 
 import { CacheStorageManager } from './cache-storage';
 import { SecureStorage } from './secure-storage';
+import { cacheInvalidationManager } from './cache-manager';
 
 // Create singleton instances
 const secureStorage = SecureStorage.getInstance();
@@ -57,6 +64,7 @@ const cacheStorageManager = CacheStorageManager.getInstance();
 export {
   secureStorage,
   cacheStorageManager,
+  cacheInvalidationManager,
   // sessionManager and tokenManager are re-exported above
 };
 

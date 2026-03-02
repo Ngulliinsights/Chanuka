@@ -85,11 +85,10 @@ export {
 } from './slices/navigationSlice';
 
 export {
-  selectLoadingState,
-  selectIsLoading,
-  selectLoadingOperations,
+  selectLoadingStats,
   startLoadingOperation,
   completeLoadingOperation,
+  retryLoadingOperation,
   selectLoadingOperation,
   selectOperationsByPriority,
   selectActiveOperationsCount,
@@ -124,9 +123,8 @@ export {
 } from './slices/sessionSlice';
 
 export {
-  startLoading,
-  stopLoading,
-  setLoadingProgress,
+  setGlobalLoading,
+  resetLoadingState,
 } from './slices/loadingSlice';
 
 // ============================================================================
@@ -152,7 +150,6 @@ export { default as errorHandlingReducer } from './slices/errorHandlingSlice';
 // ============================================================================
 
 export type {
-  LoadingState,
   LoadingStateData,
   ExtendedLoadingOperation,
 } from './slices/loadingSlice';

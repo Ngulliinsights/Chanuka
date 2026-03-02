@@ -166,6 +166,7 @@ async function initializeApplication(): Promise<void> {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    console.error('FULL INIT ERROR:', error);
     logger.error(
       '❌ Application initialization failed',
       {

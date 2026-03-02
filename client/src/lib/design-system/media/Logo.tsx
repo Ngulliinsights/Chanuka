@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
 import { ChanukaLogo } from './ChanukaLogo';
@@ -11,12 +11,12 @@ interface LogoProps {
   variant?: 'default' | 'white' | 'dark';
 }
 
-export const Logo = React.memo<LogoProps>(
-  ({ className = '', size = 'md', showText = true, variant = 'default' }) => {
-    // Map legacy variant 'dark' to 'default' or handle effectively
-    const brandVariant = variant === 'dark' ? 'default' : variant; // 'dark' usually means dark text on light bg, which is our default
+export const Logo = memo<LogoProps>(
+  ({ className = '', size = 'md', variant = 'default' }) => {
+    // Map legacy variant 'dark' to 'monochrome', default to 'brand'
+    const brandVariant = variant === 'dark' ? 'monochrome' : variant === 'white' ? 'white' : 'brand';
 
-    const sizeMap = {
+    const sizeMap: Record<string, number> = {
       sm: 32,
       md: 48,
       lg: 64,
@@ -25,7 +25,7 @@ export const Logo = React.memo<LogoProps>(
 
     return (
       <div className={cn("flex items-center", className)}>
-        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant as unknown} />
+        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant} />
       </div>
     );
   }

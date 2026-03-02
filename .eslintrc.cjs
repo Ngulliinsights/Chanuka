@@ -258,6 +258,12 @@ module.exports = {
       },
     },
     {
+      files: ["**/logger*.ts", "**/logger*.tsx", "**/utils/logger.ts"],
+      rules: {
+        "no-console": "off", // Logger utilities require console for logging implementation
+      },
+    },
+    {
       files: ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
       parserOptions: {
         project: null,

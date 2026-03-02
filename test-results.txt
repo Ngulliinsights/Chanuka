@@ -1,0 +1,75 @@
+Starting Playwright...
+Navigating to http://localhost:5173...
+[debug] [vite] connecting...
+[debug] [vite] connected.
+[info] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold
+[warning] Theme contrast validation failed: [Object, Object, Object, Object]
+[log] [2026-03-01T22:46:42.395Z] INFO Configuration service initialized {message: Configuration service initialized, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.395Z}
+[debug] [2026-03-01T22:46:42.396Z] DEBUG Configuration validator registered {message: Configuration validator registered, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.396Z}
+[debug] [2026-03-01T22:46:42.397Z] DEBUG Configuration validator registered {message: Configuration validator registered, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.397Z}
+[debug] [2026-03-01T22:46:42.397Z] DEBUG Configuration validator registered {message: Configuration validator registered, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.397Z}
+[debug] [2026-03-01T22:46:42.397Z] DEBUG Configuration validator registered {message: Configuration validator registered, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.397Z}
+[debug] [2026-03-01T22:46:42.397Z] DEBUG Response interceptor added {message: Response interceptor added, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.397Z}
+[log] [2026-03-01T22:46:42.417Z] INFO Circuit breaker monitoring started {message: Circuit breaker monitoring started, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.417Z}
+[log] [2026-03-01T22:46:42.430Z] INFO 🔧 Initializing infrastructure services... {message: 🔧 Initializing infrastructure services..., context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.430Z}
+[log] Performance monitoring initialized
+[log] Telemetry initialized
+[log] ✅ Observability module initialized
+[log] [2026-03-01T22:46:42.432Z] INFO ✅ Infrastructure initialized successfully {message: ✅ Infrastructure initialized successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.432Z}
+[log] [2026-03-01T22:46:42.435Z] INFO ✅ React application mounted successfully {message: ✅ React application mounted successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.435Z}
+[log] [2026-03-01T22:46:42.435Z] INFO ✅ Chanuka Platform initialized successfully {message: ✅ Chanuka Platform initialized successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.435Z}
+[log] [2026-03-01T22:46:42.436Z] INFO Encryption initialized {message: Encryption initialized, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.436Z}
+[log] [2026-03-01T22:46:42.465Z] INFO 🚀 Client Application Initialized {message: 🚀 Client Application Initialized, context: undefined, metadata: undefined, timestamp: 2026-03-01T22:46:42.465Z}
+[debug] [i18n] Missing translation key: legal.jurisdiction.national
+[debug] [i18n] Missing translation key: civic.legislature.nationalAssembly
+[debug] [i18n] Missing translation key: civic.legislature.senate
+[debug] [i18n] Missing translation key: legal.jurisdiction.county
+[debug] [i18n] Missing translation key: civic.legislature.countyAssembly
+[debug] [i18n] Missing translation key: legal.jurisdiction.ward
+[debug] [i18n] Missing translation key: legal.billTypes.ordinary
+[debug] [i18n] Missing translation key: legal.stages.firstReading
+[debug] [i18n] Missing translation key: legal.stages.secondReading
+[debug] [i18n] Missing translation key: legal.stages.committeeStage
+[debug] [i18n] Missing translation key: legal.stages.thirdReading
+[debug] [i18n] Missing translation key: legal.stages.assent
+[debug] [i18n] Missing translation key: legal.billTypes.money
+[debug] [i18n] Missing translation key: legal.billTypes.constitutional
+[debug] [i18n] Missing translation key: legal.billTypes.county
+[log] [2026-03-01T22:46:42.497Z] INFO AppShell initializing... {message: AppShell initializing..., context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.497Z}
+[log] [2026-03-01T22:46:42.498Z] INFO AppShell initialized successfully {message: AppShell initialized successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.498Z}
+[debug] [2026-03-01T22:46:42.502Z] DEBUG Token validation skipped in development mode {message: Token validation skipped in development mode, context: undefined, metadata: undefined, timestamp: 2026-03-01T22:46:42.502Z}
+[log] [2026-03-01T22:46:42.510Z] INFO Token validation skipped in development mode {message: Token validation skipped in development mode, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.510Z}
+[debug] [i18n] Missing translation key: common.selectLanguage
+[log] [2026-03-01T22:46:42.570Z] INFO Route changed {message: Route changed, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.570Z}
+[log] [2026-03-01T22:46:42.571Z] INFO Navigation performance check {message: Navigation performance check, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.571Z}
+[log] [2026-03-01T22:46:42.572Z] INFO Navigation consistency applied {message: Navigation consistency applied, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.572Z}
+[debug] [2026-03-01T22:46:42.617Z] DEBUG Navigation persisted state cleared {message: Navigation persisted state cleared, context: undefined, metadata: undefined, timestamp: 2026-03-01T22:46:42.617Z}
+[log] [2026-03-01T22:46:42.623Z] INFO Navigation consistency applied {message: Navigation consistency applied, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.623Z}
+[log] [2026-03-01T22:46:42.631Z] INFO Service Worker registered: {message: Service Worker registered:, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.631Z}
+[log] [2026-03-01T22:46:42.633Z] INFO Service Worker registered: {message: Service Worker registered:, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.633Z}
+[log] [2026-03-01T22:46:42.759Z] INFO Optimized Home Page loaded {message: Optimized Home Page loaded, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.759Z}
+[log] [2026-03-01T22:46:42.760Z] INFO Smart Home Page Selector initialized {message: Smart Home Page Selector initialized, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:42.760Z}
+[log] [2026-03-01T22:46:43.418Z] INFO Navigation consistency applied {message: Navigation consistency applied, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.418Z}
+[log] [2026-03-01T22:46:43.430Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.430Z}
+[log] [2026-03-01T22:46:43.669Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.669Z}
+[log] [2026-03-01T22:46:43.675Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.675Z}
+[log] [2026-03-01T22:46:43.708Z] INFO Bills Pagination Service initialized {message: Bills Pagination Service initialized, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.708Z}
+[log] [2026-03-01T22:46:43.709Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.709Z}
+[debug] [2026-03-01T22:46:43.710Z] DEBUG IndexedDB schema created {message: IndexedDB schema created, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.710Z}
+[debug] [2026-03-01T22:46:43.726Z] DEBUG IndexedDB initialized successfully {message: IndexedDB initialized successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.726Z}
+[log] [2026-03-01T22:46:43.726Z] INFO Bills Cache Service initialized {message: Bills Cache Service initialized, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:43.726Z}
+[log] [2026-03-01T22:46:44.578Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:44.578Z}
+[log] [2026-03-01T22:46:45.584Z] INFO Route preloaded successfully {message: Route preloaded successfully, context: Object, metadata: undefined, timestamp: 2026-03-01T22:46:45.584Z}
+[error] Failed to load resource: net::ERR_FAILED
+[warning] Failed to decode downloaded font: https://fonts.gstatic.com/s/worksans/v24/QGYsz_wNahGAdqQ43Rh_fKDp.woff2
+[warning] Failed to decode downloaded font: https://fonts.gstatic.com/s/dmserifdisplay/v17/-nFnOHM81r4j6k0gjAW3mujVU2B2G_Bx0g.woff2
+[warning] Failed to decode downloaded font: https://fonts.gstatic.com/s/worksans/v24/QGYsz_wNahGAdqQ43Rh_fKDp.woff2
+[warning] Failed to decode downloaded font: https://fonts.gstatic.com/s/worksans/v24/QGYsz_wNahGAdqQ43Rh_fKDp.woff2
+[warning] Failed to decode downloaded font: https://fonts.gstatic.com/s/worksans/v24/QGYsz_wNahGAdqQ43Rh_fKDp.woff2
+[debug] [Cleanup] Removed unused preload: /bills
+[debug] [Cleanup] Removed unused preload: /search
+[debug] [Cleanup] Removed unused preload: /dashboard
+Page title: Chanuka - Kenyan Legislative Intelligence
+
+--- CONSOLE LOGS START ---
+Screenshot saved to local-test.png

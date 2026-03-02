@@ -102,46 +102,12 @@ export {
 } from './4-personas-implementation-guide';
 
 // ════════════════════════════════════════════════════════════════════════════
-// COMPONENT FLATTENING ANALYSIS & VALIDATION
+// COMPONENT FLATTENING & MIGRATION DOCUMENTATION
 // ════════════════════════════════════════════════════════════════════════════
-export { COMPONENT_VALIDATION, COMPONENT_CHECKLIST } from './COMPONENT_FLATTENING_STRATEGY';
-
-export {
-  FLATTENING_EXECUTION,
-  type FlatteningExecutionType,
-} from './COMPONENT_FLATTENING_EXECUTION_REPORT';
-
-export {
-  MIGRATION_SUMMARY,
-  EXPORT_VERIFICATION,
-  ORGANIZATION_RATIONALE,
-  SAFE_DELETION_CHECKLIST,
-  QUALITY_METRICS,
-  RECOMMENDED_NEXT_STEPS,
-  type MigrationSummaryType,
-  type ExportVerificationType,
-} from './MIGRATION_SUMMARY';
-
-export {
-  COMPLETION_REPORT,
-  MIGRATION_DETAILS,
-  STRUCTURAL_CHANGES,
-  VERIFICATION_RESULTS,
-  IMPACT_ANALYSIS,
-  RECOMMENDATIONS,
-  METRICS,
-  LESSONS_LEARNED,
-  SUCCESS_CRITERIA_VERIFICATION,
-  FINAL_STATUS,
-  type CompletionReportType,
-  type MigrationDetailsType,
-  type VerificationResultsType,
-} from './COMPLETION_REPORT';
-
-// ════════════════════════════════════════════════════════════════════════════
-// REFINEMENT STRATEGY DOCUMENTATION
-// ════════════════════════════════════════════════════════════════════════════
-export * from './REFINEMENT_STRATEGY';
+// Note: COMPONENT_FLATTENING_STRATEGY, COMPONENT_FLATTENING_EXECUTION_REPORT,
+// MIGRATION_SUMMARY, COMPLETION_REPORT, and REFINEMENT_STRATEGY are .md
+// documentation files, not TypeScript modules. See the design-system docs/
+// directory for these artifacts.
 
 // ════════════════════════════════════════════════════════════════════════════
 // DESIGN STANDARDS & GUIDELINES - THE STRATEGIST (Vision & Sustainability)

@@ -3,7 +3,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
 import type { BillTrackingPreferences } from '@client/infrastructure/api/types';
-import { useWebSocket } from '@client/infrastructure/realtime/hooks/use-websocket';
+import { useWebSocket } from '@client/infrastructure/api/realtime';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import {

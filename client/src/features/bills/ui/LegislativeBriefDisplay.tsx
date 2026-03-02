@@ -11,7 +11,7 @@
 
 import React, { useState } from 'react';
 
-import { useLegislativeBrief } from '@/features/community';
+import { useLegislativeBrief } from '@features/community';
 
 interface LegislativeBriefDisplayProps {
   billId: string;

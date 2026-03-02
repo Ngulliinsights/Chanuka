@@ -5,7 +5,7 @@
  * and preferences based on their persona type.
  */
 
-import type { PersonaType, PersonaPreferences } from '@client/infrastructure/personalization/types';
+import type { PersonaType, PersonaPreferences } from '@client/infrastructure/observability/personalization';
 import {
   LayoutGrid as Layout, // Using LayoutGrid as Layout replacement
   // Eye, // Unused

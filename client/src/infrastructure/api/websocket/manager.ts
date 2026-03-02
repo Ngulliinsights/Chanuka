@@ -12,12 +12,16 @@
  */
 
 export interface WebSocketManager {
-  connect(url: string): Promise<void>;
+  connect(url?: string): Promise<void>;
   disconnect(): void;
   send(data: unknown): void;
-  on(event: string, handler: (data: unknown) => void): void;
+  on(event: string, handler: (data: unknown) => void): () => void;
   off(event: string, handler: (data: unknown) => void): void;
   getConnectionState(): ConnectionState;
+  isConnected(): boolean;
+  joinRoom(room: string): void;
+  leaveRoom(room: string): void;
+  emit(event: string, data: unknown): void;
 }
 
 export interface ReconnectionConfig {
@@ -58,25 +62,39 @@ export class WebSocketManagerImpl implements WebSocketManager {
     backoffMultiplier: 2,
   };
 
+  private static instance: WebSocketManagerImpl;
+  static getInstance(): WebSocketManagerImpl {
+    if (!this.instance) {
+      this.instance = new WebSocketManagerImpl();
+    }
+    return this.instance;
+  }
+
   constructor(config?: Partial<ReconnectionConfig>) {
     if (config) {
       this.config = { ...this.config, ...config };
     }
   }
 
-  async connect(url: string): Promise<void> {
-    this.url = url;
+  async connect(url?: string): Promise<void> {
+    if (url) {
+      this.url = url;
+    }
+    
+    if (!this.url) {
+      throw new Error('WebSocket URL is required for initial connection');
+    }
     this.connectionState = 'connecting';
 
     return new Promise((resolve, reject) => {
       try {
-        this.ws = new WebSocket(url);
+        this.ws = new WebSocket(this.url);
 
         this.ws.onopen = () => {
           this.connectionState = 'connected';
           this.reconnectAttempts = 0;
           console.log('[WebSocket] Connected successfully', {
-            url: this.url,
+            url: this.url || '',
             timestamp: new Date().toISOString(),
           });
           this.emit('connected', { url: this.url });
@@ -154,11 +172,13 @@ export class WebSocketManagerImpl implements WebSocketManager {
     }
   }
 
-  on(event: string, handler: EventHandler): void {
+  on(event: string, handler: EventHandler): () => void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
     this.eventHandlers.get(event)!.add(handler);
+    
+    return () => this.off(event, handler);
   }
 
   off(event: string, handler: EventHandler): void {
@@ -171,11 +191,25 @@ export class WebSocketManagerImpl implements WebSocketManager {
     }
   }
 
+  isConnected(): boolean {
+    return this.connectionState === 'connected';
+  }
+
   getConnectionState(): ConnectionState {
     return this.connectionState;
   }
 
-  private emit(event: string, data: unknown): void {
+  joinRoom(room: string): void {
+    console.log(`[WebSocket] Joining room: ${room}`);
+    this.send({ type: 'room:join', room });
+  }
+
+  leaveRoom(room: string): void {
+    console.log(`[WebSocket] Leaving room: ${room}`);
+    this.send({ type: 'room:leave', room });
+  }
+
+  emit(event: string, data: unknown): void {
     const handlers = this.eventHandlers.get(event);
     if (handlers) {
       handlers.forEach((handler) => {

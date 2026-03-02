@@ -2,7 +2,7 @@
  * Analytics Feature
  *
  * Business logic layer for analytics - dashboards, reports, scoring, and analysis
- * For core tracking infrastructure, see @client/infrastructure/analytics
+ * For core tracking infrastructure, see @client/infrastructure/observability/analytics
  */
 
 // Business logic models

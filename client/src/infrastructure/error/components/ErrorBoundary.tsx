@@ -10,8 +10,8 @@ import { Component, ReactNode, ErrorInfo } from 'react';
 import React from 'react';
 
 import { browserDetector } from '@client/infrastructure/browser/browser-detector';
-import { BaseError, ErrorDomain, ErrorSeverity, coreErrorHandler } from '@client/infrastructure/error';
-import { getPerformanceMonitor } from '@client/infrastructure/performance';
+import { ErrorDomain, ErrorSeverity, coreErrorHandler } from '@client/infrastructure/error';
+import { BaseError } from '@client/infrastructure/error/classes';
 
 
 /**
@@ -157,7 +157,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               component: 'ErrorBoundary',
               timestamp: Date.now(),
               browserInfo: browserDetector.getBrowserInfo(),
-              performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
+              performanceMetrics: {},
             },
           });
 
@@ -255,7 +255,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       recoverySuccessful: false,
       userFeedbackProvided: false,
       browserInfo: browserDetector.getBrowserInfo(),
-      performanceMetrics: getPerformanceMonitor().getPerformanceStats(),
+      performanceMetrics: {},
       context: this.props.context,
     };
 
@@ -466,12 +466,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
         sessionId: this.generateSessionId(),
       };
 
-      // Log feedback for now (could be sent to analytics service)
-      // logger.info('User feedback submitted', {
-      //   component: 'ErrorBoundary',
-      //   errorId: this.state.errorId,
-      //   feedback: enhancedFeedback,
-      // });
+      console.log('User feedback submitted', {
+        component: 'ErrorBoundary',
+        errorId: this.state.errorId,
+        feedback: enhancedFeedback,
+      });
 
       this.setState({ userFeedbackSubmitted: true });
 

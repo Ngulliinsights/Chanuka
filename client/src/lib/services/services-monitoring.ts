@@ -5,8 +5,8 @@
  */
 
 import { createError } from '@/infrastructure/error';
-import { CrossSystemErrorAnalytics } from '../../infrastructure/monitoring/cross-system-error-analytics';
-import { ErrorAggregationService } from '../../infrastructure/monitoring/error-aggregation-service';
+import { CrossSystemErrorAnalytics } from '../../infrastructure/observability/error-monitoring/index';
+import { ErrorAggregationService } from '../../infrastructure/observability/error-monitoring/index';
 import {
   UnifiedErrorMonitoring,
   ErrorMonitoringMiddleware,
@@ -18,7 +18,7 @@ import {
   AppError,
   ErrorDomain,
   ErrorSeverity
-} from '../../infrastructure/monitoring/unified-error-monitoring-interface';
+} from '../../infrastructure/observability/error-monitoring/index';
 
 // Type definitions for internal state management
 interface ServiceStats {

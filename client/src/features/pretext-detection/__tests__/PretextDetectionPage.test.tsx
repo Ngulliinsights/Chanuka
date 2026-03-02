@@ -11,7 +11,7 @@ import { PretextDetectionPage } from '../pages/pretext-detection';
 import * as hooks from '../hooks/usePretextDetectionApi';
 
 // Mock analytics service
-vi.mock('@client/infrastructure/analytics/service', () => ({
+vi.mock('@client/infrastructure/observability/analytics', () => ({
   analyticsService: {
     trackPageView: vi.fn(),
     trackUserAction: vi.fn(),
@@ -246,7 +246,7 @@ describe('PretextDetectionPage', () => {
   });
 
   it('tracks page view on mount', () => {
-    const { analyticsService } = require('@client/infrastructure/analytics/service');
+    const { analyticsService } = require('@client/infrastructure/observability/analytics');
     
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: [],
@@ -268,7 +268,7 @@ describe('PretextDetectionPage', () => {
 
   it('tracks tab changes', async () => {
     const user = userEvent.setup();
-    const { analyticsService } = require('@client/infrastructure/analytics/service');
+    const { analyticsService } = require('@client/infrastructure/observability/analytics');
     
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: mockAlerts,

@@ -17,7 +17,7 @@ import {
   AnalyticsDashboardData,
   PagePerformanceMetrics,
   UserEngagementMetrics,
-} from '@client/infrastructure/analytics/comprehensive-tracker';
+} from '@client/infrastructure/observability/analytics';
 import { useNavigation } from '@client/infrastructure/navigation/context';
 import { logger } from '@client/lib/utils/logger';
 

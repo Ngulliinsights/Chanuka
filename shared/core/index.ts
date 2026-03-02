@@ -29,3 +29,9 @@ export {
   maybeToArray,
   combineMaybes,
 } from './maybe';
+
+// Error types
+export {
+  ErrorDomain,
+  ErrorSeverity,
+} from '../types';

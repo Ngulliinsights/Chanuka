@@ -19,7 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/lib/design-system';
-import PerformanceMonitoring from '@client/infrastructure/monitoring/performance-monitor';
+import { PerformanceMonitor as PerformanceMonitoring } from '@client/infrastructure/observability/performance/index';
 import { logger } from '@client/lib/utils/logger';
 
 // Temporarily unused - TODO: Implement performance benchmarking
@@ -93,7 +93,7 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   const thresholds = React.useMemo(() => ({
     ...(DEFAULT_THRESHOLDS[pageName] || DEFAULT_THRESHOLDS.default),
     ...customThresholds,
-  }), [pageName, customThresholds]);
+  } as PerformanceThresholds), [pageName, customThresholds]);
 
   // Use refs for dependencies that might change on every render but shouldn't trigger monitoring restart
   const thresholdsRef = useRef(thresholds);

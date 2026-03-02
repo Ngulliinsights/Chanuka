@@ -250,7 +250,7 @@ import { requestDeduplicator } from '@/infrastructure/api/http';
 
 ```typescript
 // Old
-import { WebSocketManager } from '@/infrastructure/websocket';
+import { type WebSocketManager } from '@/infrastructure/websocket';
 
 // New
 import { createWebSocketClient } from '@/infrastructure/api';

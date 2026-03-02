@@ -9,7 +9,7 @@ import type {
   PersonaType,
   PersonaClassification,
   PersonaPreferences,
-} from '@client/infrastructure/personalization/types';
+} from '@client/infrastructure/observability/personalization';
 import {
   Activity,
   Bookmark,
