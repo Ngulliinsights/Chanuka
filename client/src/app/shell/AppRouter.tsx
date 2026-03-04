@@ -90,7 +90,7 @@ const PressPage = createLazyComponent(() => import('@client/features/home/pages/
 const BlogPage = createLazyComponent(() => import('@client/features/home/pages/blog'), 'Blog');
 const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
 const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility'), 'Accessibility');
-const CivicEducationPage = createLazyComponent(() => import('@client/features/civic/pages/civic-education'), 'Civic Education');
+const CivicEducationPage = createLazyComponent(() => import('@client/features/onboarding/pages/civic-education'), 'Civic Education');
 const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
 const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
 const ApiAccessPage = createLazyComponent(() => import('@client/features/api/pages/api-access'), 'API Access');

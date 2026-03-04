@@ -1,7 +1,7 @@
 import { Users, DollarSign, Eye, MapPin, Calendar, ExternalLink, Network } from 'lucide-react';
 import React, { useState } from 'react';
 
-import FinancialNetworkAnalysis from '@client/features/sponsorship/pages/financial-network';
+import FinancialNetworkAnalysis from '@client/features/bills/ui/sponsorship/financial-network';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {

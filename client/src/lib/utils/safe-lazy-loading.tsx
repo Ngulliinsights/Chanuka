@@ -70,7 +70,7 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
       case '../pages/home':
         return import('@client/features/home/pages/home');
       case '@client/pages/dashboard':
-        return import('@client/features/dashboard/pages/dashboard');
+        return import('@client/features/admin/pages/dashboard');
       case '@client/pages/bills-dashboard-page':
         return import('@client/features/bills/pages/bills-dashboard-page');
       case '@client/pages/auth-page':
