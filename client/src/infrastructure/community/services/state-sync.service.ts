@@ -9,7 +9,7 @@ import { QueryClient } from '@tanstack/react-query';
 
 import type { UnifiedComment, UnifiedModeration, UnifiedThread } from '../types';
 
-import { type WebSocketManager } from './websocket-manager';
+import { type WebSocketManager } from '@client/infrastructure/api';
 
 // ============================================================================
 // SYNCABLE COMMENT

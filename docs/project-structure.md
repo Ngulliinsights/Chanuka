@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 4, 2026 at 02:56 PM
+**Generated:** March 4, 2026 at 05:49 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,045
+**Total Items:** 3,941
 
 ```
 .
@@ -550,8 +550,7 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── onboarding-service.ts
 │   │   │   │   │   ├── profile-service.ts
-│   │   │   │   │   ├── user-api.ts
-│   │   │   │   │   └── user-service-legacy.ts
+│   │   │   │   │   └── user-api.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── auth/
 │   │   │   │   │   │   ├── AuthAlert.tsx
@@ -627,12 +626,12 @@
 │   │   │   │   │   ├── request.ts
 │   │   │   │   │   ├── service.ts
 │   │   │   │   │   ├── shared-imports.ts
-│   │   │   │   │   ├── sponsor.ts
-│   │   │   │   │   └── websocket.ts
+│   │   │   │   │   └── sponsor.ts
 │   │   │   │   ├── websocket/
 │   │   │   │   │   ├── client.ts
 │   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── manager.ts
+│   │   │   │   │   ├── manager.ts
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── authentication.ts
 │   │   │   │   ├── cache-manager.ts
@@ -715,8 +714,7 @@
 │   │   │   │   ├── hooks/
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── moderation.service.ts
-│   │   │   │   │   ├── state-sync.service.ts
-│   │   │   │   │   └── websocket-manager.ts
+│   │   │   │   │   └── state-sync.service.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
@@ -1203,7 +1201,6 @@
 │   │   │   │   │   └── strategy-template.ts
 │   │   │   │   ├── utils/
 │   │   │   │   │   ├── error-handling.ts
-│   │   │   │   │   ├── migration-compatibility.ts
 │   │   │   │   │   └── performance.ts
 │   │   │   │   ├── CLIENT_VALIDATION_GUIDE.md
 │   │   │   │   ├── hooks-monitoring.ts
@@ -1709,16 +1706,6 @@
 │   ├── project.json
 │   ├── README.md
 │   ├── tailwind.config.ts
-│   ├── ts_error_final.txt
-│   ├── ts_error_final2.txt
-│   ├── ts_errors.txt
-│   ├── ts_errors2.txt
-│   ├── ts_errors3.txt
-│   ├── ts_errors4.txt
-│   ├── ts_errors5.txt
-│   ├── tsc-errors-2.txt
-│   ├── tsc-errors-3.txt
-│   ├── tsc-errors.txt
 │   ├── tsconfig.json
 │   ├── tsconfig.test.json
 │   ├── tsconfig.tsbuildinfo
@@ -1949,6 +1936,15 @@
 │   │   ├── sponsorbyreal.html
 │   │   ├── strategic_additions_poems.md
 │   │   └── strategy_template_flow.mermaid
+│   ├── DCS/
+│   │   ├── ARCHITECTURE.md
+│   │   ├── CLEANUP_PLAN.md
+│   │   ├── CORE_FEATURES.md
+│   │   ├── DEVELOPMENT_WORKFLOW.md
+│   │   ├── EXTRACTION_COMPLETE.md
+│   │   ├── INDEX.md
+│   │   ├── QUICK_REFERENCE.md
+│   │   └── SECURITY_STATUS.md
 │   ├── development/
 │   │   └── CIRCULAR_DEPENDENCY_PREVENTION.md
 │   ├── features/
@@ -2185,7 +2181,6 @@
 │   │   ├── reset.ts
 │   │   ├── rollback-with-verification.ts
 │   │   ├── run-migrations-sql.ts
-│   │   ├── run-migrations.ts
 │   │   ├── run-reset.sh
 │   │   ├── run-reset.ts
 │   │   ├── schema-drift-detection.ts
@@ -3356,8 +3351,7 @@
 │   │   │   ├── validation-integration.ts
 │   │   │   └── websocket.ts
 │   │   ├── security/
-│   │   │   ├── README.md
-│   │   │   └── secure-query-builder.ts
+│   │   │   └── README.md
 │   │   ├── validation/
 │   │   │   ├── data-completeness.ts
 │   │   │   ├── data-validation-service.ts
@@ -3423,7 +3417,6 @@
 │   │   │   │   ├── priority-queue.test.ts
 │   │   │   │   └── priority-queue.ts
 │   │   │   ├── api-server.ts
-│   │   │   ├── backward-compatibility.test.ts
 │   │   │   ├── index.ts
 │   │   │   ├── integration-demo.js
 │   │   │   ├── README.md
@@ -3469,7 +3462,6 @@
 │   │   ├── fix-return-statements.js
 │   │   ├── fix-shared-core-imports.ts
 │   │   ├── fix-shared-imports.js
-│   │   ├── legacy-websocket-cleanup.ts
 │   │   ├── migrate-database-access.ts
 │   │   ├── migration-runner.ts
 │   │   ├── run-websocket-validation.ts
@@ -3483,7 +3475,6 @@
 │   │   └── websocket-performance-validation.ts
 │   ├── tests/
 │   │   ├── integration/
-│   │   │   ├── websocket-backward-compatibility.test.ts
 │   │   │   └── websocket-service.test.ts
 │   │   ├── unit/
 │   │   │   ├── infrastructure/
@@ -3508,7 +3499,6 @@
 │   │   │   └── index.ts
 │   │   ├── service/
 │   │   │   └── index.ts
-│   │   ├── api.ts
 │   │   ├── common.ts
 │   │   ├── index.ts
 │   │   ├── jest-extensions.d.ts
@@ -3517,14 +3507,12 @@
 │   │   ├── analytics-controller-wrapper.ts
 │   │   ├── anonymity-service.ts
 │   │   ├── api-response-helpers.ts
-│   │   ├── api-response.ts
 │   │   ├── api-utils.ts
 │   │   ├── cache-utils.ts
 │   │   ├── createErrorContext.ts
 │   │   ├── crypto.ts
 │   │   ├── db-helpers.ts
 │   │   ├── db-init.ts
-│   │   ├── errors.ts
 │   │   ├── featureFlags.ts
 │   │   ├── metrics.ts
 │   │   ├── missing-modules-fallback.ts
@@ -3916,140 +3904,49 @@
 │   ├── playwright.config.ts
 │   └── README.md
 ├── ARCHITECTURE.md
-├── AUDIT_REPORT.md
-├── BUILD_STATUS_FINAL.md
+├── AUDIT_PENDING_CHANGES.md
 ├── CHANGELOG.md
-├── CODEBASE_CLEANUP_COMPLETE.md
-├── COMMIT_MESSAGE.txt
-├── COMMIT_SUMMARY.md
-├── COMPLETE_CLEANUP_SUMMARY.md
-├── CONFLICT_RESOLVED.md
-├── CONSOLIDATION_SUMMARY.md
 ├── CONTRIBUTING.md
-├── CORE_8_FEATURES_INTEGRATION_PLAN.md
-├── CORE_9_FEATURES_UPDATED.md
 ├── cspell.config.yaml
-├── CURRENT_STATUS_REEVALUATION.md
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
-├── DATABASE_AUTH_STILL_FAILING.md
-├── DATABASE_CONSISTENCY_ANALYSIS.md
-├── DATABASE_CONSISTENCY_VERIFIED.md
-├── DATABASE_MIGRATION_STATUS.md
-├── DEFERRED_ISSUES_RESOLUTION.md
 ├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
-├── DRIZZLE_NEON_FIX_SUMMARY.md
 ├── drizzle.config.ts
-├── EXECUTE_NOW.md
-├── EXECUTE_PHASE_2A.md
-├── FINAL_CLEANUP_REPORT.md
-├── FINAL_MVP_STATUS_REPORT.md
-├── FINAL_SESSION_SUMMARY.md
-├── FINAL_STATUS_DATABASE_AUTH_ISSUE.md
-├── fix-logger.js
-├── FRESH_START_MIGRATION_PLAN.md
+├── FINAL_AUDIT_RECOMMENDATION.md
 ├── generate-structure.mjs
-├── git-history.txt
-├── IMMEDIATE_ACTION_PLAN_REVISED.md
-├── IMMEDIATE_ACTION_PLAN.md
-├── IMMEDIATE_FIXES_APPLIED.md
-├── IMPLEMENTATION_PROGRESS_REPORT.md
-├── IMPORT_VALIDATION_REPORT.md
-├── INFRASTRUCTURE_CONSOLIDATION_VALIDATION.md
 ├── infrastructure-aggregator-imports.txt
 ├── infrastructure-logging-imports.txt
 ├── infrastructure-recovery-imports.txt
 ├── infrastructure-stub-imports.txt
-├── INTEGRATION_ANALYSIS.md
-├── INTEGRATION_CHECKLIST.md
-├── INTEGRATION_COMPLETE_SUMMARY.md
-├── INTEGRATION_COMPLETE.md
-├── INTEGRATION_PROGRESS.md
-├── INTEGRATION_QUICKSTART.md
-├── INTEGRATION_README.md
 ├── knip.config.ts
 ├── local-test.png
-├── MIGRATION_COMPLETE.md
-├── MIGRATION_EXECUTION_GUIDE.md
 ├── migration-verification-report.json
-├── MOCK_DATA_GENERATION_PROMPTS.md
-├── MOCK_DATA_IMPLEMENTATION_SUMMARY.md
-├── MOCK_DATA_QUICK_START.md
-├── MOCK_DATA_QUICKSTART.md
-├── MOCK_DATA_STRATEGY.md
-├── MVP_ACTUAL_STATUS_REPORT.md
-├── MVP_CRITICAL_FEATURES_AUDIT.md
-├── MVP_DEMO_READINESS_SUMMARY.md
-├── MVP_INTEGRATION_PLAN.md
-├── MVP_INTEGRATION_SUMMARY.md
-├── MVP_TEST_RESULTS.md
-├── NEON_AUTH_INVESTIGATION_SUMMARY.md
-├── NEXT_STEPS_FOR_USER.md
 ├── nginx.conf
-├── NOTIFICATION_MIGRATION_COMPLETE.md
-├── NOTIFICATION_MIGRATION_FINAL.md
-├── NOTIFICATION_MIGRATION_PLAN.md
-├── NOTIFICATION_SYSTEM_COMPLETE.md
+├── nul
 ├── nx.json
 ├── package.json
-├── PHASE_2A_COMPLETE.md
-├── PHASE_2A_EXECUTION_SUMMARY.md
-├── PHASE_2B_AND_TYPESCRIPT_FIXES_STATUS.md
-├── PHASE_2B_COMPLETE.md
-├── PHASE_2B_LOGGER_CONVERSION_COMPLETE.md
-├── PHASE1_COMPLETION_SUMMARY.md
-├── PHASE2_FINAL_STATUS.md
-├── PHASE2_PROGRESS_SUMMARY.md
-├── PHASE2_READINESS_ASSESSMENT.md
-├── PHASE3_EXECUTION_PLAN.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
-├── QUALITY_REPORT.md
-├── QUICK_CLEANUP_SUMMARY.md
 ├── QUICK_START.md
 ├── README_INTEGRATION.md
 ├── README.md
-├── READY_TO_EXECUTE.md
-├── SCHEMA_CONFLICTS_RESOLUTION.md
-├── SCHEMA_IMPORT_FIXES_NEEDED.md
-├── SCHEMA_TABLES_NEEDED_ANALYSIS.md
-├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
 ├── SECURITY_REPORT.md
 ├── SECURITY_STATUS.md
-├── SEED_IMPLEMENTATION_SUMMARY.md
-├── SESSION_COMPLETION_SUMMARY.md
-├── SESSION_CONTINUATION_SUMMARY.md
-├── SESSION_SUMMARY.md
-├── SHARED_LAYER_COMPLETION_REPORT.md
-├── SHARED_LAYER_IMPLEMENTATION_PLAN.md
-├── SOLUTION_DRIZZLE_TRANSACTION_FIX.md
-├── SQL_INJECTION_FIX_PREVIEW.md
 ├── start-dev.js
-├── STRATEGIC_FILE_DELETION_RATIONALE.md
-├── STRATEGIC_PHASE2_EXECUTION.md
 ├── tailwind.config.js
-├── TEST_PROGRESS_SUMMARY.md
-├── test-neon-transaction.cjs
 ├── test-results.txt
-├── test-transaction-debug.ts
 ├── test-vite.cjs
 ├── test-vite.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json
-├── TYPESCRIPT_FIXES_SUMMARY.md
-├── vitest-output-2.txt
-├── vitest-output-3.txt
-├── vitest-output-4.txt
-├── vitest-output.txt
 ├── vitest.setup.ts
-├── vitest.workspace.ts
-└── WHY_TABLES_ARE_UNUSED_ANALYSIS.md
+└── vitest.workspace.ts
 ```
 
 ## Configuration

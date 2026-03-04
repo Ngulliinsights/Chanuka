@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { globalApiClient } from '../../../infrastructure/api/client';
 import { StateSyncService } from '../../../infrastructure/community/services/state-sync.service';
-import { WebSocketManager } from '@client/services/websocket-manager';
+import { WebSocketManager } from '@client/infrastructure/api';
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
