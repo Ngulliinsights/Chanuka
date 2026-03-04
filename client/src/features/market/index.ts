@@ -4,3 +4,5 @@
  */
 export { marketService } from './services/market';
 export type { MarketData, MarketInsight } from './services/market';
+export * from './hooks';
+
