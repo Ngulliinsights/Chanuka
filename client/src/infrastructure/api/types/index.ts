@@ -179,7 +179,7 @@ export type {
   ConnectionState,
   ConnectionQuality,
   WebSocketMessage,
-} from './websocket';
+} from '../websocket';
 
 // Realtime client types
 export type {

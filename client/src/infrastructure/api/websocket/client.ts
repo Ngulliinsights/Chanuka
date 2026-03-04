@@ -20,7 +20,7 @@ import type {
   WebSocketOptions,
   WebSocketClientEvents,
   WebSocketError,
-} from '../types/websocket';
+} from './types';
 
 type EventHandler<K extends keyof WebSocketClientEvents> = WebSocketClientEvents[K];
 

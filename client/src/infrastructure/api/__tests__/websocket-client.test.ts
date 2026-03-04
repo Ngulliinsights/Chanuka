@@ -8,7 +8,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { UnifiedWebSocketClient, createWebSocketClient } from '../websocket/client';
 import { ConnectionState, WebSocketMessage } from '@shared/types/api/websocket';
-import type { WebSocketOptions } from '../types/websocket';
+import type { WebSocketOptions } from '../websocket';
 
 // Mock dependencies
 vi.mock('@client/lib/utils/logger', () => ({

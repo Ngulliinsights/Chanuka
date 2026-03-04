@@ -250,7 +250,7 @@ export type {
   WebSocketOptions,
   WebSocketClientEvents,
   WebSocketError,
-} from './types/websocket';
+} from './websocket';
 
 // Realtime types
 export type {

@@ -33,4 +33,4 @@ export type {
   ConnectionState,
   ConnectionQuality,
   WebSocketMessage,
-} from '../types/websocket';
+} from './types';

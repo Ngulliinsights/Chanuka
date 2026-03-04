@@ -74,7 +74,7 @@ export interface IWebSocketClient {
   /**
    * Unsubscribe from one or more topics
    * @param topics - Topic or array of topics to unsubscribe from
-   * @returns true if unsubscription was successful
+   * @returns true if unsubscribe was successful
    */
   unsubscribe(topics: string | string[]): boolean;
   
@@ -126,4 +126,4 @@ export interface WebSocketError extends Error {
 }
 
 // Re-export shared types for convenience
-export { ConnectionState, ConnectionQuality, WebSocketMessage };
+export type { ConnectionState, ConnectionQuality, WebSocketMessage };

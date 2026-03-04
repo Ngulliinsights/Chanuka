@@ -17,7 +17,7 @@ import type {
   RealtimeOptions,
 } from '../types/realtime';
 import { createWebSocketClient } from '../websocket/client';
-import type { IWebSocketClient } from '../types/websocket';
+import type { IWebSocketClient } from '../websocket';
 import { WebSocketMessage } from '@shared/types/api/websocket';
 
 /**

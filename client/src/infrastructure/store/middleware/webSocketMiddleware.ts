@@ -2,22 +2,24 @@
  * Unified WebSocket Middleware for Redux Toolkit
  *
  * Centralized real-time communication middleware that integrates with Redux Toolkit.
- * Uses the enhanced UnifiedWebSocketManager from the consolidated API client architecture.
- * Manages WebSocket connections, subscriptions, and dispatches actions to Redux store.
+ * Uses the unified realtime client from the consolidated API architecture.
+ * Manages subscriptions and dispatches actions to Redux store.
  */
 
 import { Middleware, Dispatch, Action } from '@reduxjs/toolkit';
-import { ConnectionState } from '@shared/types/api/websocket';
 
 import { realTimeService } from '@client/infrastructure/api/realtime';
-import { WebSocketSubscription } from '@client/infrastructure/api/realtime';
+import { Subscription } from '@client/infrastructure/api/types/realtime';
 import {
   CivicWebSocketState,
   PollingFallbackConfig,
   RealTimeHandlers,
   BillRealTimeUpdate,
   RealTimeNotification,
-} from '@client/infrastructure/api/realtime';
+  CommunityRealTimeUpdate,
+  EngagementMetricsUpdate,
+  ExpertActivityUpdate,
+} from '@shared/core/types/realtime';
 import { logger } from '@client/lib/utils/logger';
 
 import { updateConnectionState, addBillUpdate, addNotification } from '../slices/realTimeSlice';
@@ -163,13 +165,10 @@ class WebSocketMiddlewareAdapter {
   private pollingFallback: PollingFallbackManager;
   private reduxDispatch: Dispatch<Action> | null = null;
   private handlers: RealTimeHandlers = {};
-  private subscriptionIds: Map<string, string> = new Map(); // Maps local keys to WS subscription IDs
+  private subscriptions: Map<string, Subscription> = new Map(); // Maps local keys to subscription objects
 
   // Race condition prevention
   private connectionStateUpdateTimeout: number | null = null;
-  private pendingConnectionState: Partial<CivicWebSocketState> | null = null;
-  private subscriptionQueue: Array<() => Promise<void>> = [];
-  private processingSubscriptions = false;
 
   constructor(config: WebSocketConfig) {
     this.pollingFallback = new PollingFallbackManager(config.pollingFallback);
@@ -186,114 +185,121 @@ class WebSocketMiddlewareAdapter {
     this.pollingFallback.setHandlers(handlers);
   }
 
-  async connect(): Promise<void> {
-    try {
-      await realTimeService.connect();
-      this.pollingFallback.stopPolling();
-      this.updateConnectionState();
-    } catch (error) {
-      logger.error('Failed to connect WebSocket', {
+  /**
+   * Subscribe to a bill's real-time updates
+   */
+  subscribeToBill(billId: number) {
+    const key = `bill:${billId}`;
+    if (this.subscriptions.has(key)) {
+      logger.debug('Already subscribed to bill', {
         component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error),
+        billId,
       });
-      // Start polling fallback on connection failure
-      this.pollingFallback.startPolling();
-      throw error;
+      return;
+    }
+
+    const subscription = realTimeService.subscribe<BillRealTimeUpdate>(
+      `bills:${billId}`,
+      (update: BillRealTimeUpdate) => {
+        this.handlers.onBillUpdate?.(update);
+        this.reduxDispatch?.(addBillUpdate(update));
+      }
+    );
+
+    this.subscriptions.set(key, subscription);
+    this.updatePollingFallbackSubscriptions();
+  }
+
+  /**
+   * Subscribe to notification updates
+   */
+  subscribeToNotifications() {
+    const key = 'notifications:user';
+    if (this.subscriptions.has(key)) {
+      logger.debug('Already subscribed to notifications', {
+        component: 'WebSocketMiddleware',
+      });
+      return;
+    }
+
+    const subscription = realTimeService.subscribe<RealTimeNotification>(
+      'notifications:user',
+      (notification: RealTimeNotification) => {
+        this.handlers.onNotification?.(notification);
+        this.reduxDispatch?.(addNotification(notification));
+      }
+    );
+
+    this.subscriptions.set(key, subscription);
+    this.updatePollingFallbackSubscriptions();
+  }
+
+  /**
+   * Unsubscribe from a bill's updates
+   */
+  unsubscribeFromBill(billId: number) {
+    const key = `bill:${billId}`;
+    const subscription = this.subscriptions.get(key);
+
+    if (subscription) {
+      subscription.unsubscribe();
+      this.subscriptions.delete(key);
+      this.updatePollingFallbackSubscriptions();
     }
   }
 
-  disconnect() {
-    realTimeService.disconnect();
-    this.pollingFallback.stopPolling();
-    this.updateConnectionState();
-  }
+  /**
+   * Unsubscribe from notifications
+   */
+  unsubscribeFromNotifications() {
+    const key = 'notifications:user';
+    const subscription = this.subscriptions.get(key);
 
-  subscribe(subscription: WebSocketSubscription) {
-    this.queueSubscriptionOperation(async () => {
-      const key = `${subscription.type}:${subscription.id}`;
-
-      // Check if already subscribed to prevent duplicates
-      if (this.subscriptionIds.has(key)) {
-        logger.debug('Already subscribed to', {
-          component: 'WebSocketMiddleware',
-          key,
-        });
-        return;
-      }
-
-      // Use realTimeService for subscriptions
-      const subscriptionId = realTimeService.subscribe(subscription);
-      this.subscriptionIds.set(key, subscriptionId);
-
-      // Update polling fallback subscriptions
+    if (subscription) {
+      subscription.unsubscribe();
+      this.subscriptions.delete(key);
       this.updatePollingFallbackSubscriptions();
-    });
-  }
-
-  unsubscribe(subscription: WebSocketSubscription) {
-    this.queueSubscriptionOperation(async () => {
-      const key = `${subscription.type}:${subscription.id}`;
-      const subscriptionId = this.subscriptionIds.get(key);
-
-      if (subscriptionId) {
-        realTimeService.unsubscribe(subscriptionId);
-        this.subscriptionIds.delete(key);
-
-        // Update polling fallback subscriptions
-        this.updatePollingFallbackSubscriptions();
-      }
-    });
+    }
   }
 
   private setupEventListeners() {
-    // Listen to realTimeService events
-    realTimeService.on('connected', () => {
-      logger.info('WebSocket connected', { component: 'WebSocketMiddleware' });
-      this.pollingFallback.stopPolling();
-      this.handlers.onConnectionChange?.(true);
-      this.updateConnectionState();
-    });
-
-    realTimeService.on('disconnected', () => {
-      logger.warn('WebSocket disconnected', {
-        component: 'WebSocketMiddleware',
-      });
-      this.pollingFallback.startPolling();
-      this.handlers.onConnectionChange?.(false);
-      this.updateConnectionState();
-    });
-
-    realTimeService.on('error', (data: unknown) => {
-      const error = data as Error;
-      logger.error(
-        'WebSocket error',
-        {
-          component: 'WebSocketMiddleware',
-        },
-        error
-      );
-      this.handlers.onError?.(error.message);
-      this.updateConnectionState();
-    });
-
-    // Listen to specific real-time events
-    realTimeService.on('billUpdate', (data: unknown) => {
-      const update = data as BillRealTimeUpdate;
+    // Listen to realTimeService events using the legacy on() interface
+    realTimeService.on<BillRealTimeUpdate>('billUpdate', (update: BillRealTimeUpdate) => {
       this.handlers.onBillUpdate?.(update);
       this.reduxDispatch?.(addBillUpdate(update));
     });
 
-    realTimeService.on('notification', (data: unknown) => {
-      const notification = data as RealTimeNotification;
+    realTimeService.on<RealTimeNotification>('notification', (notification: RealTimeNotification) => {
       this.handlers.onNotification?.(notification);
       this.reduxDispatch?.(addNotification(notification));
     });
+
+    realTimeService.on<CommunityRealTimeUpdate>('communityUpdate', (update: CommunityRealTimeUpdate) => {
+      this.handlers.onCommunityUpdate?.(update);
+    });
+
+    realTimeService.on<EngagementMetricsUpdate>('engagementMetrics', (update: EngagementMetricsUpdate) => {
+      this.handlers.onEngagementUpdate?.(update);
+    });
+
+    realTimeService.on<ExpertActivityUpdate>('expertActivity', (update: ExpertActivityUpdate) => {
+      this.handlers.onExpertActivity?.(update);
+    });
+
+    realTimeService.on('error', (error: unknown) => {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      logger.error('WebSocket error', {
+        component: 'WebSocketMiddleware',
+        error: errorMsg,
+      });
+      this.handlers.onError?.(errorMsg);
+      this.updateConnectionState();
+    });
   }
 
-  // Message handling is now done directly through event listeners
-
   private updateConnectionState() {
-    if (!this.reduxDispatch) return;
+    const dispatch = this.reduxDispatch;
+    if (!dispatch) return;
 
     // Clear existing timeout to prevent race conditions
     if (this.connectionStateUpdateTimeout) {
@@ -313,91 +319,46 @@ class WebSocketMiddlewareAdapter {
         connection_quality: isConnected ? 'excellent' : 'disconnected',
         last_heartbeat: null,
         message_count: 0,
+        bill_subscriptions: Array.from(this.subscriptions.keys())
+          .filter(k => k.startsWith('bill:'))
+          .map(k => Number(k.split(':')[1])),
+        community_subscriptions: [],
+        expert_subscriptions: [],
+        notification_subscriptions: this.subscriptions.has('notifications:user'),
       };
 
-      // Merge with any pending state updates
-      const finalState = this.pendingConnectionState
-        ? { ...this.pendingConnectionState, ...civicState }
-        : civicState;
+      dispatch(updateConnectionState(civicState));
 
-      this.reduxDispatch!(updateConnectionState(finalState));
-
-      // Reset state
-      this.pendingConnectionState = null;
+      // Reset timeout
       this.connectionStateUpdateTimeout = null;
     }, 100); // 100ms debounce to prevent rapid updates
-  }
-
-  getConnectionMetrics() {
-    // Return basic metrics since realTimeService doesn't expose detailed metrics
-    return {
-      status: realTimeService.isConnected()
-        ? ConnectionState.CONNECTED
-        : ConnectionState.DISCONNECTED,
-      reconnectAttempts: 0,
-      lastPong: null,
-    };
-  }
-
-  /**
-   * Queue subscription operations to prevent race conditions
-   */
-  private async queueSubscriptionOperation(operation: () => Promise<void>) {
-    this.subscriptionQueue.push(operation);
-
-    if (!this.processingSubscriptions) {
-      await this.processSubscriptionQueue();
-    }
-  }
-
-  /**
-   * Process queued subscription operations sequentially
-   */
-  private async processSubscriptionQueue() {
-    this.processingSubscriptions = true;
-
-    while (this.subscriptionQueue.length > 0) {
-      const operation = this.subscriptionQueue.shift();
-      if (operation) {
-        try {
-          await operation();
-        } catch (error) {
-          logger.error('Subscription operation failed', {
-            component: 'WebSocketMiddleware',
-            error: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }
-    }
-
-    this.processingSubscriptions = false;
   }
 
   /**
    * Update polling fallback subscriptions helper
    */
   private updatePollingFallbackSubscriptions() {
-    const currentBills = Array.from(this.subscriptionIds.entries())
-      .filter(([k]) => k.startsWith('bill:'))
-      .map(([k]) => Number(k.split(':')[1]));
+    const currentBills = Array.from(this.subscriptions.keys())
+      .filter(k => k.startsWith('bill:'))
+      .map(k => Number(k.split(':')[1]));
 
     this.pollingFallback.updateSubscriptions({
       bills: currentBills,
-      notifications: this.subscriptionIds.has('user_notifications:user'),
+      notifications: this.subscriptions.has('notifications:user'),
     });
   }
 
   /**
-   * Cleanup method to clear timeouts and queues
+   * Cleanup method to clear timeouts and subscriptions
    */
   cleanup() {
     if (this.connectionStateUpdateTimeout) {
       window.clearTimeout(this.connectionStateUpdateTimeout);
       this.connectionStateUpdateTimeout = null;
     }
-    this.subscriptionQueue.length = 0;
-    this.processingSubscriptions = false;
-    this.pendingConnectionState = null;
+    // Unsubscribe from all subscriptions
+    this.subscriptions.forEach(subscription => subscription.unsubscribe());
+    this.subscriptions.clear();
   }
 }
 
@@ -428,19 +389,14 @@ export const webSocketMiddleware: Middleware = store => next => (action: unknown
 
   // Handle WebSocket-related actions
   const reduxAction = action as Action & { type: string; payload?: unknown };
-  if (reduxAction.type === 'realTime/connect') {
-    wsAdapter.connect().catch((error: Error) => {
-      logger.error('Failed to connect WebSocket', {
-        component: 'WebSocketMiddleware',
-        error: error instanceof Error ? error.message : String(error),
-      });
-    });
-  } else if (reduxAction.type === 'realTime/disconnect') {
-    wsAdapter.disconnect();
-  } else if (reduxAction.type === 'realTime/subscribe') {
-    wsAdapter.subscribe(reduxAction.payload as WebSocketSubscription);
-  } else if (reduxAction.type === 'realTime/unsubscribe') {
-    wsAdapter.unsubscribe(reduxAction.payload as WebSocketSubscription);
+  if (reduxAction.type === 'realTime/subscribeToBill') {
+    wsAdapter.subscribeToBill(reduxAction.payload as number);
+  } else if (reduxAction.type === 'realTime/unsubscribeFromBill') {
+    wsAdapter.unsubscribeFromBill(reduxAction.payload as number);
+  } else if (reduxAction.type === 'realTime/subscribeToNotifications') {
+    wsAdapter.subscribeToNotifications();
+  } else if (reduxAction.type === 'realTime/unsubscribeFromNotifications') {
+    wsAdapter.unsubscribeFromNotifications();
   } else if (reduxAction.type === 'realTime/setHandlers') {
     wsAdapter.setHandlers(reduxAction.payload as RealTimeHandlers);
   }
@@ -448,5 +404,5 @@ export const webSocketMiddleware: Middleware = store => next => (action: unknown
   return next(action);
 };
 
-// Export WebSocket adapter for direct access and metrics
+// Export WebSocket adapter for direct access
 export { wsAdapter };
