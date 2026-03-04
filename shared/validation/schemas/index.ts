@@ -8,9 +8,9 @@
 import { z } from 'zod';
 
 // Import all schemas
-import { UserSchema, UserRegistrationSchema } from './user.schema';
 import { BillSchema } from './bill.schema';
 import { CommentSchema } from './comment.schema';
+import { UserSchema, UserRegistrationSchema } from './user.schema';
 
 /**
  * Schema registry type
@@ -57,6 +57,12 @@ export function validateWithSchema<K extends keyof SchemaRegistry>(
 export { UserSchema, UserRegistrationSchema } from './user.schema';
 export { BillSchema } from './bill.schema';
 export { CommentSchema } from './comment.schema';
+export * from './argument-intelligence.schema';
+export * from './community.schema';
+export * from './search.schema';
+export * from './notifications.schema';
+export * from './sponsors.schema';
+export * from './advocacy.schema';
 
 // Re-export validation rules
 export { USER_VALIDATION_RULES } from './user.schema';
