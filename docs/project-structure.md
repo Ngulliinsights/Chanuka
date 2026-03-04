@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 4, 2026 at 05:49 PM
+**Generated:** March 4, 2026 at 08:51 PM
 **Max Depth:** 7 levels
-**Total Items:** 3,941
+**Total Items:** 3,937
 
 ```
 .
@@ -88,13 +88,19 @@
 │   │   │       ├── ProtectedRoute.tsx
 │   │   │       └── SkipLinks.tsx
 │   │   ├── features/
-│   │   │   ├── accountability/
-│   │   │   │   └── ShadowLedgerDashboard.ts
 │   │   │   ├── admin/
 │   │   │   │   ├── pages/
+│   │   │   │   │   ├── dashboard-validation/
+│   │   │   │   │   │   ├── config.property.test.ts
+│   │   │   │   │   │   ├── config.test.ts
+│   │   │   │   │   │   ├── config.ts
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── run-property-tests.ts
+│   │   │   │   │   │   └── verify-config.ts
 │   │   │   │   │   ├── admin.tsx
 │   │   │   │   │   ├── analytics-dashboard.tsx
 │   │   │   │   │   ├── coverage.tsx
+│   │   │   │   │   ├── dashboard.tsx
 │   │   │   │   │   ├── database-manager.tsx
 │   │   │   │   │   └── integration-status.tsx
 │   │   │   │   ├── ui/
@@ -254,13 +260,20 @@
 │   │   │   │   │   │   └── index.tsx
 │   │   │   │   │   ├── list/
 │   │   │   │   │   │   └── BillCard.tsx
+│   │   │   │   │   ├── sponsorship/
+│   │   │   │   │   │   ├── co-sponsors.tsx
+│   │   │   │   │   │   ├── financial-network.tsx
+│   │   │   │   │   │   ├── methodology.tsx
+│   │   │   │   │   │   ├── overview.tsx
+│   │   │   │   │   │   └── primary-sponsor.tsx
 │   │   │   │   │   ├── tracking/
 │   │   │   │   │   │   └── real-time-tracker.tsx
 │   │   │   │   │   ├── translation/
 │   │   │   │   │   │   ├── index.tsx
 │   │   │   │   │   │   └── PlainLanguageView.tsx
 │   │   │   │   │   ├── transparency/
-│   │   │   │   │   │   └── ConflictAnalysisDashboard.tsx
+│   │   │   │   │   │   ├── ConflictAnalysisDashboard.tsx
+│   │   │   │   │   │   └── ShadowLedgerDashboard.ts
 │   │   │   │   │   ├── ArgumentsTab.tsx
 │   │   │   │   │   ├── bill-list.tsx
 │   │   │   │   │   ├── bill-tracking.tsx
@@ -280,9 +293,6 @@
 │   │   │   │   ├── README.md
 │   │   │   │   ├── services.ts
 │   │   │   │   └── types.ts
-│   │   │   ├── civic/
-│   │   │   │   └── pages/
-│   │   │   │       └── civic-education.tsx
 │   │   │   ├── community/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -301,8 +311,7 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── backend.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── websocket-manager.ts
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
 │   │   │   │   │       └── communitySlice.tsx
@@ -327,16 +336,6 @@
 │   │   │   │   │   ├── ConstitutionalAnalysisDisplay.tsx
 │   │   │   │   │   └── ConstitutionalIntelligenceTab.tsx
 │   │   │   │   └── index.ts
-│   │   │   ├── dashboard/
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── dashboard.tsx
-│   │   │   │   └── validation/
-│   │   │   │       ├── config.property.test.ts
-│   │   │   │       ├── config.test.ts
-│   │   │   │       ├── config.ts
-│   │   │   │       ├── index.ts
-│   │   │   │       ├── run-property-tests.ts
-│   │   │   │       └── verify-config.ts
 │   │   │   ├── design-system/
 │   │   │   │   └── pages/
 │   │   │   │       └── design-system-test.tsx
@@ -438,6 +437,7 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── onboarding/
 │   │   │   │   └── pages/
+│   │   │   │       ├── civic-education.tsx
 │   │   │   │       └── onboarding.tsx
 │   │   │   ├── pretext-detection/
 │   │   │   │   ├── api/
@@ -517,13 +517,6 @@
 │   │   │   ├── sitemap/
 │   │   │   │   └── pages/
 │   │   │   │       └── sitemap.tsx
-│   │   │   ├── sponsorship/
-│   │   │   │   └── pages/
-│   │   │   │       ├── co-sponsors.tsx
-│   │   │   │       ├── financial-network.tsx
-│   │   │   │       ├── methodology.tsx
-│   │   │   │       ├── overview.tsx
-│   │   │   │       └── primary-sponsor.tsx
 │   │   │   ├── status/
 │   │   │   │   └── pages/
 │   │   │   │       └── system-status.tsx
@@ -3906,6 +3899,7 @@
 ├── ARCHITECTURE.md
 ├── AUDIT_PENDING_CHANGES.md
 ├── CHANGELOG.md
+├── CONSOLIDATION_STRATEGY.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
@@ -3915,6 +3909,7 @@
 ├── Dockerfile
 ├── Dockerfile.client
 ├── drizzle.config.ts
+├── FEATURES_AUDIT.md
 ├── FINAL_AUDIT_RECOMMENDATION.md
 ├── generate-structure.mjs
 ├── infrastructure-aggregator-imports.txt
@@ -3935,6 +3930,7 @@
 ├── QUICK_START.md
 ├── README_INTEGRATION.md
 ├── README.md
+├── REALTIME_WEBSOCKET_AUDIT.md
 ├── SECURITY_REPORT.md
 ├── SECURITY_STATUS.md
 ├── start-dev.js
