@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 2, 2026 at 07:59 AM
+**Generated:** March 4, 2026 at 02:56 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,011
+**Total Items:** 4,045
 
 ```
 .
@@ -586,12 +586,6 @@
 │   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
-│   │   │   ├── analytics/
-│   │   │   │   ├── service/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── comprehensive-tracker.ts
-│   │   │   │   ├── data-retention-service.ts
-│   │   │   │   └── index.ts
 │   │   │   ├── api/
 │   │   │   │   ├── circuit-breaker/
 │   │   │   │   │   ├── core.ts
@@ -658,10 +652,6 @@
 │   │   │   │   ├── serialization-interceptors.ts
 │   │   │   │   ├── system.ts
 │   │   │   │   └── WEBSOCKET_API_README.md
-│   │   │   ├── asset-loading/
-│   │   │   │   ├── AssetLoadingProvider.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
 │   │   │   ├── auth/
 │   │   │   │   ├── config/
 │   │   │   │   │   ├── auth-config.ts
@@ -713,10 +703,6 @@
 │   │   │   │   ├── README.md
 │   │   │   │   ├── types.ts
 │   │   │   │   └── useBrowserStatus.tsx
-│   │   │   ├── cache/
-│   │   │   │   ├── cache-invalidation.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
 │   │   │   ├── command-palette/
 │   │   │   │   ├── CommandPalette.tsx
 │   │   │   │   ├── commands.ts
@@ -808,17 +794,6 @@
 │   │   │   │   ├── event-bus.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── README.md
-│   │   │   ├── hooks/
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
-│   │   │   ├── loading/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── index.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── logging/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
-│   │   │   │   └── types.ts
 │   │   │   ├── mobile/
 │   │   │   │   ├── device-detector.ts
 │   │   │   │   ├── error-handler.ts
@@ -862,8 +837,18 @@
 │   │   │   │   ├── analytics/
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── error-monitoring/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── monitoring-init.ts
+│   │   │   │   ├── logging/
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── performance/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── personalization/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── persona-detector.ts
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── system/
+│   │   │   │   │   ├── HealthCheck.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── telemetry/
 │   │   │   │   │   └── index.ts
@@ -871,23 +856,6 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
-│   │   │   ├── personalization/
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── persona-detector.test.tsx
-│   │   │   │   ├── persona-detector.ts
-│   │   │   │   ├── README.md
-│   │   │   │   └── types.ts
-│   │   │   ├── realtime/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── use-websocket.ts
-│   │   │   │   ├── optimization/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── recovery/
-│   │   │   │   ├── dashboard-recovery.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
 │   │   │   ├── scripts/
 │   │   │   │   ├── analyze-internal-imports.sh
 │   │   │   │   ├── check-jsdoc-coverage.ts
@@ -946,6 +914,13 @@
 │   │   │   │   ├── vulnerability-scanner.ts
 │   │   │   │   └── window.d.ts
 │   │   │   ├── storage/
+│   │   │   │   ├── asset-loading/
+│   │   │   │   │   ├── AssetLoadingProvider.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── sync/
+│   │   │   │   │   ├── background-sync-manager.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── cache-manager.ts
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── offline-data-manager.ts
@@ -972,17 +947,6 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
 │   │   │   │   └── store-types.ts
-│   │   │   ├── sync/
-│   │   │   │   ├── background-sync-manager.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
-│   │   │   ├── system/
-│   │   │   │   ├── HealthCheck.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
-│   │   │   ├── telemetry/
-│   │   │   │   ├── service.ts
-│   │   │   │   └── types.ts
 │   │   │   ├── validation/
 │   │   │   │   ├── dashboard-validation.ts
 │   │   │   │   ├── form-helpers.ts
@@ -1259,6 +1223,7 @@
 │   │   │   │   ├── use-i18n.tsx
 │   │   │   │   ├── use-integrated-services.ts
 │   │   │   │   ├── use-keyboard-focus.ts
+│   │   │   │   ├── use-loading.ts
 │   │   │   │   ├── use-media-query.ts
 │   │   │   │   ├── use-mobile.ts
 │   │   │   │   ├── use-mock-data.ts
@@ -1757,8 +1722,6 @@
 │   ├── tsconfig.json
 │   ├── tsconfig.test.json
 │   ├── tsconfig.tsbuildinfo
-│   ├── type-check-output.txt
-│   ├── type-errors-client.txt
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
 │   ├── vite.production.config.ts
@@ -2193,7 +2156,6 @@
 │   │   ├── align-enums.ts
 │   │   ├── check-schema.ts
 │   │   ├── check-tables.ts
-│   │   ├── consolidate-database-infrastructure.ts
 │   │   ├── create-missing-mvp-tables.ts
 │   │   ├── DATABASE_DRIVER_STRATEGY.md
 │   │   ├── debug-migration-table.ts
@@ -2263,7 +2225,10 @@
 │   ├── analyze-dependencies.ts
 │   ├── analyze-infrastructure.ts
 │   ├── apply-schema-direct.ts
-│   ├── audit-codebase.ts
+│   ├── audit-quality.test.ts
+│   ├── audit-quality.ts
+│   ├── audit-security.test.ts
+│   ├── audit-security.ts
 │   ├── boundary-fix-phase2a.sh
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
@@ -2302,6 +2267,7 @@
 │   ├── setup-playwright.js
 │   ├── start-mvp.ps1
 │   ├── start-mvp.sh
+│   ├── test-core-9-features.ts
 │   ├── test-mvp-endpoints.sh
 │   ├── test-mvp-integration.ts
 │   ├── track-progress.ts
@@ -2693,7 +2659,8 @@
 │   │   │   ├── application/
 │   │   │   │   ├── enhanced-government-data-service.ts
 │   │   │   │   ├── government-data-validation.schemas.ts
-│   │   │   │   └── managed-integration.service.ts
+│   │   │   │   ├── managed-integration.service.ts
+│   │   │   │   └── sync-service.ts
 │   │   │   ├── services/
 │   │   │   │   ├── api-integrations.service.ts
 │   │   │   │   ├── data-validation-pipeline.service.ts
@@ -3258,7 +3225,6 @@
 │   │   │   ├── REFACTORING_ANALYSIS.md
 │   │   │   ├── REFACTORING_COMPLETE.md
 │   │   │   └── repository-validation.ts
-│   │   ├── delivery/
 │   │   ├── error-handling/
 │   │   │   ├── error-factory.ts
 │   │   │   ├── external-api-error-handler.ts
@@ -3267,11 +3233,12 @@
 │   │   │   ├── resilience.ts
 │   │   │   ├── result-types.ts
 │   │   │   └── types.ts
-│   │   ├── errors/
 │   │   ├── external-data/
 │   │   │   ├── conflict-resolution-service.ts
 │   │   │   ├── data-synchronization-service.ts
 │   │   │   ├── external-api-manager.ts
+│   │   │   ├── government-api-client.ts
+│   │   │   ├── government-api-config.ts
 │   │   │   ├── index.ts
 │   │   │   └── types.ts
 │   │   ├── integration/
@@ -3575,6 +3542,16 @@
 │   └── vitest.config.ts
 ├── shared/
 │   ├── constants/
+│   │   ├── features/
+│   │   │   ├── advocacy.ts
+│   │   │   ├── analytics.ts
+│   │   │   ├── argument-intelligence.ts
+│   │   │   ├── bills.ts
+│   │   │   ├── community.ts
+│   │   │   ├── notifications.ts
+│   │   │   ├── search.ts
+│   │   │   ├── sponsors.ts
+│   │   │   └── users.ts
 │   │   ├── error-codes.ts
 │   │   ├── feature-flags.ts
 │   │   ├── index.ts
@@ -3784,11 +3761,17 @@
 │   │   └── shared-utilities.test.ts
 │   ├── validation/
 │   │   ├── schemas/
+│   │   │   ├── advocacy.schema.ts
 │   │   │   ├── analytics.schema.ts
+│   │   │   ├── argument-intelligence.schema.ts
 │   │   │   ├── bill.schema.ts
 │   │   │   ├── comment.schema.ts
 │   │   │   ├── common.ts
+│   │   │   ├── community.schema.ts
 │   │   │   ├── index.ts
+│   │   │   ├── notifications.schema.ts
+│   │   │   ├── search.schema.ts
+│   │   │   ├── sponsors.schema.ts
 │   │   │   ├── user.schema.ts
 │   │   │   └── validation-schemas.test.ts
 │   │   ├── validators/
@@ -3878,6 +3861,7 @@
 │   │   │   ├── client.ts
 │   │   │   ├── server.ts
 │   │   │   └── shared.ts
+│   │   ├── database.ts
 │   │   ├── index.ts
 │   │   ├── test-environment.ts
 │   │   └── vitest.ts
@@ -3913,7 +3897,8 @@
 │   │   │   ├── schema-agnostic-test-helper.ts
 │   │   │   ├── stress-tests.ts
 │   │   │   └── test-data-factory.ts
-│   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── result-adapter.ts
 │   ├── utils/
 │   │   └── test-helpers.ts
 │   ├── validation/
@@ -3936,27 +3921,48 @@
 ├── CHANGELOG.md
 ├── CODEBASE_CLEANUP_COMPLETE.md
 ├── COMMIT_MESSAGE.txt
+├── COMMIT_SUMMARY.md
 ├── COMPLETE_CLEANUP_SUMMARY.md
 ├── CONFLICT_RESOLVED.md
 ├── CONSOLIDATION_SUMMARY.md
 ├── CONTRIBUTING.md
+├── CORE_8_FEATURES_INTEGRATION_PLAN.md
+├── CORE_9_FEATURES_UPDATED.md
 ├── cspell.config.yaml
+├── CURRENT_STATUS_REEVALUATION.md
+├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
+├── DATABASE_AUTH_STILL_FAILING.md
 ├── DATABASE_CONSISTENCY_ANALYSIS.md
 ├── DATABASE_CONSISTENCY_VERIFIED.md
 ├── DATABASE_MIGRATION_STATUS.md
 ├── DEFERRED_ISSUES_RESOLUTION.md
+├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
+├── DRIZZLE_NEON_FIX_SUMMARY.md
 ├── drizzle.config.ts
 ├── EXECUTE_NOW.md
 ├── EXECUTE_PHASE_2A.md
 ├── FINAL_CLEANUP_REPORT.md
+├── FINAL_MVP_STATUS_REPORT.md
+├── FINAL_SESSION_SUMMARY.md
+├── FINAL_STATUS_DATABASE_AUTH_ISSUE.md
+├── fix-logger.js
 ├── FRESH_START_MIGRATION_PLAN.md
 ├── generate-structure.mjs
 ├── git-history.txt
+├── IMMEDIATE_ACTION_PLAN_REVISED.md
+├── IMMEDIATE_ACTION_PLAN.md
+├── IMMEDIATE_FIXES_APPLIED.md
+├── IMPLEMENTATION_PROGRESS_REPORT.md
 ├── IMPORT_VALIDATION_REPORT.md
+├── INFRASTRUCTURE_CONSOLIDATION_VALIDATION.md
+├── infrastructure-aggregator-imports.txt
+├── infrastructure-logging-imports.txt
+├── infrastructure-recovery-imports.txt
+├── infrastructure-stub-imports.txt
 ├── INTEGRATION_ANALYSIS.md
 ├── INTEGRATION_CHECKLIST.md
 ├── INTEGRATION_COMPLETE_SUMMARY.md
@@ -3974,8 +3980,14 @@
 ├── MOCK_DATA_QUICK_START.md
 ├── MOCK_DATA_QUICKSTART.md
 ├── MOCK_DATA_STRATEGY.md
+├── MVP_ACTUAL_STATUS_REPORT.md
+├── MVP_CRITICAL_FEATURES_AUDIT.md
+├── MVP_DEMO_READINESS_SUMMARY.md
 ├── MVP_INTEGRATION_PLAN.md
 ├── MVP_INTEGRATION_SUMMARY.md
+├── MVP_TEST_RESULTS.md
+├── NEON_AUTH_INVESTIGATION_SUMMARY.md
+├── NEXT_STEPS_FOR_USER.md
 ├── nginx.conf
 ├── NOTIFICATION_MIGRATION_COMPLETE.md
 ├── NOTIFICATION_MIGRATION_FINAL.md
@@ -3988,10 +4000,16 @@
 ├── PHASE_2B_AND_TYPESCRIPT_FIXES_STATUS.md
 ├── PHASE_2B_COMPLETE.md
 ├── PHASE_2B_LOGGER_CONVERSION_COMPLETE.md
+├── PHASE1_COMPLETION_SUMMARY.md
+├── PHASE2_FINAL_STATUS.md
+├── PHASE2_PROGRESS_SUMMARY.md
+├── PHASE2_READINESS_ASSESSMENT.md
+├── PHASE3_EXECUTION_PLAN.md
 ├── playwright.config.ts
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
+├── QUALITY_REPORT.md
 ├── QUICK_CLEANUP_SUMMARY.md
 ├── QUICK_START.md
 ├── README_INTEGRATION.md
@@ -4001,19 +4019,34 @@
 ├── SCHEMA_IMPORT_FIXES_NEEDED.md
 ├── SCHEMA_TABLES_NEEDED_ANALYSIS.md
 ├── SEARCH_CONFLICT_STRATEGIC_RESOLUTION.md
+├── SECURITY_REPORT.md
 ├── SECURITY_STATUS.md
 ├── SEED_IMPLEMENTATION_SUMMARY.md
+├── SESSION_COMPLETION_SUMMARY.md
+├── SESSION_CONTINUATION_SUMMARY.md
+├── SESSION_SUMMARY.md
+├── SHARED_LAYER_COMPLETION_REPORT.md
+├── SHARED_LAYER_IMPLEMENTATION_PLAN.md
+├── SOLUTION_DRIZZLE_TRANSACTION_FIX.md
 ├── SQL_INJECTION_FIX_PREVIEW.md
 ├── start-dev.js
 ├── STRATEGIC_FILE_DELETION_RATIONALE.md
+├── STRATEGIC_PHASE2_EXECUTION.md
 ├── tailwind.config.js
+├── TEST_PROGRESS_SUMMARY.md
+├── test-neon-transaction.cjs
 ├── test-results.txt
+├── test-transaction-debug.ts
 ├── test-vite.cjs
 ├── test-vite.js
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json
 ├── TYPESCRIPT_FIXES_SUMMARY.md
+├── vitest-output-2.txt
+├── vitest-output-3.txt
+├── vitest-output-4.txt
+├── vitest-output.txt
 ├── vitest.setup.ts
 ├── vitest.workspace.ts
 └── WHY_TABLES_ARE_UNUSED_ANALYSIS.md
