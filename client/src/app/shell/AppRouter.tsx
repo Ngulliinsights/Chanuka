@@ -93,9 +93,7 @@ const AccessibilityPage = createLazyComponent(() => import('@client/features/leg
 const CivicEducationPage = createLazyComponent(() => import('@client/features/civic/pages/civic-education'), 'Civic Education');
 const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
 const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
-const ApiAccessPage = createLazyComponent(() => import('@client/features/api/pages/api-access'), 'API Access');
-const SystemStatusPage = createLazyComponent(() => import('@client/features/status/pages/system-status'), 'System Status');
-const SitemapPage = createLazyComponent(() => import('@client/features/sitemap/pages/sitemap'), 'Sitemap');
+
 const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
 const UserProfile = createLazyComponent(
   () => import('@client/features/users/pages/user-account'),
@@ -389,21 +387,7 @@ const routes: RouteConfig[] = [
     path: '/expert',
     element: <ExpertInsightsPage />,
   },
-  {
-    id: 'api-access',
-    path: '/api',
-    element: <ApiAccessPage />,
-  },
-  {
-    id: 'system-status',
-    path: '/status',
-    element: <SystemStatusPage />,
-  },
-  {
-    id: 'sitemap',
-    path: '/sitemap',
-    element: <SitemapPage />,
-  },
+
   {
     id: 'security',
     path: '/security',
