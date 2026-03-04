@@ -3,8 +3,8 @@
  * Type-safe API contracts for comment-related endpoints
  */
 
-import { Comment, CommentThread } from '../../domains/legislative';
 import { CommentId, BillId, UserId } from '../../core/branded';
+import { Comment, CommentThread } from '../../domains/legislative';
 
 // ============================================================================
 // Request Types

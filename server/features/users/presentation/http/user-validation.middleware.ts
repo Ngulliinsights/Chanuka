@@ -121,7 +121,7 @@ export const validateSearchUsers = async (
     return next(new ValidationError(`User search validation failed: ${errorMsg}`, validation.errors || []));
   }
   
-  req.query = validation.data as any;
+  req.query = validation.data as unknown;
   next();
 };
 

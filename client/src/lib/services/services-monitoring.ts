@@ -169,7 +169,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
 
   // Private helper methods
   private ensureAppError(error: AppError | Error, context: ErrorContext): AppError {
-    if (error instanceof Error && !(error as any).type) {
+    if (error instanceof Error && !(error as unknown as Record<string, unknown>).type) {
       return createError(
         ErrorDomain.SYSTEM,
         ErrorSeverity.HIGH,

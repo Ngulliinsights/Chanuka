@@ -11,6 +11,7 @@
  */
 
 import type { Request } from 'express';
+
 import { UserId } from '../../core/branded';
 import { 
   UserRole, 

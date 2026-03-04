@@ -3,8 +3,8 @@
  * Type-safe API contracts for user-related endpoints
  */
 
-import { User } from '../../domains/authentication';
 import { UserId } from '../../core/branded';
+import { User } from '../../domains/authentication';
 
 // ============================================================================
 // Request Types

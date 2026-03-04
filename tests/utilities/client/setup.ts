@@ -70,9 +70,9 @@ Object.defineProperty(window, 'matchMedia', {
 // Polyfill for requestAnimationFrame
 global.requestAnimationFrame = vi.fn((cb) => {
   const id = setTimeout(cb, 16);
-  return id as any;
+  return id as unknown;
 });
-global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id as any));
+global.cancelAnimationFrame = vi.fn((id) => clearTimeout(id as unknown));
 
 // Polyfill for performance.mark and performance.measure
 if (!global.performance.mark) {
@@ -90,7 +90,7 @@ if (!global.crypto) {
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     }),
-  } as any;
+  } as unknown;
 }
 
 // Polyfill for URL.createObjectURL and URL.revokeObjectURL
@@ -98,7 +98,7 @@ if (!global.URL) {
   global.URL = {
     createObjectURL: vi.fn(() => 'blob:mock-url'),
     revokeObjectURL: vi.fn(),
-  } as any;
+  } as unknown;
 }
 
 // Skip clipboard polyfill - let user-event handle it
@@ -241,7 +241,7 @@ global.WebSocket = vi.fn().mockImplementation(() => ({
   send: vi.fn(),
   close: vi.fn(),
   readyState: 1,
-})) as any;
+})) as unknown;
 
 Object.defineProperty(global.WebSocket, 'CONNECTING', { value: 0 });
 Object.defineProperty(global.WebSocket, 'OPEN', { value: 1 });

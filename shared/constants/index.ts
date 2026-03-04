@@ -45,3 +45,14 @@ export {
   type FeatureFlagKey,
   type FeatureFlagValue,
 } from './feature-flags';
+
+// Feature-specific constants
+export * from './features/argument-intelligence';
+export * from './features/community';
+export * from './features/search';
+export * from './features/notifications';
+export * from './features/sponsors';
+export * from './features/advocacy';
+export * from './features/bills';
+export * from './features/users';
+export * from './features/analytics';

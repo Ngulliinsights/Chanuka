@@ -147,7 +147,7 @@ export class MonitoringService {
   /**
    * Get aggregated metrics across time window
    */
-  getAggregatedMetrics(component: string, windowMinutes: number = 60): any {
+  getAggregatedMetrics(component: string, windowMinutes: number = 60): Record<string, unknown> | null {
     const cutoffTime = new Date(Date.now() - windowMinutes * 60 * 1000);
     const componentMetrics = this.metrics.get(component) || [];
     const recentMetrics = componentMetrics.filter(m => m.timestamp >= cutoffTime);
@@ -190,7 +190,7 @@ export class MonitoringService {
    */
   private getMetricValue(metrics: MigrationMetrics, metricPath: string): number | null {
     const parts = metricPath.split('.');
-    let value: any = metrics.performance;
+    let value: unknown = metrics.performance;
     
     for (const part of parts) {
       if (value && typeof value === 'object' && part in value) {
@@ -333,9 +333,9 @@ export class MonitoringService {
   /**
    * Get dashboard data for monitoring UI
    */
-  getDashboardData(): any {
+  getDashboardData(): Record<string, unknown> {
     const components = Array.from(this.metrics.keys());
-    const dashboardData: any = {
+    const dashboardData: Record<string, unknown> = {
       timestamp: new Date(),
       components: {},
       alerts: {

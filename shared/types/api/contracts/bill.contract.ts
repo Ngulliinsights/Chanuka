@@ -3,8 +3,8 @@
  * Type-safe API contracts for bill-related endpoints
  */
 
-import { Bill, BillEngagementMetrics } from '../../domains/legislative';
 import { BillId, UserId } from '../../core/branded';
+import { Bill, BillEngagementMetrics } from '../../domains/legislative';
 
 // ============================================================================
 // Request Types

@@ -1,13 +1,14 @@
 /**
- * useDiscussion Hook - MIGRATED TO UNIFIED SYSTEM
+ * useDiscussion Hook — Legacy Compatibility Adapter
  *
- * This hook now uses the unified community system from core/community
- * while maintaining backward compatibility with existing components.
+ * Wraps useUnifiedDiscussion and translates its output into the shape that
+ * existing components expect. New components should consume useUnifiedDiscussion
+ * directly.
  *
  * MIGRATION STATUS: ✅ COMPLETED
- * - Resolves mock thread creation (lines 82-96)
- * - Implements complete moderation workflow (lines 217-240)
- * - Eliminates type casting issues (as unknown usage)
+ * - Resolves mock thread creation
+ * - Implements complete moderation workflow
+ * - Eliminates type casting issues
  * - Unifies React Query + WebSocket coordination
  */
 
@@ -21,7 +22,31 @@ import type {
   TypingIndicator,
 } from '@client/lib/types';
 
-// Legacy thread interface extending the base type with UI-specific computed properties
+// ============================================================================
+// LOCAL TYPE AUGMENTATIONS
+//
+// Mirror the EnrichedComment fields declared in useUnifiedDiscussion so that
+// both files stay in sync without importing internal types from a sibling hook.
+// Remove once UnifiedComment is updated upstream.
+// ============================================================================
+
+interface CommentVotes {
+  up: number;
+  down: number;
+}
+
+interface EnrichedCommentFields {
+  id: string;
+  authorId: string;
+  votes?: CommentVotes;
+  isAuthorExpert?: boolean;
+  updatedAt?: string;
+}
+
+// ============================================================================
+// LEGACY TYPES
+// ============================================================================
+
 interface LegacyDiscussionThread extends DiscussionThread {
   comments: Comment[];
   engagementScore: number;
@@ -70,114 +95,138 @@ interface UseDiscussionReturn {
   unsubscribe: () => void;
 }
 
+// ============================================================================
+// HELPERS
+// ============================================================================
+
+/** Safely reads enriched fields from a comment that may not carry them. */
+function enriched(comment: unknown): EnrichedCommentFields {
+  return comment as EnrichedCommentFields;
+}
+
+function computeEngagement(comments: unknown[]): number {
+  return comments.reduce<number>((sum, c) => {
+    const votes = enriched(c).votes;
+    return sum + (votes?.up ?? 0) + (votes?.down ?? 0);
+  }, 0);
+}
+
+function computeExpertParticipation(comments: unknown[]): number {
+  if (comments.length === 0) return 0;
+  const expertCount = comments.filter(c => enriched(c).isAuthorExpert).length;
+  return (expertCount / comments.length) * 100;
+}
+
+// ============================================================================
+// HOOK
+// ============================================================================
+
 export function useDiscussion({
   billId,
   autoSubscribe = true,
   enableTypingIndicators = true,
 }: UseDiscussionOptions): UseDiscussionReturn {
-  // Use the new unified discussion system
-  const unifiedDiscussion = useUnifiedDiscussion({
+  const unified = useUnifiedDiscussion({
     billId,
     autoSubscribe,
     enableTypingIndicators,
     enableRealtime: true,
   });
 
-  // Transform unified data to legacy format for backward compatibility
-  const thread: LegacyDiscussionThread | null = useMemo(() => {
-    if (!unifiedDiscussion.currentThread && unifiedDiscussion.comments.length === 0) {
-      return null;
-    }
+  // --------------------------------------------------------------------------
+  // Thread transformation
+  // --------------------------------------------------------------------------
 
-    // Use real thread if available, otherwise create from comments
-    if (unifiedDiscussion.currentThread) {
+  const thread: LegacyDiscussionThread | null = useMemo(() => {
+    const { comments, currentThread, activeUsers } = unified;
+
+    if (!currentThread && comments.length === 0) return null;
+
+    const legacyComments = comments as unknown as Comment[];
+    const engagement = computeEngagement(comments);
+    const expertParticipation = computeExpertParticipation(comments);
+
+    if (currentThread) {
       return {
-        id: unifiedDiscussion.currentThread.id,
-        billId: unifiedDiscussion.currentThread.billId,
-        title: unifiedDiscussion.currentThread.title,
-        comments: unifiedDiscussion.comments as unknown as Comment[],
-        messageCount: unifiedDiscussion.currentThread.messageCount,
-        participantCount: unifiedDiscussion.currentThread.participantCount,
-        locked: unifiedDiscussion.currentThread.locked,
-        pinned: unifiedDiscussion.currentThread.pinned,
-        engagementScore: unifiedDiscussion.comments.reduce(
-          (sum, c) => sum + (c.votes.up || 0) + (c.votes.down || 0),
-          0
-        ),
-        qualityScore: 0, // Not available in unified types yet
-        expertParticipation:
-          (unifiedDiscussion.comments.filter(c => c.isAuthorExpert).length /
-            unifiedDiscussion.comments.length) *
-            100 || 0,
-        lastActivity: unifiedDiscussion.currentThread.updatedAt, // Fallback as lastActivity is optional
-        activeUsers: unifiedDiscussion.activeUsers,
-        createdAt: unifiedDiscussion.currentThread.createdAt,
-        updatedAt: unifiedDiscussion.currentThread.updatedAt,
+        id: currentThread.id,
+        billId: Number(currentThread.billId),
+        title: currentThread.title,
+        comments: legacyComments,
+        messageCount: currentThread.messageCount,
+        participantCount: currentThread.participantCount,
+        locked: currentThread.locked,
+        pinned: currentThread.pinned,
+        engagementScore: engagement,
+        qualityScore: 0, // Not yet available in unified types
+        expertParticipation,
+        lastActivity: currentThread.updatedAt,
+        activeUsers,
+        createdAt: currentThread.createdAt,
+        updatedAt: currentThread.updatedAt,
       };
     }
 
-    // Fallback: create thread-like object from comments (but now with real data)
+    // Fallback: synthesise a thread-like object from comments alone
+    const participantIds = new Set(comments.map(c => enriched(c).authorId).filter(Boolean));
+    const lastActivityFallback =
+      enriched(comments[0])?.updatedAt ?? new Date().toISOString();
+
     return {
-      id: 0, // Fallback ID must be number
+      id: 0,
       billId,
-      title: 'Discussion', // Fallback title
-      comments: unifiedDiscussion.comments as unknown as Comment[],
-      messageCount: unifiedDiscussion.comments.length,
-      participantCount: new Set(unifiedDiscussion.comments.map(c => c.authorId)).size,
+      title: 'Discussion',
+      comments: legacyComments,
+      messageCount: comments.length,
+      participantCount: participantIds.size,
       locked: false,
       pinned: false,
-      engagementScore: unifiedDiscussion.comments.reduce(
-        (sum, c) => sum + (c.votes?.up || 0) + (c.votes?.down || 0),
-        0
-      ),
+      engagementScore: engagement,
       qualityScore: 0,
-      expertParticipation:
-        (unifiedDiscussion.comments.filter(c => c.isAuthorExpert).length /
-          unifiedDiscussion.comments.length) *
-          100 || 0,
-      lastActivity: unifiedDiscussion.comments[0]?.updatedAt || new Date().toISOString(),
-      activeUsers: unifiedDiscussion.activeUsers,
+      expertParticipation,
+      lastActivity: lastActivityFallback,
+      activeUsers,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-  }, [
-    unifiedDiscussion.currentThread,
-    unifiedDiscussion.comments,
-    unifiedDiscussion.activeUsers,
-    billId,
-  ]);
+  }, [unified.currentThread, unified.comments, unified.activeUsers, billId]);
 
-  // Transform typing users to legacy format
+  // --------------------------------------------------------------------------
+  // Typing indicators transformation
+  // --------------------------------------------------------------------------
+
   const typingIndicators: TypingIndicator[] = useMemo(
     () =>
-      unifiedDiscussion.typingUsers.map(userId => ({
-        userId: typeof userId === 'string' ? parseInt(userId, 10) : userId,
-        username: `User ${userId}`, // Would need to be enriched with actual user data
+      unified.typingUsers.map(userId => ({
+        userId: typeof userId === 'string' ? parseInt(userId, 10) : (userId as number),
+        username: `User ${userId}`, // Enrich with real user data when available
         parentId: undefined,
         startedAt: Date.now(),
       })),
-    [unifiedDiscussion.typingUsers]
+    [unified.typingUsers]
   );
 
+  // --------------------------------------------------------------------------
   // Legacy action adapters
-  const addComment = async (data: CommentFormData) => {
-    await unifiedDiscussion.createComment({
+  // --------------------------------------------------------------------------
+
+  const addComment = async (data: CommentFormData): Promise<void> => {
+    await unified.createComment({
       billId,
       content: data.content,
       parentId: data.parentId,
     });
   };
 
-  const updateComment = async (commentId: string, content: string) => {
-    await unifiedDiscussion.updateComment({ commentId, content });
+  const updateComment = async (commentId: string, content: string): Promise<void> => {
+    await unified.updateComment({ commentId, content });
   };
 
-  const deleteComment = async (commentId: string) => {
-    await unifiedDiscussion.deleteComment(commentId);
+  const deleteComment = async (commentId: string): Promise<void> => {
+    await unified.deleteComment(commentId);
   };
 
-  const voteComment = async (commentId: string, voteType: 'up' | 'down') => {
-    await unifiedDiscussion.voteComment(commentId, voteType);
+  const voteComment = async (commentId: string, voteType: 'up' | 'down'): Promise<void> => {
+    await unified.voteComment(commentId, voteType);
   };
 
   const reportComment = async (
@@ -185,56 +234,66 @@ export function useDiscussion({
     violationType: string,
     reason: string,
     description?: string
-  ) => {
-    // Map legacy violation types to the unified system's report reasons
-    const reportData = {
-      commentId,
-      reason: violationType,
-      description: description || reason
-    };
-
-    // Note: unifiedDiscussion.reportContent expects { contentId, contentType, reason... }
-    // We are adapting legacy call to new system manually here
-    console.warn('Reporting not fully implemented in legacy adapter', reportData);
+  ): Promise<void> => {
+    await unified.reportContent({
+      contentId: commentId,
+      contentType: 'comment',
+      violationType,
+      reason,
+      description,
+    });
   };
 
-  const moderateComment = async (_commentId: string, _action: string, _reason: string) => {
-    // This would need to be implemented in the unified system
-    console.warn('moderateComment not yet implemented in unified system');
+  /**
+   * Executes a moderation action on a comment (approve, reject, hide, etc.).
+   * Delegates to useUnifiedDiscussion which POSTs to POST /api/moderation/action
+   * and then broadcasts the result via StateSyncService + WebSocket.
+   */
+  const moderateComment = async (
+    commentId: string,
+    action: string,
+    reason: string
+  ): Promise<void> => {
+    await unified.moderateContent({
+      contentId: commentId,
+      contentType: 'comment',
+      action,
+      reason,
+    });
   };
 
-  const sendTypingIndicator = (_parentId?: string) => {
-    unifiedDiscussion.startTyping();
+  const sendTypingIndicator = (_parentId?: string): void => {
+    unified.startTyping();
   };
 
-  const stopTypingIndicator = (_parentId?: string) => {
-    unifiedDiscussion.stopTyping();
+  const stopTypingIndicator = (_parentId?: string): void => {
+    unified.stopTyping();
   };
 
-  const refreshThread = async () => {
-    // React Query handles this automatically, but we can force a refetch if needed
-    // This would need to be exposed from the unified hook
+  /**
+   * Invalidates the React Query comment cache for this bill, triggering a
+   * background re-fetch. Delegates to unified.invalidateComments() which
+   * calls StateSyncService.invalidateRelatedQueries().
+   */
+  const refreshThread = async (): Promise<void> => {
+    unified.invalidateComments();
   };
 
-  const subscribe = () => {
-    // Auto-handled by unified system
-  };
+  const subscribe = (): void => { /* handled by unified system */ };
+  const unsubscribe = (): void => { /* handled by unified system */ };
 
-  const unsubscribe = () => {
-    // Auto-handled by unified system
-  };
+  // --------------------------------------------------------------------------
+  // Return
+  // --------------------------------------------------------------------------
 
   return {
-    // Data
     thread,
-    comments: unifiedDiscussion.comments as unknown as Comment[],
+    comments: unified.comments as unknown as Comment[],
     typingIndicators,
 
-    // State
-    loading: unifiedDiscussion.isLoading,
-    error: unifiedDiscussion.error || null,
+    loading: unified.isLoading,
+    error: unified.error ?? null,
 
-    // Actions
     addComment,
     updateComment,
     deleteComment,
@@ -242,12 +301,10 @@ export function useDiscussion({
     reportComment,
     moderateComment,
 
-    // Real-time features
     sendTypingIndicator,
     stopTypingIndicator,
     refreshThread,
 
-    // Utility
     subscribe,
     unsubscribe,
   };

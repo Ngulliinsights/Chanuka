@@ -22,7 +22,7 @@ import type { Pool as PoolType } from 'pg';
  * Holds all initialized server service instances
  */
 export interface ServerServicesContainer {
-  database: any; // Adjust type based on your database implementation
+  database: object; // Adjust type based on your database implementation
   validation: ValidationServicesContainer;
   // Add other services as needed
   // auth: AuthServicesContainer;

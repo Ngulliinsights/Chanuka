@@ -144,7 +144,7 @@ export class TypeGuards {
    * Validates an object against a schema.
    */
   static validateSchema<T extends Record<string, unknown>>(
-    obj: any,
+    obj: unknown,
     schema: Record<string, (value: unknown) => boolean>,
     options: SchemaValidationOptions = {}
   ): TypeValidationResult<T> {
@@ -207,7 +207,7 @@ export class TypeGuards {
    * Checks if value is an array of specific type.
    */
   static isArrayOf<T>(
-    value: any,
+    value: unknown,
     typeGuard: (item: unknown) => item is T
   ): value is T[] {
     if (!Array.isArray(value)) return false;
@@ -263,7 +263,7 @@ export class TypeGuards {
    * Asserts that a value is of a specific type, throwing an error if not.
    */
   static assertType<T>(
-    value: any,
+    value: unknown,
     typeGuard: (value: unknown) => value is T,
     errorMessage?: string
   ): asserts value is T {

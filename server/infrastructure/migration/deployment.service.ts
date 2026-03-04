@@ -557,7 +557,7 @@ export class DeploymentService {
   /**
    * Monitor memory usage and performance metrics
    */
-  async monitorMemoryAndPerformance(): Promise<{ memoryImprovement: number; performanceMetrics: any }> {
+  async monitorMemoryAndPerformance(): Promise<{ memoryImprovement: number; performanceMetrics: Record<string, unknown> }> {
     console.log('[Deployment] Monitoring memory usage and performance metrics');
 
     const systemMetrics = monitoringService.getCurrentMetrics('system');

@@ -3,12 +3,12 @@ import { Express } from 'express';
 import fs from 'fs';
 import https from 'https';
 
-import { encryptionService } from '../../encryption-services/encryption.service';
-import { securityAuditService } from '../../security-audit-service';
-import { tlsConfigService } from '../../tls-config-services/tls-config.service';
+import { encryptionService } from '../../domain/services/encryption.service';
+import { securityAuditService } from './security-audit.service';
+import { tlsConfigService } from '../../domain/services/tls-config.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { secureSessionService } from '@server/infrastructure/auth/secure-session-service';
-import { securityMiddleware } from '../../security-middlewareware';
+import { securityMiddleware } from '../../security-middleware';
 
 /**
  * Security initialization service that sets up all security components
@@ -26,11 +26,11 @@ export class SecurityInitializationService {
    */
   async initializeSecurity(): Promise<void> {
     if (this.isInitialized) {
-      logger.info('⚠️  Security already initialized', { component: 'Chanuka' });
+      logger.info({ msg: '⚠️  Security already initialized', component: 'Chanuka' });
       return;
     }
 
-    logger.info('🔒 Initializing comprehensive security system...', { component: 'Chanuka' });
+    logger.info({ msg: '🔒 Initializing comprehensive security system...', component: 'Chanuka' });
 
     try {
       // 1. Initialize encryption service
@@ -58,7 +58,7 @@ export class SecurityInitializationService {
       await this.setupAutomatedSecurityTasks();
 
       this.isInitialized = true;
-      logger.info('✅ Security system initialized successfully', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Security system initialized successfully', component: 'Chanuka' });
 
       // Log security initialization
       await securityAuditService.logSecurityEvent({
@@ -82,7 +82,7 @@ export class SecurityInitializationService {
       });
 
     } catch (error) {
-      logger.error('❌ Security initialization failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Security initialization failed', component: 'Chanuka', error: error as Error });
       throw new Error('Security system initialization failed');
     }
   }
@@ -91,14 +91,14 @@ export class SecurityInitializationService {
    * Initialize encryption service
    */
   private async initializeEncryption(): Promise<void> {
-    logger.info('🔐 Initializing encryption service...', { component: 'Chanuka' });
+    logger.info({ msg: '🔐 Initializing encryption service...', component: 'Chanuka' });
 
     // Validate encryption configuration
     const hasEncryptionKey = process.env.ENCRYPTION_KEY && process.env.KEY_DERIVATION_SALT;
     
     if (!hasEncryptionKey) {
-      logger.warn('⚠️  No encryption keys found in environment. Using generated keys for development.', { component: 'Chanuka' });
-      logger.warn('🚨 IMPORTANT: Set ENCRYPTION_KEY and KEY_DERIVATION_SALT in production!', { component: 'Chanuka' });
+      logger.warn({ msg: '⚠️  No encryption keys found in environment. Using generated keys for development.', component: 'Chanuka' });
+      logger.warn({ msg: '🚨 IMPORTANT: Set ENCRYPTION_KEY and KEY_DERIVATION_SALT in production!', component: 'Chanuka' });
     }
 
     // Test encryption functionality
@@ -111,9 +111,9 @@ export class SecurityInitializationService {
         throw new Error('Encryption test failed');
       }
       
-      logger.info('✅ Encryption service initialized and tested', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Encryption service initialized and tested', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Encryption service test failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Encryption service test failed', component: 'Chanuka', error: error as Error });
       throw error;
     }
   }
@@ -122,15 +122,15 @@ export class SecurityInitializationService {
    * Set up security middleware
    */
   private async setupSecurityMiddleware(): Promise<void> {
-    logger.info('🛡️  Setting up security middleware...', { component: 'Chanuka' });
+    logger.info({ msg: '🛡️  Setting up security middleware...', component: 'Chanuka' });
     
     try {
       // Apply security middleware to the Express app
       this.app.use(securityMiddleware);
       
-      logger.info('✅ Security middleware configured', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Security middleware configured', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Security middleware setup failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Security middleware setup failed', component: 'Chanuka', error: error as Error });
       throw error;
     }
   }
@@ -139,20 +139,18 @@ export class SecurityInitializationService {
    * Initialize session management
    */
   private async initializeSessionManagement(): Promise<void> {
-    logger.info('🎫 Initializing secure session management...', { component: 'Chanuka' });
+    logger.info({ msg: '🎫 Initializing secure session management...', component: 'Chanuka' });
     
     try {
       // Test session service functionality
-      const testSessionId = 'test-session-' + Date.now();
-      
       // Verify session service is available
       if (!secureSessionService) {
         throw new Error('Secure session service not available');
       }
       
-      logger.info('✅ Session management initialized', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Session management initialized', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Session management initialization failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Session management initialization failed', component: 'Chanuka', error: error as Error });
       throw error;
     }
   }
@@ -161,7 +159,7 @@ export class SecurityInitializationService {
    * Set up input validation
    */
   private async setupInputValidation(): Promise<void> {
-    logger.info('🔍 Setting up input validation...', { component: 'Chanuka' });
+    logger.info({ msg: '🔍 Setting up input validation...', component: 'Chanuka' });
     
     try {
       // Test input validation service
@@ -171,9 +169,9 @@ export class SecurityInitializationService {
         throw new Error('Input validation service test failed');
       }
       
-      logger.info('✅ Input validation configured and tested', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Input validation configured and tested', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Input validation setup failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Input validation setup failed', component: 'Chanuka', error: error as Error });
       throw error;
     }
   }
@@ -182,17 +180,17 @@ export class SecurityInitializationService {
    * Initialize security monitoring
    */
   private async initializeSecurityMonitoring(): Promise<void> {
-    logger.info('👁️  Initializing security monitoring...', { component: 'Chanuka' });
+    logger.info({ msg: '👁️  Initializing security monitoring...', component: 'Chanuka' });
     
     try {
       // Set up monitoring for security events
       // This could include metrics collection, alerting, etc.
       
-      logger.info('✅ Security monitoring initialized', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Security monitoring initialized', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Security monitoring initialization failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Security monitoring initialization failed', component: 'Chanuka', error: error as Error });
       // Don't throw - monitoring is not critical for startup
-      logger.warn('⚠️  Continuing without security monitoring', { component: 'Chanuka' });
+      logger.warn({ msg: '⚠️  Continuing without security monitoring', component: 'Chanuka' });
     }
   }
 
@@ -200,7 +198,7 @@ export class SecurityInitializationService {
    * Set up automated security tasks
    */
   private async setupAutomatedSecurityTasks(): Promise<void> {
-    logger.info('⚙️  Setting up automated security tasks...', { component: 'Chanuka' });
+    logger.info({ msg: '⚙️  Setting up automated security tasks...', component: 'Chanuka' });
     
     try {
       // Set up periodic security tasks
@@ -212,9 +210,9 @@ export class SecurityInitializationService {
       setInterval(async () => {
         try {
           await secureSessionService.cleanupExpiredSessions();
-          logger.debug('Completed scheduled session cleanup', { component: 'Chanuka' });
+          logger.debug({ msg: 'Completed scheduled session cleanup', component: 'Chanuka' });
         } catch (error) {
-          logger.error('Session cleanup failed:', { component: 'Chanuka' }, error as Error);
+          logger.error({ msg: 'Session cleanup failed', component: 'Chanuka', error: error as Error });
         }
       }, 60 * 60 * 1000); // 1 hour
       
@@ -225,7 +223,7 @@ export class SecurityInitializationService {
           const certStatus = await tlsConfigService.checkCertificateExpiration(certPath);
           
           if (certStatus.daysUntilExpiry && certStatus.daysUntilExpiry < 30) {
-            logger.warn(`⚠️  TLS certificate expires in ${certStatus.daysUntilExpiry} days`, { component: 'Chanuka' });
+            logger.warn({ msg: `⚠️  TLS certificate expires in ${certStatus.daysUntilExpiry} days`, component: 'Chanuka' });
             
             await securityAuditService.logSecurityEvent({
               event_type: 'certificate_expiration_warning',
@@ -239,15 +237,15 @@ export class SecurityInitializationService {
             });
           }
         } catch (error) {
-          logger.error('Certificate check failed:', { component: 'Chanuka' }, error as Error);
+          logger.error({ msg: 'Certificate check failed', component: 'Chanuka', error: error as Error });
         }
       }, 24 * 60 * 60 * 1000); // 24 hours
       
-      logger.info('✅ Automated security tasks configured', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Automated security tasks configured', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Automated security tasks setup failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Automated security tasks setup failed', component: 'Chanuka', error: error as Error });
       // Don't throw - automated tasks are not critical for startup
-      logger.warn('⚠️  Continuing without automated security tasks', { component: 'Chanuka' });
+      logger.warn({ msg: '⚠️  Continuing without automated security tasks', component: 'Chanuka' });
     }
   }
 
@@ -255,7 +253,7 @@ export class SecurityInitializationService {
    * Initialize security audit logging
    */
   private async initializeSecurityAudit(): Promise<void> {
-    logger.info('📋 Initializing security audit logging...', { component: 'Chanuka' });
+    logger.info({ msg: '📋 Initializing security audit logging...', component: 'Chanuka' });
 
     // Test audit logging
     try {
@@ -267,9 +265,9 @@ export class SecurityInitializationService {
         details: { test: true }
       });
 
-      logger.info('✅ Security audit logging initialized', { component: 'Chanuka' });
+      logger.info({ msg: '✅ Security audit logging initialized', component: 'Chanuka' });
     } catch (error) {
-      logger.error('❌ Security audit logging test failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ Security audit logging test failed', component: 'Chanuka', error: error as Error });
       throw error;
     }
   }
@@ -278,22 +276,22 @@ export class SecurityInitializationService {
    * Set up TLS configuration
    */
   private async setupTLSConfiguration(): Promise<void> {
-    logger.info('🔐 Setting up TLS configuration...', { component: 'Chanuka' });
+    logger.info({ msg: '🔐 Setting up TLS configuration...', component: 'Chanuka' });
 
     try {
       const tlsOptions = tlsConfigService.getHTTPSServerOptions();
 
-      if (tlsConfigService.validateTLSConfig(tlsOptions)) {
-        logger.info('✅ TLS configuration validated', { component: 'Chanuka' });
+      if (tlsConfigService.validateTLSConfig(tlsOptions as any)) {
+        logger.info({ msg: '✅ TLS configuration validated', component: 'Chanuka' });
 
         // Store TLS options for server creation
         (this.app as Express & { tlsOptions?: unknown }).tlsOptions = tlsOptions;
       } else {
-        logger.warn('⚠️  TLS configuration validation failed. Using HTTP in development.', { component: 'Chanuka' });
+        logger.warn({ msg: '⚠️  TLS configuration validation failed. Using HTTP in development.', component: 'Chanuka' });
       }
     } catch (error) {
-      logger.warn('⚠️  TLS setup failed:', { component: 'Chanuka' }, error as Error);
-      logger.warn('🔄 Continuing with HTTP for development', { component: 'Chanuka' });
+      logger.warn({ msg: '⚠️  TLS setup failed', component: 'Chanuka', error: error as Error });
+      logger.warn({ msg: '🔄 Continuing with HTTP for development', component: 'Chanuka' });
     }
   }
 
@@ -344,7 +342,7 @@ export class SecurityInitializationService {
 
       return report;
     } catch (error) {
-      logger.error('Security report generation failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: 'Security report generation failed', component: 'Chanuka', error: error as Error });
       return {
         status: 'critical',
         summary: { error: 'Report generation failed' },
@@ -394,14 +392,14 @@ export class SecurityInitializationService {
           }
         });
 
-        logger.info('✅ HTTPS server created with TLS configuration', { component: 'Chanuka' });
+        logger.info({ msg: '✅ HTTPS server created with TLS configuration', component: 'Chanuka' });
         return server;
       } else {
-        logger.warn('⚠️  TLS configuration invalid. Cannot create HTTPS server.', { component: 'Chanuka' });
+        logger.warn({ msg: '⚠️  TLS configuration invalid. Cannot create HTTPS server.', component: 'Chanuka' });
         return null;
       }
     } catch (error) {
-      logger.error('❌ HTTPS server creation failed:', { component: 'Chanuka' }, error as Error);
+      logger.error({ msg: '❌ HTTPS server creation failed', component: 'Chanuka', error: error as Error });
       return null;
     }
   }

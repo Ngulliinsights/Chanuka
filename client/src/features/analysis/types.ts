@@ -141,7 +141,7 @@ export interface AnalysisResult {
   id: string;
   type: string;
   score: number;
-  data: any;
+  data: unknown;
 }
 
 export interface SponsorAnalysis {

@@ -6,8 +6,9 @@
  */
 
 import type { Request, Response, NextFunction } from 'express';
-import { generateCorrelationId } from './generator';
+
 import { setCurrentCorrelationId, clearCurrentCorrelationId } from './context';
+import { generateCorrelationId } from './generator';
 
 /**
  * Header name for correlation ID

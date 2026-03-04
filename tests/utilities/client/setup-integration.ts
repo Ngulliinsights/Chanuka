@@ -361,7 +361,7 @@ if (typeof window !== 'undefined') {
     }
   }
 
-  global.WebSocket = MockWebSocket as any;
+  global.WebSocket = MockWebSocket as unknown;
 
   // Mock performance API for Core Web Vitals testing
   Object.defineProperty(window, 'performance', {

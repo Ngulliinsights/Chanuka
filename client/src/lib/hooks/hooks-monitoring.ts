@@ -48,7 +48,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
   async reportError(error: AppError | Error, context: ErrorContext): Promise<void> {
     if (!this.monitoringEnabled) return;
 
-    const appError = error instanceof Error && !(error as any).type
+    const appError = error instanceof Error && !(error as unknown as Record<string, unknown>).type
       ? createError(
           ErrorDomain.SYSTEM,
           ErrorSeverity.HIGH,

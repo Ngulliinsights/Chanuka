@@ -15,11 +15,11 @@
  */
 
 import { driver as neo4jDriver, Driver } from 'neo4j-driver';
-import { db } from '../../database';
+import { db } from '../../index.js';
 import {
   graph_sync_status,
   graph_sync_batches,
-} from '../../schema/graph_sync';
+} from '../../../schema/graph_sync.js';
 import { eq, and, desc } from 'drizzle-orm';
 import { runBatchSync, startSyncScheduler, stopSyncScheduler } from './batch-sync-runner';
 import * as neo4jSchema from './schema';

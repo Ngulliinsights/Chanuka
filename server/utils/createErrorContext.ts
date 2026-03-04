@@ -26,7 +26,7 @@ export function createErrorContext(
     operation: endpoint,
     requestId: req.headers['x-request-id'] as string | undefined,
     correlationId: req.headers['x-correlation-id'] as string | undefined,
-    userId: (req as any).user?.id,
+    userId: (req as unknown as Record<string, unknown>).user?.id,
     metadata: {
       method: req.method,
       path: req.path,

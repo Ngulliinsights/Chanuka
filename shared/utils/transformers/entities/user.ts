@@ -5,14 +5,14 @@
  * Requirements: 4.2, 4.3
  */
 
-import type { Transformer } from '../types';
-import type { UserPreferences } from '../../../types/domains/authentication/user';
-import type { UserTable, UserProfileTable, UserPreferencesTable } from '../../../types/database/tables';
 import type { UserId } from '../../../types/core/branded';
 import { UserRole, UserStatus, VerificationStatus, AnonymityLevel } from '../../../types/core/enums';
+import type { UserTable, UserProfileTable, UserPreferencesTable } from '../../../types/database/tables';
+import type { UserPreferences } from '../../../types/domains/authentication/user';
 import {
   dateToStringTransformer,
 } from '../base';
+import type { Transformer } from '../types';
 
 // ============================================================================
 // Internal Domain Types (camelCase for transformer layer)

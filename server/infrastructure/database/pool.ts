@@ -395,11 +395,21 @@ export const createPoolConfig = (is_readOnly = false): pg.PoolConfig => {
       ? CONFIG.READ_REPLICA_URL
       : (CONFIG.WRITE_MASTER_URL ?? process.env.DATABASE_URL);
 
+  // Check if connection string requires SSL (e.g., Neon databases)
+  const requiresSSL = connectionString?.includes('sslmode=require') || 
+                      connectionString?.includes('neon.tech');
+
   return {
     connectionString,
-    application_name: `${CONFIG.APP_NAME}_${is_readOnly ? 'read' : 'write'}`,
+    application_name: is_readOnly ? 'chanuka-read' : 'chanuka-write',
     max: CONFIG.DEFAULT_MAX_POOL_SIZE,
-    ssl: CONFIG.IS_PRODUCTION ? { rejectUnauthorized: false } : false,
+    // Enable SSL for production OR if connection string requires it (e.g., Neon)
+    // For Neon, we need to allow unauthorized certificates
+    ssl: (CONFIG.IS_PRODUCTION || requiresSSL) ? { 
+      rejectUnauthorized: false,
+      // Disable channel binding for compatibility
+      checkServerIdentity: () => undefined
+    } : false,
     connectionTimeoutMillis: 10_000,
     idleTimeoutMillis: 30_000,
     min: 0,

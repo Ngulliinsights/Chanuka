@@ -432,7 +432,7 @@ describe('Client Notification Service', () => {
       global.Notification = {
         permission: 'default',
         requestPermission: mockRequestPermission
-      } as any;
+      } as unknown;
 
       notificationService.updatePreferences({
         push: true
@@ -443,8 +443,8 @@ describe('Client Notification Service', () => {
 
     it('should show browser notification when push is enabled', () => {
       const mockNotification = vi.fn();
-      global.Notification = mockNotification as any;
-      (global.Notification as any).permission = 'granted';
+      global.Notification = mockNotification as unknown;
+      (global.Notification as unknown as Record<string, unknown>).permission = 'granted';
 
       notificationService.updatePreferences({
         push: true

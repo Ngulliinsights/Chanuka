@@ -80,8 +80,8 @@ class PerformanceMonitor {
     let clsValue = 0;
     const observer = new PerformanceObserver((list) => {
       for (const entry of list.getEntries()) {
-        if (!(entry as any).hadRecentInput) {
-          clsValue += (entry as any).value;
+        if (!(entry as unknown as Record<string, unknown>).hadRecentInput) {
+          clsValue += (entry as unknown as Record<string, unknown>).value;
         }
       }
       this.metrics.cls = clsValue;
@@ -115,8 +115,8 @@ class PerformanceMonitor {
   }
 
   private setupMemoryMonitoring() {
-    if (typeof (performance as any).memory !== 'undefined') {
-      const memory = (performance as any).memory;
+    if (typeof (performance as unknown as Record<string, unknown>).memory !== 'undefined') {
+      const memory = (performance as unknown as Record<string, unknown>).memory;
       this.metrics.memoryUsage = memory.usedJSHeapSize;
     }
   }
@@ -223,8 +223,8 @@ export const performanceTestUtils = {
 
   // Measure memory usage during test
   measureMemoryUsage(): number {
-    if (typeof (performance as any).memory !== 'undefined') {
-      return (performance as any).memory.usedJSHeapSize;
+    if (typeof (performance as unknown as Record<string, unknown>).memory !== 'undefined') {
+      return (performance as unknown as Record<string, unknown>).memory.usedJSHeapSize;
     }
     return 0;
   },

@@ -6,6 +6,7 @@
  */
 
 import { z } from 'zod';
+
 import { createValidatedType, createZodTypeGuard } from '../../core/validation';
 
 /**

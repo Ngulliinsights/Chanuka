@@ -91,7 +91,7 @@ export class PretextAnalysisService {
    */
   private analyzeBeneficiaryMismatch(
     stakeholders: Stakeholder[],
-    billData: any
+    billData: unknown
   ): {
     score: number;
     description: string;

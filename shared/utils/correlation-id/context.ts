@@ -7,11 +7,18 @@
 
 import { generateCorrelationId } from './generator';
 
+// Type for AsyncLocalStorage
+interface AsyncLocalStorageType<T> {
+  getStore(): T | undefined;
+  run<R>(store: T, callback: () => R): R;
+  enterWith(store: T): void;
+}
+
 // Store current correlation ID in context
 let currentCorrelationId: string | null = null;
 
 // AsyncLocalStorage for Node.js (if available)
-let asyncLocalStorage: any = null;
+let asyncLocalStorage: AsyncLocalStorageType<{ correlationId?: string }> | null = null;
 
 // Initialize AsyncLocalStorage if in Node.js environment
 if (typeof process !== 'undefined' && process.versions?.node) {

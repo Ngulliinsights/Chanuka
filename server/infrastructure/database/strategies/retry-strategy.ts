@@ -167,14 +167,14 @@ export class RetryStrategy {
    * Check if error has a PostgreSQL error code
    */
   private hasErrorCode(error: Error): boolean {
-    return 'code' in error && typeof (error as any).code === 'string';
+    return 'code' in error && typeof (error as unknown as Record<string, unknown>).code === 'string';
   }
 
   /**
    * Get PostgreSQL error code from error
    */
   private getErrorCode(error: Error): string {
-    return (error as any).code as string;
+    return (error as unknown as Record<string, unknown>).code as string;
   }
 
   /**

@@ -12,7 +12,7 @@
 export interface BillRealTimeUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' |
         'engagement_change' | 'constitutional_flag' | 'expert_analysis';
-  data: any;
+  data: unknown;
   timestamp: string;
   bill_id: number;
 }

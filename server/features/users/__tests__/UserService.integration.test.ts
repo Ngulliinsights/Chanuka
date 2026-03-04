@@ -55,7 +55,7 @@ describe('EnhancedUserService Integration Tests', () => {
         password: 'SecurePassword123!',
         name: 'Test User',
         role: 'user',
-      } as any, 'hashed_password');
+      } as unknown, 'hashed_password');
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
@@ -68,7 +68,7 @@ describe('EnhancedUserService Integration Tests', () => {
         password: '123', // Too short
         name: 'Test User',
         role: 'user',
-      } as any, 'hashed_password');
+      } as unknown, 'hashed_password');
 
       expect(result.success).toBe(false);
       expect(result.error?.message).toContain('Validation failed');

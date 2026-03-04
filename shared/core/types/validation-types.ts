@@ -29,7 +29,7 @@ export interface ValidationErrorDetail {
   field: string;
   message: string;
   type: ValidationType;
-  value?: any;
+  value?: unknown;
   ruleName?: string;
   timestamp?: Date;
 }

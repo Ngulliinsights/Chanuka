@@ -23,8 +23,8 @@ type ZodSchema<T> = z.ZodType<T>;
 type ValidationDecorator<T> = (
   target: T,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<any>,
-) => TypedPropertyDescriptor<any>;
+  descriptor: TypedPropertyDescriptor<unknown>,
+) => TypedPropertyDescriptor<unknown>;
 
 /**
  * Decorator for method parameter validation

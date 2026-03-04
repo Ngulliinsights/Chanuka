@@ -47,7 +47,7 @@ export interface PaginatedResult<T> {
  * Validates data against a schema or set of rules.
  */
 export function validateData<T>(
-  data: any,
+  data: unknown,
   validator: (data: unknown) => DataValidationResult<T>
 ): DataValidationResult<T> {
   try {
@@ -245,12 +245,12 @@ export function flattenObject(obj: unknown, prefix = '', result: Record<string, 
 /**
  * Unflattens a flattened object back to nested structure.
  */
-export function unflattenObject(obj: Record<string, unknown>): any {
-  const result: any = {};
+export function unflattenObject(obj: Record<string, unknown>): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
 
   for (const [key, value] of Object.entries(obj)) {
     const keys = key.split('.');
-    let current = result;
+    let current: Record<string, unknown> = result;
 
     for (let i = 0; i < keys.length - 1; i++) {
       const k = keys[i];
@@ -258,7 +258,8 @@ export function unflattenObject(obj: Record<string, unknown>): any {
       if (!(k in current)) {
         current[k] = {};
       }
-      current = current[k];
+      // Type assertion: we know this is a Record because we just created it
+      current = current[k] as Record<string, unknown>;
     }
 
     const lastKey = keys[keys.length - 1];
@@ -462,7 +463,7 @@ export function sanitizeObject(obj: unknown): unknown {
   }
 
   if (typeof obj === 'object' && obj !== null) {
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(obj)) {
       sanitized[key] = sanitizeObject(value);
     }

@@ -77,7 +77,7 @@ describe('MessageHandler', () => {
 
     it('should reject message with invalid type', () => {
       const message: WebSocketMessage = {
-        type: 'invalid_type' as any,
+        type: 'invalid_type' as unknown,
         data: { bill_id: 123 },
       };
 
@@ -352,7 +352,7 @@ describe('MessageHandler', () => {
 
     it('should handle unknown message type', async () => {
       const message: WebSocketMessage = {
-        type: 'unknown_type' as any,
+        type: 'unknown_type' as unknown,
         messageId: 'unknown_test',
       };
 
@@ -367,17 +367,17 @@ describe('MessageHandler', () => {
 
   describe('message validation edge cases', () => {
     it('should reject null message', () => {
-      expect(messageHandler.validateMessage(null as any)).toBe(false);
+      expect(messageHandler.validateMessage(null as unknown)).toBe(false);
     });
 
     it('should reject undefined message', () => {
-      expect(messageHandler.validateMessage(undefined as any)).toBe(false);
+      expect(messageHandler.validateMessage(undefined as unknown)).toBe(false);
     });
 
     it('should reject non-object message', () => {
-      expect(messageHandler.validateMessage('string' as any)).toBe(false);
-      expect(messageHandler.validateMessage(123 as any)).toBe(false);
-      expect(messageHandler.validateMessage(true as any)).toBe(false);
+      expect(messageHandler.validateMessage('string' as unknown)).toBe(false);
+      expect(messageHandler.validateMessage(123 as unknown)).toBe(false);
+      expect(messageHandler.validateMessage(true as unknown)).toBe(false);
     });
 
     it('should reject message with non-string type', () => {
@@ -392,7 +392,7 @@ describe('MessageHandler', () => {
     it('should validate subscribe message with non-number bill_id', () => {
       const message: WebSocketMessage = {
         type: 'subscribe',
-        data: { bill_id: 'not_a_number' as any },
+        data: { bill_id: 'not_a_number' as unknown },
       };
 
       expect(messageHandler.validateMessage(message)).toBe(false);
@@ -410,7 +410,7 @@ describe('MessageHandler', () => {
     it('should validate batch_subscribe with non-array bill_ids', () => {
       const message: WebSocketMessage = {
         type: 'batch_subscribe',
-        data: { bill_ids: 'not_an_array' as any },
+        data: { bill_ids: 'not_an_array' as unknown },
       };
 
       expect(messageHandler.validateMessage(message)).toBe(false);
@@ -419,7 +419,7 @@ describe('MessageHandler', () => {
     it('should validate auth message with non-string token', () => {
       const message: WebSocketMessage = {
         type: 'auth',
-        data: { token: 123 as any },
+        data: { token: 123 as unknown },
       };
 
       expect(messageHandler.validateMessage(message)).toBe(false);
@@ -428,7 +428,7 @@ describe('MessageHandler', () => {
     it('should validate update_preferences with non-object preferences', () => {
       const message: WebSocketMessage = {
         type: 'update_preferences',
-        data: { preferences: 'not_an_object' as any },
+        data: { preferences: 'not_an_object' as unknown },
       };
 
       expect(messageHandler.validateMessage(message)).toBe(false);
@@ -439,7 +439,7 @@ describe('MessageHandler', () => {
     it('should handle MessageValidationError', async () => {
       const message: WebSocketMessage = {
         type: 'subscribe',
-        data: { bill_id: 'invalid' as any },
+        data: { bill_id: 'invalid' as unknown },
         messageId: 'validation_error_test',
       };
 
@@ -454,7 +454,7 @@ describe('MessageHandler', () => {
     it('should handle batch subscribe with invalid bill_id', async () => {
       const message: WebSocketMessage = {
         type: 'batch_subscribe',
-        data: { bill_ids: [123, 'invalid' as any, 789] },
+        data: { bill_ids: [123, 'invalid' as unknown, 789] },
         messageId: 'batch_validation_error',
       };
 

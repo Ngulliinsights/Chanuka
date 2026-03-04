@@ -116,7 +116,7 @@ export function usePerformanceMonitor(
 
     // Track memory if enabled
     if (trackMemory && 'memory' in performance) {
-      const memoryUsage = (performance as any).memory.usedJSHeapSize;
+      const memoryUsage = (performance as unknown as Record<string, unknown>).memory.usedJSHeapSize;
       monitor.recordCustomMetric({
         name: `${componentName}_memory`,
         value: memoryUsage,
@@ -369,7 +369,7 @@ export function usePerformanceAlert(
        // Map to match PerformanceConfig['alerts'] structure if possible, or just pass safe subset
        // The config types might not strictly match, so we cast or adapt as needed
        // Assuming partial update is supported
-       monitor.getAlertsManager().updateConfig(config as any);
+       monitor.getAlertsManager().updateConfig(config as unknown);
     },
     []
   );

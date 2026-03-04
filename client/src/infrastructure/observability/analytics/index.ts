@@ -54,7 +54,7 @@ export function trackEvent(event: {
   const tracker = ComprehensiveAnalyticsTracker.getInstance();
   
   tracker.trackEvent({
-    type: 'custom' as any,
+    type: 'custom' as unknown,
     name: event.name,
     timestamp: event.timestamp || new Date(),
     properties: event.properties,

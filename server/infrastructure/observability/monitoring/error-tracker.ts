@@ -260,8 +260,8 @@ class ErrorTracker {
     category: 'database' | 'authentication' | 'validation' | 'external_api' | 'system' | 'business_logic' = 'system'
   ): string {
     const context: ErrorContext = {
-      traceId: (req as any).traceId,
-      user_id: (req as any).user?.id,
+      traceId: (req as unknown as Record<string, unknown>).traceId,
+      user_id: (req as unknown as Record<string, unknown>).user?.id,
       url: req.originalUrl || req.url,
       method: req.method,
       headers: this.sanitizeHeaders(req.headers as Record<string, string | string[] | undefined>),
@@ -494,7 +494,7 @@ class ErrorTracker {
 
   private extractErrorCode(error: Error | string): string | undefined {
     if (typeof error === 'string') return undefined;
-    return (error as any).code || (error as any).errno || (error as any).status || undefined;
+    return (error as unknown as Record<string, unknown>).code || (error as unknown as Record<string, unknown>).errno || (error as unknown as Record<string, unknown>).status || undefined;
   }
 
   private getAlertThreshold(severity: string): number {
@@ -713,8 +713,8 @@ class ErrorTracker {
   ): Promise<void> {
     for (const [integrationName, filter] of Array.from(this.integrationFilters.entries())) {
       if (!filter.enabled) continue;
-      if (filter.severity && !filter.severity.includes(severity as any)) continue;
-      if (filter.category && !filter.category.includes(category as any)) continue;
+      if (filter.severity && !filter.severity.includes(severity as unknown)) continue;
+      if (filter.category && !filter.category.includes(category as unknown)) continue;
       if (filter.minOccurrences && occurrences < filter.minOccurrences) continue;
 
       const integration = this.integrationManager.getIntegration(integrationName);

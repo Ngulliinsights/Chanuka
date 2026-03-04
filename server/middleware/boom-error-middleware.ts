@@ -17,7 +17,7 @@ import { ZodError } from 'zod';
  * Processes all errors and converts them to consistent API responses
  */
 export function boomErrorMiddleware(
-  error: any,
+  error: unknown,
   req: Request,
   res: Response,
   next: NextFunction

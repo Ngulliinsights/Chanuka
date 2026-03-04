@@ -367,7 +367,7 @@ describe('MetricsReporter', () => {
 
     it('should throw error for unsupported format', () => {
       expect(() => {
-        metricsReporter.exportMetrics({ format: 'xml' as any });
+        metricsReporter.exportMetrics({ format: 'xml' as unknown });
       }).toThrow('Unsupported format: xml');
     });
   });

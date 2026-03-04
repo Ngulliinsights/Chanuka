@@ -701,12 +701,12 @@ export function isCommittee(value: unknown): value is typeof committees.$inferSe
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as any).id === 'string' &&
-    typeof (value as any).name === 'string' &&
-    typeof (value as any).chamber === 'string' &&
-    typeof (value as any).is_active === 'boolean' &&
-    typeof (value as any).created_at === 'object' &&
-    (value as any).created_at instanceof Date
+    typeof (value as unknown as Record<string, unknown>).id === 'string' &&
+    typeof (value as unknown as Record<string, unknown>).name === 'string' &&
+    typeof (value as unknown as Record<string, unknown>).chamber === 'string' &&
+    typeof (value as unknown as Record<string, unknown>).is_active === 'boolean' &&
+    typeof (value as unknown as Record<string, unknown>).created_at === 'object' &&
+    (value as unknown as Record<string, unknown>).created_at instanceof Date
   );
 }
 

@@ -39,7 +39,7 @@ export interface FlagAnalytics {
   enabledCount: number;
   disabledCount: number;
   enabledPercentage: number;
-  metrics: any;
+  metrics: Record<string, unknown>;
 }
 
 export interface CreateFlagRequest {

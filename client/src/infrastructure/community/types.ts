@@ -29,7 +29,8 @@ export interface UnifiedThread extends DiscussionThread {
 }
 
 /**
- * Moderation request
+ * Moderation report request — submitted by regular users flagging content.
+ * Posted to POST /api/moderation/report.
  */
 export interface ModerationRequest {
   readonly contentId: string;
@@ -38,6 +39,28 @@ export interface ModerationRequest {
   readonly reason: string;
   readonly description?: string;
 }
+
+/**
+ * Moderation action request — submitted by moderators acting on content.
+ * Posted to POST /api/moderation/action.
+ */
+export interface ModerationActionRequest {
+  readonly contentId: string;
+  readonly contentType: 'comment' | 'thread';
+  readonly action: ModerationAction;
+  readonly reason: string;
+}
+
+/**
+ * Moderator actions available on a piece of content.
+ */
+export type ModerationAction =
+  | 'approve'
+  | 'reject'
+  | 'hide'
+  | 'flag'
+  | 'remove'
+  | 'restore';
 
 export type ViolationType =
   | 'spam'
@@ -118,9 +141,11 @@ export interface WebSocketEvents {
   'comment:updated': UnifiedComment;
   'comment:deleted': { id: number };
   'comment:voted': { id: number; upvotes: number; downvotes: number };
-  'thread:created': UnifiedThread; // Added for state sync
+  'thread:created': UnifiedThread;
   'thread:updated': UnifiedThread;
   'typing:indicator': { userId: number; userName: string; threadId: number };
+  /** Explicit stop signal so peers clear the indicator immediately. */
+  'typing:stop': { userId: number; threadId: number };
   'moderation:action': UnifiedModeration;
   'presence:update': {
     userId: number;
@@ -168,20 +193,35 @@ export interface UseCommunityReturn {
 }
 
 export interface UseDiscussionReturn {
+  // Data
   comments: UnifiedComment[];
   threads: UnifiedThread[];
   currentThread?: UnifiedThread;
+
+  // Loading / error state
   isLoading: boolean;
   isLoadingComments: boolean;
   isLoadingThreads: boolean;
   error?: string | null;
+
+  // Comment mutations
   createComment: (data: CreateCommentRequest) => Promise<UnifiedComment>;
   updateComment: (data: UpdateCommentRequest) => Promise<UnifiedComment>;
   deleteComment: (commentId: string) => Promise<void>;
   voteComment: (commentId: string, vote: 'up' | 'down') => Promise<void>;
+
+  // Thread mutations
   createThread: (data: CreateThreadRequest) => Promise<UnifiedThread>;
   selectThread: (threadId: number) => void;
+
+  // Moderation
   reportContent: (data: ModerationRequest) => Promise<void>;
+  moderateContent: (data: ModerationActionRequest) => Promise<void>;
+
+  // Cache control
+  invalidateComments: () => void;
+
+  // Real-time
   typingUsers: string[];
   activeUsers: string[];
   startTyping: () => void;

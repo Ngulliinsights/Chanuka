@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { database as db } from '@server/infrastructure/database';
 import { and, desc, eq, gte, type SQL, sql } from 'drizzle-orm';
 import { jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import type { Request } from 'express';
@@ -205,7 +205,8 @@ export class SecurityMonitoringService {
 
       return result;
     } catch (error) {
-      logger.error('Error tracking request safety', {
+      logger.error({
+        msg: 'Error tracking request safety',
         error: error instanceof Error ? error.message : String(error)
       });
       // Fail open (allow) to prevent service outage on monitoring failure
@@ -238,9 +239,9 @@ export class SecurityMonitoringService {
 
       if (existing.length > 0) {
         // Update existing incident occurrence count or last seen (if we had that column)
-        logger.debug('Duplicate incident detected, skipping creation', {
-          type: data.type,
-          sourceIp: data.sourceIp
+        logger.debug({
+          msg: 'Duplicate incident detected, skipping creation',
+          context: { type: data.type, sourceIp: data.sourceIp }
         });
         return;
       }
@@ -261,8 +262,9 @@ export class SecurityMonitoringService {
       const incident = incidentResult[0];
 
       if (incident) {
-        logger.warn(`🚨 New Security Incident: ${data.type}`, {
-          incidentId: incident.id
+        logger.warn({
+          msg: `🚨 New Security Incident: ${data.type}`,
+          context: { incidentId: incident.id }
         });
 
         // Trigger alerts (e.g., Email/Slack)
@@ -272,9 +274,9 @@ export class SecurityMonitoringService {
       }
 
     } catch (error) {
-      logger.error('Failed to create security incident', {
-        error: error instanceof Error ? error.message : String(error),
-        incidentType: data.type
+      logger.error({
+        msg: 'Failed to create security incident',
+        context: { error: error instanceof Error ? error.message : String(error), incidentType: data.type }
       });
     }
   }
@@ -293,14 +295,14 @@ export class SecurityMonitoringService {
         status: 'pending'
       });
 
-      logger.info('Alert triggered for incident', {
-        incidentId: incident.id,
-        severity: incident.severity
+      logger.info({
+        msg: 'Alert triggered for incident',
+        context: { incidentId: incident.id, severity: incident.severity }
       });
     } catch (error) {
-      logger.error('Failed to trigger alerts', {
-        error: error instanceof Error ? error.message : String(error),
-        incidentId: incident.id
+      logger.error({
+        msg: 'Failed to trigger alerts',
+        context: { error: error instanceof Error ? error.message : String(error), incidentId: incident.id }
       });
     }
   }
@@ -357,8 +359,9 @@ export class SecurityMonitoringService {
         incidentTrend
       };
     } catch (error) {
-      logger.error('Error fetching dashboard metrics', {
-        error: error instanceof Error ? error.message : String(error)
+      logger.error({
+        msg: 'Error fetching dashboard metrics',
+        context: { error: error instanceof Error ? error.message : String(error) }
       });
       throw new Error('Failed to load security dashboard');
     }
@@ -433,8 +436,9 @@ export class SecurityMonitoringService {
         recommendations: this.generateRecommendations(incidents)
       };
     } catch (error) {
-      logger.error('Error generating report', {
-        error: error instanceof Error ? error.message : String(error)
+      logger.error({
+        msg: 'Error generating report',
+        context: { error: error instanceof Error ? error.message : String(error) }
       });
       return { error: 'Failed to generate report' };
     }
@@ -491,7 +495,7 @@ export async function getSecurityMonitoringService(): Promise<SecurityMonitoring
     // Dynamic import to avoid circular dependencies
     const [{ intrusionDetectionService }, { securityAuditService }] = await Promise.all([
       import('./intrusion-detection.service'),
-      import('../../security-audit-service')
+      import('./security-audit.service')
     ]);
 
     productionInstance = SecurityMonitoringService.getInstance(

@@ -337,7 +337,7 @@ export class UserService {
 
       // 2. Execute search using repository (caching handled by repository)
       const result = await this.userRepository.searchUsers(sanitizedQuery, {
-        role: validatedInput.role as any,
+        role: validatedInput.role as unknown,
         is_verified: validatedInput.verification_status === 'verified',
         limit: validatedInput.limit ? parseInt(validatedInput.limit) : 20,
         page: validatedInput.page ? parseInt(validatedInput.page) : undefined,

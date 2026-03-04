@@ -4,9 +4,11 @@
  */
 
 import { z, ZodSchema } from 'zod';
-import { Result, ok, err, isErr } from './errors';
-import { ValidationError } from '../../utils/errors/types';
+
 import { ErrorContextBuilder } from '../../utils/errors/context';
+import { ValidationError } from '../../utils/errors/types';
+
+import { Result, ok, err, isErr } from './errors';
 
 /**
  * Type guard factory for consistent validation

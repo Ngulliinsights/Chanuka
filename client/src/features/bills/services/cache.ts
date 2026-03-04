@@ -50,7 +50,7 @@ export interface OfflineQueueItem {
   id: string;
   type: 'create' | 'update' | 'delete';
   endpoint: string;
-  data: any;
+  data: unknown;
   timestamp: number;
   retryCount: number;
   maxRetries: number;

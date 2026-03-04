@@ -132,8 +132,8 @@ export const fetchOverviewMetrics = createAsyncThunk(
     // Use the comprehensive analytics bridge
     const metrics = await errorAnalyticsBridge.getOverviewMetrics({
       timeRange: filters.timeRange,
-      severity: filters.severity as any[],
-      domain: filters.domain as any[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
     
@@ -156,8 +156,8 @@ export const fetchTrendData = createAsyncThunk(
     // Use comprehensive trend analysis
     const trendData = await errorAnalyticsBridge.getTrendData(period, {
       timeRange: filters.timeRange,
-      severity: filters.severity as any[],
-      domain: filters.domain as any[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
     
@@ -173,8 +173,8 @@ export const fetchPatterns = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const patterns = await errorAnalyticsBridge.getPatterns({
       timeRange: filters.timeRange,
-      severity: filters.severity as any[],
-      domain: filters.domain as any[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
 
@@ -195,8 +195,8 @@ export const fetchRecoveryAnalytics = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const analytics = await errorAnalyticsBridge.getRecoveryAnalytics({
       timeRange: filters.timeRange,
-      severity: filters.severity as any[],
-      domain: filters.domain as any[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
     
@@ -221,7 +221,7 @@ export const fetchRealTimeMetrics = createAsyncThunk(
     return {
       currentErrorRate: metrics.currentErrorRate,
       activeAlerts: metrics.activeAlerts,
-      liveStream: metrics.liveStream as any[],
+      liveStream: metrics.liveStream as unknown[],
       systemHealth: metrics.systemHealth.overall,
     } as RealTimeMetrics;
   }

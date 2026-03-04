@@ -5,23 +5,6 @@
  * Requirements: 4.2, 4.3
  */
 
-import type { Transformer } from '../types';
-import type {
-  Bill,
-  BillTimelineEvent,
-  BillEngagementMetrics,
-  Sponsor,
-  Committee,
-  BillCommitteeAssignment,
-} from '../../../types/domains/legislative/bill';
-import type {
-  BillTable,
-  BillTimelineEventTable,
-  BillEngagementMetricsTable,
-  SponsorTable,
-  CommitteeTable,
-  BillCommitteeAssignmentTable,
-} from '../../../types/database/tables';
 import type {
   BillId,
   UserId,
@@ -38,6 +21,22 @@ import {
   BillType,
   CommitteeStatus,
 } from '../../../types/core/enums';
+import type {
+  BillTable,
+  BillTimelineEventTable,
+  BillEngagementMetricsTable,
+  SponsorTable,
+  CommitteeTable,
+  BillCommitteeAssignmentTable,
+} from '../../../types/database/tables';
+import type {
+  Bill,
+  BillTimelineEvent,
+  BillEngagementMetrics,
+  Sponsor,
+  Committee,
+  BillCommitteeAssignment,
+} from '../../../types/domains/legislative/bill';
 import {
   BillPriority,
   type SponsorType,
@@ -47,6 +46,7 @@ import {
 import {
   dateToStringTransformer,
 } from '../base';
+import type { Transformer } from '../types';
 
 // ============================================================================
 // Database to Domain Transformers

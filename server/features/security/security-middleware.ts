@@ -3,7 +3,7 @@ import cors from 'cors';
 import { NextFunction,Request, Response } from 'express';
 import helmet from 'helmet';
 
-import { intrusionDetectionService } from './intrusion-detection-service';
+import { intrusionDetectionService } from './infrastructure/services/intrusion-detection.service';
 
 /**
  * The Unified Security Gate

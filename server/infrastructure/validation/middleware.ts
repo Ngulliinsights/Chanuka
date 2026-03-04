@@ -49,7 +49,7 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
         }));
 
         // Create validation error without ErrorContext (server-specific)
-        const error = new Error('Request validation failed') as any;
+        const error = new Error('Request validation failed') as unknown;
         error.name = 'ValidationError';
         error.errors = errors;
         error.statusCode = 400;
@@ -70,7 +70,7 @@ export function validateSchema<T>(schema: ZodSchema<T>) {
 export function validateQuery<T>(schema: ZodSchema<T>) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req.query = schema.parse(req.query) as any;
+      req.query = schema.parse(req.query) as unknown;
       next();
     } catch (err) {
       if (err instanceof ZodError) {
@@ -80,7 +80,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
           message: e.message,
         }));
 
-        const error = new Error('Query parameter validation failed') as any;
+        const error = new Error('Query parameter validation failed') as unknown;
         error.name = 'ValidationError';
         error.errors = errors;
         error.statusCode = 400;
@@ -101,7 +101,7 @@ export function validateQuery<T>(schema: ZodSchema<T>) {
 export function validateParams<T>(schema: ZodSchema<T>) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
-      req.params = schema.parse(req.params) as any;
+      req.params = schema.parse(req.params) as unknown;
       next();
     } catch (err) {
       if (err instanceof ZodError) {
@@ -111,7 +111,7 @@ export function validateParams<T>(schema: ZodSchema<T>) {
           message: e.message,
         }));
 
-        const error = new Error('Route parameter validation failed') as any;
+        const error = new Error('Route parameter validation failed') as unknown;
         error.name = 'ValidationError';
         error.errors = errors;
         error.statusCode = 400;

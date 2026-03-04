@@ -7,7 +7,7 @@ interface ErrorResponse {
   message: string;
   code?: string;
   domain?: ErrorCategory;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export class ResponseHelper {

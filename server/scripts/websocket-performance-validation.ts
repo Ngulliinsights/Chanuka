@@ -607,8 +607,8 @@ export class WebSocketPerformanceValidator {
   }
 
   private calculateStatisticalSignificance(
-    control: any,
-    treatment: any,
+    control: unknown,
+    treatment: unknown,
     sampleSize: number
   ): { pValue: number; confidenceLevel: number; sampleSize: number } {
     // Simplified statistical significance calculation

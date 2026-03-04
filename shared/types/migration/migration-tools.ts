@@ -138,7 +138,7 @@ export interface MigrationBatchResult<T> {
   successCount: number;
   failureCount: number;
   migratedItems: T[];
-  errors: Array<{ item: any; error: Error }>;
+  errors: Array<{ item: unknown; error: Error }>;
   warnings: string[];
 }
 

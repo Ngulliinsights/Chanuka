@@ -23,10 +23,10 @@ export type CacheOptions = {
 };
 
 export type CacheDecorator = (
-  target: any,
+  target: object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<any>,
-) => TypedPropertyDescriptor<any>;
+  descriptor: TypedPropertyDescriptor<unknown>,
+) => TypedPropertyDescriptor<unknown>;
 
 // ---------------------------------------------------------------------------
 // Internals
@@ -65,10 +65,10 @@ function toErrorMessage(error: unknown): string {
 export const cache = Object.assign(
   (options: Partial<CacheOptions> = {}) =>
     (
-      _target: any,
+      _target: object,
       propertyKey: string | symbol,
-      descriptor: TypedPropertyDescriptor<any>,
-    ): TypedPropertyDescriptor<any> => {
+      descriptor: TypedPropertyDescriptor<unknown>,
+    ): TypedPropertyDescriptor<unknown> => {
       const originalMethod = descriptor.value;
 
       descriptor.value = async function (...args: unknown[]) {

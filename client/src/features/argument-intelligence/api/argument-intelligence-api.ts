@@ -21,7 +21,7 @@ const BASE_URL = '/api/argument-intelligence';
 export async function getArguments(
   billId: string,
   filters?: ArgumentFilters
-): Promise<{ arguments: Argument[]; count: number; pagination: any }> {
+): Promise<{ arguments: Argument[]; count: number; pagination: Record<string, unknown> }> {
   const params = new URLSearchParams();
   
   if (filters?.argumentType) params.append('argumentType', filters.argumentType);
@@ -73,7 +73,7 @@ export async function clusterArguments(
     minSimilarity?: number;
     maxClusters?: number;
   }
-): Promise<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: any }> {
+): Promise<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: Record<string, unknown> }> {
   const response = await fetch(`${BASE_URL}/cluster-arguments`, {
     method: 'POST',
     headers: {

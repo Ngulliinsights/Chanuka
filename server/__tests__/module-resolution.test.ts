@@ -76,7 +76,7 @@ function compileAndCollectErrors(): CompilationError[] {
     });
     
     return parseCompilerOutput(output);
-  } catch (error: any) {
+  } catch (error: unknown) {
     // tsc exits with non-zero code when there are errors
     // The output is in error.stdout
     if (error.stdout) {

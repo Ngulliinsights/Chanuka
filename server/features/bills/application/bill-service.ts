@@ -266,10 +266,10 @@ export class CachedBillService {
           .filter((v): v is string => v !== undefined),
       );
 
-      // withTransaction uses implicit context — no tx argument
-      const newBillResults = (await withTransaction(async () => {
+      // Execute within transaction
+      const newBillResults = (await withTransaction(async (tx) => {
         // @ts-expect-error - Drizzle ORM query builder returns complex types
-        return (await db
+        return (await tx
           .insert(bills)
           .values({ ...sanitizedData, created_at: new Date(), updated_at: new Date() })
           .returning()) as any[];
@@ -380,9 +380,9 @@ export class CachedBillService {
     user_id?: string,
   ): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
-      await withTransaction(async () => {
+      await withTransaction(async (tx) => {
         // @ts-expect-error - Drizzle ORM update returns unknown type
-        await db
+        await tx
           .update(bills)
           .set({
             status: newStatus,
@@ -408,11 +408,11 @@ export class CachedBillService {
    */
   async deleteBill(id: string): Promise<AsyncServiceResult<boolean>> {
     return safeAsync(async () => {
-      const deleted = (await withTransaction(async () => {
+      const deleted = (await withTransaction(async (tx) => {
         // @ts-expect-error - Drizzle ORM delete returns unknown type
-        await writeDatabase.delete(bill_engagement).where(eq(bill_engagement.bill_id, id));
+        await tx.delete(bill_engagement).where(eq(bill_engagement.bill_id, id));
         // @ts-expect-error - Drizzle ORM query builder returns complex types
-        const deletedBillResults = (await db
+        const deletedBillResults = (await tx
           .delete(bills)
           .where(eq(bills.id, id))
           .returning()) as any[];
@@ -822,9 +822,9 @@ export class CachedBillService {
 
       const validatedInput = validation.data!;
 
-      await withTransaction(async () => {
+      await withTransaction(async (tx) => {
         // @ts-expect-error - Drizzle ORM query builder returns complex types
-        const existingResults = (await db
+        const existingResults = (await tx
           .select()
           .from(bill_engagement)
           .where(
@@ -847,13 +847,13 @@ export class CachedBillService {
           }
 
           // @ts-expect-error - Drizzle ORM update returns unknown type
-          await db
+          await tx
             .update(bill_engagement)
             .set(updates)
             .where(eq(bill_engagement.id, existing.id));
         } else {
           // @ts-expect-error - Drizzle ORM insert returns unknown type
-          await writeDatabase.insert(bill_engagement).values({
+          await tx.insert(bill_engagement).values({
             bill_id: validatedInput.bill_id,
             user_id: validatedInput.user_id,
             view_count:    validatedInput.engagement_type === 'view'    ? 1 : 0,

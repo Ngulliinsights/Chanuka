@@ -30,8 +30,8 @@ export interface ValidationCheckpoint {
   checkpointId: string;
   timestamp: Date;
   errorType: string;
-  legacyResponse: any;
-  migratedResponse: any;
+  legacyResponse: unknown;
+  migratedResponse: unknown;
   isConsistent: boolean;
   differences?: string[];
 }
@@ -636,7 +636,7 @@ export class ErrorHandlingDeploymentService {
   /**
    * Generate test cases for validation
    */
-  private generateTestCases(component: string): Array<{ errorType: string; testData: any }> {
+  private generateTestCases(component: string): Array<{ errorType: string; testData: Record<string, unknown> }> {
     const baseCases = [
       { errorType: 'validation', testData: { field: 'email', message: 'Invalid email' } },
       { errorType: 'authentication', testData: { reason: 'invalid_token' } },

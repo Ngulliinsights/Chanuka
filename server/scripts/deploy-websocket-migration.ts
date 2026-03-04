@@ -46,8 +46,8 @@ interface MigrationState {
  */
 export class SocketIOWebSocketService {
   private io: Server | null = null;
-  private redisClient: any = null;
-  private redisAdapter: any = null;
+  private redisClient: unknown = null;
+  private redisAdapter: unknown = null;
   private metrics: ConnectionMetrics;
   private userSockets: Map<string, Set<string>> = new Map();
   private socketUsers: Map<string, string> = new Map();

@@ -4,6 +4,7 @@
  */
 
 import { BillId } from '../../core/branded';
+
 import { BillStatus } from './bill';
 
 // ============================================================================

@@ -1,6 +1,10 @@
-export const get = async (url: string, options?: any) => ({ data: {} }); 
-export const post = async (url: string, data?: any, options?: any) => ({ data: {} }); 
-export const put = async (url: string, data?: any, options?: any) => ({ data: {} }); 
-export const del = async (url: string, options?: any) => ({ data: {} }); 
-export const api = { get, post, put, delete: del }; 
-export default api;
+/**
+ * API Service Export
+ * 
+ * Re-exports the API client from the infrastructure/api layer.
+ * This provides backward compatibility while maintaining a single source of truth
+ * in the infrastructure layer.
+ */
+
+export { get, post, put, del as delete, api } from '@client/infrastructure/api';
+export { default } from '@client/infrastructure/api';

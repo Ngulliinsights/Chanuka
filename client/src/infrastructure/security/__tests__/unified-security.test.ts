@@ -92,7 +92,7 @@ describe('Unified Security System', () => {
 
     it('should handle CSP violations', async () => {
       // Test through public interface - simulate violation event
-      const violationEvent = new Event('securitypolicyviolation') as any;
+      const violationEvent = new Event('securitypolicyviolation') as unknown;
       violationEvent.documentURI = 'https://example.com';
       violationEvent.violatedDirective = 'script-src';
       violationEvent.blockedURI = 'https://evil.com/script.js';
@@ -292,14 +292,14 @@ describe('Unified Security System', () => {
 
       // Test CSP error inference
       const cspError = new Error('CSP violation detected');
-      const cspSecurityError = (errorMiddleware as any).createSecurityError(
+      const cspSecurityError = (errorMiddleware as unknown as Record<string, unknown>).createSecurityError(
         cspError, 'test-operation', 'TestComponent'
       );
       expect(cspSecurityError.type).toBe(SecurityErrorType.CSP_VIOLATION);
 
       // Test validation error inference
       const validationError = new Error('Input validation failed');
-      const validationSecurityError = (errorMiddleware as any).createSecurityError(
+      const validationSecurityError = (errorMiddleware as unknown as Record<string, unknown>).createSecurityError(
         validationError, 'test-operation', 'TestComponent'
       );
       expect(validationSecurityError.type).toBe(SecurityErrorType.INPUT_VALIDATION_FAILED);

@@ -13,17 +13,76 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { globalApiClient } from '../../../infrastructure/api/client';
 import { StateSyncService } from '../../../infrastructure/community/services/state-sync.service';
-import { WebSocketManager } from '../services/websocket-manager';
+import { WebSocketManager } from '@client/services/websocket-manager';
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
   DiscussionViewState,
+  ModerationActionRequest,
   ModerationRequest,
   UnifiedComment,
+  UnifiedModeration,
   UnifiedThread,
   UpdateCommentRequest,
   UseDiscussionReturn,
 } from '../../../infrastructure/community/types';
+
+// ============================================================================
+// LOCAL TYPE AUGMENTATIONS
+// Extends UnifiedComment with fields the API returns but the shared type omits.
+// Remove these once UnifiedComment is updated upstream.
+// ============================================================================
+
+interface CommentVotes {
+  up: number;
+  down: number;
+}
+
+/**
+ * Augmented comment type that includes fields present in API responses but not
+ * yet reflected in the shared UnifiedComment interface. Using intersection
+ * rather than casting so all other UnifiedComment fields remain strongly typed.
+ */
+type EnrichedComment = UnifiedComment & {
+  id: string;
+  authorId: string;
+  votes: CommentVotes;
+  isAuthorExpert: boolean;
+  updatedAt: string;
+};
+
+// ============================================================================
+// WEBSOCKET EVENT PAYLOAD TYPES
+// ============================================================================
+
+interface WsCommentPayload extends EnrichedComment {
+  billId: number | string;
+}
+
+interface WsCommentDeletedPayload {
+  id: string;
+}
+
+interface WsTypingPayload {
+  threadId: number | string | undefined;
+  userId: number | string;
+  userName: string;
+}
+
+interface WsTypingStopPayload {
+  threadId: number | string | undefined;
+  userId: number | string;
+}
+
+interface WsPresencePayload {
+  threadId: number | string | undefined;
+  userId: number | string;
+  status: 'online' | 'offline';
+}
+
+// ============================================================================
+// HOOK OPTIONS
+// ============================================================================
 
 interface UseUnifiedDiscussionOptions {
   billId: number;
@@ -32,6 +91,10 @@ interface UseUnifiedDiscussionOptions {
   enableRealtime?: boolean;
 }
 
+// Placeholder user ID used when the current user's ID is not yet resolved.
+// Replace with a real auth context lookup when available.
+const CURRENT_USER_ID = 0;
+
 export function useUnifiedDiscussion({
   billId,
   autoSubscribe = true,
@@ -39,6 +102,7 @@ export function useUnifiedDiscussion({
   enableRealtime = true,
 }: UseUnifiedDiscussionOptions): UseDiscussionReturn {
   const queryClient = useQueryClient();
+
   const [discussionState, setDiscussionState] = useState<DiscussionViewState>({
     currentBillId: String(billId),
     sortBy: 'newest',
@@ -48,29 +112,31 @@ export function useUnifiedDiscussion({
     enableTypingIndicators,
   });
 
-  // WebSocket manager for real-time features
   const wsManager = useMemo(
     () => (enableRealtime ? WebSocketManager.getInstance() : null),
     [enableRealtime]
   );
 
-  // State sync service for coordinating React Query + EventBus
   const stateSyncService = useMemo(
     () => new StateSyncService(queryClient, wsManager),
     [queryClient, wsManager]
   );
 
+  const commentsQueryKey = useMemo(
+    () => ['comments', billId, discussionState.sortBy, discussionState.filterBy] as const,
+    [billId, discussionState.sortBy, discussionState.filterBy]
+  );
+
   // ============================================================================
-  // QUERIES (React Query)
+  // QUERIES
   // ============================================================================
 
-  // Fetch comments for the bill
   const {
     data: comments = [],
     isLoading: isLoadingComments,
     error: commentsError,
   } = useQuery({
-    queryKey: ['comments', billId, discussionState.sortBy, discussionState.filterBy],
+    queryKey: commentsQueryKey,
     queryFn: async () => {
       const response = await globalApiClient.get(`/api/bills/${billId}/comments`, {
         params: {
@@ -79,12 +145,11 @@ export function useUnifiedDiscussion({
           include_moderated: discussionState.showModerated,
         },
       });
-      return response.data as UnifiedComment[];
+      return response.data as EnrichedComment[];
     },
-    staleTime: 30000, // 30 seconds
+    staleTime: 30_000,
   });
 
-  // Fetch threads for the bill (real threads, not mock ones)
   const {
     data: threads = [],
     isLoading: isLoadingThreads,
@@ -95,33 +160,64 @@ export function useUnifiedDiscussion({
       const response = await globalApiClient.get(`/api/bills/${billId}/threads`);
       return response.data as UnifiedThread[];
     },
-    staleTime: 60000, // 1 minute
+    staleTime: 60_000,
   });
 
-  // Current thread (if selected)
-  const currentThread = useMemo(() => {
-    return discussionState.currentThreadId
-      ? threads.find(t => t.id === discussionState.currentThreadId)
-      : undefined;
-  }, [threads, discussionState.currentThreadId]);
+  const currentThread = useMemo(
+    () =>
+      discussionState.currentThreadId
+        ? threads.find(t => t.id === discussionState.currentThreadId)
+        : undefined,
+    [threads, discussionState.currentThreadId]
+  );
 
   // ============================================================================
-  // MUTATIONS (Create, Update, Delete)
+  // CACHE HELPERS
+  // ============================================================================
+
+  const prependComment = useCallback(
+    (newComment: EnrichedComment) => {
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) => [newComment, ...old]
+      );
+    },
+    [queryClient, commentsQueryKey]
+  );
+
+  const replaceComment = useCallback(
+    (updated: EnrichedComment) => {
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) =>
+          old.map(c => (c.id === updated.id ? updated : c))
+      );
+    },
+    [queryClient, commentsQueryKey]
+  );
+
+  const removeComment = useCallback(
+    (commentId: string) => {
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) =>
+          old.filter(c => String(c.id) !== String(commentId))
+      );
+    },
+    [queryClient, commentsQueryKey]
+  );
+
+  // ============================================================================
+  // MUTATIONS
   // ============================================================================
 
   const createCommentMutation = useMutation({
     mutationFn: async (data: CreateCommentRequest) => {
       const response = await globalApiClient.post('/api/comments', data);
-      return response.data as UnifiedComment;
+      return response.data as EnrichedComment;
     },
     onSuccess: newComment => {
-      // Update React Query cache
-      queryClient.setQueryData(
-        ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => [newComment, ...old]
-      );
-
-      // Sync with WebSocket if enabled
+      prependComment(newComment);
       stateSyncService.syncCommentCreated(newComment);
     },
   });
@@ -131,17 +227,10 @@ export function useUnifiedDiscussion({
       const response = await globalApiClient.put(`/api/comments/${data.commentId}`, {
         content: data.content,
       });
-      return response.data as UnifiedComment;
+      return response.data as EnrichedComment;
     },
     onSuccess: updatedComment => {
-      // Update React Query cache
-      queryClient.setQueryData(
-        ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) =>
-          old.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
-      );
-
-      // Sync with WebSocket
+      replaceComment(updatedComment);
       stateSyncService.syncCommentUpdated(updatedComment);
     },
   });
@@ -152,13 +241,7 @@ export function useUnifiedDiscussion({
       return commentId;
     },
     onSuccess: commentId => {
-      // Update React Query cache
-      queryClient.setQueryData(
-        ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) => old.filter(comment => String(comment.id) !== String(commentId))
-      );
-
-      // Sync with WebSocket
+      removeComment(commentId);
       stateSyncService.syncCommentDeleted(commentId);
     },
   });
@@ -166,17 +249,10 @@ export function useUnifiedDiscussion({
   const voteCommentMutation = useMutation({
     mutationFn: async ({ commentId, vote }: { commentId: string; vote: 'up' | 'down' }) => {
       const response = await globalApiClient.post(`/api/comments/${commentId}/vote`, { vote });
-      return response.data as UnifiedComment;
+      return response.data as EnrichedComment;
     },
     onSuccess: updatedComment => {
-      // Update React Query cache
-      queryClient.setQueryData(
-        ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-        (old: UnifiedComment[] = []) =>
-          old.map(comment => (comment.id === updatedComment.id ? updatedComment : comment))
-      );
-
-      // Sync with WebSocket
+      replaceComment(updatedComment);
       stateSyncService.syncCommentVoted(updatedComment);
     },
   });
@@ -187,98 +263,101 @@ export function useUnifiedDiscussion({
       return response.data as UnifiedThread;
     },
     onSuccess: newThread => {
-      // Update React Query cache
-      queryClient.setQueryData(['threads', billId], (old: UnifiedThread[] = []) => [
-        newThread,
-        ...old,
-      ]);
-
-      // Auto-select the new thread
-      setDiscussionState(prev => ({
-        ...prev,
-        currentThreadId: newThread.id,
-      }));
-
-      // Sync with WebSocket
+      queryClient.setQueryData(
+        ['threads', billId],
+        (old: UnifiedThread[] = []) => [newThread, ...old]
+      );
+      setDiscussionState(prev => ({ ...prev, currentThreadId: newThread.id }));
       stateSyncService.syncThreadCreated(newThread);
     },
   });
 
-  // Complete moderation implementation (was incomplete in original)
   const reportContentMutation = useMutation({
     mutationFn: async (data: ModerationRequest) => {
       const response = await globalApiClient.post('/api/moderation/report', data);
       return response.data;
     },
     onSuccess: () => {
-      // Refresh comments to show updated report status
       queryClient.invalidateQueries({ queryKey: ['comments', billId] });
     },
   });
 
+  /**
+   * Moderator action mutation.
+   *
+   * Posts to POST /api/moderation/action, receives a UnifiedModeration record,
+   * then delegates cache invalidation and WebSocket broadcast to StateSyncService.
+   */
+  const moderateContentMutation = useMutation({
+    mutationFn: async (data: ModerationActionRequest) => {
+      const response = await globalApiClient.post('/api/moderation/action', data);
+      return response.data as UnifiedModeration;
+    },
+    onSuccess: moderation => {
+      stateSyncService.syncModerationAction(moderation, billId);
+    },
+  });
+
   // ============================================================================
-  // REAL-TIME FEATURES (WebSocket + EventBus coordination)
+  // REAL-TIME FEATURES
   // ============================================================================
 
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [activeUsers, setActiveUsers] = useState<string[]>([]);
 
-  // Set up WebSocket event listeners
   useEffect(() => {
     if (!wsManager || !enableRealtime) return;
 
     const unsubscribers = [
-      // Comment events
-      wsManager.on('comment:new', comment => {
+      wsManager.on('comment:new', (payload: unknown) => {
+        const comment = payload as WsCommentPayload;
         if (String(comment.billId) === String(billId)) {
-          queryClient.setQueryData(
-            ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-            (old: UnifiedComment[] = []) => [comment, ...old]
-          );
+          prependComment(comment);
         }
       }),
 
-      wsManager.on('comment:updated', updatedComment => {
+      wsManager.on('comment:updated', (payload: unknown) => {
+        const updatedComment = payload as WsCommentPayload;
         if (String(updatedComment.billId) === String(billId)) {
-          queryClient.setQueryData(
-            ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-            (old: UnifiedComment[] = []) =>
-              old.map(c => (c.id === updatedComment.id ? updatedComment : c))
-          );
+          replaceComment(updatedComment);
         }
       }),
 
-      wsManager.on('comment:deleted', ({ id }) => {
-        queryClient.setQueryData(
-          ['comments', billId, discussionState.sortBy, discussionState.filterBy],
-          (old: UnifiedComment[] = []) => old.filter(c => c.id !== id)
-        );
+      wsManager.on('comment:deleted', (payload: unknown) => {
+        const { id } = payload as WsCommentDeletedPayload;
+        removeComment(id);
       }),
 
-      // Typing indicators
-      wsManager.on('typing:indicator', data => {
+      wsManager.on('typing:indicator', (payload: unknown) => {
+        const data = payload as WsTypingPayload;
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
-          setTypingUsers(prev => {
-            const userIdStr = String(data.userId); // Ensure string comparison
-            return [...prev.filter(id => id !== userIdStr), userIdStr];
-          });
+          const userIdStr = String(data.userId);
+          setTypingUsers(prev => [...prev.filter(id => id !== userIdStr), userIdStr]);
         }
       }),
 
-      // Active users (Presence)
-      wsManager.on('presence:update', data => {
-         if (data.threadId === discussionState.currentThreadId) {
-           const userIdStr = String(data.userId);
-           if (data.status === 'online') {
-             setActiveUsers(prev => [...prev.filter(id => id !== userIdStr), userIdStr]);
-           } else {
-             setActiveUsers(prev => prev.filter(id => id !== userIdStr));
-           }
-         }
+      // Clear the typing indicator immediately when a peer explicitly stops.
+      wsManager.on('typing:stop', (payload: unknown) => {
+        const data = payload as WsTypingStopPayload;
+        if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
+          const userIdStr = String(data.userId);
+          setTypingUsers(prev => prev.filter(id => id !== userIdStr));
+        }
+      }),
+
+      wsManager.on('presence:update', (payload: unknown) => {
+        const data = payload as WsPresencePayload;
+        if (data.threadId === discussionState.currentThreadId) {
+          const userIdStr = String(data.userId);
+          if (data.status === 'online') {
+            setActiveUsers(prev => [...prev.filter(id => id !== userIdStr), userIdStr]);
+          } else {
+            setActiveUsers(prev => prev.filter(id => id !== userIdStr));
+          }
+        }
       }),
     ];
 
-    // Join the bill's discussion room
     wsManager.joinRoom(`bill:${billId}`);
     if (discussionState.currentThreadId) {
       wsManager.joinRoom(`thread:${discussionState.currentThreadId}`);
@@ -297,9 +376,9 @@ export function useUnifiedDiscussion({
     discussionState.currentThreadId,
     enableRealtime,
     enableTypingIndicators,
-    queryClient,
-    discussionState.sortBy,
-    discussionState.filterBy,
+    prependComment,
+    replaceComment,
+    removeComment,
   ]);
 
   // ============================================================================
@@ -307,16 +386,14 @@ export function useUnifiedDiscussion({
   // ============================================================================
 
   const createComment = useCallback(
-    async (data: CreateCommentRequest): Promise<UnifiedComment> => {
-      return createCommentMutation.mutateAsync(data);
-    },
+    (data: CreateCommentRequest): Promise<UnifiedComment> =>
+      createCommentMutation.mutateAsync(data),
     [createCommentMutation]
   );
 
   const updateComment = useCallback(
-    async (data: UpdateCommentRequest): Promise<UnifiedComment> => {
-      return updateCommentMutation.mutateAsync(data);
-    },
+    (data: UpdateCommentRequest): Promise<UnifiedComment> =>
+      updateCommentMutation.mutateAsync(data),
     [updateCommentMutation]
   );
 
@@ -335,17 +412,13 @@ export function useUnifiedDiscussion({
   );
 
   const createThread = useCallback(
-    async (data: CreateThreadRequest): Promise<UnifiedThread> => {
-      return createThreadMutation.mutateAsync(data);
-    },
+    (data: CreateThreadRequest): Promise<UnifiedThread> =>
+      createThreadMutation.mutateAsync(data),
     [createThreadMutation]
   );
 
   const selectThread = useCallback((threadId: number) => {
-    setDiscussionState(prev => ({
-      ...prev,
-      currentThreadId: threadId,
-    }));
+    setDiscussionState(prev => ({ ...prev, currentThreadId: threadId }));
   }, []);
 
   const reportContent = useCallback(
@@ -355,39 +428,60 @@ export function useUnifiedDiscussion({
     [reportContentMutation]
   );
 
+  const moderateContent = useCallback(
+    async (data: ModerationActionRequest): Promise<void> => {
+      await moderateContentMutation.mutateAsync(data);
+    },
+    [moderateContentMutation]
+  );
+
+  /**
+   * Manually invalidate the comment cache for this bill.
+   * Useful for components that need an explicit escape hatch beyond React
+   * Query's automatic background refetching.
+   */
+  const invalidateComments = useCallback((): void => {
+    stateSyncService.invalidateRelatedQueries(billId);
+  }, [stateSyncService, billId]);
+
   const startTyping = useCallback(() => {
     if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
       wsManager.emit('typing:indicator', {
         threadId: discussionState.currentThreadId,
-        userId: 0, // Should be actual user, but using 0/placeholder as per hook limitations
-        userName: 'Current User',
-      });
+        userId: CURRENT_USER_ID,
+        userName: 'Current User', // Replace with real auth context when available
+      } satisfies WsTypingPayload);
     }
   }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
+  /**
+   * Emit an explicit stop signal so peers clear the typing indicator
+   * immediately rather than waiting for the server-side timeout.
+   */
   const stopTyping = useCallback(() => {
-    // No specific stop typing event in defined types, usually handled by timeout or presence
-  }, []);
+    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
+      wsManager.emit('typing:stop', {
+        threadId: discussionState.currentThreadId,
+        userId: CURRENT_USER_ID,
+      } satisfies WsTypingStopPayload);
+    }
+  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   // ============================================================================
   // RETURN INTERFACE
   // ============================================================================
 
   return {
-    // Data
     comments,
     threads,
     currentThread,
 
-    // Loading states
     isLoading: isLoadingComments || isLoadingThreads,
     isLoadingComments,
     isLoadingThreads,
 
-    // Error states
-    error: commentsError?.message || threadsError?.message,
+    error: commentsError?.message ?? threadsError?.message,
 
-    // Actions
     createComment,
     updateComment,
     deleteComment,
@@ -395,8 +489,10 @@ export function useUnifiedDiscussion({
     createThread,
     selectThread,
     reportContent,
+    moderateContent,
 
-    // Real-time
+    invalidateComments,
+
     typingUsers,
     activeUsers,
     startTyping,

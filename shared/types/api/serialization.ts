@@ -3,12 +3,13 @@
  * Serialization and deserialization support for API types
  */
 
+import { ErrorContextBuilder } from '../../utils/errors/context';
+import { ValidationError } from '../../utils/errors/types';
+import { Result, ok, err } from '../core/errors';
+
+import { ApiError, ApiErrorContext } from './error-types';
 import { ApiRequest, PaginatedApiRequest, FileUploadRequest, GraphQLRequest, WebSocketRequest } from './request-types';
 import { ApiResponse, PaginatedApiResponse, ErrorApiResponse, FileDownloadResponse, GraphQLResponse, WebSocketResponse, StreamingResponse, HttpStatusCode } from './response-types';
-import { ApiError, ApiErrorContext } from './error-types';
-import { Result, ok, err } from '../core/errors';
-import { ValidationError } from '../../utils/errors/types';
-import { ErrorContextBuilder } from '../../utils/errors/context';
 
 /**
  * Serializable API Request

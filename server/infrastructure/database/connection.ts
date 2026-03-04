@@ -279,11 +279,27 @@ export async function withTransaction<T>(
 
   // Attempt transaction with configurable retries
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    // Import pool directly from pool.ts to ensure it's initialized
+    const { pool: pgPool } = await import('./pool');
+    
+    // Use raw pg client instead of Drizzle transaction to bypass Drizzle's transaction handling
+    const client = await pgPool.connect();
+    
     try {
-      const transactionPromise = writeDatabase.transaction(callback);
-
-      // Apply timeout protection if configured
+      // Start transaction using raw SQL
+      await client.query('BEGIN');
+      
+      // Import drizzle and schema
+      const { drizzle } = await import('drizzle-orm/node-postgres');
+      const schema = await import('../schema');
+      
+      // Create a Drizzle instance using the transaction client with full schema
+      const txDb = drizzle(client, { schema });
+      
+      // Execute callback with the transaction-scoped Drizzle instance
+      let result: T;
       if (timeout) {
+        const callbackPromise = callback(txDb);
         const timeoutPromise = new Promise<never>((_, reject) => {
           setTimeout(
             () => reject(new Error(`Transaction exceeded ${timeout}ms timeout`)), 
@@ -291,12 +307,27 @@ export async function withTransaction<T>(
           );
         });
 
-        return await Promise.race([transactionPromise, timeoutPromise]);
+        result = await Promise.race([callbackPromise, timeoutPromise]);
+      } else {
+        result = await callback(txDb);
       }
-
-      return await transactionPromise;
+      
+      // Commit transaction
+      await client.query('COMMIT');
+      client.release();
+      
+      return result;
 
     } catch (error) {
+      // Rollback transaction on error
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        logger.error({ error: rollbackError }, 'Transaction rollback failed');
+      } finally {
+        client.release();
+      }
+      
       lastError = error instanceof Error ? error : new Error(String(error));
 
       const isRetryable = isTransientError(lastError);

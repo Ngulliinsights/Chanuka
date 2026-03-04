@@ -6,7 +6,9 @@
  */
 
 import { z } from 'zod';
+
 import { createValidatedType, createZodTypeGuard } from '../../core/validation';
+
 // Import types directly to avoid circular dependency with index.ts
 import type {
   SliceState,

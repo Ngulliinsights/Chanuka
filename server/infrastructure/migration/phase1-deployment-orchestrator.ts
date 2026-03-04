@@ -18,8 +18,8 @@ export interface Phase1DeploymentResult {
   success: boolean;
   memoryImprovement: number;
   statisticalSignificance: boolean;
-  rollbackTestResults: any;
-  validationResults: any;
+  rollbackTestResults: Record<string, unknown>;
+  validationResults: Record<string, unknown>;
   lessonsLearned: string[];
   timestamp: Date;
 }

@@ -13,15 +13,7 @@ export * from './bill';
 
 // Register all transformers
 import { registerTransformer } from '../registry';
-import {
-  userDbToDomain,
-  userProfileDbToDomain,
-  userPreferencesDbToDomain,
-  userDomainToApi,
-  userProfileDomainToApi,
-  userPreferencesDomainToApi,
-  userDbToApi,
-} from './user';
+
 import {
   billDbToDomain,
   billTimelineEventDbToDomain,
@@ -37,6 +29,15 @@ import {
   billCommitteeAssignmentDomainToApi,
   billDbToApi,
 } from './bill';
+import {
+  userDbToDomain,
+  userProfileDbToDomain,
+  userPreferencesDbToDomain,
+  userDomainToApi,
+  userProfileDomainToApi,
+  userPreferencesDomainToApi,
+  userDbToApi,
+} from './user';
 
 /**
  * Register all entity transformers in the global registry

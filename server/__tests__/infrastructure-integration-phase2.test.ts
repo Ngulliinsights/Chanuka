@@ -258,10 +258,10 @@ describe('Phase 2: Infrastructure Integration Validation', () => {
       const helpers = await import('@server/infrastructure/validation/validation-helpers');
       
       // These should NOT exist anymore
-      expect((helpers as any).BillValidationSchema).toBeUndefined();
-      expect((helpers as any).UserValidationSchema).toBeUndefined();
-      expect((helpers as any).CommentValidationSchema).toBeUndefined();
-      expect((helpers as any).AnalyticsValidationSchema).toBeUndefined();
+      expect((helpers as unknown).BillValidationSchema).toBeUndefined();
+      expect((helpers as unknown).UserValidationSchema).toBeUndefined();
+      expect((helpers as unknown).CommentValidationSchema).toBeUndefined();
+      expect((helpers as unknown).AnalyticsValidationSchema).toBeUndefined();
     });
   });
 

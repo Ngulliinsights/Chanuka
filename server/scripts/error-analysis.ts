@@ -112,7 +112,7 @@ export function compileAndCollectErrors(): CompilationError[] {
     // If no error thrown, compilation succeeded
     console.log('Compilation succeeded, no errors');
     return [];
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Compilation failed, parse the output
     const output = error.stdout || error.output?.join('') || error.stderr || '';
     console.log(`Captured output length: ${output.length} characters`);

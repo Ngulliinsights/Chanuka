@@ -144,7 +144,7 @@ export function autoInitializeMonitoring() {
   if (typeof window === 'undefined') return;
 
   const env = process.env.NODE_ENV || 'development';
-  const version = (process.env as any).BUILD_VERSION || '1.0.0';
+  const version = (process.env as unknown as Record<string, unknown>).BUILD_VERSION || '1.0.0';
 
   // In real implementation, these would come from env vars
   const config: MonitoringConfig = {
@@ -154,11 +154,11 @@ export function autoInitializeMonitoring() {
     enablePerformanceMonitoring: true,
     enableAnalytics: env === 'production',
     sentry: {
-      dsn: (import.meta as any).env?.VITE_SENTRY_DSN || '',
+      dsn: (import.meta as unknown as Record<string, unknown>).env?.VITE_SENTRY_DSN || '',
     },
     datadog: {
-      applicationId: (import.meta as any).env?.VITE_DATADOG_APPLICATION_ID || '',
-      clientToken: (import.meta as any).env?.VITE_DATADOG_CLIENT_TOKEN || '',
+      applicationId: (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_APPLICATION_ID || '',
+      clientToken: (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_CLIENT_TOKEN || '',
     }
   };
 

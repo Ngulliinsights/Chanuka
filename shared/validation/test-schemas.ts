@@ -3,6 +3,16 @@
  */
 
 import { 
+  BillSchema as _BillSchema, 
+  LegacyBillSchema as _LegacyBillSchema,
+  validateBill 
+} from './schemas/bill.schema';
+import { 
+  CommentSchema as _CommentSchema, 
+  LegacyCommentSchema as _LegacyCommentSchema,
+  validateComment 
+} from './schemas/comment.schema';
+import { 
   UserSchema as _UserSchema, 
   UserProfileSchema as _UserProfileSchema, 
   UserWithProfileSchema as _UserWithProfileSchema,
@@ -10,17 +20,7 @@ import {
   validateUserProfile 
 } from './schemas/user.schema';
 
-import { 
-  CommentSchema as _CommentSchema, 
-  LegacyCommentSchema as _LegacyCommentSchema,
-  validateComment 
-} from './schemas/comment.schema';
 
-import { 
-  BillSchema as _BillSchema, 
-  LegacyBillSchema as _LegacyBillSchema,
-  validateBill 
-} from './schemas/bill.schema';
 
 // Test User Schema
 const testUser = {

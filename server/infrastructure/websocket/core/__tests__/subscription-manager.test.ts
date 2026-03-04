@@ -110,7 +110,7 @@ describe('SubscriptionManager', () => {
 
     it('should reject invalid WebSocket connection', () => {
       expect(() => {
-        subscriptionManager.subscribe(null as any, 123);
+        subscriptionManager.subscribe(null as unknown, 123);
       }).toThrow('Invalid or closed WebSocket connection');
 
       const closedWebSocket = createMockWebSocket({ readyState: 3 }); // CLOSED
@@ -210,17 +210,17 @@ describe('SubscriptionManager', () => {
 
       it('should reject non-array bill IDs', () => {
         expect(() => {
-          subscriptionManager.batchSubscribe(mockWebSocket1, 'not-array' as any);
+          subscriptionManager.batchSubscribe(mockWebSocket1, 'not-array' as unknown);
         }).toThrow('Bill IDs must be a non-empty array');
 
         expect(() => {
-          subscriptionManager.batchSubscribe(mockWebSocket1, null as any);
+          subscriptionManager.batchSubscribe(mockWebSocket1, null as unknown);
         }).toThrow('Bill IDs must be a non-empty array');
       });
 
       it('should reject invalid WebSocket connection', () => {
         expect(() => {
-          subscriptionManager.batchSubscribe(null as any, [123, 456]);
+          subscriptionManager.batchSubscribe(null as unknown, [123, 456]);
         }).toThrow('Invalid or closed WebSocket connection');
 
         const closedWebSocket = createMockWebSocket({ readyState: 3 });
@@ -294,7 +294,7 @@ describe('SubscriptionManager', () => {
 
       it('should reject non-array bill IDs', () => {
         expect(() => {
-          subscriptionManager.batchUnsubscribe(mockWebSocket1, 'not-array' as any);
+          subscriptionManager.batchUnsubscribe(mockWebSocket1, 'not-array' as unknown);
         }).toThrow('Bill IDs must be a non-empty array');
       });
 

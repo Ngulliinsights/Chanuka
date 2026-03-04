@@ -132,19 +132,6 @@ router.patch('/me/basic', authenticateToken, asyncHandler(async (req: Authentica
 
   res.json(result.value);
 }));
-    }
-
-    logger.error('Error updating basic info:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
-
-    throw new BaseError('Failed to update basic info', {
-      statusCode: 500,
-      code: ERROR_CODES.INTERNAL_SERVER_ERROR,
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      details: { component: 'profile-routes', userId: req.user?.id }
-    });
-  }
-}));
 
 /**
  * PATCH /me/interests - Update user's interests

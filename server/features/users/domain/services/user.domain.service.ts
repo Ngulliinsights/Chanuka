@@ -374,7 +374,7 @@ export class UserDomainService {
 
       // Get counts by role
       const roles: UserRole[] = ['citizen', 'representative', 'admin', 'moderator'];
-      const roleCounts: Record<UserRole, number> = {} as any;
+      const roleCounts: Record<UserRole, number> = {} as Record<UserRole, number>;
 
       for (const role of roles) {
         const countResult = await this.userRepository.count({ role });

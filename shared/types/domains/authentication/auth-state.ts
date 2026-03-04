@@ -3,9 +3,10 @@
  * Discriminated unions for authentication state management
  */
 
+import { UserId, SessionId } from '../../core/branded';
+
 import { User } from './user';
 
-import { UserId, SessionId } from '../../core/branded';
 
 /**
  * Authentication Status Types

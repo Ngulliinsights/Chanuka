@@ -8,9 +8,11 @@
  */
 
 import { z } from 'zod';
-import type { Transformer } from './types';
+
 import { ErrorContextBuilder } from '../errors/context';
 import { ValidationError } from '../errors/types';
+
+import type { Transformer } from './types';
 
 /**
  * Options for creating a validating transformer

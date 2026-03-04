@@ -210,7 +210,7 @@ export function useErrorHandler(
         return false;
       }
 
-      const connectionType = (navigator as any).connection?.effectiveType || 'unknown';
+      const connectionType = (navigator as unknown as Record<string, unknown>).connection?.effectiveType || 'unknown';
       const isOnline = navigator.onLine;
 
       const errorContext: ErrorContext = {

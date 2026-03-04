@@ -16,32 +16,6 @@ export {
   useRenderOptimization,
 } from './utils/performance';
 
-// Migration Compatibility Layer
-export {
-  useToastShared,
-  useMobileShared,
-  useKeyboardFocusShared,
-  useDebounceShared,
-  useMediaQueryShared,
-  useCleanupShared,
-  useProgressiveDisclosureShared,
-  useBottomSheetShared,
-  useDeviceInfoShared,
-  useInfiniteScrollShared,
-  useMobileNavigationShared,
-  useMobileTabsShared,
-  usePullToRefreshShared,
-  useScrollManagerShared,
-  useSwipeGestureShared,
-  useAuth,
-  useApiConnection,
-  useUnifiedNavigation,
-  useTimeoutAwareLoading,
-  useMigrationConfig,
-  useMigrationStatus,
-  useDeprecationWarning,
-} from './utils/migration-compatibility';
-
 // Hook Patterns - Templates and utilities for creating standardized hooks
 export { useExampleReducer, useAdvancedReducer } from './patterns/reducer-template';
 export { useExampleCallback, useAdvancedCallback } from './patterns/callback-template';

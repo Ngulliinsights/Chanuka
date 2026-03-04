@@ -141,9 +141,9 @@ export {
 // Global clients
 export { contractApiClient } from './contract-client';
 export const analyticsApiService = {
-  trackEvent: async (event: any) => ({ data: {} }),
+  trackEvent: async (event: unknown) => ({ data: {} }),
   getEvents: async () => ({ data: [] }),
-  getDashboard: async (filters?: any) => ({
+  getDashboard: async (filters?: Record<string, unknown>) => ({
     data: {
       summary: {
         total_bills: 0,

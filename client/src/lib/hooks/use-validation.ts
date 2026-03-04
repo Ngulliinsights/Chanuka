@@ -84,13 +84,13 @@ export function validateField<T>(
 ): ValidationResult<unknown> {
   try {
     // Create a partial schema for the field
-    const fieldSchema = schema.pick({ [fieldName]: true } as any);
+    const fieldSchema = schema.pick({ [fieldName]: true } as unknown);
     const result = fieldSchema.safeParse({ [fieldName]: value });
 
     if (result.success) {
       return {
         success: true,
-        data: (result.data as any)[fieldName],
+        data: (result.data as unknown as Record<string, unknown>)[fieldName],
       };
     }
 

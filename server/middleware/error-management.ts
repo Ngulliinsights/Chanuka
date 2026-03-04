@@ -5,25 +5,25 @@
  * Transforms all errors to StandardError format with correlation IDs.
  */
 
-import { ERROR_STATUS_CODES } from '@shared/constants';
 import { logger } from '@server/infrastructure/observability';
+import { ERROR_STATUS_CODES } from '@shared/constants';
 import {
   ErrorClassification,
   getHttpStatusFromClassification,
   type StandardError,
 } from '@shared/types';
-import type { Request, Response, NextFunction } from 'express';
-
-// Extend Request interface to include correlationId
-interface RequestWithCorrelation extends Request {
-  correlationId?: string;
-}
 import {
   generateCorrelationId,
   getCurrentCorrelationId,
   setCurrentCorrelationId,
 } from '@shared/utils/correlation-id';
 import { toStandardError } from '@shared/utils/errors';
+import { NextFunction, Request, Response } from 'express';
+
+// Extend Request interface to include correlationId
+interface RequestWithCorrelation extends Request {
+  correlationId?: string;
+}
 
 
 /**
@@ -55,6 +55,19 @@ function createErrorContext(req: Request) {
     url: req.url,
     ip: req.ip,
     correlationId: getCurrentCorrelationId() || (req as RequestWithCorrelation).correlationId || '',
+  };
+}
+
+interface ErrorResponseBody {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    classification: ErrorClassification;
+    correlationId: string;
+    timestamp: string;
+    details?: Record<string, unknown>;
+    stack?: string;
   };
 }
 
@@ -95,7 +108,7 @@ export function createUnifiedErrorMiddleware() {
       }, 'Request failed');
 
       // Build response
-      const errorResponse: any = {
+      const errorResponse: ErrorResponseBody = {
         success: false,
         error: {
           code: standardError.code,
@@ -137,7 +150,7 @@ export function createUnifiedErrorMiddleware() {
  * Helper to wrap route handlers with error handling
  * Catches async errors and passes to error middleware
  */
-export function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) {
+export function asyncHandler(fn: (req: Request, res: Response, next: NextFunction) => Promise<void>) {
   return (req: Request, res: Response, next: NextFunction) => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };

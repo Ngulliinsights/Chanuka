@@ -44,12 +44,12 @@ export interface TargetingRule {
 export interface TargetingCondition {
   attribute: string;
   operator: 'equals' | 'not_equals' | 'in' | 'not_in' | 'contains' | 'starts_with' | 'ends_with' | 'greater_than' | 'less_than';
-  value: any;
+  value: unknown;
 }
 
 export interface FlagVariant {
   name: string;
-  value: any;
+  value: unknown;
   description?: string;
   weight?: number;
 }
@@ -70,7 +70,7 @@ export interface FlagEvaluation {
   flagName: string;
   enabled: boolean;
   variant: string;
-  value: any;
+  value: unknown;
   reason: string;
   ruleId?: string;
   evaluatedAt: Date;
@@ -530,7 +530,7 @@ export class FeatureFlagsService {
     });
   }
 
-  private getAttributeValue(userContext: UserContext, attribute: string): any {
+  private getAttributeValue(userContext: UserContext, attribute: string): unknown {
     switch (attribute) {
       case 'userId':
         return userContext.user_id;

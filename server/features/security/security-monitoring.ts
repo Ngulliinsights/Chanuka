@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { bills, user_interests,users } from '@server/infrastructure/schema'; // Fixed: Added user_interests import
+import { db } from '@server/infrastructure/database';
+import { bills, user_interests, users } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 /**
@@ -8,8 +8,6 @@ import { eq } from 'drizzle-orm';
  * Tests all CRUD operations, smart filtering, delivery channels, and statistics.
  */
 
-// Configuration constants for better maintainability
-// Fixed: Changed 'users' and 'bills' to 'user' and 'bill' to match usage
 const TEST_CONFIG = {
   user: {
     email: 'alert-test@example.com',
@@ -32,7 +30,6 @@ const TEST_CONFIG = {
   alertTypes: ['new_comment', 'amendment', 'voting_scheduled'] as const
 };
 
-// Type definitions for better type safety
 interface TestContext {
   user_id: string;
   bill_id: string;
@@ -40,17 +37,10 @@ interface TestContext {
   email: string;
 }
 
-/**
- * Creates all necessary test data in the database.
- * Returns a context object with IDs for use in subsequent tests.
- * Note: IDs are converted to strings to match the API's expected format.
- */
 async function createTestData(): Promise<TestContext> {
-  logger.info('Creating test data...', { component: 'AlertVerification' });
+  logger.info('Creating test data...');
 
-  // Create test user with all required fields
-  // Fixed: Corrected property access from TEST_CONFIG.users to TEST_CONFIG.user
-  const [testUser] = await db
+  const testUserResult = await db
     .insert(users)
     .values({
       email: TEST_CONFIG.user.email,
@@ -62,10 +52,10 @@ async function createTestData(): Promise<TestContext> {
       verification_status: TEST_CONFIG.user.verification_status
     })
     .returning();
+  const testUser = (Array.isArray(testUserResult) ? testUserResult : [])[0];
+  if (!testUser) throw new Error('Failed to create test user');
 
-  // Create test bill for alert generation
-  // Fixed: Corrected property access from TEST_CONFIG.bills to TEST_CONFIG.bill
-  const [testBill] = await db
+  const testBillResult = await db
     .insert(bills)
     .values({
       title: TEST_CONFIG.bill.title,
@@ -76,9 +66,9 @@ async function createTestData(): Promise<TestContext> {
       summary: TEST_CONFIG.bill.summary
     })
     .returning();
+  const testBill = (Array.isArray(testBillResult) ? testBillResult : [])[0];
+  if (!testBill) throw new Error('Failed to create test bill');
 
-  // Add user interests for smart filtering tests
-  // Fixed: Changed user_interests to userInterests (camelCase as per import)
   await db
     .insert(user_interests)
     .values(
@@ -88,13 +78,8 @@ async function createTestData(): Promise<TestContext> {
       }))
     );
 
-  logger.info('✅ Test data created successfully', {
-    component: 'AlertVerification',
-    user_id: testUser.id,
-    bill_id: testBill.id
-  });
+  logger.info(`✅ Test data created successfully — user_id: ${testUser.id}, bill_id: ${testBill.id}`);
 
-  // Convert IDs to strings as expected by the service API
   return {
     user_id: String(testUser.id),
     bill_id: String(testBill.id),
@@ -103,44 +88,22 @@ async function createTestData(): Promise<TestContext> {
   };
 }
 
-/**
- * Cleans up all test data from the database.
- * Ensures no residual data remains after testing.
- * Fixed: Properly handles ID type conversions and query builder calls.
- */
 async function cleanupTestData(context: TestContext): Promise<void> {
-  logger.info('Cleaning up test data...', { component: 'AlertVerification' });
+  logger.info('Cleaning up test data...');
 
   try {
-    // Use the IDs as-is since they're already strings (UUIDs)
-    const user_id = context.user_id;
-    const bill_id = context.bill_id;
+    const { user_id, bill_id } = context;
 
-    // Delete in reverse order of dependencies
-    // Fixed: Changed user_interests to userInterests and removed parseInt for bill_id
-    await db
-      .delete(user_interests)
-      .where(eq(user_interests.user_id, user_id));
+    await db.delete(user_interests).where(eq(user_interests.user_id, user_id));
+    await db.delete(bills).where(eq(bills.id, bill_id));
+    await db.delete(users).where(eq(users.id, user_id));
 
-    // Fixed: Use bill_id directly as a string (UUID) instead of parseInt
-    await db
-      .delete(bills)
-      .where(eq(bills.id, bill_id));
-
-    await db
-      .delete(users)
-      .where(eq(users.id, user_id));
-
-    logger.info('✅ Test data cleaned up successfully', { component: 'AlertVerification' });
+    logger.info('✅ Test data cleaned up successfully');
   } catch (error) {
-    logger.error('⚠️ Error during cleanup (non-fatal):', { component: 'AlertVerification' }, error);
+    logger.error(`⚠️ Error during cleanup (non-fatal): ${String(error)}`);
   }
 }
 
-/**
- * Builds a standard alert preference configuration.
- * This represents a typical user preference setup with smart filtering.
- */
 function buildStandardPreference(email: string) {
   return {
     name: 'Healthcare Alerts',
@@ -176,9 +139,7 @@ function buildStandardPreference(email: string) {
         priority: 'normal' as const
       }
     ],
-    frequency: {
-      type: 'immediate' as const
-    },
+    frequency: { type: 'immediate' as const },
     smartFiltering: {
       enabled: true,
       user_interestWeight: 0.7,
@@ -191,9 +152,6 @@ function buildStandardPreference(email: string) {
   };
 }
 
-/**
- * Builds a batched alert preference for daily digest scenarios.
- */
 function buildBatchedPreference(email: string) {
   return {
     name: 'Daily Digest',
@@ -232,95 +190,46 @@ function buildBatchedPreference(email: string) {
 }
 
 /**
- * Main verification function that orchestrates all tests.
- * Each test is isolated and results are logged comprehensively.
- * 
- * NOTE: This function is currently disabled because unifiedAlertPreferenceService
- * is not available. Uncomment the import at the top of the file once the service
- * dependencies are resolved.
+ * Main verification function.
+ * NOTE: Body is commented out — unifiedAlertPreferenceService is not yet available.
+ * Uncomment once service dependencies are resolved.
  */
 async function verifyAlertPreferences(): Promise<void> {
-  logger.info('🔍 Starting Alert Preference Management System Verification', {
-    component: 'AlertVerification'
-  });
-
-  // Early return with helpful message since service is not available
-  logger.warn('⚠️ Verification skipped: unifiedAlertPreferenceService is not available', {
-    component: 'AlertVerification',
-    action: 'Uncomment the service import once dependencies are resolved'
-  });
-
+  logger.info('🔍 Starting Alert Preference Management System Verification');
+  logger.warn('⚠️ Verification skipped: unifiedAlertPreferenceService is not available. Uncomment the service import once dependencies are resolved.');
   return;
 
-  /* Uncomment this section once unifiedAlertPreferenceService is available
-  
+  /* Uncomment once unifiedAlertPreferenceService is available
+
   let context: TestContext | null = null;
 
   try {
-    // Test 1: Service Initialization
-    logger.info('Test 1/16: Verifying service initialization...', { component: 'AlertVerification' });
+    logger.info('Test 1/16: Verifying service initialization...');
     const initialStats = unifiedAlertPreferenceService.getServiceStats();
-    logger.info('✅ Service initialized successfully', {
-      component: 'AlertVerification',
-      stats: initialStats
-    });
+    logger.info(`✅ Service initialized — stats: ${JSON.stringify(initialStats)}`);
 
-    // Test 2: Setup Test Data
-    logger.info('Test 2/16: Setting up test environment...', { component: 'AlertVerification' });
+    logger.info('Test 2/16: Setting up test environment...');
     context = await createTestData();
 
-    // Test 3: Create Alert Preference
-    logger.info('Test 3/16: Testing alert preference creation...', { component: 'AlertVerification' });
-    const preferenceData = buildStandardPreference(context.email);
-
+    logger.info('Test 3/16: Testing alert preference creation...');
     const createdPreference = await unifiedAlertPreferenceService.createAlertPreference(
       context.user_id,
-      preferenceData
+      buildStandardPreference(context.email)
     );
-
     context.preferenceId = createdPreference.id;
+    logger.info(`✅ Preference created — id: ${createdPreference.id}, alertTypes: ${createdPreference.alertTypes.length}, channels: ${createdPreference.channels.length}`);
 
-    logger.info('✅ Alert preference created', {
-      component: 'AlertVerification',
-      id: createdPreference.id,
-      name: createdPreference.name,
-      alertTypesCount: createdPreference.alertTypes.length,
-      channelsCount: createdPreference.channels.length
-    });
-
-    // Test 4: Retrieve User Preferences
-    logger.info('Test 4/16: Testing user preferences retrieval...', { component: 'AlertVerification' });
+    logger.info('Test 4/16: Testing user preferences retrieval...');
     const userPreferences = await unifiedAlertPreferenceService.getUserAlertPreferences(context.user_id);
+    if (userPreferences.length === 0) throw new Error('Expected at least one preference, but found none');
+    logger.info(`✅ User preferences retrieved — count: ${userPreferences.length}`);
 
-    if (userPreferences.length === 0) {
-      throw new Error('Expected at least one preference, but found none');
-    }
+    logger.info('Test 5/16: Testing specific preference retrieval...');
+    const specificPreference = await unifiedAlertPreferenceService.getAlertPreference(context.user_id, context.preferenceId);
+    if (!specificPreference) throw new Error('Failed to retrieve specific preference');
+    logger.info(`✅ Specific preference retrieved — name: ${specificPreference.name}`);
 
-    logger.info('✅ User preferences retrieved', {
-      component: 'AlertVerification',
-      count: userPreferences.length,
-      firstPreferenceName: userPreferences[0].name
-    });
-
-    // Test 5: Retrieve Specific Preference
-    logger.info('Test 5/16: Testing specific preference retrieval...', { component: 'AlertVerification' });
-    const specificPreference = await unifiedAlertPreferenceService.getAlertPreference(
-      context.user_id,
-      context.preferenceId
-    );
-
-    if (!specificPreference) {
-      throw new Error('Failed to retrieve specific preference');
-    }
-
-    logger.info('✅ Specific preference retrieved', {
-      component: 'AlertVerification',
-      name: specificPreference.name,
-      is_active: specificPreference.is_active
-    });
-
-    // Test 6: Update Alert Preference
-    logger.info('Test 6/16: Testing preference update...', { component: 'AlertVerification' });
+    logger.info('Test 6/16: Testing preference update...');
     const updatedPreference = await unifiedAlertPreferenceService.updateAlertPreference(
       context.user_id,
       context.preferenceId,
@@ -338,15 +247,9 @@ async function verifyAlertPreferences(): Promise<void> {
         }
       }
     );
+    logger.info(`✅ Preference updated — name: ${updatedPreference.name}`);
 
-    logger.info('✅ Preference updated', {
-      component: 'AlertVerification',
-      name: updatedPreference.name,
-      user_interestWeight: updatedPreference.smartFiltering.user_interestWeight
-    });
-
-    // Test 7: Smart Filtering
-    logger.info('Test 7/16: Testing smart filtering logic...', { component: 'AlertVerification' });
+    logger.info('Test 7/16: Testing smart filtering logic...');
     const alertData = {
       bill_id: context.bill_id,
       billTitle: TEST_CONFIG.bill.title,
@@ -354,181 +257,84 @@ async function verifyAlertPreferences(): Promise<void> {
       keywords: ['healthcare', 'reform'],
       message: 'Healthcare bill status changed'
     };
-
     const filteringResult = await unifiedAlertPreferenceService.processSmartFiltering(
-      context.user_id,
-      'bill_status_change',
-      alertData,
-      updatedPreference
+      context.user_id, 'bill_status_change', alertData, updatedPreference
     );
+    logger.info(`✅ Smart filtering processed — shouldSend: ${filteringResult.shouldSend}, confidence: ${filteringResult.confidence}`);
 
-    logger.info('✅ Smart filtering processed', {
-      component: 'AlertVerification',
-      shouldSend: filteringResult.shouldSend,
-      confidence: filteringResult.confidence,
-      adjustedPriority: filteringResult.adjustedPriority,
-      filteredReason: filteringResult.filteredReason || 'none'
-    });
-
-    // Test 8: Alert Delivery Processing
-    logger.info('Test 8/16: Testing alert delivery...', { component: 'AlertVerification' });
+    logger.info('Test 8/16: Testing alert delivery...');
     const deliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
-      context.user_id,
-      'bill_status_change',
-      alertData,
-      'normal'
+      context.user_id, 'bill_status_change', alertData, 'normal'
     );
-
     if (deliveryLogs.length === 0) {
-      logger.warn('⚠️ No delivery logs generated (may be filtered)', {
-        component: 'AlertVerification'
-      });
+      logger.warn('⚠️ No delivery logs generated (may be filtered)');
     } else {
-      logger.info('✅ Alert delivery processed', {
-        component: 'AlertVerification',
-        logsCount: deliveryLogs.length,
-        firstLogStatus: deliveryLogs[0].status,
-        channelsUsed: deliveryLogs[0].channels
-      });
+      logger.info(`✅ Alert delivery processed — logs: ${deliveryLogs.length}, status: ${deliveryLogs[0].status}`);
     }
 
-    // Test 9: Retrieve Delivery Logs
-    logger.info('Test 9/16: Testing delivery log retrieval...', { component: 'AlertVerification' });
-    const logsResult = await unifiedAlertPreferenceService.getAlertDeliveryLogs(context.user_id, {
-      page: 1,
-      limit: 10
-    });
+    logger.info('Test 9/16: Testing delivery log retrieval...');
+    const logsResult = await unifiedAlertPreferenceService.getAlertDeliveryLogs(context.user_id, { page: 1, limit: 10 });
+    logger.info(`✅ Delivery logs retrieved — total: ${logsResult.pagination.total}, on page: ${logsResult.logs.length}`);
 
-    logger.info('✅ Delivery logs retrieved', {
-      component: 'AlertVerification',
-      totalLogs: logsResult.pagination.total,
-      logsOnPage: logsResult.logs.length,
-      firstLogType: logsResult.logs[0]?.alertType || 'none'
-    });
-
-    // Test 10: Statistics Retrieval
-    logger.info('Test 10/16: Testing statistics generation...', { component: 'AlertVerification' });
+    logger.info('Test 10/16: Testing statistics generation...');
     const stats = await unifiedAlertPreferenceService.getAlertPreferenceStats(context.user_id);
+    logger.info(`✅ Statistics retrieved — total: ${stats.totalPreferences}, active: ${stats.activePreferences}`);
 
-    logger.info('✅ Statistics retrieved', {
-      component: 'AlertVerification',
-      totalPreferences: stats.totalPreferences,
-      activePreferences: stats.activePreferences,
-      totalAlerts: stats.deliveryStats.totalAlerts,
-      successfulDeliveries: stats.deliveryStats.successfulDeliveries
-    });
-
-    // Test 11: Multiple Alert Types
-    logger.info('Test 11/16: Testing various alert types...', { component: 'AlertVerification' });
-
+    logger.info('Test 11/16: Testing various alert types...');
     for (const alertType of TEST_CONFIG.alertTypes) {
-      const typeDeliveryLogs = await unifiedAlertPreferenceService.processAlertDelivery(
-        context.user_id,
-        alertType,
-        {
-          ...alertData,
-          message: `${alertType} alert for testing`
-        },
-        'low'
+      const logs = await unifiedAlertPreferenceService.processAlertDelivery(
+        context.user_id, alertType, { ...alertData, message: `${alertType} alert for testing` }, 'low'
       );
-
-      logger.info(`✅ Processed ${alertType} alert`, {
-        component: 'AlertVerification',
-        logsGenerated: typeDeliveryLogs.length
-      });
+      logger.info(`✅ Processed ${alertType} — logs: ${logs.length}`);
     }
 
-    // Test 12: Batched Preference Creation
-    logger.info('Test 12/16: Testing batched preference...', { component: 'AlertVerification' });
-    const batchedPreferenceData = buildBatchedPreference(context.email);
+    logger.info('Test 12/16: Testing batched preference...');
     const batchedPreference = await unifiedAlertPreferenceService.createAlertPreference(
-      context.user_id,
-      batchedPreferenceData
+      context.user_id, buildBatchedPreference(context.email)
     );
+    logger.info(`✅ Batched preference created — id: ${batchedPreference.id}, frequency: ${batchedPreference.frequency.type}`);
 
-    logger.info('✅ Batched preference created', {
-      component: 'AlertVerification',
-      id: batchedPreference.id,
-      frequencyType: batchedPreference.frequency.type,
-      batchInterval: batchedPreference.frequency.batchInterval
-    });
+    logger.info('Test 13/16: Testing preference deletion...');
+    await unifiedAlertPreferenceService.deleteAlertPreference(context.user_id, batchedPreference.id);
+    const deletedPreference = await unifiedAlertPreferenceService.getAlertPreference(context.user_id, batchedPreference.id);
+    if (deletedPreference) throw new Error('Preference was not deleted successfully');
+    logger.info('✅ Preference deleted successfully');
 
-    // Test 13: Preference Deletion
-    logger.info('Test 13/16: Testing preference deletion...', { component: 'AlertVerification' });
-    await unifiedAlertPreferenceService.deleteAlertPreference(
-      context.user_id,
-      batchedPreference.id
-    );
-
-    const deletedPreference = await unifiedAlertPreferenceService.getAlertPreference(
-      context.user_id,
-      batchedPreference.id
-    );
-
-    if (deletedPreference) {
-      throw new Error('Preference was not deleted successfully');
-    }
-
-    logger.info('✅ Preference deleted successfully', { component: 'AlertVerification' });
-
-    // Test 14: Final Statistics Verification
-    logger.info('Test 14/16: Verifying final statistics...', { component: 'AlertVerification' });
+    logger.info('Test 14/16: Verifying final statistics...');
     const finalStats = await unifiedAlertPreferenceService.getAlertPreferenceStats(context.user_id);
+    logger.info(`✅ Final statistics verified — total: ${finalStats.totalPreferences}, alerts: ${finalStats.deliveryStats.totalAlerts}`);
 
-    logger.info('✅ Final statistics verified', {
-      component: 'AlertVerification',
-      totalPreferences: finalStats.totalPreferences,
-      totalAlerts: finalStats.deliveryStats.totalAlerts,
-      channelStatsCount: Object.keys(finalStats.channelStats).length
-    });
-
-    // Test 15: Service Shutdown
-    logger.info('Test 15/16: Testing graceful shutdown...', { component: 'AlertVerification' });
+    logger.info('Test 15/16: Testing graceful shutdown...');
     await unifiedAlertPreferenceService.shutdown();
-    logger.info('✅ Service shutdown completed', { component: 'AlertVerification' });
+    logger.info('✅ Service shutdown completed');
 
-    // Test 16: Cleanup
-    logger.info('Test 16/16: Cleaning up test environment...', { component: 'AlertVerification' });
+    logger.info('Test 16/16: Cleaning up test environment...');
     await cleanupTestData(context);
 
-    // Final Summary
     printTestSummary();
 
   } catch (error) {
-    logger.error('❌ Verification failed', { component: 'AlertVerification' }, error);
-
-    // Attempt cleanup even on failure
-    if (context) {
-      await cleanupTestData(context);
-    }
-
+    logger.error(`❌ Verification failed: ${String(error)}`);
+    if (context) await cleanupTestData(context);
     throw error;
   }
   */
 }
 
-/**
- * Prints a comprehensive summary of all implemented features.
- * This serves as documentation and verification checkpoint.
- */
 function printTestSummary(): void {
-  logger.info('\n🎉 All Alert Preference Management System tests passed!', {
-    component: 'AlertVerification'
-  });
+  logger.info('\n🎉 All Alert Preference Management System tests passed!');
+  logger.info('\n📋 Task 5.3 Implementation Summary:');
 
-  logger.info('\n📋 Task 5.3 Implementation Summary:', { component: 'AlertVerification' });
   const coreFeatures = [
     'User alert preference CRUD operations',
     'Notification channel selection (email, in-app, SMS)',
     'Alert frequency and timing preferences',
     'Smart notification filtering based on user interests'
   ];
+  coreFeatures.forEach(f => logger.info(`✅ ${f} - IMPLEMENTED`));
 
-  coreFeatures.forEach(feature => {
-    logger.info(`✅ ${feature} - IMPLEMENTED`, { component: 'AlertVerification' });
-  });
+  logger.info('\n🔧 Additional Features Implemented:');
 
-  logger.info('\n🔧 Additional Features Implemented:', { component: 'AlertVerification' });
   const additionalFeatures = [
     'Comprehensive alert preference management system',
     'Smart filtering with user interest weighting',
@@ -547,36 +353,25 @@ function printTestSummary(): void {
     'User interest-based smart recommendations',
     'Configurable filtering weights and thresholds'
   ];
+  additionalFeatures.forEach(f => logger.info(`✅ ${f}`));
 
-  additionalFeatures.forEach(feature => {
-    logger.info(`✅ ${feature}`, { component: 'AlertVerification' });
-  });
-
-  logger.info('\n✨ Alert Preference Management System is fully functional and production-ready!', {
-    component: 'AlertVerification'
-  });
+  logger.info('\n✨ Alert Preference Management System is fully functional and production-ready!');
 }
 
-// Execute verification with proper error handling
-verifyAlertPreferences()
-  .then(() => {
-    logger.info('Verification completed successfully', { component: 'AlertVerification' });
-    process.exit(0);
-  })
-  .catch((error) => {
-    logger.error('Verification failed with error', { component: 'AlertVerification' }, error);
-    process.exit(1);
-  });
+if (process.env.NODE_ENV !== 'test') {
+  verifyAlertPreferences()
+    .then(() => {
+      logger.info('Verification completed successfully');
+      process.exit(0);
+    })
+    .catch((error) => {
+      logger.error(`Verification failed with error: ${String(error)}`);
+      process.exit(1);
+    });
+}
 
-// Export placeholder for router integration
-export default {
-  // This is a test/verification module, not a router
-  // The actual security monitoring router should be imported from elsewhere
-};
+export default {};
 
-// Prevent 'declared but never read' TS6133 diagnostics for this verification-only module
-// (these functions are intentionally present for manual testing and will be used
-//  when the verification suite is enabled)
 /* istanbul ignore next */
 void createTestData;
 /* istanbul ignore next */
@@ -587,5 +382,3 @@ void buildStandardPreference;
 void buildBatchedPreference;
 /* istanbul ignore next */
 void printTestSummary;
-
-

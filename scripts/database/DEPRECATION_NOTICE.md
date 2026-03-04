@@ -66,7 +66,6 @@ As of January 8, 2026, the database scripts have been consolidated to reduce con
 | Old Script | Reason | Replacement | Migration Path |
 |---|---|---|---|
 | `init-strategic-database.ts` | Duplicate of initialize-database-integration.ts | `initialize-database-integration.ts` | Use `npm run db:init` |
-| `consolidate-database-infrastructure.ts` | Specialized (use init if needed) | `initialize-database-integration.ts` | Use `npm run db:init` |
 | `setup.ts` | Basic version (replaced by initialize-database-integration.ts) | `initialize-database-integration.ts` | Use `npm run db:init` |
 | `setup-schema.ts` | Schema-specific (use schema:check instead) | `check-schema.ts` | Use `npm run db:schema:check` |
 

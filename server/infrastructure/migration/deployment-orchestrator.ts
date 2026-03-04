@@ -52,7 +52,7 @@ export interface RollbackTrigger {
   reason: string;
   triggeredBy: 'automatic' | 'manual';
   timestamp: Date;
-  metrics: any;
+  metrics: Record<string, unknown>;
 }
 
 /**

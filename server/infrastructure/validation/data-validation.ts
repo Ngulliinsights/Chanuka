@@ -418,9 +418,9 @@ export class GovernmentDataValidationService {
    * Group records by identifier for cross-validation
    */
   private static groupRecordsByIdentifier(
-    records: Array<{ data: any; source: string }>, 
+    records: Array<{ data: unknown; source: string }>, 
     type: 'bills' | 'sponsors'
-  ): Map<string, Array<{ data: any; source: string }>> {
+  ): Map<string, Array<{ data: unknown; source: string }>> {
     const groups = new Map();
     
     for (const record of records) {
@@ -515,7 +515,7 @@ interface BatchValidationResult {
   averageScore: number;
   results: ValidationResult[];
   validData: unknown[];
-  invalidData: Array<{ record: any; validation: ValidationResult }>;
+  invalidData: Array<{ record: unknown; validation: ValidationResult }>;
   summary: {
     completeness: number;
     accuracy: number;

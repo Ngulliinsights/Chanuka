@@ -5,9 +5,10 @@
  * Requirements: 4.1, 4.2
  */
 
-import type { Transformer, PartialTransformer, TransformationContext, TransformationOptions } from './types';
 import { ErrorContextBuilder } from '../errors/context';
 import { TransformationError } from '../errors/types';
+
+import type { Transformer, PartialTransformer, TransformationContext, TransformationOptions } from './types';
 
 /**
  * Identity transformer - returns input unchanged

@@ -3,8 +3,8 @@
  * Type-safe API contracts for search-related endpoints
  */
 
-import { Bill } from '../../domains/legislative';
 import { User } from '../../domains/authentication';
+import { Bill } from '../../domains/legislative';
 
 // ============================================================================
 // Domain Types

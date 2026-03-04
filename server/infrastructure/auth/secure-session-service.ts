@@ -6,8 +6,8 @@ import crypto from 'crypto';
 import { and, eq, gt,lt } from 'drizzle-orm';
 import { Request, Response } from 'express';
 
-// Get database instance
-const db = getLegacyDatabase();
+// Get database instance lazily to avoid initialization issues in tests
+const getDb = () => getLegacyDatabase();
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -88,7 +88,7 @@ export class SecureSessionService {
        };
 
       // Get user data
-      const user = await db
+      const user = await getDb()
         .select()
         .from(users)
         .where(eq(users.id, user_id))
@@ -106,7 +106,7 @@ export class SecureSessionService {
       );
 
       // Store session in database
-      await db.insert(sessions).values({ id: session_id,
+      await getDb().insert(sessions).values({ id: session_id,
         user_id,
         expires_at: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
         data: { encryptedSessionData }
@@ -152,7 +152,7 @@ export class SecureSessionService {
       }
 
       // Get session from database
-      const sessionRecord = await db
+      const sessionRecord = await getDb()
         .select()
         .from(sessions)
         .where(and(
@@ -246,7 +246,7 @@ export class SecureSessionService {
         'session'
       );
 
-      await db
+      await getDb()
         .update(sessions)
         .set({ 
           token: updatedSessionData,
@@ -267,7 +267,7 @@ export class SecureSessionService {
    */
   async invalidateSession(session_id: string): Promise<void> {
     try {
-      await db
+      await getDb()
         .update(sessions)
         .set({ 
           expires_at: new Date(), // Mark as expired
@@ -284,7 +284,7 @@ export class SecureSessionService {
    */
   async invalidateAllUserSessions(user_id: string): Promise<void> {
     try {
-      await db
+      await getDb()
         .update(sessions)
         .set({ 
           expires_at: new Date(), // Mark as expired
@@ -304,7 +304,7 @@ export class SecureSessionService {
       const now = new Date();
       
       // Delete expired sessions entirely
-      await db
+      await getDb()
         .delete(sessions)
         .where(lt(sessions.expires_at, now));
 
@@ -319,7 +319,7 @@ export class SecureSessionService {
    */
   private async cleanupUserSessions(user_id: string): Promise<void> { try {
       // Get all active sessions for user, ordered by creation time
-      const userSessions = await db
+      const userSessions = await getDb()
         .select()
         .from(sessions)
         .where(and(
@@ -397,7 +397,7 @@ export class SecureSessionService {
   }> {
     try {
       // This would need proper SQL aggregation in production
-      const activeSessions = await db
+      const activeSessions = await getDb()
         .select()
         .from(sessions)
         .where(gt(sessions.expires_at, new Date()));

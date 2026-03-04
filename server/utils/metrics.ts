@@ -50,8 +50,8 @@ class Metrics {
     return (
       target: Object,
       propertyKey: string | symbol,
-      descriptor: TypedPropertyDescriptor<any>,
-    ): TypedPropertyDescriptor<any> | void => {
+      descriptor: TypedPropertyDescriptor<unknown>,
+    ): TypedPropertyDescriptor<unknown> | void => {
       const originalMethod = descriptor.value;
 
       descriptor.value = function (...args: unknown[]) {
@@ -96,8 +96,8 @@ class Metrics {
     return (
       target: Object,
       propertyKey: string | symbol,
-      descriptor: TypedPropertyDescriptor<any>,
-    ): TypedPropertyDescriptor<any> | void => {
+      descriptor: TypedPropertyDescriptor<unknown>,
+    ): TypedPropertyDescriptor<unknown> | void => {
       const originalMethod = descriptor.value;
 
       descriptor.value = async function (...args: unknown[]) {

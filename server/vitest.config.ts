@@ -13,6 +13,12 @@ export default defineConfig({
     testTimeout: 10000,
     hookTimeout: 5000,
     
+    // Setup files - run before tests
+    setupFiles: [
+      '../tests/setup/test-environment.ts',
+      '../tests/setup/database.ts',
+    ],
+    
     include: [
       'server/**/__tests__/**/*.test.{ts,tsx}',
       'server/**/*.test.{ts,tsx}',

@@ -45,8 +45,8 @@ export interface IntegrationAlert {
   type: string;
   title: string;
   message: string;
-  threshold?: Record<string, any>;
-  actualValue?: any;
+  threshold?: Record<string, unknown>;
+  actualValue?: unknown;
   triggered: boolean;
   acknowledged: boolean;
   acknowledgedBy?: string;

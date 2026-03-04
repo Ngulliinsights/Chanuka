@@ -74,12 +74,39 @@ global.BroadcastChannel = vi.fn().mockImplementation(() => ({
 // =============================================================================
 
 beforeAll(() => {
-  // Set test environment variables
+  // Load .env file first to get actual database credentials
+  // This allows tests to use the existing database
+  const dotenv = require('dotenv');
+  const path = require('path');
+  
+  // Load .env from project root
+  const envPath = path.resolve(process.cwd(), '.env');
+  const result = dotenv.config({ path: envPath });
+  
+  if (result.error) {
+    console.warn('⚠️  No .env file found, using default test environment variables');
+  }
+  
+  // Set test environment variables (only if not already set from .env)
   process.env.NODE_ENV = 'test';
-  process.env.REDIS_URL = 'redis://localhost:6379';
-  process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
-  process.env.JWT_SECRET = 'test-jwt-secret';
-  process.env.API_BASE_URL = 'http://localhost:3001/api';
+  
+  // Use TEST_DATABASE_URL if available, otherwise use DATABASE_URL from .env
+  // If neither exists, fall back to local test database
+  if (!process.env.DATABASE_URL && !process.env.TEST_DATABASE_URL) {
+    process.env.DATABASE_URL = 'postgresql://test:test@localhost:5432/test';
+    console.warn('⚠️  No DATABASE_URL or TEST_DATABASE_URL found, using default test database');
+  }
+  
+  // Set other test environment variables (only if not already set)
+  if (!process.env.REDIS_URL) {
+    process.env.REDIS_URL = 'redis://localhost:6379';
+  }
+  if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'test-jwt-secret';
+  }
+  if (!process.env.API_BASE_URL) {
+    process.env.API_BASE_URL = 'http://localhost:3001/api';
+  }
   
   // Suppress console output in tests
   const originalConsoleError = console.error;

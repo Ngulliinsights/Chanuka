@@ -90,7 +90,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
         if (invalidWidgets.length > 0) {
           invalidWidgets[0] = {
             ...invalidWidgets[0],
-            type: 'invalid-type' as any,
+            type: 'invalid-type' as unknown,
           };
         }
 

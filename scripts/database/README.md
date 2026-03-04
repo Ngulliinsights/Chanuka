@@ -40,8 +40,7 @@ scripts/database/
     ├── run-reset.sh                 # Use npm scripts instead
     ├── init-strategic-database.ts   # Use initialize-database-integration.ts instead
     ├── setup.ts                     # Use initialize-database-integration.ts instead
-    ├── setup-schema.ts              # Use check-schema.ts instead
-    └── consolidate-database-infrastructure.ts  # Use initialize-database-integration.ts instead
+    └── setup-schema.ts              # Use check-schema.ts instead
     
 └── 🔧 Utility/Debug Scripts
     ├── debug-migration-table.ts     # Debugging helper

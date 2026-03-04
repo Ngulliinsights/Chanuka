@@ -27,7 +27,7 @@ export async function getDashboardData(): Promise<MonitoringDashboardData> {
   const data = await response.json();
   
   // Parse dates
-  data.features = data.features.map((feature: any) => ({
+  data.features = data.features.map((feature: unknown) => ({
     ...feature,
     lastHealthCheck: feature.lastHealthCheck ? new Date(feature.lastHealthCheck) : undefined,
     recentMetrics: feature.recentMetrics ? {
@@ -68,7 +68,7 @@ export async function getFeatureMetrics(
   const data = await response.json();
   
   // Parse dates
-  return data.map((metric: any) => ({
+  return data.map((metric: unknown) => ({
     ...metric,
     timestamp: new Date(metric.timestamp),
   }));
@@ -99,7 +99,7 @@ export async function getFeatureAlerts(
   const data = await response.json();
   
   // Parse dates
-  return data.map((alert: any) => ({
+  return data.map((alert: unknown) => ({
     ...alert,
     created_at: new Date(alert.created_at),
     updated_at: new Date(alert.updated_at),
@@ -163,7 +163,7 @@ export async function getFeatureLogs(
   const data = await response.json();
   
   // Parse dates
-  return data.map((log: any) => ({
+  return data.map((log: unknown) => ({
     ...log,
     timestamp: new Date(log.timestamp),
   }));

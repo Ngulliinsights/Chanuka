@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
 import { logger } from '@server/infrastructure/observability';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { securityAuditService } from '@server/features/security';
+import { NextFunction, Request, Response } from 'express';
 
 interface SecurityMiddlewareOptions {
   validateInput?: boolean;
@@ -63,8 +63,8 @@ export class SecurityMiddleware {
         // Audit logging
         if (auditLog) {
           await securityAuditService.logSecurityEvent({
-            eventType: 'api_request',
-            userId: (req as any).user?.id,
+            event_type: 'api_request',
+            userId: ((req as unknown as Record<string, unknown>).user as Record<string, unknown> | undefined)?.id,
             ipAddress: req.ip || req.socket.remoteAddress || 'unknown',
             userAgent: req.get('user-agent') || 'unknown',
             resource: req.path,
@@ -81,7 +81,7 @@ export class SecurityMiddleware {
         // Sanitize output
         if (sanitizeOutput) {
           const originalJson = res.json.bind(res);
-          res.json = (data: any) => {
+          res.json = (data: unknown) => {
             const sanitized = inputValidationService.sanitizeQueryParams(
               typeof data === 'object' ? data : { data }
             );
@@ -184,9 +184,11 @@ export class SecurityMiddleware {
    * Add security headers to response
    */
   private addSecurityHeaders(res: Response): void {
+    // cspell:ignore clickjacking
     // Prevent clickjacking
     res.setHeader('X-Frame-Options', 'DENY');
     
+    // cspell:ignore nosniff
     // Prevent MIME type sniffing
     res.setHeader('X-Content-Type-Options', 'nosniff');
     

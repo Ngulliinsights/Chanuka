@@ -316,7 +316,7 @@ export class DrizzleUserRepository implements IUserRepository {
             return dbUser;
           });
 
-          updatedUser = userDbToDomain.transform(updatedDbUser as any); // Transform DB → Domain
+          updatedUser = userDbToDomain.transform(updatedDbUser as unknown); // Transform DB → Domain
 
           // Log audit trail for sensitive user updates
           if (currentUser !== null) {

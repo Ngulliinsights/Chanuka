@@ -11,9 +11,6 @@ export { dashboardService } from './dashboard-service';
 export { engagementService } from './engagement-service';
 export { achievementService } from './achievements-service';
 
-// Legacy compatibility
-export { userService as legacyUserService, UserService } from './user-service-legacy';
-
 // Re-export types for convenience
 export type {
   AuthCredentials,

@@ -5,13 +5,14 @@
  * Ensures consistent error structure across all layers.
  */
 
+import { ZodError } from 'zod';
+
 import { ERROR_CODES, ERROR_MESSAGES, type ErrorCode } from '../../constants';
 import {
   ErrorClassification,
   getClassificationFromErrorCode,
   type StandardError,
 } from '../../types/core/errors';
-import { ZodError } from 'zod';
 // import { generateCorrelationId, getCurrentCorrelationId } from './correlation-id';
 
 // Temporary stubs until correlation-id is implemented

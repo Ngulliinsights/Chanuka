@@ -302,7 +302,7 @@ export class NotificationChannelService {
         .select({ id: users.id, email: users.email })
         .from(users)
         .where(eq(users.id, request.user_id))
-        .limit(1) as any[];
+        .limit(1) as unknown[];
 
       const user = userRows[0];
       if (!user)       throw new Error(`User not found: ${request.user_id}`);
@@ -317,7 +317,7 @@ export class NotificationChannelService {
         })
         .from(user_profiles)
         .where(eq(user_profiles.user_id, request.user_id))
-        .limit(1) as any[];
+        .limit(1) as unknown[];
 
       const profile = profileRows[0];
 
@@ -510,9 +510,9 @@ export class NotificationChannelService {
     title: string;
     body: string;
     data?: Record<string, string>;
-    android?: any;
-    apns?: any;
-    webpush?: any;
+    android?: Record<string, unknown>;
+    apns?: Record<string, unknown>;
+    webpush?: Record<string, unknown>;
   } {
     const { title, message } = request.content;
     const { priority, actionUrl, relatedBillId, category } = request.metadata ?? {};

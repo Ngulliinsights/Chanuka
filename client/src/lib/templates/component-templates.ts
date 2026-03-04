@@ -739,7 +739,7 @@ export function is${pascalName}DataValid(data: unknown): data is ${pascalName}Da
     typeof data === 'object' &&
     data !== null &&
     'id' in data &&
-    typeof (data as any).id === 'string'
+    typeof (data as unknown as Record<string, unknown>).id === 'string'
   );
 }
 

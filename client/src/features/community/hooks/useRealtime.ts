@@ -7,7 +7,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 
-import { WebSocketManager } from '../services/websocket-manager';
+import { WebSocketManager } from '@client/services/websocket-manager';
 import type { WebSocketEvents } from '../../../infrastructure/community/types';
 
 interface UseRealtimeOptions {

@@ -3,71 +3,22 @@
  * Centralized registry of all API endpoints with type-safe contracts
  */
 
-import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery } from './endpoint';
-import {
-  CreateUserRequestSchema,
-  CreateUserResponseSchema,
-  UpdateUserRequestSchema,
-  UpdateUserResponseSchema,
-  GetUserParamsSchema,
-  GetUserResponseSchema,
-  ListUsersQuerySchema,
-  ListUsersResponseSchema,
-  DeleteUserParamsSchema,
-  DeleteUserResponseSchema,
-} from './user.schemas';
-import {
-  CreateBillRequestSchema,
-  CreateBillResponseSchema,
-  UpdateBillRequestSchema,
-  UpdateBillResponseSchema,
-  GetBillParamsSchema,
-  GetBillResponseSchema,
-  ListBillsQuerySchema,
-  ListBillsResponseSchema,
-  DeleteBillParamsSchema,
-  DeleteBillResponseSchema,
-  GetBillEngagementParamsSchema,
-  GetBillEngagementResponseSchema,
-} from './bill.schemas';
-import {
-  CreateNotificationRequestSchema,
-  CreateNotificationResponseSchema,
-  GetNotificationsRequestSchema,
-  GetNotificationsResponseSchema,
-  MarkNotificationReadRequestSchema,
-  MarkNotificationReadResponseSchema,
-  MarkAllNotificationsReadResponseSchema,
-  DeleteNotificationRequestSchema,
-  DeleteNotificationResponseSchema,
-  GetNotificationStatsResponseSchema,
-  GetNotificationPreferencesResponseSchema,
-  UpdateNotificationPreferencesRequestSchema,
-  UpdateNotificationPreferencesResponseSchema,
-  TestNotificationFilterRequestSchema,
-  TestNotificationFilterResponseSchema,
-  GetNotificationServiceStatusResponseSchema,
-} from './notification.schemas';
-import {
-  GetAnalyticsMetricsRequestSchema,
-  GetAnalyticsMetricsResponseSchema,
-  GetBillAnalyticsRequestSchema,
-  GetBillAnalyticsResponseSchema,
-  GetUserAnalyticsRequestSchema,
-  GetUserAnalyticsResponseSchema,
-  TrackEventRequestSchema,
-  TrackEventResponseSchema,
-} from './analytics.schemas';
-import {
-  SearchRequestSchema,
-  SearchResponseSchema,
-  SearchBillsRequestSchema,
-  SearchBillsResponseSchema,
-  SearchUsersRequestSchema,
-  SearchUsersResponseSchema,
-  GetSearchSuggestionsRequestSchema,
-  GetSearchSuggestionsResponseSchema,
-} from './search.schemas';
+import type {
+  GetSystemStatusRequest,
+  GetSystemStatusResponse,
+  GetSystemMetricsRequest,
+  GetSystemMetricsResponse,
+  GetAuditLogsRequest,
+  GetAuditLogsResponse,
+  CreateModerationActionRequest,
+  CreateModerationActionResponse,
+  GetModerationActionsRequest,
+  GetModerationActionsResponse,
+  UpdateUserRoleRequest,
+  UpdateUserRoleResponse,
+  BulkDeleteRequest,
+  BulkDeleteResponse,
+} from './admin.contract';
 import {
   GetSystemStatusRequestSchema,
   GetSystemStatusResponseSchema,
@@ -85,17 +36,25 @@ import {
   BulkDeleteResponseSchema,
 } from './admin.schemas';
 import type {
-  CreateUserRequest,
-  CreateUserResponse,
-  UpdateUserRequest,
-  UpdateUserResponse,
-  GetUserRequest,
-  GetUserResponse,
-  ListUsersRequest,
-  ListUsersResponse,
-  DeleteUserRequest,
-  DeleteUserResponse,
-} from './user.contract';
+  GetAnalyticsMetricsRequest,
+  GetAnalyticsMetricsResponse,
+  GetBillAnalyticsRequest,
+  GetBillAnalyticsResponse,
+  GetUserAnalyticsRequest,
+  GetUserAnalyticsResponse,
+  TrackEventRequest,
+  TrackEventResponse,
+} from './analytics.contract';
+import {
+  GetAnalyticsMetricsRequestSchema,
+  GetAnalyticsMetricsResponseSchema,
+  GetBillAnalyticsRequestSchema,
+  GetBillAnalyticsResponseSchema,
+  GetUserAnalyticsRequestSchema,
+  GetUserAnalyticsResponseSchema,
+  TrackEventRequestSchema,
+  TrackEventResponseSchema,
+} from './analytics.schemas';
 import type {
   CreateBillRequest,
   CreateBillResponse,
@@ -110,6 +69,21 @@ import type {
   GetBillEngagementRequest,
   GetBillEngagementResponse,
 } from './bill.contract';
+import {
+  CreateBillRequestSchema,
+  CreateBillResponseSchema,
+  UpdateBillRequestSchema,
+  UpdateBillResponseSchema,
+  GetBillParamsSchema,
+  GetBillResponseSchema,
+  ListBillsQuerySchema,
+  ListBillsResponseSchema,
+  DeleteBillParamsSchema,
+  DeleteBillResponseSchema,
+  GetBillEngagementParamsSchema,
+  GetBillEngagementResponseSchema,
+} from './bill.schemas';
+import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery } from './endpoint';
 import type {
   CreateNotificationRequest,
   CreateNotificationResponse,
@@ -128,16 +102,24 @@ import type {
   TestNotificationFilterResponse,
   GetNotificationServiceStatusResponse,
 } from './notification.contract';
-import type {
-  GetAnalyticsMetricsRequest,
-  GetAnalyticsMetricsResponse,
-  GetBillAnalyticsRequest,
-  GetBillAnalyticsResponse,
-  GetUserAnalyticsRequest,
-  GetUserAnalyticsResponse,
-  TrackEventRequest,
-  TrackEventResponse,
-} from './analytics.contract';
+import {
+  CreateNotificationRequestSchema,
+  CreateNotificationResponseSchema,
+  GetNotificationsRequestSchema,
+  GetNotificationsResponseSchema,
+  MarkNotificationReadRequestSchema,
+  MarkNotificationReadResponseSchema,
+  MarkAllNotificationsReadResponseSchema,
+  DeleteNotificationRequestSchema,
+  DeleteNotificationResponseSchema,
+  GetNotificationStatsResponseSchema,
+  GetNotificationPreferencesResponseSchema,
+  UpdateNotificationPreferencesRequestSchema,
+  UpdateNotificationPreferencesResponseSchema,
+  TestNotificationFilterRequestSchema,
+  TestNotificationFilterResponseSchema,
+  GetNotificationServiceStatusResponseSchema,
+} from './notification.schemas';
 import type {
   SearchRequest,
   SearchResponse,
@@ -148,22 +130,40 @@ import type {
   GetSearchSuggestionsRequest,
   GetSearchSuggestionsResponse,
 } from './search.contract';
+import {
+  SearchRequestSchema,
+  SearchResponseSchema,
+  SearchBillsRequestSchema,
+  SearchBillsResponseSchema,
+  SearchUsersRequestSchema,
+  SearchUsersResponseSchema,
+  GetSearchSuggestionsRequestSchema,
+  GetSearchSuggestionsResponseSchema,
+} from './search.schemas';
 import type {
-  GetSystemStatusRequest,
-  GetSystemStatusResponse,
-  GetSystemMetricsRequest,
-  GetSystemMetricsResponse,
-  GetAuditLogsRequest,
-  GetAuditLogsResponse,
-  CreateModerationActionRequest,
-  CreateModerationActionResponse,
-  GetModerationActionsRequest,
-  GetModerationActionsResponse,
-  UpdateUserRoleRequest,
-  UpdateUserRoleResponse,
-  BulkDeleteRequest,
-  BulkDeleteResponse,
-} from './admin.contract';
+  CreateUserRequest,
+  CreateUserResponse,
+  UpdateUserRequest,
+  UpdateUserResponse,
+  GetUserRequest,
+  GetUserResponse,
+  ListUsersRequest,
+  ListUsersResponse,
+  DeleteUserRequest,
+  DeleteUserResponse,
+} from './user.contract';
+import {
+  CreateUserRequestSchema,
+  CreateUserResponseSchema,
+  UpdateUserRequestSchema,
+  UpdateUserResponseSchema,
+  GetUserParamsSchema,
+  GetUserResponseSchema,
+  ListUsersQuerySchema,
+  ListUsersResponseSchema,
+  DeleteUserParamsSchema,
+  DeleteUserResponseSchema,
+} from './user.schemas';
 
 // ============================================================================
 // User Endpoints

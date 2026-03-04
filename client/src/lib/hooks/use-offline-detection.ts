@@ -48,7 +48,7 @@ export function useOfflineDetection(): OfflineDetectionState & {
 
     debounceTimerRef.current = setTimeout(() => {
       if (typeof navigator !== 'undefined' && 'connection' in navigator) {
-        const connection = (navigator as any).connection;
+        const connection = (navigator as unknown as Record<string, unknown>).connection;
         if (connection) {
           const quality: ConnectionQuality = {
             type: 'fast',

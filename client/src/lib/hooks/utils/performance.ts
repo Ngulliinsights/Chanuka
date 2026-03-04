@@ -38,7 +38,7 @@ export function usePerformanceMonitor(name: string, enabled: boolean = true) {
     metricsRef.current.renderCount++;
 
     if ('memory' in performance) {
-      metricsRef.current.memoryUsage = (performance as any).memory.usedJSHeapSize;
+      metricsRef.current.memoryUsage = (performance as unknown as Record<string, unknown>).memory.usedJSHeapSize;
     }
   }, [enabled]);
 

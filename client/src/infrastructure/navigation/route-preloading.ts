@@ -69,7 +69,7 @@ class RoutePreloader {
   }
 
   constructor() {
-    this.connection = (navigator as any).connection || null;
+    this.connection = (navigator as unknown as Record<string, unknown>).connection || null;
     this.initializePreloading();
   }
 

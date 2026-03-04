@@ -3,9 +3,10 @@
  * Automatic caching for API responses
  */
 
-import { NextFunction,Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
-import { serverCache } from '../infrastructure/cache';
+import { logger } from '@server/infrastructure/observability';
+import { serverCache } from '@server/infrastructure/cache';
 
 export interface CacheOptions {
   ttl?: number; // TTL in seconds
@@ -53,8 +54,11 @@ export function createCacheMiddleware(options: CacheOptions = {}) {
       res.json = function(data: unknown) {
         // Cache the response if condition is met
         if (condition(req, res)) {
-          serverCache.cacheApiResponse(cacheKey, data, ttl).catch(err => {
-            console.error('Failed to cache response:', err);
+          serverCache.cacheApiResponse(cacheKey, data, ttl).catch((err: unknown) => {
+            logger.error(
+              { error: err instanceof Error ? err.message : String(err), cacheKey },
+              'Failed to cache response'
+            );
           });
         }
         
@@ -64,7 +68,10 @@ export function createCacheMiddleware(options: CacheOptions = {}) {
 
       next();
     } catch (error) {
-      console.error('Cache middleware error:', error);
+      logger.error(
+        { error: error instanceof Error ? error.message : String(error) },
+        'Cache middleware error'
+      );
       // Continue without caching on error
       next();
     }
@@ -88,8 +95,8 @@ export const cacheMiddleware = {
   userSpecific: (ttl: number = 300) => createCacheMiddleware({
     ttl,
     keyGenerator: (req) => {
-      const user_id = (req as any).user?.id || 'anonymous';
-      return `user:${ user_id }:${req.method}:${req.originalUrl}`;
+      const userId = ((req as unknown as Record<string, unknown>).user as Record<string, unknown> | undefined)?.id || 'anonymous';
+      return `user:${userId}:${req.method}:${req.originalUrl}`;
     }
   }),
 
@@ -109,13 +116,16 @@ export function createCacheInvalidationMiddleware(patterns: string[]) {
     // Store original end function
     const originalEnd = res.end;
     
-    (res as any).end = function(this: Response, ...args: unknown[]) {
+    (res as unknown as Record<string, unknown>).end = function(this: Response, ...args: unknown[]) {
       // Invalidate cache patterns after successful response
       if (res.statusCode >= 200 && res.statusCode < 300) {
         Promise.all(
           patterns.map(pattern => serverCache.invalidateQueryPattern(pattern))
-        ).catch(err => {
-          console.error('Failed to invalidate cache:', err);
+        ).catch((err: unknown) => {
+          logger.error(
+            { error: err instanceof Error ? err.message : String(err) },
+            'Failed to invalidate cache'
+          );
         });
       }
       

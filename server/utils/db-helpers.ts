@@ -101,18 +101,18 @@ export function normalizeRowNumbers<T extends Record<string, unknown>>(rows: T[]
     // Look for row number fields and normalize them
     Object.keys(normalized).forEach(key => {
       if (key.toLowerCase().includes('row') && key.toLowerCase().includes('number')) {
-        const value = (normalized as any)[key];
+        const value = (normalized as unknown as Record<string, unknown>)[key];
         if (value !== null && value !== undefined) {
           const numValue = typeof value === 'string' ? parseInt(value, 10) : Number(value);
           if (!isNaN(numValue)) {
-            (normalized as any)[key] = numValue;
+            (normalized as unknown as Record<string, unknown>)[key] = numValue;
           } else {
             logger.warn('Failed to normalize row number', {
               component: 'db-helpers',
               operation: 'normalizeRowNumbers',
               key,
               value,
-              rowId: (row as any).id || 'unknown'
+              rowId: (row as unknown as Record<string, unknown>).id || 'unknown'
             });
           }
         }

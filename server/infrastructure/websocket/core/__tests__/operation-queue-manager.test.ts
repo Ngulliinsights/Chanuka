@@ -289,7 +289,7 @@ describe('OperationQueueManager', () => {
 
     it('should handle unknown operation type', async () => {
       const operation: QueueOperation = {
-        type: 'unknown' as any,
+        type: 'unknown' as unknown,
         priority: OPERATION_PRIORITIES.NORMAL,
         data: { test: true },
         timestamp: Date.now(),

@@ -119,7 +119,7 @@ export function useOfflineCapabilities(): OfflineCapabilities {
          method: 'POST',
          priority: 'high',
          maxRetries: 3
-      } as any); // Using 'as any' as a temporary workaround because the API is different.
+      } as unknown); // Using 'as unknown' as a temporary workaround because the API is different.
       // Actually, looking at Step 506, processQueue is public.
       await backgroundSyncManager.processQueue();
       

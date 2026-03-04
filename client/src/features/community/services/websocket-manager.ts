@@ -1,4 +1,8 @@
-import { WebSocketManager as BaseWebSocketManager } from '@client/infrastructure/api';
+/**
+ * Community WebSocket Manager
+ * 
+ * Provides WebSocket manager instance for community features.
+ * Delegates to the main infrastructure implementation.
+ */
 
-export const WebSocketManager = BaseWebSocketManager;
-export const getWebSocketManager = () => WebSocketManager;
+export { WebSocketManager } from '@client/infrastructure/api';

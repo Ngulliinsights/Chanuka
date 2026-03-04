@@ -322,7 +322,7 @@ class IntelligentSearchService {
       });
 
       // Transform Fuse results to standardized format
-      const results: SearchResult[] = fuseResults.map((result: any) => ({
+      const results: SearchResult[] = fuseResults.map((result: unknown) => ({
         id: result.item.id?.toString() || crypto.randomUUID(),
         type: this.getResultType(request.type),
         title: result.item.title || result.item.name || 'Untitled',
@@ -577,7 +577,7 @@ class IntelligentSearchService {
         const fuse = this.getFuseInstance('bills', billData);
         const results = fuse.search(query, { limit: 3 });
 
-        results.forEach((result: any) => {
+        results.forEach((result: unknown) => {
           suggestions.push({
             text: result.item.title,
             type: 'bill_title',
@@ -848,7 +848,7 @@ class IntelligentSearchService {
    * Generate contextual excerpt with query highlighting
    */
   private generateExcerpt(item: unknown, query: string): string {
-    const typedItem = item as any;
+    const typedItem = item as unknown;
     const content = typedItem.summary || typedItem.content || typedItem.title || '';
     const maxLength = 200;
     const contextWindow = 50;
@@ -881,7 +881,7 @@ class IntelligentSearchService {
   private generateHighlights(matches: readonly unknown[] | undefined): SearchHighlight[] {
     if (!matches || matches.length === 0) return [];
 
-    const highlights: (SearchHighlight | null)[] = matches.map((match: any) => {
+    const highlights: (SearchHighlight | null)[] = matches.map((match: unknown) => {
       if (!match || !match.value || !match.indices) return null;
 
       const { value, indices } = match;

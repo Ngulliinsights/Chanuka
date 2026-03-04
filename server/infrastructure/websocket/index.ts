@@ -472,9 +472,9 @@ export interface UnifiedServiceConfig {
   redis?: {
     enabled: boolean;
     url?: string;
-    config?: any;
+    config?: Record<string, unknown>;
   };
-  config?: any;
+  config?: Record<string, unknown>;
 }
 
 /**
