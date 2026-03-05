@@ -1,0 +1,113 @@
+{
+  "budgets": [
+    {
+      "name": "Core Web Vitals",
+      "description": "Google's Core Web Vitals metrics for user experience",
+      "metrics": {
+        "lcp": {
+          "name": "Largest Contentful Paint",
+          "good": 2500,
+          "warning": 4000,
+          "unit": "ms",
+          "description": "Loading performance - time until largest content element is visible"
+        },
+        "fid": {
+          "name": "First Input Delay",
+          "good": 100,
+          "warning": 300,
+          "unit": "ms",
+          "description": "Interactivity - time from first user interaction to browser response"
+        },
+        "cls": {
+          "name": "Cumulative Layout Shift",
+          "good": 0.1,
+          "warning": 0.25,
+          "unit": "",
+          "description": "Visual stability - amount of unexpected layout shift"
+        },
+        "fcp": {
+          "name": "First Contentful Paint",
+          "good": 1800,
+          "warning": 3000,
+          "unit": "ms",
+          "description": "Perceived load speed - time until first content is visible"
+        },
+        "ttfb": {
+          "name": "Time to First Byte",
+          "good": 800,
+          "warning": 1800,
+          "unit": "ms",
+          "description": "Server response time - time until first byte received"
+        },
+        "inp": {
+          "name": "Interaction to Next Paint",
+          "good": 200,
+          "warning": 500,
+          "unit": "ms",
+          "description": "Responsiveness - time from interaction to visual update"
+        }
+      }
+    },
+    {
+      "name": "Bundle Size",
+      "description": "JavaScript and CSS bundle size limits (gzipped)",
+      "metrics": {
+        "total": {
+          "name": "Total Bundle Size",
+          "good": 204800,
+          "warning": 307200,
+          "unit": "bytes",
+          "description": "Total size of all assets (200KB good, 300KB warning)"
+        },
+        "javascript": {
+          "name": "JavaScript Bundle",
+          "good": 153600,
+          "warning": 204800,
+          "unit": "bytes",
+          "description": "Total JavaScript size (150KB good, 200KB warning)"
+        },
+        "css": {
+          "name": "CSS Bundle",
+          "good": 51200,
+          "warning": 102400,
+          "unit": "bytes",
+          "description": "Total CSS size (50KB good, 100KB warning)"
+        }
+      }
+    },
+    {
+      "name": "Resource Counts",
+      "description": "Number of resources loaded",
+      "metrics": {
+        "requests": {
+          "name": "Total Requests",
+          "good": 50,
+          "warning": 100,
+          "unit": "count",
+          "description": "Total number of HTTP requests"
+        },
+        "images": {
+          "name": "Image Count",
+          "good": 20,
+          "warning": 40,
+          "unit": "count",
+          "description": "Number of image resources"
+        },
+        "fonts": {
+          "name": "Font Count",
+          "good": 4,
+          "warning": 8,
+          "unit": "count",
+          "description": "Number of font files"
+        }
+      }
+    }
+  ],
+  "thresholds": {
+    "good": "All metrics within good range",
+    "warning": "Some metrics in warning range",
+    "poor": "One or more metrics exceed warning threshold"
+  },
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-05"
+}

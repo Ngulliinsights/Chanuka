@@ -1,7 +1,7 @@
 // Assuming ML service exists and is properly typed
 import { MLAnalysisService, MLBeneficiaryResult } from '@server/features/analysis/infrastructure/adapters/ml-service-adapter'; // Adjust path and types
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase } from '@server/infrastructure/database';
+import { db } from '@server/infrastructure/database/pool';
 import { eq } from 'drizzle-orm';
 
 import * as schema from '@server/infrastructure/schema';
@@ -49,8 +49,6 @@ export interface StakeholderAnalysisResult {
  * Service for analyzing the impact of a bill on various stakeholders.
  */
 export class StakeholderAnalysisService {
-    private get db() { return readDatabase; }
-
     /**
      * Performs stakeholder analysis using bill content and potentially ML services.
      */
@@ -58,7 +56,7 @@ export class StakeholderAnalysisService {
         logger.info(`👥 Performing stakeholder analysis for bill ${bill_id }`);
         try { 
             const bill = await this.getBillContent(bill_id);
-            const billContent = bill?.content ?? '';
+            const billContent = bill?.full_text ?? '';
             const billTitle = bill?.title ?? '';
 
             // --- Use ML service if available ---
@@ -91,14 +89,15 @@ export class StakeholderAnalysisService {
     }
 
     /** Fetches required bill content and title */
-    private async getBillContent(bill_id: string): Promise<Pick<schema.Bill, 'id' | 'content' | 'title'> | null> {
-         // Drizzle ORM type inference issue, works correctly at runtime
-         // @ts-ignore
-         const whereClause = eq(schema.bills.id, bill_id);
-         const [bill] = await this.db
-             .select({ id: schema.bills.id, content: schema.bills.content, title: schema.bills.title })
+    private async getBillContent(bill_id: string): Promise<Pick<schema.Bill, 'id' | 'full_text' | 'title'> | null> {
+         const [bill] = await db
+             .select({
+                 id: schema.bills.id,
+                 full_text: schema.bills.full_text,
+                 title: schema.bills.title
+             })
              .from(schema.bills)
-             .where(whereClause)
+             .where(eq(schema.bills.id, bill_id))
              .limit(1);
           if (!bill) throw new Error(`Bill ${ bill_id } not found for stakeholder analysis.`);
          return bill;

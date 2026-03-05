@@ -79,6 +79,7 @@ const AuthPage = createLazyComponent(
   'Authentication'
 );
 const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
+const WelcomeTour = createLazyComponent(() => import('@client/features/onboarding/pages/welcome-tour'), 'Welcome Tour');
 const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
 const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
 const SupportPage = createLazyComponent(() => import('@client/features/home/pages/support'), 'Support');
@@ -89,7 +90,7 @@ const CareersPage = createLazyComponent(() => import('@client/features/home/page
 const PressPage = createLazyComponent(() => import('@client/features/home/pages/press'), 'Press');
 const BlogPage = createLazyComponent(() => import('@client/features/home/pages/blog'), 'Blog');
 const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
-const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility'), 'Accessibility');
+const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility-statement'), 'Accessibility Statement');
 const CivicEducationPage = createLazyComponent(() => import('@client/features/onboarding/pages/civic-education'), 'Civic Education');
 const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
 const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
@@ -130,9 +131,25 @@ const IntegrationMonitoringDashboard = createLazyComponent(
   () => import('@client/features/monitoring/pages/integration-monitoring'),
   'Integration Monitoring'
 );
+const PerformanceDashboard = createLazyComponent(
+  () => import('@client/infrastructure/observability/performance/performance-dashboard'),
+  'Performance Dashboard'
+);
 const ArgumentIntelligencePage = createLazyComponent(
   () => import('@client/features/argument-intelligence/pages/argument-intelligence'),
   'Argument Intelligence'
+);
+const CollectionsPage = createLazyComponent(
+  () => import('@client/features/bills/pages/CollectionsPage'),
+  'Collections'
+);
+const WorkspacesPage = createLazyComponent(
+  () => import('@client/features/collaboration/pages/WorkspacesPage'),
+  'Workspaces'
+);
+const WorkspaceDetailPage = createLazyComponent(
+  () => import('@client/features/collaboration/pages/WorkspaceDetailPage'),
+  'Workspace Detail'
 );
 
 interface RouteConfig {
@@ -264,6 +281,7 @@ const routes: RouteConfig[] = [
     element: <HomePage />,
     preload: true,
   },
+  // Bills routes - unified portal with detail views
   {
     id: 'bills-portal',
     path: '/bills',
@@ -271,14 +289,43 @@ const routes: RouteConfig[] = [
     preload: true,
   },
   {
-    id: 'bills-dashboard-legacy',
-    path: '/bills/dashboard',
-    element: <BillsDashboard />,
-  },
-  {
     id: 'bill-detail',
     path: '/bills/:id',
     element: <BillDetail />,
+  },
+  {
+    id: 'bill-analysis',
+    path: '/bills/:id/analysis',
+    element: <WorkaroundAnalysisPage />,
+  },
+  {
+    id: 'bill-arguments',
+    path: '/bills/:billId/arguments',
+    element: <ArgumentIntelligencePage />,
+  },
+  {
+    id: 'collections',
+    path: '/collections',
+    element: <CollectionsPage />,
+    protected: true,
+  },
+  {
+    id: 'workspaces',
+    path: '/workspaces',
+    element: <WorkspacesPage />,
+    protected: true,
+  },
+  {
+    id: 'workspace-detail',
+    path: '/workspaces/:id',
+    element: <WorkspaceDetailPage />,
+    protected: true,
+  },
+  // Legacy redirect
+  {
+    id: 'bills-dashboard-legacy',
+    path: '/bills/dashboard',
+    element: <Navigate to="/bills" replace />,
   },
 
   {
@@ -291,18 +338,12 @@ const routes: RouteConfig[] = [
     path: '/community/expert-verification',
     element: <ExpertVerificationPage />,
   },
-  // Consolidated search route - main search interface
+  // Unified search route - handles both search and results
   {
     id: 'search',
     path: '/search',
     element: <UniversalSearchPage />,
     preload: true,
-  },
-  // Search results route - clean results display without "Intelligent Search" branding
-  {
-    id: 'search-results',
-    path: '/results',
-    element: <UniversalSearchPage />,
   },
   {
     id: 'auth',
@@ -313,6 +354,11 @@ const routes: RouteConfig[] = [
     id: 'onboarding',
     path: '/onboarding',
     element: <Onboarding />,
+  },
+  {
+    id: 'welcome',
+    path: '/welcome',
+    element: <WelcomeTour />,
   },
   {
     id: 'terms',
@@ -494,26 +540,24 @@ const routes: RouteConfig[] = [
     roles: ['admin', 'super_admin'],
     requireVerification: true,
   },
-
-  // Workaround Analysis - Strategic Dashboard
   {
-    id: 'workaround-analysis',
-    path: '/workarounds',
-    element: <WorkaroundAnalysisPage />,
+    id: 'admin-performance',
+    path: '/admin/performance',
+    element: (
+      <AdminRoute>
+        <PerformanceDashboard />
+      </AdminRoute>
+    ),
+    protected: true,
+    roles: ['admin', 'super_admin'],
+    requireVerification: true,
   },
 
-  // Pretext Detection
+  // Advanced analysis features
   {
     id: 'pretext-detection',
-    path: '/pretext-detection',
+    path: '/analysis/pretext-detection',
     element: <PretextDetectionPage />,
-  },
-
-  // Argument Intelligence
-  {
-    id: 'argument-intelligence',
-    path: '/bills/:billId/arguments',
-    element: <ArgumentIntelligencePage />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility
@@ -531,6 +575,16 @@ const routes: RouteConfig[] = [
     id: 'legacy-intelligent-search-redirect-alt',
     path: '/intelligent-search',
     element: <Navigate to="/search" replace />,
+  },
+  {
+    id: 'legacy-results-redirect',
+    path: '/results',
+    element: <Navigate to="/search" replace />,
+  },
+  {
+    id: 'legacy-workarounds-redirect',
+    path: '/workarounds',
+    element: <Navigate to="/analysis/workarounds" replace />,
   },
 
   // Catch-all route

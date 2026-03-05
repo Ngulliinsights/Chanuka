@@ -29,6 +29,7 @@ import { router as searchRouter } from '@server/features/search/SearchController
 import { sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
 import { router as usersRouter } from '@server/features/users/application/profile';
 import { router as verificationRouter } from '@server/features/users/application/verification';
+import { default as electoralAccountabilityRoutes } from '@server/features/electoral-accountability/application/electoral-accountability.routes';
 import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
 import { cacheCoordinator } from '@server/infrastructure/cache';
 import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
@@ -127,7 +128,8 @@ app.get('/api', (_req: Request, res: Response) => {
       verification: "/api/verification",
       community: "/api/community",
       "constitutional-analysis": "/api/constitutional-analysis",
-      "argument-intelligence": "/api/argument-intelligence"
+      "argument-intelligence": "/api/argument-intelligence",
+      "electoral-accountability": "/api/electoral-accountability"
     }
   });
 });
@@ -388,6 +390,7 @@ app.use('/api/argument-intelligence', argumentIntelligenceRouter);
 app.use('/api/recommendation', newRecommendationRouter);
 app.use('/api/pretext-detection', pretextDetectionRouter);
 app.use('/api/feature-flags', featureFlagRouter);
+app.use('/api/electoral-accountability', electoralAccountabilityRoutes);
 
 // Unified error handling middleware (MUST BE LAST!)
 // This integrates @shared/core error management with server configuration

@@ -1,9 +1,0 @@
-client/src/infrastructure/logging/index.ts: * @module infrastructure/logging
-client/src/infrastructure/logging/README.md:infrastructure/logging/
-client/src/infrastructure/logging/README.md:import { logger } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { logger, LogContext } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { logger } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { logger } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { logger } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { logger } from '@/infrastructure/logging';
-client/src/infrastructure/logging/README.md:import { Logger, LogContext } from '@/infrastructure/logging';

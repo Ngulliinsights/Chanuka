@@ -509,12 +509,44 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   }
 
   private async authenticateWithServer(credentials: AuthCredentials): Promise<AuthSession> {
-    // Simulate API call - in real implementation, this would call the backend
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        // Mock authentication logic - FOR DEVELOPMENT/TESTING ONLY
-        // TODO: Replace with actual backend API call
-        if (credentials.email === 'test@example.com' && credentials.password === 'password123') {
+    try {
+      // Real backend authentication
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Authentication failed');
+      }
+
+      const data = await response.json();
+      
+      // Validate response structure
+      if (!data.user || !data.accessToken) {
+        throw new Error('Invalid authentication response');
+      }
+
+      const user: AuthUser = {
+        id: data.user.id,
+        email: data.user.email,
+        name: data.user.name || data.user.display_name,
+        role: data.user.role || 'citizen',
+        verified: data.user.verified || false,
+        twoFactorEnabled: data.user.two_factor_enabled || false,
+        preferences: data.user.preferences || {
+          theme: 'light',
+          language: 'en',
+          timezone: 'UTC',
+          email_frequency: 'immediate',
+          notification_preferences: {
           const user: AuthUser = {
             id: 'user_123',
             email: credentials.email,

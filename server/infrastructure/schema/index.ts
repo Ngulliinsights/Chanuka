@@ -55,6 +55,9 @@ export * from './market_intelligence';
 // Accountability Ledger
 export * from './accountability_ledger';
 
+// Electoral Accountability
+export * from './electoral_accountability';
+
 // Constitutional Compliance - commented out (file may not exist)
 // export * from './constitutional_compliance';
 
