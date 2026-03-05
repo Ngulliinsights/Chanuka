@@ -21,6 +21,12 @@ export const ERROR_CODES = {
   INVALID_FORMAT: 'INVALID_FORMAT',
   INVALID_ID: 'INVALID_ID',
 
+  // Network Errors (450-459)
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  
+  // Resource Errors (460-469)
+  RESOURCE_NOT_FOUND: 'RESOURCE_NOT_FOUND',
+
   // Authentication Errors (500-599)
   AUTHENTICATION_FAILED: 'AUTHENTICATION_FAILED',
   INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
@@ -76,6 +82,12 @@ export const ERROR_STATUS_CODES: Record<ErrorCode, number> = {
   INVALID_FORMAT: 400,
   INVALID_ID: 400,
 
+  // Network Errors (0 for network issues)
+  NETWORK_ERROR: 0,
+  
+  // Resource Errors (404)
+  RESOURCE_NOT_FOUND: 404,
+
   // Authentication Errors (401)
   AUTHENTICATION_FAILED: 401,
   INVALID_CREDENTIALS: 401,
@@ -128,6 +140,12 @@ export const ERROR_MESSAGES: Record<ErrorCode, string> = {
   MISSING_REQUIRED_FIELD: 'A required field is missing',
   INVALID_FORMAT: 'Data format is invalid',
   INVALID_ID: 'Invalid identifier provided',
+
+  // Network Errors
+  NETWORK_ERROR: 'A network error occurred',
+  
+  // Resource Errors
+  RESOURCE_NOT_FOUND: 'The requested resource was not found',
 
   // Authentication Errors
   AUTHENTICATION_FAILED: 'Authentication failed',

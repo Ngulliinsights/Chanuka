@@ -78,6 +78,10 @@ class ErrorMonitoringService {
 
         tracesSampleRate: config.tracesSampleRate || 0.1,
 
+        beforeSend: (event, hint) => {
+          return this.filterAndEnhanceError(event, hint);
+        },
+
         beforeBreadcrumb: breadcrumb => {
           return this.filterBreadcrumb(breadcrumb);
         },
@@ -440,11 +444,11 @@ export class ErrorBoundary extends React.Component<
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error) {
+  static override getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     errorMonitoring.captureError(error, {
       feature: 'react-error-boundary',
       metadata: {

@@ -29,8 +29,13 @@ export function createValidationError(
   fields: Array<{ field: string; message: string }>,
   context?: Partial<ErrorContext>
 ): ClientError {
-  const message = fields.length === 1
-    ? `Validation failed: ${fields[0].message}`
+  if (fields.length === 0) {
+    throw new Error('Validation error must have at least one field');
+  }
+  
+  const firstField = fields[0];
+  const message = fields.length === 1 && firstField
+    ? `Validation failed: ${firstField.message}`
     : `Validation failed for ${fields.length} fields`;
 
   return {

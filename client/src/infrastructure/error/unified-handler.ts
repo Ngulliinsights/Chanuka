@@ -11,8 +11,8 @@
  */
 
 import { observability } from '../observability';
-import { logger } from '../logging';
-import type { ClientError, ErrorContext, RecoveryStrategy, RecoveryResult } from './unified-types';
+import { logger } from '../observability/logging';
+import type { ClientError, RecoveryStrategy, RecoveryResult } from './unified-types';
 import { ErrorSeverity } from '@shared/core';
 
 /**
@@ -113,17 +113,18 @@ export class UnifiedErrorHandler {
         component: error.context.component || 'unknown',
         operation: error.context.operation || 'unknown',
         userId: error.context.userId,
-        sessionId: error.context.sessionId,
-        requestId: error.context.requestId,
-        errorId: error.id,
-        errorType: error.type,
-        errorSeverity: error.severity,
-        errorCode: error.code,
-        correlationId: error.correlationId,
-        recoverable: error.recoverable,
-        retryable: error.retryable,
-        statusCode: error.statusCode,
-        ...error.context.metadata,
+        metadata: {
+          errorId: error.id,
+          errorType: error.type,
+          errorSeverity: error.severity,
+          errorCode: error.code,
+          correlationId: error.correlationId,
+          recoverable: error.recoverable,
+          retryable: error.retryable,
+          statusCode: error.statusCode,
+          requestId: error.context.requestId,
+          ...error.context.metadata,
+        },
       });
     } catch (trackingError) {
       // Don't let tracking errors break error handling
@@ -144,7 +145,6 @@ export class UnifiedErrorHandler {
         component: error.context.component || 'unknown',
         operation: error.context.operation || 'unknown',
         userId: error.context.userId,
-        sessionId: error.context.sessionId,
         requestId: error.context.requestId,
         errorId: error.id,
         errorType: error.type,
