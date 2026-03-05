@@ -26,6 +26,7 @@ import {
   type GetAllBillsInput,
   type RecordEngagementInput,
 } from './bill-validation.schemas';
+import { billLifecycleHooks } from './bill-lifecycle-hooks';
 
 // Module-level sanitization service instance
 const inputSanitizationService = new InputSanitizationService();
@@ -295,6 +296,11 @@ export class CachedBillService {
 
       await this.invalidateAllBillCaches();
 
+      // Trigger lifecycle hooks asynchronously (non-blocking)
+      billLifecycleHooks.onBillCreated(newBill).catch(error => {
+        logger.warn({ error, billId: newBill.id }, 'Bill creation hook failed (non-blocking)');
+      });
+
       return newBill;
     }, { service: 'CachedBillService', operation: 'createBill' });
   }
@@ -365,6 +371,11 @@ export class CachedBillService {
         });
 
         await this.invalidateBillCaches(sanitizedId);
+
+        // Trigger lifecycle hooks asynchronously (non-blocking)
+        billLifecycleHooks.onBillUpdated(updatedBill, sanitizedUpdates).catch(error => {
+          logger.warn({ error, billId: sanitizedId }, 'Bill update hook failed (non-blocking)');
+        });
       }
 
       return updatedBill ?? null;
@@ -380,6 +391,10 @@ export class CachedBillService {
     user_id?: string,
   ): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
+      // Get old status before update
+      const billResult = await this.getBillById(id);
+      const oldStatus = billResult.isOk && billResult.value ? billResult.value.status : 'unknown';
+
       await withTransaction(async (tx) => {
         // @ts-expect-error - Drizzle ORM update returns unknown type
         await tx
@@ -400,6 +415,18 @@ export class CachedBillService {
       });
 
       await this.invalidateBillCaches(id);
+
+      // Get updated bill for lifecycle hook
+      const updatedBillResult = await this.getBillById(id);
+      if (updatedBillResult.isOk && updatedBillResult.value) {
+        billLifecycleHooks.onBillStatusChanged(
+          updatedBillResult.value as Bill, 
+          oldStatus, 
+          newStatus
+        ).catch(error => {
+          logger.warn({ error, billId: id }, 'Bill status change hook failed (non-blocking)');
+        });
+      }
     }, { service: 'CachedBillService', operation: 'updateBillStatus' });
   }
 

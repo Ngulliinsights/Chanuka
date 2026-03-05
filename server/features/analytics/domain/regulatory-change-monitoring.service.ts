@@ -1,29 +1,30 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { cacheService } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { and, count, desc, eq, gt, gte, lte,or, sql } from "drizzle-orm";
 
-import {
-  type Sponsor,
-  sponsors} from '@server/infrastructure/schema';
+// ============================================================================
+// CONSTANTS
+// ============================================================================
 
-// Extended cache keys for monitoring features
 const MONITORING_CACHE_KEYS = {
-  REGULATORY_ALERTS: 'monitoring:alerts',
-  MONITORING_REPORTS: 'monitoring:reports',
-  STAKEHOLDER_ANALYSIS: 'monitoring:stakeholder',
-  STRATEGIC_OPPORTUNITIES: 'monitoring:opportunities'
+  REGULATORY_ALERTS:       'monitoring:alerts',
+  MONITORING_REPORTS:      'monitoring:reports',
+  STAKEHOLDER_ANALYSIS:    'monitoring:stakeholder',
+  STRATEGIC_OPPORTUNITIES: 'monitoring:opportunities',
 } as const;
 
-// Extended cache TTL values
 const MONITORING_CACHE_TTL = {
   HOUR: 60 * 60 * 1000,
-  DAY: 24 * 60 * 60 * 1000,
-  WEEK: 7 * 24 * 60 * 60 * 1000
+  DAY:  24 * 60 * 60 * 1000,
+  WEEK: 7 * 24 * 60 * 60 * 1000,
 } as const;
 
-// Define interfaces for regulation-related data since they're not exported
+const COMPONENT = 'RegulatoryChangeMonitoringService';
+
+// ============================================================================
+// INTERNAL TYPES
+// ============================================================================
+
 interface RegulationData {
   id: string;
   title: string;
@@ -42,10 +43,19 @@ interface RegulationData {
   effectiveDate?: Date;
 }
 
-// Enhanced interfaces with complete type definitions
+// ============================================================================
+// PUBLIC INTERFACES
+// ============================================================================
+
 export interface RegulatoryAlert {
   id: string;
-  type: 'new_regulation' | 'regulatory_update' | 'impact_assessment' | 'strategic_opportunity' | 'deadline_approaching' | 'stakeholder_shift';
+  type:
+    | 'new_regulation'
+    | 'regulatory_update'
+    | 'impact_assessment'
+    | 'strategic_opportunity'
+    | 'deadline_approaching'
+    | 'stakeholder_shift';
   title: string;
   description: string;
   severity: 'info' | 'warning' | 'critical';
@@ -75,7 +85,13 @@ export interface StakeholderImpact {
 export interface StrategicOpportunity {
   id: string;
   regulationId: string;
-  opportunityType: 'capacity_increase' | 'pivot_required' | 'new_market' | 'partnership' | 'technology_adoption' | 'regulatory_arbitrage';
+  opportunityType:
+    | 'capacity_increase'
+    | 'pivot_required'
+    | 'new_market'
+    | 'partnership'
+    | 'technology_adoption'
+    | 'regulatory_arbitrage';
   title: string;
   description: string;
   potentialBenefit: string;
@@ -101,10 +117,7 @@ export interface MonitoringReport {
   id: string;
   generatedAt: Date;
   reportType: 'daily' | 'weekly' | 'monthly' | 'ad_hoc';
-  timeRange: {
-    start: Date;
-    end: Date;
-  };
+  timeRange: { start: Date; end: Date };
   summary: {
     newRegulations: number;
     updatedRegulations: number;
@@ -124,240 +137,115 @@ export interface MonitoringReport {
   opportunities: StrategicOpportunity[];
 }
 
+// ============================================================================
+// SERVICE
+// ============================================================================
+
 export class RegulatoryChangeMonitoringService {
   private readonly MONITORING_INTERVALS = {
-    DAILY_CHECK: 24 * 60 * 60 * 1000,
-    WEEKLY_ANALYSIS: 7 * 24 * 60 * 60 * 1000,
-    MONTHLY_REVIEW: 30 * 24 * 60 * 60 * 1000
+    DAILY_CHECK:     24 * 60 * 60 * 1000,
+    WEEKLY_ANALYSIS:  7 * 24 * 60 * 60 * 1000,
+    MONTHLY_REVIEW:  30 * 24 * 60 * 60 * 1000,
   };
 
   private readonly SEVERITY_THRESHOLDS = {
-    CRITICAL_IMPACT_SCORE: 8.0,
-    WARNING_IMPACT_SCORE: 5.0,
-    STAKEHOLDER_COUNT_CRITICAL: 100,
+    CRITICAL_IMPACT_SCORE:        8.0,
+    WARNING_IMPACT_SCORE:         5.0,
+    STAKEHOLDER_COUNT_CRITICAL:   100,
     DAYS_UNTIL_DEADLINE_CRITICAL: 7,
-    DAYS_UNTIL_DEADLINE_WARNING: 30
+    DAYS_UNTIL_DEADLINE_WARNING:  30,
   };
 
-  // Use NodeJS.Timeout instead of NodeJS.Timer for proper typing
   private monitoringTimer: NodeJS.Timeout | null = null;
-  private weeklyTimer: NodeJS.Timeout | null = null;
-  private monthlyTimer: NodeJS.Timeout | null = null;
+  private weeklyTimer:     NodeJS.Timeout | null = null;
+  private monthlyTimer:    NodeJS.Timeout | null = null;
+
+  // ============================================================================
+  // LIFECYCLE
+  // ============================================================================
 
   /**
-   * Start comprehensive automated monitoring system for regulatory changes.
-   * This creates a multi-layered monitoring approach that catches different
-   * types of changes at appropriate intervals.
+   * Start the multi-layered automated monitoring system.
+   * Daily: urgent changes and immediate alerts.
+   * Weekly: trend identification and strategic planning.
+   * Monthly: comprehensive strategic assessment.
    */
   startAutomatedMonitoring(): void {
-    logger.info('Starting comprehensive regulatory change monitoring system...', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Starting comprehensive regulatory change monitoring system...');
 
-    // Daily monitoring for immediate changes and urgent alerts
     this.monitoringTimer = setInterval(async () => {
       try {
         await this.performDailyMonitoring();
       } catch (error) {
-  logger.error('Error in daily monitoring:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+        logger.error(
+          { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+          'Error in daily monitoring',
+        );
       }
     }, this.MONITORING_INTERVALS.DAILY_CHECK);
 
-    // Weekly analysis for trend identification and strategic planning
     this.weeklyTimer = setInterval(async () => {
       try {
         await this.performWeeklyAnalysis();
       } catch (error) {
-  logger.error('Error in weekly analysis:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+        logger.error(
+          { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+          'Error in weekly analysis',
+        );
       }
     }, this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
 
-    // Monthly review for comprehensive strategic assessment
     this.monthlyTimer = setInterval(async () => {
       try {
         await this.performMonthlyReview();
       } catch (error) {
-  logger.error('Error in monthly review:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+        logger.error(
+          { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+          'Error in monthly review',
+        );
       }
     }, this.MONITORING_INTERVALS.MONTHLY_REVIEW);
 
-    // Run initial monitoring to establish baseline
-    this.performDailyMonitoring().catch(error => {
-      logger.error('Error in initial monitoring run:', { component: 'Chanuka' }, error);
+    // Establish baseline immediately.
+    this.performDailyMonitoring().catch((error) => {
+      logger.error({ component: COMPONENT, error }, 'Error in initial monitoring run');
     });
   }
 
   /**
-   * Stop all automated monitoring processes cleanly
+   * Stop all automated monitoring processes cleanly.
    */
   stopAutomatedMonitoring(): void {
-    logger.info('Stopping regulatory change monitoring system...', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Stopping regulatory change monitoring system...');
 
     if (this.monitoringTimer) {
       clearInterval(this.monitoringTimer);
       this.monitoringTimer = null;
-      logger.info('Daily monitoring stopped', { component: 'Chanuka' });
+      logger.info({ component: COMPONENT }, 'Daily monitoring stopped');
     }
 
     if (this.weeklyTimer) {
       clearInterval(this.weeklyTimer);
       this.weeklyTimer = null;
-      logger.info('Weekly analysis stopped', { component: 'Chanuka' });
+      logger.info({ component: COMPONENT }, 'Weekly analysis stopped');
     }
 
     if (this.monthlyTimer) {
       clearInterval(this.monthlyTimer);
       this.monthlyTimer = null;
-      logger.info('Monthly review stopped', { component: 'Chanuka' });
+      logger.info({ component: COMPONENT }, 'Monthly review stopped');
     }
 
-    logger.info('All automated regulatory change monitoring stopped.', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'All automated regulatory change monitoring stopped.');
   }
 
-  // Report generation and analysis methods
-
-  private generateKeyFindings(
-    newRegulations: RegulationData[], 
-    updatedRegulations: RegulationData[], 
-    alerts: RegulatoryAlert[]
-  ): string[] {
-    const findings: string[] = [];
-
-    if (newRegulations.length > 0) {
-      findings.push(
-        `${newRegulations.length} new regulations introduced, focusing on ${this.identifyDominantSectors(newRegulations).join(', ')}`
-      );
-    }
-
-    if (updatedRegulations.length > 0) {
-      const criticalUpdates = updatedRegulations.filter(reg => 
-        this.calculateUpdateSeverity(reg) === 'critical'
-      );
-      if (criticalUpdates.length > 0) {
-        findings.push(
-          `${criticalUpdates.length} critical regulatory updates require immediate attention`
-        );
-      }
-    }
-
-    const criticalAlerts = alerts.filter(alert => alert.severity === 'critical');
-    if (criticalAlerts.length > 0) {
-      findings.push(
-        `${criticalAlerts.length} critical alerts generated requiring urgent action`
-      );
-    }
-
-    return findings;
-  }
-
-  private async analyzeDailyTrends(
-    newRegulations: RegulationData[], 
-    updatedRegulations: RegulationData[]
-  ): Promise<MonitoringReport['trends']> {
-    const allRegulations = [...newRegulations, ...updatedRegulations];
-
-    return {
-      regulatoryActivity: this.assessActivityLevel(allRegulations.length),
-      sectorFocus: this.identifyDominantSectors(allRegulations),
-      emergingThemes: await this.identifyDailyThemes(allRegulations)
-    };
-  }
-
-  private generateDailyRecommendations(alerts: RegulatoryAlert[]): string[] {
-    const recommendations: string[] = [];
-
-    const criticalAlerts = alerts.filter(alert => alert.severity === 'critical');
-    if (criticalAlerts.length > 0) {
-      recommendations.push(
-        'Immediate review of critical alerts required - assign responsible teams'
-      );
-    }
-
-    const deadlineAlerts = alerts.filter(alert => alert.type === 'deadline_approaching');
-    if (deadlineAlerts.length > 0) {
-      recommendations.push(
-        'Prepare compliance documentation for approaching deadlines'
-      );
-    }
-
-    const opportunityAlerts = alerts.filter(alert => alert.type === 'strategic_opportunity');
-    if (opportunityAlerts.length > 0) {
-      recommendations.push(
-        'Evaluate strategic opportunities for business development potential'
-      );
-    }
-
-    return recommendations;
-  }
-
-  private assessActivityLevel(regulationCount: number): 'increasing' | 'stable' | 'decreasing' {
-    // Compare against historical averages using simple thresholds
-    // In production, this would use historical data analysis
-    if (regulationCount > 5) return 'increasing';
-    if (regulationCount < 2) return 'decreasing';
-    return 'stable';
-  }
-
-  private identifyDominantSectors(regulations: RegulationData[]): string[] {
-    const sectorCount: Record<string, number> = {};
-
-    regulations.forEach(reg => {
-      const sectors = reg.affectedSectors || [];
-      sectors.forEach((sector: string) => {
-        sectorCount[sector] = (sectorCount[sector] || 0) + 1;
-      });
-    });
-
-    return Object.entries(sectorCount)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 3)
-      .map(([sector]) => sector);
-  }
-
-  private async identifyDailyThemes(regulations: RegulationData[]): Promise<string[]> {
-    const themes: Set<string> = new Set();
-
-    // Analyze regulation content for common themes
-    // This would use more sophisticated NLP in production
-    regulations.forEach(reg => {
-      const content = `${reg.title} ${reg.description}`.toLowerCase();
-      
-      if (content.includes('environment') || content.includes('climate')) {
-        themes.add('environmental_compliance');
-      }
-      if (content.includes('digital') || content.includes('technology')) {
-        themes.add('digital_transformation');
-      }
-      if (content.includes('financial') || content.includes('reporting')) {
-        themes.add('financial_transparency');
-      }
-      if (content.includes('public') || content.includes('citizen')) {
-        themes.add('citizen_engagement');
-      }
-      if (content.includes('data') || content.includes('privacy')) {
-        themes.add('data_privacy');
-      }
-    });
-
-    return Array.from(themes);
-  }
-
-  // Storage and persistence methods
-
-  private async storeMonitoringReport(report: MonitoringReport): Promise<void> {
-    try {
-      // Store in cache for quick access
-      const cacheKey = `${MONITORING_CACHE_KEYS.MONITORING_REPORTS}:${report.reportType}:${report.id}`;
-      await cacheService.set(cacheKey, report, MONITORING_CACHE_TTL.WEEK);
-
-      console.log(`Stored ${report.reportType} monitoring report: ${report.id}`);
-    } catch (error) {
-  logger.error('Error storing monitoring report:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
-    }
-  }
-
-  // Public API methods for external access
+  // ============================================================================
+  // PUBLIC API
+  // ============================================================================
 
   /**
-   * Get all active alerts, optionally filtered by severity or type
+   * Get all active (unresolved) alerts, with optional filtering by severity,
+   * type, and result count.
    */
   async getActiveAlerts(filters?: {
     severity?: RegulatoryAlert['severity'];
@@ -365,67 +253,65 @@ export class RegulatoryChangeMonitoringService {
     limit?: number;
   }): Promise<RegulatoryAlert[]> {
     try {
-      // Note: This assumes cacheService has been extended with a keys() method
-      // If not available, you'll need to maintain an index of alert IDs
-      const alerts: RegulatoryAlert[] = [];
-      
-      // Placeholder for retrieving alerts from cache
-      // In production, you'd maintain an index or use a database query
-      
-      let filteredAlerts = alerts;
-      if (filters?.severity) {
-        filteredAlerts = filteredAlerts.filter(alert => alert.severity === filters.severity);
-      }
-      if (filters?.type) {
-        filteredAlerts = filteredAlerts.filter(alert => alert.type === filters.type);
-      }
+      // Production: maintain a cache index key or query the DB for unresolved alerts.
+      let alerts: RegulatoryAlert[] = [];
 
-      filteredAlerts.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+      if (filters?.severity) alerts = alerts.filter((a) => a.severity === filters.severity);
+      if (filters?.type)     alerts = alerts.filter((a) => a.type     === filters.type);
 
-      if (filters?.limit) {
-        filteredAlerts = filteredAlerts.slice(0, filters.limit);
-      }
+      alerts.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
 
-      return filteredAlerts;
+      if (filters?.limit) alerts = alerts.slice(0, filters.limit);
+
+      return alerts;
     } catch (error) {
-  logger.error('Error retrieving active alerts:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      logger.error(
+        { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+        'Error retrieving active alerts',
+      );
       return [];
     }
   }
 
   /**
-   * Resolve an alert by ID
+   * Resolve an alert by ID. Returns true on success.
    */
   async resolveAlert(alertId: string): Promise<boolean> {
     try {
       const cacheKey = `${MONITORING_CACHE_KEYS.REGULATORY_ALERTS}:${alertId}`;
-      const alert = await cacheService.get<RegulatoryAlert>(cacheKey);
+      const alert    = await cacheService.get<RegulatoryAlert>(cacheKey);
 
       if (!alert) {
-        console.warn(`Alert ${alertId} not found`);
+        logger.warn({ component: COMPONENT, alertId }, `Alert ${alertId} not found`);
         return false;
       }
 
       alert.isResolved = true;
       await cacheService.set(cacheKey, alert, MONITORING_CACHE_TTL.WEEK);
 
-      console.log(`Resolved alert: ${alertId}`);
+      logger.info({ component: COMPONENT, alertId }, `Resolved alert: ${alertId}`);
       return true;
     } catch (error) {
-      logger.error(`Error resolving alert ${alertId}`, { component: 'regulatory-change-monitoring', alertId, error });
+      logger.error(
+        { component: COMPONENT, alertId, error },
+        `Error resolving alert ${alertId}`,
+      );
       try {
         if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', alertId });
+          (errorTracker as any).capture(
+            error instanceof Error ? error : new Error(String(error)),
+            { component: COMPONENT, alertId },
+          );
         }
       } catch (reportErr) {
-        logger.warn('Failed to report resolveAlert error to errorTracker', { reportErr });
+        logger.warn({ reportErr }, 'Failed to report resolveAlert error to errorTracker');
       }
       return false;
     }
   }
 
   /**
-   * Create and store a new regulatory alert with enhanced metadata.
+   * Create and cache a new regulatory alert.
    */
   async createRegulatoryAlert(
     type: RegulatoryAlert['type'],
@@ -439,273 +325,323 @@ export class RegulatoryChangeMonitoringService {
       actionRequired?: boolean;
       affectedSectors?: string[];
       metadata?: Record<string, unknown>;
-    } = {}
+    } = {},
   ): Promise<RegulatoryAlert> {
     const alert: RegulatoryAlert = {
-      id: `reg_alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id:              `reg_alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       type,
       title,
       description,
       severity,
-      regulationId: options.regulationId,
-      sponsor_id: options.sponsor_id,
-      created_at: new Date(),
-      expires_at: options.expires_at,
-      isResolved: false,
-      actionRequired: options.actionRequired ?? (severity === 'critical'),
+      regulationId:    options.regulationId,
+      sponsor_id:      options.sponsor_id,
+      created_at:      new Date(),
+      expires_at:      options.expires_at,
+      isResolved:      false,
+      actionRequired:  options.actionRequired ?? severity === 'critical',
       affectedSectors: options.affectedSectors ?? [],
-      metadata: options.metadata
+      metadata:        options.metadata,
     };
 
     await cacheService.set(
       `${MONITORING_CACHE_KEYS.REGULATORY_ALERTS}:${alert.id}`,
       alert,
-      MONITORING_CACHE_TTL.WEEK
+      MONITORING_CACHE_TTL.WEEK,
     );
 
-    console.log(`Created ${severity} alert: ${title}`);
+    logger.info({ component: COMPONENT, alertId: alert.id, severity }, `Created ${severity} alert: ${title}`);
     return alert;
   }
 
   /**
-   * Comprehensive stakeholder impact analysis
+   * Comprehensive stakeholder impact analysis for a given regulation.
    */
   async analyzeStakeholderImpact(regulationId: string): Promise<StakeholderImpact[]> {
     const cacheKey = `${MONITORING_CACHE_KEYS.STAKEHOLDER_ANALYSIS}:${regulationId}`;
-    const cached = await cacheService.get<StakeholderImpact[]>(cacheKey);
+    const cached   = await cacheService.get<StakeholderImpact[]>(cacheKey);
     if (cached) return cached;
 
     try {
-      // This would query the actual regulations table in production
-      // For now, returning a placeholder structure
       const impacts: StakeholderImpact[] = [];
-
       await cacheService.set(cacheKey, impacts, MONITORING_CACHE_TTL.HOUR * 2);
       return impacts;
     } catch (error) {
-      logger.error(`Error analyzing stakeholder impact for regulation ${regulationId}`, { component: 'regulatory-change-monitoring', regulationId, error });
+      logger.error(
+        { component: COMPONENT, regulationId, error },
+        `Error analyzing stakeholder impact for regulation ${regulationId}`,
+      );
       try {
         if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', regulationId });
+          (errorTracker as any).capture(
+            error instanceof Error ? error : new Error(String(error)),
+            { component: COMPONENT, regulationId },
+          );
         }
       } catch (reportErr) {
-        logger.warn('Failed to report stakeholder impact error to errorTracker', { reportErr });
+        logger.warn({ reportErr }, 'Failed to report stakeholder impact error to errorTracker');
       }
       return [];
     }
   }
 
   /**
-   * Identify strategic opportunities arising from regulatory changes
+   * Identify strategic opportunities arising from a regulatory change.
    */
   async identifyStrategicOpportunities(regulationId: string): Promise<StrategicOpportunity[]> {
     const cacheKey = `${MONITORING_CACHE_KEYS.STRATEGIC_OPPORTUNITIES}:${regulationId}`;
-    const cached = await cacheService.get<StrategicOpportunity[]>(cacheKey);
+    const cached   = await cacheService.get<StrategicOpportunity[]>(cacheKey);
     if (cached) return cached;
 
     try {
       const opportunities: StrategicOpportunity[] = [];
-
       await cacheService.set(cacheKey, opportunities, MONITORING_CACHE_TTL.HOUR * 4);
       return opportunities;
     } catch (error) {
-      logger.error(`Error identifying strategic opportunities for regulation ${regulationId}`, { component: 'regulatory-change-monitoring', regulationId, error });
+      logger.error(
+        { component: COMPONENT, regulationId, error },
+        `Error identifying strategic opportunities for regulation ${regulationId}`,
+      );
       try {
         if ((errorTracker as any)?.capture) {
-          (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'regulatory-change-monitoring', regulationId });
+          (errorTracker as any).capture(
+            error instanceof Error ? error : new Error(String(error)),
+            { component: COMPONENT, regulationId },
+          );
         }
       } catch (reportErr) {
-        logger.warn('Failed to report strategic opportunities error to errorTracker', { reportErr });
+        logger.warn({ reportErr }, 'Failed to report strategic opportunities error to errorTracker');
       }
       return [];
     }
   }
 
-  /**
-   * Daily monitoring performs immediate-response monitoring for urgent changes
-   */
-  private async performDailyMonitoring(): Promise<MonitoringReport> {
-    logger.info('Performing daily regulatory change monitoring...', { component: 'Chanuka' });
+  // ============================================================================
+  // PRIVATE — SCHEDULED JOBS
+  // ============================================================================
 
-    const startTime = new Date();
+  private async performDailyMonitoring(): Promise<MonitoringReport> {
+    logger.info({ component: COMPONENT }, 'Performing daily regulatory change monitoring...');
+
+    const startTime  = new Date();
     const cutoffTime = new Date(startTime.getTime() - this.MONITORING_INTERVALS.DAILY_CHECK);
 
     try {
-      // Note: These methods would need access to the actual regulations table
-      // You'll need to either export the table from schema or query it differently
-      const newRegulations: RegulationData[] = [];
+      // Production: query regulations table for rows newer than cutoffTime.
+      const newRegulations:     RegulationData[] = [];
       const updatedRegulations: RegulationData[] = [];
-      const approachingDeadlines: Array<{regulationId: string, title: string, deadline: Date}> = [];
-
-      const alerts: RegulatoryAlert[] = [];
+      const alerts:             RegulatoryAlert[] = [];
 
       const report: MonitoringReport = {
-        id: `daily_${Date.now()}`,
+        id:          `daily_${Date.now()}`,
         generatedAt: new Date(),
-        reportType: 'daily',
-        timeRange: { start: cutoffTime, end: startTime },
+        reportType:  'daily',
+        timeRange:   { start: cutoffTime, end: startTime },
         summary: {
-          newRegulations: newRegulations.length,
-          updatedRegulations: updatedRegulations.length,
-          alertsGenerated: alerts.length,
-          criticalAlerts: alerts.filter(a => a.severity === 'critical').length,
+          newRegulations:          newRegulations.length,
+          updatedRegulations:      updatedRegulations.length,
+          alertsGenerated:         alerts.length,
+          criticalAlerts:          alerts.filter((a) => a.severity === 'critical').length,
           opportunitiesIdentified: 0,
-          stakeholdersAffected: 0
+          stakeholdersAffected:    0,
         },
-        keyFindings: this.generateKeyFindings(newRegulations, updatedRegulations, alerts),
-        trends: await this.analyzeDailyTrends(newRegulations, updatedRegulations),
+        keyFindings:     this.generateKeyFindings(newRegulations, updatedRegulations, alerts),
+        trends:          await this.analyzeDailyTrends(newRegulations, updatedRegulations),
         recommendations: this.generateDailyRecommendations(alerts),
         alerts,
-        opportunities: []
+        opportunities:   [],
       };
 
       await this.storeMonitoringReport(report);
-
-      console.log(`Daily monitoring completed. Generated ${alerts.length} alerts.`);
+      logger.info(
+        { component: COMPONENT, alertCount: alerts.length },
+        `Daily monitoring completed. Generated ${alerts.length} alerts.`,
+      );
       return report;
     } catch (error) {
-  logger.error('Error in daily monitoring:', { component: 'Chanuka', error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+      logger.error(
+        { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+        'Error in daily monitoring',
+      );
       throw error;
     }
   }
 
-  /**
-   * Weekly analysis focuses on trend identification and strategic planning
-   */
   private async performWeeklyAnalysis(): Promise<MonitoringReport> {
-    logger.info('Performing weekly regulatory trend analysis...', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Performing weekly regulatory trend analysis...');
 
-    const endTime = new Date();
+    const endTime   = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.WEEKLY_ANALYSIS);
 
     const report: MonitoringReport = {
-      id: `weekly_${Date.now()}`,
+      id:          `weekly_${Date.now()}`,
       generatedAt: new Date(),
-      reportType: 'weekly',
-      timeRange: { start: startTime, end: endTime },
+      reportType:  'weekly',
+      timeRange:   { start: startTime, end: endTime },
       summary: {
-        newRegulations: 0,
-        updatedRegulations: 0,
-        alertsGenerated: 0,
-        criticalAlerts: 0,
-        opportunitiesIdentified: 0,
-        stakeholdersAffected: 0
+        newRegulations: 0, updatedRegulations: 0,
+        alertsGenerated: 0, criticalAlerts: 0,
+        opportunitiesIdentified: 0, stakeholdersAffected: 0,
       },
-      keyFindings: [],
-      trends: {
-        regulatoryActivity: 'stable',
-        sectorFocus: [],
-        emergingThemes: []
-      },
+      keyFindings:     [],
+      trends:          { regulatoryActivity: 'stable', sectorFocus: [], emergingThemes: [] },
       recommendations: [],
-      alerts: [],
-      opportunities: []
+      alerts:          [],
+      opportunities:   [],
     };
 
     await this.storeMonitoringReport(report);
-    logger.info('Weekly analysis completed', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Weekly analysis completed');
     return report;
   }
 
-  /**
-   * Monthly review provides comprehensive strategic assessment
-   */
   private async performMonthlyReview(): Promise<MonitoringReport> {
-    logger.info('Performing monthly regulatory review...', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Performing monthly regulatory review...');
 
-    const endTime = new Date();
+    const endTime   = new Date();
     const startTime = new Date(endTime.getTime() - this.MONITORING_INTERVALS.MONTHLY_REVIEW);
 
     const report: MonitoringReport = {
-      id: `monthly_${Date.now()}`,
+      id:          `monthly_${Date.now()}`,
       generatedAt: new Date(),
-      reportType: 'monthly',
-      timeRange: { start: startTime, end: endTime },
+      reportType:  'monthly',
+      timeRange:   { start: startTime, end: endTime },
       summary: {
-        newRegulations: 0,
-        updatedRegulations: 0,
-        alertsGenerated: 0,
-        criticalAlerts: 0,
-        opportunitiesIdentified: 0,
-        stakeholdersAffected: 0
+        newRegulations: 0, updatedRegulations: 0,
+        alertsGenerated: 0, criticalAlerts: 0,
+        opportunitiesIdentified: 0, stakeholdersAffected: 0,
       },
-      keyFindings: [],
-      trends: {
-        regulatoryActivity: 'stable',
-        sectorFocus: [],
-        emergingThemes: []
-      },
+      keyFindings:     [],
+      trends:          { regulatoryActivity: 'stable', sectorFocus: [], emergingThemes: [] },
       recommendations: [],
-      alerts: [],
-      opportunities: []
+      alerts:          [],
+      opportunities:   [],
     };
 
     await this.storeMonitoringReport(report);
-    logger.info('Monthly review completed', { component: 'Chanuka' });
+    logger.info({ component: COMPONENT }, 'Monthly review completed');
     return report;
   }
 
-  // Utility methods
+  // ============================================================================
+  // PRIVATE — REPORT HELPERS
+  // ============================================================================
+
+  private generateKeyFindings(
+    newRegulations: RegulationData[],
+    updatedRegulations: RegulationData[],
+    alerts: RegulatoryAlert[],
+  ): string[] {
+    const findings: string[] = [];
+
+    if (newRegulations.length > 0) {
+      findings.push(
+        `${newRegulations.length} new regulation(s) introduced, focusing on ${this.identifyDominantSectors(newRegulations).join(', ')}`,
+      );
+    }
+
+    const criticalUpdates = updatedRegulations.filter(
+      (reg) => this.calculateUpdateSeverity(reg) === 'critical',
+    );
+    if (criticalUpdates.length > 0) {
+      findings.push(`${criticalUpdates.length} critical regulatory update(s) require immediate attention`);
+    }
+
+    const criticalAlerts = alerts.filter((a) => a.severity === 'critical');
+    if (criticalAlerts.length > 0) {
+      findings.push(`${criticalAlerts.length} critical alert(s) generated requiring urgent action`);
+    }
+
+    return findings;
+  }
+
+  private async analyzeDailyTrends(
+    newRegulations: RegulationData[],
+    updatedRegulations: RegulationData[],
+  ): Promise<MonitoringReport['trends']> {
+    const all = [...newRegulations, ...updatedRegulations];
+    return {
+      regulatoryActivity: this.assessActivityLevel(all.length),
+      sectorFocus:        this.identifyDominantSectors(all),
+      emergingThemes:     await this.identifyDailyThemes(all),
+    };
+  }
+
+  private generateDailyRecommendations(alerts: RegulatoryAlert[]): string[] {
+    const recommendations: string[] = [];
+
+    if (alerts.some((a) => a.severity === 'critical')) {
+      recommendations.push('Immediate review of critical alerts required — assign responsible teams');
+    }
+    if (alerts.some((a) => a.type === 'deadline_approaching')) {
+      recommendations.push('Prepare compliance documentation for approaching deadlines');
+    }
+    if (alerts.some((a) => a.type === 'strategic_opportunity')) {
+      recommendations.push('Evaluate strategic opportunities for business development potential');
+    }
+
+    return recommendations;
+  }
+
+  private assessActivityLevel(regulationCount: number): 'increasing' | 'stable' | 'decreasing' {
+    if (regulationCount > 5) return 'increasing';
+    if (regulationCount < 2) return 'decreasing';
+    return 'stable';
+  }
+
+  private identifyDominantSectors(regulations: RegulationData[]): string[] {
+    const sectorCount: Record<string, number> = {};
+
+    for (const reg of regulations) {
+      for (const sector of reg.affectedSectors ?? []) {
+        sectorCount[sector] = (sectorCount[sector] ?? 0) + 1;
+      }
+    }
+
+    return Object.entries(sectorCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 3)
+      .map(([sector]) => sector);
+  }
+
+  private async identifyDailyThemes(regulations: RegulationData[]): Promise<string[]> {
+    const themes = new Set<string>();
+
+    for (const reg of regulations) {
+      const content = `${reg.title} ${reg.description}`.toLowerCase();
+      if (content.includes('environment') || content.includes('climate'))    themes.add('environmental_compliance');
+      if (content.includes('digital')     || content.includes('technology')) themes.add('digital_transformation');
+      if (content.includes('financial')   || content.includes('reporting'))  themes.add('financial_transparency');
+      if (content.includes('public')      || content.includes('citizen'))    themes.add('citizen_engagement');
+      if (content.includes('data')        || content.includes('privacy'))    themes.add('data_privacy');
+    }
+
+    return Array.from(themes);
+  }
+
+  private async storeMonitoringReport(report: MonitoringReport): Promise<void> {
+    try {
+      const cacheKey = `${MONITORING_CACHE_KEYS.MONITORING_REPORTS}:${report.reportType}:${report.id}`;
+      await cacheService.set(cacheKey, report, MONITORING_CACHE_TTL.WEEK);
+    } catch (error) {
+      logger.error(
+        { component: COMPONENT, error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined },
+        'Error storing monitoring report',
+      );
+    }
+  }
 
   private calculateUpdateSeverity(regulation: RegulationData): 'info' | 'warning' | 'critical' {
-    // Determine severity based on regulation characteristics
-    const hasHighImpact = (regulation.estimatedImpact ?? 0) > this.SEVERITY_THRESHOLDS.CRITICAL_IMPACT_SCORE;
-    const affectsMany = (regulation.affectedStakeholders ?? 0) > this.SEVERITY_THRESHOLDS.STAKEHOLDER_COUNT_CRITICAL;
-    
+    const hasHighImpact = (regulation.estimatedImpact      ?? 0) > this.SEVERITY_THRESHOLDS.CRITICAL_IMPACT_SCORE;
+    const affectsMany   = (regulation.affectedStakeholders ?? 0) > this.SEVERITY_THRESHOLDS.STAKEHOLDER_COUNT_CRITICAL;
+
     if (hasHighImpact || affectsMany) return 'critical';
     if ((regulation.estimatedImpact ?? 0) > this.SEVERITY_THRESHOLDS.WARNING_IMPACT_SCORE) return 'warning';
     return 'info';
   }
 }
 
-// Export singleton instance
+// ============================================================================
+// SINGLETON EXPORT
+// ============================================================================
+
 export const regulatoryChangeMonitoringService = new RegulatoryChangeMonitoringService();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

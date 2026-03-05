@@ -8,25 +8,16 @@
  * @deprecated Use conflictDetectionOrchestratorService from './conflict-detection/index' instead
  */
 
-import { logger } from '@server/infrastructure/observability';
-
 import {
   ConflictAnalysis,
-  ConflictDetectionConfig,
-  ConflictDetectionError,
   conflictDetectionOrchestratorService,
-  FinancialConflict,
-  ProfessionalConflict,
   Stakeholder,
-  VotingAnomaly} from '../conflict-detection/index';
+  ConflictDetectionError
+} from '../conflict-detection/index';
 
 // Re-export types for backward compatibility
 export type {
   ConflictAnalysis,
-  FinancialConflict,
-  ProfessionalConflict,
-  VotingAnomaly,
-  ConflictDetectionConfig,
   Stakeholder
 } from '../conflict-detection/index';
 

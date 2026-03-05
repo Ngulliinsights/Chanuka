@@ -1,4 +1,4 @@
-import { AnalysisResult } from '@shared/analysis/types/index';
+import { AnalysisResult } from '@server/features/analysis/types';
 import { logger } from '@server/infrastructure/observability';
 import { spawn } from 'child_process';
 import path from 'path';
@@ -171,7 +171,10 @@ export class LegalAnalysisService {
     const executing: Promise<void>[] = [];
 
     for (let i = 0; i < texts.length; i++) {
-      const promise = this.analyzeDocument(texts[i])
+      const text = texts[i];
+      if (!text) continue; // Skip undefined/null entries
+      
+      const promise = this.analyzeDocument(text)
         .then(result => {
           results[i] = result;
         })
@@ -187,7 +190,8 @@ export class LegalAnalysisService {
         await Promise.race(executing);
         // Remove completed promises to maintain the concurrency limit
         for (let j = executing.length - 1; j >= 0; j--) {
-          if (await this.isPromiseSettled(executing[j])) {
+          const executingPromise = executing[j];
+          if (executingPromise && await this.isPromiseSettled(executingPromise)) {
             executing.splice(j, 1);
           }
         }
@@ -217,7 +221,7 @@ export class LegalAnalysisService {
    */
   private isValidAnalysisResult(result: unknown): result is AnalysisResult {
     // Basic structural validation - adapt this based on your AnalysisResult interface
-    return result && typeof result === 'object';
+    return !!(result && typeof result === 'object');
   }
 
   /**
@@ -249,7 +253,7 @@ export class LegalAnalysisService {
   async shutdown(): Promise<void> {
     // Currently no persistent resources to clean up
     // This method is here for future extensibility
-    logger.info('LegalAnalysisService shutting down gracefully', { component: 'Chanuka' });
+    logger.info({ component: 'LegalAnalysisService' }, 'Shutting down gracefully');
   }
 }
 

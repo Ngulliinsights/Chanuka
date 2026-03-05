@@ -19,6 +19,10 @@ export type { BillServices } from './bill.factory';
 export { BillService, billService } from './application/bill-service';
 export { BillServiceAdapter } from './application/bill-service-adapter';
 
+// Integration Components (NEW - Cross-Feature Integration)
+export { billIntegrationOrchestrator, BillIntegrationOrchestrator } from './application/bill-integration-orchestrator';
+export { billLifecycleHooks, BillLifecycleHooks } from './application/bill-lifecycle-hooks';
+
 // Domain
 export { BillRepository } from './domain/repositories/bill.repository';
 export { BillDomainService } from './domain/services/bill.domain.service';

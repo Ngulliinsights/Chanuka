@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 4, 2026 at 08:51 PM
+**Generated:** March 5, 2026 at 07:23 AM
 **Max Depth:** 7 levels
-**Total Items:** 3,937
+**Total Items:** 3,972
 
 ```
 .
@@ -172,8 +172,16 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── api/
-│   │   │   │   └── pages/
-│   │   │   │       └── api-access.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useApiDocumentation.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── api-access.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── api-documentation.ts
+│   │   │   │   ├── types/
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── argument-intelligence/
 │   │   │   │   ├── api/
 │   │   │   │   │   └── argument-intelligence-api.ts
@@ -395,7 +403,12 @@
 │   │   │   │   │   └── LegalAnalysisTab.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── market/
-│   │   │   │   ├── pages/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useMarket.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── market.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   └── SokoHaki.tsx
 │   │   │   ├── monitoring/
 │   │   │   │   ├── api/
@@ -431,14 +444,25 @@
 │   │   │   │   └── model/
 │   │   │   │       └── index.ts
 │   │   │   ├── notifications/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useNotifications.ts
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── notification-service.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── notifications.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── onboarding/
-│   │   │   │   └── pages/
-│   │   │   │       ├── civic-education.tsx
-│   │   │   │       └── onboarding.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useOnboarding.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   ├── civic-education.tsx
+│   │   │   │   │   └── onboarding.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── onboarding.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── pretext-detection/
 │   │   │   │   ├── api/
 │   │   │   │   │   └── pretext-detection-api.ts
@@ -461,10 +485,6 @@
 │   │   │   ├── privacy/
 │   │   │   │   └── pages/
 │   │   │   │       └── privacy-center.tsx
-│   │   │   ├── realtime/
-│   │   │   │   ├── model/
-│   │   │   │   │   └── index.ts
-│   │   │   │   └── index.ts
 │   │   │   ├── recommendation/
 │   │   │   │   ├── api/
 │   │   │   │   │   └── recommendation-api.ts
@@ -515,11 +535,23 @@
 │   │   │   │   │   └── security-demo.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── sitemap/
-│   │   │   │   └── pages/
-│   │   │   │       └── sitemap.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useSitemap.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── sitemap.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── sitemap.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── status/
-│   │   │   │   └── pages/
-│   │   │   │       └── system-status.tsx
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useSystemStatus.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── system-status.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── status.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── users/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -3909,6 +3941,7 @@
 ├── Dockerfile
 ├── Dockerfile.client
 ├── drizzle.config.ts
+├── eslint-report.json
 ├── FEATURES_AUDIT.md
 ├── FINAL_AUDIT_RECOMMENDATION.md
 ├── generate-structure.mjs
@@ -3931,6 +3964,7 @@
 ├── README_INTEGRATION.md
 ├── README.md
 ├── REALTIME_WEBSOCKET_AUDIT.md
+├── SECURITY_INCIDENT_RESPONSE.md
 ├── SECURITY_REPORT.md
 ├── SECURITY_STATUS.md
 ├── start-dev.js
@@ -3938,6 +3972,7 @@
 ├── test-results.txt
 ├── test-vite.cjs
 ├── test-vite.js
+├── tsc-errors.txt
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json
