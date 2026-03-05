@@ -9,8 +9,6 @@ import { Toaster } from '@client/lib/design-system';
 import { LoadingStates } from '@client/lib/ui/loading/LoadingStates';
 import { logger } from '@client/lib/utils/logger';
 import { FeedbackWidget } from '@client/lib/ui/feedback/FeedbackWidget';
-import { OnboardingTrigger } from '@client/features/onboarding/components/OnboardingTrigger';
-
 function App() {
   useEffect(() => {
     logger.info('🚀 Client Application Initialized');
@@ -27,7 +25,6 @@ function App() {
         </AppShell>
         <Toaster />
         <FeedbackWidget position="bottom-right" />
-        <OnboardingTrigger />
       </ErrorBoundary>
     </AppProviders>
   );

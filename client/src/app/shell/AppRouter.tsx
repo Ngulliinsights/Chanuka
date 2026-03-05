@@ -4,6 +4,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ErrorBoundary } from '@client/infrastructure/error/components';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { logger } from '@client/lib/utils/logger';
+import { OnboardingTrigger } from '@client/features/onboarding/components/OnboardingTrigger';
 
 import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute';
 
@@ -705,6 +706,7 @@ export function AppRouter() {
 
   return (
     <ErrorBoundary onError={handleRouteError}>
+      <OnboardingTrigger />
       <Routes>{routeElements}</Routes>
     </ErrorBoundary>
   );
