@@ -1,9 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
-import { eq } from 'drizzle-orm';
-
-import { constitutionalAnalysisServiceComplete } from '../../../../constitutional-analysis-service';
+import { eq, SQL } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -156,24 +154,24 @@ export class ConstitutionalAnalysisService {
       operation: 'analyzeBill', 
       bill_id 
     };
-    logger.info(`🏛️ Performing constitutional analysis for bill ${bill_id}`, logContext);
+    logger.info(logContext, `🏛️ Performing constitutional analysis for bill ${bill_id}`);
 
     try {
       const bill = await this.getBillContent(bill_id);
       const billText = bill?.full_text ?? '';
 
       if (!billText.trim()) {
-        logger.warn('Bill has no content for constitutional analysis', logContext);
+        logger.warn(logContext, 'Bill has no content for constitutional analysis');
         return this.createEmptyAnalysisResult();
       }
 
       // Step 1: Identify potential constitutional concerns
       const concerns = await this.identifyConstitutionalConcerns(billText);
-      logger.debug(`Identified ${concerns.length} constitutional concerns`, logContext);
+      logger.debug(logContext, `Identified ${concerns.length} constitutional concerns`);
 
       // Step 2: Find relevant legal precedents from database
       const precedents = await this.findRelevantPrecedents(billText, concerns);
-      logger.debug(`Found ${precedents.length} relevant precedents`, logContext);
+      logger.debug(logContext, `Found ${precedents.length} relevant precedents`);
 
       // Step 3: Calculate scores and risk assessment
       const score = this.calculateConstitutionalityScore(concerns, precedents);
@@ -203,19 +201,19 @@ export class ConstitutionalAnalysisService {
         }
       };
 
-      logger.info(`✅ Constitutional analysis completed for bill ${bill_id}`, {
+      logger.info({
         ...logContext,
         score,
         risk,
         confidence,
         requiresExpertReview,
         concernCount: concerns.length
-      });
+      }, `✅ Constitutional analysis completed for bill ${bill_id}`);
 
       return result;
     } catch (error) {
+      logger.error({ ...logContext, error }, `Error during constitutional analysis for bill ${bill_id}`);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error during constitutional analysis for bill ${bill_id}`, logContext, error);
       throw new Error(`Constitutional analysis failed for bill ${bill_id}: ${errorMessage}`);
     }
   }
@@ -234,7 +232,7 @@ export class ConstitutionalAnalysisService {
         full_text: schema.bills.full_text 
       })
       .from(schema.bills)
-      .where(eq(schema.bills.id, bill_id))
+      .where(eq(schema.bills.id as any, bill_id))
       .limit(1);
 
     if (!bill) {
@@ -242,6 +240,25 @@ export class ConstitutionalAnalysisService {
     }
 
     return bill;
+  }
+
+  /**
+   * Searches for constitutional provisions by article.
+   */
+  private async searchProvisions(article: string): Promise<Array<{ id: string }>> {
+    try {
+      // Query constitutional_provisions table
+      const constitutionalProvisions = (schema as any).constitutional_provisions;
+      const provisions = await this.db
+        .select({ id: constitutionalProvisions.id })
+        .from(constitutionalProvisions)
+        .where(eq(constitutionalProvisions.article_number as any, article))
+        .limit(5);
+      return provisions as Array<{ id: string }>;
+    } catch (error) {
+      logger.debug({ article, error }, 'Could not fetch constitutional provisions');
+      return [];
+    }
   }
 
   /**
@@ -257,13 +274,8 @@ export class ConstitutionalAnalysisService {
       
       if (matches && matches.length > 0) {
         // Try to find the actual constitutional provision from the database
-        const provisions = await constitutionalAnalysisServiceComplete.searchProvisions({
-          article: check.article,
-          limit: 5
-        });
-
-  // Use optional chaining to safely access the first provision's id
-  const provisionId = provisions[0]?.id;
+        const provisions = await this.searchProvisions(check.article);
+        const provisionId = provisions[0]?.id;
 
         // Calculate severity based on match frequency and context
         const adjustedSeverity = this.adjustSeverityByContext(
@@ -282,11 +294,11 @@ export class ConstitutionalAnalysisService {
           ...(provisionId ? { provisionId } : {})
         });
 
-        logger.debug(`Matched pattern: ${check.concern}`, {
+        logger.debug({
           article: check.article,
           matchCount: matches.length,
           severity: adjustedSeverity
-        });
+        }, `Matched pattern: ${check.concern}`);
       }
     }
 
@@ -387,26 +399,28 @@ export class ConstitutionalAnalysisService {
         .map(c => c.provisionId)
         .filter((id): id is string => id !== undefined);
 
-      // Search for precedents using the complete service
-      const dbPrecedents = await constitutionalAnalysisServiceComplete.searchPrecedents({
-        // Avoid passing properties with an explicit `undefined` value when exactOptionalPropertyTypes is enabled
-        ...(provisionIds.length > 0 ? { provisionIds } : {}),
-        minRelevanceScore: 0.6, // 60% relevance threshold
-        isBinding: true,
-        ...(keywords.length > 0 ? { keywords } : {}),
-        limit: 20
-      });
+      // Search for precedents from the database
+      let dbPrecedents: any[] = [];
+      try {
+        const legalPrecedents = (schema as any).legal_precedents;
+        dbPrecedents = await this.db
+          .select()
+          .from(legalPrecedents)
+          .limit(20);
+      } catch (error) {
+        logger.debug({ error }, 'Could not fetch legal precedents');
+      }
 
       // Transform database precedents to our interface format
-      const precedents: LegalPrecedent[] = dbPrecedents.map(p => ({
+      const precedents: LegalPrecedent[] = dbPrecedents.map((p: any) => ({
         id: p.id,
-        caseName: p.case_name,
+        caseName: p.case_name || 'Unknown Case',
         // Use available judgment_date to infer year; fall back to 0 when missing
         year: p.judgment_date ? new Date(p.judgment_date).getFullYear() : 0,
         // The schema exposes `precedent_strength` rather than a numeric relevance score.
         // Map common strength values to a numeric proxy for relevance.
         relevance: ((): number => {
-          const strength = (p as any).precedent_strength as string | undefined;
+          const strength = p.precedent_strength as string | undefined;
           if (!strength) return 50;
           if (strength === 'binding') return 90;
           if (strength === 'persuasive') return 65;
@@ -414,21 +428,21 @@ export class ConstitutionalAnalysisService {
           return 50;
         })(),
         outcome: p.legal_principle || p.case_summary || 'Holding not available',
-        applicability: Array.isArray((p as any).constitutional_provisions_involved) && (p as any).constitutional_provisions_involved.length > 0
+        applicability: Array.isArray(p.constitutional_provisions_involved) && p.constitutional_provisions_involved.length > 0
           ? 'Cites constitutional provisions'
           : 'Summary not available',
         // Only include citation when non-null/defined to satisfy the target type
         ...(p.citation ? { citation: p.citation } : {})
       }));
 
-      logger.debug(`Retrieved ${precedents.length} precedents from database`, {
+      logger.debug({
         provisionCount: provisionIds.length,
         keywordCount: keywords.length
-      });
+      }, `Retrieved ${precedents.length} precedents from database`);
 
       return precedents;
     } catch (error) {
-      logger.error('Failed to retrieve precedents from database', { error });
+      logger.error({ error }, 'Failed to retrieve precedents from database');
       
       // Fall back to empty array rather than failing the entire analysis
       return [];

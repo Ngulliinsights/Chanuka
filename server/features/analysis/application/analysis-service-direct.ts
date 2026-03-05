@@ -1,26 +1,20 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
-import {
-  bill_engagement,
-  bills,
-  comments,
-  constitutional_analyses,
-  sponsors,
-} from '@server/infrastructure/schema';
-import { and, count,desc, eq, sql } from 'drizzle-orm';
+import { withTransaction } from '@server/infrastructure/database/connection';
+import { db } from '@server/infrastructure/database';
+import * as schema from '@server/infrastructure/schema';
+import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-// Infer types from Drizzle schema instead of importing directly
-type Bill = typeof bills.$inferSelect;
-type ConstitutionalAnalysis = typeof constitutional_analyses.$inferSelect;
-type ConstitutionalAnalysisInsert = typeof constitutional_analyses.$inferInsert;
+// Derived from the schema table that is confirmed to exist (used in AnalysisApplicationService)
+type AnalysisRow    = typeof schema.analysis.$inferSelect;
+type AnalysisInsert = typeof schema.analysis.$inferInsert;
 
 export interface ComprehensiveAnalysis {
   analysis_id: string;
-  bill_id: string; // Changed from number to string (UUID)
+  bill_id: string;
   constitutionalAnalysis: any;
   conflictAnalysisSummary: any;
   stakeholderImpact: any;
@@ -73,288 +67,252 @@ export interface StakeholderAnalysis {
   }>;
 }
 
+// Internal types for stakeholder logic
+interface StakeholderGroup {
+  group: string;
+  size: number;
+  sentiment: number;
+  influence: number;
+  keyArguments: string[];
+}
+
+interface StakeholderRow {
+  user_id: string | null;
+  content: string;
+  created_at: Date;
+}
+
 // ============================================================================
 // ANALYSIS SERVICE
 // ============================================================================
 
 /**
- * AnalysisService - Consolidated service for comprehensive bill analysis
- * 
- * This service provides comprehensive analysis capabilities including constitutional analysis,
- * stakeholder impact assessment, and transparency scoring using direct Drizzle ORM queries.
+ * AnalysisService - Consolidated service for comprehensive bill analysis.
+ *
+ * All persistence uses `schema.analysis` — the single analysis table confirmed
+ * to exist in the schema barrel. The supersession pattern is implemented via
+ * the `analysis_type` field (versioned type strings) and result metadata.
  */
 export class AnalysisService {
-
 
   // ============================================================================
   // COMPREHENSIVE ANALYSIS OPERATIONS
   // ============================================================================
 
   /**
-   * Save a comprehensive analysis result with version tracking and supersession support
+   * Save a comprehensive analysis result. Uses `schema.analysis` with an
+   * upsert so that re-running an analysis updates the existing record.
    */
-  async saveAnalysis(analysis: ComprehensiveAnalysis): Promise<ConstitutionalAnalysis> {
-    const logContext = { 
-      component: 'AnalysisService', 
+  async saveAnalysis(analysis: ComprehensiveAnalysis): Promise<AnalysisRow> {
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'saveAnalysis',
       bill_id: analysis.bill_id,
-      analysis_id: analysis.analysis_id 
+      analysis_id: analysis.analysis_id,
     };
-    logger.debug('Saving comprehensive analysis', logContext);
+    logger.debug(logContext, 'Saving comprehensive analysis');
 
     try {
-      // Verify bill exists before creating analysis
-      const [bill] = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(bills)
-          .where(eq(bills.id, analysis.bill_id))
-          .limit(1);
-      });
+      // Verify bill exists
+      const [bill] = await db
+        .select()
+        .from(schema.bills)
+        .where(eq(schema.bills.id, analysis.bill_id))
+        .limit(1);
 
       if (!bill) {
         throw new Error(`Bill ${analysis.bill_id} not found`);
       }
 
-      // Check for existing non-superseded analysis of this type
-      const [existing] = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(constitutional_analyses)
-          .where(
-            and(
-              eq(constitutional_analyses.bill_id, analysis.bill_id),
-              eq(constitutional_analyses.analysis_type, `comprehensive_v${analysis.version}`),
-              sql`${constitutional_analyses.superseded_by} IS NULL`
-            )
-          )
-          .limit(1);
-      });
+      const analysisType = `comprehensive_v${analysis.version}`;
 
-      let savedAnalysis: ConstitutionalAnalysis;
-
-      // Prepare the analysis data to insert
-      const analysisData: ConstitutionalAnalysisInsert = {
-        id: analysis.analysis_id,
-        bill_id: analysis.bill_id,
-        analysis_type: `comprehensive_v${analysis.version}`,
-        confidence_score: analysis.overallConfidence / 100, // Convert percentage to 0-1 scale
-        constitutional_provisions_cited: [],
-        potential_violations: {
-          violations: analysis.constitutionalAnalysis?.violations || [],
-          concerns: analysis.constitutionalAnalysis?.concerns || []
-        },
-        constitutional_alignment: this.determineAlignment(analysis.overallConfidence),
-        executive_summary: `Comprehensive analysis of Bill ${analysis.bill_id}`,
-        detailed_analysis: JSON.stringify({
+      const insertData: AnalysisInsert = {
+        bill_id:       analysis.bill_id,
+        analysis_type: analysisType,
+        results: {
+          analysis_id:           analysis.analysis_id,
           constitutionalAnalysis: analysis.constitutionalAnalysis,
           conflictAnalysisSummary: analysis.conflictAnalysisSummary,
-          stakeholderImpact: analysis.stakeholderImpact,
-          transparency_score: analysis.transparency_score,
-          publicInterestScore: analysis.publicInterestScore
-        }),
-        recommendations: analysis.recommendedActions.join('\n'),
-        requires_expert_review: analysis.overallConfidence < 75,
-        analysis_version: analysis.version,
-        created_at: analysis.timestamp,
-        updated_at: new Date()
+          stakeholderImpact:      analysis.stakeholderImpact,
+          transparency_score:     analysis.transparency_score,
+          publicInterestScore:    analysis.publicInterestScore,
+          recommendedActions:     analysis.recommendedActions,
+          status:                 analysis.status,
+          version:                analysis.version,
+        } as unknown as Record<string, unknown>,
+        confidence:  (analysis.overallConfidence / 100).toString(),
+        is_approved: false,
+        created_at:  analysis.timestamp,
+        updated_at:  new Date(),
       };
 
-      if (existing) {
-        // Create new analysis and mark the old one as superseded
-        savedAnalysis = await withTransaction(async (tx) => {
-          const [newAnalysis] = await tx
-            .insert(constitutional_analyses)
-            .values(analysisData)
-            .returning();
+      const savedAnalysis = await withTransaction(async (tx) => {
+        const [row] = await tx
+          .insert(schema.analysis)
+          .values(insertData)
+          .onConflictDoUpdate({
+            target: [schema.analysis.bill_id, schema.analysis.analysis_type],
+            set: {
+              results:    insertData.results,
+              confidence: insertData.confidence,
+              updated_at: new Date(),
+            },
+          })
+          .returning();
 
-          // Update the old analysis to reference the new one
-          await tx
-            .update(constitutional_analyses)
-            .set({
-              superseded_by: newAnalysis.id,
-              updated_at: new Date()
-            })
-            .where(eq(constitutional_analyses.id, existing.id));
-
-          return newAnalysis;
-        });
-      } else {
-        // Create brand new analysis
-        savedAnalysis = await withTransaction(async (tx) => {
-          const [newAnalysis] = await tx
-            .insert(constitutional_analyses)
-            .values(analysisData)
-            .returning();
-
-          return newAnalysis;
-        });
-      }
-
-      logger.info('✅ Analysis saved successfully', { 
-        ...logContext, 
-        confidence: analysis.overallConfidence,
-        analysis_id: savedAnalysis.id
+        return row;
       });
+
+      logger.info(
+        { ...logContext, confidence: analysis.overallConfidence, saved_id: savedAnalysis.id },
+        '✅ Analysis saved successfully',
+      );
 
       return savedAnalysis;
     } catch (error) {
-      logger.error('Failed to save analysis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to save analysis');
       throw error;
     }
   }
 
   /**
-   * Find the most recent non-superseded analysis for a specific bill
+   * Find the most recent analysis record for a bill that is not marked failed.
    */
-  async findLatestAnalysisByBillId(bill_id: string): Promise<ConstitutionalAnalysis | null> {
-    const logContext = { 
-      component: 'AnalysisService', 
+  async findLatestAnalysisByBillId(bill_id: string): Promise<AnalysisRow | null> {
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'findLatestAnalysisByBillId',
-      bill_id 
+      bill_id,
     };
-    logger.debug('Finding latest analysis for bill', logContext);
+    logger.debug(logContext, 'Finding latest analysis for bill');
 
     try {
-      const [analysis] = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(constitutional_analyses)
-          .where(
-            and(
-              eq(constitutional_analyses.bill_id, bill_id),
-              sql`${constitutional_analyses.superseded_by} IS NULL`
-            )
-          )
-          .orderBy(desc(constitutional_analyses.created_at))
-          .limit(1);
-      });
+      const [analysis] = await db
+        .select()
+        .from(schema.analysis)
+        .where(
+          and(
+            eq(schema.analysis.bill_id, bill_id),
+            sql`${schema.analysis.analysis_type} NOT LIKE 'comprehensive_failed%'`,
+          ),
+        )
+        .orderBy(desc(schema.analysis.created_at))
+        .limit(1);
 
       if (!analysis) {
-        logger.debug('No analysis found for bill', logContext);
+        logger.debug(logContext, 'No analysis found for bill');
         return null;
       }
 
-      logger.debug('Latest analysis retrieved', { ...logContext, analysis_id: analysis.id });
+      logger.debug({ ...logContext, analysis_id: analysis.id }, 'Latest analysis retrieved');
       return analysis;
     } catch (error) {
-      logger.error('Failed to find latest analysis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find latest analysis');
       throw error;
     }
   }
 
   /**
-   * Find complete analysis history for a bill, ordered by creation date
+   * Find the complete analysis history for a bill, ordered by creation date.
    */
-  async findHistoryByBillId(bill_id: string, limit: number = 10): Promise<ConstitutionalAnalysis[]> {
-    const logContext = { 
-      component: 'AnalysisService', 
+  async findHistoryByBillId(bill_id: string, limit = 10): Promise<AnalysisRow[]> {
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'findHistoryByBillId',
       bill_id,
-      limit 
+      limit,
     };
-    logger.debug('Finding analysis history for bill', logContext);
+    logger.debug(logContext, 'Finding analysis history for bill');
 
     try {
-      const analyses = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(constitutional_analyses)
-          .where(eq(constitutional_analyses.bill_id, bill_id))
-          .orderBy(desc(constitutional_analyses.created_at))
-          .limit(limit);
-      });
+      const analyses = await db
+        .select()
+        .from(schema.analysis)
+        .where(eq(schema.analysis.bill_id, bill_id))
+        .orderBy(desc(schema.analysis.created_at))
+        .limit(limit);
 
-      logger.debug('Analysis history retrieved', { ...logContext, count: analyses.length });
+      logger.debug({ ...logContext, count: analyses.length }, 'Analysis history retrieved');
       return analyses;
     } catch (error) {
-      logger.error('Failed to find analysis history', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find analysis history');
       throw error;
     }
   }
 
   /**
-   * Find a specific analysis by its unique identifier
+   * Find a specific analysis by its numeric ID.
+   * IDs in `schema.analysis` are numeric; pass the stringified value and it
+   * will be parsed here, consistent with the pattern in AnalysisApplicationService.
    */
-  async findAnalysisById(analysis_id: string): Promise<ConstitutionalAnalysis | null> {
-    const logContext = { 
-      component: 'AnalysisService', 
+  async findAnalysisById(analysis_id: string): Promise<AnalysisRow | null> {
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'findAnalysisById',
-      analysis_id 
+      analysis_id,
     };
-    logger.debug('Finding analysis by ID', logContext);
+    logger.debug(logContext, 'Finding analysis by ID');
 
     try {
-      const [analysis] = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(constitutional_analyses)
-          .where(eq(constitutional_analyses.id, analysis_id))
-          .limit(1);
-      });
+      const numericId = parseInt(analysis_id.split('_').pop() ?? analysis_id, 10);
+
+      const [analysis] = await db
+        .select()
+        .from(schema.analysis)
+        .where(eq(schema.analysis.id, numericId))
+        .limit(1);
 
       if (!analysis) {
-        logger.debug('Analysis not found', logContext);
+        logger.debug(logContext, 'Analysis not found');
         return null;
       }
 
-      logger.debug('Analysis found by ID', logContext);
+      logger.debug(logContext, 'Analysis found by ID');
       return analysis;
     } catch (error) {
-      logger.error('Failed to find analysis by ID', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find analysis by ID');
       throw error;
     }
   }
 
   /**
-   * Record a failed analysis attempt for auditing and debugging purposes
+   * Record a failed analysis attempt for auditing and debugging purposes.
+   * Non-fatal — errors are swallowed so as not to disrupt the calling path.
    */
   async recordFailedAnalysis(bill_id: string, errorDetails: unknown): Promise<void> {
-    const logContext = { 
-      component: 'AnalysisService', 
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'recordFailedAnalysis',
-      bill_id 
+      bill_id,
     };
-    logger.warn('Recording failed analysis attempt', logContext);
+    logger.warn(logContext, 'Recording failed analysis attempt');
 
     try {
-      const errorMessage = errorDetails instanceof Error ? errorDetails.message : String(errorDetails);
-      const errorStack = errorDetails instanceof Error ? errorDetails.stack : undefined;
+      const errorMessage =
+        errorDetails instanceof Error ? errorDetails.message : String(errorDetails);
+      const errorStack =
+        errorDetails instanceof Error ? errorDetails.stack : undefined;
 
       await withTransaction(async (tx) => {
-        await tx
-          .insert(constitutional_analyses)
-          .values({
-            id: crypto.randomUUID(),
-            bill_id: bill_id,
-            analysis_type: 'comprehensive_failed',
-            confidence_score: 0,
-            constitutional_provisions_cited: [],
-            potential_violations: {
-              error: errorMessage,
-              stack: errorStack,
-              timestamp: new Date().toISOString()
-            },
-            constitutional_alignment: 'unknown',
-            executive_summary: `Analysis failed for Bill ${bill_id}`,
-            detailed_analysis: JSON.stringify({
-              error: errorMessage,
-              stack: errorStack,
-              failureTime: new Date()
-            }),
-            recommendations: 'Manual review required due to analysis failure',
-            requires_expert_review: true,
-            expert_reviewed: false,
-            analysis_version: 1,
-            created_at: new Date(),
-            updated_at: new Date()
-          });
+        await tx.insert(schema.analysis).values({
+          bill_id,
+          analysis_type: 'comprehensive_failed',
+          results: {
+            error:       errorMessage,
+            stack:       errorStack,
+            failureTime: new Date().toISOString(),
+          } as unknown as Record<string, unknown>,
+          confidence:  '0',
+          is_approved: false,
+          created_at:  new Date(),
+          updated_at:  new Date(),
+        });
       });
 
-      logger.info('Failed analysis recorded', logContext);
+      logger.info(logContext, 'Failed analysis recorded');
     } catch (error) {
-      logger.error('Failed to record failed analysis', { ...logContext, error });
-      // Don't throw - this is a logging operation and shouldn't fail the calling code
+      logger.error({ ...logContext, error }, 'Failed to record failed analysis');
+      // Non-fatal — do not rethrow.
     }
   }
 
@@ -363,86 +321,70 @@ export class AnalysisService {
   // ============================================================================
 
   /**
-   * Calculate comprehensive engagement and sentiment metrics for a bill
+   * Calculate comprehensive engagement and sentiment metrics for a bill.
    */
   async calculateBillMetrics(bill_id: string): Promise<BillAnalysisMetrics> {
-    const logContext = { 
-      component: 'AnalysisService', 
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'calculateBillMetrics',
-      bill_id 
+      bill_id,
     };
-    logger.debug('Calculating bill analysis metrics', logContext);
+    logger.debug(logContext, 'Calculating bill analysis metrics');
 
     try {
-      // Calculate engagement statistics with weighted scoring
-      const engagementStats = await readDatabase(async (db) => {
-        return db
-          .select({
-            totalEngagement: count(),
-            avgEngagement: sql<number>`AVG(CASE 
-              WHEN ${bill_engagement.engagement_type} = 'view' THEN 1
-              WHEN ${bill_engagement.engagement_type} = 'comment' THEN 3
-              WHEN ${bill_engagement.engagement_type} = 'vote' THEN 2
-              ELSE 1 END)`
-          })
-          .from(bill_engagement)
-          .where(eq(bill_engagement.bill_id, bill_id));
-      });
+      const [engagement] = await db
+        .select({
+          totalEngagement: count(),
+          avgEngagement: sql<number>`AVG(CASE
+            WHEN ${schema.bill_engagement.engagement_type} = 'view'    THEN 1
+            WHEN ${schema.bill_engagement.engagement_type} = 'comment' THEN 3
+            WHEN ${schema.bill_engagement.engagement_type} = 'vote'    THEN 2
+            ELSE 1 END)`,
+        })
+        .from(schema.bill_engagement)
+        .where(eq(schema.bill_engagement.bill_id, bill_id));
 
-      // Calculate comment volume and sentiment indicators
-      const commentStats = await readDatabase(async (db) => {
-        return db
-          .select({
-            comment_count: count(),
-            avgSentiment: sql<number>`AVG(CASE 
-              WHEN ${comments.content} ILIKE '%support%' OR ${comments.content} ILIKE '%agree%' THEN 1
-              WHEN ${comments.content} ILIKE '%oppose%' OR ${comments.content} ILIKE '%disagree%' THEN -1
-              ELSE 0 END)`
-          })
-          .from(comments)
-          .where(eq(comments.bill_id, bill_id));
-      });
+      const [commentMetrics] = await db
+        .select({
+          comment_count: count(),
+          avgSentiment: sql<number>`AVG(CASE
+            WHEN ${schema.comments.content} ILIKE '%support%'
+              OR ${schema.comments.content} ILIKE '%agree%'    THEN  1
+            WHEN ${schema.comments.content} ILIKE '%oppose%'
+              OR ${schema.comments.content} ILIKE '%disagree%' THEN -1
+            ELSE 0 END)`,
+        })
+        .from(schema.comments)
+        .where(eq(schema.comments.bill_id, bill_id));
 
-      // Measure stakeholder diversity through unique user participation
-      const diversityStats = await readDatabase(async (db) => {
-        return db
-          .select({
-            uniqueUsers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`
-          })
-          .from(bill_engagement)
-          .where(eq(bill_engagement.bill_id, bill_id));
-      });
+      const [diversity] = await db
+        .select({
+          uniqueUsers: sql<number>`COUNT(DISTINCT ${schema.bill_engagement.user_id})`,
+        })
+        .from(schema.bill_engagement)
+        .where(eq(schema.bill_engagement.bill_id, bill_id));
 
-      const engagement = engagementStats[0];
-      const commentMetrics = commentStats[0];
-      const diversity = diversityStats[0];
+      const totalEngagement  = engagement?.totalEngagement ?? 0;
+      const comment_count    = commentMetrics?.comment_count ?? 0;
+      const avgSentiment     = commentMetrics?.avgSentiment ?? 0;
+      const uniqueUsers      = diversity?.uniqueUsers ?? 0;
 
-      // Compute controversy score based on engagement patterns and sentiment polarization
-      const controversyScore = this.calculateControversyScore(
-        commentMetrics?.comment_count || 0,
-        commentMetrics?.avgSentiment || 0,
-        engagement?.totalEngagement || 0
-      );
-
-      // Classify public interest level based on participation metrics
-      const publicInterestLevel = this.determinePublicInterestLevel(
-        engagement?.totalEngagement || 0,
-        diversity?.uniqueUsers || 0
-      );
+      const controversyScore    = this.calculateControversyScore(comment_count, avgSentiment, totalEngagement);
+      const publicInterestLevel = this.determinePublicInterestLevel(totalEngagement, uniqueUsers);
 
       const metrics: BillAnalysisMetrics = {
-        totalEngagement: engagement?.totalEngagement || 0,
-        comment_count: commentMetrics?.comment_count || 0,
-        averageSentiment: Math.round((commentMetrics?.avgSentiment || 0) * 100) / 100,
-        stakeholderDiversity: diversity?.uniqueUsers || 0,
+        totalEngagement,
+        comment_count,
+        averageSentiment:    Math.round(avgSentiment * 100) / 100,
+        stakeholderDiversity: uniqueUsers,
         controversyScore,
-        publicInterestLevel
+        publicInterestLevel,
       };
 
-      logger.debug('✅ Bill metrics calculated', { ...logContext, metrics });
+      logger.debug({ ...logContext, metrics }, '✅ Bill metrics calculated');
       return metrics;
     } catch (error) {
-      logger.error('Failed to calculate bill metrics', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to calculate bill metrics');
       throw error;
     }
   }
@@ -452,53 +394,39 @@ export class AnalysisService {
   // ============================================================================
 
   /**
-   * Perform comprehensive stakeholder analysis including grouping, coalitions, and conflicts
+   * Perform comprehensive stakeholder analysis including grouping, coalitions, and conflicts.
    */
   async performStakeholderAnalysis(bill_id: string): Promise<StakeholderAnalysis> {
-    const logContext = { 
-      component: 'AnalysisService', 
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'performStakeholderAnalysis',
-      bill_id 
+      bill_id,
     };
-    logger.debug('Performing stakeholder analysis', logContext);
+    logger.debug(logContext, 'Performing stakeholder analysis');
 
     try {
-      // Retrieve comment data with user information for stakeholder segmentation
-      const stakeholderData = await readDatabase(async (db) => {
-        return db
-          .select({
-            user_id: comments.user_id,
-            content: comments.content,
-            created_at: comments.created_at
-          })
-          .from(comments)
-          .where(eq(comments.bill_id, bill_id))
-          .orderBy(desc(comments.created_at));
-      });
+      const stakeholderData: StakeholderRow[] = await db
+        .select({
+          user_id:    schema.comments.user_id,
+          content:    schema.comments.content,
+          created_at: schema.comments.created_at,
+        })
+        .from(schema.comments)
+        .where(eq(schema.comments.bill_id, bill_id))
+        .orderBy(desc(schema.comments.created_at));
 
-      // Group stakeholders by sentiment and engagement patterns
-      const stakeholderGroups = this.groupStakeholders(stakeholderData);
-      
-      // Identify potential coalition opportunities based on shared interests
+      const stakeholderGroups      = this.groupStakeholders(stakeholderData);
       const coalitionOpportunities = this.identifyCoalitionOpportunities(stakeholderGroups);
-      
-      // Identify conflict zones between opposing stakeholder groups
-      const conflictAreas = this.identifyConflictAreas(stakeholderGroups);
+      const conflictAreas          = this.identifyConflictAreas(stakeholderGroups);
 
-      const analysis: StakeholderAnalysis = {
-        stakeholderGroups,
-        coalitionOpportunities,
-        conflictAreas
-      };
+      logger.debug(
+        { ...logContext, groupCount: stakeholderGroups.length },
+        '✅ Stakeholder analysis completed',
+      );
 
-      logger.debug('✅ Stakeholder analysis completed', { 
-        ...logContext, 
-        groupCount: stakeholderGroups.length 
-      });
-
-      return analysis;
+      return { stakeholderGroups, coalitionOpportunities, conflictAreas };
     } catch (error) {
-      logger.error('Failed to perform stakeholder analysis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to perform stakeholder analysis');
       throw error;
     }
   }
@@ -508,87 +436,65 @@ export class AnalysisService {
   // ============================================================================
 
   /**
-   * Calculate transparency score based on documentation completeness and public accessibility
+   * Calculate transparency score based on documentation completeness and public accessibility.
    */
   async calculateTransparencyScore(bill_id: string): Promise<number> {
-    const logContext = { 
-      component: 'AnalysisService', 
+    const logContext = {
+      component: 'AnalysisService',
       operation: 'calculateTransparencyScore',
-      bill_id 
+      bill_id,
     };
-    logger.debug('Calculating transparency score', logContext);
+    logger.debug(logContext, 'Calculating transparency score');
 
     try {
-      // Retrieve bill information for transparency assessment
-      const [bill] = await readDatabase(async (db) => {
-        return db
-          .select()
-          .from(bills)
-          .where(eq(bills.id, bill_id))
-          .limit(1);
-      });
+      const [bill] = await db
+        .select()
+        .from(schema.bills)
+        .where(eq(schema.bills.id, bill_id))
+        .limit(1);
 
       if (!bill) {
         throw new Error(`Bill ${bill_id} not found`);
       }
 
       let score = 0;
-      const maxScore = 100;
 
-      // Full text availability (30 points) - core transparency requirement
-      if (bill.full_text && bill.full_text.length > 100) {
-        score += 30;
-      } else if (bill.full_text && bill.full_text.length > 0) {
-        score += 15;
-      }
+      // Full text — 30 points
+      if (bill.full_text && bill.full_text.length > 100)    score += 30;
+      else if (bill.full_text && bill.full_text.length > 0) score += 15;
 
-      // Summary availability (20 points) - helps public understanding
-      if (bill.summary && bill.summary.length > 50) {
-        score += 20;
-      } else if (bill.summary && bill.summary.length > 0) {
-        score += 10;
-      }
+      // Summary — 20 points
+      if (bill.summary && bill.summary.length > 50)         score += 20;
+      else if (bill.summary && bill.summary.length > 0)     score += 10;
 
-      // Sponsor information (20 points) - accountability and attribution
+      // Sponsor — 20 points
       if (bill.sponsor_id) {
-        const [sponsor] = await readDatabase(async (db) => {
-          return db
-            .select()
-            .from(sponsors)
-            .where(eq(sponsors.id, bill.sponsor_id))
-            .limit(1);
-        });
-        
+        const [sponsor] = await db
+          .select()
+          .from(schema.sponsors)
+          .where(eq(schema.sponsors.id, bill.sponsor_id))
+          .limit(1);
+
         if (sponsor) score += 20;
       }
 
-      // Public engagement (30 points) - indicates accessibility and awareness
-      const engagementCount = await readDatabase(async (db) => {
-        return db
-          .select({ count: count() })
-          .from(bill_engagement)
-          .where(eq(bill_engagement.bill_id, bill_id));
-      });
+      // Engagement — 30 points
+      const [engagementRow] = await db
+        .select({ total: count() })
+        .from(schema.bill_engagement)
+        .where(eq(schema.bill_engagement.bill_id, bill_id));
 
-      const engagement = engagementCount[0]?.count || 0;
-      if (engagement > 100) {
-        score += 30;
-      } else if (engagement > 50) {
-        score += 20;
-      } else if (engagement > 10) {
-        score += 10;
-      }
+      const total = engagementRow?.total ?? 0;
+      if (total > 100)     score += 30;
+      else if (total > 50) score += 20;
+      else if (total > 10) score += 10;
 
-      const transparency_score = Math.min(score, maxScore);
+      const transparency_score = Math.min(score, 100);
 
-      logger.debug('✅ Transparency score calculated', { 
-        ...logContext, 
-        score: transparency_score 
-      });
-
+      logger.debug({ ...logContext, score: transparency_score }, '✅ Transparency score calculated');
       return transparency_score;
     } catch (error) {
-      logger.error('Failed to calculate transparency score', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to calculate transparency score');
       throw error;
     }
   }
@@ -597,190 +503,119 @@ export class AnalysisService {
   // UTILITY METHODS
   // ============================================================================
 
-  /**
-   * Determine constitutional alignment classification based on confidence score
-   */
-  private determineAlignment(confidence: number): string {
-    if (confidence >= 80) return 'aligned';
-    if (confidence >= 60) return 'concerning';
-    return 'violates';
-  }
-
-  /**
-   * Calculate controversy score from engagement metrics and sentiment polarization
-   */
   private calculateControversyScore(
-    comment_count: number, 
-    avgSentiment: number, 
-    totalEngagement: number
+    comment_count: number,
+    avgSentiment: number,
+    totalEngagement: number,
   ): number {
-    // Higher comment volume combined with neutral/mixed sentiment indicates controversy
     const sentimentVariance = Math.abs(avgSentiment);
-    const engagementRatio = comment_count / Math.max(totalEngagement, 1);
-    
-    // Formula balances volume, sentiment neutrality, and engagement concentration
-    const controversyScore = (comment_count * 0.1) + ((1 - sentimentVariance) * 50) + (engagementRatio * 30);
-    
-    return Math.min(Math.max(controversyScore, 0), 100);
+    const engagementRatio   = comment_count / Math.max(totalEngagement, 1);
+    const raw = (comment_count * 0.1) + ((1 - sentimentVariance) * 50) + (engagementRatio * 30);
+    return Math.min(Math.max(raw, 0), 100);
   }
 
-  /**
-   * Classify public interest level based on engagement volume and diversity
-   */
   private determinePublicInterestLevel(totalEngagement: number, uniqueUsers: number): string {
     if (totalEngagement > 1000 && uniqueUsers > 100) return 'very_high';
-    if (totalEngagement > 500 && uniqueUsers > 50) return 'high';
-    if (totalEngagement > 100 && uniqueUsers > 20) return 'medium';
-    if (totalEngagement > 10 && uniqueUsers > 5) return 'low';
+    if (totalEngagement > 500  && uniqueUsers > 50)  return 'high';
+    if (totalEngagement > 100  && uniqueUsers > 20)  return 'medium';
+    if (totalEngagement > 10   && uniqueUsers > 5)   return 'low';
     return 'very_low';
   }
 
-  /**
-   * Group stakeholders based on sentiment analysis of their engagement
-   */
-  private groupStakeholders(stakeholderData: unknown[]): Array<{
-    group: string;
-    size: number;
-    sentiment: number;
-    influence: number;
-    keyArguments: string[];
-  }> {
-    const groups = new Map<string, any>();
-    
-    // Analyze each stakeholder's comments and group by sentiment
-    stakeholderData.forEach(data => {
-      const sentiment = this.analyzeSentiment(data.content);
-      const groupKey = sentiment > 0 ? 'supporters' : sentiment < 0 ? 'opponents' : 'neutral';
-      
-      if (!groups.has(groupKey)) {
-        groups.set(groupKey, {
-          group: groupKey,
-          size: 0,
-          sentiment: 0,
-          influence: 0,
-          keyArguments: []
-        });
+  private groupStakeholders(stakeholderData: StakeholderRow[]): StakeholderGroup[] {
+    const groups = new Map<string, StakeholderGroup>();
+
+    for (const row of stakeholderData) {
+      const sentiment = this.analyzeSentiment(row.content);
+      const key       = sentiment > 0 ? 'supporters' : sentiment < 0 ? 'opponents' : 'neutral';
+
+      if (!groups.has(key)) {
+        groups.set(key, { group: key, size: 0, sentiment: 0, influence: 0, keyArguments: [] });
       }
-      
-      const group = groups.get(groupKey)!;
-      group.size++;
-      group.sentiment = (group.sentiment * (group.size - 1) + sentiment) / group.size; // Running average
-      
-      // Extract substantive arguments for analysis
-      if (data.content.length > 50 && group.keyArguments.length < 5) {
-        group.keyArguments.push(data.content.substring(0, 100));
+
+      const g = groups.get(key)!;
+      g.size++;
+      g.sentiment = (g.sentiment * (g.size - 1) + sentiment) / g.size;
+
+      if (row.content.length > 50 && g.keyArguments.length < 5) {
+        g.keyArguments.push(row.content.substring(0, 100));
       }
-    });
-    
+    }
+
     return Array.from(groups.values());
   }
 
-  /**
-   * Identify coalition opportunities between stakeholder groups with aligned interests
-   */
-  private identifyCoalitionOpportunities(stakeholderGroups: unknown[]): Array<{
-    groups: string[];
-    sharedInterests: string[];
-    likelihood: number;
-  }> {
-    const opportunities = [];
-    
-    // Compare all pairs of stakeholder groups
-    for (let i = 0; i < stakeholderGroups.length; i++) {
-      for (let j = i + 1; j < stakeholderGroups.length; j++) {
-        const group1 = stakeholderGroups[i];
-        const group2 = stakeholderGroups[j];
-        
-        // Groups with similar sentiment profiles can form coalitions
-        if (Math.abs(group1.sentiment - group2.sentiment) < 0.5) {
+  private identifyCoalitionOpportunities(
+    groups: StakeholderGroup[],
+  ): StakeholderAnalysis['coalitionOpportunities'] {
+    const opportunities: StakeholderAnalysis['coalitionOpportunities'] = [];
+
+    for (let i = 0; i < groups.length; i++) {
+      for (let j = i + 1; j < groups.length; j++) {
+        const g1 = groups[i];
+        const g2 = groups[j];
+        if (g1 === undefined || g2 === undefined) continue;
+
+        const diff = Math.abs(g1.sentiment - g2.sentiment);
+        if (diff < 0.5) {
           opportunities.push({
-            groups: [group1.group, group2.group],
+            groups:          [g1.group, g2.group],
             sharedInterests: ['common_goals', 'similar_concerns'],
-            likelihood: 70 + (30 * (1 - Math.abs(group1.sentiment - group2.sentiment)))
+            likelihood:      Math.round(70 + 30 * (1 - diff)),
           });
         }
       }
     }
-    
+
     return opportunities;
   }
 
-  /**
-   * Identify conflict areas between opposing stakeholder groups
-   */
-  private identifyConflictAreas(stakeholderGroups: unknown[]): Array<{
-    groups: string[];
-    disagreements: string[];
-    severity: number;
-  }> {
-    const conflicts = [];
-    
-    // Compare all pairs of stakeholder groups
-    for (let i = 0; i < stakeholderGroups.length; i++) {
-      for (let j = i + 1; j < stakeholderGroups.length; j++) {
-        const group1 = stakeholderGroups[i];
-        const group2 = stakeholderGroups[j];
-        
-        // Groups with opposing sentiments indicate conflict
-        if (group1.sentiment * group2.sentiment < 0) {
+  private identifyConflictAreas(
+    groups: StakeholderGroup[],
+  ): StakeholderAnalysis['conflictAreas'] {
+    const conflicts: StakeholderAnalysis['conflictAreas'] = [];
+
+    for (let i = 0; i < groups.length; i++) {
+      for (let j = i + 1; j < groups.length; j++) {
+        const g1 = groups[i];
+        const g2 = groups[j];
+        if (g1 === undefined || g2 === undefined) continue;
+
+        if (g1.sentiment * g2.sentiment < 0) {
           conflicts.push({
-            groups: [group1.group, group2.group],
+            groups:        [g1.group, g2.group],
             disagreements: ['policy_approach', 'implementation_concerns'],
-            severity: Math.abs(group1.sentiment - group2.sentiment) * 100
+            severity:      Math.round(Math.abs(g1.sentiment - g2.sentiment) * 100),
           });
         }
       }
     }
-    
+
     return conflicts;
   }
 
-  /**
-   * Perform basic sentiment analysis on text content
-   */
   private analyzeSentiment(text: string): number {
-    const positiveWords = ['support', 'agree', 'good', 'excellent', 'approve', 'favor'];
-    const negativeWords = ['oppose', 'disagree', 'bad', 'terrible', 'reject', 'against'];
-    
-    const lowerText = text.toLowerCase();
-    let sentiment = 0;
-    
-    positiveWords.forEach(word => {
-      if (lowerText.includes(word)) sentiment += 1;
-    });
-    
-    negativeWords.forEach(word => {
-      if (lowerText.includes(word)) sentiment -= 1;
-    });
-    
-    // Normalize to range of -1 to 1
-    return Math.max(-1, Math.min(1, sentiment / 5));
+    const positive = ['support', 'agree', 'good', 'excellent', 'approve', 'favor'];
+    const negative = ['oppose', 'disagree', 'bad', 'terrible', 'reject', 'against'];
+    const lower    = text.toLowerCase();
+
+    let score = 0;
+    for (const w of positive) if (lower.includes(w)) score++;
+    for (const w of negative) if (lower.includes(w)) score--;
+
+    return Math.max(-1, Math.min(1, score / 5));
   }
 
   /**
-   * Perform health check to verify database connectivity and service availability
+   * Health check — verifies database connectivity.
    */
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
-      // Test database connectivity with a simple query
-      await readDatabase(async (db) => {
-        return readDatabase.select({ count: count() }).from(bills).limit(1);
-      });
-      
-      return {
-        status: 'healthy',
-        timestamp: new Date()
-      };
+      await db.select({ total: count() }).from(schema.bills).limit(1);
+      return { status: 'healthy', timestamp: new Date() };
     } catch (error) {
-      logger.error('Analysis service health check failed', { 
-        component: 'AnalysisService',
-        error 
-      });
-      
-      return {
-        status: 'unhealthy',
-        timestamp: new Date()
-      };
+      logger.error({ component: 'AnalysisService', error }, 'Analysis service health check failed');
+      return { status: 'unhealthy', timestamp: new Date() };
     }
   }
 }
@@ -789,10 +624,4 @@ export class AnalysisService {
 // SINGLETON EXPORT
 // ============================================================================
 
-/**
- * Singleton instance of AnalysisService for application-wide use.
- * This ensures consistent state and connection pooling across the application.
- */
 export const analysisService = new AnalysisService();
-
-

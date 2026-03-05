@@ -6,8 +6,8 @@
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
 import { logger } from '@server/infrastructure/observability';
-import { cacheService, cacheKeys, CACHE_TTL } from '@server/infrastructure/cache';
-import { readDatabase } from '@server/infrastructure/database';
+import { cacheService, CACHE_TTL } from '@server/infrastructure/cache';
+import { db } from '@server/infrastructure/database';
 import { billComprehensiveAnalysisService } from './bill-comprehensive-analysis.service';
 import {
   AnalyzeBillSchema,
@@ -30,190 +30,239 @@ import {
 import * as schema from '@server/infrastructure/schema';
 import { eq, and, desc } from 'drizzle-orm';
 
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Build a stable string cache key from an arbitrary list of parts. */
+function ck(...parts: unknown[]): string {
+  return parts
+    .map(p => (p !== null && typeof p === 'object' ? JSON.stringify(p) : String(p ?? '')))
+    .join(':');
+}
+
+/**
+ * Silently evict a cache entry.
+ *
+ * `cacheService` only exposes `.get` / `.set`; there is no `.delete` / `.invalidate`.
+ * Setting with TTL = 0 causes an immediate expiry on all common cache adapters.
+ * If the adapter adds a dedicated eviction method in future, replace the body here.
+ */
+async function bust(key: string): Promise<void> {
+  try {
+    await cacheService.set(key, null, 0);
+  } catch {
+    // Non-fatal — a stale read is preferable to crashing the write path.
+  }
+}
+
+/**
+ * Unwrap a `validateData` result, throwing on validation failure.
+ *
+ * `validateData` returns `{ data?: T; error?: ... }`.
+ * TypeScript infers `data` as `T | undefined`, so we assert here once
+ * rather than scattering `!` or `??` guards throughout every method.
+ */
+function unwrap<T>(result: { data?: T }): T {
+  if (result.data === undefined) {
+    throw new Error('Input validation failed');
+  }
+  return result.data;
+}
+
+// ---------------------------------------------------------------------------
+
 export class AnalysisApplicationService {
   // ============================================================================
   // BILL ANALYSIS
   // ============================================================================
 
   /**
-   * Analyze a bill comprehensively
-   * Includes caching to avoid expensive re-computation
+   * Analyse a bill comprehensively.
+   * Results are cached for CACHE_TTL.LONG to avoid expensive re-computation.
    */
-  async analyzeBill(input: AnalyzeBillInput): Promise<AsyncServiceResult<ComprehensiveBillAnalysis>> {
+  async analyzeBill(
+    input: AnalyzeBillInput,
+  ): Promise<AsyncServiceResult<ComprehensiveBillAnalysis>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(AnalyzeBillSchema, input);
-      
-      logger.info('Analyzing bill', {
-        bill_id: validatedInput.bill_id,
-        type: validatedInput.analysis_type,
-        force: validatedInput.force_reanalysis,
-      });
-      
-      // Check cache unless force reanalysis
-      if (!validatedInput.force_reanalysis) {
-        const cacheKey = cacheKeys.query('bill-analysis', {
-          bill_id: validatedInput.bill_id,
-          type: validatedInput.analysis_type,
-        });
-        const cached = await cacheService.get<ComprehensiveBillAnalysis>(cacheKey);
+      const v = unwrap(await validateData(AnalyzeBillSchema, input));
+
+      const billId        = v.bill_id         as string;
+      const analysisType  = v.analysis_type   as string | undefined;
+      const forceRedo     = v.force_reanalysis as boolean | undefined;
+
+      logger.info(
+        { bill_id: billId, type: analysisType, force: forceRedo },
+        'Analyzing bill',
+      );
+
+      const billCacheKey = ck('bill-analysis', billId, analysisType ?? 'comprehensive');
+
+      if (!forceRedo) {
+        const cached = await cacheService.get<ComprehensiveBillAnalysis>(billCacheKey);
         if (cached) {
-          logger.info('Returning cached analysis', { bill_id: validatedInput.bill_id });
+          logger.info({ bill_id: billId }, 'Returning cached analysis');
           return cached;
         }
       }
-      
-      // Run analysis
-      const analysis = await billComprehensiveAnalysisService.analyzeBill(validatedInput.bill_id);
-      
-      // Cache for 30 minutes (expensive operation)
-      const cacheKey = cacheKeys.query('bill-analysis', {
-        bill_id: validatedInput.bill_id,
-        type: validatedInput.analysis_type,
-      });
-      await cacheService.set(cacheKey, analysis, CACHE_TTL.LONG);
-      
-      // Invalidate history cache
-      await cacheService.delete(cacheKeys.list('analysis-history', { bill_id: validatedInput.bill_id }));
-      
-      logger.info('Bill analysis complete', {
-        bill_id: validatedInput.bill_id,
-        analysis_id: analysis.analysis_id,
-        confidence: analysis.overallConfidence,
-      });
-      
+
+      // Run analysis (expensive).
+      // Cast: bill-comprehensive-analysis.service.ConstitutionalConcern uses the literal
+      // "moderate" for severity, while analysis-validation.schemas uses "info".
+      // Both are safe at runtime; the cast reconciles the divergent unions.
+      const raw      = await billComprehensiveAnalysisService.analyzeBill(billId);
+      const analysis = raw as unknown as ComprehensiveBillAnalysis;
+
+      await Promise.all([
+        cacheService.set(billCacheKey, analysis, CACHE_TTL.LONG),
+        bust(ck('analysis-history', billId)),
+      ]);
+
+      logger.info(
+        {
+          bill_id:     billId,
+          analysis_id: analysis.analysis_id,
+          confidence:  analysis.overallConfidence,
+        },
+        'Bill analysis complete',
+      );
+
       return analysis;
     }, { service: 'AnalysisApplicationService', operation: 'analyzeBill' });
   }
 
-  /**
-   * Get analysis history for a bill
-   */
-  async getAnalysisHistory(input: GetAnalysisHistoryInput): Promise<AsyncServiceResult<AnalysisHistoryRecord[]>> {
+  // ============================================================================
+  // ANALYSIS HISTORY
+  // ============================================================================
+
+  async getAnalysisHistory(
+    input: GetAnalysisHistoryInput,
+  ): Promise<AsyncServiceResult<AnalysisHistoryRecord[]>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(GetAnalysisHistorySchema, input);
-      
-      // Check cache
-      const cacheKey = cacheKeys.list('analysis-history', {
-        bill_id: validatedInput.bill_id,
-        limit: validatedInput.limit,
-        type: validatedInput.analysis_type,
-      });
-      const cached = await cacheService.get<AnalysisHistoryRecord[]>(cacheKey);
+      const v = unwrap(await validateData(GetAnalysisHistorySchema, input));
+
+      const billId       = v.bill_id       as string;
+      const limit        = v.limit         as number;
+      const offset       = v.offset        as number;
+      const analysisType = v.analysis_type as string | undefined;
+
+      const historyCacheKey = ck('analysis-history', billId, limit, analysisType ?? 'all');
+      const cached = await cacheService.get<AnalysisHistoryRecord[]>(historyCacheKey);
       if (cached) return cached;
-      
-      // Query database
-      const db = await readDatabase();
-      
-      let query = db
+
+      const baseCondition =
+        analysisType && analysisType !== 'all'
+          ? and(
+              eq(schema.analysis.bill_id, billId),
+              eq(schema.analysis.analysis_type, analysisType),
+            )
+          : eq(schema.analysis.bill_id, billId);
+
+      const records = await db
         .select()
         .from(schema.analysis)
-        .where(eq(schema.analysis.bill_id, validatedInput.bill_id))
+        .where(baseCondition)
         .orderBy(desc(schema.analysis.created_at))
-        .limit(validatedInput.limit)
-        .offset(validatedInput.offset);
-      
-      // Filter by type if specified
-      if (validatedInput.analysis_type !== 'all') {
-        query = query.where(
-          and(
-            eq(schema.analysis.bill_id, validatedInput.bill_id),
-            eq(schema.analysis.analysis_type, validatedInput.analysis_type)
-          )
-        );
-      }
-      
-      const records = await query;
-      
-      // Transform to history records
-      const history: AnalysisHistoryRecord[] = records.map(record => {
-        const resultsData = record.results as any;
-        return {
-          dbId: record.id,
-          analysis_id: resultsData?.analysis_id || `analysis_${record.id}`,
-          bill_id: record.bill_id,
-          analysis_type: record.analysis_type,
-          timestamp: record.created_at,
-          overallConfidence: parseFloat(record.confidence || '0'),
-          status: resultsData?.status || 'completed',
-          scores: {
-            publicInterest: resultsData?.publicInterestScore?.score,
-            transparency: resultsData?.transparency_score?.overall,
-            constitutional: resultsData?.constitutionalAnalysis?.constitutionalityScore,
-          },
-        };
-      });
-      
-      // Cache for 5 minutes
-      await cacheService.set(cacheKey, history, CACHE_TTL.SHORT);
-      
+        .limit(limit)
+        .offset(offset);
+
+      const history: AnalysisHistoryRecord[] = records.map(
+        (record: typeof schema.analysis.$inferSelect) => {
+          const rd = record.results as Record<string, unknown> | null;
+          return {
+            dbId:              record.id,
+            analysis_id:       (rd?.analysis_id as string) ?? `analysis_${record.id}`,
+            bill_id:           record.bill_id,
+            analysis_type:     record.analysis_type,
+            timestamp:         record.created_at,
+            overallConfidence: parseFloat((record.confidence as string) || '0'),
+            status:            (rd?.status as string) ?? 'completed',
+            scores: {
+              publicInterest: (rd?.publicInterestScore as { score?: number })?.score,
+              transparency:   (rd?.transparency_score  as { overall?: number })?.overall,
+              constitutional: (
+                rd?.constitutionalAnalysis as { constitutionalityScore?: number }
+              )?.constitutionalityScore,
+            },
+          };
+        },
+      );
+
+      await cacheService.set(historyCacheKey, history, CACHE_TTL.SHORT);
+
       return history;
     }, { service: 'AnalysisApplicationService', operation: 'getAnalysisHistory' });
   }
 
-  /**
-   * Get a specific analysis by ID
-   */
-  async getAnalysis(input: GetAnalysisInput): Promise<AsyncServiceResult<ComprehensiveBillAnalysis | null>> {
+  // ============================================================================
+  // SINGLE ANALYSIS RETRIEVAL
+  // ============================================================================
+
+  async getAnalysis(
+    input: GetAnalysisInput,
+  ): Promise<AsyncServiceResult<ComprehensiveBillAnalysis | null>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(GetAnalysisSchema, input);
-      
-      // Check cache
-      const cacheKey = cacheKeys.entity('analysis', validatedInput.analysis_id);
-      const cached = await cacheService.get<ComprehensiveBillAnalysis>(cacheKey);
+      const v = unwrap(await validateData(GetAnalysisSchema, input));
+
+      const analysisId     = v.analysis_id as string;
+      const entityCacheKey = ck('analysis', analysisId);
+
+      const cached = await cacheService.get<ComprehensiveBillAnalysis>(entityCacheKey);
       if (cached) return cached;
-      
-      // Query database
-      const db = await readDatabase();
+
+      const numericId = parseInt(analysisId.split('_').pop() ?? '0', 10);
+
       const [record] = await db
         .select()
         .from(schema.analysis)
-        .where(eq(schema.analysis.id, parseInt(validatedInput.analysis_id.split('_').pop() || '0', 10)))
+        .where(eq(schema.analysis.id, numericId))
         .limit(1);
-      
+
       if (!record) return null;
-      
-      const analysis = record.results as ComprehensiveBillAnalysis;
-      
-      // Cache for 30 minutes
-      await cacheService.set(cacheKey, analysis, CACHE_TTL.LONG);
-      
+
+      const analysis = record.results as unknown as ComprehensiveBillAnalysis;
+      await cacheService.set(entityCacheKey, analysis, CACHE_TTL.LONG);
+
       return analysis;
     }, { service: 'AnalysisApplicationService', operation: 'getAnalysis' });
   }
 
-  /**
-   * Trigger manual analysis (admin only)
-   */
-  async triggerAnalysis(input: TriggerAnalysisInput): Promise<AsyncServiceResult<ComprehensiveBillAnalysis>> {
+  // ============================================================================
+  // MANUAL / ADMIN TRIGGER
+  // ============================================================================
+
+  async triggerAnalysis(
+    input: TriggerAnalysisInput,
+  ): Promise<AsyncServiceResult<ComprehensiveBillAnalysis>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(TriggerAnalysisSchema, input);
-      
-      logger.info('Manual analysis triggered', {
-        bill_id: validatedInput.bill_id,
-        type: validatedInput.analysis_type,
-        priority: validatedInput.priority,
-      });
-      
-      // Force reanalysis
-      const analysis = await billComprehensiveAnalysisService.analyzeBill(validatedInput.bill_id);
-      
-      // Invalidate caches
+      const v = unwrap(await validateData(TriggerAnalysisSchema, input));
+
+      const billId           = v.bill_id            as string;
+      const analysisType     = v.analysis_type      as string | undefined;
+      const priority         = v.priority           as string | undefined;
+      const notifyOnComplete = v.notify_on_complete as boolean | undefined;
+
+      logger.info(
+        { bill_id: billId, type: analysisType, priority },
+        'Manual analysis triggered',
+      );
+
+      const raw      = await billComprehensiveAnalysisService.analyzeBill(billId);
+      const analysis = raw as unknown as ComprehensiveBillAnalysis;
+
       await Promise.all([
-        cacheService.delete(cacheKeys.query('bill-analysis', {
-          bill_id: validatedInput.bill_id,
-          type: validatedInput.analysis_type,
-        })),
-        cacheService.delete(cacheKeys.list('analysis-history', { bill_id: validatedInput.bill_id })),
+        bust(ck('bill-analysis', billId, analysisType ?? 'comprehensive')),
+        bust(ck('analysis-history', billId)),
       ]);
-      
-      // TODO: Send notification if requested
-      if (validatedInput.notify_on_complete) {
-        logger.info('Analysis notification requested', {
-          bill_id: validatedInput.bill_id,
-          analysis_id: analysis.analysis_id,
-        });
+
+      if (notifyOnComplete) {
+        logger.info(
+          { bill_id: billId, analysis_id: analysis.analysis_id },
+          'Analysis notification requested',
+        );
+        // TODO: dispatch notification via notification service
       }
-      
+
       return analysis;
     }, { service: 'AnalysisApplicationService', operation: 'triggerAnalysis' });
   }
@@ -222,163 +271,162 @@ export class AnalysisApplicationService {
   // ADVANCED OPERATIONS
   // ============================================================================
 
-  /**
-   * Compare multiple analyses
-   */
-  async compareAnalyses(input: CompareAnalysesInput): Promise<AsyncServiceResult<AnalysisComparison>> {
+  async compareAnalyses(
+    input: CompareAnalysesInput,
+  ): Promise<AsyncServiceResult<AnalysisComparison>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(CompareAnalysesSchema, input);
-      
-      logger.info('Comparing analyses', {
-        bill_id: validatedInput.bill_id,
-        count: validatedInput.analysis_ids.length,
-      });
-      
-      // Fetch all analyses
-      const analyses = await Promise.all(
-        validatedInput.analysis_ids.map(id => this.getAnalysis({ analysis_id: id, include_details: true }))
+      const v = unwrap(await validateData(CompareAnalysesSchema, input));
+
+      const billId      = v.bill_id            as string;
+      const analysisIds = v.analysis_ids        as string[];
+      const cmpFields   = v.comparison_fields   as string[] | undefined;
+
+      logger.info(
+        { bill_id: billId, count: analysisIds.length },
+        'Comparing analyses',
       );
-      
-      const validAnalyses = analyses
-        .filter(r => r.success && r.data)
-        .map(r => r.data!);
-      
+
+      const fetchResults = await Promise.all(
+        analysisIds.map((id: string) =>
+          this.getAnalysis({ analysis_id: id, include_details: true }),
+        ),
+      );
+
+      const validAnalyses = fetchResults
+        .filter(r => r.isOk())
+        .map(r => r.value)
+        .filter((v): v is ComprehensiveBillAnalysis => v !== null);
+
       if (validAnalyses.length < 2) {
-        throw new Error('At least 2 valid analyses required for comparison');
+        throw new Error('At least 2 valid analyses are required for comparison');
       }
-      
-      // Calculate changes
-      const changes: AnalysisComparison['changes'] = [];
-      const fields = validatedInput.comparison_fields || [
+
+      const fields: string[] = cmpFields ?? [
         'constitutional_score',
         'transparency_score',
         'public_interest_score',
         'overall_confidence',
       ];
-      
-      for (const field of fields) {
-        const first = this.extractFieldValue(validAnalyses[0], field);
-        const last = this.extractFieldValue(validAnalyses[validAnalyses.length - 1], field);
+
+      const changes: AnalysisComparison['changes'] = fields.reduce<
+        AnalysisComparison['changes']
+      >((acc, field) => {
+        const firstAnalysis = validAnalyses[0];
+        const lastAnalysis = validAnalyses[validAnalyses.length - 1];
         
-        if (first !== null && last !== null) {
-          const change_percent = ((last - first) / first) * 100;
-          changes.push({
+        if (!firstAnalysis || !lastAnalysis) return acc;
+        
+        const first = this.extractFieldValue(firstAnalysis, field);
+        const last  = this.extractFieldValue(lastAnalysis, field);
+
+        if (first !== null && last !== null && first !== 0) {
+          acc.push({
             field,
-            from: first,
-            to: last,
-            change_percent: Math.round(change_percent * 10) / 10,
+            from:           first,
+            to:             last,
+            change_percent: Math.round(((last - first) / first) * 1000) / 10,
           });
         }
-      }
-      
-      // Determine trend
-      const avgChange = changes.reduce((sum, c) => sum + c.change_percent, 0) / changes.length;
-      const trend = avgChange > 5 ? 'improving' : avgChange < -5 ? 'declining' : 'stable';
-      
-      return {
-        bill_id: validatedInput.bill_id,
-        analyses: validAnalyses,
-        changes,
-        trend,
-      };
+        return acc;
+      }, []);
+
+      const avgChange =
+        changes.length > 0
+          ? changes.reduce((sum, c) => sum + c.change_percent, 0) / changes.length
+          : 0;
+
+      const trend: AnalysisComparison['trend'] =
+        avgChange > 5 ? 'improving' : avgChange < -5 ? 'declining' : 'stable';
+
+      return { bill_id: billId, analyses: validAnalyses, changes, trend };
     }, { service: 'AnalysisApplicationService', operation: 'compareAnalyses' });
   }
 
-  /**
-   * Batch analyze multiple bills
-   */
-  async batchAnalyze(input: BatchAnalyzeInput): Promise<AsyncServiceResult<BatchAnalysisResult>> {
+  async batchAnalyze(
+    input: BatchAnalyzeInput,
+  ): Promise<AsyncServiceResult<BatchAnalysisResult>> {
     return safeAsync(async () => {
-      const validatedInput = await validateData(BatchAnalyzeSchema, input);
-      
-      logger.info('Batch analysis started', {
-        count: validatedInput.bill_ids.length,
-        parallel: validatedInput.parallel,
-      });
-      
+      const v = unwrap(await validateData(BatchAnalyzeSchema, input));
+
+      const billIds      = v.bill_ids      as string[];
+      const analysisType = v.analysis_type as AnalyzeBillInput['analysis_type'] | undefined;
+      const parallel     = v.parallel      as boolean | undefined;
+
+      logger.info(
+        { count: billIds.length, parallel },
+        'Batch analysis started',
+      );
+
+      const analyzeOne = (bill_id: string) =>
+        this.analyzeBill({ bill_id, analysis_type: analysisType, force_reanalysis: false });
+
       const results: BatchAnalysisResult['results'] = [];
-      
-      if (validatedInput.parallel) {
-        // Parallel execution
-        const promises = validatedInput.bill_ids.map(bill_id =>
-          this.analyzeBill({
-            bill_id,
-            analysis_type: validatedInput.analysis_type,
-            force_reanalysis: false,
-          })
-        );
-        
-        const settled = await Promise.allSettled(promises);
-        
-        settled.forEach((result, index) => {
-          const bill_id = validatedInput.bill_ids[index];
-          if (result.status === 'fulfilled' && result.value.success) {
-            results.push({
-              bill_id,
-              success: true,
-              analysis: result.value.data,
-            });
+
+      if (parallel) {
+        const settled = await Promise.allSettled(billIds.map(analyzeOne));
+
+        billIds.forEach((bill_id, index) => {
+          const outcome = settled[index];
+          if (!outcome) return; // Skip if outcome is undefined (shouldn't happen)
+          
+          if (outcome.status === 'fulfilled' && outcome.value.isOk()) {
+            results.push({ bill_id, success: true, analysis: outcome.value.value });
           } else {
-            results.push({
-              bill_id,
-              success: false,
-              error: result.status === 'rejected' ? result.reason : result.value.error,
-            });
+            const err =
+              outcome.status === 'rejected'
+                ? String(outcome.reason)
+                : outcome.value.isErr()
+                  ? outcome.value.error.message
+                  : 'Unknown error';
+            results.push({ bill_id, success: false, error: err });
           }
         });
       } else {
-        // Sequential execution
-        for (const bill_id of validatedInput.bill_ids) {
-          const result = await this.analyzeBill({
-            bill_id,
-            analysis_type: validatedInput.analysis_type,
-            force_reanalysis: false,
-          });
-          
-          results.push({
-            bill_id,
-            success: result.success,
-            analysis: result.data,
-            error: result.error,
-          });
+        for (const bill_id of billIds) {
+          const result = await analyzeOne(bill_id);
+          if (result.isOk()) {
+            results.push({ bill_id, success: true, analysis: result.value });
+          } else {
+            results.push({ bill_id, success: false, error: result.error.message });
+          }
         }
       }
-      
+
       const successful = results.filter(r => r.success).length;
-      const failed = results.filter(r => !r.success).length;
-      
-      logger.info('Batch analysis complete', {
-        total: results.length,
-        successful,
-        failed,
-      });
-      
-      return {
-        total: results.length,
-        successful,
-        failed,
-        results,
-      };
+      const failed     = results.length - successful;
+
+      logger.info(
+        { total: results.length, successful, failed },
+        'Batch analysis complete',
+      );
+
+      return { total: results.length, successful, failed, results };
     }, { service: 'AnalysisApplicationService', operation: 'batchAnalyze' });
   }
 
   // ============================================================================
-  // HELPER METHODS
+  // PRIVATE HELPERS
   // ============================================================================
 
-  private extractFieldValue(analysis: ComprehensiveBillAnalysis, field: string): number | null {
+  private extractFieldValue(
+    analysis: ComprehensiveBillAnalysis,
+    field: string,
+  ): number | null {
+    const RISK_SCORE: Record<string, number> = {
+      low: 25, medium: 50, high: 75, critical: 100,
+    };
+
     switch (field) {
       case 'constitutional_score':
-        return analysis.constitutionalAnalysis.constitutionalityScore;
+        return analysis.constitutionalAnalysis.constitutionalityScore ?? null;
       case 'transparency_score':
-        return analysis.transparency_score.overall;
+        return analysis.transparency_score.overall ?? null;
       case 'public_interest_score':
-        return analysis.publicInterestScore.score;
+        return analysis.publicInterestScore.score ?? null;
       case 'conflict_risk':
-        const riskMap = { low: 25, medium: 50, high: 75, critical: 100 };
-        return riskMap[analysis.conflictAnalysisSummary.overallRisk];
+        return RISK_SCORE[analysis.conflictAnalysisSummary.overallRisk] ?? null;
       case 'overall_confidence':
-        return analysis.overallConfidence;
+        return analysis.overallConfidence ?? null;
       default:
         return null;
     }

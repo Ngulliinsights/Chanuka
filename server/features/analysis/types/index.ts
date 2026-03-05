@@ -42,12 +42,12 @@ export interface StakeholderAnalysis {
 export type {
   ConstitutionalAnalysisResult,
   LegalPrecedent,
-  ComprehensiveBillAnalysis,
   ConstitutionalConcern
-} from '@shared/application/constitutional-analysis.service';
+} from '../application/constitutional-analysis.service';
 
 export type {
+  ComprehensiveBillAnalysis,
   ComprehensiveBillAnalysis as BillComprehensiveAnalysis
-} from '@shared/application/bill-comprehensive-analysis.service';
+} from '../application/bill-comprehensive-analysis.service';
 
 

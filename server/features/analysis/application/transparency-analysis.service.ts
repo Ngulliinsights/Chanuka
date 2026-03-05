@@ -37,7 +37,7 @@ export class TransparencyAnalysisService {
     /**
      * Calculates the transparency score based on bill data and conflict analysis.
      */
-    async calculateScore(bill_id: number, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> { logger.info(`📊 Calculating transparency score for bill ${bill_id }`);
+    async calculateScore(bill_id: string, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> { logger.info(`📊 Calculating transparency score for bill ${bill_id }`);
          try { const bill = await this.getBillDetails(bill_id); // Fetch more details if needed
             if (!bill) {
                  logger.warn(`Bill ${bill_id } not found for transparency scoring.`);

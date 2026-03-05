@@ -290,7 +290,7 @@ export interface AnalysisHistoryRecord {
  * Analysis comparison result
  */
 export interface AnalysisComparison {
-  bill_id: number;
+  bill_id: string;
   analyses: ComprehensiveBillAnalysis[];
   changes: {
     field: string;
@@ -309,7 +309,7 @@ export interface BatchAnalysisResult {
   successful: number;
   failed: number;
   results: Array<{
-    bill_id: number;
+    bill_id: string;
     success: boolean;
     analysis?: ComprehensiveBillAnalysis;
     error?: string;

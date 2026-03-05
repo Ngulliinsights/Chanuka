@@ -48,7 +48,7 @@ export class MlServiceAdapter {
             return transformedResult;
 
         } catch (error) {
-            logger.error("Error calling ML service for stakeholder analysis:", { component: 'MlServiceAdapter' }, error);
+            logger.error({ component: 'MlServiceAdapter', error }, "Error calling ML service for stakeholder analysis:");
             throw new Error(`ML service failed during stakeholder analysis: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
@@ -89,7 +89,7 @@ export class MlServiceAdapter {
             return transformedResult;
 
         } catch (error) {
-            logger.error("Error calling ML service for beneficiary analysis:", { component: 'MlServiceAdapter' }, error);
+            logger.error({ component: 'MlServiceAdapter', error }, "Error calling ML service for beneficiary analysis:");
             throw new Error(`ML service failed during beneficiary analysis: ${error instanceof Error ? error.message : String(error)}`);
         }
     }
