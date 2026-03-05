@@ -412,6 +412,9 @@ export const createPoolConfig = (is_readOnly = false): pg.PoolConfig => {
     } : false,
     connectionTimeoutMillis: 10_000,
     idleTimeoutMillis: 30_000,
+    // Set statement timeout to prevent hung queries (30 seconds)
+    statement_timeout: CONFIG.QUERY_TIMEOUT_MS,
+    query_timeout: CONFIG.QUERY_TIMEOUT_MS,
     min: 0,
     keepAlive: true,
     keepAliveInitialDelayMillis: 10_000,

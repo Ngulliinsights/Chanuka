@@ -1,8 +1,15 @@
 import { analysisApplicationService } from './application/AnalysisApplicationService';
 import { logger } from '@server/infrastructure/observability';
 import { authenticateToken, type AuthenticatedRequest } from '@server/middleware';
+import { validateData } from '@server/infrastructure/validation/validation-helpers';
 import express, { type Router, type Response } from 'express';
 import { asyncHandler } from '@server/middleware';
+import {
+  GetComprehensiveAnalysisSchema,
+  TriggerAnalysisParamsSchema,
+  TriggerAnalysisBodySchema,
+  GetAnalysisHistorySchema,
+} from './analysis-validation.schemas';
 
 const router: Router = express.Router();
 
@@ -12,15 +19,25 @@ const router: Router = express.Router();
 // Triggers analysis on-demand with caching.
 // ============================================================================
 router.get('/bills/:bill_id/comprehensive', asyncHandler(async (req, res: Response) => {
-  const bill_id = req.params.bill_id;
-  if (!bill_id) {
-    res.status(400).json({ success: false, error: 'bill_id is required' });
+  // Validate input
+  const validation = await validateData(GetComprehensiveAnalysisSchema, {
+    bill_id: req.params.bill_id,
+    force: req.query.force as string | undefined,
+  });
+
+  if (!validation.success) {
+    res.status(400).json({
+      success: false,
+      errors: validation.errors,
+    });
     return;
   }
 
+  const { bill_id, force } = validation.data!;
+
   const result = await analysisApplicationService.analyzeBill({
     bill_id,
-    force_reanalysis: req.query.force === 'true',
+    force_reanalysis: force === 'true',
     analysis_type: 'comprehensive',
   });
 
@@ -61,17 +78,38 @@ router.post(
       return;
     }
 
-    const bill_id = req.params.bill_id;
-    if (!bill_id) {
-      res.status(400).json({ success: false, error: 'bill_id is required' });
+    // Validate params
+    const paramsValidation = await validateData(TriggerAnalysisParamsSchema, {
+      bill_id: req.params.bill_id,
+    });
+
+    if (!paramsValidation.success) {
+      res.status(400).json({
+        success: false,
+        errors: paramsValidation.errors,
+      });
       return;
     }
+
+    // Validate body
+    const bodyValidation = await validateData(TriggerAnalysisBodySchema, req.body);
+
+    if (!bodyValidation.success) {
+      res.status(400).json({
+        success: false,
+        errors: bodyValidation.errors,
+      });
+      return;
+    }
+
+    const { bill_id } = paramsValidation.data!;
+    const { priority, notify_on_complete } = bodyValidation.data!;
 
     const result = await analysisApplicationService.triggerAnalysis({
       bill_id,
       analysis_type: 'comprehensive',
-      priority: (req.body.priority as string) || 'normal',
-      notify_on_complete: (req.body.notify_on_complete as boolean) || false,
+      priority,
+      notify_on_complete,
     });
 
     if (result.isOk()) {
@@ -99,20 +137,29 @@ router.post(
 // Retrieve historical comprehensive analysis runs for a bill.
 // ============================================================================
 router.get('/bills/:bill_id/history', asyncHandler(async (req, res: Response) => {
-  const bill_id = req.params.bill_id;
-  if (!bill_id) {
-    res.status(400).json({ success: false, error: 'bill_id is required' });
+  // Validate input
+  const validation = await validateData(GetAnalysisHistorySchema, {
+    bill_id: req.params.bill_id,
+    limit: req.query.limit ? parseInt(req.query.limit as string, 10) : undefined,
+    offset: req.query.offset ? parseInt(req.query.offset as string, 10) : undefined,
+    type: req.query.type as string | undefined,
+  });
+
+  if (!validation.success) {
+    res.status(400).json({
+      success: false,
+      errors: validation.errors,
+    });
     return;
   }
 
-  const limit  = req.query.limit  ? parseInt(req.query.limit  as string, 10) : 10;
-  const offset = req.query.offset ? parseInt(req.query.offset as string, 10) : 0;
+  const { bill_id, limit, offset, type } = validation.data!;
 
   const result = await analysisApplicationService.getAnalysisHistory({
     bill_id,
     limit,
     offset,
-    analysis_type: (req.query.type as string) || 'all',
+    analysis_type: type,
   });
 
   if (result.isOk()) {
