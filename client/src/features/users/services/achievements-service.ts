@@ -9,17 +9,11 @@
  */
 
 import { CacheService } from '@client/lib/services/cache';
-import {
-  ServiceErrorFactory,
-  ValidationError,
-  ResourceNotFoundError,
-  SystemError
-} from '@client/lib/services/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   AchievementService as IAchievementService,
   AchievementDefinition,
-  AchievementCriteria,
   UserAchievementProgress,
   UserAchievement
 } from '@client/lib/services/interfaces';
@@ -54,7 +48,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  async init(config?: unknown): Promise<void> {
+  async init(_config?: unknown): Promise<void> {
     await this.cache.warmCache();
     this.startProgressMonitoring();
     logger.info('AchievementService initialized');
@@ -117,13 +111,13 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return definitions;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get achievement definitions',
-        'AchievementService',
-        'getAchievementDefinitions',
-        undefined,
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'getAchievementDefinitions' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -159,13 +153,13 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return result;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user achievements',
-        'AchievementService',
-        'getUserAchievements',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUserAchievements' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -188,13 +182,13 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return progress;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to check achievement progress',
-        'AchievementService',
-        'checkAchievementProgress',
-        undefined,
-        { originalError: error, achievementId, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'checkAchievementProgress' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -207,13 +201,9 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
       const alreadyEarned = userAchievements.earned.some(a => a.id === achievementId);
 
       if (alreadyEarned) {
-        throw new ValidationError(
-          'Achievement already earned',
-          'AchievementService',
-          'awardAchievement',
-          'achievementId',
-          achievementId
-        );
+        throw ErrorFactory.createValidationError([
+          { field: 'achievementId', message: 'Achievement already earned' }
+        ]);
       }
 
       // Award achievement
@@ -226,17 +216,11 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return achievement;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to award achievement',
-        'AchievementService',
-        'awardAchievement',
-        undefined,
-        { originalError: error, achievementId, userId }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'awardAchievement'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -274,13 +258,13 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return stats;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get achievement stats',
-        'AchievementService',
-        'getAchievementStats',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getAchievementStats' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -313,13 +297,13 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 
       return leaderboard;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get leaderboard',
-        'AchievementService',
-        'getLeaderboard',
-        undefined,
-        { originalError: error, category, limit }
+        error instanceof Error ? error : undefined,
+        { operation: 'getLeaderboard' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -368,7 +352,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  private async fetchUserAchievementsFromServer(userId: string): Promise<{
+  private async fetchUserAchievementsFromServer(_userId: string): Promise<{
     earned: UserAchievement[];
     progress: UserAchievementProgress[];
     next_milestones: AchievementDefinition[];
@@ -385,7 +369,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  private async fetchAchievementProgressFromServer(userId: string, achievementId: string): Promise<UserAchievementProgress> {
+  private async fetchAchievementProgressFromServer(_userId: string, achievementId: string): Promise<UserAchievementProgress> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -401,7 +385,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  private async awardAchievementToUser(userId: string, achievementId: string): Promise<UserAchievement> {
+  private async awardAchievementToUser(_userId: string, achievementId: string): Promise<UserAchievement> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -419,7 +403,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  private async fetchAchievementStatsFromServer(userId: string): Promise<{
+  private async fetchAchievementStatsFromServer(_userId: string): Promise<{
     total_earned: number;
     total_points: number;
     completion_rate: number;
@@ -441,7 +425,7 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
     });
   }
 
-  private async fetchLeaderboardFromServer(category?: string, limit?: number): Promise<Array<{
+  private async fetchLeaderboardFromServer(_category?: string, _limit?: number): Promise<Array<{
     user_id: string;
     username: string;
     total_points: number;

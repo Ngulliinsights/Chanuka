@@ -5,7 +5,7 @@
  */
 
 import { z } from 'zod';
-import { ErrorFactory, coreErrorHandler } from '../error';
+import { ErrorFactory, errorHandler } from '../error';
 import type {
   FieldValidationRules,
   FormValidationSchema,
@@ -312,7 +312,7 @@ export class Validator implements IValidator {
     } as ValidationError;
 
     // Track error through error handler
-    coreErrorHandler.handleError(validationError);
+    errorHandler.handleError(validationError);
 
     return validationError;
   }

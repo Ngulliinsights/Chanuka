@@ -9,11 +9,7 @@
  */
 
 import { CacheService } from '@client/lib/services/cache';
-import {
-  ServiceErrorFactory,
-  ValidationError,
-  SystemError
-} from '@client/lib/services/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   EngagementService as IEngagementService,
@@ -196,13 +192,16 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return result;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get engagement history',
-        'EngagementService',
-        'getEngagementHistory',
-        undefined,
-        { originalError: error }
+        error as Error,
+        {
+          component: 'EngagementService',
+          operation: 'getEngagementHistory',
+        }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -225,13 +224,17 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return stats;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get engagement stats',
-        'EngagementService',
-        'getEngagementStats',
-        undefined,
-        { originalError: error, userId }
+        error as Error,
+        {
+          component: 'EngagementService',
+          operation: 'getEngagementStats',
+          userId,
+        }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -303,13 +306,17 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 
       return streak;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user streak',
-        'EngagementService',
-        'getUserStreak',
-        undefined,
-        { originalError: error, userId }
+        error as Error,
+        {
+          component: 'EngagementService',
+          operation: 'getUserStreak',
+          userId,
+        }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 

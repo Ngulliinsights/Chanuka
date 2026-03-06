@@ -11,7 +11,7 @@ import {
   ErrorDomain,
   ErrorSeverity,
   ErrorContext,
-  coreErrorHandler,
+  errorHandler,
   createError,
 } from '@client/infrastructure/error';
 import { logger } from '@client/lib/utils/logger';
@@ -204,8 +204,8 @@ export const attemptRecovery = createAsyncThunk(
       });
 
       // Use core error system for recovery if available
-      const coreStats = coreErrorHandler.getErrorStats();
-      const success = coreStats.recovered > 0 ? Math.random() > 0.3 : Math.random() > 0.5;
+      const coreStats = errorHandler.getMetrics();
+      const success = coreStats.totalCount > 0 ? Math.random() > 0.3 : Math.random() > 0.5;
 
       return {
         errorId,
@@ -402,7 +402,7 @@ const errorHandlingSlice = createSlice({
 
     // Sync with core error system
     syncWithCoreSystem: state => {
-      const coreStats = coreErrorHandler.getErrorStats();
+      const coreStats = errorHandler.getMetrics();
 
       // Update stats from core system
       state.errorStats.recoveryRate = coreStats.recovered / Math.max(coreStats.total, 1);

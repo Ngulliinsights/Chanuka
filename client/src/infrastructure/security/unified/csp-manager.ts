@@ -134,6 +134,8 @@ export class UnifiedCSPManager {
           'ws://localhost:*',
           'http://localhost:*',
           'https://api.chanuka.ke',
+          'https://fonts.googleapis.com',
+          'https://fonts.gstatic.com',
         ],
         'font-src': ["'self'", 'https://fonts.gstatic.com'],
       };
@@ -154,6 +156,8 @@ export class UnifiedCSPManager {
         "'self'",
         'wss://ws.chanuka.ke',
         'https://api.chanuka.ke',
+        'https://fonts.googleapis.com',
+        'https://fonts.gstatic.com',
       ],
       'font-src': ["'self'", 'https://fonts.gstatic.com', 'https://cdn.chanuka.ke'],
       'upgrade-insecure-requests': [],

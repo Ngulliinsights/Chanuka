@@ -6,7 +6,7 @@
 
 import { Middleware, Action } from '@reduxjs/toolkit';
 
-import { ErrorDomain, ErrorSeverity, coreErrorHandler, createError } from '@client/infrastructure/error';
+import { ErrorDomain, ErrorSeverity, errorHandler, createError } from '@client/infrastructure/error';
 import { logger } from '@client/lib/utils/logger';
 
 export const errorHandlingMiddleware: Middleware = store => next => (action: unknown) => {
@@ -39,7 +39,7 @@ export const errorHandlingMiddleware: Middleware = store => next => (action: unk
     );
 
     // Handle through core system
-    coreErrorHandler.handleError(appError);
+    errorHandler.handleError(appError);
 
     // Additional Redux-specific logging
     logger.error('Action error caught by middleware', {

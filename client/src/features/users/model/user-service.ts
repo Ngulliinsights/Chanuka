@@ -16,6 +16,7 @@ import { EngagementHistoryFilters } from '@client/features/users/services/api';
 import { authService } from '@client/infrastructure/auth';
 import { userApi } from '@client/features/users/services/user-api';
 import { logger } from '@client/lib/utils/logger';
+import { ErrorFactory } from '@client/infrastructure/error';
 
 // ============================================================================
 // Type Definitions (Consolidated from all user services)
@@ -620,7 +621,9 @@ class UserService {
   private validateEmail(email: string): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      throw new ValidationError('Invalid email format', 'email');
+      throw ErrorFactory.createValidationError([
+        { field: 'email', message: 'Invalid email format' }
+      ]);
     }
   }
 
@@ -631,19 +634,27 @@ class UserService {
     this.validateEmail(data.email);
 
     if (!data.password || data.password.length < 8) {
-      throw new ValidationError('Password must be at least 8 characters long', 'password');
+      throw ErrorFactory.createValidationError([
+        { field: 'password', message: 'Password must be at least 8 characters long' }
+      ]);
     }
 
     if (data.password !== data.confirmPassword) {
-      throw new ValidationError('Passwords do not match', 'confirmPassword');
+      throw ErrorFactory.createValidationError([
+        { field: 'confirmPassword', message: 'Passwords do not match' }
+      ]);
     }
 
     if (!data.name || data.name.trim().length === 0) {
-      throw new ValidationError('Name is required', 'name');
+      throw ErrorFactory.createValidationError([
+        { field: 'name', message: 'Name is required' }
+      ]);
     }
 
     if (!data.acceptTerms) {
-      throw new ValidationError('You must accept the terms and conditions', 'acceptTerms');
+      throw ErrorFactory.createValidationError([
+        { field: 'acceptTerms', message: 'You must accept the terms and conditions' }
+      ]);
     }
   }
 

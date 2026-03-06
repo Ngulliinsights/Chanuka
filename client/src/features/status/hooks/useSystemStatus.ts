@@ -3,6 +3,7 @@
  * Integrates system status service with React component lifecycle
  */
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { createQueryErrorHandler, createMutationErrorHandler } from '@client/infrastructure/error';
 import { statusService } from '../services/status';
 import { useEffect, useState } from 'react';
 
@@ -12,6 +13,7 @@ export const useSystemStatus = () => {
     queryFn: () => statusService.fetchSystemStatus(),
     refetchInterval: 30000, // Poll every 30 seconds
     staleTime: 10000,
+    ...createQueryErrorHandler(),
   });
 };
 
@@ -45,6 +47,7 @@ export const useIncidentReport = () => {
   return useMutation({
     mutationFn: ({ title, services }: { title: string; services: string[] }) =>
       statusService.reportIncident(title, services),
+    ...createMutationErrorHandler(),
   });
 };
 
@@ -53,5 +56,6 @@ export const useIncidentHistory = (days: number = 30) => {
     queryKey: ['incident-history', days],
     queryFn: () => statusService.getIncidentHistory(days),
     staleTime: 1000 * 60 * 15, // 15 minutes
+    ...createQueryErrorHandler(),
   });
 };

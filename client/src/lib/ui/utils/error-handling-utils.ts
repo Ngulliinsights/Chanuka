@@ -6,8 +6,8 @@
  * React components to support Fast Refresh.
  */
 
-import { createError, coreErrorHandler, handleError as coreHandleError } from '@client/infrastructure/error';
-import type { AppError, ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
+import { createError, errorHandler, handleError as coreHandleError } from '@client/infrastructure/error';
+import type { ClientError, ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
 import { logger } from '@lib/utils/logger';
 
 // ============================================================================
@@ -187,7 +187,7 @@ export const createUIErrorHandler = (componentName?: string): UIErrorHandler => 
     });
 
     // Handle through core system
-    coreErrorHandler.handleError(appError);
+    errorHandler.handleError(appError);
 
     // Additional UI-specific logging
     logger.error(`[${componentName || 'SharedUI'}] Error:`, {
@@ -324,14 +324,14 @@ export const integrateWithMonitoring = (): void => {
   };
 
   // Register with core error system
-  coreErrorHandler.addReporter(uiErrorReporter);
+  errorHandler.addListener(uiErrorReporter);
 };
 
 // ============================================================================
 // Re-exports from Core (for convenience)
 // ============================================================================
 
-export { coreErrorHandler, createError, coreHandleError as handleError };
+export { errorHandler, createError, coreHandleError as handleError };
 
 // ============================================================================
 // Default Export

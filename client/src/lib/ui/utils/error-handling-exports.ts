@@ -17,7 +17,7 @@ export type {
 
 // Re-export functions and components from core
 export {
-  coreErrorHandler,
+  errorHandler,
   createError,
   useCoreErrorHandler,
   ErrorBoundary as CoreErrorBoundary,

@@ -14,6 +14,7 @@ import type {
 } from '@client/features/bills/services/api';
 import { billsApiService } from '@client/features/bills/services/api';
 import { useToast } from '@client/lib/hooks/use-toast';
+import { createQueryErrorHandler, createMutationErrorHandler } from '@client/infrastructure/error';
 
 import { BillsQueryParams } from './types';
 
@@ -59,6 +60,7 @@ export function useBills(params: BillsQueryParams = {}) {
     queryFn: () => billsApiService.getBills(params as BillsSearchParams),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -74,6 +76,7 @@ export function useBill(id: string | undefined) {
     enabled: !!id,
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 15 * 60 * 1000, // 15 minutes
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -93,6 +96,7 @@ export function useBillComments(billId: string | undefined) {
     enabled: !!billId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 5 * 60 * 1000, // 5 minutes
+    ...createQueryErrorHandler(),
   });
 }
 

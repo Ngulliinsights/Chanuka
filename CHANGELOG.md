@@ -5,7 +5,11 @@ All notable changes to the Chanuka Platform will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.0] - 2025-12-03
+> **Note:** This changelog tracks documentation milestones and infrastructure changes, not product releases.  
+> **Product Version:** v0.9-beta (pre-launch)  
+> **Launch Status:** See [README.md](./README.md) for current platform status and Q2 2026 launch target.
+
+## [3.0.0] - 2025-12-03## [3.0.0] - 2025-12-03
 
 ### Added
 - **Quality Assurance & Version Control Phase**: Complete Phase 3 implementation

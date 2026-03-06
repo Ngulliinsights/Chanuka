@@ -73,7 +73,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
   const nonce = crypto.randomBytes(16).toString('base64')
 
   // CSP policies
-  const baseCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
+  const baseCSP = "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com ws: wss: ws://localhost:* ws://127.0.0.1:* http://localhost:* http://127.0.0.1:* ws://localhost:4200 http://localhost:4200; worker-src 'self' blob:; child-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self';"
 
   const devCSP = baseCSP.replace("script-src 'self'", "script-src 'self' 'unsafe-inline' 'unsafe-eval'")
   const prodCSP = baseCSP.replace("script-src 'self'", `script-src 'self' 'nonce-${nonce}'`)
@@ -244,8 +244,8 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Development needs looser policies for hot module replacement
       headers: {
         'Content-Security-Policy': isDevelopment
-          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
-          : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self'; worker-src 'self' blob:; child-src 'self' blob:;",
+          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
+          : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self' blob:; child-src 'self' blob:;",
       },
 
       // Hot Module Replacement keeps your app state while updating code

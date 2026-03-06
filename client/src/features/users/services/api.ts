@@ -11,9 +11,9 @@
  */
 
 import { logger } from '@client/lib/utils/logger';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 
 import { globalApiClient } from '../../../infrastructure/api/client';
-import { globalErrorHandler } from '../../../infrastructure/api/errors';
 
 // ============================================================================
 // Type Re-exports
@@ -794,15 +794,12 @@ export class UserApiService {
     operation: string,
     context?: Record<string, unknown>
   ): Promise<Error> {
-    const handler = globalErrorHandler as (
-      error: unknown,
-      context?: Record<string, unknown>
-    ) => void;
-    handler(error, {
+    const clientError = ErrorFactory.createFromError(error, {
       component: 'UserApiService',
       operation,
       ...context,
     });
+    errorHandler.handleError(clientError);
     return error as Error;
   }
 }

@@ -1,19 +1,122 @@
 /**
- * Core Error Management Module
- *
- * Comprehensive error handling system with full feature parity
+ * Consolidated Error Management Module
  */
 
 // ============================================================================
-// Type Exports
+// Core Exports (New consolidated system)
+// ============================================================================
+
+export { ErrorFactory } from './core/factory';
+export { errorHandler } from './core/handler';
+export type {
+  BaseError,
+  ClientError,
+  ErrorContext,
+  ErrorMetrics,
+  ErrorListener,
+  ApiErrorResponse,
+} from './core/types';
+export { isBaseError, isClientError, isApiErrorResponse } from './core/types';
+
+// ============================================================================
+// Integration Exports
+// ============================================================================
+
+export { createQueryErrorHandler, createMutationErrorHandler } from './integration/react-query';
+
+// ============================================================================
+// Patterns (Strategic - Optional)
+// ============================================================================
+
+export type { ClientResult, Ok, Err } from './patterns/result';
+export {
+  ok,
+  err,
+  isOk,
+  isErr,
+  safeAsync,
+  safe,
+  map,
+  mapError,
+  andThen,
+  unwrap,
+  unwrapOr,
+  match,
+  combine,
+  fromPromise,
+  tap,
+  tapError,
+} from './patterns/result';
+
+// ============================================================================
+// Recovery (Strategic - Auth & User Actions)
+// ============================================================================
+
+export {
+  authRefreshStrategy,
+  authRetryStrategy,
+  authLogoutStrategy,
+  pageReloadStrategy,
+  cacheClearStrategy,
+  redirectStrategy,
+} from './recovery';
+
+// ============================================================================
+// Shared Types (Re-export from shared)
+// ============================================================================
+
+export { ErrorDomain, ErrorSeverity } from '@shared/core';
+
+// ============================================================================
+// Convenience Functions
+// ============================================================================
+
+import { ErrorFactory } from './core/factory';
+import { errorHandler } from './core/handler';
+import { ErrorDomain, ErrorSeverity } from '@shared/core';
+import type { ClientError, ErrorContext } from './core/types';
+
+/**
+ * Create and track an error
+ */
+export function createError(
+  type: ErrorDomain,
+  severity: ErrorSeverity,
+  message: string,
+  options?: {
+    details?: Record<string, unknown>;
+    context?: Partial<ErrorContext>;
+    recoverable?: boolean;
+    retryable?: boolean;
+  }
+): ClientError {
+  const error = ErrorFactory.createClientError(
+    'INTERNAL_SERVER_ERROR' as any,
+    message,
+    type,
+    severity,
+    options
+  );
+  return errorHandler.handleError(error);
+}
+
+/**
+ * Handle an error
+ */
+export function handleError(error: ClientError): ClientError {
+  return errorHandler.handleError(error);
+}
+
+// ============================================================================
+// Legacy Exports (Backward compatibility - will be deprecated)
 // ============================================================================
 
 export type {
-  ErrorContext,
+  ErrorContext as LegacyErrorContext,
   ErrorRecoveryStrategy,
   RecoveryStrategy,
   ErrorHandlerConfig,
-  ErrorListener,
+  ErrorListener as LegacyErrorListener,
   ErrorStats,
   ReactErrorInfo,
   ErrorBoundaryProps,
@@ -25,22 +128,6 @@ export type {
   ErrorTransformer,
   NavigationErrorType,
 } from './types';
-
-// Unified error types (aligned with server StandardizedError)
-export type {
-  BaseError as UnifiedBaseError,
-  ClientError,
-  ApiErrorResponse,
-  RecoveryStrategy as UnifiedRecoveryStrategy,
-  RecoveryResult as UnifiedRecoveryResult,
-} from './unified-types';
-
-export {
-  isBaseError,
-  isClientError,
-  isApiErrorResponse,
-  standardErrorToBaseError,
-} from './unified-types';
 
 // Component types
 export type {
@@ -90,11 +177,17 @@ export {
 export type { RecoveryContext as DashboardRecoveryContext, RecoveryStrategy as DashboardRecoveryStrategy } from './dashboard-errors';
 
 // ============================================================================
-// Core Services
+// Core Services (Legacy - use new core exports instead)
 // ============================================================================
 
-export { coreErrorHandler } from './handler';
-export { createNetworkError, createValidationError, createAuthError } from './handler';
+// Note: These are re-exported from the new core system for backward compatibility
+export { errorHandler as coreErrorHandler } from './core/handler';
+export { ErrorFactory } from './core/factory';
+
+// Legacy convenience functions (use ErrorFactory instead)
+export const createNetworkError = ErrorFactory.createNetworkError;
+export const createValidationError = ErrorFactory.createValidationError;
+export const createAuthError = ErrorFactory.createAuthenticationError;
 
 // ============================================================================
 // Reporter Integration Methods
@@ -151,22 +244,11 @@ export type {
   PatternSignature,
 } from './analytics';
 export { ErrorRateLimiter } from './rate-limiter';
-export { ErrorFactory } from './factory';
 
-// Unified factory functions (pure, no side effects)
-export {
-  createValidationError as createUnifiedValidationError,
-  createNetworkError as createUnifiedNetworkError,
-  createAuthenticationError,
-  createAuthorizationError,
-  createBusinessError,
-  createSystemError,
-  createNotFoundError,
-  createTimeoutError,
-  createClientError,
-} from './unified-factory';
+// ============================================================================
+// HTTP Boundary Serialization
+// ============================================================================
 
-// HTTP boundary serialization
 export {
   toApiError,
   fromApiError,
@@ -178,38 +260,6 @@ export {
   enrichErrorContext,
   cloneError,
 } from './serialization';
-
-// Unified error handler (with observability and logging integration)
-export {
-  UnifiedErrorHandler,
-  errorHandler as unifiedErrorHandler,
-  handleError as handleUnifiedError,
-} from './unified-handler';
-export type { ErrorHandlerConfig as UnifiedErrorHandlerConfig } from './unified-handler';
-
-// Result monad for functional error handling
-export type { ClientResult, Ok, Err } from './result';
-export {
-  ok,
-  err,
-  isOk,
-  isErr,
-  safeAsync,
-  safe,
-  map,
-  mapError,
-  andThen,
-  unwrap,
-  unwrapOr,
-  unwrapOrElse,
-  match,
-  combine,
-  combineWith,
-  fromPromise,
-  toPromise,
-  tap,
-  tapError,
-} from './result';
 
 // ============================================================================
 // Error Boundary Components
@@ -297,7 +347,7 @@ export {
 
 import { useCallback } from 'react';
 
-import { coreErrorHandler } from './handler';
+import { errorHandler as coreErrorHandler } from './core/handler';
 import { registerDefaultRecoveryStrategies } from './recovery';
 import type {
   AppError,

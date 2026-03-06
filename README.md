@@ -26,11 +26,13 @@ Visit:
 **Current Phase**: Pre-launch development  
 **Target Launch**: Q2 2026
 
+> **Understanding Status:** This platform uses three separate status dimensions: Code Health (engineering quality), Feature Completeness (user-facing functionality), and Launch Readiness (platform-wide). See [docs/STATUS_VOCABULARY.md](./docs/STATUS_VOCABULARY.md) for definitions.
+
 ### What's Working Today
 - ✅ Bill tracking and search
 - ✅ User authentication and profiles
 - ✅ Community comments and voting
-- ✅ Constitutional analysis
+- 🟡 Constitutional analysis (provision matching works, needs ML training)
 - ✅ Multi-language support (English & Swahili)
 - ✅ Real-time notifications
 
@@ -66,13 +68,12 @@ See [CURRENT_CAPABILITIES.md](./CURRENT_CAPABILITIES.md) for detailed feature st
 - [📋 Documentation Index](./DOCUMENTATION_INDEX.md) ← **Complete guide to all docs**
 - [🏗️ Architecture Overview](./ARCHITECTURE.md) ← **Module organization**
 - [✅ Current Capabilities](./CURRENT_CAPABILITIES.md) ← **What actually works today**
-- [⚠️ Contradictions Reconciliation](./CONTRADICTIONS_RECONCILIATION.md) ← **Addressing gaps**
 
 **Detailed Guides**:
 - [📖 Full Documentation](./docs/README.md)
-- [🏗️ Setup Guide](./docs/setup.md)
+- [🏗️ Setup Guide](./docs/guides/setup.md)
 - [🔧 Monorepo Guide](./docs/monorepo.md)
-- [🏛️ Architecture](./docs/architecture.md)
+- [🏛️ Technical Architecture](./docs/technical/architecture.md)
 - [🔄 Migration Guides](./docs/migrations/)
   - [API Service Unification](./docs/migrations/api-service-unification.md)
   - [Logger Consolidation](./docs/migrations/logger-consolidation.md)

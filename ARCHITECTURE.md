@@ -26,7 +26,7 @@ chanuka-platform/
 
 ### What Is shared/core?
 
-Despite its "shared" name, `shared/core` is **80% server infrastructure**. It contains:
+Despite its "shared" name, `shared/core` is **mostly server infrastructure** (~80%). It contains:
 
 **Server-Only Modules:**
 - `observability/` - Server logging, error management, tracing, metrics
@@ -54,6 +54,20 @@ Despite its "shared" name, `shared/core` is **80% server infrastructure**. It co
 ### Why Is Server Code in shared/core?
 
 This is a legacy architectural decision. The module was originally created for truly shared infrastructure, but as the server grew, infrastructure modules were added here for convenience.
+
+### Design Boundary: What Belongs in shared/core?
+
+**Add to shared/core ONLY if:**
+- The code is imported by BOTH client and server
+- It's a primitive type, constant, or utility with zero dependencies
+- Examples: string-utils, type-guards, auth types, feature flags
+
+**Add to server/infrastructure if:**
+- The code is only imported by server code
+- It has server-specific dependencies (Express, database, cache)
+- Examples: middleware, observability, caching, validation schemas
+
+**When in doubt:** Check existing imports. If no client code imports it, it doesn't belong in shared/core.
 
 ### Future Plans
 

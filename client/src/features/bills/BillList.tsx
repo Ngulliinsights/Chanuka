@@ -21,7 +21,7 @@ import {
 } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import type { Bill, BillsQueryParams } from '@client/lib/types';
-import { BillStatus } from '@client/lib/types';
+import { BillStatus } from '@shared/types';
 
 import BillCard from './ui/list/BillCard';
 

@@ -9,6 +9,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import { useCallback, useEffect } from 'react';
 
 import { useAuth } from '@client/infrastructure/auth';
+import { createQueryErrorHandler, createMutationErrorHandler } from '@client/infrastructure/error';
 import { useUserDashboardStore } from '@client/infrastructure/store';
 import { userService as userBackendService } from '@client/lib/services/userService';
 import type { UserProfile, NotificationPreferences } from '@client/lib/services/userService';
@@ -72,6 +73,7 @@ export function useUserProfile(userId?: string) {
     staleTime: 5 * 60 * 1000, // Data stays fresh for 5 minutes
     retry: 2,
     gcTime: 10 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -95,6 +97,7 @@ export function useUpdateUserProfile() {
     onError: error => {
       logger.error('Failed to update user profile', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -110,6 +113,7 @@ export function useUserDashboard(userId?: string) {
     staleTime: 2 * 60 * 1000, // Refresh dashboard data every 2 minutes
     retry: 2,
     gcTime: 5 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -127,6 +131,7 @@ export function useSavedBills(userId?: string, page: number = 1, limit: number =
     gcTime: 10 * 60 * 1000,
     // Use placeholderData to keep previous page visible while loading new page
     placeholderData: keepPreviousData,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -154,6 +159,7 @@ export function useSaveBill() {
     onError: error => {
       logger.error('Failed to save bill', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -179,6 +185,7 @@ export function useUnsaveBill() {
     onError: error => {
       logger.error('Failed to unsave bill', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -210,6 +217,7 @@ export function useTrackBill() {
     onError: error => {
       logger.error('Failed to track bill', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -235,6 +243,7 @@ export function useUntrackBill() {
     onError: error => {
       logger.error('Failed to untrack bill', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -251,6 +260,7 @@ export function useEngagementHistory(userId?: string, options?: EngagementHistor
     retry: 2,
     gcTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -290,6 +300,7 @@ export function useTrackEngagement() {
       // Engagement tracking failures shouldn't disrupt user experience
       logger.warn('Failed to track engagement (non-critical)', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -319,6 +330,7 @@ export function useCivicMetrics(userId?: string, timeRange?: string) {
     staleTime: 5 * 60 * 1000,
     retry: 2,
     gcTime: 10 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -334,6 +346,7 @@ export function useUserBadges(userId?: string) {
     staleTime: 10 * 60 * 1000,
     retry: 2,
     gcTime: 20 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -349,6 +362,7 @@ export function useUserAchievements(userId?: string) {
     staleTime: 10 * 60 * 1000,
     retry: 2,
     gcTime: 20 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -378,6 +392,7 @@ export function useRecommendations(userId?: string, limit: number = 10) {
     staleTime: 15 * 60 * 1000, // Recommendations can be cached longer
     retry: 2,
     gcTime: 30 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -423,6 +438,7 @@ export function useDismissRecommendation() {
     onError: error => {
       logger.error('Failed to dismiss recommendation', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -443,6 +459,7 @@ export function useUserPreferences(userId?: string) {
     staleTime: 10 * 60 * 1000,
     retry: 2,
     gcTime: 20 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -472,6 +489,7 @@ export function useUpdateUserPreferences() {
     onError: error => {
       logger.error('Failed to update user preferences', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -501,6 +519,7 @@ export function useNotificationPreferences(userId?: string) {
     staleTime: 10 * 60 * 1000,
     retry: 2,
     gcTime: 20 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -540,6 +559,7 @@ export function useUpdateNotificationPreferences() {
     onError: error => {
       logger.error('Failed to update notification preferences', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -568,6 +588,7 @@ export function usePrivacyControls(userId?: string) {
     staleTime: 10 * 60 * 1000,
     retry: 2,
     gcTime: 20 * 60 * 1000,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -613,6 +634,7 @@ export function useUpdatePrivacyControls() {
     onError: error => {
       logger.error('Failed to update privacy controls', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 
@@ -642,6 +664,7 @@ export function useRequestDataExport() {
     onError: error => {
       logger.error('Failed to request data export', { error });
     },
+    ...createMutationErrorHandler(),
   });
 }
 

@@ -9,16 +9,10 @@
  */
 
 import { CacheService } from '@client/lib/services/cache';
-import {
-  ServiceErrorFactory,
-  ValidationError,
-  ResourceNotFoundError,
-  SystemError
-} from '@client/lib/services/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   UserProfileService as IProfileService,
-  UserProfile,
   UserBadge,
   UserAchievement,
   ActivitySummary,
@@ -26,7 +20,22 @@ import {
   EngagementFilters,
   UserPreferences
 } from '@client/lib/services/interfaces';
+import type { AuthUser } from '@client/lib/services/interfaces';
 import { logger } from '@client/lib/utils/logger';
+
+// UserProfile is referenced in interfaces but not exported - using AuthUser as base
+type UserProfile = AuthUser & {
+  bio?: string;
+  location?: string;
+  website?: string;
+  twitter?: string;
+  linkedin?: string;
+  cover_image_url?: string;
+  civic_engagement_score?: number;
+  badges?: UserBadge[];
+  achievements?: UserAchievement[];
+  activity_summary?: ActivitySummary;
+};
 
 export class UserProfileService implements IProfileService, ServiceLifecycleInterface {
   public readonly id = 'UserProfileService';
@@ -55,7 +64,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  async init(config?: unknown): Promise<void> {
+  async init(_config?: unknown): Promise<void> {
     await this.cache.warmCache();
     logger.info('UserProfileService initialized');
   }
@@ -113,17 +122,11 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return profile;
     } catch (error) {
-      if (error instanceof ResourceNotFoundError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to get user profile',
-        'UserProfileService',
-        'getUserProfile',
-        undefined,
-        { originalError: error, userId }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'getUserProfile'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -154,17 +157,11 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return savedProfile;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to update user profile',
-        'UserProfileService',
-        'updateProfile',
-        undefined,
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'updateProfile'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -195,17 +192,11 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return savedProfile.preferences;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to update user preferences',
-        'UserProfileService',
-        'updatePreferences',
-        undefined,
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'updatePreferences'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -226,17 +217,11 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return updatedProfile.avatar_url!;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to update user avatar',
-        'UserProfileService',
-        'updateAvatar',
-        undefined,
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'updateAvatar'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -257,17 +242,11 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return updatedProfile.cover_image_url!;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw new SystemError(
-        'Failed to update user cover image',
-        'UserProfileService',
-        'updateCoverImage',
-        undefined,
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'updateCoverImage'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -294,13 +273,13 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return statistics;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user statistics',
-        'UserProfileService',
-        'getUserStatistics',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUserStatistics' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -323,13 +302,13 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return badges;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user badges',
-        'UserProfileService',
-        'getUserBadges',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUserBadges' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -352,13 +331,13 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return achievements;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user achievements',
-        'UserProfileService',
-        'getUserAchievements',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUserAchievements' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -400,13 +379,13 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
       return result;
     } catch (error) {
-      throw new SystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get activity history',
-        'UserProfileService',
-        'getActivityHistory',
-        undefined,
-        { originalError: error, userId }
+        error instanceof Error ? error : undefined,
+        { operation: 'getActivityHistory' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -421,118 +400,78 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 
   private validateProfileUpdates(updates: Partial<UserProfile>): void {
     if (updates.name && (updates.name.length < 2 || updates.name.length > 100)) {
-      throw new ValidationError(
-        'Name must be between 2 and 100 characters',
-        'UserProfileService',
-        'validateProfileUpdates',
-        'name',
-        updates.name
+      throw ErrorFactory.createValidationError(
+        [{ field: 'name', message: 'Name must be between 2 and 100 characters' }]
       );
     }
 
     if (updates.bio && updates.bio.length > 500) {
-      throw new ValidationError(
-        'Bio cannot exceed 500 characters',
-        'UserProfileService',
-        'validateProfileUpdates',
-        'bio',
-        updates.bio
+      throw ErrorFactory.createValidationError(
+        [{ field: 'bio', message: 'Bio cannot exceed 500 characters' }]
       );
     }
 
     if (updates.location && updates.location.length > 100) {
-      throw new ValidationError(
-        'Location cannot exceed 100 characters',
-        'UserProfileService',
-        'validateProfileUpdates',
-        'location',
-        updates.location
+      throw ErrorFactory.createValidationError(
+        [{ field: 'location', message: 'Location cannot exceed 100 characters' }]
       );
     }
   }
 
   private validatePreferences(preferences: Partial<UserPreferences>): void {
     if (preferences.theme && !['light', 'dark', 'system'].includes(preferences.theme)) {
-      throw new ValidationError(
-        'Invalid theme value',
-        'UserProfileService',
-        'validatePreferences',
-        'theme',
-        preferences.theme
+      throw ErrorFactory.createValidationError(
+        [{ field: 'theme', message: 'Invalid theme value' }]
       );
     }
 
     if (preferences.language && preferences.language.length !== 2) {
-      throw new ValidationError(
-        'Invalid language code',
-        'UserProfileService',
-        'validatePreferences',
-        'language',
-        preferences.language
+      throw ErrorFactory.createValidationError(
+        [{ field: 'language', message: 'Invalid language code' }]
       );
     }
 
     if (preferences.email_frequency && !['immediate', 'daily', 'weekly', 'never'].includes(preferences.email_frequency)) {
-      throw new ValidationError(
-        'Invalid email frequency',
-        'UserProfileService',
-        'validatePreferences',
-        'email_frequency',
-        preferences.email_frequency
+      throw ErrorFactory.createValidationError(
+        [{ field: 'email_frequency', message: 'Invalid email frequency' }]
       );
     }
   }
 
   private validateAvatarFile(file: File): void {
     if (!file.type.startsWith('image/')) {
-      throw new ValidationError(
-        'File must be an image',
-        'UserProfileService',
-        'validateAvatarFile',
-        'file',
-        file.type
+      throw ErrorFactory.createValidationError(
+        [{ field: 'file', message: 'File must be an image' }]
       );
     }
 
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      throw new ValidationError(
-        'File size cannot exceed 5MB',
-        'UserProfileService',
-        'validateAvatarFile',
-        'file',
-        file.size
+      throw ErrorFactory.createValidationError(
+        [{ field: 'file', message: 'File size cannot exceed 5MB' }]
       );
     }
   }
 
   private validateCoverImageFile(file: File): void {
     if (!file.type.startsWith('image/')) {
-      throw new ValidationError(
-        'File must be an image',
-        'UserProfileService',
-        'validateCoverImageFile',
-        'file',
-        file.type
+      throw ErrorFactory.createValidationError(
+        [{ field: 'file', message: 'File must be an image' }]
       );
     }
 
     if (file.size > 10 * 1024 * 1024) { // 10MB limit
-      throw new ValidationError(
-        'File size cannot exceed 10MB',
-        'UserProfileService',
-        'validateCoverImageFile',
-        'file',
-        file.size
+      throw ErrorFactory.createValidationError(
+        [{ field: 'file', message: 'File size cannot exceed 10MB' }]
       );
     }
   }
 
-  private async fetchUserProfileFromServer(userId: string): Promise<UserProfile> {
+  private async fetchUserProfileFromServer(_userId: string): Promise<UserProfile> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve({
-          id: userId,
+          id: _userId,
           email: 'test@example.com',
           name: 'Test User',
           role: 'citizen',
@@ -589,7 +528,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async saveUserProfileToServer(userId: string, profile: UserProfile): Promise<UserProfile> {
+  private async saveUserProfileToServer(_userId: string, profile: UserProfile): Promise<UserProfile> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -598,7 +537,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async uploadAvatarFile(file: File, userId: string): Promise<string> {
+  private async uploadAvatarFile(_file: File, userId: string): Promise<string> {
     // Simulate file upload
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -607,7 +546,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async uploadCoverImageFile(file: File, userId: string): Promise<string> {
+  private async uploadCoverImageFile(_file: File, userId: string): Promise<string> {
     // Simulate file upload
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -616,7 +555,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async fetchUserStatisticsFromServer(userId: string): Promise<ActivitySummary> {
+  private async fetchUserStatisticsFromServer(_userId: string): Promise<ActivitySummary> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -634,7 +573,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async fetchUserBadgesFromServer(userId: string): Promise<UserBadge[]> {
+  private async fetchUserBadgesFromServer(_userId: string): Promise<UserBadge[]> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -652,7 +591,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
     });
   }
 
-  private async fetchUserAchievementsFromServer(userId: string): Promise<UserAchievement[]> {
+  private async fetchUserAchievementsFromServer(_userId: string): Promise<UserAchievement[]> {
     // Simulate API call
     return new Promise((resolve) => {
       setTimeout(() => {
@@ -673,10 +612,10 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
   }
 
   private async fetchActivityHistoryFromServer(
-    userId: string,
-    page: number,
-    limit: number,
-    filters: EngagementFilters
+    _userId: string,
+    _page: number,
+    _limit: number,
+    _filters: EngagementFilters
   ): Promise<{
     history: UserEngagementHistory[];
     total: number;
@@ -690,7 +629,7 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
           history: [
             {
               id: 'activity_1',
-              user_id: userId,
+              user_id: _userId,
               action_type: 'view',
               entity_type: 'bill',
               entity_id: 'bill_123',

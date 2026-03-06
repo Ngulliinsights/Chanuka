@@ -4,8 +4,8 @@
 import { logger } from '@client/lib/utils/logger';
 
 import { createAuthApiService } from '../auth';
-import { ErrorFactory, ErrorDomain } from '../error';
-import globalErrorHandler from '../error';
+import { ErrorFactory } from '../error';
+import { ErrorDomain } from '@shared/core';
 
 import { globalCache, CacheKeyGenerator } from './cache-manager';
 import { globalConfig } from './config';

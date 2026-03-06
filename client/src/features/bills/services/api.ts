@@ -7,6 +7,7 @@ import type {
   BillCategory,
 } from '@client/lib/types/bill';
 import { logger } from '@client/lib/utils/logger';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 
 import { globalApiClient } from '../../../infrastructure/api/client';
 
@@ -152,7 +153,7 @@ export class BillsApiService {
       return response.data;
     } catch (error) {
       logger.error('Failed to fetch bills', { error, params });
-      throw error;
+      throw this.handleError(error, 'getBills', { params });
     }
   }
 
@@ -167,7 +168,7 @@ export class BillsApiService {
       return response.data;
     } catch (error) {
       logger.error(`Failed to fetch bill ${id}`, { error });
-      throw error;
+      throw this.handleError(error, 'getBillById', { id });
     }
   }
 
@@ -183,7 +184,7 @@ export class BillsApiService {
       logger.info(`Bill ${id} ${action}ed successfully`);
     } catch (error) {
       logger.error(`Failed to ${tracking ? 'track' : 'untrack'} bill ${id}`, { error });
-      throw error;
+      throw this.handleError(error, tracking ? 'trackBill' : 'untrackBill', { id });
     }
   }
 
@@ -447,6 +448,19 @@ export class BillsApiService {
       logger.error('Failed to fetch bill statuses', { error });
       throw error;
     }
+  }
+
+  /**
+   * Handle errors with consolidated error system
+   */
+  private handleError(error: unknown, operation: string, context?: Record<string, unknown>): Error {
+    const clientError = ErrorFactory.createFromError(error, {
+      component: 'BillsApiService',
+      operation,
+      ...context,
+    });
+    errorHandler.handleError(clientError);
+    return error as Error;
   }
 }
 

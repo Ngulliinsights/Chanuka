@@ -1,4 +1,5 @@
 import { globalApiClient } from '@client/infrastructure/api';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { logger } from '@client/lib/utils/logger';
 import type { User } from '@client/lib/types';
 import type {
@@ -290,6 +291,11 @@ export const userApi = {
       });
     } catch (error) {
       // Silent failure - tracking should never block user actions
+      const clientError = ErrorFactory.createFromError(error, {
+        component: 'UserApiService',
+        operation: 'trackEngagement',
+      });
+      errorHandler.handleError(clientError);
       logger.warn('Engagement tracking failed (non-blocking)', {
         component: 'UserApiService',
         action: action.action_type,

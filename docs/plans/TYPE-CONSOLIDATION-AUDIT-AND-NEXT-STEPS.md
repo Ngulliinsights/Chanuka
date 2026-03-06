@@ -114,7 +114,8 @@
 **Government Data Services**:
 - `server/features/government-data/services/api-integrations.service.ts`
 - `server/features/government-data/services/data-validation-pipeline.service.ts`
-- `server/features/government-data/services/web-scraping.service.ts`
+- `server/features/government-data/services/parliament-scraper.service.ts`
+- `server/features/government-data/services/gazette-scraper.service.ts`
 
 **Schema Backup**:
 - `server/infrastructure/schema/index-full.ts.backup`

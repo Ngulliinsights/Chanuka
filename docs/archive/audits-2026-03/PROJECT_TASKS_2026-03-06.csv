@@ -1,0 +1,80 @@
+Task ID,Task Name,Module/File Origin,Stage,Status,Effort,Role Owner,Depends On,Unblocks,Critical Path,Priority,Notes
+F1.1,Database Schema Design,server/infrastructure/schema/,1-Foundation,Complete,L,Architect,,F1.2|F2.1|F2.2|F2.3,N,P0,30+ schema files production-ready
+F1.2,Database Migration Framework,drizzle.config.ts,1-Foundation,Complete,M,Civil Engineer,F1.1,F1.3|F1.4,N,P0,Drizzle with verification
+F1.3,Database Health Monitoring,server/infrastructure/database/monitoring/,1-Foundation,Complete,S,Civil Engineer,F1.2,F5.7,N,P1,Health checks implemented
+F1.4,Database Connection Pooling,server/infrastructure/database/pool.ts,1-Foundation,Complete,M,Civil Engineer,F1.2,ALL,N,P0,Connection management ready
+F1.5,Authentication System,server/infrastructure/auth/,1-Foundation,Complete,L,Architect,F1.1,F2.1|F2.2|F2.3|F2.4,Y,P0,JWT + OAuth2 + 2FA
+F1.6,Authorization RBAC,server/infrastructure/auth/rbac.ts,1-Foundation,Complete,M,Architect,F1.5,F2.1|F2.2|F3.10,N,P0,Role-based access control
+F1.7,API Infrastructure,client/src/infrastructure/api/,1-Foundation,Complete,L,Architect,F1.5,F2.1|F2.2|F2.3,Y,P0,HTTP client + circuit breaker
+F1.8,Error Handling System,client/src/infrastructure/error/,1-Foundation,Complete,L,Architect,,ALL,Y,P0,ErrorFactory + AsyncServiceResult
+F1.9,Logging & Observability,server/infrastructure/observability/,1-Foundation,Complete,M,Civil Engineer,,F5.3|F5.4,N,P0,Pino logger + metrics
+F1.10,Caching Layer,server/infrastructure/cache/,1-Foundation,Complete,L,Civil Engineer,F1.4,F2.1|F2.6|F3.1,N,P0,Redis + memory fallback
+F1.11,Environment Configuration,server/config/,1-Foundation,Complete,S,Civil Engineer,,F5.2,N,P0,Multi-env config
+F1.12,Docker Deployment,docker-compose.yml,1-Foundation,Complete,M,Civil Engineer,F1.11,F5.1|F5.2,N,P0,Container orchestration
+SUMMARY-F1,Foundation Stage Summary,,,95% Complete,XL,Both,,,,,"10/10 tasks complete, production-ready infrastructure"
+F2.1,Bill CRUD Operations,server/features/bills/,2-Core,Complete,L,Architect,F1.1|F1.5|F1.7,F2.9|F3.1|F3.2,Y,P0,Bills service + routes + UI
+F2.2,Bill Tracking System,server/features/bills/bill-tracking.routes.ts,2-Core,Complete,M,Architect,F2.1|F1.21,F3.1|F3.8,N,P0,Real-time tracking via WebSocket
+F2.3,User Registration/Login,server/features/users/,2-Core,Complete,M,Architect,F1.5|F1.7,F2.4|F2.5,Y,P0,Auth flows complete
+F2.4,User Profile Management,server/features/users/application/UserProfileService.ts,2-Core,Complete,M,Architect,F2.3,F3.1|F3.4,N,P0,Profiles + preferences + badges
+F2.5,Comment System,server/features/community/,2-Core,Complete,M,Architect,F2.1|F2.3|F1.21,F3.2|F3.11,N,P0,Comments + voting on bills
+F2.6,Search Functionality,server/features/search/,2-Core,Complete,L,Architect,F1.1|F1.10,F3.1|F3.4,N,P0,Dual-engine semantic + keyword
+F2.7,Notification System,server/features/notifications/,2-Core,Complete,M,Architect,F2.3|F1.22,F3.8|F3.9,N,P0,Multi-channel delivery
+F2.8,User Dashboard,client/src/features/users/pages/,2-Core,Complete,M,Architect,F2.4|F3.4,F6.2,N,P0,Dashboard + widgets + metrics
+F2.9,Bill Analysis Basic,server/features/analysis/,2-Core,Partial,L,Architect,F2.1|F1.23,F3.5|F3.6|F3.7,Y,P0,Needs ML integration
+F2.10,Sponsorship Tracking,server/features/sponsors/,2-Core,Complete,M,Architect,F2.1|F1.19,F3.8,N,P0,Sponsor service + conflict analysis
+SUMMARY-F2,Core Features Summary,,,75% Complete,XL,Architect,,,,,"8/10 complete, 2 need ML integration"
+F3.1,Recommendation Engine,server/features/recommendation/,3-Supporting,Complete,L,Architect,F2.1|F2.4|F2.6,F6.2,N,P1,Engagement-based recommendations
+F3.2,Analytics Dashboard,server/features/analytics/,3-Supporting,Complete,M,Architect,F2.1|F2.4|F2.5,F6.2,N,P1,User analytics + engagement
+F3.3,Feature Flags System,server/features/feature-flags/,3-Supporting,Complete,M,Architect,F1.1,F5.2|F6.1,N,P1,A/B testing support
+F3.4,Admin Panel,server/features/admin/,3-Supporting,Complete,M,Architect,F1.6|F2.4,F4.2|F5.3,N,P1,Admin routes + moderation
+F3.5,Monitoring System,server/features/monitoring/,3-Supporting,Complete,M,Civil Engineer,F1.9,F5.3|F5.4,N,P1,Health checks + alerting
+F3.6,Constitutional Intelligence,server/features/constitutional-intelligence/,3-Supporting,Partial,XL,Architect,F2.1|F1.23,F3.7|F3.8,Y,P0,Needs ML models + knowledge base
+F3.7,Argument Intelligence,server/features/argument-intelligence/,3-Supporting,Partial,XL,Architect,F2.5|F1.23,F3.11,Y,P0,NLP pipeline needs training
+F3.8,Pretext Detection,server/features/pretext-detection/,3-Supporting,Partial,L,Architect,F2.1|F1.23,F4.6,Y,P0,ML models need refinement
+F3.9,Electoral Accountability,server/features/electoral-accountability/,3-Supporting,Partial,L,Architect,F2.1|F1.19,F3.10,Y,P0,Needs government data integration
+F3.10,Advocacy Coordination,server/features/advocacy/,3-Supporting,Partial,L,Architect,F2.1|F2.3|F3.9,F6.2,N,P1,Campaign management incomplete
+SUMMARY-F3,Supporting Layer Summary,,,55% Complete,XL,Architect,,,,,"5/10 complete, 5 partial - ML dependency"
+F4.1,Error Recovery Strategies,client/src/infrastructure/error/recovery/,4-Hardening,Complete,M,Architect,F1.8,F5.3,N,P1,Recovery handlers implemented
+F4.2,Security Hardening,server/features/security/,4-Hardening,Complete,L,Civil Engineer,F1.5,F4.6|F5.3,N,P0,CSRF + CSP + sanitization
+F4.3,Performance Optimization,client/src/infrastructure/,4-Hardening,Partial,L,Civil Engineer,F1.10|F1.21,F5.6,Y,P1,Caching done - needs profiling
+F4.4,Edge Case Testing,tests/,4-Hardening,Partial,L,Both,F2.1-F2.10,F5.10,N,P1,Some coverage - needs comprehensive tests
+F4.5,Input Validation,shared/validation/,4-Hardening,Complete,M,Architect,F1.8,F4.2,N,P0,Zod schemas + middleware
+F4.6,API Rate Limiting,server/middleware/rate-limiter.ts,4-Hardening,Complete,S,Civil Engineer,F1.7,F4.2,N,P0,Rate limiter middleware
+F4.7,Data Integrity Checks,server/infrastructure/validation/,4-Hardening,Partial,M,Civil Engineer,F1.1,F5.7,N,P1,Schema validation - needs constraints
+F4.8,Backup Strategy,N/A,4-Hardening,Missing,M,Civil Engineer,F1.4,F4.9,Y,P0,No backup strategy evident
+F4.9,Disaster Recovery Plan,N/A,4-Hardening,Missing,L,Civil Engineer,F4.8,F5.10,Y,P0,No DR plan evident
+F4.10,Load Testing,N/A,4-Hardening,Missing,M,Civil Engineer,F2.1-F2.10,F5.6,Y,P1,No load test scripts found
+SUMMARY-F4,Hardening Summary,,,60% Complete,L,Both,,,,,"4/10 complete, 3 partial, 3 missing - critical gaps"
+F5.1,CI/CD Pipeline,.github/workflows/,5-Scale,Partial,L,Civil Engineer,F1.12,F5.2,Y,P0,GitHub workflows - needs completion
+F5.2,Deployment Automation,deployment/,5-Scale,Partial,L,Civil Engineer,F1.12|F3.3,F5.9,Y,P0,Docker setup - needs orchestration
+F5.3,Monitoring Dashboards,server/features/monitoring/,5-Scale,Partial,M,Civil Engineer,F1.9|F3.5,F5.10,N,P1,Metrics collection - needs visualization
+F5.4,Log Aggregation,server/infrastructure/observability/,5-Scale,Partial,M,Civil Engineer,F1.9,F5.3,N,P1,Pino logging - needs centralization
+F5.5,Performance Monitoring,server/infrastructure/observability/monitoring/,5-Scale,Partial,M,Civil Engineer,F1.9,F5.6,N,P1,Performance tracking - needs APM
+F5.6,Scalability Testing,N/A,5-Scale,Missing,L,Civil Engineer,F4.10,F5.9,Y,P1,No scalability tests
+F5.7,Database Optimization,server/infrastructure/database/,5-Scale,Partial,M,Civil Engineer,F1.3|F4.7,F5.6,N,P1,Indexes defined - needs query optimization
+F5.8,CDN Integration,N/A,5-Scale,Missing,M,Civil Engineer,F1.12,F5.9,N,P2,No CDN configuration
+F5.9,Auto-scaling Setup,N/A,5-Scale,Missing,L,Civil Engineer,F5.2|F5.6,F5.10,Y,P1,No auto-scaling setup
+F5.10,Incident Response,N/A,5-Scale,Missing,M,Civil Engineer,F4.9|F5.3,F6.10,Y,P0,No runbooks evident
+SUMMARY-F5,Scale & Ops Summary,,,45% Complete,XL,Civil Engineer,,,,,"0/10 complete, 5 partial, 5 missing - ops gaps"
+F6.1,A/B Testing Framework,server/features/feature-flags/,6-Growth,Partial,M,Architect,F3.3,F6.2,N,P2,Feature flags support - needs analytics
+F6.2,Analytics Integration,client/src/features/analytics/,6-Growth,Partial,M,Architect,F3.2|F6.1,F6.10,N,P2,User analytics - needs external integration
+F6.3,API Versioning,N/A,6-Growth,Missing,M,Architect,F1.7,F6.4|F6.7,N,P2,No API versioning strategy
+F6.4,API Documentation,server/features/*/API.md,6-Growth,Partial,M,Architect,F1.7,F6.7,N,P2,Some docs - needs OpenAPI spec
+F6.5,Extensibility Hooks,N/A,6-Growth,Missing,L,Architect,F1.7,F6.6,N,P3,No plugin system
+F6.6,Third-party Integrations,server/infrastructure/auth/,6-Growth,Partial,M,Architect,F1.5,F6.2,N,P2,OAuth2 - needs more integrations
+F6.7,Mobile App API,N/A,6-Growth,Missing,L,Architect,F6.3,F6.9,N,P2,No mobile-specific API
+F6.8,Internationalization,shared/i18n/,6-Growth,Partial,M,Architect,,F6.9,N,P2,i18n setup (en sw) - needs completion
+F6.9,Accessibility Compliance,client/src/lib/a11y/,6-Growth,Partial,L,Architect,F6.8,F6.10,N,P1,Some a11y - needs WCAG compliance
+F6.10,SEO Optimization,N/A,6-Growth,Missing,M,Architect,F6.2|F6.9,LAUNCH,N,P2,No SEO strategy evident
+SUMMARY-F6,Growth Layer Summary,,,25% Complete,L,Architect,,,,,"0/10 complete, 5 partial, 5 missing - future work"
+I1.19,Government Data Integration,server/features/government-data/,3-Supporting,Partial,XL,Both,F1.1|F1.7,F3.9|F2.10|F3.8,Y,P0,CRITICAL BLOCKER - 45% complete
+I1.20,Government API Client,server/infrastructure/external-data/government-api-client.ts,3-Supporting,Partial,L,Civil Engineer,I1.19,F3.9,Y,P0,API client scaffolded - needs integration
+I1.21,WebSocket Real-time,server/infrastructure/websocket/,1-Foundation,Complete,L,Civil Engineer,F1.4,F2.2|F2.5|F2.7,N,P0,Socket.io + Redis adapter
+I1.22,Messaging Infrastructure,server/infrastructure/messaging/,1-Foundation,Complete,M,Civil Engineer,F1.4,F2.7,N,P0,Email + SMS + push
+I1.23,ML Model Training,server/features/ml/,3-Supporting,Scaffolded,XL,Architect,,F2.9|F3.6|F3.7|F3.8,Y,P0,CRITICAL BLOCKER - 30% complete
+I1.24,ML Model Deployment,server/features/ml/services/,3-Supporting,Scaffolded,L,Civil Engineer,I1.23,F2.9|F3.6|F3.7|F3.8,Y,P0,Models not trained
+I1.25,Graph Database Sync,server/infrastructure/database/graph/,3-Supporting,Partial,L,Civil Engineer,F1.1|I1.26,I1.27,Y,P1,Neo4j sync incomplete - 40%
+I1.26,Neo4j Deployment,docker-compose.neo4j.yml,5-Scale,Partial,M,Civil Engineer,F1.12,I1.25,N,P1,Docker setup - needs production config
+I1.27,Influence Mapping,server/infrastructure/database/graph/analytics/,6-Growth,Scaffolded,L,Architect,I1.25,F6.2,N,P2,Graph analytics incomplete
+I1.28,USSD Gateway Integration,server/features/universal_access/,3-Supporting,Partial,L,Civil Engineer,F1.1,F6.9,N,P2,USSD service - needs gateway
+SUMMARY-I1,Infrastructure Integration,,,45% Complete,XL,Both,,,,,"Critical blockers: Gov Data ML Models Graph DB"

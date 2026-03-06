@@ -10,11 +10,7 @@
  */
 
 import { CacheService } from '@client/lib/services/cache';
-import {
-  ServiceErrorFactory,
-  ValidationError,
-  ResourceNotFoundError
-} from '@client/lib/services/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   DashboardService as IDashboardService,
@@ -22,8 +18,7 @@ import {
   DashboardWidget,
   DashboardLayout,
   UserMetrics,
-  Recommendation,
-  Notification
+  Recommendation
 } from '@client/lib/services/interfaces';
 import { logger } from '@client/lib/utils/logger';
 
@@ -59,7 +54,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     });
   }
 
-  async init(config?: unknown): Promise<void> {
+  async init(_config?: unknown): Promise<void> {
     await this.cache.warmCache();
     logger.info('DashboardService initialized');
   }
@@ -103,7 +98,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
       const cacheKey = 'dashboard_data';
 
       // Try cache first
-      let dashboardData = await this.cache.get<DashboardData>(cacheKey);
+      let dashboardData = await this.cache.get<DashboardData | null>(cacheKey);
       if (dashboardData) {
         return dashboardData;
       }
@@ -142,12 +137,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return dashboardData;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get dashboard data',
-        'DashboardService',
-        'getDashboardData',
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'getDashboardData' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -173,12 +169,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return widgets;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get dashboard widgets',
-        'DashboardService',
-        'getDashboardWidgets',
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'getDashboardWidgets' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -198,16 +195,11 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       logger.info('Dashboard layout updated successfully');
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createSystemError(
-        'Failed to update dashboard layout',
-        'DashboardService',
-        'updateDashboardLayout',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'updateDashboardLayout'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -233,12 +225,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return metrics;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get user metrics',
-        'DashboardService',
-        'getUserMetrics',
-        { originalError: error, timeRange }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUserMetrics' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -260,12 +253,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return recommendations;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get bill recommendations',
-        'DashboardService',
-        'getBillRecommendations',
-        { originalError: error, limit }
+        error instanceof Error ? error : undefined,
+        { operation: 'getBillRecommendations' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -278,12 +272,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
       const notifications = await this.fetchNotifications();
       return notifications.filter(n => !n.read).length;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get unread notifications count',
-        'DashboardService',
-        'getUnreadNotificationsCount',
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'getUnreadNotificationsCount' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -296,21 +291,22 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       logger.info('Notification marked as read', { notificationId });
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to mark notification as read',
-        'DashboardService',
-        'markNotificationAsRead',
-        { originalError: error, notificationId }
+        error instanceof Error ? error : undefined,
+        { operation: 'markNotificationAsRead' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
-  async getNotifications(page?: number, limit?: number): Promise<Notification[]> {
+  async getNotifications(page?: number, limit?: number): Promise<any[]> {
     try {
       const cacheKey = `notifications_${page || 1}_${limit || 20}`;
 
       // Try cache first
-      let notifications = await this.cache.get<Notification[]>(cacheKey);
+      let notifications = await this.cache.get<any[]>(cacheKey);
       if (notifications) {
         return notifications;
       }
@@ -323,12 +319,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       return notifications;
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to get notifications',
-        'DashboardService',
-        'getNotifications',
-        { originalError: error, page, limit }
+        error instanceof Error ? error : undefined,
+        { operation: 'getNotifications' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -341,12 +338,13 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
       logger.info('All notifications cleared');
     } catch (error) {
-      throw ServiceErrorFactory.createSystemError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to clear notifications',
-        'DashboardService',
-        'clearNotifications',
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'clearNotifications' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -356,34 +354,22 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 
   private validateDashboardLayout(layout: DashboardLayout): void {
     if (!layout.widgets || !Array.isArray(layout.widgets)) {
-      throw new ValidationError(
-        'Layout must contain widgets array',
-        'DashboardService',
-        'validateDashboardLayout',
-        'widgets',
-        layout.widgets
+      throw ErrorFactory.createValidationError(
+        [{ field: 'widgets', message: 'Layout must contain widgets array' }]
       );
     }
 
     if (layout.widgets.length > (this.config.options?.maxWidgets || 20)) {
-      throw new ValidationError(
-        `Maximum ${this.config.options?.maxWidgets} widgets allowed`,
-        'DashboardService',
-        'validateDashboardLayout',
-        'widgets',
-        layout.widgets.length
+      throw ErrorFactory.createValidationError(
+        [{ field: 'widgets', message: `Maximum ${this.config.options?.maxWidgets} widgets allowed` }]
       );
     }
 
     // Validate widget positions
     for (const widget of layout.widgets) {
       if (widget.position.x < 0 || widget.position.y < 0) {
-        throw new ValidationError(
-          'Widget position must be positive',
-          'DashboardService',
-          'validateDashboardLayout',
-          'position',
-          widget.position
+        throw ErrorFactory.createValidationError(
+          [{ field: 'position', message: 'Widget position must be positive' }]
         );
       }
     }
@@ -467,7 +453,7 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     return [];
   }
 
-  private async fetchNotifications(page?: number, limit?: number): Promise<Notification[]> {
+  private async fetchNotifications(_page?: number, _limit?: number): Promise<any[]> {
     // Mock implementation
     return [];
   }
@@ -491,11 +477,11 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     ];
   }
 
-  private async saveDashboardLayout(layout: DashboardLayout): Promise<void> {
+  private async saveDashboardLayout(_layout: DashboardLayout): Promise<void> {
     // Mock implementation
   }
 
-  private async fetchUserMetrics(timeRange?: string): Promise<UserMetrics> {
+  private async fetchUserMetrics(_timeRange?: string): Promise<UserMetrics> {
     // Mock implementation
     return {
       total_bills_tracked: 10,
@@ -508,12 +494,12 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
     };
   }
 
-  private async fetchBillRecommendations(limit?: number): Promise<Recommendation[]> {
+  private async fetchBillRecommendations(_limit?: number): Promise<Recommendation[]> {
     // Mock implementation
     return [];
   }
 
-  private async updateNotificationReadStatus(notificationId: string, read: boolean): Promise<void> {
+  private async updateNotificationReadStatus(_notificationId: string, _read: boolean): Promise<void> {
     // Mock implementation
   }
 

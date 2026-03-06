@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { createQueryErrorHandler, createMutationErrorHandler } from '@client/infrastructure/error';
 import { useToast } from '@client/lib/hooks/use-toast';
 
 import { userApi } from '../services/user-api';
@@ -41,6 +42,7 @@ export function useAuth() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const register = useMutation({
@@ -62,6 +64,7 @@ export function useAuth() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const logout = useMutation({
@@ -76,6 +79,7 @@ export function useAuth() {
         description: 'You have been successfully logged out.',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   return {
@@ -94,6 +98,7 @@ export function useUser() {
     queryFn: () => userApi.getCurrentUser(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: false,
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -109,6 +114,7 @@ export function useProfile(user_id?: string) {
     queryFn: () => userApi.getUserProfile(user_id),
     enabled: !!user_id || !user_id, // Always enabled for current user, conditional for others
     staleTime: 10 * 60 * 1000, // 10 minutes
+    ...createQueryErrorHandler(),
   });
 
   const updateProfile = useMutation({
@@ -127,6 +133,7 @@ export function useProfile(user_id?: string) {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const updateAvatar = useMutation({
@@ -148,6 +155,7 @@ export function useProfile(user_id?: string) {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const deleteAccount = useMutation({
@@ -169,6 +177,7 @@ export function useProfile(user_id?: string) {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   return {
@@ -190,6 +199,7 @@ export function usePreferences() {
     queryKey: ['preferences'],
     queryFn: () => userApi.getPreferences(),
     staleTime: 30 * 60 * 1000, // 30 minutes
+    ...createQueryErrorHandler(),
   });
 
   const updatePreferences = useMutation({
@@ -208,6 +218,7 @@ export function usePreferences() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   return {
@@ -227,6 +238,7 @@ export function useVerification() {
     queryKey: ['verification'],
     queryFn: () => userApi.getVerificationStatus(),
     staleTime: 15 * 60 * 1000, // 15 minutes
+    ...createQueryErrorHandler(),
   });
 
   const submitVerification = useMutation({
@@ -245,6 +257,7 @@ export function useVerification() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const verifyPhone = useMutation({
@@ -264,6 +277,7 @@ export function useVerification() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const resendPhoneVerification = useMutation({
@@ -281,6 +295,7 @@ export function useVerification() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   return {
@@ -313,6 +328,7 @@ export function usePassword() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const requestPasswordReset = useMutation({
@@ -330,6 +346,7 @@ export function usePassword() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   const resetPassword = useMutation({
@@ -347,6 +364,7 @@ export function usePassword() {
         variant: 'destructive',
       });
     },
+    ...createMutationErrorHandler(),
   });
 
   return {
@@ -365,6 +383,7 @@ export function useUserSearch(query: string, enabled = true) {
     queryFn: () => userApi.searchUsers(query),
     enabled: enabled && query.length > 2,
     staleTime: 2 * 60 * 1000, // 2 minutes
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -377,6 +396,7 @@ export function useUserById(user_id: string | undefined) {
     queryFn: () => userApi.getUserById(user_id!),
     enabled: !!user_id,
     staleTime: 10 * 60 * 1000, // 10 minutes
+    ...createQueryErrorHandler(),
   });
 }
 
@@ -388,12 +408,14 @@ export function useUserActivity(user_id?: string) {
     queryKey: ['users', user_id, 'activity'],
     queryFn: () => userApi.getUserActivity(user_id),
     staleTime: 5 * 60 * 1000, // 5 minutes
+    ...createQueryErrorHandler(),
   });
 
   const stats = useQuery({
     queryKey: ['users', user_id, 'stats'],
     queryFn: () => userApi.getUserStats(user_id),
     staleTime: 15 * 60 * 1000, // 15 minutes
+    ...createQueryErrorHandler(),
   });
 
   return {

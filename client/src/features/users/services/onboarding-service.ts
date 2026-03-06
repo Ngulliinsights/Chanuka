@@ -3,6 +3,7 @@
  * Manages user persona selection and onboarding persistence
  */
 
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import type { UserPersona } from '../ui/onboarding/UserJourneyOptimizer';
 
 const PERSONA_STORAGE_KEY = 'chanuka_user_persona';
@@ -16,7 +17,15 @@ export class OnboardingService {
     try {
       localStorage.setItem(PERSONA_STORAGE_KEY, JSON.stringify(persona));
     } catch (error) {
-      console.error('Failed to save persona:', error);
+      const clientError = ErrorFactory.createSystemError(
+        'Failed to save persona to localStorage',
+        error as Error,
+        {
+          component: 'OnboardingService',
+          operation: 'savePersona',
+        }
+      );
+      errorHandler.handleError(clientError);
     }
   }
 
@@ -28,7 +37,15 @@ export class OnboardingService {
       const stored = localStorage.getItem(PERSONA_STORAGE_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch (error) {
-      console.error('Failed to retrieve persona:', error);
+      const clientError = ErrorFactory.createSystemError(
+        'Failed to retrieve persona from localStorage',
+        error as Error,
+        {
+          component: 'OnboardingService',
+          operation: 'getPersona',
+        }
+      );
+      errorHandler.handleError(clientError);
       return null;
     }
   }
@@ -40,7 +57,15 @@ export class OnboardingService {
     try {
       localStorage.setItem(ONBOARDING_COMPLETED_KEY, 'true');
     } catch (error) {
-      console.error('Failed to mark onboarding complete:', error);
+      const clientError = ErrorFactory.createSystemError(
+        'Failed to mark onboarding complete in localStorage',
+        error as Error,
+        {
+          component: 'OnboardingService',
+          operation: 'markOnboardingComplete',
+        }
+      );
+      errorHandler.handleError(clientError);
     }
   }
 
@@ -51,7 +76,15 @@ export class OnboardingService {
     try {
       return localStorage.getItem(ONBOARDING_COMPLETED_KEY) === 'true';
     } catch (error) {
-      console.error('Failed to check onboarding status:', error);
+      const clientError = ErrorFactory.createSystemError(
+        'Failed to check onboarding status in localStorage',
+        error as Error,
+        {
+          component: 'OnboardingService',
+          operation: 'isOnboardingComplete',
+        }
+      );
+      errorHandler.handleError(clientError);
       return false;
     }
   }
@@ -64,7 +97,15 @@ export class OnboardingService {
       localStorage.removeItem(PERSONA_STORAGE_KEY);
       localStorage.removeItem(ONBOARDING_COMPLETED_KEY);
     } catch (error) {
-      console.error('Failed to clear onboarding data:', error);
+      const clientError = ErrorFactory.createSystemError(
+        'Failed to clear onboarding data from localStorage',
+        error as Error,
+        {
+          component: 'OnboardingService',
+          operation: 'clearOnboarding',
+        }
+      );
+      errorHandler.handleError(clientError);
     }
   }
 }

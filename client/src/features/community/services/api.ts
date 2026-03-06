@@ -74,7 +74,7 @@ import type { SearchResult } from '@client/lib/types/search';
 import { logger } from '@client/lib/utils/logger';
 
 import { globalApiClient } from '../../../infrastructure/api/client';
-import { globalErrorHandler } from '../../../infrastructure/api/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 
 // Re-export community types from unified module
 export type {
@@ -998,22 +998,13 @@ export class CommunityApiService {
     operation: string,
     context?: Record<string, unknown>
   ): Promise<Error> {
-    // Ensure we have an Error object to work with
-    const errorObj = error instanceof Error ? error : new Error(String(error));
-
-    // globalErrorHandler may be a function that optionally returns a Promise.
-    // Call it and treat the result as unknown, then check for a `then` function.
-    const maybePromise: unknown = globalErrorHandler(errorObj, {
+    const clientError = ErrorFactory.createFromError(error, {
       component: 'CommunityApiService',
       operation,
       ...context,
-    }) as unknown;
-
-    if (maybePromise && typeof (maybePromise as { then?: unknown }).then === 'function') {
-      (await maybePromise) as Promise<void>;
-    }
-
-    return errorObj;
+    });
+    errorHandler.handleError(clientError);
+    return error as Error;
   }
 }
 

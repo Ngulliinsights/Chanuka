@@ -202,3 +202,12 @@ test-styles.html
 !DOCUMENTATION_AUDIT_REPORT.md
 !CONSOLIDATION_SESSION_SUMMARY.md
 nul
+
+# Ad-hoc debugging scripts
+test-vite*.js
+test-vite*.cjs
+local-test.png
+test-results.txt
+
+# Generated analysis files
+analysis-results/

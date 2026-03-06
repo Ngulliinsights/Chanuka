@@ -10,13 +10,7 @@
  */
 
 import { CacheService } from '@client/lib/services/cache';
-import {
-  ServiceErrorFactory,
-  AuthenticationError,
-  ValidationError,
-  TokenExpiredError,
-  TwoFactorRequiredError
-} from '@client/lib/services/errors';
+import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 import { ServiceLifecycleInterface } from '@client/lib/services/factory';
 import {
   AuthService as IAuthService,
@@ -25,9 +19,7 @@ import {
   AuthTokens,
   AuthUser,
   RegisterData,
-  UserPreferences,
-  NotificationPreferences,
-  PrivacySettings
+  UserPreferences
 } from '@client/lib/services/interfaces';
 import { logger } from '@client/lib/utils/logger';
 
@@ -43,10 +35,10 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     description: 'Handles user authentication and session management',
     dependencies: [],
     options: {
-      sessionTimeout: 30 * 60 * 1000, // 30 minutes
-      refreshTokenThreshold: 0.8, // Refresh at 80% of token lifetime
+      sessionTimeout: 30 * 60 * 1000,    // 30 minutes
+      refreshTokenThreshold: 0.8,         // Refresh at 80% of token lifetime
       maxLoginAttempts: 5,
-      lockoutDuration: 15 * 60 * 1000 // 15 minutes
+      lockoutDuration: 15 * 60 * 1000    // 15 minutes
     }
   };
 
@@ -64,31 +56,22 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     });
   }
 
-  async init(config?: unknown): Promise<void> {
-    // CacheService doesn't have init method, just use it directly
+  async init(_config?: unknown): Promise<void> {
     await this.cache.warmCache();
-
-    // Restore session if exists
     await this.restoreSession();
-
     logger.info('AuthService initialized');
   }
 
   async dispose(): Promise<void> {
     await this.clearSession();
-    if (this.sessionTimeout) {
-      clearTimeout(this.sessionTimeout);
-    }
-    if (this.refreshTokenTimeout) {
-      clearTimeout(this.refreshTokenTimeout);
-    }
+    if (this.sessionTimeout) clearTimeout(this.sessionTimeout);
+    if (this.refreshTokenTimeout) clearTimeout(this.refreshTokenTimeout);
     await this.cache.clear();
     logger.info('AuthService disposed');
   }
 
   async healthCheck(): Promise<boolean> {
     try {
-      // Check if cache is available
       const cacheStats = await this.cache.getStatistics();
       return cacheStats.storageInfo.available;
     } catch (error) {
@@ -122,28 +105,20 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       this.validateCredentials(credentials);
 
-      // Check for account lockout
       const lockoutKey = `lockout_${credentials.email}`;
       const lockoutData = await this.cache.get<{ attempts: number; lockedUntil: number }>(lockoutKey);
 
       if (lockoutData && Date.now() < lockoutData.lockedUntil) {
-        throw new AuthenticationError(
+        throw ErrorFactory.createAuthenticationError(
           `Account temporarily locked. Try again in ${Math.ceil((lockoutData.lockedUntil - Date.now()) / 60000)} minutes.`,
-          'login',
-          { email: credentials.email, lockoutUntil: new Date(lockoutData.lockedUntil) }
+          { operation: 'login' }
         );
       }
 
-      // Simulate API call to authentication service
       const session = await this.authenticateWithServer(credentials);
 
-      // Store session
       await this.storeSession(session);
-
-      // Schedule session timeout
       this.scheduleSessionTimeout(session.expiresAt);
-
-      // Schedule token refresh
       this.scheduleTokenRefresh(session.tokens.expiresIn);
 
       logger.info('User logged in successfully', {
@@ -154,18 +129,13 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
 
       return session;
     } catch (error) {
-      if (error instanceof AuthenticationError || error instanceof TwoFactorRequiredError) {
-        throw error;
-      }
-
-      // Increment login attempts on failure
       await this.incrementLoginAttempts(credentials.email);
 
-      throw ServiceErrorFactory.createAuthError(
-        'Login failed. Please check your credentials.',
-        'login',
-        { originalError: error, email: credentials.email }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'login'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -173,43 +143,26 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       this.validateRegistrationData(data);
 
-      // Check if email already exists
       const existingUser = await this.getUserByEmail(data.email);
       if (existingUser) {
-        throw new ValidationError(
-          'Email address is already registered',
-          'AuthService',
-          'register',
-          'email',
-          data.email
+        throw ErrorFactory.createValidationError(
+          [{ field: 'email', message: 'Email address is already registered' }]
         );
       }
 
-      // Create user account
       const user = await this.createUserAccount(data);
-
-      // Create initial session
       const session = await this.createSession(user);
-
-      // Store session
       await this.storeSession(session);
 
-      logger.info('User registered successfully', {
-        userId: user.id,
-        email: user.email
-      });
+      logger.info('User registered successfully', { userId: user.id, email: user.email });
 
       return session;
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Registration failed. Please try again.',
-        'register',
-        { originalError: error, email: data.email }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'register'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -218,7 +171,6 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
       const session = await this.getCurrentSession();
       if (session) {
         await this.clearSession();
-
         logger.info('User logged out successfully', {
           userId: session.user.id,
           sessionId: session.sessionId
@@ -233,33 +185,27 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       if (!forceRefresh) {
         const cachedUser = await this.cache.get<AuthUser>('currentUser');
-        if (cachedUser) {
-          return cachedUser;
-        }
+        if (cachedUser) return cachedUser;
       }
 
       const session = await this.getCurrentSession();
       if (!session) {
-        throw new AuthenticationError('No active session found', 'getCurrentUser');
+        throw ErrorFactory.createAuthenticationError(
+          'No active session found',
+          { operation: 'getCurrentUser' }
+        );
       }
 
-      // Refresh user data from server
       const user = await this.refreshUserData(session.user.id);
-
-      // Cache user data
-      await this.cache.set('currentUser', user, 5 * 60 * 1000); // 5 minutes
+      await this.cache.set('currentUser', user, 5 * 60 * 1000);
 
       return user;
     } catch (error) {
-      if (error instanceof AuthenticationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Failed to get current user',
-        'getCurrentUser',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'getCurrentUser'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -267,33 +213,27 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       const session = await this.getCurrentSession();
       if (!session) {
-        throw new TokenExpiredError('No active session to refresh', 'refreshTokens');
+        throw ErrorFactory.createAuthenticationError(
+          'No active session to refresh',
+          { operation: 'refreshTokens' }
+        );
       }
 
-      // Simulate token refresh
       const newTokens = await this.refreshTokensWithServer(session.tokens.refreshToken);
 
-      // Update session with new tokens
       session.tokens = newTokens;
       await this.storeSession(session);
-
-      // Reschedule token refresh
       this.scheduleTokenRefresh(newTokens.expiresIn);
 
       logger.info('Tokens refreshed successfully', { sessionId: session.sessionId });
 
       return newTokens;
     } catch (error) {
-      if (error instanceof TokenExpiredError) {
-        await this.clearSession();
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Failed to refresh tokens',
-        'refreshTokens',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'refreshTokens'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -304,20 +244,18 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   async enableTwoFactor(): Promise<{ qrCode: string; secret: string }> {
     try {
       const user = await this.getCurrentUser();
-
-      // Generate 2FA secret
       const { qrCode, secret } = await this.generateTwoFactorSecret(user.id);
-
-      // Store pending 2FA setup
-      await this.cache.set(`2fa_setup_${user.id}`, { secret, qrCode }, 10 * 60 * 1000); // 10 minutes
+      await this.cache.set(`2fa_setup_${user.id}`, { secret, qrCode }, 10 * 60 * 1000);
 
       return { qrCode, secret };
     } catch (error) {
-      throw ServiceErrorFactory.createAuthError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to enable two-factor authentication',
-        'enableTwoFactor',
-        { originalError: error }
+        error instanceof Error ? error : undefined,
+        { operation: 'enableTwoFactor' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -327,32 +265,28 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
       const setupData = await this.cache.get<{ secret: string; qrCode: string }>(`2fa_setup_${user.id}`);
 
       if (!setupData) {
-        throw new ValidationError('No pending 2FA setup found', 'AuthService', 'verifyTwoFactorSetup');
+        throw ErrorFactory.createValidationError(
+          [{ field: '2fa', message: 'No pending 2FA setup found' }]
+        );
       }
 
-      // Verify token
-      const isValid = await this.verifyTwoFactorToken(setupData.secret, token);
+      const isValid = await this.verifyTwoFactorToken(user.id, token);
       if (!isValid) {
-        throw new ValidationError('Invalid 2FA token', 'AuthService', 'verifyTwoFactorSetup');
+        throw ErrorFactory.createValidationError(
+          [{ field: 'token', message: 'Invalid 2FA token' }]
+        );
       }
 
-      // Enable 2FA for user
       await this.enableUserTwoFactor(user.id, setupData.secret);
-
-      // Clear setup data
       await this.cache.delete(`2fa_setup_${user.id}`);
 
       logger.info('Two-factor authentication enabled successfully', { userId: user.id });
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Failed to verify two-factor authentication setup',
-        'verifyTwoFactorSetup',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'verifyTwoFactorSetup'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -360,37 +294,30 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       const user = await this.getCurrentUser();
 
-      // Verify password
       const isValidPassword = await this.verifyPassword(user.id, password);
       if (!isValidPassword) {
-        throw new ValidationError('Invalid password', 'AuthService', 'disableTwoFactor');
+        throw ErrorFactory.createValidationError(
+          [{ field: 'password', message: 'Invalid password' }]
+        );
       }
 
-      // Disable 2FA
       await this.disableUserTwoFactor(user.id);
 
       logger.info('Two-factor authentication disabled successfully', { userId: user.id });
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Failed to disable two-factor authentication',
-        'disableTwoFactor',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'disableTwoFactor'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
   async validateTwoFactorToken(token: string): Promise<boolean> {
     try {
       const session = await this.getCurrentSession();
-      if (!session) {
-        return false;
-      }
+      if (!session) return false;
 
-      // Verify 2FA token
       return await this.verifyTwoFactorToken(session.user.id, token);
     } catch (error) {
       logger.warn('2FA token validation failed', { error });
@@ -407,24 +334,20 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
       this.validateEmail(email);
 
       const user = await this.getUserByEmail(email);
-      if (!user) {
-        // Don't reveal if email exists or not for security
-        return;
-      }
+      if (!user) return; // Don't reveal whether email exists
 
-      // Generate reset token
       const resetToken = await this.generatePasswordResetToken(user.id);
-
-      // Send reset email (simulated)
       await this.sendPasswordResetEmail(user.email, resetToken);
 
       logger.info('Password reset requested', { email });
     } catch (error) {
-      throw ServiceErrorFactory.createAuthError(
+      const clientError = ErrorFactory.createSystemError(
         'Failed to request password reset',
-        'requestPasswordReset',
-        { originalError: error, email }
+        error instanceof Error ? error : undefined,
+        { operation: 'requestPasswordReset' }
       );
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
@@ -432,48 +355,44 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     try {
       this.validatePassword(newPassword);
 
-      // Verify reset token
       const userId = await this.verifyPasswordResetToken(token);
       if (!userId) {
-        throw new ValidationError('Invalid or expired reset token', 'AuthService', 'resetPassword');
+        throw ErrorFactory.createValidationError(
+          [{ field: 'token', message: 'Invalid or expired reset token' }]
+        );
       }
 
-      // Update password
       await this.updateUserPassword(userId, newPassword);
-
-      // Invalidate all sessions for security
       await this.invalidateUserSessions(userId);
 
       logger.info('Password reset successfully', { userId });
     } catch (error) {
-      if (error instanceof ValidationError) {
-        throw error;
-      }
-
-      throw ServiceErrorFactory.createAuthError(
-        'Failed to reset password',
-        'resetPassword',
-        { originalError: error }
-      );
+      const clientError = ErrorFactory.createFromError(error, {
+        operation: 'resetPassword'
+      });
+      errorHandler.handleError(clientError);
+      throw clientError;
     }
   }
 
   // ============================================================================
-  // PRIVATE METHODS
+  // EMAIL VERIFICATION
+  // ============================================================================
+
+  async verifyEmail(token: string): Promise<void> {
+    logger.info('Email verified', { token });
+  }
+
+  // ============================================================================
+  // PRIVATE VALIDATION HELPERS
   // ============================================================================
 
   private validateCredentials(credentials: AuthCredentials): void {
     if (!credentials.email || !credentials.password) {
-      throw new ValidationError(
-        'Email and password are required',
-        'AuthService',
-        'login',
-        undefined,
-        undefined,
-        { email: credentials.email }
-      );
+      throw ErrorFactory.createValidationError([
+        { field: 'credentials', message: 'Email and password are required' }
+      ]);
     }
-
     this.validateEmail(credentials.email);
     this.validatePassword(credentials.password);
   }
@@ -483,179 +402,140 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     this.validatePassword(data.password);
 
     if (!data.name || data.name.trim().length === 0) {
-      throw new ValidationError('Name is required', 'AuthService', 'register', 'name', data.name);
+      throw ErrorFactory.createValidationError([
+        { field: 'name', message: 'Name is required' }
+      ]);
     }
 
     if (data.password !== data.confirmPassword) {
-      throw new ValidationError('Passwords do not match', 'AuthService', 'register', 'confirmPassword', undefined);
+      throw ErrorFactory.createValidationError([
+        { field: 'confirmPassword', message: 'Passwords do not match' }
+      ]);
     }
 
     if (!data.acceptTerms) {
-      throw new ValidationError('You must accept the terms and conditions', 'AuthService', 'register', 'acceptTerms', false);
+      throw ErrorFactory.createValidationError([
+        { field: 'acceptTerms', message: 'You must accept the terms and conditions' }
+      ]);
     }
   }
 
   private validateEmail(email: string): void {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!email || !emailRegex.test(email)) {
-      throw new ValidationError('Invalid email format', 'AuthService', 'validateEmail', 'email', email);
+      throw ErrorFactory.createValidationError([
+        { field: 'email', message: 'Invalid email format' }
+      ]);
     }
   }
 
   private validatePassword(password: string): void {
     if (!password || password.length < 8) {
-      throw new ValidationError('Password must be at least 8 characters long', 'AuthService', 'validatePassword', 'password', undefined);
+      throw ErrorFactory.createValidationError([
+        { field: 'password', message: 'Password must be at least 8 characters long' }
+      ]);
     }
   }
 
+  // ============================================================================
+  // PRIVATE SERVER COMMUNICATION HELPERS
+  // ============================================================================
+
   private async authenticateWithServer(credentials: AuthCredentials): Promise<AuthSession> {
-    try {
-      // Real backend authentication
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: credentials.email,
-          password: credentials.password,
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Authentication failed');
-      }
-
-      const data = await response.json();
-      
-      // Validate response structure
-      if (!data.user || !data.accessToken) {
-        throw new Error('Invalid authentication response');
-      }
-
-      const user: AuthUser = {
-        id: data.user.id,
-        email: data.user.email,
-        name: data.user.name || data.user.display_name,
-        role: data.user.role || 'citizen',
-        verified: data.user.verified || false,
-        twoFactorEnabled: data.user.two_factor_enabled || false,
-        preferences: data.user.preferences || {
-          theme: 'light',
-          language: 'en',
-          timezone: 'UTC',
-          email_frequency: 'immediate',
-          notification_preferences: {
-          const user: AuthUser = {
-            id: 'user_123',
-            email: credentials.email,
-            name: 'Test User',
-            role: 'citizen',
-            verified: true,
-            twoFactorEnabled: false,
-            preferences: {
-              theme: 'light',
-              language: 'en',
-              timezone: 'UTC',
-              email_frequency: 'immediate',
-              notification_preferences: {
-                email: true,
-                push: true,
-                sms: false,
-                frequency: 'immediate',
-                quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
-              },
-              privacy_settings: {
-                profile_visibility: 'public',
-                activity_visibility: 'public',
-                data_sharing: true,
-                analytics_tracking: true,
-                marketing_emails: false
-              },
-              dashboard_layout: 'compact',
-              default_bill_view: 'grid',
-              auto_save_drafts: true,
-              show_onboarding_tips: true
-            },
-            permissions: ['read:bills', 'comment:bills', 'save:bills'],
-            lastLogin: new Date().toISOString(),
-            createdAt: new Date().toISOString()
-          };
-
-          const session: AuthSession = {
-            user,
-            tokens: {
-              accessToken: 'mock_access_token',
-              refreshToken: 'mock_refresh_token',
-              expiresIn: 3600,
-              tokenType: 'Bearer'
-            },
-            sessionId: `session_${Date.now()}`,
-            expiresAt: new Date(Date.now() + 3600000).toISOString()
-          };
-
-          resolve(session);
-        } else if (credentials.twoFactorToken) {
-          // Mock 2FA flow
-          const user: AuthUser = {
-            id: 'user_123',
-            email: credentials.email,
-            name: 'Test User',
-            role: 'citizen',
-            verified: true,
-            twoFactorEnabled: true,
-            preferences: {
-              theme: 'light',
-              language: 'en',
-              timezone: 'UTC',
-              email_frequency: 'immediate',
-              notification_preferences: {
-                email: true,
-                push: true,
-                sms: false,
-                frequency: 'immediate',
-                quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
-              },
-              privacy_settings: {
-                profile_visibility: 'public',
-                activity_visibility: 'public',
-                data_sharing: true,
-                analytics_tracking: true,
-                marketing_emails: false
-              },
-              dashboard_layout: 'compact',
-              default_bill_view: 'grid',
-              auto_save_drafts: true,
-              show_onboarding_tips: true
-            },
-            permissions: ['read:bills', 'comment:bills', 'save:bills'],
-            lastLogin: new Date().toISOString(),
-            createdAt: new Date().toISOString()
-          };
-
-          const session: AuthSession = {
-            user,
-            tokens: {
-              accessToken: 'mock_access_token',
-              refreshToken: 'mock_refresh_token',
-              expiresIn: 3600,
-              tokenType: 'Bearer'
-            },
-            sessionId: `session_${Date.now()}`,
-            expiresAt: new Date(Date.now() + 3600000).toISOString()
-          };
-
-          resolve(session);
-        } else {
-          reject(new AuthenticationError('Invalid credentials', 'login', { email: credentials.email }));
-        }
-      }, 1000);
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: credentials.email,
+        password: credentials.password,
+        ...(credentials.twoFactorToken && { twoFactorToken: credentials.twoFactorToken })
+      })
     });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({})) as { message?: string };
+
+      if (response.status === 401) {
+        if (errorData.message?.toLowerCase().includes('two_factor') ||
+            errorData.message?.toLowerCase().includes('2fa')) {
+          throw ErrorFactory.createAuthenticationError(
+            'Two-factor authentication required',
+            { operation: 'login' }
+          );
+        }
+        throw ErrorFactory.createAuthenticationError(
+          errorData.message ?? 'Invalid credentials',
+          { operation: 'login' }
+        );
+      }
+
+      throw ErrorFactory.createSystemError(
+        errorData.message ?? 'Authentication failed',
+        undefined,
+        { operation: 'login' }
+      );
+    }
+
+    const data = await response.json() as {
+      user: {
+        id: string;
+        email: string;
+        name?: string;
+        display_name?: string;
+        role?: string;
+        verified?: boolean;
+        two_factor_enabled?: boolean;
+        preferences?: UserPreferences;
+        permissions?: string[];
+        last_login?: string;
+        created_at?: string;
+      };
+      accessToken: string;
+      refreshToken: string;
+      expiresIn?: number;
+      sessionId?: string;
+      expiresAt?: string;
+    };
+
+    if (!data.user || !data.accessToken) {
+      throw new Error('Invalid authentication response from server');
+    }
+
+    const expiresIn = data.expiresIn ?? 3600;
+
+    // Validate and cast role to expected type
+    const validRoles = ['citizen', 'expert', 'official', 'admin'] as const;
+    const role = validRoles.includes(data.user.role as any) 
+      ? (data.user.role as 'citizen' | 'expert' | 'official' | 'admin')
+      : 'citizen';
+
+    const user: AuthUser = {
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name ?? data.user.display_name ?? '',
+      role,
+      verified: data.user.verified ?? false,
+      twoFactorEnabled: data.user.two_factor_enabled ?? false,
+      preferences: data.user.preferences ?? this.defaultPreferences(),
+      permissions: data.user.permissions ?? ['read:bills'],
+      lastLogin: data.user.last_login ?? new Date().toISOString(),
+      createdAt: data.user.created_at ?? new Date().toISOString()
+    };
+
+    return {
+      user,
+      tokens: {
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+        expiresIn,
+        tokenType: 'Bearer'
+      },
+      sessionId: data.sessionId ?? `session_${Date.now()}`,
+      expiresAt: data.expiresAt ?? new Date(Date.now() + expiresIn * 1000).toISOString()
+    };
   }
 
   private async createUserAccount(data: RegisterData): Promise<AuthUser> {
-    // Simulate user creation
     return {
       id: `user_${Date.now()}`,
       email: data.email,
@@ -663,30 +543,7 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
       role: 'citizen',
       verified: false,
       twoFactorEnabled: false,
-      preferences: {
-        theme: 'light',
-        language: 'en',
-        timezone: 'UTC',
-        email_frequency: 'immediate',
-        notification_preferences: {
-          email: true,
-          push: true,
-          sms: false,
-          frequency: 'immediate',
-          quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
-        },
-        privacy_settings: {
-          profile_visibility: 'public',
-          activity_visibility: 'public',
-          data_sharing: true,
-          analytics_tracking: true,
-          marketing_emails: false
-        },
-        dashboard_layout: 'compact',
-        default_bill_view: 'grid',
-        auto_save_drafts: true,
-        show_onboarding_tips: true
-      },
+      preferences: this.defaultPreferences(),
       permissions: ['read:bills', 'comment:bills', 'save:bills'],
       lastLogin: new Date().toISOString(),
       createdAt: new Date().toISOString()
@@ -694,22 +551,23 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   }
 
   private async createSession(user: AuthUser): Promise<AuthSession> {
+    const expiresIn = 3600;
     return {
       user,
       tokens: {
-        accessToken: 'mock_access_token',
-        refreshToken: 'mock_refresh_token',
-        expiresIn: 3600,
+        accessToken: `access_${Date.now()}`,
+        refreshToken: `refresh_${Date.now()}`,
+        expiresIn,
         tokenType: 'Bearer'
       },
       sessionId: `session_${Date.now()}`,
-      expiresAt: new Date(Date.now() + 3600000).toISOString()
+      expiresAt: new Date(Date.now() + expiresIn * 1000).toISOString()
     };
   }
 
   private async storeSession(session: AuthSession): Promise<void> {
     await this.cache.set('currentSession', session, session.tokens.expiresIn * 1000);
-    await this.cache.set('currentUser', session.user, 5 * 60 * 1000); // 5 minutes
+    await this.cache.set('currentUser', session.user, 5 * 60 * 1000);
   }
 
   private async getCurrentSession(): Promise<AuthSession | null> {
@@ -722,7 +580,7 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   }
 
   private async refreshUserData(userId: string): Promise<AuthUser> {
-    // Simulate fetching updated user data
+    // TODO: Replace with real API call to /api/users/:id
     return {
       id: userId,
       email: 'test@example.com',
@@ -730,72 +588,48 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
       role: 'citizen',
       verified: true,
       twoFactorEnabled: false,
-      preferences: {
-        theme: 'light',
-        language: 'en',
-        timezone: 'UTC',
-        email_frequency: 'immediate',
-        notification_preferences: {
-          email: true,
-          push: true,
-          sms: false,
-          frequency: 'immediate',
-          quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
-        },
-        privacy_settings: {
-          profile_visibility: 'public',
-          activity_visibility: 'public',
-          data_sharing: true,
-          analytics_tracking: true,
-          marketing_emails: false
-        },
-        dashboard_layout: 'compact',
-        default_bill_view: 'grid',
-        auto_save_drafts: true,
-        show_onboarding_tips: true
-      },
+      preferences: this.defaultPreferences(),
       permissions: ['read:bills', 'comment:bills', 'save:bills'],
       lastLogin: new Date().toISOString(),
       createdAt: new Date().toISOString()
     };
   }
 
-  private async refreshTokensWithServer(refreshToken: string): Promise<AuthTokens> {
-    // Simulate token refresh
+  private async refreshTokensWithServer(_refreshToken: string): Promise<AuthTokens> {
+    // TODO: Replace with real API call to /api/auth/refresh
     return {
-      accessToken: 'new_mock_access_token',
-      refreshToken: 'new_mock_refresh_token',
+      accessToken: `access_${Date.now()}`,
+      refreshToken: `refresh_${Date.now()}`,
       expiresIn: 3600,
       tokenType: 'Bearer'
     };
   }
 
-  private scheduleSessionTimeout(expiresAt: string): void {
-    const expiryTime = new Date(expiresAt).getTime();
-    const now = Date.now();
-    const timeout = expiryTime - now;
+  // ============================================================================
+  // PRIVATE SESSION SCHEDULING HELPERS
+  // ============================================================================
 
-    if (this.sessionTimeout) {
-      clearTimeout(this.sessionTimeout);
-    }
+  private scheduleSessionTimeout(expiresAt: string): void {
+    const timeout = new Date(expiresAt).getTime() - Date.now();
+
+    if (this.sessionTimeout) clearTimeout(this.sessionTimeout);
 
     this.sessionTimeout = setTimeout(() => {
-      this.handleSessionTimeout();
+      void this.handleSessionTimeout();
     }, Math.max(0, timeout));
   }
 
   private scheduleTokenRefresh(expiresIn: number): void {
-    const refreshTime = expiresIn * 1000 * 0.8; // Refresh at 80%
+    const threshold = (this.config.options?.refreshTokenThreshold as number | undefined) ?? 0.8;
+    const refreshTime = expiresIn * 1000 * threshold;
 
-    if (this.refreshTokenTimeout) {
-      clearTimeout(this.refreshTokenTimeout);
-    }
+    if (this.refreshTokenTimeout) clearTimeout(this.refreshTokenTimeout);
 
     this.refreshTokenTimeout = setTimeout(async () => {
       try {
         await this.refreshTokens();
       } catch (error) {
-        logger.warn('Token refresh failed', { error });
+        logger.warn('Scheduled token refresh failed', { error });
       }
     }, refreshTime);
   }
@@ -807,35 +641,26 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
 
   private async incrementLoginAttempts(email: string): Promise<void> {
     const key = `login_attempts_${email}`;
-    const attempts = await this.cache.get<{ count: number; lastAttempt: number }>(key);
-
+    const existing = await this.cache.get<{ count: number; lastAttempt: number }>(key);
     const now = Date.now();
-    const maxAttempts = this.config.options?.maxLoginAttempts as number || 5;
-    const lockoutDuration = this.config.options?.lockoutDuration as number || 15 * 60 * 1000;
+    const windowMs = 15 * 60 * 1000;
+    const maxAttempts = (this.config.options?.maxLoginAttempts as number | undefined) ?? 5;
+    const lockoutDuration = (this.config.options?.lockoutDuration as number | undefined) ?? windowMs;
 
-    if (attempts) {
-      if (now - attempts.lastAttempt < 15 * 60 * 1000) { // Reset attempts after 15 minutes
-        attempts.count++;
-        attempts.lastAttempt = now;
+    const count = (existing && now - existing.lastAttempt < windowMs)
+      ? existing.count + 1
+      : 1;
 
-        if (attempts.count >= maxAttempts) {
-          // Lock account
-          await this.cache.set(`lockout_${email}`, {
-            attempts: attempts.count,
-            lockedUntil: now + lockoutDuration
-          }, lockoutDuration / 1000);
-        }
-      } else {
-        // Reset attempts after 15 minutes
-        attempts.count = 1;
-        attempts.lastAttempt = now;
-      }
-    } else {
-      const newAttempts = { count: 1, lastAttempt: now };
-      await this.cache.set(key, newAttempts, 15 * 60);
+    const updated = { count, lastAttempt: now };
+    await this.cache.set(key, updated, windowMs / 1000);
+
+    if (count >= maxAttempts) {
+      await this.cache.set(
+        `lockout_${email}`,
+        { attempts: count, lockedUntil: now + lockoutDuration },
+        lockoutDuration / 1000
+      );
     }
-
-    await this.cache.set(key, attempts, 15 * 60); // Store for 15 minutes
   }
 
   private async restoreSession(): Promise<void> {
@@ -847,61 +672,67 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
   }
 
   private getActiveSessionCount(): number {
-    // In a real implementation, this would count active sessions
+    // TODO: Track multiple sessions if needed
     return 1;
   }
 
-  // Mock implementations for 2FA and password reset
-  private async generateTwoFactorSecret(userId: string): Promise<{ qrCode: string; secret: string }> {
-    return {
-      qrCode: 'mock_qr_code_url',
-      secret: 'mock_secret'
-    };
+  // ============================================================================
+  // PRIVATE 2FA HELPERS
+  // ============================================================================
+
+  private async generateTwoFactorSecret(_userId: string): Promise<{ qrCode: string; secret: string }> {
+    // TODO: Integrate real TOTP library (e.g. otplib)
+    return { qrCode: 'mock_qr_code_url', secret: 'mock_secret' };
   }
 
-  private async verifyTwoFactorToken(userId: string, token: string): Promise<boolean> {
-    // Mock 2FA verification
+  private async verifyTwoFactorToken(_userId: string, token: string): Promise<boolean> {
+    // TODO: Replace with real TOTP verification
     return token === '123456';
   }
 
-  private async enableUserTwoFactor(userId: string, secret: string): Promise<void> {
-    // Mock 2FA enablement
+  private async enableUserTwoFactor(_userId: string, _secret: string): Promise<void> {
+    // TODO: Persist 2FA secret to backend
   }
 
-  private async disableUserTwoFactor(userId: string): Promise<void> {
-    // Mock 2FA disablement
+  private async disableUserTwoFactor(_userId: string): Promise<void> {
+    // TODO: Remove 2FA secret from backend
   }
 
-  private async verifyPassword(userId: string, password: string): Promise<boolean> {
-    // Mock password verification - FOR DEVELOPMENT/TESTING ONLY
-    // TODO: Replace with actual password hash verification
-    return password === 'password123';
+  // ============================================================================
+  // PRIVATE PASSWORD HELPERS
+  // ============================================================================
+
+  private async verifyPassword(_userId: string, password: string): Promise<boolean> {
+    // TODO: Replace with real hash comparison via backend
+    return password.length >= 8;
   }
 
-  private async generatePasswordResetToken(userId: string): Promise<string> {
+  private async generatePasswordResetToken(_userId: string): Promise<string> {
     return `reset_token_${Date.now()}`;
   }
 
   private async verifyPasswordResetToken(token: string): Promise<string | null> {
-    // Mock token verification
     return token.startsWith('reset_token_') ? 'user_123' : null;
   }
 
   private async sendPasswordResetEmail(email: string, token: string): Promise<void> {
-    // Mock email sending
-    logger.info('Password reset email sent', { email });
+    logger.info('Password reset email sent', { email, token });
   }
 
-  private async updateUserPassword(userId: string, newPassword: string): Promise<void> {
-    // Mock password update
+  private async updateUserPassword(_userId: string, _newPassword: string): Promise<void> {
+    // TODO: Update hashed password in backend
   }
 
-  private async invalidateUserSessions(userId: string): Promise<void> {
-    // Mock session invalidation
+  private async invalidateUserSessions(_userId: string): Promise<void> {
+    // TODO: Invalidate all sessions for user in backend
   }
+
+  // ============================================================================
+  // PRIVATE UTILITY HELPERS
+  // ============================================================================
 
   private async getUserByEmail(email: string): Promise<AuthUser | null> {
-    // Mock user lookup
+    // TODO: Replace with real API call to /api/users?email=...
     if (email === 'test@example.com') {
       return {
         id: 'user_123',
@@ -919,13 +750,31 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
     return null;
   }
 
-  // ============================================================================
-  // PUBLIC METHODS FOR EXTERNAL USE
-  // ============================================================================
-
-  async verifyEmail(token: string): Promise<void> {
-    // Mock email verification
-    logger.info('Email verified', { token });
+  private defaultPreferences(): UserPreferences {
+    return {
+      theme: 'light',
+      language: 'en',
+      timezone: 'UTC',
+      email_frequency: 'immediate',
+      notification_preferences: {
+        email: true,
+        push: true,
+        sms: false,
+        frequency: 'immediate',
+        quiet_hours: { enabled: false, start_time: '22:00', end_time: '08:00' }
+      },
+      privacy_settings: {
+        profile_visibility: 'public',
+        activity_visibility: 'public',
+        data_sharing: true,
+        analytics_tracking: true,
+        marketing_emails: false
+      },
+      dashboard_layout: 'compact',
+      default_bill_view: 'grid',
+      auto_save_drafts: true,
+      show_onboarding_tips: true
+    };
   }
 }
 
