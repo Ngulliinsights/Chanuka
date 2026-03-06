@@ -219,11 +219,20 @@ app.get('/', (_req, res) => {
             models.forEach(model => {
                 const card = document.createElement('div');
                 card.className = 'model-card';
-                card.innerHTML = \`
-                    <h3>\${model.name}</h3>
-                    <p>\${model.description}</p>
-                    <button onclick="quickTest('\${model.type}')">Quick Test</button>
-                \`;
+                
+                const h3 = document.createElement('h3');
+                h3.textContent = model.name;
+                
+                const p = document.createElement('p');
+                p.textContent = model.description;
+                
+                const button = document.createElement('button');
+                button.textContent = 'Quick Test';
+                button.onclick = () => quickTest(model.type);
+                
+                card.appendChild(h3);
+                card.appendChild(p);
+                card.appendChild(button);
                 modelsDiv.appendChild(card);
                 
                 const option = document.createElement('option');
