@@ -7,6 +7,9 @@
 // Memory adapter
 export { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 
+// Redis adapter
+export { RedisCacheAdapter, type RedisCacheConfig } from './redis-adapter';
+
 // Multi-tier adapter (placeholder for now)
 export { MultiTierAdapter, type MultiTierAdapterConfig } from './multi-tier-adapter';
 

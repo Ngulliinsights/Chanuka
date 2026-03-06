@@ -291,11 +291,12 @@ export class ContentClassifier extends BaseAnalyzer<
     const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
     const primary = sorted[0]?.[0] || 'general';
     const secondary = sorted.slice(1, 3).map((s) => s[0]);
+    const confidence = (sorted[0]?.[1] ?? 0) > 0 ? 0.7 : 0.4;
 
     return {
       primary,
       secondary,
-      confidence: sorted[0]?.[1] > 0 ? 0.7 : 0.4,
+      confidence,
       tags: [primary, ...secondary],
     };
   }

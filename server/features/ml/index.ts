@@ -1,54 +1,28 @@
 // ============================================================================
-// ML MODULE INDEX - Central Export Point
+// ML MODULE INDEX - MWANGA Stack
 // ============================================================================
-// Exports all ML models, services, and utilities
+// Zero-training-first ML/AI architecture for Chanuka Platform
+// See: docs/architecture/ML_AI_ARCHITECTURE.md
 
-// Models
+// ============================================================================
+// MWANGA Stack Models (New Architecture)
+// ============================================================================
 export * from './models';
 
-// Services
-export * from './services/ml-orchestrator';
-export * from './services/analysis-pipeline';
+// Configuration
+export * from './config/mwanga-config';
 
-// Types and schemas
-export type {
-  TrojanBillInput,
-  TrojanBillOutput,
-  ConstitutionalInput,
-  ConstitutionalOutput,
-  ConflictInput,
-  ConflictOutput,
-  SentimentInput,
-  SentimentOutput,
-  EngagementInput,
-  EngagementOutput,
-  TransparencyInput,
-  TransparencyOutput,
-  InfluenceInput,
-  InfluenceOutput,
-  ClassificationInput,
-  ClassificationOutput,
-} from './models';
+// ============================================================================
+// Legacy Services (To be migrated)
+// ============================================================================
+// TODO: Migrate these to MWANGA Stack architecture
+// export * from './services/ml-orchestrator';
+// export * from './services/analysis-pipeline';
 
-export type {
-  MLRequest,
-  MLResponse,
-} from './services/ml-orchestrator';
-
-export type {
-  PipelineConfig,
-  PipelineInput,
-  PipelineResult,
-} from './services/analysis-pipeline';
-
-// Utility functions
-export const ML_UTILS = {
-  // Model validation helpers
-  validateInput: (modelType: string, input: unknown) => {
-    // Add input validation logic here
-    return true;
-  },
-  
+// ============================================================================
+// MWANGA Stack Utilities
+// ============================================================================
+export const MWANGA_UTILS = {
   // Performance monitoring
   measurePerformance: async <T>(fn: () => Promise<T>): Promise<{result: T, duration: number}> => {
     const start = Date.now();
@@ -59,7 +33,7 @@ export const ML_UTILS = {
   
   // Error handling
   handleMLError: (error: unknown, context: string) => {
-    console.error(`ML Error in ${context}:`, error);
+    console.error(`MWANGA Error in ${context}:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown ML error',
@@ -67,7 +41,7 @@ export const ML_UTILS = {
     };
   },
   
-  // Data preprocessing
+  // Text preprocessing
   preprocessText: (text: string) => {
     return text
       .toLowerCase()
@@ -75,47 +49,44 @@ export const ML_UTILS = {
       .replace(/\s+/g, ' ')
       .trim();
   },
-  
-  // Confidence scoring
-  calculateConfidence: (scores: number[]) => {
-    if (scores.length === 0) return 0;
-    const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-    const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length;
-    const stdDev = Math.sqrt(variance);
-    return Math.max(0, Math.min(1, 1 - (stdDev / mean)));
-  },
 };
 
-// Constants
-export const ML_CONSTANTS = {
-  // Model versions
-  MODEL_VERSIONS: {
-    TROJAN_BILL_DETECTOR: '2.0.0',
-    CONSTITUTIONAL_ANALYZER: '2.0.0',
-    CONFLICT_DETECTOR: '2.0.0',
-    SENTIMENT_ANALYZER: '2.0.0',
-    ENGAGEMENT_PREDICTOR: '2.0.0',
-    TRANSPARENCY_SCORER: '2.0.0',
-    INFLUENCE_MAPPER: '2.0.0',
-    REAL_TIME_CLASSIFIER: '2.0.0',
+// ============================================================================
+// MWANGA Stack Constants
+// ============================================================================
+export const MWANGA_CONSTANTS = {
+  // Stack version
+  VERSION: '1.0.0',
+  
+  // Tier names
+  TIERS: {
+    TIER1: 'tier1' as const,
+    TIER2: 'tier2' as const,
+    TIER3: 'tier3' as const,
   },
   
-  // Thresholds
-  THRESHOLDS: {
-    HIGH_RISK: 70,
-    MEDIUM_RISK: 40,
-    LOW_RISK: 20,
-    HIGH_CONFIDENCE: 0.8,
-    MEDIUM_CONFIDENCE: 0.6,
-    LOW_CONFIDENCE: 0.4,
+  // Risk thresholds
+  RISK_THRESHOLDS: {
+    CRITICAL: 0.8,
+    HIGH: 0.6,
+    MEDIUM: 0.4,
+    LOW: 0.2,
+  },
+  
+  // Confidence thresholds
+  CONFIDENCE_THRESHOLDS: {
+    HIGH: 0.8,
+    MEDIUM: 0.6,
+    LOW: 0.4,
   },
   
   // Cache TTL (milliseconds)
   CACHE_TTL: {
-    SHORT: 5 * 60 * 1000,      // 5 minutes
-    MEDIUM: 30 * 60 * 1000,    // 30 minutes
-    LONG: 60 * 60 * 1000,      // 1 hour
+    SHORT: 5 * 60 * 1000,         // 5 minutes
+    MEDIUM: 30 * 60 * 1000,       // 30 minutes
+    LONG: 60 * 60 * 1000,         // 1 hour
     EXTENDED: 2 * 60 * 60 * 1000, // 2 hours
+    CONSTITUTIONAL: 7200000,       // 2 hours (Constitution doesn't change)
   },
   
   // Processing limits
@@ -124,5 +95,15 @@ export const ML_CONSTANTS = {
     MAX_BATCH_SIZE: 50,
     DEFAULT_TIMEOUT: 30000,
     MAX_TIMEOUT: 120000,
+    MAX_CACHE_SIZE: 1000,
+  },
+  
+  // Model identifiers
+  MODELS: {
+    OLLAMA_DEFAULT: 'llama3.2',
+    OLLAMA_FALLBACK: 'mistral',
+    HUGGINGFACE_SENTIMENT: 'cardiffnlp/twitter-roberta-base-sentiment',
+    SENTENCE_TRANSFORMER: 'all-MiniLM-L6-v2',
+    SPACY_MODEL: 'en_core_web_sm',
   },
 } as const;

@@ -58,6 +58,9 @@ export * from './accountability_ledger';
 // Electoral Accountability
 export * from './electoral_accountability';
 
+// ML Intelligence (MWANGA Stack)
+export * from './ml_intelligence';
+
 // Constitutional Compliance - commented out (file may not exist)
 // export * from './constitutional_compliance';
 

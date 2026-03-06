@@ -6,6 +6,7 @@
  */
 
 import { MemoryAdapter } from './adapters/memory-adapter';
+import { RedisCacheAdapter } from './adapters/redis-adapter';
 import { MultiTierAdapter } from './adapters/multi-tier-adapter';
 import type { CacheService, CacheConfig } from './core/interfaces';
 
@@ -196,9 +197,22 @@ export function createCacheService(config: CacheConfig): CacheService {
       break;
 
     case 'redis':
-      // Note: RedisAdapter is not yet implemented in the adapters directory
-      // This case is kept for future implementation
-      throw new Error('Redis adapter is not yet implemented. Use memory or multi-tier provider.');
+      if (!config.redisUrl && !process.env.REDIS_URL) {
+        throw new Error('Redis URL is required for redis provider. Set REDIS_URL environment variable or provide redisUrl in config.');
+      }
+      baseAdapter = new RedisCacheAdapter({
+        url: config.redisUrl,
+        keyPrefix: config.keyPrefix ?? 'cache:',
+        enableCompression: config.enableCompression ?? true,
+        compressionThreshold: config.compressionThreshold ?? 1024,
+        maxRetries: 3,
+        retryDelayMs: 50,
+        enableOfflineQueue: false,
+        lazyConnect: true,
+        connectionTimeout: 10000,
+        commandTimeout: 5000,
+      }) as unknown as CacheService;
+      break;
 
     case 'multi-tier':
       baseAdapter = new MultiTierAdapter({

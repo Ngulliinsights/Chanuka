@@ -340,11 +340,11 @@ Muswada huu utaanza kutumika tarehe [tarehe] ikiwa utapitishwa na Bunge.`
     const matches = text.matchAll(sectionRegex);
 
     for (const match of matches) {
-      const section = `${match[1]} ${match[2]}`;
-      const title = match[3].trim();
+      const section = `${match[1] || ''} ${match[2] || ''}`;
+      const title = (match[3] || '').trim();
       
       // Extract text after section header (next 200 chars)
-      const startIndex = match.index! + match[0].length;
+      const startIndex = (match.index ?? 0) + match[0].length;
       const summary = text.substring(startIndex, startIndex + 200).trim();
 
       // Determine importance (simple heuristic)

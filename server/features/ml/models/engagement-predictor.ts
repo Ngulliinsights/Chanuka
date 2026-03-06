@@ -220,9 +220,9 @@ export class EngagementPredictor extends BaseAnalyzer<
     ];
 
     // Simple weighted sum (replace with actual model)
+    const weights = [0.30, 0.10, 0.05, 0.20, 0.10, 0.15, 0.10];
     const score = featureVector.reduce((sum, val, i) => {
-      const weights = [0.30, 0.10, 0.05, 0.20, 0.10, 0.15, 0.10];
-      return sum + val * weights[i];
+      return sum + val * (weights[i] || 0);
     }, 0);
 
     return Math.min(score, 1.0);
