@@ -471,6 +471,148 @@ export const engagementPredictionsRelations = relations(
 );
 
 // ============================================================================
+// Bill Summarization Cache
+// ============================================================================
+
+export const billSummarizationCache = pgTable(
+  'bill_summarization_cache',
+  {
+    id: serial('id').primaryKey(),
+    billId: integer('bill_id')
+      .notNull()
+      .references(() => bills.id, { onDelete: 'cascade' }),
+    billHash: varchar('bill_hash', { length: 64 }).notNull(),
+    
+    // Summarization parameters
+    summarizationType: varchar('summarization_type', { length: 50 }).notNull(),
+    targetAudience: varchar('target_audience', { length: 50 }),
+    language: varchar('language', { length: 20 }),
+    
+    // Summary results
+    executiveSummary: text('executive_summary').notNull(),
+    keyProvisions: jsonb('key_provisions').notNull(),
+    plainLanguageVersion: text('plain_language_version'),
+    swahiliSummary: text('swahili_summary'),
+    impactAnalysis: jsonb('impact_analysis'),
+    keyTerms: jsonb('key_terms'),
+    actionItems: jsonb('action_items'),
+    
+    // Metadata
+    wordCount: jsonb('word_count').notNull(),
+    readabilityScore: jsonb('readability_score').notNull(),
+    tierUsed: varchar('tier_used', { length: 20 }).notNull(),
+    
+    // Timestamps
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    lastAccessed: timestamp('last_accessed').notNull().defaultNow(),
+    accessCount: integer('access_count').default(1),
+  },
+  (table) => ({
+    billIdIdx: index('idx_bill_summary_cache_bill_id').on(table.billId),
+    hashIdx: index('idx_bill_summary_cache_hash').on(table.billHash),
+    typeIdx: index('idx_bill_summary_cache_type').on(table.summarizationType),
+    uniqueConstraint: unique('unique_bill_summary').on(
+      table.billHash,
+      table.summarizationType,
+      table.targetAudience,
+      table.language
+    ),
+  })
+);
+
+export const billSummarizationCacheRelations = relations(
+  billSummarizationCache,
+  ({ one }) => ({
+    bill: one(bills, {
+      fields: [billSummarizationCache.billId],
+      references: [bills.id],
+    }),
+  })
+);
+
+// ============================================================================
+// Content Classification Cache
+// ============================================================================
+
+export const contentClassificationCache = pgTable(
+  'content_classification_cache',
+  {
+    id: serial('id').primaryKey(),
+    contentHash: varchar('content_hash', { length: 64 }).notNull().unique(),
+    
+    // Content metadata
+    contentSource: varchar('content_source', { length: 50 }).notNull(),
+    
+    // Classification results
+    classifications: jsonb('classifications').notNull(),
+    
+    // Analysis metadata
+    tierUsed: varchar('tier_used', { length: 20 }).notNull(),
+    tasksPerformed: jsonb('tasks_performed').notNull(),
+    
+    // Timestamps
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    lastAccessed: timestamp('last_accessed').notNull().defaultNow(),
+    accessCount: integer('access_count').default(1),
+  },
+  (table) => ({
+    hashIdx: index('idx_content_classification_hash').on(table.contentHash),
+    sourceIdx: index('idx_content_classification_source').on(table.contentSource),
+    createdIdx: index('idx_content_classification_created').on(table.createdAt),
+  })
+);
+
+// ============================================================================
+// Transparency Assessment Cache
+// ============================================================================
+
+export const transparencyAssessmentCache = pgTable(
+  'transparency_assessment_cache',
+  {
+    id: serial('id').primaryKey(),
+    entityType: varchar('entity_type', { length: 50 }).notNull(),
+    entityId: varchar('entity_id', { length: 255 }).notNull(),
+    assessmentHash: varchar('assessment_hash', { length: 64 }).notNull(),
+    
+    // Assessment results
+    overallScore: float('overall_score').notNull(),
+    grade: varchar('grade', { length: 1 }).notNull(),
+    confidence: float('confidence').notNull(),
+    
+    // Dimension scores
+    dimensions: jsonb('dimensions').notNull(),
+    
+    // Analysis details
+    strengths: jsonb('strengths').notNull(),
+    weaknesses: jsonb('weaknesses').notNull(),
+    recommendations: jsonb('recommendations').notNull(),
+    benchmarking: jsonb('benchmarking').notNull(),
+    
+    // Metadata
+    tierUsed: varchar('tier_used', { length: 20 }).notNull(),
+    narrative: text('narrative'),
+    
+    // Timestamps
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    lastAccessed: timestamp('last_accessed').notNull().defaultNow(),
+    accessCount: integer('access_count').default(1),
+  },
+  (table) => ({
+    entityIdx: index('idx_transparency_cache_entity').on(table.entityType, table.entityId),
+    hashIdx: index('idx_transparency_cache_hash').on(table.assessmentHash),
+    scoreIdx: index('idx_transparency_cache_score').on(table.overallScore),
+    gradeIdx: index('idx_transparency_cache_grade').on(table.grade),
+    uniqueConstraint: unique('unique_transparency_assessment').on(
+      table.entityType,
+      table.entityId,
+      table.assessmentHash
+    ),
+    scoreCheck: check('overall_score_check', 'overall_score >= 0.0 AND overall_score <= 100.0'),
+    confidenceCheck: check('confidence_check', 'confidence >= 0.0 AND confidence <= 1.0'),
+  })
+);
+
+// ============================================================================
 // Type Exports
 // ============================================================================
 
@@ -503,3 +645,12 @@ export type NewConflictDetectionCache = typeof conflictDetectionCache.$inferInse
 
 export type EngagementPrediction = typeof engagementPredictions.$inferSelect;
 export type NewEngagementPrediction = typeof engagementPredictions.$inferInsert;
+
+export type BillSummarizationCache = typeof billSummarizationCache.$inferSelect;
+export type NewBillSummarizationCache = typeof billSummarizationCache.$inferInsert;
+
+export type ContentClassificationCache = typeof contentClassificationCache.$inferSelect;
+export type NewContentClassificationCache = typeof contentClassificationCache.$inferInsert;
+
+export type TransparencyAssessmentCache = typeof transparencyAssessmentCache.$inferSelect;
+export type NewTransparencyAssessmentCache = typeof transparencyAssessmentCache.$inferInsert;

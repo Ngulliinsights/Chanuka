@@ -8,8 +8,8 @@
 
 CREATE TABLE IF NOT EXISTS ml_interactions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  bill_id INTEGER REFERENCES bills(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  bill_id UUID REFERENCES bills(id) ON DELETE CASCADE,
   interaction_type VARCHAR(50) NOT NULL, -- 'view', 'comment', 'share', 'vote', 'bookmark'
   timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
   
@@ -31,13 +31,7 @@ CREATE TABLE IF NOT EXISTS ml_interactions (
   device_type VARCHAR(50),
   metadata JSONB,
   
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  
-  -- Indexes for fast querying during training
-  INDEX idx_ml_interactions_user_id (user_id),
-  INDEX idx_ml_interactions_bill_id (bill_id),
-  INDEX idx_ml_interactions_timestamp (timestamp),
-  INDEX idx_ml_interactions_engaged (engaged)
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 COMMENT ON TABLE ml_interactions IS 'Logs user interactions for engagement prediction model training';
@@ -61,12 +55,8 @@ CREATE TABLE IF NOT EXISTS conflict_graph_nodes (
   last_verified TIMESTAMP,
   
   -- Unique constraint on type + entity_id
-  UNIQUE(node_type, entity_id),
+  UNIQUE(node_type, entity_id)
   
-  -- Indexes
-  INDEX idx_conflict_nodes_type (node_type),
-  INDEX idx_conflict_nodes_entity_id (entity_id),
-  INDEX idx_conflict_nodes_name (entity_name)
 );
 
 COMMENT ON TABLE conflict_graph_nodes IS 'Nodes in the conflict-of-interest relationship graph';
@@ -103,13 +93,8 @@ CREATE TABLE IF NOT EXISTS conflict_graph_edges (
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   
   -- Prevent duplicate edges
-  UNIQUE(source_node_id, target_node_id, relationship_type),
+  UNIQUE(source_node_id, target_node_id, relationship_type)
   
-  -- Indexes for fast graph traversal
-  INDEX idx_conflict_edges_source (source_node_id),
-  INDEX idx_conflict_edges_target (target_node_id),
-  INDEX idx_conflict_edges_type (relationship_type),
-  INDEX idx_conflict_edges_both (source_node_id, target_node_id)
 );
 
 COMMENT ON TABLE conflict_graph_edges IS 'Edges (relationships) in the conflict-of-interest graph';
@@ -146,9 +131,6 @@ CREATE TABLE IF NOT EXISTS vector_embeddings (
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   
-  -- Indexes
-  INDEX idx_vector_embeddings_type (document_type),
-  INDEX idx_vector_embeddings_doc_id (document_id),
   UNIQUE(document_type, document_id, chunk_index)
   
   -- Vector similarity index (if using pgvector):
@@ -177,11 +159,8 @@ CREATE TABLE IF NOT EXISTS sentiment_cache (
   -- Timestamps
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
-  access_count INTEGER DEFAULT 1,
+  access_count INTEGER DEFAULT 1
   
-  -- Indexes
-  INDEX idx_sentiment_cache_hash (text_hash),
-  INDEX idx_sentiment_cache_created (created_at)
 );
 
 COMMENT ON TABLE sentiment_cache IS 'Cache for sentiment analysis results to avoid redundant processing';
@@ -207,11 +186,8 @@ CREATE TABLE IF NOT EXISTS constitutional_analysis_cache (
   -- Timestamps
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
-  access_count INTEGER DEFAULT 1,
+  access_count INTEGER DEFAULT 1
   
-  -- Indexes
-  INDEX idx_constitutional_cache_hash (bill_section_hash),
-  INDEX idx_constitutional_cache_risk (risk_level)
 );
 
 COMMENT ON TABLE constitutional_analysis_cache IS 'Cache for constitutional analysis to avoid redundant RAG queries';
@@ -222,7 +198,7 @@ COMMENT ON TABLE constitutional_analysis_cache IS 'Cache for constitutional anal
 
 CREATE TABLE IF NOT EXISTS trojan_bill_detections (
   id SERIAL PRIMARY KEY,
-  bill_id INTEGER NOT NULL REFERENCES bills(id) ON DELETE CASCADE,
+  bill_id UUID NOT NULL REFERENCES bills(id) ON DELETE CASCADE,
   
   -- Detection scores
   overall_risk_score FLOAT NOT NULL CHECK (overall_risk_score >= 0.0 AND overall_risk_score <= 1.0),
@@ -244,12 +220,8 @@ CREATE TABLE IF NOT EXISTS trojan_bill_detections (
   
   -- Timestamps
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
   
-  -- Indexes
-  INDEX idx_trojan_detections_bill_id (bill_id),
-  INDEX idx_trojan_detections_risk_level (risk_level),
-  INDEX idx_trojan_detections_score (overall_risk_score)
 );
 
 COMMENT ON TABLE trojan_bill_detections IS 'Results of trojan bill detection analysis';
@@ -287,9 +259,6 @@ CREATE TABLE IF NOT EXISTS ml_model_metadata (
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
   
-  -- Indexes
-  INDEX idx_ml_models_name (model_name),
-  INDEX idx_ml_models_active (is_active),
   UNIQUE(model_name, model_version)
 );
 
@@ -301,7 +270,7 @@ COMMENT ON TABLE ml_model_metadata IS 'Tracks ML model versions and performance 
 
 CREATE TABLE IF NOT EXISTS conflict_detection_cache (
   id SERIAL PRIMARY KEY,
-  bill_id INTEGER NOT NULL REFERENCES bills(id) ON DELETE CASCADE,
+  bill_id UUID NOT NULL REFERENCES bills(id) ON DELETE CASCADE,
   sponsor_id INTEGER, -- Reference to MP/sponsor
   
   -- Detection results
@@ -319,12 +288,8 @@ CREATE TABLE IF NOT EXISTS conflict_detection_cache (
   
   -- Timestamps
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_accessed TIMESTAMP NOT NULL DEFAULT NOW()
   
-  -- Indexes
-  INDEX idx_conflict_cache_bill_id (bill_id),
-  INDEX idx_conflict_cache_sponsor (sponsor_id),
-  INDEX idx_conflict_cache_has_conflict (has_conflict)
 );
 
 COMMENT ON TABLE conflict_detection_cache IS 'Cache for conflict-of-interest detection results';
@@ -335,8 +300,8 @@ COMMENT ON TABLE conflict_detection_cache IS 'Cache for conflict-of-interest det
 
 CREATE TABLE IF NOT EXISTS engagement_predictions (
   id SERIAL PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  bill_id INTEGER REFERENCES bills(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  bill_id UUID REFERENCES bills(id) ON DELETE CASCADE,
   
   -- Prediction
   predicted_engagement_score FLOAT NOT NULL CHECK (predicted_engagement_score >= 0.0 AND predicted_engagement_score <= 1.0),
@@ -351,15 +316,159 @@ CREATE TABLE IF NOT EXISTS engagement_predictions (
   
   -- Timestamps
   predicted_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  outcome_recorded_at TIMESTAMP,
+  outcome_recorded_at TIMESTAMP
   
-  -- Indexes
-  INDEX idx_engagement_predictions_user (user_id),
-  INDEX idx_engagement_predictions_bill (bill_id),
-  INDEX idx_engagement_predictions_predicted_at (predicted_at)
 );
 
 COMMENT ON TABLE engagement_predictions IS 'Tracks engagement predictions for model evaluation';
+
+-- ============================================================================
+-- Bill Summarization Cache (optional - for performance optimization)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS bill_summarization_cache (
+  id SERIAL PRIMARY KEY,
+  bill_id UUID NOT NULL REFERENCES bills(id) ON DELETE CASCADE,
+  bill_hash VARCHAR(64) NOT NULL, -- SHA-256 hash of bill text
+  
+  -- Summarization parameters
+  summarization_type VARCHAR(50) NOT NULL, -- 'executive', 'section_by_section', 'plain_language', 'impact_focused'
+  target_audience VARCHAR(50), -- 'general_public', 'activists', 'legal_experts', 'media'
+  language VARCHAR(20), -- 'english', 'swahili', 'both'
+  
+  -- Summary results
+  executive_summary TEXT NOT NULL,
+  key_provisions JSONB NOT NULL, -- Array of key provisions
+  plain_language_version TEXT,
+  swahili_summary TEXT,
+  impact_analysis JSONB,
+  key_terms JSONB,
+  action_items JSONB,
+  
+  -- Metadata
+  word_count JSONB NOT NULL, -- {original, summary, compressionRatio}
+  readability_score JSONB NOT NULL, -- {original, summary, improvement}
+  tier_used VARCHAR(20) NOT NULL, -- 'tier1', 'tier2', 'tier3'
+  
+  -- Timestamps
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
+  access_count INTEGER DEFAULT 1,
+  
+  UNIQUE(bill_hash, summarization_type, target_audience, language)
+);
+
+COMMENT ON TABLE bill_summarization_cache IS 'Cache for bill summarization results to avoid redundant processing';
+
+-- ============================================================================
+-- Content Classification Cache (optional - for performance optimization)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS content_classification_cache (
+  id SERIAL PRIMARY KEY,
+  content_hash VARCHAR(64) NOT NULL UNIQUE, -- SHA-256 hash of content
+  
+  -- Content metadata
+  content_source VARCHAR(50) NOT NULL, -- 'bill', 'comment', 'news', 'social_media', 'official_statement'
+  
+  -- Classification results
+  classifications JSONB NOT NULL, -- Full classification results object
+  
+  -- Analysis metadata
+  tier_used VARCHAR(20) NOT NULL, -- 'tier1', 'tier2', 'tier3'
+  tasks_performed JSONB NOT NULL, -- Array of classification tasks performed
+  
+  -- Timestamps
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
+  access_count INTEGER DEFAULT 1
+  
+);
+
+COMMENT ON TABLE content_classification_cache IS 'Cache for content classification results to avoid redundant processing';
+
+-- ============================================================================
+-- Transparency Assessment Cache (optional - for performance optimization)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS transparency_assessment_cache (
+  id SERIAL PRIMARY KEY,
+  entity_type VARCHAR(50) NOT NULL, -- 'bill', 'sponsor', 'process', 'institution'
+  entity_id VARCHAR(255) NOT NULL,
+  assessment_hash VARCHAR(64) NOT NULL, -- SHA-256 hash of assessment data
+  
+  -- Assessment results
+  overall_score FLOAT NOT NULL CHECK (overall_score >= 0.0 AND overall_score <= 100.0),
+  grade VARCHAR(1) NOT NULL CHECK (grade IN ('A', 'B', 'C', 'D', 'F')),
+  confidence FLOAT NOT NULL CHECK (confidence >= 0.0 AND confidence <= 1.0),
+  
+  -- Dimension scores
+  dimensions JSONB NOT NULL, -- {accessibility, completeness, timeliness, participation, accountability}
+  
+  -- Analysis details
+  strengths JSONB NOT NULL, -- Array of strengths
+  weaknesses JSONB NOT NULL, -- Array of weaknesses
+  recommendations JSONB NOT NULL, -- Array of recommendations
+  benchmarking JSONB NOT NULL, -- Benchmarking data
+  
+  -- Metadata
+  tier_used VARCHAR(20) NOT NULL, -- 'tier1', 'tier2', 'tier3'
+  narrative TEXT,
+  
+  -- Timestamps
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  last_accessed TIMESTAMP NOT NULL DEFAULT NOW(),
+  access_count INTEGER DEFAULT 1,
+  
+  UNIQUE(entity_type, entity_id, assessment_hash)
+);
+
+COMMENT ON TABLE transparency_assessment_cache IS 'Cache for transparency assessment results to avoid redundant processing';
+
+-- ============================================================================
+
+-- ============================================================================
+-- Indexes (created separately for PostgreSQL compatibility)
+-- ============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_ml_interactions_user_id ON ml_interactions (user_id);
+CREATE INDEX IF NOT EXISTS idx_ml_interactions_bill_id ON ml_interactions (bill_id);
+CREATE INDEX IF NOT EXISTS idx_ml_interactions_timestamp ON ml_interactions (timestamp);
+CREATE INDEX IF NOT EXISTS idx_ml_interactions_engaged ON ml_interactions (engaged);
+CREATE INDEX IF NOT EXISTS idx_conflict_nodes_type ON conflict_graph_nodes (node_type);
+CREATE INDEX IF NOT EXISTS idx_conflict_nodes_entity_id ON conflict_graph_nodes (entity_id);
+CREATE INDEX IF NOT EXISTS idx_conflict_nodes_name ON conflict_graph_nodes (entity_name);
+CREATE INDEX IF NOT EXISTS idx_conflict_edges_source ON conflict_graph_edges (source_node_id);
+CREATE INDEX IF NOT EXISTS idx_conflict_edges_target ON conflict_graph_edges (target_node_id);
+CREATE INDEX IF NOT EXISTS idx_conflict_edges_type ON conflict_graph_edges (relationship_type);
+CREATE INDEX IF NOT EXISTS idx_conflict_edges_both ON conflict_graph_edges (source_node_id, target_node_id);
+CREATE INDEX IF NOT EXISTS idx_vector_embeddings_type ON vector_embeddings (document_type);
+CREATE INDEX IF NOT EXISTS idx_vector_embeddings_doc_id ON vector_embeddings (document_id);
+CREATE INDEX IF NOT EXISTS idx_sentiment_cache_hash ON sentiment_cache (text_hash);
+CREATE INDEX IF NOT EXISTS idx_sentiment_cache_created ON sentiment_cache (created_at);
+CREATE INDEX IF NOT EXISTS idx_constitutional_cache_hash ON constitutional_analysis_cache (bill_section_hash);
+CREATE INDEX IF NOT EXISTS idx_constitutional_cache_risk ON constitutional_analysis_cache (risk_level);
+CREATE INDEX IF NOT EXISTS idx_trojan_detections_bill_id ON trojan_bill_detections (bill_id);
+CREATE INDEX IF NOT EXISTS idx_trojan_detections_risk_level ON trojan_bill_detections (risk_level);
+CREATE INDEX IF NOT EXISTS idx_trojan_detections_score ON trojan_bill_detections (overall_risk_score);
+CREATE INDEX IF NOT EXISTS idx_ml_models_name ON ml_model_metadata (model_name);
+CREATE INDEX IF NOT EXISTS idx_ml_models_active ON ml_model_metadata (is_active);
+CREATE INDEX IF NOT EXISTS idx_conflict_cache_bill_id ON conflict_detection_cache (bill_id);
+CREATE INDEX IF NOT EXISTS idx_conflict_cache_sponsor ON conflict_detection_cache (sponsor_id);
+CREATE INDEX IF NOT EXISTS idx_conflict_cache_has_conflict ON conflict_detection_cache (has_conflict);
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_user ON engagement_predictions (user_id);
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_bill ON engagement_predictions (bill_id);
+CREATE INDEX IF NOT EXISTS idx_engagement_predictions_predicted_at ON engagement_predictions (predicted_at);
+CREATE INDEX IF NOT EXISTS idx_bill_summary_cache_bill_id ON bill_summarization_cache (bill_id);
+CREATE INDEX IF NOT EXISTS idx_bill_summary_cache_hash ON bill_summarization_cache (bill_hash);
+CREATE INDEX IF NOT EXISTS idx_bill_summary_cache_type ON bill_summarization_cache (summarization_type);
+CREATE INDEX IF NOT EXISTS idx_content_classification_hash ON content_classification_cache (content_hash);
+CREATE INDEX IF NOT EXISTS idx_content_classification_source ON content_classification_cache (content_source);
+CREATE INDEX IF NOT EXISTS idx_content_classification_created ON content_classification_cache (created_at);
+CREATE INDEX IF NOT EXISTS idx_transparency_cache_entity ON transparency_assessment_cache (entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_transparency_cache_hash ON transparency_assessment_cache (assessment_hash);
+CREATE INDEX IF NOT EXISTS idx_transparency_cache_score ON transparency_assessment_cache (overall_score);
+CREATE INDEX IF NOT EXISTS idx_transparency_cache_grade ON transparency_assessment_cache (grade);
 
 -- ============================================================================
 -- Trigger to update updated_at timestamps
@@ -390,4 +499,13 @@ CREATE TRIGGER update_trojan_detections_updated_at BEFORE UPDATE ON trojan_bill_
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_ml_models_updated_at BEFORE UPDATE ON ml_model_metadata
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_bill_summary_cache_updated_at BEFORE UPDATE ON bill_summarization_cache
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_content_classification_cache_updated_at BEFORE UPDATE ON content_classification_cache
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_transparency_cache_updated_at BEFORE UPDATE ON transparency_assessment_cache
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
