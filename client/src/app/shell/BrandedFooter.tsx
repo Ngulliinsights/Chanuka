@@ -80,7 +80,7 @@ export const BrandedFooter: React.FC<{ className?: string }> = ({ className = ''
           {/* Brand Column */}
           <div className="lg:col-span-2">
             <div className="mb-6">
-              <ChanukaWordmark size="md" className="h-8 w-auto brightness-0 invert" />
+              <ChanukaWordmark size="sm" className="h-6 w-auto brightness-0 invert" />
             </div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering citizens with transparent access to legislative information and civic

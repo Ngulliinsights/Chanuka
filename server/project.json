@@ -16,7 +16,7 @@
     "serve": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "tsx server/index.ts"
+        "command": "cd server && tsx --tsconfig ./tsconfig.json index.ts"
       }
     },
     "test": {

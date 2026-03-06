@@ -6,13 +6,16 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Hero Section */}
-      <section className="bg-[#1a2e49] text-white py-16">
+      <section className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-16 border-b border-brand-gold/10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Users className="w-8 h-8" aria-hidden="true" />
+            </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               About Chanuka
             </h1>
-            <p className="text-xl text-gray-200 leading-relaxed">
+            <p className="text-xl text-blue-100 leading-relaxed">
               Empowering Kenyan citizens with transparent access to legislative information and civic engagement tools.
               We believe democracy thrives when information is accessible to all, and we're committed to strengthening
               Kenya's democratic institutions through technology.

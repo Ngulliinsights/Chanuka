@@ -157,6 +157,7 @@
     "test:e2e": "playwright test",
     "test:performance": "playwright test tests/performance",
     "test:strategic": "node scripts/run-strategic-tests.cjs",
+    "test:ml:services": "tsx --tsconfig scripts/tsconfig.json server/features/ml/scripts/test-services.ts",
     "// --- LINTING & FIXING ---": "",
     "lint": "nx run-many --target=lint --all",
     "lint:css": "stylelint \"client/src/**/*.css\"",

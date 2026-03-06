@@ -4,7 +4,7 @@
  */
 
 // API Configuration
-export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+export const API_BASE_URL = process.env.VITE_API_BASE_URL || 'http://localhost:4200/api';
 export const WS_BASE_URL = process.env.VITE_WS_URL || 'ws://localhost:3001';
 
 // Authentication

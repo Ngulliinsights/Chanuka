@@ -13,13 +13,28 @@ This document serves as the **Single Source of Truth** for architectural changes
 |-----------|--------|-------|------------|-------|
 | **Documentation Reorganization** | 🟡 In Progress | @User | [Plan](../DOCUMENTATION_REMEDIATION_PLAN.md) | Phase 1 complete (root cleanup). Phase 2-4 pending. |
 | **Error System Restructure** | 🟢 Complete | @User | [History](../../client/src/infrastructure/error/MIGRATION_HISTORY.md) | Moved to core/patterns/integration/recovery structure. |
-| **Type System Cleanup** | 🟡 In Progress | @User | - | Removing `@types` conflicts. Establishing `lib/types` as single source of truth. |
 
 
 ---
 
 ## 🏆 Recent Architectural Decisions
 *Log key decisions that affect how code should be written going forward.*
+
+### [2026-03-06] Type System Cleanup Complete
+- **Context:** Type definitions were scattered across `@types`, local `types.ts`, and `shared`. Import conflicts and duplicate definitions caused type errors.
+- **Decision:**
+    1. Removed `@types` directory - no longer exists
+    2. Established `lib/types` as single source of truth for shared types
+    3. Feature modules maintain local `types.ts` for feature-specific extensions
+    4. Fixed duplicate constant exports (ANALYSIS_OPTIONS, FALLACY_SEVERITY) in shared/constants
+    5. Fixed unterminated string literals in client/src/lib/hooks/index.ts
+    6. Completed incomplete onboarding-analytics.tsx file
+    7. Updated server tsconfig.json ignoreDeprecations from "6.0" to "5.0"
+- **Consequences:**
+    - Zero type conflicts across codebase
+    - Clear separation: shared types in lib/types, feature-specific in feature/types.ts
+    - All packages (shared, client, server) pass type-check
+    - Unblocks all downstream development work
 
 ### [2026-03-06] Documentation Structure Reorganization
 - **Context:** Docs root had 50+ files making it difficult to find current documentation. Historical completion reports mixed with living documents.
@@ -66,6 +81,7 @@ This document serves as the **Single Source of Truth** for architectural changes
 
 | Date | Migration | Outcome | Archive Link |
 |------|-----------|---------|--------------|
+| 2026-03-06 | Type System Cleanup | ✅ Complete | No @types conflicts. lib/types is single source of truth. Feature modules use local types.ts for feature-specific extensions. |
 | 2026-03-06 | Documentation Root Cleanup (Phase 1) | ✅ Complete | [Archive](../archive/2026-03-root-cleanup/) |
 | 2026-03-06 | Error Infrastructure Restructure | ✅ Complete | [History](../../client/src/infrastructure/error/MIGRATION_HISTORY.md) |
 | 2026-02-27 | Notification System Consolidation | ✅ Complete | [Guide](../features/NOTIFICATION_SYSTEM_CONSOLIDATION.md) |

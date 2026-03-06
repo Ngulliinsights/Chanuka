@@ -27,6 +27,11 @@ import {
   DropdownMenuTrigger,
   ChanukaWordmark,
   ChanukaSmallLogo,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
 } from '../../lib/design-system';
 import { useMobileMenu } from '../../lib/hooks/use-navigation-slice';
 import { LanguageSwitcher } from '../../lib/ui/i18n/LanguageSwitcher';
@@ -315,17 +320,43 @@ export const NavigationBar = memo<NavigationBarProps>(
                 aria-label="Chanuka home"
               >
                 <div className="md:hidden">
-                  <ChanukaSmallLogo size="sm" className="w-6 h-6" />
+                  <ChanukaSmallLogo size="sm" className="w-5 h-5" />
                 </div>
                 <div className="hidden md:block">
-                  <ChanukaWordmark size="full" className="h-3 w-auto" />
+                  <ChanukaWordmark size="sm" className="h-6 w-auto" />
                 </div>
               </Link>
+
+              {/* Main Navigation Menu (desktop) */}
+              {!isMobile && (
+                <nav className="hidden md:flex items-center ml-8 space-x-1" aria-label="Primary navigation">
+                  <Link to="/bills">
+                    <Button variant="ghost" size="sm" className="text-sm font-medium">
+                      Bills
+                    </Button>
+                  </Link>
+                  <Link to="/community">
+                    <Button variant="ghost" size="sm" className="text-sm font-medium">
+                      Community
+                    </Button>
+                  </Link>
+                  <Link to="/analysis">
+                    <Button variant="ghost" size="sm" className="text-sm font-medium">
+                      Analysis
+                    </Button>
+                  </Link>
+                  <Link to="/about">
+                    <Button variant="ghost" size="sm" className="text-sm font-medium">
+                      About
+                    </Button>
+                  </Link>
+                </nav>
+              )}
             </div>
 
             {/* Center: Search (desktop only) */}
             {showSearch && !isMobile && (
-              <div className="flex-1 max-w-lg mx-8">
+              <div className="flex-1 max-w-md mx-4">
                 <UnifiedSearchInterface
                   variant="header"
                   placeholder={searchPlaceholder}
@@ -405,6 +436,79 @@ export const NavigationBar = memo<NavigationBarProps>(
           {...(commandPalette.customCommands && { customCommands: commandPalette.customCommands })}
           {...(commandPalette.onCommandExecute && { onCommandExecute: commandPalette.onCommandExecute })}
         />
+
+        {/* Mobile Navigation Menu */}
+        <Sheet open={mobileMenuOpen} onOpenChange={toggleMobileMenu}>
+          <SheetContent side="left" className="w-[280px] sm:w-[320px]">
+            <SheetHeader>
+              <SheetTitle>Menu</SheetTitle>
+              <SheetDescription className="sr-only">
+                Main navigation menu with links to key sections of the application
+              </SheetDescription>
+            </SheetHeader>
+            <nav className="flex flex-col space-y-1 mt-6" aria-label="Mobile navigation">
+              <Link
+                to="/bills"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.FileText className="mr-3 h-5 w-5" />
+                Bills
+              </Link>
+              <Link
+                to="/community"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.Users className="mr-3 h-5 w-5" />
+                Community
+              </Link>
+              <Link
+                to="/analysis"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.BarChart3 className="mr-3 h-5 w-5" />
+                Analysis
+              </Link>
+              <Link
+                to="/expert"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.Award className="mr-3 h-5 w-5" />
+                Expert Insights
+              </Link>
+              <Link
+                to="/about"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.Info className="mr-3 h-5 w-5" />
+                About
+              </Link>
+              
+              <div className="border-t border-gray-200 my-4" />
+              
+              <Link
+                to="/contact"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.Mail className="mr-3 h-5 w-5" />
+                Contact
+              </Link>
+              <Link
+                to="/support"
+                onClick={toggleMobileMenu}
+                className="flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 rounded-md transition-colors"
+              >
+                <LucideIcons.HelpCircle className="mr-3 h-5 w-5" />
+                Support
+              </Link>
+            </nav>
+          </SheetContent>
+        </Sheet>
       </nav>
     );
   }

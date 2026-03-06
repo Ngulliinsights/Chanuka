@@ -131,22 +131,22 @@ export const COMMUNITY_FALLACY_LABELS = {
 // Fallacy Severity
 // ============================================================================
 
-export const FALLACY_SEVERITY = {
+export const COMMUNITY_FALLACY_SEVERITY = {
   LOW: 'low',
   MEDIUM: 'medium',
   HIGH: 'high',
 } as const;
 
-export const FALLACY_SEVERITY_LABELS = {
-  [FALLACY_SEVERITY.LOW]: 'Low',
-  [FALLACY_SEVERITY.MEDIUM]: 'Medium',
-  [FALLACY_SEVERITY.HIGH]: 'High',
+export const COMMUNITY_FALLACY_SEVERITY_LABELS = {
+  [COMMUNITY_FALLACY_SEVERITY.LOW]: 'Low',
+  [COMMUNITY_FALLACY_SEVERITY.MEDIUM]: 'Medium',
+  [COMMUNITY_FALLACY_SEVERITY.HIGH]: 'High',
 } as const;
 
-export const FALLACY_SEVERITY_SCORES = {
-  [FALLACY_SEVERITY.LOW]: 0.1,
-  [FALLACY_SEVERITY.MEDIUM]: 0.3,
-  [FALLACY_SEVERITY.HIGH]: 0.5,
+export const COMMUNITY_FALLACY_SEVERITY_SCORES = {
+  [COMMUNITY_FALLACY_SEVERITY.LOW]: 0.1,
+  [COMMUNITY_FALLACY_SEVERITY.MEDIUM]: 0.3,
+  [COMMUNITY_FALLACY_SEVERITY.HIGH]: 0.5,
 } as const;
 
 // ============================================================================
@@ -316,7 +316,7 @@ export const SCORE_RANGES = {
 // Analysis Options
 // ============================================================================
 
-export const ANALYSIS_OPTIONS = {
+export const COMMUNITY_ANALYSIS_OPTIONS = {
   ANALYZE_ARGUMENT: true,
   REANALYZE: true,
   INCLUDE_ANALYSIS: true,

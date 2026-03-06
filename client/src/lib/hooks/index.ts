@@ -36,7 +36,7 @@ export {
   useEventListenerCleanup,
   useAbortController,
   useAsyncOperation 
-} from './use-cleanup
+} from './use-cleanup';
 export { useDebounce } from './use-debounce';
 export { useMediaQuery } from './use-media-query';
 export { useKeyboardFocus } from './use-keyboard-focus';
@@ -56,7 +56,7 @@ export { useIntegratedServices } from './use-integrated-services';
 // export { useIsMobile as useMobileLegacy } from './use-mobile'; // Invalid
 export { useOfflineDetection as useOfflineDetectionLegacy } from './use-offline-detection';
 // export { useSystem as useSystemLegacy } from './use-system'; // Invalid
-export { useCleanup as useCleanupLegacy } from './use-cleanup
+export { useCleanup as useCleanupLegacy } from './use-cleanup';
 
 // FSD Integration Exports - For Feature-Sliced Design integration
 // These will be implemented as features are migrated to FSD structure

@@ -2,14 +2,14 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     // Deprecation handling
-    "ignoreDeprecations": "6.0",
+    "ignoreDeprecations": "5.0",
 
     "outDir": "./dist",
     "rootDir": ".",
     "composite": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "@server": ["."],

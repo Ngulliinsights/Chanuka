@@ -58,7 +58,6 @@ export {
   authLogoutStrategy,
   pageReloadStrategy,
   cacheClearStrategy,
-  redirectStrategy,
 } from './recovery';
 
 // ============================================================================
@@ -141,7 +140,7 @@ export type {
   UseErrorBoundaryReturn,
 } from './components/types';
 
-export { ErrorDomain, ErrorSeverity, RecoveryAction } from './constants';
+export { RecoveryAction } from './constants';
 
 // ============================================================================
 // Error Classes
@@ -182,7 +181,6 @@ export type { RecoveryContext as DashboardRecoveryContext, RecoveryStrategy as D
 
 // Note: These are re-exported from the new core system for backward compatibility
 export { errorHandler as coreErrorHandler } from './core/handler';
-export { ErrorFactory } from './core/factory';
 
 // Legacy convenience functions (use ErrorFactory instead)
 export const createNetworkError = ErrorFactory.createNetworkError;
@@ -324,13 +322,8 @@ export { ErrorBoundary as EnhancedErrorBoundary } from './components';
 export {
   networkRetryStrategy,
   connectionAwareRetryStrategy,
-  cacheClearStrategy,
   cacheFallbackStrategy,
   cacheRecoveryStrategy,
-  pageReloadStrategy,
-  authRefreshStrategy,
-  authRetryStrategy,
-  authLogoutStrategy,
   gracefulDegradationStrategy,
   offlineModeStrategy,
   reducedFunctionalityStrategy,
@@ -404,13 +397,6 @@ export function clearErrors(): void {
 }
 
 /**
- * Handle an error through the core system
- */
-export function handleError(errorData: Partial<AppError>): AppError {
-  return coreErrorHandler.handleError(errorData);
-}
-
-/**
  * Hook for error handling in React components
  */
 export function useCoreErrorHandler() {
@@ -429,31 +415,6 @@ export function useCoreErrorHandler() {
       []
     ),
   };
-}
-
-/**
- * Create a standardized error object
- */
-export function createError(
-  type: ErrorDomain,
-  severity: ErrorSeverity,
-  message: string,
-  options?: {
-    details?: Record<string, unknown>;
-    context?: Partial<ErrorContext>;
-    recoverable?: boolean;
-    retryable?: boolean;
-  }
-): AppError {
-  return coreErrorHandler.handleError({
-    type,
-    severity,
-    message,
-    details: options?.details,
-    context: options?.context,
-    recoverable: options?.recoverable ?? true,
-    retryable: options?.retryable ?? false,
-  });
 }
 
 /**

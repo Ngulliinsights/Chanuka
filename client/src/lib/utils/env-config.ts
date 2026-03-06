@@ -56,8 +56,8 @@ const getEnvironmentConfig = (): EnvironmentConfig => {
   };
 
   const config = {
-    apiUrl: getEnv('VITE_API_URL') || (isDevelopment ? 'http://localhost:3000' : ''),
-    wsUrl: getEnv('VITE_WS_URL') || (isDevelopment ? 'ws://localhost:3000' : ''),
+    apiUrl: getEnv('VITE_API_URL') || (isDevelopment ? 'http://localhost:4200' : ''),
+    wsUrl: getEnv('VITE_WS_URL') || (isDevelopment ? 'ws://localhost:4200' : ''),
     environment: isProduction ? 'production' : isDevelopment ? 'development' : 'staging',
     enableAnalytics: getEnv('VITE_ENABLE_ANALYTICS') === 'true',
     enableSecurityMonitoring: getEnv('VITE_ENABLE_SECURITY_MONITORING') !== 'false',

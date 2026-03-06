@@ -33,7 +33,7 @@ import { observability, initializeObservability } from './observability';
 import { cacheInvalidationManager } from './storage';
 
 // Import business services
-import { unifiedErrorHandler } from './error';
+import { errorHandler } from './error';
 import { globalApiClient } from './api';
 import { store } from './store';
 
@@ -166,7 +166,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
     createServiceFactory(
       (_container: IDIContainer) => {
         // Error handler is already initialized with observability and logger
-        return unifiedErrorHandler;
+        return errorHandler;
       },
       {
         dependencies: [

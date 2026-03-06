@@ -244,7 +244,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Development needs looser policies for hot module replacement
       headers: {
         'Content-Security-Policy': isDevelopment
-          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com ws: wss: http://localhost:* https://localhost:*; worker-src 'self' blob:; child-src 'self' blob:;"
+          ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com ws: wss: http://localhost:* https://localhost:* http://127.0.0.1:*; worker-src 'self' blob:; child-src 'self' blob:;"
           : "default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://fonts.googleapis.com https://fonts.gstatic.com; worker-src 'self' blob:; child-src 'self' blob:;",
       },
 
@@ -264,7 +264,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Proxy configuration to route API calls to the backend
       proxy: {
         '/api': {
-          target: 'http://localhost:3000',
+          target: 'http://localhost:4200',
           changeOrigin: true,
           secure: false,
         },

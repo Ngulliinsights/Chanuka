@@ -38,15 +38,23 @@ export default function ContactPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-6xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
+      {/* Hero */}
+      <section className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-16 border-b border-brand-gold/10">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <MessageSquare className="w-8 h-8" aria-hidden="true" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us</h1>
+            <p className="text-xl text-blue-100">
               We're here to help. Reach out with questions, feedback, or partnership inquiries.
             </p>
           </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-6xl mx-auto">
 
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Contact Information */}

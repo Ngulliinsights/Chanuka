@@ -6,7 +6,7 @@
  */
 
 import { ErrorDomain, ErrorSeverity } from './constants';
-import { coreErrorHandler } from './handler';
+import { errorHandler as coreErrorHandler } from './core/handler';
 import { ErrorRecoveryStrategy, RecoveryAction, RecoveryResult } from './types';
 
 // ============================================================================
