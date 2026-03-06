@@ -166,7 +166,18 @@ export class SecureQueryBuilderService {
       // Build JOIN clauses safely
       const joinClauses = joins.map(j => {
         const joinType = j.type || 'INNER';
-        return sql`${sql.raw(joinType)} JOIN ${sql.identifier(j.table)} ON ${sql.raw(j.on)}`;
+        // Parse the ON clause to extract table.column = table.column format
+        const onParts = j.on.split('=').map(p => p.trim());
+        if (onParts.length === 2) {
+          const [left, right] = onParts;
+          const leftParts = left!.split('.');
+          const rightParts = right!.split('.');
+          if (leftParts.length === 2 && rightParts.length === 2) {
+            return sql`${sql.raw(joinType)} JOIN ${sql.identifier(j.table)} ON ${sql.identifier(leftParts[0]!)}.${sql.identifier(leftParts[1]!)} = ${sql.identifier(rightParts[0]!)}.${sql.identifier(rightParts[1]!)}`;
+          }
+        }
+        // Fallback for complex ON clauses - should be validated separately
+        throw new Error(`Complex JOIN ON clause not supported: ${j.on}`);
       });
       
       return sql`

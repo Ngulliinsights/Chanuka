@@ -26,8 +26,9 @@ class SimpleSocketIOService {
     this.io = new Server(httpServer, {
       path: '/socket.io',
       cors: {
-        origin: '*',
-        methods: ['GET', 'POST']
+        origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+        methods: ['GET', 'POST'],
+        credentials: true
       },
       transports: ['websocket', 'polling']
     });

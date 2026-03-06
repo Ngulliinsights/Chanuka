@@ -16,7 +16,13 @@ import { AuthToken, Config } from 'neo4j-driver';
 export const NEO4J_CONFIG = {
   URI: process.env.NEO4J_URI ?? 'neo4j://localhost:7687',
   USER: process.env.NEO4J_USER ?? 'neo4j',
-  PASSWORD: process.env.NEO4J_PASSWORD ?? 'password',
+  PASSWORD: (() => {
+    if (process.env.NEO4J_PASSWORD) return process.env.NEO4J_PASSWORD;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEO4J_PASSWORD must be set in production');
+    }
+    return 'neo4j'; // Development only
+  })(),
   MAX_CONNECTION_POOL_SIZE: parseInt(process.env.NEO4J_MAX_POOL ?? '100'),
   CONNECTION_TIMEOUT_MS: parseInt(process.env.NEO4J_TIMEOUT ?? '5000'),
   MAX_CONNECTION_LIFETIME_MS: parseInt(process.env.NEO4J_LIFETIME ?? '3600000'),

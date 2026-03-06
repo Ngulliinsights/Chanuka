@@ -9,11 +9,18 @@ import { logger } from '@server/infrastructure/observability';
 let testDriver: Driver | null = null;
 
 export async function setupGraphTestEnvironment(): Promise<Driver> {
+  const testPassword = process.env.NEO4J_TEST_PASSWORD || (() => {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('NEO4J_TEST_PASSWORD required in production');
+    }
+    return 'neo4j'; // Test environment only
+  })();
+  
   testDriver = neo4jDriver.driver(
     process.env.NEO4J_TEST_URI || 'bolt://localhost:7687',
     neo4jDriver.auth.basic(
       process.env.NEO4J_TEST_USER || 'neo4j',
-      process.env.NEO4J_TEST_PASSWORD || 'password'
+      testPassword
     )
   );
   
