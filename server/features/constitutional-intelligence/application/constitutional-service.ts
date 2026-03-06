@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { constitutionalAnalyzer } from '@server/features/ml/models/constitutional-analyzer';
-import type { ConstitutionalInput, ConstitutionalOutput } from '@server/features/ml/models/constitutional-analyzer';
+import type { ConstitutionalAnalysisInput, ConstitutionalAnalysisResult } from '@server/features/ml/models/types';
 import { cacheService } from '@server/infrastructure/cache';
 import { expertReviewWorkflow, type ExpertReviewRequest } from './expert-review-workflow';
 import { constitutionalMonitoring } from './monitoring-integration';
@@ -20,7 +20,7 @@ export interface ConstitutionalAnalysisRequest {
   proposedChanges?: string[];
 }
 
-export interface ConstitutionalAnalysisResult extends ConstitutionalOutput {
+export interface ConstitutionalServiceResult extends ConstitutionalAnalysisResult {
   billId: string;
   analyzedAt: string;
   processingTime: number;
@@ -59,7 +59,7 @@ export class ConstitutionalService {
       }
 
       // Prepare input for analyzer
-      const input: ConstitutionalInput = {
+      const input: ConstitutionalAnalysisInput = {
         billText: request.billText,
         billTitle: request.billTitle,
         billType: request.billType,
