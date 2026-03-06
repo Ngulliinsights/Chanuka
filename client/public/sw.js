@@ -32,6 +32,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip external font/style requests (let browser handle them directly)
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
+    return;
+  }
+  
   // Notification API requests: Network-first with cache fallback
   if (url.pathname.includes('/api/notifications')) {
     event.respondWith(networkFirstStrategy(event.request));
@@ -289,6 +294,11 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol === 'chrome-extension:' || 
       url.protocol === 'moz-extension:' || 
       url.href.includes('chrome-extension://invalid/')) {
+    return;
+  }
+  
+  // Skip external font/style requests (let browser handle them directly)
+  if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     return;
   }
   

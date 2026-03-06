@@ -407,7 +407,7 @@ function createBaseConfig(): AppConfig {
   const env = process.env.NODE_ENV || 'development';
   const baseConfig: AppConfig = {
     server: {
-      port: getEnvNumber('PORT', 5000),
+      port: getEnvNumber('PORT', 4200),
       nodeEnv: env as 'development' | 'production' | 'test',
       host: getEnvVar('HOST', '0.0.0.0'),
       frontendUrl: getEnvVar('FRONTEND_URL'),
@@ -640,7 +640,7 @@ function createBaseConfig(): AppConfig {
       ...baseConfig,
       server: {
         ...baseConfig.server,
-        port: getEnvNumber('PORT', 3000), // Default port for dev to match frontend proxy
+        port: getEnvNumber('PORT', 4200), // Default port for dev
       },
       cors: {
         ...baseConfig.cors,

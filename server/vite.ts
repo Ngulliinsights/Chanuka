@@ -16,7 +16,7 @@ export function setupVite(app: Express) {
   
   // 1. In Development, we expect the user to run 'npm run dev' which starts Vite on port 5173
   if (!isProduction) {
-    logger.info('🔧 Development mode: Expecting Frontend on http://localhost:5173', { component: 'ViteIntegration' });
+    logger.info({ component: 'ViteIntegration' }, '🔧 Development mode: Expecting Frontend on http://localhost:5173');
     
     // Add CORS headers for development to allow frontend on different port
     app.use((req: Request, res: Response, next: NextFunction) => {
@@ -44,11 +44,11 @@ export function setupVite(app: Express) {
 
   // Validate build exists
   if (!fs.existsSync(clientDistPath)) {
-    logger.warn('⚠️  Client build not found in dist/client. Did you run "npm run build"?', { component: 'ViteIntegration' });
+    logger.warn({ component: 'ViteIntegration' }, '⚠️  Client build not found in dist/client. Did you run "npm run build"?');
     return;
   }
 
-  logger.info(`📂 Serving static files from: ${clientDistPath}`, { component: 'ViteIntegration' });
+  logger.info({ component: 'ViteIntegration' }, `📂 Serving static files from: ${clientDistPath}`);
 
   // A. Serve Static Assets (JS, CSS, Images) with aggressive caching
   app.use(express.static(clientDistPath, {
