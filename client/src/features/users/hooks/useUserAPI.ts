@@ -715,7 +715,7 @@ export function useSyncDashboardData() {
       // Update React Query cache
       queryClient.setQueryData(userQueryKeys.dashboard(user.id), dashboardData);
 
-      // Update Zustand store if method exists
+      // Update Redux store if method exists
       // Note: Only update if the store's setDashboardData exists and can handle the data type
       if (dashboardStore.setDashboardData) {
         // We use 'as unknown as UserDashboardData' because the types may not perfectly align

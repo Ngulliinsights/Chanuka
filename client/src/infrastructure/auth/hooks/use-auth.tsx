@@ -600,7 +600,7 @@ export function useAuth(): AuthContextType {
 }
 
 /**
- * Legacy compatibility hook for zustand-style auth store
+ * Legacy compatibility hook for Redux auth store
  */
  
 export function useAuthStore() {

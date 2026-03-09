@@ -1,7 +1,6 @@
 /**
  * Real-time Slice for Redux Toolkit
  *
- * Migrated from Zustand to Redux Toolkit for unified state management.
  * Manages WebSocket connections, subscriptions, and real-time updates across all domains.
  */
 
@@ -158,10 +157,11 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-50);
       state.billUpdates[billId] = updates;
 
-      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
-        ? update.timestamp 
-        : update.timestamp instanceof Date 
-          ? update.timestamp.toISOString() 
+      const timestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof timestamp === 'string' 
+        ? timestamp 
+        : timestamp instanceof Date 
+          ? timestamp.toISOString() 
           : new Date().toISOString();
     },
 
@@ -174,20 +174,23 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-100);
       state.communityUpdates[discussionId] = updates;
 
-      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
-        ? update.timestamp 
-        : update.timestamp instanceof Date 
-          ? update.timestamp.toISOString() 
+      const timestamp = update.timestamp;
+      state.lastUpdateTimestamp = typeof timestamp === 'string' 
+        ? timestamp 
+        : timestamp instanceof Date 
+          ? timestamp.toISOString() 
           : new Date().toISOString();
     },
 
     updateEngagementMetrics: (state, action: PayloadAction<EngagementMetricsUpdate>) => {
       const metrics = action.payload;
       state.engagementMetrics[metrics.bill_id] = metrics;
-      state.lastUpdateTimestamp = typeof metrics.timestamp === 'string' 
-        ? metrics.timestamp 
-        : metrics.timestamp instanceof Date 
-          ? metrics.timestamp.toISOString() 
+      
+      const timestamp = metrics.timestamp;
+      state.lastUpdateTimestamp = typeof timestamp === 'string' 
+        ? timestamp 
+        : timestamp instanceof Date 
+          ? timestamp.toISOString() 
           : new Date().toISOString();
     },
 
@@ -195,7 +198,11 @@ export const realTimeSlice = createSlice({
       // Keep only last 200 expert activities
       state.expertActivities = [...state.expertActivities, action.payload].slice(-200);
       const timestamp = action.payload.timestamp;
-      state.lastUpdateTimestamp = timestamp instanceof Date ? timestamp.toISOString() : timestamp;
+      state.lastUpdateTimestamp = typeof timestamp === 'string' 
+        ? timestamp 
+        : timestamp instanceof Date 
+          ? timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     addNotification: (state, action: PayloadAction<RealTimeNotification>) => {
@@ -242,12 +249,6 @@ export const realTimeSlice = createSlice({
       delete state.communityUpdates[action.payload];
     },
 
-    // Migration utilities
-    migrateFromZustand: (state, action: PayloadAction<Partial<RealTimeState>>) => {
-      // Merge migrated state from Zustand store
-      Object.assign(state, action.payload);
-    },
-
     resetRealTimeState: () => initialState,
   },
 });
@@ -269,7 +270,6 @@ export const {
   toggleNotifications,
   clearBillUpdates,
   clearCommunityUpdates,
-  migrateFromZustand,
   resetRealTimeState,
 } = realTimeSlice.actions;
 

@@ -64,58 +64,61 @@ client/src/features/bills/
 
 ## Code Snippets
 
-### 1. Comparison Cart Hook
+### 1. Comparison Cart Hook (Redux Implementation)
 
 ```typescript
 // client/src/features/bills/hooks/useComparisonCart.ts
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
+import {
+  addBill,
+  removeBill,
+  toggleBill,
+  clearCart,
+  setBills,
+} from '../store/comparisonCartSlice';
 
-interface ComparisonCartState {
-  billIds: string[];
-  maxBills: number;
-  addBill: (id: string) => void;
-  removeBill: (id: string) => void;
-  clearCart: () => void;
-  toggleBill: (id: string) => void;
-  canAddMore: boolean;
-}
+export const useComparisonCart = () => {
+  const dispatch = useAppDispatch();
+  
+  const billIds = useAppSelector((state) => (state as any).comparisonCart?.billIds || []);
+  const maxBills = useAppSelector((state) => (state as any).comparisonCart?.maxBills || 4);
+  const count = billIds.length;
+  const canAddMore = billIds.length < maxBills;
 
-export const useComparisonCart = create<ComparisonCartState>()(
-  persist(
-    (set, get) => ({
-      billIds: [],
-      maxBills: 4,
-      
-      addBill: (id) => {
-        const { billIds, maxBills } = get();
-        if (billIds.length < maxBills && !billIds.includes(id)) {
-          set({ billIds: [...billIds, id] });
-        }
-      },
-      
-      removeBill: (id) => {
-        set({ billIds: get().billIds.filter(bid => bid !== id) });
-      },
-      
-      clearCart: () => set({ billIds: [] }),
-      
-      toggleBill: (id) => {
-        const { billIds } = get();
-        if (billIds.includes(id)) {
-          get().removeBill(id);
-        } else {
-          get().addBill(id);
-        }
-      },
-      
-      get canAddMore() {
-        return get().billIds.length < get().maxBills;
-      },
-    }),
-    { name: 'comparison-cart' }
-  )
-);
+  const handleAddBill = useCallback((id: string) => {
+    dispatch(addBill(id));
+  }, [dispatch]);
+
+  const handleRemoveBill = useCallback((id: string) => {
+    dispatch(removeBill(id));
+  }, [dispatch]);
+
+  const handleToggleBill = useCallback((id: string) => {
+    dispatch(toggleBill(id));
+  }, [dispatch]);
+
+  const handleClearCart = useCallback(() => {
+    dispatch(clearCart());
+  }, [dispatch]);
+
+  const hasBill = useCallback((id: string) => {
+    return billIds.includes(id);
+  }, [billIds]);
+
+  return {
+    billIds,
+    maxBills,
+    count,
+    addBill: handleAddBill,
+    removeBill: handleRemoveBill,
+    clearCart: handleClearCart,
+    toggleBill: handleToggleBill,
+    hasBill,
+    canAddMore,
+    setBills: (ids: string[]) => dispatch(setBills(ids)),
+  };
+};
 ```
 
 ### 2. Add Compare Button to Bill Header

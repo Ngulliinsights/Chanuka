@@ -1,7 +1,7 @@
 /**
  * Community Integration Hooks
  *
- * Connects the community API service with React Query and Zustand store
+ * Connects the community API service with React Query and Redux store
  * Provides unified hooks for all community features
  */
 
