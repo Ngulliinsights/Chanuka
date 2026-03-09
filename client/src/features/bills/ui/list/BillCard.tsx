@@ -15,6 +15,7 @@ import {
   Bookmark,
   BookmarkCheck,
   AlertCircle,
+  GitCompare,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -22,8 +23,10 @@ import { Link } from 'react-router-dom';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Checkbox } from '@client/lib/design-system';
 import { cn } from '@client/lib/design-system';
 import { Bill, Sponsor } from '@client/lib/types';
+import { useComparisonCart } from '../../hooks/useComparisonCart';
 
 interface BillCardProps {
   bill: Bill;
@@ -33,6 +36,9 @@ interface BillCardProps {
   isSaved?: boolean;
   showQuickActions?: boolean;
   viewMode?: 'grid' | 'list';
+  showSelection?: boolean;
+  onSelectionChange?: (billId: string, selected: boolean) => void;
+  isSelected?: boolean;
 }
 
 const statusLabels: Record<string, string> = {
@@ -89,9 +95,15 @@ export default function BillCard({
   isSaved = false,
   showQuickActions = true,
   viewMode = 'grid',
+  showSelection = false,
+  onSelectionChange,
+  isSelected = false,
 }: BillCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [quickActionFocus, setQuickActionFocus] = useState<string | null>(null);
+  const { toggleBill, hasBill } = useComparisonCart();
+  
+  const isInComparisonCart = hasBill(String(bill.id));
 
   const statusColor =
     statusColors[bill.status] || statusColors.introduced;
@@ -125,11 +137,27 @@ export default function BillCard({
       className={cn(
         'group relative transition-all duration-200 hover:shadow-lg hover:shadow-primary/10',
         'border border-border hover:border-primary/20',
-        viewMode === 'list' && 'flex flex-row'
+        viewMode === 'list' && 'flex flex-row',
+        isInComparisonCart && 'ring-2 ring-primary/50'
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      {/* Selection Checkbox */}
+      {showSelection && (
+        <div className="absolute top-2 left-2 z-10">
+          <Checkbox
+            checked={isSelected || isInComparisonCart}
+            onCheckedChange={(checked) => {
+              toggleBill(String(bill.id));
+              onSelectionChange?.(String(bill.id), checked as boolean);
+            }}
+            aria-label={`Select ${bill.title} for comparison`}
+            className="bg-white shadow-sm"
+          />
+        </div>
+      )}
+
       {/* Quick Actions Overlay */}
       {showQuickActions && (
         <div
@@ -138,6 +166,21 @@ export default function BillCard({
             isHovered || quickActionFocus ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
           )}
         >
+          <Button
+            size="sm"
+            variant="secondary"
+            className={cn(
+              'h-8 w-8 p-0 bg-white/90 hover:bg-white shadow-sm',
+              isInComparisonCart && 'bg-primary/10'
+            )}
+            onClick={() => toggleBill(String(bill.id))}
+            onFocus={() => setQuickActionFocus('compare')}
+            onBlur={() => setQuickActionFocus(null)}
+            aria-label={isInComparisonCart ? 'Remove from comparison' : 'Add to comparison'}
+          >
+            <GitCompare className={cn('h-4 w-4', isInComparisonCart && 'text-primary')} />
+          </Button>
+
           <Button
             size="sm"
             variant="secondary"
@@ -184,7 +227,11 @@ export default function BillCard({
       )}
 
       <CardHeader className="pb-3">
-        <div className={cn('flex items-start justify-between gap-2', showQuickActions && 'pr-20')}>
+        <div className={cn(
+          'flex items-start justify-between gap-2',
+          showQuickActions && 'pr-20',
+          showSelection && 'pl-8'
+        )}>
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-mono">{bill.billNumber}</span>

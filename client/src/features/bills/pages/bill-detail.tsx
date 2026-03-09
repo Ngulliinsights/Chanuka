@@ -1,6 +1,5 @@
 import { ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import React from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 // Feature Imports
@@ -190,7 +189,7 @@ export default function BillDetail() {
 
       {/* Similar Bills Widget */}
       <div className="mt-8">
-        <SimilarBillsWidget billId={bill.id} limit={5} />
+        <SimilarBillsWidget billId={Number(bill.id)} limit={5} />
       </div>
     </div>
   );

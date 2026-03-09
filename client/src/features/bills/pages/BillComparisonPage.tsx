@@ -62,11 +62,11 @@ export default function BillComparisonPage() {
       <div className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold text-white py-8 border-b border-brand-gold/10">
         <div className="container mx-auto px-4">
           <Link
-            to="/analysis"
+            to={searchParams.get('from') === 'bills' ? '/bills' : '/analysis'}
             className="inline-flex items-center text-sm text-blue-100 hover:text-white mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Analysis Tools
+            {searchParams.get('from') === 'bills' ? 'Back to Bills' : 'Back to Analysis Tools'}
           </Link>
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Bill Comparison</h1>
           <p className="text-blue-100">

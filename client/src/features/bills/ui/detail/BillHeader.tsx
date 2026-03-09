@@ -1,8 +1,10 @@
-import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lucide-react';
-import React from 'react';
+import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2, GitCompare } from 'lucide-react';
+import React, { useState } from 'react';
 
-import { Badge } from '@client/lib/design-system';
+import { Badge, Button } from '@client/lib/design-system';
 import type { Bill } from '@client/lib/types';
+import { useComparisonCart } from '../../hooks/useComparisonCart';
+import { ComparisonModal } from '../comparison/ComparisonModal';
 
 interface BillHeaderProps {
   bill: Bill;
@@ -13,6 +15,10 @@ interface BillHeaderProps {
  * Displays bill metadata, status, and engagement metrics
  */
 export function BillHeader({ bill }: BillHeaderProps) {
+  const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+  const { billIds, toggleBill, hasBill } = useComparisonCart();
+  const isInCart = hasBill(String(bill.id));
+
   // Generate structured data for SEO and accessibility
   const structuredData = {
     '@context': 'https://schema.org',
@@ -103,6 +109,21 @@ export function BillHeader({ bill }: BillHeaderProps) {
 
           {/* Engagement Actions */}
           <div className="flex items-center gap-3">
+            <Button
+              variant={isInCart ? "default" : "outline"}
+              size="sm"
+              onClick={() => setIsComparisonModalOpen(true)}
+              className="gap-2"
+            >
+              <GitCompare className="h-4 w-4" />
+              <span>{isInCart ? 'In Comparison' : 'Compare'}</span>
+              {billIds.length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {billIds.length}
+                </Badge>
+              )}
+            </Button>
+
             <button className="flex items-center gap-2 px-3 py-2 text-sm bg-muted hover:bg-muted/80 rounded-md transition-colors">
               <Eye className="h-4 w-4" />
               <span>Watch</span>
@@ -125,6 +146,13 @@ export function BillHeader({ bill }: BillHeaderProps) {
           </div>
         </div>
       </div>
+
+      {/* Comparison Modal */}
+      <ComparisonModal
+        isOpen={isComparisonModalOpen}
+        onClose={() => setIsComparisonModalOpen(false)}
+        preselectedBillId={String(bill.id)}
+      />
     </header>
   );
 }

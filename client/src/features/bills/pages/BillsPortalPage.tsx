@@ -12,6 +12,7 @@ import {
   TrendingUp,
   Clock,
   FileText,
+  GitCompare,
 } from 'lucide-react';
 import { useState, useCallback, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -37,6 +38,8 @@ import { cn } from '@client/lib/design-system/utils/cn';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
+import { useComparisonCart } from '@client/features/bills/hooks/useComparisonCart';
+import { ComparisonFloatingBar } from '@client/features/bills/ui/comparison/ComparisonFloatingBar';
 
 // Types for the portal
 interface BillsPortalFilters {
@@ -79,6 +82,7 @@ export default function BillsPortalPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isMobile } = useDeviceInfo();
   const { toast } = useToast();
+  const { billIds, clearCart } = useComparisonCart();
 
   // Extract current filters from URL params
   const currentFilters = useMemo<BillsPortalFilters>(
@@ -571,6 +575,13 @@ export default function BillsPortalPage() {
           </div>
         </div>
       )}
+
+      {/* Comparison Floating Bar */}
+      <ComparisonFloatingBar
+        selectedCount={billIds.length}
+        onCompare={() => navigate(`/analysis/compare?bills=${billIds.join(',')}`)}
+        onClear={clearCart}
+      />
     </div>
   );
 }
