@@ -7,7 +7,6 @@
 
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
-import type { RootState } from '@client/infrastructure/store';
 import {
   addBill,
   removeBill,
