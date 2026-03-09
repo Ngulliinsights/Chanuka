@@ -62,6 +62,10 @@ const BillDetail = createLazyComponent(
   () => import('@client/features/bills/pages/bill-detail'),
   'Bill Detail'
 );
+const BillComparisonPage = createLazyComponent(
+  () => import('@client/features/bills/pages/BillComparisonPage'),
+  'Bill Comparison'
+);
 
 const CommunityHub = createLazyComponent(
   () => import('@client/features/community/pages/community-input'),
@@ -293,6 +297,11 @@ const routes: RouteConfig[] = [
     id: 'bill-detail',
     path: '/bills/:id',
     element: <BillDetail />,
+  },
+  {
+    id: 'bill-comparison',
+    path: '/analysis/compare',
+    element: <BillComparisonPage />,
   },
   {
     id: 'bill-analysis',

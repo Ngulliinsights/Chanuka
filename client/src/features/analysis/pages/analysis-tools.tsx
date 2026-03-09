@@ -8,18 +8,39 @@ import { BarChart3, TrendingUp, Search, Users, Download, Filter } from 'lucide-r
 export default function AnalysisToolsPage() {
   const tools = [
     {
+      title: 'Comprehensive Bill Analysis',
+      description: 'Constitutional analysis, stakeholder impact, transparency scores, and public interest assessment for any bill',
+      icon: BarChart3,
+      link: '/bills',
+      status: 'Available'
+    },
+    {
+      title: 'Pretext Detection',
+      description: 'Detect hidden agendas and pretexts in legislative language',
+      icon: Search,
+      link: '/analysis/pretext-detection',
+      status: 'Available'
+    },
+    {
+      title: 'Advanced Filters',
+      description: 'Use advanced filtering to find specific legislation',
+      icon: Filter,
+      link: '/bills?advanced=true',
+      status: 'Available'
+    },
+    {
       title: 'Bill Impact Analysis',
       description: 'Analyze the potential impact of bills on different sectors and communities',
       icon: TrendingUp,
       link: '/analysis/impact',
-      status: 'Available'
+      status: 'Coming Soon'
     },
     {
       title: 'Legislative Trends',
       description: 'Track trends in legislation across counties and the national assembly',
       icon: BarChart3,
       link: '/analysis/trends',
-      status: 'Available'
+      status: 'Coming Soon'
     },
     {
       title: 'Bill Comparison',
@@ -40,14 +61,7 @@ export default function AnalysisToolsPage() {
       description: 'Export legislative data for custom analysis',
       icon: Download,
       link: '/analysis/export',
-      status: 'Available'
-    },
-    {
-      title: 'Advanced Filters',
-      description: 'Use advanced filtering to find specific legislation',
-      icon: Filter,
-      link: '/bills?advanced=true',
-      status: 'Available'
+      status: 'Coming Soon'
     }
   ];
 

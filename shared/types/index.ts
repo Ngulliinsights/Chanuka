@@ -83,6 +83,9 @@ export * from './domains/legislative';
 // Arguments domain - Argument intelligence types
 export * from './domains/arguments';
 
+// Analysis domain - Comprehensive bill analysis types
+export * from './features/analysis';
+
 // Loading states - UI loading state management
 // export * from './domains/loading'; // Commented out to avoid ActionType conflict
 

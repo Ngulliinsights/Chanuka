@@ -14,7 +14,13 @@
 export { ConflictOfInterestAnalysis, AnalysisDashboard } from './ui';
 
 // Hooks
-export { useConflictAnalysis, useBillAnalysis } from './model/hooks';
+export { 
+  useConflictAnalysis, 
+  useBillAnalysis,
+  useComprehensiveAnalysis,
+  useAnalysisHistory,
+  useTriggerAnalysis
+} from './model/hooks';
 
 // Services
 export {
@@ -22,6 +28,8 @@ export {
   RealConflictDetectionService,
   createConflictDetectionService,
   type ConflictDetectionService,
+  analysisApiService,
+  AnalysisApiService,
 } from './model/services';
 
 // Re-export types for convenience
