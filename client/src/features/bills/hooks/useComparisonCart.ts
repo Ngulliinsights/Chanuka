@@ -32,8 +32,9 @@ export interface UseComparisonCartReturn {
 export const useComparisonCart = (): UseComparisonCartReturn => {
   const dispatch = useAppDispatch();
   
-  const billIds = useAppSelector((state: RootState) => state.comparisonCart?.billIds || []);
-  const maxBills = useAppSelector((state: RootState) => state.comparisonCart?.maxBills || 4);
+  // Use inline selectors to avoid type issues with redux-persist
+  const billIds = useAppSelector((state) => (state as any).comparisonCart?.billIds || []);
+  const maxBills = useAppSelector((state) => (state as any).comparisonCart?.maxBills || 4);
   const count = billIds.length;
   const canAddMore = billIds.length < maxBills;
 
