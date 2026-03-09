@@ -1,9 +1,15 @@
 # Chanuka Platform — Documentation Index
 
-**Last Updated:** March 6, 2026  
+**Last Updated:** March 9, 2026  
 **Purpose:** Single source of truth for navigating all platform documentation
 
+> **New to documentation?** See [Documentation Navigation Guide](./docs/DOCUMENTATION_NAVIGATION.md) to understand how ADRs, DCS, and root docs work together.
+
+---
+
 ## 🚀 Start Here (New Developers)
+
+> **Quick Navigation:** See [Documentation Navigation Guide](./docs/DOCUMENTATION_NAVIGATION.md) for a complete guide to our documentation systems (ADRs, DCS, and root docs).
 
 If you're new to the Chanuka platform, read these in order:
 
@@ -38,13 +44,22 @@ If you're new to the Chanuka platform, read these in order:
 
 **Core Architecture:**
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** — Module organization, shared vs server patterns
+- **[docs/DCS/ARCHITECTURE.md](./docs/DCS/ARCHITECTURE.md)** — Detailed architecture guide with practical examples
 - **[docs/technical/architecture.md](./docs/technical/architecture.md)** — Technical architecture details
 - **[docs/INTEGRATION_ARCHITECTURE.md](./docs/INTEGRATION_ARCHITECTURE.md)** — Integration patterns
 - **[docs/DESIGN_DECISIONS.md](./docs/DESIGN_DECISIONS.md)** — Key design decisions
 
 **Architectural Decision Records (ADRs):**
-- **[docs/adr/](./docs/adr/)** — 19 ADRs documenting major architectural decisions
+- **[docs/adr/README.md](./docs/adr/README.md)** — Index of all 20 ADRs documenting major architectural decisions
 - **[docs/ADR_EXTRACTION_SUMMARY.md](./docs/ADR_EXTRACTION_SUMMARY.md)** — ADR system overview
+- **[docs/adr/ADR-020-root-documentation-consolidation.md](./docs/adr/ADR-020-root-documentation-consolidation.md)** — Recent design decisions (March 2026)
+
+**Key ADRs:**
+- [ADR-001: API Client Consolidation](./docs/adr/ADR-001-api-client-consolidation.md)
+- [ADR-012: Infrastructure Security Pattern](./docs/adr/ADR-012-infrastructure-security-pattern.md)
+- [ADR-013: Caching Strategy](./docs/adr/ADR-013-caching-strategy.md)
+- [ADR-014: Error Handling Pattern](./docs/adr/ADR-014-error-handling-pattern.md)
+- [ADR-017: Repository Pattern](./docs/adr/ADR-017-repository-pattern-standardization.md)
 
 **Module-Specific Architecture:**
 - **[client/docs/README.md](./client/docs/README.md)** — Client architecture
@@ -55,8 +70,10 @@ If you're new to the Chanuka platform, read these in order:
 
 **Getting Started:**
 - **[docs/DEVELOPER_ONBOARDING.md](./docs/DEVELOPER_ONBOARDING.md)** — Onboarding workflow
+- **[docs/DCS/QUICK_REFERENCE.md](./docs/DCS/QUICK_REFERENCE.md)** — Commands, setup, and quick answers
 - **[docs/guides/setup.md](./docs/guides/setup.md)** — Setup instructions
 - **[docs/DEVELOPMENT_WORKFLOW.md](./docs/DEVELOPMENT_WORKFLOW.md)** — Development workflow
+- **[docs/DCS/DEVELOPMENT_WORKFLOW.md](./docs/DCS/DEVELOPMENT_WORKFLOW.md)** — DCS development standards
 
 **Code Organization:**
 - **[docs/PATH_ALIAS_RESOLUTION.md](./docs/PATH_ALIAS_RESOLUTION.md)** — Import path patterns
@@ -157,8 +174,18 @@ If you're new to the Chanuka platform, read these in order:
 
 **Historical Documentation:**
 - **[docs/archive/](./docs/archive/)** — Archived documentation (superseded or historical)
+- **[docs/archive/root-cleanup-2026-03-09/](./docs/archive/root-cleanup-2026-03-09/)** — March 2026 root cleanup (26 files)
 - **[scripts/deprecated/](./scripts/deprecated/)** — Deprecated scripts
 - **[scripts/archived-migration-tools/](./scripts/archived-migration-tools/)** — Old migration tools
+
+See [ADR-020](./docs/adr/ADR-020-root-documentation-consolidation.md) for details on the March 2026 cleanup.
+
+## 📖 Documentation Systems
+
+**Understanding Our Documentation:**
+- **[docs/DOCUMENTATION_NAVIGATION.md](./docs/DOCUMENTATION_NAVIGATION.md)** — How ADRs, DCS, and root docs work together
+- **[docs/adr/README.md](./docs/adr/README.md)** — Architectural Decision Records (formal decisions)
+- **[docs/DCS/INDEX.md](./docs/DCS/INDEX.md)** — Documentation Content Summary (practical guides)
 
 ## 🎯 Strategic Documents
 

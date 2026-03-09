@@ -2,6 +2,27 @@
 
 This directory contains Architecture Decision Records documenting significant architectural decisions made during the Chanuka platform development.
 
+> **For practical development guides and quick reference:** See [Documentation Content Summary (DCS)](../DCS/INDEX.md)  
+> **For formal architectural decisions with full context:** Use this ADR folder
+
+## What Are ADRs?
+
+ADRs document **why** we made specific architectural decisions, including:
+- The context and problem being solved
+- The decision and its rationale
+- Consequences (positive and negative)
+- Alternatives considered
+
+## When to Create an ADR
+
+Create an ADR when making decisions about:
+- System architecture and design patterns
+- Technology choices and frameworks
+- Data models and storage strategies
+- API design and integration patterns
+- Security and performance patterns
+- Code organization and structure
+
 ## Index
 
 ### ADR-001: API Client Consolidation
@@ -132,5 +153,7 @@ Each ADR should follow this structure:
 
 ## References
 
-- [Architecture Documentation](../ARCHITECTURE.md)
-- [Codebase Consolidation Spec](.kiro/specs/codebase-consolidation/)
+- **[DCS (Documentation Content Summary)](../DCS/INDEX.md)** - Practical development guides
+- **[DCS Architecture Guide](../DCS/ARCHITECTURE.md)** - Day-to-day architecture reference
+- **[Root ARCHITECTURE.md](../../ARCHITECTURE.md)** - Architecture overview
+- **[Codebase Consolidation Spec](../../.agent/specs/codebase-consolidation/)** - Consolidation work

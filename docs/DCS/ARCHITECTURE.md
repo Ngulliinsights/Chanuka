@@ -1,8 +1,11 @@
 # Architecture & Design Decisions
 
 **Extracted From:** ARCHITECTURE.md (January 17, 2026)  
+**Updated:** March 9, 2026  
 **Purpose:** Strategic reference for module organization and design patterns  
 **For Questions About:** Why modules are organized this way, what should go where
+
+> **Note:** For formal architectural decisions with full context and rationale, see [Architectural Decision Records (ADRs)](../adr/README.md). This document provides practical guidance for day-to-day development.
 
 ---
 
@@ -267,25 +270,20 @@ shared/
 
 ## Architecture Decision Log
 
-### Decision: Feature-Driven Server Structure
+> **For detailed architectural decisions, see [ADRs](../adr/README.md)**
 
-**Why:** Easier to locate all code related to a feature, clearer dependency boundaries, easier testing
+### Key Decisions Summary
 
-### Decision: Separate validation at API boundary
-
-**Why:** Type safety at runtime, prevent invalid data from reaching business logic
-
-### Decision: Shared types, not shared implementations
-
-**Why:** Prevents coupling between client and server logic while maintaining type safety
-
-### Decision: Result types for error handling
-
-**Why:** Explicit error handling pattern, no implicit errors, easier to test failure paths
-
-### Decision: Caching at service layer
-
-**Why:** Transparent to routes, easy to invalidate, all features benefit
+| Decision | Rationale | ADR Reference |
+|----------|-----------|---------------|
+| Feature-Driven Server Structure | Easier to locate code, clearer boundaries, easier testing | [ADR-004](../adr/ADR-004-feature-structure-convention.md) |
+| Validation at API Boundary | Type safety at runtime, prevent invalid data | [ADR-006](../adr/ADR-006-validation-single-source.md), [ADR-012](../adr/ADR-012-infrastructure-security-pattern.md) |
+| Shared Types, Not Implementations | Prevents coupling while maintaining type safety | [ADR-011](../adr/ADR-011-type-system-single-source.md) |
+| Result Types for Error Handling | Explicit error handling, easier to test failures | [ADR-014](../adr/ADR-014-error-handling-pattern.md) |
+| Caching at Service Layer | Transparent to routes, easy invalidation | [ADR-013](../adr/ADR-013-caching-strategy.md) |
+| API Client Consolidation | Single source of truth for API calls | [ADR-001](../adr/ADR-001-api-client-consolidation.md) |
+| Repository Pattern | Standardized data access | [ADR-017](../adr/ADR-017-repository-pattern-standardization.md) |
+| Security Integration Pattern | Consistent security across features | [ADR-012](../adr/ADR-012-infrastructure-security-pattern.md) |
 
 ---
 
@@ -309,3 +307,11 @@ shared/
 3. Implement event sourcing for audit trails
 4. Separate query and command models (CQRS pattern)
 5. Add GraphQL layer alongside REST
+6. Intelligent Bill Pipeline (see [ADR-015](../adr/ADR-015-intelligent-bill-pipeline.md))
+
+## Related Documentation
+
+- **[ADR Index](../adr/README.md)** - All architectural decisions with full context
+- **[ADR-020](../adr/ADR-020-root-documentation-consolidation.md)** - Recent design decisions from March 2026
+- **[ARCHITECTURE.md](../../ARCHITECTURE.md)** - Root architecture overview
+- **[DCS Index](./INDEX.md)** - Strategic reference documentation

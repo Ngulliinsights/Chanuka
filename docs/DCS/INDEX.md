@@ -10,12 +10,15 @@
 
 This folder contains extracted institutional knowledge from historical reports and status documents. Use this as your strategic reference instead of scattered root-level documents.
 
+> **For formal architectural decisions:** See [Architectural Decision Records (ADRs)](../adr/README.md)  
+> **For practical development guides:** Use this DCS folder
+
 ### 🏗️ Architecture Foundation
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Module structure, design decisions, patterns
   - Project folder layout
   - Client/server/shared organization
-  - Why certain architectural choices were made
-  - Future refactoring plans
+  - Practical guidance for development
+  - References to formal [ADRs](../adr/README.md) for detailed decisions
 
 ### ✨ Core Features
 - [CORE_FEATURES.md](./CORE_FEATURES.md) - The 8 MVP features and their status
@@ -108,9 +111,18 @@ docs/DCS/
 ## 🔄 Maintenance
 
 This DCS should be updated when:
-1. Architectural decisions change
-2. Development workflow standards evolve
-3. New core features are defined
-4. Critical issues are resolved
+1. Development workflow standards evolve
+2. New core features are defined
+3. Critical issues are resolved
+4. Quick reference information changes
+
+**For architectural decisions:** Create an [ADR](../adr/README.md) instead
 
 **Do NOT store:** Status reports, progress reports, or temporary documents. These should remain in root only during active work, then be deleted when no longer current.
+
+## 🔗 Related Documentation
+
+- **[ADR Index](../adr/README.md)** - Formal architectural decisions
+- **[ADR-020](../adr/ADR-020-root-documentation-consolidation.md)** - Recent design decisions (March 2026)
+- **[Archive](../archive/)** - Historical documentation
+- **[Root ARCHITECTURE.md](../../ARCHITECTURE.md)** - Architecture overview
