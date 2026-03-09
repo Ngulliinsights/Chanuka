@@ -32,8 +32,8 @@ export interface UseComparisonCartReturn {
 export const useComparisonCart = (): UseComparisonCartReturn => {
   const dispatch = useAppDispatch();
   
-  const billIds = useAppSelector((state: RootState) => state.comparisonCart.billIds);
-  const maxBills = useAppSelector((state: RootState) => state.comparisonCart.maxBills);
+  const billIds = useAppSelector((state: RootState) => state.comparisonCart?.billIds || []);
+  const maxBills = useAppSelector((state: RootState) => state.comparisonCart?.maxBills || 4);
   const count = billIds.length;
   const canAddMore = billIds.length < maxBills;
 
