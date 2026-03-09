@@ -8,16 +8,16 @@
  */
 
 import { createContext, useContext, useEffect, ReactNode, useRef, useCallback } from 'react';
-import React from 'react';
 
 import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
+import type { RootState } from '@client/infrastructure/store';
 import { logger } from '@client/lib/utils/logger';
+import type { User } from '@shared/types/domains/authentication';
 
 import { getAuthApiService } from '../services/auth-api-service';
 import { sessionManager } from '../services/session-manager';
 import * as authActions from '../store/auth-slice';
 import type {
-  User,
   RegisterData,
   AuthResponse,
   TwoFactorSetup,
@@ -49,12 +49,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
 
   // Create wrapper selectors that work with the actual Redux state
-  const user = useAppSelector((state: unknown) => state.auth?.user || null);
-  const loading = useAppSelector((state: unknown) => state.auth?.isLoading || false);
-  const sessionExpiry = useAppSelector((state: unknown) => state.auth?.sessionExpiry || null);
-  const isInitialized = useAppSelector((state: unknown) => state.auth?.isInitialized || false);
-  const twoFactorRequired = useAppSelector((state: unknown) => state.auth?.twoFactorRequired || false);
-  const isAuthenticated = useAppSelector((state: unknown) => state.auth?.isAuthenticated || false);
+  const user = useAppSelector((state: RootState) => (state as any).auth?.user || null);
+  const loading = useAppSelector((state: RootState) => (state as any).auth?.isLoading || false);
+  const sessionExpiry = useAppSelector((state: RootState) => (state as any).auth?.sessionExpiry || null);
+  const isInitialized = useAppSelector((state: RootState) => (state as any).auth?.isInitialized || false);
+  const twoFactorRequired = useAppSelector((state: RootState) => (state as any).auth?.twoFactorRequired || false);
+  const isAuthenticated = useAppSelector((state: RootState) => (state as any).auth?.isAuthenticated || false);
 
   const mountedRef = useRef(true);
 
@@ -604,6 +604,6 @@ export function useAuth(): AuthContextType {
  */
  
 export function useAuthStore() {
-  const user = useAppSelector((state: unknown) => state.auth?.user || null);
+  const user = useAppSelector((state: RootState) => (state as any).auth?.user || null);
   return { user } as const;
 }
