@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 9, 2026 at 01:32 PM
+**Generated:** March 9, 2026 at 04:31 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,275
+**Total Items:** 4,245
 
 ```
 .
@@ -2645,6 +2645,7 @@
 │   │   │   │   ├── bill-lifecycle-hooks.ts
 │   │   │   │   ├── bill-service-adapter.ts
 │   │   │   │   ├── bill-service.ts
+│   │   │   │   ├── bill-status-monitor.service.ts
 │   │   │   │   ├── bill-tracking.service.ts
 │   │   │   │   ├── bill-validation.schemas.ts
 │   │   │   │   ├── index.ts
@@ -2668,11 +2669,19 @@
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── repositories/
 │   │   │   │   ├── bill-storage.ts
-│   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── legislative-storage.ts
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
+│   │   │   │       ├── action-prompts.routes.ts
+│   │   │   │       ├── bill-tracking.routes.ts
 │   │   │   │       ├── bill-validation.middleware.ts
-│   │   │   │       └── coverage-routes.ts
+│   │   │   │       ├── bills.routes.ts
+│   │   │   │       ├── coverage-routes.ts
+│   │   │   │       ├── real-time-tracking.routes.ts
+│   │   │   │       ├── sponsorship.routes.ts
+│   │   │   │       ├── translation.routes.ts
+│   │   │   │       └── voting-pattern-analysis.routes.ts
 │   │   │   ├── repositories/
 │   │   │   │   └── sponsorship-repository.ts
 │   │   │   ├── services/
@@ -2684,25 +2693,18 @@
 │   │   │   │   └── voting-pattern-analysis-service.ts
 │   │   │   ├── types/
 │   │   │   │   └── analysis.ts
-│   │   │   ├── action-prompts-routes.ts
-│   │   │   ├── bill-status-monitor.ts
-│   │   │   ├── bill-tracking.routes.ts
 │   │   │   ├── bill.factory.ts
 │   │   │   ├── bill.js
 │   │   │   ├── BILLS_MIGRATION_ADAPTER.ts
-│   │   │   ├── bills-router.ts
+│   │   │   ├── CLIENT_SERVER_CONGRUENCE_ANALYSIS.md
 │   │   │   ├── index.ts
 │   │   │   ├── INTEGRATION_GUIDE.md
 │   │   │   ├── INTEGRATION_QUICK_START.md
 │   │   │   ├── INTERNAL_CONSISTENCY_ANALYSIS.md
-│   │   │   ├── legislative-storage.ts
 │   │   │   ├── MIGRATION_SUMMARY.md
+│   │   │   ├── QUICK_FIX_ACTION_PLAN.md
 │   │   │   ├── README.md
-│   │   │   ├── real-time-tracking.ts
-│   │   │   ├── sponsorship.routes.ts
-│   │   │   ├── translation-routes.ts
-│   │   │   ├── voting-pattern-analysis-router.ts
-│   │   │   └── voting-pattern-analysis.ts
+│   │   │   └── REORGANIZATION_SUMMARY.md
 │   │   ├── community/
 │   │   │   ├── application/
 │   │   │   │   ├── use-cases/
@@ -3371,10 +3373,10 @@
 │   │   │   │   │   ├── safeguards-networks.ts
 │   │   │   │   │   └── sync-monitoring.ts
 │   │   │   │   ├── utils/
-│   │   │   │   │   ├── cache-adapter-v2.ts
-│   │   │   │   │   ├── error-adapter-v2.ts
+│   │   │   │   │   ├── cache-adapter.ts
+│   │   │   │   │   ├── error-adapter.ts
 │   │   │   │   │   ├── error-classifier.ts
-│   │   │   │   │   ├── health-adapter-v2.ts
+│   │   │   │   │   ├── health-adapter.ts
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── operation-guard.ts
 │   │   │   │   │   ├── query-builder.ts
@@ -3784,38 +3786,6 @@
 │   ├── fix_logger_ast.js
 │   ├── fix_logger.js
 │   ├── FIXES_APPLIED_2026-03-09.md
-│   ├── full_err_tsc_index.txt
-│   ├── full_err_tsc.txt
-│   ├── full_err_tsc2.txt
-│   ├── full_err.txt
-│   ├── full_err2.txt
-│   ├── full_err3.txt
-│   ├── full_err4.txt
-│   ├── full_err5.txt
-│   ├── full_err6.txt
-│   ├── full_err7.txt
-│   ├── full_err8.txt
-│   ├── full_err9.txt
-│   ├── full_err10.txt
-│   ├── full_err11.txt
-│   ├── full_err12.txt
-│   ├── full_err13.txt
-│   ├── full_err14.txt
-│   ├── full_err15.txt
-│   ├── full_err16.txt
-│   ├── full_err17.txt
-│   ├── full_err18.txt
-│   ├── full_err19.txt
-│   ├── full_err20.txt
-│   ├── full_err21.txt
-│   ├── full_err22.txt
-│   ├── full_err23.txt
-│   ├── full_err24.txt
-│   ├── full_err25.txt
-│   ├── full_err26.txt
-│   ├── full_err27.txt
-│   ├── full_err28.txt
-│   ├── full_err29.txt
 │   ├── index.ts
 │   ├── loader.mjs
 │   ├── MVP_CORE_FEATURES_STATUS.md

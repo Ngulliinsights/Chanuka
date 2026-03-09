@@ -5,7 +5,7 @@
  * PRODUCTION: Replace mock data with OpenAI API or NLP model
  */
 
-import { getMockTranslation, getMockClauses, type ClauseTranslation } from './mocks/translation-mock-data';
+import { getMockTranslation, getMockClauses, type ClauseTranslation } from '../infrastructure/mocks/translation-mock-data';
 
 export interface TranslationRequest {
   billId: string;

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express';
-import { translationService } from './services/translation-service';
-import { impactCalculator } from './services/impact-calculator';
+import { translationService } from '../../application/translation.service';
+import { impactCalculator } from '../../application/impact-calculator.service';
 
 export const translationRouter: Router = Router();
 

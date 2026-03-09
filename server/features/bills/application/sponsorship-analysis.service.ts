@@ -5,7 +5,7 @@ import {
   getSectionConflictsForBill,
   getSponsorAffiliations,
   getSponsorshipsByBill,
-} from '../repositories/sponsorship-repository';
+} from '../domain/repositories/sponsorship-repository';
 
 // ============================================================================
 // TYPE DEFINITIONS FOR BILL-CENTRIC ANALYSIS

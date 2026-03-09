@@ -8,7 +8,7 @@
  */
 
 // bill-status-monitor exports the singleton instance as `billStatusMonitorService`
-import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/bill-status-monitor';
+import { billStatusMonitorService as billStatusMonitor } from '@server/features/bills/application/bill-status-monitor.service';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 import { logger } from '@server/infrastructure/observability';
 import { webSocketService } from '@server/infrastructure/websocket';

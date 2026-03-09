@@ -5,7 +5,7 @@
  */
 
 import { Router, type Request, type Response } from 'express';
-import { billLifecycleHooks } from './bill-lifecycle-hooks';
+import { billLifecycleHooks } from '../../application/bill-lifecycle-hooks';
 import { logger } from '@server/infrastructure/observability';
 
 const router: Router = Router();

@@ -2,7 +2,7 @@
 // This is the public API for the bills feature
 
 // Routes
-export { router } from './bills-router';
+export { router } from './presentation/http/bills.routes';
 
 // Factory and Services (NEW - Repository Pattern)
 export { 

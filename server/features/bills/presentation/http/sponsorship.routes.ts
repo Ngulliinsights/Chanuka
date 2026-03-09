@@ -2,7 +2,7 @@ import { logger } from '@server/infrastructure/observability';
 import { asyncHandler } from '@server/middleware/error-management';
 import { Router, Request, Response } from 'express';
 
-import { SponsorshipAnalysisService } from './application/sponsorship-analysis.service';
+import { SponsorshipAnalysisService } from '../../application/sponsorship-analysis.service';
 
 // ---------------------------------------------------------------------------
 // Router setup
@@ -31,7 +31,9 @@ type AnalysisHandler = (billId: number) => Promise<unknown>;
 
 function sponsorshipRoute(handler: AnalysisHandler, errorMessage: string) {
   return asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const billId = parseInt(req.params.bill_id ?? '', 10);
+    // Support both :bill_id and :id parameter names
+    const billIdParam = req.params.bill_id || req.params.id;
+    const billId = parseInt(billIdParam ?? '', 10);
 
     if (isNaN(billId) || billId <= 0) {
       fail(res, 'bill_id must be a valid positive integer', 400);
@@ -82,6 +84,46 @@ router.get(
 /** GET /bills/:bill_id/sponsorship-analysis/financial-network */
 router.get(
   '/bills/:bill_id/sponsorship-analysis/financial-network',
+  sponsorshipRoute(
+    (id) => analysisService.getFinancialNetworkAnalysis(id),
+    'Failed to fetch financial network analysis',
+  ),
+);
+
+// ---------------------------------------------------------------------------
+// Route Aliases - Support client-expected paths
+// ---------------------------------------------------------------------------
+
+/** GET /bills/:id/analysis/sponsorship — alias for comprehensive sponsorship overview */
+router.get(
+  '/bills/:id/analysis/sponsorship',
+  sponsorshipRoute(
+    (id) => analysisService.getComprehensiveAnalysis(id),
+    'Failed to fetch sponsorship analysis',
+  ),
+);
+
+/** GET /bills/:id/analysis/sponsor/primary — alias for primary sponsor */
+router.get(
+  '/bills/:id/analysis/sponsor/primary',
+  sponsorshipRoute(
+    (id) => analysisService.getPrimarySponsorAnalysis(id),
+    'Failed to fetch primary sponsor analysis',
+  ),
+);
+
+/** GET /bills/:id/analysis/sponsor/co — alias for co-sponsors */
+router.get(
+  '/bills/:id/analysis/sponsor/co',
+  sponsorshipRoute(
+    (id) => analysisService.getCoSponsorsAnalysis(id),
+    'Failed to fetch co-sponsors analysis',
+  ),
+);
+
+/** GET /bills/:id/analysis/financial — alias for financial network */
+router.get(
+  '/bills/:id/analysis/financial',
   sponsorshipRoute(
     (id) => analysisService.getFinancialNetworkAnalysis(id),
     'Failed to fetch financial network analysis',

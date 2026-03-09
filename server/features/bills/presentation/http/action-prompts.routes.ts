@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
-import { actionPromptGenerator } from '../notifications/action-prompt-generator';
-import { readDatabase } from '../../infrastructure/database';
-import { bills } from '../../infrastructure/schema/foundation';
+import { actionPromptGenerator } from '../../../notifications/action-prompt-generator';
+import { readDatabase } from '../../../../infrastructure/database';
+import { bills } from '../../../../infrastructure/schema/foundation';
 import { eq } from 'drizzle-orm';
 
 export const actionPromptsRouter: Router = Router();

@@ -11,11 +11,11 @@ import { router as systemRouter } from '@server/features/admin/application/syste
 import { analysisRouter } from '@server/features/analysis/analysis.routes';
 import analyticsRouter from '@server/features/analytics/application/analytics.routes';
 import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/argument-intelligence-router';
-import { billTrackingRouter } from '@server/features/bills/bill-tracking.routes';
-import { router as billsRouter } from '@server/features/bills/bills-router';
-import { router as sponsorshipRouter } from '@server/features/bills/sponsorship.routes';
-import { translationRouter } from '@server/features/bills/translation-routes';
-import { actionPromptsRouter } from '@server/features/bills/action-prompts-routes';
+import { billTrackingRouter } from '@server/features/bills/presentation/http/bill-tracking.routes';
+import { router as billsRouter } from '@server/features/bills/presentation/http/bills.routes';
+import { router as sponsorshipRouter } from '@server/features/bills/presentation/http/sponsorship.routes';
+import { translationRouter } from '@server/features/bills/presentation/http/translation.routes';
+import { actionPromptsRouter } from '@server/features/bills/presentation/http/action-prompts.routes';
 import { router as communityRouter } from '@server/features/community/community';
 import { constitutionalAnalysisRouter } from '@server/features/constitutional-analysis/constitutional-analysis-router';
 import coverageRouter from '@server/features/bills/presentation/http/coverage-routes';

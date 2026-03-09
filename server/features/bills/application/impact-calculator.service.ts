@@ -5,7 +5,7 @@
  * PRODUCTION: Replace mock calculations with real algorithms
  */
 
-import { calculateMockImpact, type PersonalImpact, type UserContext } from './mocks/impact-mock-data';
+import { calculateMockImpact, type PersonalImpact, type UserContext } from '../infrastructure/mocks/impact-mock-data';
 
 export interface ImpactRequest {
   billId: string;

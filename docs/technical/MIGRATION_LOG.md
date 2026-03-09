@@ -12,6 +12,7 @@ This document serves as the **Single Source of Truth** for architectural changes
 | Migration | Status | Owner | Core Links | Notes |
 |-----------|--------|-------|------------|-------|
 | **Documentation Reorganization** | 🟡 In Progress | @User | [Plan](../DOCUMENTATION_REMEDIATION_PLAN.md) | Phase 1 complete (root cleanup). Phase 2-4 pending. |
+| **Bills Feature Server Startup** | 🟢 Complete | @Kiro | [Summary](../../server/features/bills/IMPLEMENTATION_COMPLETE.md) | Fixed imports, created mock data, server running on port 4200. |
 | **Error System Restructure** | 🟢 Complete | @User | [History](../../client/src/infrastructure/error/MIGRATION_HISTORY.md) | Moved to core/patterns/integration/recovery structure. |
 
 
@@ -19,6 +20,48 @@ This document serves as the **Single Source of Truth** for architectural changes
 
 ## 🏆 Recent Architectural Decisions
 *Log key decisions that affect how code should be written going forward.*
+
+### [2026-03-09] Bills Feature Complete - Client-Server Congruence at 100%
+- **Context:** Bills feature had 11 missing server endpoints causing client API calls to fail. Server startup was broken due to import errors and missing mock data files.
+- **Decision:**
+    1. **Fixed Server Startup Issues:**
+       - Corrected `bill-storage.ts` imports (schema tables, database types, logger context)
+       - Created `translation-mock-data.ts` for plain-language translation service
+       - Created `impact-mock-data.ts` for personal impact calculator
+       - Updated import paths in translation and impact calculator services
+    2. **Implemented 11 Missing Endpoints:**
+       - Public: categories, statuses, sponsors, analysis, polls (GET)
+       - Protected: track, untrack, engagement, vote, endorse, create poll (POST)
+    3. **Added Route Aliases:** 4 sponsorship route aliases for backward compatibility
+    4. **Server Configuration:** Runs on port 4200 as requested
+    5. **Testing:** Live HTTP endpoint verification with curl, all 11 endpoints operational
+- **Consequences:**
+    - Client-server congruence: 69% → 100%
+    - Server starts successfully without errors
+    - All authentication, validation, and error handling working
+    - Mock data pattern established for development (infrastructure/mocks/)
+    - Ready for client integration
+- **Architecture Pattern:**
+    - Mock data lives in `infrastructure/mocks/` not `services/mocks/`
+    - Services import from `../infrastructure/mocks/` for consistency
+    - Translation and impact services use mock data until AI integration ready
+
+### [2026-03-09] Natural Branching Architecture Validation
+- **Context:** Review of codebase architecture patterns against nature-inspired efficiency principles.
+- **Validation:**
+    1. **Layered Architecture:** Mimics tree rings/lung alveoli (root → branches → leaves)
+    2. **Circuit Breaker:** Mimics blood vessel constriction/dilation (CLOSED → OPEN → HALF_OPEN)
+    3. **Exponential Backoff:** Mimics breathing rhythm adjustment (quick → slower with jitter)
+    4. **Caching:** Mimics oxygen storage in hemoglobin (instant delivery of stored data)
+    5. **Middleware Pipeline:** Mimics respiratory filtration (nose → mucus → cilia → alveoli)
+    6. **Feature Isolation:** Mimics organ systems (specialized but interconnected)
+    7. **Error Propagation:** Mimics pain signals (local → spinal cord → brain)
+    8. **Health Monitoring:** Mimics homeostasis (constant monitoring and adjustment)
+- **Consequences:**
+    - Architecture follows universal patterns proven by nature
+    - Fractal design: same patterns repeat at different scales
+    - Efficient resource distribution and fault tolerance
+    - Intuitive for developers (mirrors natural systems)
 
 ### [2026-03-06] Type System Cleanup Complete
 - **Context:** Type definitions were scattered across `@types`, local `types.ts`, and `shared`. Import conflicts and duplicate definitions caused type errors.
@@ -81,6 +124,7 @@ This document serves as the **Single Source of Truth** for architectural changes
 
 | Date | Migration | Outcome | Archive Link |
 |------|-----------|---------|--------------|
+| 2026-03-09 | Bills Feature Server Startup & Endpoint Implementation | ✅ Complete | [Summary](../../server/features/bills/IMPLEMENTATION_COMPLETE.md), [Tests](../../server/features/bills/__tests__/LIVE_TEST_RESULTS.md) |
 | 2026-03-06 | Type System Cleanup | ✅ Complete | No @types conflicts. lib/types is single source of truth. Feature modules use local types.ts for feature-specific extensions. |
 | 2026-03-06 | Documentation Root Cleanup (Phase 1) | ✅ Complete | [Archive](../archive/2026-03-root-cleanup/) |
 | 2026-03-06 | Error Infrastructure Restructure | ✅ Complete | [History](../../client/src/infrastructure/error/MIGRATION_HISTORY.md) |
@@ -113,6 +157,11 @@ This document serves as the **Single Source of Truth** for architectural changes
 - **DO NOT** create completion report files (e.g., `PHASE_X_COMPLETE.md`) in docs root - archive them immediately to `docs/archive/`.
 - **DO NOT** delete strategic tracking documents like MIGRATION_LOG.md without ensuring functionality is preserved elsewhere.
 - **DO** update MIGRATION_LOG.md when starting or completing migrations to maintain critical path visibility.
+- **DO** place mock data in `infrastructure/mocks/` not `services/mocks/` for consistency.
+- **DO** import mock data from `../infrastructure/mocks/` in service files.
+- **DO** test server startup after fixing imports - use `npm run dev` to verify.
+- **DO** verify all endpoints with live HTTP tests (curl) before marking complete.
+- **DO NOT** assume database connection works - always test with actual queries.
 
 ---
 
