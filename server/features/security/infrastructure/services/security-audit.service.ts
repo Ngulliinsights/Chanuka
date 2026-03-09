@@ -1,27 +1,42 @@
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database';
+import { db, writeDatabase } from '@server/infrastructure/database';
 import {
   audit_payloads,
-  system_audit_log
+  system_audit_log,
 } from '@server/infrastructure/schema/integrity_operations';
 import { and, count, desc, eq, gte, inArray, lte, type SQL, sql } from 'drizzle-orm';
 import type { Request } from 'express';
 
+// ─── Severity types ───────────────────────────────────────────────────────────
+
+/**
+ * Severity levels used when *writing* security events.
+ * 'info' is intentionally excluded — security events always carry actionable weight.
+ */
 type SeverityLevel = 'low' | 'medium' | 'high' | 'critical';
+
+/**
+ * Severity levels that may appear when *reading* from the audit log.
+ * The DB schema permits 'info' (e.g. system-generated housekeeping entries),
+ * so read-side types need to accommodate it.
+ */
+type AuditSeverityLevel = SeverityLevel | 'info';
+
+// ─── Public interfaces ────────────────────────────────────────────────────────
 
 export interface SecurityEvent {
   event_type: string;
   severity: SeverityLevel;
-  user_id?: string | undefined;
-  ip_address?: string | undefined;
-  user_agent?: string | undefined;
-  resource?: string | undefined;
-  action?: string | undefined;
-  result?: string | undefined;
+  user_id?: string;
+  ip_address?: string;
+  user_agent?: string;
+  resource?: string;
+  action?: string;
+  result?: string;
   success: boolean;
-  details?: Record<string, unknown> | undefined;
-  session_id?: string | undefined;
-  timestamp?: Date | undefined;
+  details?: Record<string, unknown>;
+  session_id?: string;
+  timestamp?: Date;
 }
 
 export interface AuditQueryOptions {
@@ -40,7 +55,7 @@ export interface AuditLogRow {
   id: string;
   event_type: string;
   event_category: string;
-  severity: SeverityLevel;
+  severity: AuditSeverityLevel; // read-side: includes 'info'
   actor_type: string;
   actor_id: string | null;
   actor_role: string | null;
@@ -77,6 +92,8 @@ export interface AuditReport {
   events: AuditLogRow[];
 }
 
+// ─── Internal types ───────────────────────────────────────────────────────────
+
 type AuthEventType =
   | 'login_attempt'
   | 'login_success'
@@ -89,14 +106,7 @@ type AuthEventType =
   | 'registration_success'
   | 'registration_failure';
 
-type DataAccessAction =
-  | 'read'
-  | 'write'
-  | 'update'
-  | 'delete'
-  | 'export'
-  | 'bulk_read'
-  | 'bulk_export';
+type DataAccessAction = 'read' | 'write' | 'update' | 'delete' | 'export' | 'bulk_read' | 'bulk_export';
 
 type MatchField = 'user_id' | 'ip_address';
 
@@ -108,11 +118,15 @@ interface AuditLogInsertResult {
   id: string;
 }
 
-interface QueryResultRow {
+/**
+ * Shape Drizzle returns from the audit log select.
+ * severity includes 'info' because the DB column enum does.
+ */
+interface DrizzleAuditRow {
   id: string;
   event_type: string;
   event_category: string;
-  severity: SeverityLevel;
+  severity: AuditSeverityLevel;
   actor_type: string;
   actor_id: string | null;
   actor_role: string | null;
@@ -140,31 +154,38 @@ interface CountResult {
   count: number;
 }
 
+// ─── Type guard ───────────────────────────────────────────────────────────────
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+// ─── Service ──────────────────────────────────────────────────────────────────
+
 /**
- * Security Audit Infrastructure Service
- * Records security events to the audit trail
+ * Security Audit Infrastructure Service.
+ * Records security events to the audit trail; never throws to callers.
  */
 export class SecurityAuditService {
+
+  // ── logSecurityEvent ──────────────────────────────────────────────────────
+
   async logSecurityEvent(event: SecurityEvent): Promise<void> {
     try {
       const auditLogResult = await db
         .insert(system_audit_log)
         .values({
-          event_type: event.event_type,
-          event_category: 'security',
-          actor_type: 'user',
-          actor_id: event.user_id ?? null,
-          action: event.action ?? 'unknown',
-          source_ip: event.ip_address ?? null,
-          user_agent: event.user_agent ?? null,
-          target_description: event.resource ?? null,
-          success: event.success,
-          severity: event.severity,
-          session_id: event.session_id ?? null,
+          event_type:          event.event_type,
+          event_category:      'security',
+          actor_type:          'user',
+          actor_id:            event.user_id ?? null,
+          action:              event.action ?? 'unknown',
+          source_ip:           event.ip_address ?? null,
+          user_agent:          event.user_agent ?? null,
+          target_description:  event.resource ?? null,
+          success:             event.success,
+          severity:            event.severity,
+          session_id:          event.session_id ?? null,
         })
         .returning({ id: system_audit_log.id });
 
@@ -189,7 +210,7 @@ export class SecurityAuditService {
       }
 
       const resourceUsageData = event.details?.resource_usage;
-      if (resourceUsageData && isRecord(resourceUsageData)) {
+      if (isRecord(resourceUsageData)) {
         payloadInserts.push({
           audit_log_id: auditLogId,
           payload_type: 'resource_usage',
@@ -198,44 +219,51 @@ export class SecurityAuditService {
       }
 
       if (payloadInserts.length > 0) {
-        await writeDatabase.insert(audit_payloads).values(payloadInserts);
+        await ((writeDatabase as any).insert(audit_payloads).values(payloadInserts));
       }
-
-    } catch (error) {
-      logger.error('CRITICAL: Audit logging failed', { component: 'SecurityAudit' }, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-        event_type: event.event_type,
-        user_id: event.user_id ?? 'unknown',
-        timestamp: new Date().toISOString()
-      });
+    } catch (error: unknown) {
+      // Audit failures must never propagate — log and swallow
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error(
+        {
+          component: 'SecurityAudit',
+          event_type: event.event_type,
+          userId: event.user_id ?? 'unknown',
+          errorMessage,
+          timestamp: new Date().toISOString(),
+        },
+        'CRITICAL: Audit logging failed',
+      );
     }
   }
+
+  // ── logAuthEvent ──────────────────────────────────────────────────────────
 
   async logAuthEvent(
     event_type: AuthEventType,
     req: Request | undefined,
     user_id: string | undefined,
     success = true,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): Promise<void> {
-    const severity = this.determineAuthSeverity(event_type, success);
-
     await this.logSecurityEvent({
       event_type,
-      severity,
+      severity:   this.determineAuthSeverity(event_type, success),
       user_id,
       ip_address: this.extractClientIP(req),
       user_agent: req?.get?.('User-Agent') ?? 'unknown',
-      result: success ? 'success' : 'failure',
+      result:     success ? 'success' : 'failure',
       success,
       details: {
         ...details,
         attemptTimestamp: new Date().toISOString(),
         referer: req?.get?.('Referer'),
       },
-      session_id: (req as RequestWithSession)?.sessionID ?? 'unknown',
+      session_id: (req as RequestWithSession | undefined)?.sessionID ?? 'unknown',
     });
   }
+
+  // ── logDataAccess ─────────────────────────────────────────────────────────
 
   async logDataAccess(
     resource: string,
@@ -244,65 +272,67 @@ export class SecurityAuditService {
     user_id: string | undefined,
     recordCount?: number,
     success = true,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): Promise<void> {
-    const severity = this.determineDataAccessSeverity(action, recordCount);
-
     await this.logSecurityEvent({
       event_type: 'data_access',
-      severity,
+      severity:   this.determineDataAccessSeverity(action, recordCount),
       user_id,
       ip_address: this.extractClientIP(req),
       user_agent: req?.get?.('User-Agent') ?? 'unknown',
       resource,
       action,
-      result: success ? 'allowed' : 'denied',
+      result:     success ? 'allowed' : 'denied',
       success,
       details: {
         recordCount,
         ...details,
         dataCategory: this.categorizeResource(resource),
       },
-      session_id: (req as RequestWithSession)?.sessionID ?? 'unknown',
+      session_id: (req as RequestWithSession | undefined)?.sessionID ?? 'unknown',
     });
   }
+
+  // ── logAdminAction ────────────────────────────────────────────────────────
 
   async logAdminAction(
     action: string,
     req: Request | undefined,
     user_id: string,
     targetResource?: string,
-    details?: Record<string, unknown>
+    details?: Record<string, unknown>,
   ): Promise<void> {
     await this.logSecurityEvent({
       event_type: 'admin_action',
-      severity: 'high',
+      severity:   'high',
       user_id,
       ip_address: this.extractClientIP(req),
       user_agent: req?.get?.('User-Agent') ?? 'unknown',
-      resource: targetResource,
+      resource:   targetResource,
       action,
-      result: 'executed',
-      success: true,
+      result:     'executed',
+      success:    true,
       details: {
         ...details,
         adminActionType: this.categorizeAdminAction(action),
       },
-      session_id: (req as RequestWithSession)?.sessionID ?? 'unknown',
+      session_id: (req as RequestWithSession | undefined)?.sessionID ?? 'unknown',
     });
   }
+
+  // ── logSecuritySystemEvent ────────────────────────────────────────────────
 
   async logSecuritySystemEvent(
     event_type: string,
     action: string,
     details?: Record<string, unknown>,
-    severity: SeverityLevel = 'low'
+    severity: SeverityLevel = 'low',
   ): Promise<void> {
     await this.logSecurityEvent({
       event_type,
       severity,
       action,
-      result: 'completed',
+      result:  'completed',
       success: true,
       details: {
         ...details,
@@ -312,198 +342,169 @@ export class SecurityAuditService {
     });
   }
 
+  // ── queryAuditLogs ────────────────────────────────────────────────────────
+
   async queryAuditLogs(options: AuditQueryOptions): Promise<AuditLogRow[]> {
     try {
-      const whereConditions: SQL[] = [];
+      const conditions: SQL[] = this.buildWhereConditions(options);
 
-      if (options.user_id) {
-        whereConditions.push(eq(system_audit_log.actor_id, options.user_id));
-      }
-      if (options.ip_address) {
-        whereConditions.push(eq(system_audit_log.source_ip, options.ip_address));
-      }
-      if (options.event_type) {
-        whereConditions.push(eq(system_audit_log.event_type, options.event_type));
-      }
-      if (options.event_types && options.event_types.length > 0) {
-        whereConditions.push(inArray(system_audit_log.event_type, options.event_types));
-      }
-      if (options.severity) {
-        whereConditions.push(eq(system_audit_log.severity, options.severity as SeverityLevel));
-      }
-      if (options.start_date) {
-        whereConditions.push(gte(system_audit_log.created_at, options.start_date));
-      }
-      if (options.end_date) {
-        whereConditions.push(lte(system_audit_log.created_at, options.end_date));
-      }
-
+      // .$dynamic() allows successive .where()/.orderBy()/.limit()/.offset()
+      // calls without Drizzle narrowing the return type on each step.
       let query = db
         .select({
-          id: system_audit_log.id,
-          event_type: system_audit_log.event_type,
-          event_category: system_audit_log.event_category,
-          severity: system_audit_log.severity,
-          actor_type: system_audit_log.actor_type,
-          actor_id: system_audit_log.actor_id,
-          actor_role: system_audit_log.actor_role,
-          actor_identifier: system_audit_log.actor_identifier,
-          action: system_audit_log.action,
-          target_type: system_audit_log.target_type,
-          target_id: system_audit_log.target_id,
-          target_description: system_audit_log.target_description,
-          success: system_audit_log.success,
-          status_code: system_audit_log.status_code,
-          error_message: system_audit_log.error_message,
-          error_stack: system_audit_log.error_stack,
-          source_ip: system_audit_log.source_ip,
-          user_agent: system_audit_log.user_agent,
-          session_id: system_audit_log.session_id,
-          request_id: system_audit_log.request_id,
-          processing_time_ms: system_audit_log.processing_time_ms,
+          id:                    system_audit_log.id,
+          event_type:            system_audit_log.event_type,
+          event_category:        system_audit_log.event_category,
+          severity:              system_audit_log.severity,
+          actor_type:            system_audit_log.actor_type,
+          actor_id:              system_audit_log.actor_id,
+          actor_role:            system_audit_log.actor_role,
+          actor_identifier:      system_audit_log.actor_identifier,
+          action:                system_audit_log.action,
+          target_type:           system_audit_log.target_type,
+          target_id:             system_audit_log.target_id,
+          target_description:    system_audit_log.target_description,
+          success:               system_audit_log.success,
+          status_code:           system_audit_log.status_code,
+          error_message:         system_audit_log.error_message,
+          error_stack:           system_audit_log.error_stack,
+          source_ip:             system_audit_log.source_ip,
+          user_agent:            system_audit_log.user_agent,
+          session_id:            system_audit_log.session_id,
+          request_id:            system_audit_log.request_id,
+          processing_time_ms:    system_audit_log.processing_time_ms,
           retention_period_days: system_audit_log.retention_period_days,
-          created_at: system_audit_log.created_at,
+          created_at:            system_audit_log.created_at,
           action_details: sql<Record<string, unknown>>`COALESCE((
-            SELECT payload_data
-            FROM audit_payloads
-            WHERE audit_log_id = ${system_audit_log.id} AND payload_type = 'action_details'
+            SELECT payload_data FROM audit_payloads
+            WHERE audit_log_id = ${system_audit_log.id}
+              AND payload_type = 'action_details'
             LIMIT 1
           ), '{}')`.as('action_details'),
           resource_usage: sql<Record<string, unknown>>`COALESCE((
-            SELECT payload_data
-            FROM audit_payloads
-            WHERE audit_log_id = ${system_audit_log.id} AND payload_type = 'resource_usage'
+            SELECT payload_data FROM audit_payloads
+            WHERE audit_log_id = ${system_audit_log.id}
+              AND payload_type = 'resource_usage'
             LIMIT 1
           ), '{}')`.as('resource_usage'),
         })
-        .from(system_audit_log);
+        .from(system_audit_log)
+        .$dynamic();
 
-      if (whereConditions.length > 0) {
-        query = query.where(whereConditions.length === 1 ? whereConditions[0]! : and(...whereConditions)!);
+      if (conditions.length > 0) {
+        query = query.where(conditions.length === 1 ? conditions[0]! : and(...conditions)!);
       }
 
       query = query.orderBy(desc(system_audit_log.created_at));
 
-      if (options.limit) {
-        query = query.limit(options.limit);
-      }
-      if (options.offset) {
-        query = query.offset(options.offset);
-      }
+      if (options.limit  !== undefined) query = query.limit(options.limit);
+      if (options.offset !== undefined) query = query.offset(options.offset);
 
-      const results = await query;
+      const rows = await query as DrizzleAuditRow[];
 
-      return results.map((row: QueryResultRow): AuditLogRow => {
+      return rows.map((row): AuditLogRow => {
         const actionDetails = isRecord(row.action_details) ? row.action_details : {};
         const resourceUsage = isRecord(row.resource_usage) ? row.resource_usage : {};
-
         return {
           ...row,
-          details: {
-            ...actionDetails,
-            resource_usage: resourceUsage,
-          },
+          details: { ...actionDetails, resource_usage: resourceUsage },
         };
       });
-
     } catch (error) {
-      logger.error('Failed to query audit logs:', { component: 'SecurityAudit' }, error);
+      logger.error(
+        { component: 'SecurityAudit', errorMessage: error instanceof Error ? error.message : String(error) },
+        'Failed to query audit logs',
+      );
       throw new Error('Audit log query failed');
     }
   }
 
+  // ── getEventCount ─────────────────────────────────────────────────────────
+
   async getEventCount(options: AuditQueryOptions): Promise<number> {
     try {
-      const whereConditions: SQL[] = [];
-
-      if (options.user_id) {
-        whereConditions.push(eq(system_audit_log.actor_id, options.user_id));
-      }
-      if (options.ip_address) {
-        whereConditions.push(eq(system_audit_log.source_ip, options.ip_address));
-      }
-      if (options.event_type) {
-        whereConditions.push(eq(system_audit_log.event_type, options.event_type));
-      }
-      if (options.start_date) {
-        whereConditions.push(gte(system_audit_log.created_at, options.start_date));
-      }
-      if (options.end_date) {
-        whereConditions.push(lte(system_audit_log.created_at, options.end_date));
-      }
+      const conditions: SQL[] = this.buildWhereConditions(options);
 
       let query = db
         .select({ count: count() })
-        .from(system_audit_log);
+        .from(system_audit_log)
+        .$dynamic();
 
-      if (whereConditions.length > 0) {
-        query = query.where(whereConditions.length === 1 ? whereConditions[0]! : and(...whereConditions)!);
+      if (conditions.length > 0) {
+        query = query.where(conditions.length === 1 ? conditions[0]! : and(...conditions)!);
       }
 
       const result = await query;
       const firstResult = result[0] as CountResult | undefined;
       return firstResult ? Number(firstResult.count) : 0;
     } catch (error) {
-      logger.error('Failed to get event count:', { component: 'SecurityAudit' }, error);
+      logger.error(
+        { component: 'SecurityAudit', errorMessage: error instanceof Error ? error.message : String(error) },
+        'Failed to get event count',
+      );
       return 0;
     }
   }
 
+  // ── generateAuditReport ───────────────────────────────────────────────────
+
   async generateAuditReport(start_date: Date, end_date: Date): Promise<AuditReport> {
     try {
-      const events = await this.queryAuditLogs({
-        start_date,
-        end_date,
-        limit: 10000,
-      });
+      const events = await this.queryAuditLogs({ start_date, end_date, limit: 10_000 });
 
-      const eventsByType: Record<string, number> = {};
+      const eventsByType: Record<string, number>     = {};
       const eventsBySeverity: Record<string, number> = {};
       const uniqueUsers = new Set<string>();
-      const uniqueIPs = new Set<string>();
+      const uniqueIPs   = new Set<string>();
 
-      events.forEach(event => {
-        eventsByType[event.event_type] = (eventsByType[event.event_type] || 0) + 1;
-        eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] || 0) + 1;
-
-        if (event.actor_id) uniqueUsers.add(event.actor_id);
-        if (event.source_ip) uniqueIPs.add(event.source_ip);
-      });
+      for (const event of events) {
+        eventsByType[event.event_type]   = (eventsByType[event.event_type]   ?? 0) + 1;
+        eventsBySeverity[event.severity] = (eventsBySeverity[event.severity] ?? 0) + 1;
+        if (event.actor_id)   uniqueUsers.add(event.actor_id);
+        if (event.source_ip)  uniqueIPs.add(event.source_ip);
+      }
 
       return {
         period: { start: start_date, end: end_date },
         summary: {
-          totalEvents: events.length,
+          totalEvents:      events.length,
           eventsByType,
           eventsBySeverity,
-          uniqueUsers: uniqueUsers.size,
-          uniqueIPs: uniqueIPs.size,
+          uniqueUsers:      uniqueUsers.size,
+          uniqueIPs:        uniqueIPs.size,
         },
         events: events.slice(0, 100),
       };
     } catch (error) {
-      logger.error('Failed to generate audit report:', { component: 'SecurityAudit' }, error);
+      logger.error(
+        { component: 'SecurityAudit', errorMessage: error instanceof Error ? error.message : String(error) },
+        'Failed to generate audit report',
+      );
       throw new Error('Audit report generation failed');
     }
   }
 
+  // ── getRecentFailedLogins ─────────────────────────────────────────────────
+
   async getRecentFailedLogins(
-    user_idOrIP: string,
+    userIdOrIP: string,
     since: Date,
-    matchField: MatchField = 'user_id'
+    matchField: MatchField = 'user_id',
   ): Promise<AuditLogRow[]> {
-    return await this.queryAuditLogs({
-      [matchField]: user_idOrIP,
-      event_type: 'login_failure',
-      start_date: since,
+    return this.queryAuditLogs({
+      [matchField]: userIdOrIP,
+      event_type:   'login_failure',
+      start_date:   since,
     });
   }
+
+  // ── getRecentDataAccessVolume ─────────────────────────────────────────────
 
   async getRecentDataAccessVolume(user_id: string, since: Date): Promise<number> {
     const events = await this.queryAuditLogs({
       user_id,
-      event_type: 'data_access',
-      start_date: since,
+      event_type:  'data_access',
+      start_date:  since,
     });
 
     return events.reduce((total, event) => {
@@ -512,64 +513,61 @@ export class SecurityAuditService {
     }, 0);
   }
 
+  // ── Private helpers ───────────────────────────────────────────────────────
+
+  /**
+   * Builds a reusable WHERE clause array from AuditQueryOptions.
+   * Extracted to avoid duplication between queryAuditLogs and getEventCount.
+   */
+  private buildWhereConditions(options: AuditQueryOptions): SQL[] {
+    const conditions: SQL[] = [];
+
+    if (options.user_id)    conditions.push(eq(system_audit_log.actor_id,   options.user_id));
+    if (options.ip_address) conditions.push(eq(system_audit_log.source_ip,  options.ip_address));
+    if (options.event_type) conditions.push(eq(system_audit_log.event_type, options.event_type));
+    if (options.event_types?.length) {
+      conditions.push(inArray(system_audit_log.event_type, options.event_types));
+    }
+    if (options.severity) {
+      conditions.push(eq(system_audit_log.severity, options.severity as SeverityLevel));
+    }
+    if (options.start_date) conditions.push(gte(system_audit_log.created_at, options.start_date));
+    if (options.end_date)   conditions.push(lte(system_audit_log.created_at, options.end_date));
+
+    return conditions;
+  }
+
   private determineAuthSeverity(event_type: string, success: boolean): SeverityLevel {
-    if (!success) {
-      return 'medium';
-    }
-
-    if (event_type.includes('password')) {
-      return 'medium';
-    }
-
+    if (!success)                        return 'medium';
+    if (event_type.includes('password')) return 'medium';
     return 'low';
   }
 
   private determineDataAccessSeverity(action: string, recordCount?: number): SeverityLevel {
     if (action.includes('export') || action.includes('bulk')) {
-      return recordCount && recordCount > 1000 ? 'critical' : 'high';
+      return recordCount && recordCount > 1_000 ? 'critical' : 'high';
     }
-
-    if (action === 'delete') {
-      return 'high';
-    }
-
-    if (recordCount && recordCount > 100) {
-      return 'medium';
-    }
-
+    if (action === 'delete')                          return 'high';
+    if (recordCount !== undefined && recordCount > 100) return 'medium';
     return 'low';
   }
 
   private categorizeResource(resource: string): string {
-    if (resource.includes('user') || resource.includes('profile')) {
-      return 'personal_data';
-    }
-    if (resource.includes('payment') || resource.includes('financial')) {
-      return 'financial_data';
-    }
-    if (resource.includes('health') || resource.includes('medical')) {
-      return 'health_data';
-    }
+    if (resource.includes('user') || resource.includes('profile'))     return 'personal_data';
+    if (resource.includes('payment') || resource.includes('financial')) return 'financial_data';
+    if (resource.includes('health') || resource.includes('medical'))   return 'health_data';
     return 'general_data';
   }
 
   private categorizeAdminAction(action: string): string {
-    if (action.includes('user') || action.includes('role')) {
-      return 'user_management';
-    }
-    if (action.includes('config') || action.includes('setting')) {
-      return 'configuration';
-    }
-    if (action.includes('permission') || action.includes('access')) {
-      return 'access_control';
-    }
+    if (action.includes('user') || action.includes('role'))           return 'user_management';
+    if (action.includes('config') || action.includes('setting'))      return 'configuration';
+    if (action.includes('permission') || action.includes('access'))   return 'access_control';
     return 'general_admin';
   }
 
   private extractClientIP(req: Request | undefined): string {
-    if (!req?.headers) {
-      return 'unknown';
-    }
+    if (!req?.headers) return 'unknown';
 
     const forwardedFor = req.headers['x-forwarded-for'];
     if (typeof forwardedFor === 'string') {
@@ -577,9 +575,7 @@ export class SecurityAuditService {
     }
 
     const realIp = req.headers['x-real-ip'];
-    if (typeof realIp === 'string') {
-      return realIp;
-    }
+    if (typeof realIp === 'string') return realIp;
 
     return req.ip ?? 'unknown';
   }

@@ -6,19 +6,26 @@
  * within the observability infrastructure.
  */
 
-export {
-  ApiResponse,
-  ApiSuccess,
-  ApiError,
-  ApiValidationError,
-  handleApiError,
-  createApiResponse,
-  createSuccessResponse,
-  createErrorResponse,
-} from '@shared/types/api';
-
+// Export types
 export type {
-  ApiResponseType,
-  ApiErrorType,
-  ApiValidationErrorType,
-} from '@shared/types/api';
+  ApiResponse,
+  ErrorApiResponse,
+  PaginatedApiResponse,
+  ResponseStatus,
+  HttpStatusCode,
+} from '../../../../shared/types/api.js';
+
+// Export factory classes
+export {
+  ApiResponseFactory,
+  ApiRequestFactory,
+  ApiTypeFactory,
+} from '../../../../shared/types/api.js';
+
+// Export error types
+export type {
+  ApiErrorCode,
+  ApiErrorSeverity,
+  ApiErrorContext,
+  ValidationErrorDetail,
+} from '../../../../shared/types/api.js';

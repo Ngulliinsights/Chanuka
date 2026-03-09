@@ -15,7 +15,8 @@ import {
   text,
   timestamp,
   boolean,
-  float,
+  real,
+  doublePrecision,
   jsonb,
   index,
   unique,
@@ -39,13 +40,13 @@ export const mlInteractions = pgTable(
     timestamp: timestamp('timestamp').notNull().defaultNow(),
     
     // Feature engineering fields
-    topicMatchScore: float('topic_match_score').default(0.0),
+    topicMatchScore: real('topic_match_score').default(0.0),
     hourOfDay: integer('hour_of_day'),
     dayOfWeek: integer('day_of_week'),
     urgencyLevel: integer('urgency_level'),
     contentLength: integer('content_length'),
     userHistoryCount: integer('user_history_count').default(0),
-    trendingScore: float('trending_score').default(0.0),
+    trendingScore: real('trending_score').default(0.0),
     
     // Outcome
     engaged: boolean('engaged').notNull(),
@@ -126,8 +127,8 @@ export const conflictGraphEdges = pgTable(
     relationshipType: varchar('relationship_type', { length: 100 }).notNull(),
     
     // Relationship strength and confidence
-    strength: float('strength').default(1.0),
-    confidence: float('confidence').default(1.0),
+    strength: real('strength').default(1.0),
+    confidence: real('confidence').default(1.0),
     
     // Source of relationship data
     sourceDocument: varchar('source_document', { length: 500 }),
@@ -226,7 +227,7 @@ export const sentimentCache = pgTable(
     
     // Sentiment results
     sentiment: varchar('sentiment', { length: 20 }).notNull(),
-    confidence: float('confidence').notNull(),
+    confidence: real('confidence').notNull(),
     scores: jsonb('scores').notNull(),
     
     // Analysis metadata
@@ -259,7 +260,7 @@ export const constitutionalAnalysisCache = pgTable(
     relevantArticles: jsonb('relevant_articles').notNull(),
     analysisSummary: text('analysis_summary'),
     riskLevel: varchar('risk_level', { length: 20 }),
-    riskScore: float('risk_score'),
+    riskScore: real('risk_score'),
     
     // Analysis metadata
     tierUsed: varchar('tier_used', { length: 20 }).notNull(),
@@ -290,15 +291,15 @@ export const trojanBillDetections = pgTable(
       .references(() => bills.id, { onDelete: 'cascade' }),
     
     // Detection scores
-    overallRiskScore: float('overall_risk_score').notNull(),
+    overallRiskScore: real('overall_risk_score').notNull(),
     riskLevel: varchar('risk_level', { length: 20 }).notNull(),
     
     // Individual risk factors
-    structuralAnomalyScore: float('structural_anomaly_score'),
-    urgencyManipulationScore: float('urgency_manipulation_score'),
-    consultationAdequacyScore: float('consultation_adequacy_score'),
-    scheduleDensityScore: float('schedule_density_score'),
-    amendmentComplexityScore: float('amendment_complexity_score'),
+    structuralAnomalyScore: real('structural_anomaly_score'),
+    urgencyManipulationScore: real('urgency_manipulation_score'),
+    consultationAdequacyScore: real('consultation_adequacy_score'),
+    scheduleDensityScore: real('schedule_density_score'),
+    amendmentComplexityScore: real('amendment_complexity_score'),
     
     // Findings
     findings: jsonb('findings').notNull(),
@@ -350,10 +351,10 @@ export const mlModelMetadata = pgTable(
     trainingDurationSeconds: integer('training_duration_seconds'),
     
     // Performance metrics
-    accuracy: float('accuracy'),
-    precisionScore: float('precision_score'),
-    recall: float('recall'),
-    f1Score: float('f1_score'),
+    accuracy: real('accuracy'),
+    precisionScore: real('precision_score'),
+    recall: real('recall'),
+    f1Score: real('f1_score'),
     metrics: jsonb('metrics'),
     
     // Status
@@ -387,7 +388,7 @@ export const conflictDetectionCache = pgTable(
     // Detection results
     hasConflict: boolean('has_conflict').notNull(),
     conflictType: varchar('conflict_type', { length: 50 }),
-    confidence: float('confidence'),
+    confidence: real('confidence'),
     
     // Conflict details
     conflictPath: jsonb('conflict_path'),
@@ -431,7 +432,7 @@ export const engagementPredictions = pgTable(
     billId: integer('bill_id').references(() => bills.id, { onDelete: 'cascade' }),
     
     // Prediction
-    predictedEngagementScore: float('predicted_engagement_score').notNull(),
+    predictedEngagementScore: real('predicted_engagement_score').notNull(),
     predictionTier: varchar('prediction_tier', { length: 20 }).notNull(),
     
     // Features used
@@ -575,9 +576,9 @@ export const transparencyAssessmentCache = pgTable(
     assessmentHash: varchar('assessment_hash', { length: 64 }).notNull(),
     
     // Assessment results
-    overallScore: float('overall_score').notNull(),
+    overallScore: real('overall_score').notNull(),
     grade: varchar('grade', { length: 1 }).notNull(),
-    confidence: float('confidence').notNull(),
+    confidence: real('confidence').notNull(),
     
     // Dimension scores
     dimensions: jsonb('dimensions').notNull(),

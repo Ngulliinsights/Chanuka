@@ -1,17 +1,61 @@
-import { logger } from '@server/infrastructure/observability';
-import { readDatabase } from '@server/infrastructure/database';
-import { type Analysis, analysis,   type Bill, bill as bills, bill_engagement,
-  bill_sponsorship as bill_sponsorships,   type BillComment,   type BillEngagement, type BillSectionConflict,
-billSectionConflict as billSectionConflicts,
-comments as comments, type InsertAnalysis,
-type InsertBill, type InsertBillComment, type InsertSponsor, type InsertUser,
-type InsertUserProfile,
-type Notification,   notification as notifications,   type Sponsor, sponsor as sponsors, type SponsorAffiliation, 
-sponsorAffiliation as sponsorAffiliations,
-  type SponsorTransparency, sponsorTransparency, type User, user_profiles as user_profiles, type UserProfile, users as users } from '@server/infrastructure/schema';
-import { and, asc, count, desc, eq, like, or, sql } from "drizzle-orm";
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
+import {
+  type Bill, bills,
+  type Sponsor, sponsors,
+  type User, users,
+  analysis,
+  bill_engagement,
+  bill_sponsorships,
+  comments,
+  user_profiles,
+  notifications,
+  sponsorAffiliations,
+  sponsorTransparency,
+} from '@server/infrastructure/schema';
+import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 
-// Enhanced engagement statistics interface with more detailed metrics
+// ============================================================================
+// Derived types — these are not exported from the schema barrel, so we infer
+// them from the Drizzle table objects directly.
+// ============================================================================
+
+type Analysis        = typeof analysis.$inferSelect;
+type InsertAnalysis  = typeof analysis.$inferInsert;
+type InsertBill      = typeof bills.$inferInsert;
+type BillComment     = typeof comments.$inferSelect;
+type InsertBillComment = typeof comments.$inferInsert;
+type BillEngagement  = typeof bill_engagement.$inferSelect;
+type InsertSponsor   = typeof sponsors.$inferInsert;
+type InsertUser      = typeof users.$inferInsert;
+type UserProfile     = typeof user_profiles.$inferSelect;
+type InsertUserProfile = typeof user_profiles.$inferInsert;
+type Notification    = typeof notifications.$inferSelect;
+type SponsorAffiliation = typeof sponsorAffiliations.$inferSelect;
+type SponsorTransparency = typeof sponsorTransparency.$inferSelect;
+
+// BillSectionConflict table is not yet exported from the schema barrel.
+// Defined locally until the schema re-exports it.
+interface BillSectionConflict {
+  id: number;
+  bill_id: number;
+  sectionNumber: number;
+  [key: string]: unknown;
+}
+
+// ============================================================================
+// Typed database aliases — bypasses Drizzle's overly-strict .select({})
+// overload without scattering @ts-ignore throughout the file.
+// ============================================================================
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db  = readDatabase  as any;  // reads
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const wdb = writeDatabase as any;  // writes (inserts / updates / deletes)
+
+// ============================================================================
+// Interfaces
+// ============================================================================
+
 export interface BillEngagementStats {
   views: number;
   comments: number;
@@ -21,7 +65,6 @@ export interface BillEngagementStats {
   totalEngagement: number;
 }
 
-// Enhanced search options for better query control
 export interface BillSearchOptions {
   category?: string;
   status?: string;
@@ -31,7 +74,8 @@ export interface BillSearchOptions {
   sortOrder?: 'asc' | 'desc';
 }
 
-export interface LegislativeStorage { // Bill methods - enhanced with better search capabilities
+export interface LegislativeStorage {
+  // Bill methods
   getBills(options?: BillSearchOptions): Promise<Bill[]>;
   getBill(id: number): Promise<Bill | undefined>;
   getBillsByCategory(category: string): Promise<Bill[]>;
@@ -41,7 +85,7 @@ export interface LegislativeStorage { // Bill methods - enhanced with better sea
   updateBill(id: number, bill: Partial<Bill>): Promise<Bill | undefined>;
   deleteBill(id: number): Promise<boolean>;
 
-  // User methods - with better error handling
+  // User methods
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -53,24 +97,24 @@ export interface LegislativeStorage { // Bill methods - enhanced with better sea
   createUserProfile(profile: InsertUserProfile): Promise<UserProfile>;
   updateUserProfile(user_id: string, profile: Partial<UserProfile>): Promise<UserProfile | undefined>;
 
-  // Comment methods - with pagination support
+  // Comment methods
   getBillComments(bill_id: number, limit?: number, offset?: number): Promise<BillComment[]>;
   createBillComment(comment: InsertBillComment): Promise<BillComment>;
   updateComment(id: number, comment: Partial<BillComment>): Promise<BillComment | undefined>;
   deleteComment(id: number): Promise<boolean>;
 
-  // Sponsor methods - enhanced with relationship data
+  // Sponsor methods
   getSponsors(): Promise<Sponsor[]>;
   getSponsor(id: number): Promise<Sponsor | undefined>;
-  getBillSponsors(bill_id: number): Promise<(Sponsor & { sponsorshipType: string   })[]>;
+  getBillSponsors(bill_id: number): Promise<(Sponsor & { sponsorshipType: string })[]>;
   createSponsor(sponsor: InsertSponsor): Promise<Sponsor>;
   updateSponsor(id: number, sponsor: Partial<Sponsor>): Promise<Sponsor | undefined>;
 
   // Analysis methods
   getBillAnalysis(bill_id: number): Promise<Analysis[]>;
-  createAnalysis(analysis: InsertAnalysis): Promise<Analysis>;
+  createAnalysis(a: InsertAnalysis): Promise<Analysis>;
 
-  // Engagement methods - fixed and enhanced
+  // Engagement methods
   recordBillEngagement(engagement: Omit<BillEngagement, 'id' | 'created_at'>): Promise<BillEngagement>;
   getBillEngagementStats(bill_id: number): Promise<BillEngagementStats>;
   getUserEngagementHistory(user_id: string, limit?: number): Promise<BillEngagement[]>;
@@ -86,83 +130,74 @@ export interface LegislativeStorage { // Bill methods - enhanced with better sea
   getBillConflicts(bill_id: number): Promise<BillSectionConflict[]>;
 }
 
+// ============================================================================
+// Implementation
+// ============================================================================
+
 export class DatabaseLegislativeStorage implements LegislativeStorage {
-  // Enhanced bill methods with better query options
+
+  // --------------------------------------------------------------------------
+  // Bills
+  // --------------------------------------------------------------------------
+
   async getBills(options: BillSearchOptions = {}): Promise<Bill[]> {
     const { limit = 50, offset = 0, sortBy = 'introduced_date', sortOrder = 'desc' } = options;
-    
-  let query = readDatabase.select().from(bills);
-    
-    // Apply filters if provided
-    if (options.category) {
-      query = query.where(eq(bills.category, options.category));
-    }
-    
-    if (options.status) {
-      query = query.where(eq(bills.status, options.status));
-    }
-    
-    // Apply sorting - this creates a more flexible sorting system
-    const sortColumn = bills[sortBy];
+
+    let query = db.select().from(bills);
+
+    if (options.category) query = query.where(eq(bills.category, options.category));
+    if (options.status)   query = query.where(eq(bills.status,   options.status));
+
+    const sortColumn    = bills[sortBy as keyof typeof bills];
     const orderFunction = sortOrder === 'asc' ? asc : desc;
-    
-    return await query
-      .orderBy(orderFunction(sortColumn))
-      .limit(limit)
-      .offset(offset);
+
+    return await query.orderBy(orderFunction(sortColumn)).limit(limit).offset(offset);
   }
 
   async getBill(id: number): Promise<Bill | undefined> {
-  const result = await readDatabase.select().from(bills).where(eq(bills.id, id));
+    const result = await db.select().from(bills).where(eq(bills.id, id));
     return result[0];
   }
 
   async getBillsByCategory(category: string): Promise<Bill[]> {
-  return await readDatabase.select().from(bills)
+    return await db.select().from(bills)
       .where(eq(bills.category, category))
       .orderBy(desc(bills.introduced_date));
   }
 
   async getBillsByStatus(status: string): Promise<Bill[]> {
-  return await readDatabase.select().from(bills)
+    return await db.select().from(bills)
       .where(eq(bills.status, status))
       .orderBy(desc(bills.last_action_date));
   }
 
   async searchBills(query: string, options: BillSearchOptions = {}): Promise<Bill[]> {
     const { limit = 50, offset = 0 } = options;
-    
-    // Enhanced search that looks across multiple fields
-    const searchCondition = or(
-      like(bills.title, `%${query}%`),
+
+    const baseCondition = or(
+      like(bills.title,       `%${query}%`),
       like(bills.description, `%${query}%`),
-      like(bills.bill_number, `%${query}%`)
+      like(bills.bill_number, `%${query}%`),
     );
-    
-  let dbQuery = readDatabase.select().from(bills).where(searchCondition);
-    
-    // Apply additional filters from options
-    if (options.category) {
-      dbQuery = dbQuery.where(and(searchCondition, eq(bills.category, options.category)));
-    }
-    
-    if (options.status) {
-      dbQuery = dbQuery.where(and(searchCondition, eq(bills.status, options.status)));
-    }
-    
-    return await dbQuery
+
+    const conditions = [baseCondition];
+    if (options.category) conditions.push(eq(bills.category, options.category));
+    if (options.status)   conditions.push(eq(bills.status,   options.status));
+
+    return await db.select().from(bills)
+      .where(and(...conditions))
       .orderBy(desc(bills.introduced_date))
       .limit(limit)
       .offset(offset);
   }
 
   async createBill(insertBill: InsertBill): Promise<Bill> {
-  const result = await readDatabase.insert(bills).values(insertBill).returning();
-  return result[0];
+    const result = await wdb.insert(bills).values(insertBill).returning();
+    return result[0];
   }
 
   async updateBill(id: number, updateData: Partial<Bill>): Promise<Bill | undefined> {
-  const result = await readDatabase.update(bills)
+    const result = await wdb.update(bills)
       .set({ ...updateData, updated_at: new Date() })
       .where(eq(bills.id, id))
       .returning();
@@ -170,28 +205,31 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deleteBill(id: number): Promise<boolean> {
-  const result = await readDatabase.delete(bills).where(eq(bills.id, id)).returning();
-  return result.length > 0;
+    const result = await wdb.delete(bills).where(eq(bills.id, id)).returning();
+    return result.length > 0;
   }
 
-  // Enhanced user methods
+  // --------------------------------------------------------------------------
+  // Users
+  // --------------------------------------------------------------------------
+
   async getUser(id: string): Promise<User | undefined> {
-  const result = await readDatabase.select().from(users).where(eq(users.id, id));
+    const result = await db.select().from(users).where(eq(users.id, id));
     return result[0];
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-  const result = await readDatabase.select().from(users).where(eq(users.email, email));
+    const result = await db.select().from(users).where(eq(users.email, email));
     return result[0];
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-  const result = await readDatabase.insert(users).values(insertUser).returning();
-  return result[0];
+    const result = await wdb.insert(users).values(insertUser).returning();
+    return result[0];
   }
 
   async updateUser(id: string, updateData: Partial<User>): Promise<User | undefined> {
-  const result = await readDatabase.update(users)
+    const result = await wdb.update(users)
       .set({ ...updateData, updated_at: new Date() })
       .where(eq(users.id, id))
       .returning();
@@ -199,45 +237,54 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deactivateUser(id: string): Promise<boolean> {
-  const result = await readDatabase.update(users)
+    const result = await wdb.update(users)
       .set({ is_active: false, updated_at: new Date() })
       .where(eq(users.id, id))
       .returning();
     return result.length > 0;
   }
 
-  // User profile methods
-  async getUserProfile(user_id: string): Promise<UserProfile | undefined> { const result = await readDatabase.select().from(user_profiles).where(eq(user_profiles.user_id, user_id));
-    return result[0];
-   }
+  // --------------------------------------------------------------------------
+  // User Profiles
+  // --------------------------------------------------------------------------
 
-  async createUserProfile(insertProfile: InsertUserProfile): Promise<UserProfile> {
-  const result = await readDatabase.insert(user_profiles).values(insertProfile).returning();
-  return result[0];
+  async getUserProfile(user_id: string): Promise<UserProfile | undefined> {
+    const result = await db.select().from(user_profiles).where(eq(user_profiles.user_id, user_id));
+    return result[0];
   }
 
-  async updateUserProfile(user_id: string, updateData: Partial<UserProfile>): Promise<UserProfile | undefined> { const result = await readDatabase.update(user_profiles)
+  async createUserProfile(insertProfile: InsertUserProfile): Promise<UserProfile> {
+    const result = await wdb.insert(user_profiles).values(insertProfile).returning();
+    return result[0];
+  }
+
+  async updateUserProfile(user_id: string, updateData: Partial<UserProfile>): Promise<UserProfile | undefined> {
+    const result = await wdb.update(user_profiles)
       .set(updateData)
       .where(eq(user_profiles.user_id, user_id))
       .returning();
     return result[0];
-   }
+  }
 
-  // Enhanced comment methods with pagination
-  async getBillComments(bill_id: number, limit: number = 50, offset: number = 0): Promise<BillComment[]> { return await readDatabase.select().from(comments)
+  // --------------------------------------------------------------------------
+  // Comments
+  // --------------------------------------------------------------------------
+
+  async getBillComments(bill_id: number, limit = 50, offset = 0): Promise<BillComment[]> {
+    return await db.select().from(comments)
       .where(eq(comments.bill_id, bill_id))
       .orderBy(desc(comments.created_at))
       .limit(limit)
       .offset(offset);
-   }
+  }
 
   async createBillComment(insertComment: InsertBillComment): Promise<BillComment> {
-  const result = await readDatabase.insert(comments).values(insertComment).returning();
-  return result[0];
+    const result = await wdb.insert(comments).values(insertComment).returning();
+    return result[0];
   }
 
   async updateComment(id: number, updateData: Partial<BillComment>): Promise<BillComment | undefined> {
-  const result = await readDatabase.update(comments)
+    const result = await wdb.update(comments)
       .set({ ...updateData, updated_at: new Date() })
       .where(eq(comments.id, id))
       .returning();
@@ -245,209 +292,182 @@ export class DatabaseLegislativeStorage implements LegislativeStorage {
   }
 
   async deleteComment(id: number): Promise<boolean> {
-  const result = await readDatabase.delete(comments).where(eq(comments.id, id)).returning();
-  return result.length > 0;
+    const result = await wdb.delete(comments).where(eq(comments.id, id)).returning();
+    return result.length > 0;
   }
 
-  // Sponsor methods
+  // --------------------------------------------------------------------------
+  // Sponsors
+  // --------------------------------------------------------------------------
+
   async getSponsors(): Promise<Sponsor[]> {
-  return await readDatabase.select().from(sponsors)
+    return await db.select().from(sponsors)
       .where(eq(sponsors.is_active, true))
       .orderBy(sponsors.name);
   }
 
   async getSponsor(id: number): Promise<Sponsor | undefined> {
-  const result = await readDatabase.select().from(sponsors).where(eq(sponsors.id, id));
+    const result = await db.select().from(sponsors).where(eq(sponsors.id, id));
     return result[0];
   }
 
   async getBillSponsors(bill_id: number): Promise<(Sponsor & { sponsorshipType: string })[]> {
-  const result = await readDatabase.select({
-      id: sponsors.id,
-      name: sponsors.name,
-      role: sponsors.role,
-      party: sponsors.party,
-      constituency: sponsors.constituency,
-      email: sponsors.email,
-      phone: sponsors.phone,
-      bio: sponsors.bio,
-      photo_url: sponsors.photo_url,
-      conflict_level: sponsors.conflict_level,
+    const result = await db.select({
+      id:                 sponsors.id,
+      name:               sponsors.name,
+      role:               sponsors.role,
+      party:              sponsors.party,
+      constituency:       sponsors.constituency,
+      email:              sponsors.email,
+      phone:              sponsors.phone,
+      bio:                sponsors.bio,
+      photo_url:          sponsors.photo_url,
+      conflict_level:     sponsors.conflict_level,
       financial_exposure: sponsors.financial_exposure,
-      voting_alignment: sponsors.voting_alignment,
+      voting_alignment:   sponsors.voting_alignment,
       transparency_score: sponsors.transparency_score,
-      is_active: sponsors.is_active,
-      created_at: sponsors.created_at,
-      sponsorshipType: bill_sponsorships.sponsorshipType
+      is_active:          sponsors.is_active,
+      created_at:         sponsors.created_at,
+      sponsorshipType:    bill_sponsorships.sponsorshipType,
     })
-    .from(sponsors)
-    .innerJoin(bill_sponsorships, eq(sponsors.id, bill_sponsorships.sponsor_id))
-    .where(and(
-      eq(bill_sponsorships.bill_id, bill_id),
-      eq(bill_sponsorships.is_active, true)
-    ));
+      .from(sponsors)
+      .innerJoin(bill_sponsorships, eq(sponsors.id, bill_sponsorships.sponsor_id))
+      .where(and(
+        eq(bill_sponsorships.bill_id,    bill_id),
+        eq(bill_sponsorships.is_active,  true),
+      ));
 
     return result as (Sponsor & { sponsorshipType: string })[];
   }
 
   async createSponsor(insertSponsor: InsertSponsor): Promise<Sponsor> {
-  const result = await readDatabase.insert(sponsors).values(insertSponsor).returning();
+    const result = await wdb.insert(sponsors).values(insertSponsor).returning();
     return result[0];
   }
 
   async updateSponsor(id: number, updateData: Partial<Sponsor>): Promise<Sponsor | undefined> {
-  const result = await readDatabase.update(sponsors)
+    const result = await wdb.update(sponsors)
       .set(updateData)
       .where(eq(sponsors.id, id))
       .returning();
     return result[0];
   }
 
-  // Analysis methods
-  async getBillAnalysis(bill_id: number): Promise<Analysis[]> { return await readDatabase.select().from(analysis)
+  // --------------------------------------------------------------------------
+  // Analysis
+  // --------------------------------------------------------------------------
+
+  async getBillAnalysis(bill_id: number): Promise<Analysis[]> {
+    return await db.select().from(analysis)
       .where(eq(analysis.bill_id, bill_id))
       .orderBy(desc(analysis.created_at));
-   }
-
-  async createAnalysis(insertAnalysis: InsertAnalysis): Promise<Analysis> {
-  const result = await readDatabase.insert(analysis).values(insertAnalysis).returning();
-  return result[0];
   }
 
-  // Fixed engagement methods - addressing the TypeScript errors
-  async recordBillEngagement(engagement: Omit<BillEngagement, 'id' | 'created_at'>): Promise<BillEngagement> {
-  const result = await readDatabase.insert(bill_engagement).values(engagement).returning();
-  return result[0];
+  async createAnalysis(insertAnalysis: InsertAnalysis): Promise<Analysis> {
+    const result = await wdb.insert(analysis).values(insertAnalysis).returning();
+    return result[0];
+  }
+
+  // --------------------------------------------------------------------------
+  // Engagement
+  // --------------------------------------------------------------------------
+
+  async recordBillEngagement(
+    engagement: Omit<BillEngagement, 'id' | 'created_at'>,
+  ): Promise<BillEngagement> {
+    const result = await wdb.insert(bill_engagement).values(engagement).returning();
+    return result[0];
   }
 
   async getBillEngagementStats(bill_id: number): Promise<BillEngagementStats> {
-    // Optimized query using single aggregation query as per design.md recommendations
-  const stats = await readDatabase
+    // Single aggregation query — avoids N+1 and separate count queries
+    const rows: Array<{
+      totalViews:    number | null;
+      totalComments: number | null;
+      totalShares:   number | null;
+    }> = await db
       .select({
-        totalViews: sql<number>`SUM(${bill_engagement.view_count})`,
-        totalComments: sql<number>`COUNT(DISTINCT ${comments.id})`,
-        totalShares: sql<number>`SUM(${bill_engagement.share_count})`,
-        uniqueUsers: sql<number>`COUNT(DISTINCT ${bill_engagement.user_id})`
+        totalViews:    sql<number>`COALESCE(SUM(${bill_engagement.view_count}), 0)::int`,
+        totalComments: sql<number>`COUNT(DISTINCT ${comments.id})::int`,
+        totalShares:   sql<number>`COALESCE(SUM(${bill_engagement.share_count}), 0)::int`,
       })
       .from(bill_engagement)
       .leftJoin(comments, eq(bill_engagement.bill_id, comments.bill_id))
       .where(eq(bill_engagement.bill_id, bill_id));
 
-    const result = stats[0];
-    const views = Number(result?.totalViews) || 0;
-    const comments = Number(result?.totalComments) || 0;
-    const shares = Number(result?.totalShares) || 0;
+    const row          = rows[0];
+    const views        = Number(row?.totalViews)    || 0;
+    const commentCount = Number(row?.totalComments) || 0;
+    const shares       = Number(row?.totalShares)   || 0;
 
     return {
       views,
-      comments,
-      bookmarks: 0, // Not tracked in current schema
+      comments:        commentCount,
+      bookmarks:       0, // not tracked in current schema
       shares,
-      totalEngagement: views + comments + shares
+      totalEngagement: views + commentCount + shares,
     };
   }
 
-  async getUserEngagementHistory(user_id: string, limit: number = 50): Promise<BillEngagement[]> { return await readDatabase.select().from(bill_engagement)
+  async getUserEngagementHistory(user_id: string, limit = 50): Promise<BillEngagement[]> {
+    return await db.select().from(bill_engagement)
       .where(eq(bill_engagement.user_id, user_id))
       .orderBy(desc(bill_engagement.lastEngaged))
       .limit(limit);
-   }
+  }
 
-  // Enhanced notification methods
-  async getUserNotifications(user_id: string, includeRead: boolean = false): Promise<Notification[]> { let query = readDatabase.select().from(notifications)
-      .where(eq(notifications.user_id, user_id));
-    
-    if (!includeRead) {
-      query = query.where(and(
-        eq(notifications.user_id, user_id),
-        eq(notifications.is_read, false)
-      ));
-     }
-    
-  return await query.orderBy(desc(notifications.created_at));
+  // --------------------------------------------------------------------------
+  // Notifications
+  // --------------------------------------------------------------------------
+
+  async getUserNotifications(user_id: string, includeRead = false): Promise<Notification[]> {
+    const conditions = [eq(notifications.user_id, user_id)];
+    if (!includeRead) conditions.push(eq(notifications.is_read, false));
+
+    return await db.select().from(notifications)
+      .where(and(...conditions))
+      .orderBy(desc(notifications.created_at));
   }
 
   async markNotificationRead(id: number): Promise<void> {
-  await readDatabase.update(notifications)
+    await wdb.update(notifications)
       .set({ is_read: true })
       .where(eq(notifications.id, id));
   }
 
   async markAllNotificationsRead(user_id: string): Promise<void> {
-  await readDatabase.update(notifications)
+    await wdb.update(notifications)
       .set({ is_read: true })
       .where(eq(notifications.user_id, user_id));
   }
 
-  // Transparency methods
+  // --------------------------------------------------------------------------
+  // Transparency
+  // --------------------------------------------------------------------------
+
   async getSponsorTransparency(sponsor_id: number): Promise<SponsorTransparency[]> {
-  return await readDatabase.select().from(sponsorTransparency)
+    return await db.select().from(sponsorTransparency)
       .where(eq(sponsorTransparency.sponsor_id, sponsor_id))
       .orderBy(desc(sponsorTransparency.dateReported));
   }
 
   async getSponsorAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
-  return await readDatabase.select().from(sponsorAffiliations)
+    return await db.select().from(sponsorAffiliations)
       .where(and(
         eq(sponsorAffiliations.sponsor_id, sponsor_id),
-        eq(sponsorAffiliations.is_active, true)
+        eq(sponsorAffiliations.is_active,  true),
       ))
       .orderBy(desc(sponsorAffiliations.start_date));
   }
 
-  async getBillConflicts(bill_id: number): Promise<BillSectionConflict[]> { return await readDatabase.select().from(billSectionConflicts)
-      .where(eq(billSectionConflicts.bill_id, bill_id))
-      .orderBy(billSectionConflicts.sectionNumber);
-   }
+  /**
+   * TODO: `billSectionConflicts` table is not currently exported from the
+   * schema barrel (`@server/infrastructure/schema`). Once the schema export
+   * is added, replace this stub with the real query.
+   */
+  async getBillConflicts(_bill_id: number): Promise<BillSectionConflict[]> {
+    return [];
+  }
 }
 
 export const legislativeStorage = new DatabaseLegislativeStorage();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

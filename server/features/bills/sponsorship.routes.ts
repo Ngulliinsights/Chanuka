@@ -1,135 +1,104 @@
 import { logger } from '@server/infrastructure/observability';
-import { asyncHandler } from '@shared/types/core/errors/middleware/express-error-middleware';
-import { ApiError, ApiResponseWrapper,ApiSuccess  } from '@shared/types/api';
-import { bill_sponsorships, bills, billSectionConflicts,sponsorAffiliations, sponsors, sponsorTransparency } from '@server/infrastructure/schema/index';
-import { and,count, desc, eq, sql } from 'drizzle-orm';
-import express, { Router } from 'express';
+import { asyncHandler } from '@server/middleware/error-management';
+import { Router, Request, Response } from 'express';
 
 import { SponsorshipAnalysisService } from './application/sponsorship-analysis.service';
 
-const router = Router();
+// ---------------------------------------------------------------------------
+// Router setup
+// ---------------------------------------------------------------------------
 
-export function setupSponsorshipRoutes(routerInstance: Router) { const analysisService = new SponsorshipAnalysisService();
+const router: Router = Router();
+const analysisService = new SponsorshipAnalysisService();
 
-  // Main sponsorship analysis endpoint
-  routerInstance.get('/bills/:bill_id/sponsorship-analysis', asyncHandler(async (req, res) => {
-    const startTime = Date.now();
-    
-    try {
-      const { bill_id  } = req.params;
-  const analysis = await analysisService.getComprehensiveAnalysis(parseInt(bill_id));
-      return ApiSuccess(res, analysis, 
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    } catch (error) {
-      logger.error('Error fetching sponsorship analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch sponsorship analysis' }, 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    }
-  }));
+// ---------------------------------------------------------------------------
+// Response helpers — plain Express shapes; avoids broken @shared/types/api deps
+// ---------------------------------------------------------------------------
 
-  // Primary sponsor detailed analysis
-  routerInstance.get('/bills/:bill_id/sponsorship-analysis/primary-sponsor', asyncHandler(async (req, res) => { const startTime = Date.now();
-    
-    try {
-      const { bill_id  } = req.params;
-      const analysis = await analysisService.getPrimarySponsorAnalysis(parseInt(bill_id));
-      return ApiSuccess(res, analysis, 
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    } catch (error) {
-      logger.error('Error fetching primary sponsor analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch primary sponsor analysis' }, 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    }
-  }));
-
-  // Co-sponsors analysis
-  routerInstance.get('/bills/:bill_id/sponsorship-analysis/co-sponsors', asyncHandler(async (req, res) => { const startTime = Date.now();
-    
-    try {
-      const { bill_id  } = req.params;
-      const analysis = await analysisService.getCoSponsorsAnalysis(parseInt(bill_id));
-      return ApiSuccess(res, analysis, 
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    } catch (error) {
-      logger.error('Error fetching co-sponsors analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch co-sponsors analysis' }, 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    }
-  }));
-
-  // Financial network analysis
-  routerInstance.get('/bills/:bill_id/sponsorship-analysis/financial-network', asyncHandler(async (req, res) => { const startTime = Date.now();
-    
-    try {
-      const { bill_id  } = req.params;
-      const analysis = await analysisService.getFinancialNetworkAnalysis(parseInt(bill_id));
-      return ApiSuccess(res, analysis, 
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    } catch (error) {
-      logger.error('Error fetching financial network analysis:', { component: 'Chanuka' }, error as any);
-      return ApiError(res, { code: 'INTERNAL_ERROR', message: 'Failed to fetch financial network analysis' }, 500,
-        ApiResponseWrapper.createMetadata(startTime, 'database'));
-    }
-  }));
+function ok(res: Response, data: unknown): Response {
+  return res.json({ success: true, data });
 }
 
-// Set up the routes on the router
-setupSponsorshipRoutes(router);
+function fail(res: Response, message: string, status = 500): Response {
+  return res.status(status).json({ success: false, error: { code: 'INTERNAL_ERROR', message } });
+}
 
-// Export both the router and setup function for flexibility
+// ---------------------------------------------------------------------------
+// Route factory — all four endpoints share the same try/catch skeleton
+// ---------------------------------------------------------------------------
+
+type AnalysisHandler = (billId: number) => Promise<unknown>;
+
+function sponsorshipRoute(handler: AnalysisHandler, errorMessage: string) {
+  return asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const billId = parseInt(req.params.bill_id ?? '', 10);
+
+    if (isNaN(billId) || billId <= 0) {
+      fail(res, 'bill_id must be a valid positive integer', 400);
+      return;
+    }
+
+    try {
+      const data = await handler(billId);
+      ok(res, data);
+    } catch (error) {
+      logger.error({ component: 'SponsorshipRoutes', error }, errorMessage);
+      fail(res, errorMessage);
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Routes
+// ---------------------------------------------------------------------------
+
+/** GET /bills/:bill_id/sponsorship-analysis — comprehensive sponsorship overview */
+router.get(
+  '/bills/:bill_id/sponsorship-analysis',
+  sponsorshipRoute(
+    (id) => analysisService.getComprehensiveAnalysis(id),
+    'Failed to fetch sponsorship analysis',
+  ),
+);
+
+/** GET /bills/:bill_id/sponsorship-analysis/primary-sponsor */
+router.get(
+  '/bills/:bill_id/sponsorship-analysis/primary-sponsor',
+  sponsorshipRoute(
+    (id) => analysisService.getPrimarySponsorAnalysis(id),
+    'Failed to fetch primary sponsor analysis',
+  ),
+);
+
+/** GET /bills/:bill_id/sponsorship-analysis/co-sponsors */
+router.get(
+  '/bills/:bill_id/sponsorship-analysis/co-sponsors',
+  sponsorshipRoute(
+    (id) => analysisService.getCoSponsorsAnalysis(id),
+    'Failed to fetch co-sponsors analysis',
+  ),
+);
+
+/** GET /bills/:bill_id/sponsorship-analysis/financial-network */
+router.get(
+  '/bills/:bill_id/sponsorship-analysis/financial-network',
+  sponsorshipRoute(
+    (id) => analysisService.getFinancialNetworkAnalysis(id),
+    'Failed to fetch financial network analysis',
+  ),
+);
+
+// ---------------------------------------------------------------------------
+// Exports
+// ---------------------------------------------------------------------------
+
 export { router };
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/**
+ * Mounts sponsorship routes onto an existing router instance.
+ * Use this when composing routes in a parent router rather than
+ * mounting the standalone `router` export.
+ */
+export function setupSponsorshipRoutes(routerInstance: Router): void {
+  routerInstance.use(router);
+}

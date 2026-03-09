@@ -1,30 +1,22 @@
-// @ts-nocheck
 // cSpell:ignore upvotes downvotes
-import { logger } from '../../../infrastructure/observability';
+import { logger } from '@server/infrastructure/observability';
 import { Bill, bills } from '@server/infrastructure/schema';
 import { bill_engagement, comments } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import type { AsyncServiceResult } from '@server/infrastructure/error-handling';
 import { safeAsync } from '@server/infrastructure/error-handling';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { InputSanitizationService, securityAuditService } from '@server/features/security';
 import { cacheKeys, CACHE_TTL, createCacheInvalidation } from '@server/infrastructure/cache/cache-keys';
 import { cacheService } from '@server/infrastructure/cache';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
-import { BillRepository } from '../domain/repositories/bill.repository';
-import type { InsertBill as RepositoryInsertBill } from '../domain/repositories/bill.repository';
 import {
   CreateBillSchema,
   UpdateBillSchema,
   SearchBillsSchema,
   GetAllBillsSchema,
   RecordEngagementSchema,
-  type CreateBillInput,
-  type UpdateBillInput,
-  type SearchBillsInput,
-  type GetAllBillsInput,
-  type RecordEngagementInput,
 } from './bill-validation.schemas';
 import { billLifecycleHooks } from './bill-lifecycle-hooks';
 
@@ -97,6 +89,13 @@ function validateStringInputs(values: string[]): void {
   }
 }
 
+// Typed aliases that bypass Drizzle's overly-strict projection overload.
+// All actual query safety is enforced at the SQL/schema layer.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const db = readDatabase as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const wdb = writeDatabase as any;
+
 // ============================================================================
 // Enhanced Bill Service with Integrated Caching
 // ============================================================================
@@ -105,15 +104,8 @@ function validateStringInputs(values: string[]): void {
  * Enhanced BillService with comprehensive caching, error handling, and
  * performance optimisation. Provides a multi-layer caching strategy with
  * automatic invalidation and fallback support.
- *
- * Uses BillRepository for data access operations.
  */
 export class CachedBillService {
-  private readonly repository: BillRepository;
-
-  constructor() {
-    this.repository = new BillRepository();
-  }
 
   // --------------------------------------------------------------------------
   // Fallback Data
@@ -173,8 +165,7 @@ export class CachedBillService {
       }
 
       try {
-        // @ts-ignore - Drizzle ORM query builder type issues
-        const billResults = (await readDatabase
+        const billResults = (await db
           .select({
             id: bills.id,
             title: bills.title,
@@ -235,7 +226,6 @@ export class CachedBillService {
    */
   async createBill(billData: InsertBill): Promise<AsyncServiceResult<Bill>> {
     return safeAsync(async () => {
-      // Validate input using Zod schema
       const validation = await validateData(CreateBillSchema, billData);
       if (!validation.success) {
         const errorMsg = validation.errors?.map(e => `${e.field}: ${e.message}`).join(', ');
@@ -267,9 +257,7 @@ export class CachedBillService {
           .filter((v): v is string => v !== undefined),
       );
 
-      // Execute within transaction
-      const newBillResults = (await withTransaction(async (tx) => {
-        // @ts-expect-error - Drizzle ORM query builder returns complex types
+      const newBillResults = (await withTransaction(async (tx: any) => {
         return (await tx
           .insert(bills)
           .values({ ...sanitizedData, created_at: new Date(), updated_at: new Date() })
@@ -296,7 +284,6 @@ export class CachedBillService {
 
       await this.invalidateAllBillCaches();
 
-      // Trigger lifecycle hooks asynchronously (non-blocking)
       billLifecycleHooks.onBillCreated(newBill).catch(error => {
         logger.warn({ error, billId: newBill.id }, 'Bill creation hook failed (non-blocking)');
       });
@@ -313,7 +300,6 @@ export class CachedBillService {
     updates: Partial<InsertBill>,
   ): Promise<AsyncServiceResult<Bill | null>> {
     return safeAsync(async () => {
-      // Validate input using Zod schema
       const validation = await validateData(UpdateBillSchema, updates);
       if (!validation.success) {
         const errorMsg = validation.errors?.map(e => `${e.field}: ${e.message}`).join(', ');
@@ -336,7 +322,6 @@ export class CachedBillService {
       if (validatedUpdates.bill_number)
         sanitizedUpdates.bill_number = inputSanitizationService.sanitizeString(validatedUpdates.bill_number);
 
-      // Copy remaining non-sanitized fields using string keys to avoid symbol index errors
       const skipKeys = new Set<string>(['title', 'summary', 'full_text', 'bill_number']);
       for (const key of Object.keys(validatedUpdates)) {
         if (!skipKeys.has(key)) {
@@ -345,8 +330,7 @@ export class CachedBillService {
         }
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const updatedBillResults = (await writeDatabase
+      const updatedBillResults = (await wdb
         .update(bills)
         .set({ ...sanitizedUpdates, updated_at: new Date() })
         .where(eq(bills.id, sanitizedId))
@@ -372,7 +356,6 @@ export class CachedBillService {
 
         await this.invalidateBillCaches(sanitizedId);
 
-        // Trigger lifecycle hooks asynchronously (non-blocking)
         billLifecycleHooks.onBillUpdated(updatedBill, sanitizedUpdates).catch(error => {
           logger.warn({ error, billId: sanitizedId }, 'Bill update hook failed (non-blocking)');
         });
@@ -391,12 +374,10 @@ export class CachedBillService {
     user_id?: string,
   ): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
-      // Get old status before update
       const billResult = await this.getBillById(id);
-      const oldStatus = billResult.isOk && billResult.value ? billResult.value.status : 'unknown';
+      const oldStatus = billResult.isOk() ? (billResult.value?.status ?? 'unknown') : 'unknown';
 
-      await withTransaction(async (tx) => {
-        // @ts-expect-error - Drizzle ORM update returns unknown type
+      await withTransaction(async (tx: any) => {
         await tx
           .update(bills)
           .set({
@@ -416,13 +397,12 @@ export class CachedBillService {
 
       await this.invalidateBillCaches(id);
 
-      // Get updated bill for lifecycle hook
       const updatedBillResult = await this.getBillById(id);
-      if (updatedBillResult.isOk && updatedBillResult.value) {
+      if (updatedBillResult.isOk() && updatedBillResult.value) {
         billLifecycleHooks.onBillStatusChanged(
-          updatedBillResult.value as Bill, 
-          oldStatus, 
-          newStatus
+          updatedBillResult.value as Bill,
+          oldStatus,
+          newStatus,
         ).catch(error => {
           logger.warn({ error, billId: id }, 'Bill status change hook failed (non-blocking)');
         });
@@ -435,10 +415,8 @@ export class CachedBillService {
    */
   async deleteBill(id: string): Promise<AsyncServiceResult<boolean>> {
     return safeAsync(async () => {
-      const deleted = (await withTransaction(async (tx) => {
-        // @ts-expect-error - Drizzle ORM delete returns unknown type
+      const deleted = (await withTransaction(async (tx: any) => {
         await tx.delete(bill_engagement).where(eq(bill_engagement.bill_id, id));
-        // @ts-expect-error - Drizzle ORM query builder returns complex types
         const deletedBillResults = (await tx
           .delete(bills)
           .where(eq(bills.id, id))
@@ -466,7 +444,6 @@ export class CachedBillService {
     filters: BillFilters = {},
   ): Promise<AsyncServiceResult<Bill[]>> {
     return safeAsync(async () => {
-      // Validate input using Zod schema
       const validation = await validateData(SearchBillsSchema, { query, filters });
       if (!validation.success) {
         const errorMsg = validation.errors?.map(e => `${e.field}: ${e.message}`).join(', ');
@@ -502,8 +479,7 @@ export class CachedBillService {
       if (validatedFilters.category)   conditions.push(eq(bills.category, validatedFilters.category));
       if (validatedFilters.sponsor_id) conditions.push(eq(bills.sponsor_id, validatedFilters.sponsor_id));
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await this.database
+      const results = (await db
         .select()
         .from(bills)
         .where(and(...conditions))
@@ -544,8 +520,7 @@ export class CachedBillService {
         return cached;
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await readDatabase
+      const results = (await db
         .select()
         .from(bills)
         .where(eq(bills.status, status))
@@ -568,8 +543,7 @@ export class CachedBillService {
         return cached;
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await readDatabase
+      const results = (await db
         .select()
         .from(bills)
         .where(eq(bills.category, category))
@@ -592,8 +566,7 @@ export class CachedBillService {
         return cached;
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await readDatabase
+      const results = (await db
         .select()
         .from(bills)
         .where(eq(bills.sponsor_id, sponsor_id))
@@ -611,8 +584,7 @@ export class CachedBillService {
     return safeAsync(async () => {
       if (ids.length === 0) return [];
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const results = (await readDatabase
+      const results = (await db
         .select()
         .from(bills)
         .where(inArray(bills.id, ids))
@@ -624,28 +596,39 @@ export class CachedBillService {
 
   /**
    * Gets paginated bills with comprehensive caching.
+   *
+   * Note: GetAllBillsSchema accepts string-typed page/limit from query params;
+   * the validated output is coerced to numbers before use.
    */
   async getAllBills(
     filters: BillFilters = {},
     pagination: PaginationOptions = { page: 1, limit: 10 },
   ): Promise<AsyncServiceResult<PaginatedBills>> {
     return safeAsync(async () => {
-      // Validate input using Zod schema
-      const validation = await validateData(GetAllBillsSchema, { filters, pagination });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const validation = await validateData(GetAllBillsSchema as any, { filters, pagination });
       if (!validation.success) {
         const errorMsg = validation.errors?.map(e => `${e.field}: ${e.message}`).join(', ');
         throw new Error(`Validation failed: ${errorMsg}`);
       }
 
-      const validatedInput = validation.data!;
-      const validatedFilters = validatedInput.filters || {};
-      const validatedPagination = validatedInput.pagination || { page: 1, limit: 10 };
+      // Cast to any — schema output type mismatches string page/limit from HTTP query params
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const validatedInput = validation.data as any;
+      const validatedFilters: BillFilters = validatedInput?.filters ?? {};
+      const rawPagination = validatedInput?.pagination ?? { page: 1, limit: 10 };
 
-      // Check cache first
-      const cacheKey = cacheKeys.list('bill', { 
-        ...validatedFilters, 
-        page: validatedPagination.page, 
-        limit: validatedPagination.limit 
+      // Coerce page/limit to numbers in case schema emits strings from query params
+      const validatedPagination: PaginationOptions = {
+        ...rawPagination,
+        page: Number(rawPagination.page) || 1,
+        limit: Number(rawPagination.limit) || 10,
+      };
+
+      const cacheKey = cacheKeys.list('bill', {
+        ...validatedFilters,
+        page: validatedPagination.page,
+        limit: validatedPagination.limit,
       });
       const cached = await cacheService.get<PaginatedBills>(cacheKey);
       if (cached) {
@@ -653,7 +636,6 @@ export class CachedBillService {
         return cached;
       }
 
-      // Drizzle SQL expressions have a complex union type; any[] avoids symbol-index errors
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const conditions: any[] = [];
 
@@ -673,8 +655,7 @@ export class CachedBillService {
 
       const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const totalResults = (await readDatabase
+      const totalResults = (await db
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .where(whereClause)) as any[];
@@ -685,8 +666,7 @@ export class CachedBillService {
       const sortColumn = this.getSortColumn(validatedPagination.sortBy);
       const orderExpr = validatedPagination.sortOrder === 'asc' ? sortColumn : desc(sortColumn);
 
-      // @ts-ignore - Drizzle ORM query builder type issues
-      const billResults = (await readDatabase
+      const billResults = (await db
         .select({
           id: bills.id,
           title: bills.title,
@@ -717,7 +697,8 @@ export class CachedBillService {
 
       const result: PaginatedBills = {
         bills: billResults.map(
-          (billItem: typeof billResults[0]): BillWithEngagement => ({ ...billItem, complexity_score: 5 } as BillWithEngagement),
+          (billItem: (typeof billResults)[0]): BillWithEngagement =>
+            ({ ...billItem, complexity_score: 5 } as BillWithEngagement),
         ),
         total,
         page: validatedPagination.page,
@@ -739,7 +720,6 @@ export class CachedBillService {
    */
   async getBillStats(): Promise<AsyncServiceResult<BillStats>> {
     return safeAsync(async () => {
-      // Check cache first
       const cacheKey = cacheKeys.analytics('bill-stats');
       const cached = await cacheService.get<BillStats>(cacheKey);
       if (cached) {
@@ -747,21 +727,18 @@ export class CachedBillService {
         return cached;
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const totalResults = (await readDatabase
+      const totalResults = (await db
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)) as any[];
 
       const totalResult = totalResults[0];
 
-      // @ts-ignore - Drizzle ORM query builder type issues
-      const statusResults = (await readDatabase
+      const statusResults = (await db
         .select({ status: bills.status, count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .groupBy(bills.status)) as any[];
 
-      // @ts-ignore - Drizzle ORM query builder type issues
-      const categoryResults = (await readDatabase
+      const categoryResults = (await db
         .select({ category: bills.category, count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .groupBy(bills.category)) as any[];
@@ -811,15 +788,12 @@ export class CachedBillService {
         );
       }
 
-      // @ts-expect-error - Drizzle ORM query builder returns complex types
-      const countResults = (await readDatabase
+      const countResults = (await db
         .select({ count: sql<number>`COUNT(*)::int` })
         .from(bills)
         .where(conditions.length > 0 ? and(...conditions) : undefined)) as any[];
 
-      const result = countResults[0];
-
-      return result?.count ?? 0;
+      return countResults[0]?.count ?? 0;
     }, { service: 'CachedBillService', operation: 'countBills' });
   }
 
@@ -836,11 +810,10 @@ export class CachedBillService {
     engagement_type: 'view' | 'comment' | 'share',
   ): Promise<AsyncServiceResult<void>> {
     return safeAsync(async () => {
-      // Validate input using Zod schema
-      const validation = await validateData(RecordEngagementSchema, { 
-        bill_id, 
-        user_id, 
-        engagement_type 
+      const validation = await validateData(RecordEngagementSchema, {
+        bill_id,
+        user_id,
+        engagement_type,
       });
       if (!validation.success) {
         const errorMsg = validation.errors?.map(e => `${e.field}: ${e.message}`).join(', ');
@@ -849,8 +822,7 @@ export class CachedBillService {
 
       const validatedInput = validation.data!;
 
-      await withTransaction(async (tx) => {
-        // @ts-expect-error - Drizzle ORM query builder returns complex types
+      await withTransaction(async (tx: any) => {
         const existingResults = (await tx
           .select()
           .from(bill_engagement)
@@ -873,16 +845,14 @@ export class CachedBillService {
             case 'share':   updates.share_count   = sql`${bill_engagement.share_count} + 1`;   break;
           }
 
-          // @ts-expect-error - Drizzle ORM update returns unknown type
           await tx
             .update(bill_engagement)
             .set(updates)
             .where(eq(bill_engagement.id, existing.id));
         } else {
-          // @ts-expect-error - Drizzle ORM insert returns unknown type
           await tx.insert(bill_engagement).values({
-            bill_id: validatedInput.bill_id,
-            user_id: validatedInput.user_id,
+            bill_id:       validatedInput.bill_id,
+            user_id:       validatedInput.user_id,
             view_count:    validatedInput.engagement_type === 'view'    ? 1 : 0,
             comment_count: validatedInput.engagement_type === 'comment' ? 1 : 0,
             share_count:   validatedInput.engagement_type === 'share'   ? 1 : 0,
@@ -919,12 +889,9 @@ export class CachedBillService {
     try {
       logger.info({}, 'Starting cache warm-up...');
 
-      // AsyncServiceResult is a neverthrow Result type — use .isOk() / .value
       const popularBillsResult = await this.getAllBills({}, { page: 1, limit: 20 });
       if (popularBillsResult.isOk()) {
-        const billIds = popularBillsResult.value.bills.map(
-          (b: BillWithEngagement) => b.id,
-        );
+        const billIds = popularBillsResult.value.bills.map((b: BillWithEngagement) => b.id);
         if (billIds.length > 0) {
           await Promise.all(billIds.map((id: string) => this.getBillById(id)));
         }

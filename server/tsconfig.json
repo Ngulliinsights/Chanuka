@@ -10,6 +10,8 @@
     "esModuleInterop": true,
     "downlevelIteration": true,
     "moduleResolution": "node",
+    "module": "ESNext",
+    "target": "ES2022",
     "baseUrl": ".",
     "paths": {
       "@server": ["."],
@@ -17,6 +19,9 @@
       "@shared": ["../shared"],
       "@shared/*": ["../shared/*"]
     }
+  },
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
   },
   "references": [
     { "path": "../shared" }

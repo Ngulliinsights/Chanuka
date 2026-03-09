@@ -1,36 +1,24 @@
+import { NextFunction, Request, Response, Router } from 'express';
+
 import type { AuthenticatedRequest } from '@server/middleware/auth';
 import { authenticateToken } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { 
-  ApiError, 
-  ApiNotFound, 
-  ApiSuccess, 
-  ApiValidationError 
-} from '@shared/types/api';
 import type {
   BillUpdate,
   ConnectionMetrics,
   ConnectionQuality,
   ConnectionState,
-  NotificationData,
-  Priority,
-  WebSocketStats as SharedWebSocketStats} from '@server/infrastructure/schema/websocket';
-import { NextFunction, Request, Response, Router } from 'express';
+} from '@server/infrastructure/schema/websocket';
+import { Priority } from '@server/infrastructure/schema/websocket';
 
-// ============================================================================
-// TYPE DEFINITIONS
-// ============================================================================
+// ─── Domain types ─────────────────────────────────────────────────────────────
 
 /** Branded type for bill IDs to prevent mixing with other numeric IDs */
 type BillId = number & { readonly __brand: 'BillId' };
 
-/** Branded type for user IDs */
-type UserId = string & { readonly __brand: 'UserId' };
-
-/** Valid subscription event types - aligned with BillUpdate types */
+/** Valid subscription event types — aligned with BillUpdate */
 type SubscriptionType = BillUpdate['updateType'];
 
-/** Core bill data structure */
 interface Bill {
   id: number;
   title: string;
@@ -41,7 +29,6 @@ interface Bill {
   shares?: number;
 }
 
-/** Bill with real-time activity data */
 interface BillWithRealTimeData extends Bill {
   realTimeData: {
     lastActivity: Date;
@@ -50,43 +37,40 @@ interface BillWithRealTimeData extends Bill {
   };
 }
 
-/** Extended WebSocket statistics for API responses */
-interface WebSocketApiStats extends SharedWebSocketStats {
-  /** Unique connected user count */
+interface WebSocketStats {
   uniqueUsers: number;
-  /** Total active subscriptions */
   totalSubscriptions: number;
-  /** Service uptime in milliseconds */
   uptime: number;
+  messagesSent: number;
+  messagesReceived: number;
+  bytesSent: number;
+  bytesReceived: number;
+  averageLatency: number;
+  connectionQuality: ConnectionQuality['level'];
 }
 
-/** System health status */
 interface HealthStatus {
   isHealthy: boolean;
   connectionState?: ConnectionState;
   quality?: ConnectionQuality;
 }
 
-/** Validation error structure */
 interface ValidationError {
   field: string;
   message: string;
 }
 
-/** Rate limiter configuration */
 interface RateLimitConfig {
   windowMs: number;
   max: number;
   message: string;
 }
 
-/** Pagination parameters */
 interface PaginationParams {
   limit: number;
   offset: number;
 }
 
-/** Pagination metadata in responses */
 interface PaginationMeta {
   limit: number;
   offset: number;
@@ -94,7 +78,6 @@ interface PaginationMeta {
   hasMore: boolean;
 }
 
-/** User subscription info */
 interface UserSubscriptionInfo {
   billId: BillId;
   types: SubscriptionType[];
@@ -102,7 +85,6 @@ interface UserSubscriptionInfo {
   subscribedAt: number;
 }
 
-/** Real-time activity metrics for a bill */
 interface BillActivityMetrics {
   lastUpdate: Date;
   is_active: boolean;
@@ -112,11 +94,8 @@ interface BillActivityMetrics {
   activeViewers?: number;
 }
 
-// ============================================================================
-// SERVICE INTERFACES (Dependency Injection Contracts)
-// ============================================================================
+// ─── Service interfaces (DI contracts) ───────────────────────────────────────
 
-/** Service for bill-related operations */
 interface IBillService {
   getBills(): Promise<Bill[]>;
   getBill(id: number): Promise<Bill>;
@@ -125,377 +104,275 @@ interface IBillService {
   getBillSubscribers?(id: number): Promise<string[]>;
 }
 
-/** Service for WebSocket operations - aligned with shared types */
 interface IWebSocketService {
-  /** Get aggregate WebSocket statistics */
-  getStats(): WebSocketApiStats;
-  
-  /** Get system health status */
+  getStats(): WebSocketStats;
   getHealthStatus(): HealthStatus;
-  
-  /** Get list of user IDs subscribed to a specific bill */
   getBillSubscribers(billId: number): string[];
-  
-  /** Check if a user is currently connected */
   isUserConnected(userId: string): boolean;
-  
-  /** Get all bill IDs a user is subscribed to */
   getUserSubscriptions(userId: string): number[];
-  
-  /** Get detailed subscription info for a user */
   getUserSubscriptionDetails?(userId: string): UserSubscriptionInfo[];
-  
-  /** Get connection metrics for a specific user */
   getUserConnectionMetrics?(userId: string): ConnectionMetrics | null;
-  
-  /** Get active viewer count for a bill */
   getActiveBillViewers?(billId: number): number;
 }
 
-/** Rate limiter middleware */
 interface IRateLimiter {
   (req: Request, res: Response, next: NextFunction): void;
 }
 
-/** Factory for creating rate limiters */
 interface IRateLimiterFactory {
   createRateLimit(config: RateLimitConfig): IRateLimiter;
 }
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
+export interface RealTimeTrackingDependencies {
+  billService: IBillService;
+  webSocketService: IWebSocketService;
+  rateLimiterFactory: IRateLimiterFactory;
+}
 
-/** Valid subscription event types */
+// ─── Constants ────────────────────────────────────────────────────────────────
+
 const VALID_SUBSCRIPTION_TYPES: readonly SubscriptionType[] = [
   'status_change',
-  'engagement_change', 
-  'amendment', 
-  'voting_scheduled'
+  'engagement_change',
+  'amendment',
+  'voting_scheduled',
 ] as const;
 
-/** Rate limiting configurations */
 const RATE_LIMITS = {
-  REAL_TIME: { windowMs: 60 * 1000, max: 30, message: 'Too many real-time requests' },
-  SUBSCRIPTION: { windowMs: 60 * 1000, max: 10, message: 'Too many subscription requests' },
-  STATUS: { windowMs: 60 * 1000, max: 60, message: 'Too many status requests' }
+  REAL_TIME:    { windowMs: 60_000, max: 30, message: 'Too many real-time requests' },
+  SUBSCRIPTION: { windowMs: 60_000, max: 10, message: 'Too many subscription requests' },
+  STATUS:       { windowMs: 60_000, max: 60, message: 'Too many status requests' },
 } as const;
 
-/** Pagination constraints */
 const PAGINATION = {
-  MIN_LIMIT: 1,
-  MAX_LIMIT: 100,
-  DEFAULT_LIMIT: 50,
-  DEFAULT_OFFSET: 0
+  MIN_LIMIT:      1,
+  MAX_LIMIT:      100,
+  DEFAULT_LIMIT:  50,
+  DEFAULT_OFFSET: 0,
 } as const;
 
-/** Activity threshold windows */
 const ACTIVITY_THRESHOLD = {
   ACTIVE_24H: 24 * 60 * 60 * 1000,
-  ACTIVE_1H: 60 * 60 * 1000,
-  ACTIVE_15M: 15 * 60 * 1000
+  ACTIVE_1H:       60 * 60 * 1000,
+  ACTIVE_15M:      15 * 60 * 1000,
 } as const;
 
-/** Default subscription priority */
-const DEFAULT_SUBSCRIPTION_PRIORITY: Priority = Priority.NORMAL;
+const DEFAULT_SUBSCRIPTION_PRIORITY = Priority.NORMAL;
 
-// ============================================================================
-// VALIDATION UTILITIES
-// ============================================================================
+// ─── Response helpers ─────────────────────────────────────────────────────────
+// Inline helpers used while @shared/types/api does not export standalone
+// response functions. Replace with the shared equivalents once available.
 
-/** Result type for validation operations */
-type ValidationResult<T> = 
-  | { valid: true; value: T }
+function sendSuccess(res: Response, data: unknown, status = 200): void {
+  res.status(status).json({ success: true, data });
+}
+
+function sendNotFound(res: Response, resource: string, message: string): void {
+  res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: `${resource}: ${message}` } });
+}
+
+function sendValidationError(res: Response, errors: ValidationError[]): void {
+  res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', errors } });
+}
+
+function sendInternalError(res: Response, context: string): void {
+  res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: `Failed to ${context}` } });
+}
+
+// ─── Validation utilities ─────────────────────────────────────────────────────
+
+type ValidationResult<T> =
+  | { valid: true;  value: T }
   | { valid: false; errors: ValidationError[] };
 
-/**
- * Validates and parses a positive integer parameter
- */
 function validatePositiveInteger(
   value: string | undefined,
   fieldName: string,
-  required: boolean = true
+  required = true,
 ): ValidationResult<number> {
   if (!value) {
-    return required 
+    return required
       ? { valid: false, errors: [{ field: fieldName, message: `${fieldName} is required` }] }
       : { valid: true, value: 0 };
   }
-
   const parsed = parseInt(value, 10);
-  
   if (isNaN(parsed) || parsed <= 0) {
-    return { 
-      valid: false, 
-      errors: [{ field: fieldName, message: `${fieldName} must be a valid positive integer` }]
-    };
+    return { valid: false, errors: [{ field: fieldName, message: `${fieldName} must be a valid positive integer` }] };
   }
-
   return { valid: true, value: parsed };
 }
 
-/**
- * Validates pagination parameters
- */
 function validatePagination(
   limit?: string,
-  offset?: string
+  offset?: string,
 ): ValidationResult<PaginationParams> {
   const errors: ValidationError[] = [];
-
-  const parsedLimit = parseInt(limit || PAGINATION.DEFAULT_LIMIT.toString(), 10);
-  const parsedOffset = parseInt(offset || PAGINATION.DEFAULT_OFFSET.toString(), 10);
+  const parsedLimit  = parseInt(limit  ?? String(PAGINATION.DEFAULT_LIMIT),  10);
+  const parsedOffset = parseInt(offset ?? String(PAGINATION.DEFAULT_OFFSET), 10);
 
   if (isNaN(parsedLimit) || parsedLimit < PAGINATION.MIN_LIMIT || parsedLimit > PAGINATION.MAX_LIMIT) {
-    errors.push({
-      field: 'limit',
-      message: `Limit must be between ${PAGINATION.MIN_LIMIT} and ${PAGINATION.MAX_LIMIT}`
-    });
+    errors.push({ field: 'limit', message: `Limit must be between ${PAGINATION.MIN_LIMIT} and ${PAGINATION.MAX_LIMIT}` });
   }
-
   if (isNaN(parsedOffset) || parsedOffset < 0) {
-    errors.push({
-      field: 'offset',
-      message: 'Offset must be a non-negative integer'
-    });
+    errors.push({ field: 'offset', message: 'Offset must be a non-negative integer' });
   }
 
-  if (errors.length > 0) {
-    return { valid: false, errors };
-  }
-
-  return { 
-    valid: true, 
-    value: { limit: parsedLimit, offset: parsedOffset }
-  };
+  return errors.length > 0
+    ? { valid: false, errors }
+    : { valid: true, value: { limit: parsedLimit, offset: parsedOffset } };
 }
 
-/**
- * Validates an array of bill IDs
- */
-function validateBillIds(billIds: unknown, fieldName: string = 'bill_ids'): ValidationResult<number[]> {
+function validateBillIds(
+  billIds: unknown,
+  fieldName = 'bill_ids',
+): ValidationResult<number[]> {
   if (!Array.isArray(billIds)) {
-    return {
-      valid: false,
-      errors: [{ field: fieldName, message: `${fieldName} must be an array` }]
-    };
+    return { valid: false, errors: [{ field: fieldName, message: `${fieldName} must be an array` }] };
   }
-
   if (billIds.length === 0) {
+    return { valid: false, errors: [{ field: fieldName, message: `${fieldName} cannot be empty` }] };
+  }
+  const invalid = billIds.filter((id) => !Number.isInteger(id) || id <= 0);
+  if (invalid.length > 0) {
     return {
       valid: false,
-      errors: [{ field: fieldName, message: `${fieldName} cannot be empty` }]
+      errors: [{ field: fieldName, message: `All ${fieldName} must be positive integers. Invalid values: ${invalid.join(', ')}` }],
     };
   }
-
-  const invalidIds = billIds.filter(id => !Number.isInteger(id) || id <= 0);
-  
-  if (invalidIds.length > 0) {
-    return {
-      valid: false,
-      errors: [{ 
-        field: fieldName, 
-        message: `All ${fieldName} must be positive integers. Invalid values: ${invalidIds.join(', ')}` 
-      }]
-    };
-  }
-
   return { valid: true, value: billIds as number[] };
 }
 
-/**
- * Validates subscription types against shared schema
- */
 function validateSubscriptionTypes(types: unknown): ValidationResult<SubscriptionType[]> {
   if (!Array.isArray(types)) {
-    return {
-      valid: false,
-      errors: [{ field: 'subscriptionTypes', message: 'subscriptionTypes must be an array' }]
-    };
+    return { valid: false, errors: [{ field: 'subscriptionTypes', message: 'subscriptionTypes must be an array' }] };
   }
-
-  const invalidTypes = types.filter(
-    type => !VALID_SUBSCRIPTION_TYPES.includes(type as SubscriptionType)
-  );
-
-  if (invalidTypes.length > 0) {
+  const invalid = types.filter((t) => !VALID_SUBSCRIPTION_TYPES.includes(t as SubscriptionType));
+  if (invalid.length > 0) {
     return {
       valid: false,
       errors: [{
         field: 'subscriptionTypes',
-        message: `Invalid subscription types: ${invalidTypes.join(', ')}. Valid types: ${VALID_SUBSCRIPTION_TYPES.join(', ')}`
-      }]
+        message: `Invalid subscription types: ${invalid.join(', ')}. Valid: ${VALID_SUBSCRIPTION_TYPES.join(', ')}`,
+      }],
     };
   }
-
   return { valid: true, value: types as SubscriptionType[] };
 }
 
-/**
- * Validates priority level
- */
 function validatePriority(priority: unknown): ValidationResult<Priority> {
   if (priority === undefined || priority === null) {
     return { valid: true, value: DEFAULT_SUBSCRIPTION_PRIORITY };
   }
-
-  const validPriorities = Object.values(Priority).filter(v => typeof v === 'number') as Priority[];
-  
-  if (!validPriorities.includes(priority as Priority)) {
-    return {
-      valid: false,
-      errors: [{
-        field: 'priority',
-        message: `Invalid priority. Valid values: ${validPriorities.join(', ')}`
-      }]
-    };
+  const valid = Object.values(Priority).filter((v) => typeof v === 'number') as Priority[];
+  if (!valid.includes(priority as Priority)) {
+    return { valid: false, errors: [{ field: 'priority', message: `Invalid priority. Valid values: ${valid.join(', ')}` }] };
   }
-
   return { valid: true, value: priority as Priority };
 }
 
-/**
- * Validates WebSocket connection requirement
- */
 function validateWebSocketConnection(
   webSocketService: IWebSocketService,
-  userId: string
+  userId: string,
 ): ValidationResult<void> {
   if (!webSocketService.isUserConnected(userId)) {
     return {
       valid: false,
-      errors: [{
-        field: 'connection',
-        message: 'Active WebSocket connection required. Please connect to /ws first.'
-      }]
+      errors: [{ field: 'connection', message: 'Active WebSocket connection required. Please connect to /ws first.' }],
     };
   }
-
   return { valid: true, value: undefined };
 }
 
-// ============================================================================
-// ERROR HANDLING UTILITIES
-// ============================================================================
+// ─── Error handling ───────────────────────────────────────────────────────────
 
-/**
- * Centralized error handler for route operations
- */
 function handleRouteError(
-  res: Response, 
-  error: unknown, 
-  context: string, 
-  userId?: string
+  res: Response,
+  error: unknown,
+  context: string,
+  userId?: string,
 ): void {
-  logger.error(`Real-time tracking error in ${context}:`, {
-    component: 'RealTimeTrackingRouter',
-    context,
-    user_id: userId,
-    errorType: error instanceof Error ? error.constructor.name : 'Unknown',
-    message: error instanceof Error ? error.message : 'Unknown error',
-    stack: error instanceof Error ? error.stack : undefined
-  });
+  logger.error(
+    {
+      component: 'RealTimeTrackingRouter',
+      context,
+      userId,
+      errorType: error instanceof Error ? error.constructor.name : 'Unknown',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    },
+    `Real-time tracking error in ${context}`,
+  );
 
   if (error instanceof Error && error.message.toLowerCase().includes('not found')) {
-    ApiNotFound(res, 'Resource', error.message);
+    sendNotFound(res, 'Resource', error.message);
     return;
   }
-
-  ApiError(res, { 
-    code: 'INTERNAL_ERROR', 
-    message: `Failed to ${context}` 
-  });
+  sendInternalError(res, context);
 }
 
 /**
- * Higher-order function that wraps async route handlers with error handling
+ * Wraps an async route handler so unhandled rejections are forwarded to
+ * Express's error middleware instead of crashing the process.
  */
-function asyncHandler<T extends AuthenticatedRequest = AuthenticatedRequest>(
-  fn: (req: T, res: Response, next: NextFunction) => Promise<void>
+function asyncHandler(
+  fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>,
 ) {
-  return (req: T, res: Response, next: NextFunction): void => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
     Promise.resolve(fn(req, res, next)).catch(next);
   };
 }
 
-// ============================================================================
-// HELPER FUNCTIONS
-// ============================================================================
+// ─── Domain helpers ───────────────────────────────────────────────────────────
 
-/**
- * Calculates whether a bill is currently active based on last update
- */
-function isBillActive(updatedAt: Date, thresholdMs: number = ACTIVITY_THRESHOLD.ACTIVE_24H): boolean {
+function isBillActive(updatedAt: Date, thresholdMs = ACTIVITY_THRESHOLD.ACTIVE_24H): boolean {
   return new Date(updatedAt).getTime() > Date.now() - thresholdMs;
 }
 
-/**
- * Creates pagination metadata
- */
-function createPaginationMeta(
-  params: PaginationParams,
-  totalCount: number
-): PaginationMeta {
-  return {
-    limit: params.limit,
-    offset: params.offset,
-    total: totalCount,
-    hasMore: params.offset + params.limit < totalCount
-  };
+function createPaginationMeta(params: PaginationParams, total: number): PaginationMeta {
+  return { ...params, total, hasMore: params.offset + params.limit < total };
 }
 
-/**
- * Enriches bills with real-time data
- */
 function enrichBillWithRealTimeData(
   bill: Bill,
-  webSocketService: IWebSocketService
+  webSocketService: IWebSocketService,
 ): BillWithRealTimeData {
   return {
     ...bill,
     realTimeData: {
       lastActivity: bill.updated_at,
       is_active: isBillActive(bill.updated_at),
-      subscriberCount: webSocketService.getBillSubscribers(bill.id).length
-    }
+      subscriberCount: webSocketService.getBillSubscribers(bill.id).length,
+    },
   };
 }
 
-/**
- * Creates activity metrics for a bill
- */
 function createBillActivityMetrics(
   bill: Bill,
   webSocketService: IWebSocketService,
-  includeActiveViewers: boolean = false
+  includeActiveViewers = false,
 ): BillActivityMetrics {
-  const subscriberCount = webSocketService.getBillSubscribers(bill.id).length;
-  const activeViewers = includeActiveViewers && webSocketService.getActiveBillViewers
-    ? webSocketService.getActiveBillViewers(bill.id)
-    : undefined;
-
   return {
     lastUpdate: bill.updated_at,
     is_active: isBillActive(bill.updated_at, ACTIVITY_THRESHOLD.ACTIVE_1H),
-    recentViews: bill.views || 0,
-    recentComments: bill.comments || 0,
-    subscriberCount,
-    activeViewers
+    recentViews: bill.views ?? 0,
+    recentComments: bill.comments ?? 0,
+    subscriberCount: webSocketService.getBillSubscribers(bill.id).length,
+    activeViewers:
+      includeActiveViewers && webSocketService.getActiveBillViewers
+        ? webSocketService.getActiveBillViewers(bill.id)
+        : undefined,
   };
 }
 
-/**
- * Formats WebSocket stats for API response
- */
-function formatWebSocketStats(stats: WebSocketApiStats): Record<string, unknown> {
+function formatWebSocketStats(stats: WebSocketStats): Record<string, unknown> {
+  const totalMessages = stats.messagesSent + stats.messagesReceived;
   return {
     status: stats.connectionQuality === 'disconnected' ? 'degraded' : 'healthy',
-    activeConnections: stats.activeConnections,
     connectedUsers: stats.uniqueUsers,
     totalSubscriptions: stats.totalSubscriptions,
     uptime: stats.uptime,
-    messageSuccessRate: stats.messagesSent + stats.messagesReceived > 0
-      ? `${((stats.messagesSent / (stats.messagesSent + stats.messagesReceived)) * 100).toFixed(2)}%`
+    messageSuccessRate: totalMessages > 0
+      ? `${((stats.messagesSent / totalMessages) * 100).toFixed(2)}%`
       : '0.00%',
     performance: {
       messagesSent: stats.messagesSent,
@@ -503,393 +380,307 @@ function formatWebSocketStats(stats: WebSocketApiStats): Record<string, unknown>
       bytesSent: stats.bytesSent,
       bytesReceived: stats.bytesReceived,
       averageLatency: stats.averageLatency,
-      connectionQuality: stats.connectionQuality
-    }
+      connectionQuality: stats.connectionQuality,
+    },
   };
 }
 
-// ============================================================================
-// ROUTER FACTORY (Dependency Injection Implementation)
-// ============================================================================
-
-interface RealTimeTrackingDependencies {
-  billService: IBillService;
-  webSocketService: IWebSocketService;
-  rateLimiterFactory: IRateLimiterFactory;
-}
+// ─── Router factory ───────────────────────────────────────────────────────────
 
 /**
- * Factory function to create the real-time tracking router with injected dependencies.
- * This enables testing with mock services and better separation of concerns.
- * 
- * @param deps - Service dependencies for the router
- * @returns Configured Express router
+ * Factory function to create the real-time tracking router with injected
+ * dependencies, enabling clean unit testing with mock services.
  */
 export function createRealTimeTrackingRouter(
-  deps: RealTimeTrackingDependencies
+  deps: RealTimeTrackingDependencies,
 ): Router {
   const router = Router();
   const { billService, webSocketService, rateLimiterFactory } = deps;
 
-  // Create rate limiters
-  const realTimeRateLimit = rateLimiterFactory.createRateLimit(RATE_LIMITS.REAL_TIME);
+  const realTimeRateLimit    = rateLimiterFactory.createRateLimit(RATE_LIMITS.REAL_TIME);
   const subscriptionRateLimit = rateLimiterFactory.createRateLimit(RATE_LIMITS.SUBSCRIPTION);
-  const statusRateLimit = rateLimiterFactory.createRateLimit(RATE_LIMITS.STATUS);
+  const statusRateLimit       = rateLimiterFactory.createRateLimit(RATE_LIMITS.STATUS);
 
-  // ============================================================================
-  // ROUTE HANDLERS
-  // ============================================================================
+  // ── GET /bills ─────────────────────────────────────────────────────────────
+  // Returns paginated bills enriched with real-time activity data.
+  //
+  // Query params:
+  //   limit           – results per page (1–100, default 50)
+  //   offset          – pagination offset (default 0)
+  //   status          – filter by bill status (optional)
+  //   includeWebSocket – include aggregate WS stats (default false)
+  //   activeOnly      – only bills with recent activity (default false)
 
-  /**
-   * GET /api/real-time/bills
-   * Retrieves bills with real-time activity data and optional WebSocket statistics
-   * 
-   * Query params:
-   * - limit: Number of bills to return (1-100, default: 50)
-   * - offset: Pagination offset (default: 0)
-   * - status: Filter by bill status (optional)
-   * - includeWebSocket: Include WebSocket stats (default: false)
-   * - activeOnly: Only return bills with recent activity (default: false)
-   */
-  router.get('/bills', realTimeRateLimit, asyncHandler(async (req, res) => {
-    const { 
-      limit, 
-      offset, 
-      status, 
-      includeWebSocket = 'false',
-      activeOnly = 'false'
-    } = req.query;
-
-    // Validate pagination
-    const paginationResult = validatePagination(limit as string, offset as string);
-    if (!paginationResult.valid) {
-      ApiValidationError(res, paginationResult.errors);
-      return;
-    }
-
-    const { limit: validLimit, offset: validOffset } = paginationResult.value;
-
-    try {
-      // Fetch and filter bills
-      let bills = await billService.getBills();
-      
-      // Filter by status if provided
-      if (status && typeof status === 'string') {
-        bills = bills.filter(bill => bill.status === status);
-      }
-
-      // Filter by activity if requested
-      if (activeOnly === 'true') {
-        bills = bills.filter(bill => isBillActive(bill.updated_at, ACTIVITY_THRESHOLD.ACTIVE_24H));
-      }
-
-      // Apply pagination
-      const paginatedBills = bills.slice(validOffset, validOffset + validLimit);
-
-      // Enrich with real-time data
-      const billsWithRealTimeData = paginatedBills.map(bill => 
-        enrichBillWithRealTimeData(bill, webSocketService)
-      );
-
-      // Get WebSocket statistics if requested
-      const webSocketInfo = includeWebSocket === 'true' 
-        ? {
-            connectedUsers: webSocketService.getStats().uniqueUsers,
-            activeConnections: webSocketService.getStats().activeConnections,
-            totalSubscriptions: webSocketService.getStats().totalSubscriptions,
-            connectionQuality: webSocketService.getStats().connectionQuality
-          }
-        : undefined;
-
-      ApiSuccess(res, {
-        bills: billsWithRealTimeData,
-        pagination: createPaginationMeta(
-          { limit: validLimit, offset: validOffset },
-          bills.length
-        ),
-        webSocketInfo,
-        timestamp: new Date().toISOString(),
-        message: billsWithRealTimeData.length === 0 
-          ? 'No bills found matching criteria' 
-          : undefined
-      });
-    } catch (error) {
-      handleRouteError(res, error, 'fetch real-time bills');
-    }
-  }));
-
-  /**
-   * GET /api/real-time/bills/:id
-   * Retrieves real-time data for a specific bill
-   * 
-   * Query params:
-   * - includeSubscribers: Include list of subscriber IDs (default: false)
-   * - includeActivity: Include activity metrics (default: true)
-   * - includeViewers: Include active viewer count (default: false)
-   */
-  router.get('/bills/:id', realTimeRateLimit, asyncHandler(async (req, res) => {
-    const idValidation = validatePositiveInteger(req.params.id, 'id');
-    if (!idValidation.valid) {
-      ApiValidationError(res, idValidation.errors);
-      return;
-    }
-
-    const { 
-      includeSubscribers = 'false', 
-      includeActivity = 'true',
-      includeViewers = 'false'
-    } = req.query;
-
-    try {
-      const bill = await billService.getBill(idValidation.value);
-      const billSubscribers = webSocketService.getBillSubscribers(bill.id);
-      const subscriberCount = billSubscribers.length;
-
-      const activityData = includeActivity === 'true'
-        ? createBillActivityMetrics(bill, webSocketService, includeViewers === 'true')
-        : undefined;
-
-      ApiSuccess(res, {
-        bill: {
-          ...bill,
-          realTimeData: {
-            subscribers: includeSubscribers === 'true' ? billSubscribers : undefined,
-            subscriberCount,
-            activity: activityData,
-            webSocketChannel: `bill-${bill.id}`,
-            connectionQuality: webSocketService.getHealthStatus().quality?.level
-          }
-        },
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      if (error instanceof Error && error.message.toLowerCase().includes('not found')) {
-        ApiNotFound(res, 'Bill', `Bill with ID ${idValidation.value} not found`);
-        return;
-      }
-      handleRouteError(res, error, 'fetch real-time bill data');
-    }
-  }));
-
-  /**
-   * POST /api/real-time/subscribe
-   * Subscribes authenticated user to real-time updates for specified bills
-   * 
-   * Body:
-   * - bill_ids: Array of bill IDs to subscribe to (required)
-   * - subscriptionTypes: Array of event types to subscribe to (optional)
-   * - priority: Subscription priority level (0-3, default: 1)
-   */
-  router.post(
-    '/subscribe', 
-    authenticateToken, 
-    subscriptionRateLimit, 
+  router.get(
+    '/bills',
+    realTimeRateLimit,
     asyncHandler(async (req, res) => {
-      const { 
-        bill_ids, 
-        subscriptionTypes = VALID_SUBSCRIPTION_TYPES,
-        priority 
-      } = req.body;
+      const { limit, offset, status, includeWebSocket = 'false', activeOnly = 'false' } = req.query;
 
-      // Validate inputs
-      const billIdsValidation = validateBillIds(bill_ids);
-      if (!billIdsValidation.valid) {
-        ApiValidationError(res, billIdsValidation.errors);
-        return;
-      }
+      const paginationResult = validatePagination(limit as string, offset as string);
+      if (!paginationResult.valid) { sendValidationError(res, paginationResult.errors); return; }
 
-      const typesValidation = validateSubscriptionTypes(subscriptionTypes);
-      if (!typesValidation.valid) {
-        ApiValidationError(res, typesValidation.errors);
-        return;
-      }
-
-      const priorityValidation = validatePriority(priority);
-      if (!priorityValidation.valid) {
-        ApiValidationError(res, priorityValidation.errors);
-        return;
-      }
-
-      const userId = req.user!.id.toString();
-
-      // Validate WebSocket connection
-      const connectionValidation = validateWebSocketConnection(webSocketService, userId);
-      if (!connectionValidation.valid) {
-        ApiValidationError(res, connectionValidation.errors);
-        return;
-      }
+      const { limit: validLimit, offset: validOffset } = paginationResult.value;
 
       try {
-        const currentSubscriptions = webSocketService.getUserSubscriptions(userId);
-        const newSubscriptions = billIdsValidation.value.filter(
-          id => !currentSubscriptions.includes(id)
-        );
-        const alreadySubscribed = billIdsValidation.value.filter(
-          id => currentSubscriptions.includes(id)
-        );
+        let bills = await billService.getBills();
 
-        logger.info('Real-time subscription request', {
-          component: 'RealTimeTrackingRouter',
-          user_id: req.user!.id,
-          bill_ids: newSubscriptions,
-          subscriptionTypes: typesValidation.value,
-          priority: priorityValidation.value
+        if (status && typeof status === 'string') {
+          bills = bills.filter((b) => b.status === status);
+        }
+        if (activeOnly === 'true') {
+          bills = bills.filter((b) => isBillActive(b.updated_at, ACTIVITY_THRESHOLD.ACTIVE_24H));
+        }
+
+        const page = bills.slice(validOffset, validOffset + validLimit);
+        const enriched = page.map((b) => enrichBillWithRealTimeData(b, webSocketService));
+
+        const wsStats = webSocketService.getStats();
+        const webSocketInfo = includeWebSocket === 'true'
+          ? {
+              connectedUsers:   wsStats.uniqueUsers,
+              totalSubscriptions: wsStats.totalSubscriptions,
+              connectionQuality: wsStats.connectionQuality,
+            }
+          : undefined;
+
+        sendSuccess(res, {
+          bills: enriched,
+          pagination: createPaginationMeta({ limit: validLimit, offset: validOffset }, bills.length),
+          webSocketInfo,
+          timestamp: new Date().toISOString(),
+          message: enriched.length === 0 ? 'No bills found matching criteria' : undefined,
         });
+      } catch (error) {
+        handleRouteError(res, error, 'fetch real-time bills');
+      }
+    }),
+  );
 
-        ApiSuccess(res, {
-          subscribed: newSubscriptions,
-          alreadySubscribed,
-          subscriptionTypes: typesValidation.value,
-          priority: priorityValidation.value,
-          message: newSubscriptions.length > 0
-            ? `Successfully subscribed to ${newSubscriptions.length} bill(s)`
+  // ── GET /bills/:id ─────────────────────────────────────────────────────────
+  // Returns real-time data for a single bill.
+  //
+  // Query params:
+  //   includeSubscribers – include subscriber ID list (default false)
+  //   includeActivity    – include activity metrics (default true)
+  //   includeViewers     – include active viewer count (default false)
+
+  router.get(
+    '/bills/:id',
+    realTimeRateLimit,
+    asyncHandler(async (req, res) => {
+      const idResult = validatePositiveInteger(req.params.id, 'id');
+      if (!idResult.valid) { sendValidationError(res, idResult.errors); return; }
+
+      const {
+        includeSubscribers = 'false',
+        includeActivity = 'true',
+        includeViewers = 'false',
+      } = req.query;
+
+      try {
+        const bill = await billService.getBill(idResult.value);
+        const subscribers = webSocketService.getBillSubscribers(bill.id);
+
+        sendSuccess(res, {
+          bill: {
+            ...bill,
+            realTimeData: {
+              subscribers: includeSubscribers === 'true' ? subscribers : undefined,
+              subscriberCount: subscribers.length,
+              activity: includeActivity === 'true'
+                ? createBillActivityMetrics(bill, webSocketService, includeViewers === 'true')
+                : undefined,
+              webSocketChannel: `bill-${bill.id}`,
+              connectionQuality: webSocketService.getHealthStatus().quality?.level,
+            },
+          },
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        if (error instanceof Error && error.message.toLowerCase().includes('not found')) {
+          sendNotFound(res, 'Bill', `Bill with ID ${idResult.value} not found`);
+          return;
+        }
+        handleRouteError(res, error, 'fetch real-time bill data');
+      }
+    }),
+  );
+
+  // ── POST /subscribe ────────────────────────────────────────────────────────
+  // Subscribes the authenticated user to real-time updates for specified bills.
+  //
+  // Body:
+  //   bill_ids           – bill IDs to subscribe to (required)
+  //   subscriptionTypes  – event types (optional, defaults to all)
+  //   priority           – subscription priority 0–3 (optional, default NORMAL)
+
+  router.post(
+    '/subscribe',
+    authenticateToken,
+    subscriptionRateLimit,
+    asyncHandler(async (req, res) => {
+      const { bill_ids, subscriptionTypes = VALID_SUBSCRIPTION_TYPES, priority } = req.body;
+
+      const billIdsResult = validateBillIds(bill_ids);
+      if (!billIdsResult.valid)  { sendValidationError(res, billIdsResult.errors);  return; }
+
+      const typesResult = validateSubscriptionTypes(subscriptionTypes);
+      if (!typesResult.valid)    { sendValidationError(res, typesResult.errors);    return; }
+
+      const priorityResult = validatePriority(priority);
+      if (!priorityResult.valid) { sendValidationError(res, priorityResult.errors); return; }
+
+      const userId = String(req.user!.id);
+
+      const connResult = validateWebSocketConnection(webSocketService, userId);
+      if (!connResult.valid) { sendValidationError(res, connResult.errors); return; }
+
+      try {
+        const current = webSocketService.getUserSubscriptions(userId);
+        const toAdd   = billIdsResult.value.filter((id) => !current.includes(id));
+        const already = billIdsResult.value.filter((id) =>  current.includes(id));
+
+        logger.info(
+          { component: 'RealTimeTrackingRouter', userId, bill_ids: toAdd, subscriptionTypes: typesResult.value, priority: priorityResult.value },
+          'Real-time subscription request',
+        );
+
+        sendSuccess(res, {
+          subscribed: toAdd,
+          alreadySubscribed: already,
+          subscriptionTypes: typesResult.value,
+          priority: priorityResult.value,
+          message: toAdd.length > 0
+            ? `Successfully subscribed to ${toAdd.length} bill(s)`
             : 'Already subscribed to all specified bills',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       } catch (error) {
         handleRouteError(res, error, 'subscribe to real-time updates', userId);
       }
-    })
+    }),
   );
 
-  /**
-   * DELETE /api/real-time/unsubscribe
-   * Unsubscribes authenticated user from real-time updates
-   * 
-   * Body:
-   * - bill_ids: Array of bill IDs to unsubscribe from (optional, defaults to all)
-   */
+  // ── DELETE /unsubscribe ────────────────────────────────────────────────────
+  // Unsubscribes the authenticated user from real-time updates.
+  //
+  // Body:
+  //   bill_ids – IDs to unsubscribe from (optional, defaults to all)
+
   router.delete(
-    '/unsubscribe', 
-    authenticateToken, 
-    subscriptionRateLimit, 
+    '/unsubscribe',
+    authenticateToken,
+    subscriptionRateLimit,
     asyncHandler(async (req, res) => {
-      const userId = req.user!.id.toString();
+      const userId = String(req.user!.id);
+
+      const connResult = validateWebSocketConnection(webSocketService, userId);
+      if (!connResult.valid) { sendValidationError(res, connResult.errors); return; }
+
       const { bill_ids } = req.body;
+      const current = webSocketService.getUserSubscriptions(userId);
+      const target: unknown = bill_ids ?? current;
 
-      // Validate WebSocket connection
-      const connectionValidation = validateWebSocketConnection(webSocketService, userId);
-      if (!connectionValidation.valid) {
-        ApiValidationError(res, connectionValidation.errors);
-        return;
-      }
-
-      // If no bill_ids provided, unsubscribe from all
-      const currentSubscriptions = webSocketService.getUserSubscriptions(userId);
-      const targetBillIds = bill_ids || currentSubscriptions;
-
-      // Validate bill IDs if provided
       if (bill_ids) {
-        const billIdsValidation = validateBillIds(targetBillIds);
-        if (!billIdsValidation.valid) {
-          ApiValidationError(res, billIdsValidation.errors);
-          return;
-        }
+        const billIdsResult = validateBillIds(target);
+        if (!billIdsResult.valid) { sendValidationError(res, billIdsResult.errors); return; }
       }
 
       try {
-        const subscriptionsToRemove = Array.isArray(targetBillIds)
-          ? targetBillIds.filter(id => currentSubscriptions.includes(id))
-          : [];
-        
-        const notSubscribed = Array.isArray(targetBillIds)
-          ? targetBillIds.filter(id => !currentSubscriptions.includes(id))
-          : [];
+        const targetIds = Array.isArray(target) ? (target as number[]) : [];
+        const toRemove  = targetIds.filter((id) =>  current.includes(id));
+        const missing   = targetIds.filter((id) => !current.includes(id));
 
-        logger.info('Real-time unsubscription request', {
-          component: 'RealTimeTrackingRouter',
-          user_id: req.user!.id,
-          bill_ids: subscriptionsToRemove
-        });
+        logger.info(
+          { component: 'RealTimeTrackingRouter', userId, bill_ids: toRemove },
+          'Real-time unsubscription request',
+        );
 
-        ApiSuccess(res, {
-          unsubscribed: subscriptionsToRemove,
-          notSubscribed,
-          message: subscriptionsToRemove.length > 0
-            ? `Successfully unsubscribed from ${subscriptionsToRemove.length} bill(s)`
+        sendSuccess(res, {
+          unsubscribed: toRemove,
+          notSubscribed: missing,
+          message: toRemove.length > 0
+            ? `Successfully unsubscribed from ${toRemove.length} bill(s)`
             : 'No active subscriptions to remove',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       } catch (error) {
         handleRouteError(res, error, 'unsubscribe from real-time updates', userId);
       }
-    })
+    }),
   );
 
-  /**
-   * GET /api/real-time/subscriptions
-   * Retrieves authenticated user's active subscriptions
-   */
+  // ── GET /subscriptions ─────────────────────────────────────────────────────
+  // Returns the authenticated user's active subscriptions.
+
   router.get(
     '/subscriptions',
     authenticateToken,
     realTimeRateLimit,
     asyncHandler(async (req, res) => {
-      const userId = req.user!.id.toString();
+      const userId = String(req.user!.id);
 
-      // Validate WebSocket connection
-      const connectionValidation = validateWebSocketConnection(webSocketService, userId);
-      if (!connectionValidation.valid) {
-        ApiValidationError(res, connectionValidation.errors);
-        return;
-      }
+      const connResult = validateWebSocketConnection(webSocketService, userId);
+      if (!connResult.valid) { sendValidationError(res, connResult.errors); return; }
 
       try {
-        const subscriptions = webSocketService.getUserSubscriptions(userId);
-        const subscriptionDetails = webSocketService.getUserSubscriptionDetails
+        const subscriptionIds = webSocketService.getUserSubscriptions(userId);
+        const details: UserSubscriptionInfo[] = webSocketService.getUserSubscriptionDetails
           ? webSocketService.getUserSubscriptionDetails(userId)
-          : subscriptions.map(billId => ({
+          : subscriptionIds.map((billId) => ({
               billId: billId as BillId,
               types: [...VALID_SUBSCRIPTION_TYPES],
               priority: DEFAULT_SUBSCRIPTION_PRIORITY,
-              subscribedAt: Date.now()
+              subscribedAt: Date.now(),
             }));
 
-        ApiSuccess(res, {
-          subscriptions: subscriptionDetails,
-          totalCount: subscriptions.length,
-          timestamp: new Date().toISOString()
+        sendSuccess(res, {
+          subscriptions: details,
+          totalCount: subscriptionIds.length,
+          timestamp: new Date().toISOString(),
         });
       } catch (error) {
         handleRouteError(res, error, 'fetch user subscriptions', userId);
       }
-    })
+    }),
   );
 
-  /**
-   * GET /api/real-time/status
-   * Retrieves real-time system status and WebSocket connection information
-   */
-  router.get('/status', statusRateLimit, asyncHandler(async (req, res) => {
-    try {
-      const wsStats = webSocketService.getStats();
-      const healthStatus = webSocketService.getHealthStatus();
+  // ── GET /status ────────────────────────────────────────────────────────────
+  // Returns aggregate WebSocket system status (public, no auth required).
 
-      ApiSuccess(res, {
-        webSocket: formatWebSocketStats(wsStats),
-        health: {
-          isHealthy: healthStatus.isHealthy,
-          connectionState: healthStatus.connectionState,
-          connectionQuality: healthStatus.quality
-        },
-        timestamp: new Date().toISOString(),
-        serverTime: new Date().toISOString()
-      });
-    } catch (error) {
-      handleRouteError(res, error, 'fetch real-time status');
-    }
-  }));
+  router.get(
+    '/status',
+    statusRateLimit,
+    asyncHandler(async (_req, res) => {
+      try {
+        const stats  = webSocketService.getStats();
+        const health = webSocketService.getHealthStatus();
 
-  /**
-   * GET /api/real-time/connection
-   * Retrieves authenticated user's WebSocket connection information
-   */
+        sendSuccess(res, {
+          webSocket: formatWebSocketStats(stats),
+          health: {
+            isHealthy:        health.isHealthy,
+            connectionState:  health.connectionState,
+            connectionQuality: health.quality,
+          },
+          timestamp: new Date().toISOString(),
+        });
+      } catch (error) {
+        handleRouteError(res, error, 'fetch real-time status');
+      }
+    }),
+  );
+
+  // ── GET /connection ────────────────────────────────────────────────────────
+  // Returns the authenticated user's WebSocket connection details.
+
   router.get(
     '/connection',
     authenticateToken,
     realTimeRateLimit,
     asyncHandler(async (req, res) => {
-      const userId = req.user!.id.toString();
+      const userId = String(req.user!.id);
 
       try {
         const isConnected = webSocketService.isUserConnected(userId);
@@ -897,36 +688,35 @@ export function createRealTimeTrackingRouter(
           ? webSocketService.getUserConnectionMetrics(userId)
           : null;
 
-        ApiSuccess(res, {
+        sendSuccess(res, {
           connected: isConnected,
           metrics,
           userId,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       } catch (error) {
         handleRouteError(res, error, 'fetch connection info', userId);
       }
-    })
+    }),
   );
 
-  /**
-   * Global error handler for this router
-   */
+  // ── Global error handler ───────────────────────────────────────────────────
+
   router.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
     handleRouteError(
-      res, 
-      err, 
-      'handle real-time request', 
-      (req as AuthenticatedRequest).user?.id?.toString()
+      res,
+      err,
+      'handle real-time request',
+      (req as AuthenticatedRequest).user?.id
+        ? String((req as AuthenticatedRequest).user!.id)
+        : undefined,
     );
   });
 
   return router;
 }
 
-// ============================================================================
-// TYPE EXPORTS
-// ============================================================================
+// ─── Type exports ─────────────────────────────────────────────────────────────
 
 export type {
   Bill,
@@ -941,17 +731,8 @@ export type {
   IWebSocketService,
   IRateLimiter,
   IRateLimiterFactory,
-  RealTimeTrackingDependencies,
-  WebSocketApiStats,
-  HealthStatus
+  WebSocketStats,
+  HealthStatus,
 };
 
-// Re-export shared types for convenience
-export type {
-  BillUpdate,
-  NotificationData,
-  Priority,
-  ConnectionState,
-  ConnectionQuality,
-  ConnectionMetrics
-} from '@server/infrastructure/schema/websocket';
+export type { BillUpdate, ConnectionMetrics, ConnectionQuality, ConnectionState } from '@server/infrastructure/schema/websocket';
