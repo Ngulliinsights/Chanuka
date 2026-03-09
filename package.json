@@ -258,7 +258,8 @@
     "sql-template-tag": "^5.2.1",
     "uuid": "^13.0.0",
     "ws": "^8.18.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",

@@ -2,70 +2,75 @@
  * Comparison Cart Hook
  * 
  * Manages persistent state for bill comparison selections.
- * Uses Zustand with localStorage persistence for cross-session state.
+ * Uses Redux with localStorage persistence for cross-session state.
  */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
+import type { RootState } from '@client/infrastructure/store';
+import {
+  addBill,
+  removeBill,
+  toggleBill,
+  clearCart,
+  setBills,
+} from '../store/comparisonCartSlice';
 
-export interface ComparisonCartState {
+export interface UseComparisonCartReturn {
   billIds: string[];
   maxBills: number;
+  count: number;
   addBill: (id: string) => void;
   removeBill: (id: string) => void;
   clearCart: () => void;
   toggleBill: (id: string) => void;
   hasBill: (id: string) => boolean;
-  canAddMore: () => boolean;
+  canAddMore: boolean;
   setBills: (ids: string[]) => void;
 }
 
-export const useComparisonCart = create<ComparisonCartState>()(
-  persist(
-    (set, get) => ({
-      billIds: [],
-      maxBills: 4,
+export const useComparisonCart = (): UseComparisonCartReturn => {
+  const dispatch = useAppDispatch();
+  
+  const billIds = useAppSelector((state: RootState) => state.comparisonCart.billIds);
+  const maxBills = useAppSelector((state: RootState) => state.comparisonCart.maxBills);
+  const count = billIds.length;
+  const canAddMore = billIds.length < maxBills;
 
-      addBill: (id: string) => {
-        const { billIds, maxBills } = get();
-        if (billIds.length < maxBills && !billIds.includes(id)) {
-          set({ billIds: [...billIds, id] });
-        }
-      },
+  const handleAddBill = useCallback((id: string) => {
+    dispatch(addBill(id));
+  }, [dispatch]);
 
-      removeBill: (id: string) => {
-        set({ billIds: get().billIds.filter(bid => bid !== id) });
-      },
+  const handleRemoveBill = useCallback((id: string) => {
+    dispatch(removeBill(id));
+  }, [dispatch]);
 
-      clearCart: () => {
-        set({ billIds: [] });
-      },
+  const handleToggleBill = useCallback((id: string) => {
+    dispatch(toggleBill(id));
+  }, [dispatch]);
 
-      toggleBill: (id: string) => {
-        const { billIds } = get();
-        if (billIds.includes(id)) {
-          get().removeBill(id);
-        } else {
-          get().addBill(id);
-        }
-      },
+  const handleClearCart = useCallback(() => {
+    dispatch(clearCart());
+  }, [dispatch]);
 
-      hasBill: (id: string) => {
-        return get().billIds.includes(id);
-      },
+  const handleSetBills = useCallback((ids: string[]) => {
+    dispatch(setBills(ids));
+  }, [dispatch]);
 
-      canAddMore: () => {
-        return get().billIds.length < get().maxBills;
-      },
+  const hasBill = useCallback((id: string) => {
+    return billIds.includes(id);
+  }, [billIds]);
 
-      setBills: (ids: string[]) => {
-        const { maxBills } = get();
-        set({ billIds: ids.slice(0, maxBills) });
-      },
-    }),
-    {
-      name: 'comparison-cart',
-      version: 1,
-    }
-  )
-);
+  return {
+    billIds,
+    maxBills,
+    count,
+    addBill: handleAddBill,
+    removeBill: handleRemoveBill,
+    clearCart: handleClearCart,
+    toggleBill: handleToggleBill,
+    hasBill,
+    canAddMore,
+    setBills: handleSetBills,
+  };
+};

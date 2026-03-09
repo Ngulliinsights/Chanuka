@@ -8,6 +8,7 @@ import storage from 'redux-persist/lib/storage';
 
 // Import slices
 import authReducer from '@client/infrastructure/auth/store/auth-slice';
+import comparisonCartReducer from '@client/features/bills/store/comparisonCartSlice';
 
 import errorHandlingReducer from './slices/errorHandlingSlice';
 import loadingReducer from './slices/loadingSlice';
@@ -20,7 +21,7 @@ import userDashboardReducer from './slices/userDashboardSlice';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'session', 'ui', 'userDashboard', 'navigation'], // Only persist these slices
+  whitelist: ['auth', 'session', 'ui', 'userDashboard', 'navigation', 'comparisonCart'], // Only persist these slices
 };
 
 // Root reducer
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   loading: loadingReducer,
   navigation: navigationReducer,
   errorHandling: errorHandlingReducer,
+  comparisonCart: comparisonCartReducer,
 });
 
 // Create persisted reducer
