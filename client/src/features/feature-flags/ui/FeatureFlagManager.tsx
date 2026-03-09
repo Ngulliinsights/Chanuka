@@ -9,7 +9,7 @@ import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, TrendingUp } from 'lucide-
 import { useFeatureFlags, useDeleteFlag, useToggleFlag } from '../hooks/useFeatureFlags';
 import { FlagEditor } from './FlagEditor';
 import { RolloutControls } from './RolloutControls';
-import { FlagAnalyticsDashboard } from './FlagAnalyticsDashboard';
+import { AnalyticsDashboard as FlagAnalyticsDashboard } from './FlagAnalyticsDashboard';
 import type { FeatureFlag } from '../types';
 
 export function FeatureFlagManager() {

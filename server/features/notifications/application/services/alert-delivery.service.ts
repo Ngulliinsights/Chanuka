@@ -193,14 +193,14 @@ export class AlertDeliveryService {
         }
       }
 
-      logger.info(`Alert delivery processed: ${deliveryLogs.length} logs created`, {
+      logger.info({
         component: 'AlertDelivery',
         user_id,
         alertType,
         filtered: filteredCount,
         sent: sentCount,
         failed: failedCount
-      });
+      }, `Alert delivery processed: ${deliveryLogs.length} logs created`);
 
       return {
         success: sentCount > 0 || deliveryLogs.length > 0,
@@ -238,11 +238,11 @@ export class AlertDeliveryService {
       );
 
       if (!preference) {
-        logger.warn(`Preference ${preferenceId} not found for batched alerts`, {
+        logger.warn({
           component: 'AlertDelivery',
           user_id,
           preferenceId
-        });
+        }, `Preference ${preferenceId} not found for batched alerts`);
         return 0;
       }
 
@@ -274,11 +274,11 @@ export class AlertDeliveryService {
       // Clear the batch
       await cacheService.delete(batchKey);
 
-      logger.info(`Processed ${batch.length} batched alerts`, {
+      logger.info({
         component: 'AlertDelivery',
         user_id,
         preferenceId
-      });
+      }, `Processed ${batch.length} batched alerts`);
 
       return batch.length;
     } catch (error) {

@@ -226,7 +226,7 @@ function getErrorMessage(error: unknown): string {
  * Process items in batches with retry logic and exponential back-off.
  *
  * LOGGER CONVENTION: this project's logger is message-first:
- *   `logger.info('Human readable message', { contextObject })`
+ *   `logger.info({ contextObject }, 'Human readable message')`
  */
 async function processBatch<T>(
   items: T[],

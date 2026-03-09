@@ -6,7 +6,8 @@
 import { CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
-import { AdvocacyEventPublisher, CoalitionFormedEvent,CoalitionOpportunityIdentifiedEvent } from '@shared/domain/events/advocacy-events';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { AdvocacyEventPublisher, CoalitionFormedEvent,CoalitionOpportunityIdentifiedEvent } from '@shared/domain/events/advocacy-events';
 
 export interface CoalitionProposal {
   id: string;
@@ -91,11 +92,11 @@ export class CoalitionBuilder {
       // Sort by estimated impact
       opportunities.sort((a, b) => b.estimatedImpact - a.estimatedImpact);
 
-      logger.info('Coalition opportunities identified', { 
+      logger.info({ 
         campaign_id,
         opportunityCount: opportunities.length,
         component: 'CoalitionBuilder' 
-      });
+      }, 'Coalition opportunities identified');
 
       return opportunities;
     } catch (error) {
@@ -172,12 +173,12 @@ export class CoalitionBuilder {
 
       // Store proposal (this would be in a coalition_proposals table)
       // For now, we'll just log it
-      logger.info('Coalition proposal created', { 
+      logger.info({ 
         proposalId: proposal.id,
         initiatingCampaignId,
         targetCampaignIds,
         component: 'CoalitionBuilder' 
-      });
+      }, 'Coalition proposal created');
 
       return proposal;
     } catch (error) {
@@ -222,11 +223,11 @@ export class CoalitionBuilder {
         coalition.sharedObjectives
       ));
 
-      logger.info('Coalition formed', { 
+      logger.info({ 
         coalitionId: coalition.id,
         name: coalitionName,
         component: 'CoalitionBuilder' 
-      });
+      }, 'Coalition formed');
 
       return coalition;
     } catch (error) {
@@ -272,12 +273,12 @@ export class CoalitionBuilder {
       
       const actionIds: string[] = [];
       
-      logger.info('Coalition actions coordinated', { 
+      logger.info({ 
         coalitionId,
         actionType,
         actionCount: actionIds.length,
         component: 'CoalitionBuilder' 
-      });
+      }, 'Coalition actions coordinated');
 
       return actionIds;
     } catch (error) {

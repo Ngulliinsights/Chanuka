@@ -51,10 +51,10 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
       const failedValidations = validationResults.filter(r => !r.success);
       
       if (failedValidations.length > 0) {
-        logger.error('❌ Pre-migration validation failed', {
+        logger.error({
           component: 'WebSocketMigrationExecution',
           failedValidations: failedValidations.map(v => v.name)
-        });
+        }, '❌ Pre-migration validation failed');
         
         if (!dryRun) {
           throw new Error(`Pre-migration validation failed: ${failedValidations.map(v => v.name).join(', ')}`);
@@ -94,13 +94,13 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
       const socketIOService = deployer.getSocketIOService();
       const metrics = socketIOService.getMetrics();
 
-      logger.info('✅ WebSocket migration completed successfully', {
+      logger.info({
         component: 'WebSocketMigrationExecution',
         migrationDuration: migrationState.completionTime ? 
           migrationState.completionTime - migrationState.startTime : 'unknown',
         finalMetrics: metrics,
         errors: migrationState.errors
-      });
+      }, '✅ WebSocket migration completed successfully');
 
       // Step 4: Post-migration validation
       if (!skipValidation) {
@@ -113,10 +113,10 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
         const postFailedValidations = postValidationResults.filter(r => !r.success);
         
         if (postFailedValidations.length > 0) {
-          logger.warn('⚠️ Post-migration validation had issues', {
+          logger.warn({
             component: 'WebSocketMigrationExecution',
             failedValidations: postFailedValidations.map(v => v.name)
-          });
+          }, '⚠️ Post-migration validation had issues');
         } else {
           logger.info('✅ Post-migration validation passed');
         }

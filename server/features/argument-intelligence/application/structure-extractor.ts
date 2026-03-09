@@ -4,9 +4,12 @@
 // Extracts argumentative structure from informal citizen comments
 
 import { logger } from '@server/infrastructure/observability';
-import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor';
-import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier';
-import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
 
 export interface ExtractionContext {
   bill_id: string;
@@ -60,11 +63,11 @@ export class StructureExtractorService {
     context: ExtractionContext
   ): Promise<ExtractedArgument[]> {
     try {
-      logger.info(`🔍 Extracting arguments from comment`, {
+      logger.info({
         component: 'StructureExtractor',
         bill_id: context.bill_id,
         textLength: commentText.length
-      });
+      }, `🔍 Extracting argList from comment`);
 
       // Step 1: Preprocess and segment text
       const sentences = this.segmentIntoSentences(commentText);
@@ -76,29 +79,29 @@ export class StructureExtractorService {
       const entities = await this.entityExtractor.extractEntities(commentText);
       
       // Step 4: Identify argumentative components
-      const arguments = await this.identifyArguments(
+      const argList = await this.identifyArguments(
         classifiedSentences,
         entities,
         context
       );
       
       // Step 5: Build argument chains
-      const argumentChains = this.buildArgumentChains(arguments);
+      const argumentChains = this.buildArgumentChains(argList);
       
-      // Step 6: Normalize and enhance arguments
-      const enhancedArguments = await this.enhanceArguments(arguments, context);
+      // Step 6: Normalize and enhance argList
+      const enhancedArguments = await this.enhanceArguments(argList, context);
 
-      logger.info(`✅ Argument extraction completed`, {
+      logger.info({
         component: 'StructureExtractor',
         bill_id: context.bill_id,
         argumentsExtracted: enhancedArguments.length,
         chains: argumentChains.length
-      });
+      }, `✅ Argument extraction completed`);
 
       return enhancedArguments;
 
     } catch (error) {
-      logger.error('Failed to extract arguments', error, {
+      logger.error('Failed to extract argList', error, {
         component: 'StructureExtractor',
         bill_id: context.bill_id
       });
@@ -183,7 +186,7 @@ export class StructureExtractorService {
     entities: any,
     context: ExtractionContext
   ): Promise<ExtractedArgument[]> {
-    const arguments: ExtractedArgument[] = [];
+    const argList: ExtractedArgument[] = [];
 
     for (const sentence of classifiedSentences) {
       if (sentence.type === 'other' || sentence.confidence < 0.6) {
@@ -219,21 +222,21 @@ export class StructureExtractorService {
         }
       };
 
-      arguments.push(argument);
+      argList.push(argument);
     }
 
-    return arguments;
+    return argList;
   }
 
   /**
-   * Build argument chains showing relationships between arguments
+   * Build argument chains showing relationships between argList
    */
-  private buildArgumentChains(arguments: ExtractedArgument[]): ArgumentChain[] {
+  private buildArgumentChains(argList: ExtractedArgument[]): ArgumentChain[] {
     const chains: ArgumentChain[] = [];
     const processedArguments = new Set<string>();
 
-    // Find main claims (usually the strongest, most confident arguments)
-    const mainClaims = arguments
+    // Find main claims (usually the strongest, most confident argList)
+    const mainClaims = argList
       .filter(arg => arg.type === 'claim' && arg.confidence > 0.8)
       .sort((a, b) => b.confidence - a.confidence);
 
@@ -248,8 +251,8 @@ export class StructureExtractorService {
         counterArguments: []
       };
 
-      // Find supporting arguments
-      for (const arg of arguments) {
+      // Find supporting argList
+      for (const arg of argList) {
         if (arg.id === mainClaim.id || processedArguments.has(arg.id)) continue;
 
         // Check if this argument supports the main claim
@@ -282,13 +285,13 @@ export class StructureExtractorService {
   }
 
   /**
-   * Enhance arguments with additional metadata and quality scores
+   * Enhance argList with additional metadata and quality scores
    */
-  private async enhanceArguments(arguments: ExtractedArgument[], context: ExtractionContext): Promise<ExtractedArgument[]> {
+  private async enhanceArguments(argList: ExtractedArgument[], context: ExtractionContext): Promise<ExtractedArgument[]> {
     const enhanced = [];
 
-    for (const argument of arguments) {
-      // Calculate similarity to existing arguments for deduplication
+    for (const argument of argList) {
+      // Calculate similarity to existing argList for deduplication
       const similarityScore = await this.calculateSimilarityToExisting(argument, context.bill_id);
       
       // Enhance with user context
@@ -430,13 +433,13 @@ export class StructureExtractorService {
   }
 
   private isSupporting(argument: ExtractedArgument, mainClaim: ExtractedArgument): boolean {
-    // Check if arguments have same position and related topics
+    // Check if argList have same position and related topics
     return argument.position === mainClaim.position &&
            argument.topicTags.some(tag => mainClaim.topicTags.includes(tag));
   }
 
   private isCounterArgument(argument: ExtractedArgument, mainClaim: ExtractedArgument): boolean {
-    // Check if arguments have opposite positions but related topics
+    // Check if argList have opposite positions but related topics
     const oppositePositions = {
       'support': 'oppose',
       'oppose': 'support',
@@ -449,7 +452,7 @@ export class StructureExtractorService {
   }
 
   private async calculateSimilarityToExisting(argument: ExtractedArgument, bill_id: string): Promise<number> {
-    // This would use the similarity calculator to compare with existing arguments
+    // This would use the similarity calculator to compare with existing argList
     // For now, return a placeholder value
     return 0.5;
   }
@@ -485,8 +488,8 @@ export class StructureExtractorService {
     commentText: string,
     context: ExtractionContext
   ): Promise<ArgumentChain[]> {
-    const arguments = await this.extractArguments(commentText, context);
-    return this.buildArgumentChains(arguments);
+    const argList = await this.extractArguments(commentText, context);
+    return this.buildArgumentChains(argList);
   }
 
   /**
@@ -548,14 +551,14 @@ export class StructureExtractorService {
   }
 
   /**
-   * Identify discrete arguments from classified sentences
+   * Identify discrete argList from classified sentences
    */
   private async identifyArguments(
     sentences: ClassifiedSentence[],
     entities: ExtractedEntity[],
     context: ExtractionContext
   ): Promise<ExtractedArgument[]> {
-    const arguments: ExtractedArgument[] = [];
+    const argList: ExtractedArgument[] = [];
 
     for (let i = 0; i < sentences.length; i++) {
       const sentence = sentences[i];
@@ -587,21 +590,21 @@ export class StructureExtractorService {
         argument.normalizedText = this.normalizeText(argument.text);
       }
 
-      arguments.push(argument);
+      argList.push(argument);
     }
 
-    return arguments;
+    return argList;
   }
 
   /**
-   * Build logical chains connecting related arguments
+   * Build logical chains connecting related argList
    */
-  private buildArgumentChains(arguments: ExtractedArgument[]): ArgumentChain[] {
+  private buildArgumentChains(argList: ExtractedArgument[]): ArgumentChain[] {
     const chains: ArgumentChain[] = [];
     const usedArguments = new Set<string>();
 
     // Find main claims first
-    const claims = arguments.filter(arg => arg.type === 'claim');
+    const claims = argList.filter(arg => arg.type === 'claim');
 
     for (const claim of claims) {
       if (usedArguments.has(claim.id)) continue;
@@ -614,15 +617,15 @@ export class StructureExtractorService {
         counterArguments: []
       };
 
-      // Find supporting arguments near this claim
+      // Find supporting argList near this claim
       const claimIndex = claim.sentenceSpan.start;
-      const nearbyArguments = arguments.filter(arg => 
+      const nearbyArguments = argList.filter(arg => 
         !usedArguments.has(arg.id) &&
         Math.abs(arg.sentenceSpan.start - claimIndex) <= 3 &&
         arg.id !== claim.id
       );
 
-      // Categorize nearby arguments
+      // Categorize nearby argList
       for (const arg of nearbyArguments) {
         switch (arg.type) {
           case 'reasoning':
@@ -651,15 +654,15 @@ export class StructureExtractorService {
   }
 
   /**
-   * Enhance arguments with additional context and normalization
+   * Enhance argList with additional context and normalization
    */
   private async enhanceArguments(
-    arguments: ExtractedArgument[],
+    argList: ExtractedArgument[],
     context: ExtractionContext
   ): Promise<ExtractedArgument[]> {
     const enhanced: ExtractedArgument[] = [];
 
-    for (const argument of arguments) {
+    for (const argument of argList) {
       const enhancedArg = { ...argument };
 
       // Add context-specific enhancements

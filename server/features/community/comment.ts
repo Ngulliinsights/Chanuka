@@ -568,7 +568,7 @@ export class CommentService {
       });
 
       this.clearCommentCaches(updatedComment.bill_id).catch((error) =>
-        logger.error('Error clearing comment caches after update', { error }),
+        logger.error({ error }, 'Error clearing comment caches after update'),
       );
 
       return {
@@ -630,7 +630,7 @@ export class CommentService {
         });
 
         this.clearCommentCaches(comment.bill_id).catch((error) =>
-          logger.error('Error clearing comment caches after delete', { error }),
+          logger.error({ error }, 'Error clearing comment caches after delete'),
         );
       }
 
@@ -716,7 +716,7 @@ export class CommentService {
         .where(and(...conditions));
       return Number(total);
     } catch (error) {
-      logger.error('Error getting total comment count', { error });
+      logger.error({ error }, 'Error getting total comment count');
       return 0;
     }
   }
@@ -766,7 +766,7 @@ export class CommentService {
 
       return new Map(results.map((r) => [Number(r.parent_id), Number(r.count)]));
     } catch (error) {
-      logger.error('Error fetching batch reply counts', { error, comment_ids });
+      logger.error({ error, comment_ids }, 'Error fetching batch reply counts');
       return new Map();
     }
   }

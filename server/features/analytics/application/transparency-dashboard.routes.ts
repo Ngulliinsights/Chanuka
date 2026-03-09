@@ -1,6 +1,7 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { cacheService } from '@server/infrastructure/cache';
-import { financialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
+// FIXME: financial-disclosure-analytics service not implemented
+// import { financialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database/connection';
 import { and, count,desc, eq, gte, lte } from "drizzle-orm";
@@ -109,7 +110,7 @@ export class SimpleTransparencyDashboardService {
         lastCalculated: new Date()
       };
     } catch (error) {
-      logger.error(`Error calculating transparency score for sponsor ${sponsor_id}`, { component: 'transparency-dashboard', sponsor_id, error });
+      logger.error({ component: 'transparency-dashboard', sponsor_id, error }, `Error calculating transparency score for sponsor ${sponsor_id}`);
       try {
         if ((errorTracker as any)?.trackRequestError) {
           (errorTracker as any).trackRequestError(error instanceof Error ? error : new Error(String(error)), undefined as any, 'medium', 'calculateTransparencyScore');
@@ -117,7 +118,7 @@ export class SimpleTransparencyDashboardService {
           (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'transparency-dashboard', sponsor_id });
         }
       } catch (reportErr) {
-        logger.warn('Failed to report transparency dashboard error to errorTracker', { reportErr });
+        logger.warn({ reportErr }, 'Failed to report transparency dashboard error to errorTracker');
       }
       throw new Error('Failed to calculate transparency score');
     }
@@ -182,7 +183,7 @@ export class SimpleTransparencyDashboardService {
    */
   async getTransparencyDashboard() {
     try {
-      logger.info('🔄 Loading transparency dashboard...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🔄 Loading transparency dashboard...');
 
       // Get all active sponsors
       const allSponsors = await readDatabase
@@ -267,7 +268,7 @@ export class SimpleTransparencyDashboardService {
 
       const alertCount = dataFreshness < 70 ? 1 : 0;
 
-      logger.info('✅ Transparency dashboard loaded', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Transparency dashboard loaded');
 
       return {
         summary: {

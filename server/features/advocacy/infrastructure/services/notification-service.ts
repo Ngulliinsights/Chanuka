@@ -49,11 +49,11 @@ export class NotificationService {
       const enabledChannels = this.getEnabledChannels(message, userPreferences);
 
       if (enabledChannels.length === 0) {
-        logger.info('No enabled channels for notification', { 
+        logger.info({ 
           messageId: message.id,
           recipientId: message.recipientId,
           component: 'NotificationService' 
-        });
+        }, 'No enabled channels for notification');
         return [];
       }
 

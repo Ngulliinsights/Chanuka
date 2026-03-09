@@ -92,6 +92,14 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
   }
 
   /**
+   * Register an event listener (legacy style)
+   * Alias for subscribe() for backward compatibility
+   */
+  public on<T = unknown>(event: string, handler: EventHandler<T>): void {
+    this.subscribe(event, handler);
+  }
+
+  /**
    * Unsubscribe from a subscription
    */
   public unsubscribe(subscription: Subscription): void {

@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { desc, eq, gt, sql } from 'drizzle-orm';
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
+import { desc, gt, sql } from 'drizzle-orm';
 import { boolean, integer, jsonb, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
 import { Request } from 'express';
 
@@ -200,12 +200,13 @@ export class IntrusionDetectionService {
         source: 'internal_firewall',
         occurrences: 1,
         blocked: true,
-        metadata: { path: req.path, method: req.method }
+        metadata: { path: req.path, method: req.method } as any
       });
     } catch (err: unknown) {
-      logger.error('Failed to log threat to DB', {
-        error: err instanceof Error ? err.message : String(err)
-      });
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      logger.error({
+        error: errorMessage
+      }, 'Failed to log threat to DB');
     }
 
     if (tracker.violations >= 1) {
@@ -258,15 +259,16 @@ export class IntrusionDetectionService {
         .from(threatIntelligence)
         .where(gt(threatIntelligence.created_at, fromDate))
         .groupBy(threatIntelligence.threatType, threatIntelligence.severity)
-        .orderBy(desc(sql`count(*)`));
+        .orderBy(desc(sql`count(*)`)) as any;
 
       return {
         generatedAt: new Date(),
         period: `${days} days`,
         stats: stats as IntrusionStats[]
       };
-    } catch (error) {
-      logger.error('Error generating intrusion report', { error });
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error({ error: errorMessage }, 'Error generating intrusion report');
       return { error: 'Failed to generate report' };
     }
   }

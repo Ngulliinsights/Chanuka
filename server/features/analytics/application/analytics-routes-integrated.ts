@@ -57,15 +57,15 @@ router.get(
       const result = await analyticsServiceIntegrated.getOverview();
       
       // Log request
-      logger.info('Analytics overview requested', {
+      logger.info({
         userId: req.user?.id,
         duration: Date.now() - startTime
-      });
+      }, 'Analytics overview requested');
       
       // Send result (handles both success and error cases)
       sendResult(res, result);
     } catch (error) {
-      logger.error('Analytics overview request failed', { error });
+      logger.error({ error }, 'Analytics overview request failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to fetch analytics overview'
@@ -95,15 +95,15 @@ router.get(
     try {
       const result = await analyticsServiceIntegrated.queryMetrics(req.query);
       
-      logger.info('Metrics queried', {
+      logger.info({
         userId: req.user?.id,
         metric: req.query.metric,
         duration: Date.now() - startTime
-      });
+      }, 'Metrics queried');
       
       sendResult(res, result);
     } catch (error) {
-      logger.error('Metrics query failed', { error, query: req.query });
+      logger.error({ error, query: req.query }, 'Metrics query failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to query metrics'
@@ -135,15 +135,15 @@ router.post(
     try {
       const result = await analyticsServiceIntegrated.recordMetric(req.body);
       
-      logger.info('Metric recorded', {
+      logger.info({
         userId: req.user?.id,
         metric: req.body.metric,
         duration: Date.now() - startTime
-      });
+      }, 'Metric recorded');
       
       sendResult(res, result);
     } catch (error) {
-      logger.error('Metric recording failed', { error, data: req.body });
+      logger.error({ error, data: req.body }, 'Metric recording failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to record metric'
@@ -172,15 +172,15 @@ router.get(
     try {
       const result = await analyticsServiceIntegrated.getMetricById(req.params.id);
       
-      logger.info('Metric retrieved', {
+      logger.info({
         userId: req.user?.id,
         metricId: req.params.id,
         duration: Date.now() - startTime
-      });
+      }, 'Metric retrieved');
       
       sendResult(res, result);
     } catch (error) {
-      logger.error('Metric retrieval failed', { error, id: req.params.id });
+      logger.error({ error, id: req.params.id }, 'Metric retrieval failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to retrieve metric'
@@ -210,15 +210,15 @@ router.delete(
     try {
       const result = await analyticsServiceIntegrated.deleteMetric(req.params.id);
       
-      logger.info('Metric deleted', {
+      logger.info({
         userId: req.user?.id,
         metricId: req.params.id,
         duration: Date.now() - startTime
-      });
+      }, 'Metric deleted');
       
       sendResult(res, result);
     } catch (error) {
-      logger.error('Metric deletion failed', { error, id: req.params.id });
+      logger.error({ error, id: req.params.id }, 'Metric deletion failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to delete metric'
@@ -255,15 +255,15 @@ router.get(
         Number(limit)
       );
       
-      logger.info('Metrics searched', {
+      logger.info({
         userId: req.user?.id,
         query,
         duration: Date.now() - startTime
-      });
+      }, 'Metrics searched');
       
       sendResult(res, result);
     } catch (error) {
-      logger.error('Metrics search failed', { error, query: req.query });
+      logger.error({ error, query: req.query }, 'Metrics search failed');
       res.status(500).json({
         error: 'Internal server error',
         message: 'Failed to search metrics'
@@ -276,13 +276,13 @@ router.get(
  * Error handling middleware for this router
  */
 router.use((error: Error, req: any, res: any, next: any) => {
-  logger.error('Analytics route error', {
+  logger.error({
     error: error.message,
     stack: error.stack,
     path: req.path,
     method: req.method,
     userId: req.user?.id
-  });
+  }, 'Analytics route error');
 
   res.status(500).json({
     error: 'Internal server error',

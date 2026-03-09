@@ -120,10 +120,10 @@ export class EntityExtractor {
     const startTime = Date.now();
     
     try {
-      logger.debug(`Extracting entities from text`, {
+      logger.debug({
         component: 'EntityExtractor',
         textLength: text.length
-      });
+      }, `Extracting entities from text`);
 
       const entities: ExtractedEntity[] = [];
 
@@ -151,19 +151,19 @@ export class EntityExtractor {
         extractionMethod: 'rule_based'
       };
 
-      logger.debug(`Entity extraction completed`, {
+      logger.debug({
         component: 'EntityExtractor',
         entitiesFound: filteredEntities.length,
         processingTime: result.processingTime
-      });
+      }, `Entity extraction completed`);
 
       return result;
 
     } catch (error) {
-      logger.error(`Entity extraction failed`, {
+      logger.error({
         component: 'EntityExtractor',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `Entity extraction failed`);
 
       return {
         entities: [],

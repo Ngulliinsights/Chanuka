@@ -453,7 +453,7 @@ export class MemoryManager implements IMemoryManager {
    */
   private logError(message: string, error?: unknown): void {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      logger.error(`[MemoryManager] ${message}`, { error });
+      logger.error({ error }, `[MemoryManager] ${message}`);
     }
   }
 }

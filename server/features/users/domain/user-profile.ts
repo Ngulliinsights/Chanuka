@@ -401,7 +401,7 @@ export class UserProfileService {
 
       return profile;
     } catch (error) {
-      logger.error('Error fetching public profile:', { component: 'UserProfileService', error });
+      logger.error({ component: 'UserProfileService', error }, 'Error fetching public profile:');
       throw error;
     }
   }
@@ -440,7 +440,7 @@ export class UserProfileService {
         };
       });
     } catch (error) {
-      logger.error('Error searching users:', { component: 'UserProfileService', error });
+      logger.error({ component: 'UserProfileService', error }, 'Error searching users:');
       return [];
     }
   }
@@ -850,10 +850,10 @@ export class UserProfileService {
 
       return { ...profile, preferences, verification, engagement: engagementHistory };
     } catch (error) {
-      logger.error('Error fetching complete user profile:', {
+      logger.error({
         component: 'UserProfileService',
         error,
-      });
+      }, 'Error fetching complete user profile:');
       throw error;
     }
   }

@@ -25,12 +25,12 @@ import type { BillRepository } from '../domain/repositories/bill.repository';
 // const TRACKING_TABLE = schema.billTracking;
 //
 // Currently using a conditional to handle both cases:
-const TRACKING_TABLE = (schema as any).user_bill_tracking_preferences || 
+const TRACKING_TABLE = (schema as any).bill_tracking_preferences ||
                        (schema as any).userBillTrackingPreferences ||
                        (schema as any).billTracking;
 
 if (!TRACKING_TABLE) {
-  logger.error('❌ CRITICAL: user_bill_tracking_preferences table not found in schema exports!');
+  logger.error('❌ CRITICAL: bill_tracking_preferences table not found in schema exports!');
   logger.error('Please check server/infrastructure/schema/citizen_participation.ts');
 }
 // ============================================================================

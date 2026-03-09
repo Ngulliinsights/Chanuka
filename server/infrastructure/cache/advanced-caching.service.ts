@@ -65,7 +65,7 @@ export class AdvancedCachingService {
 
       if (!entry) {
         this.stats.misses++;
-        logger.debug('Cache miss', { key });
+        logger.debug({ key }, 'Cache miss');
         return null;
       }
 
@@ -73,12 +73,12 @@ export class AdvancedCachingService {
       if (Date.now() > entry.expiresAt) {
         this.delete(key);
         this.stats.misses++;
-        logger.debug('Cache expired', { key });
+        logger.debug({ key }, 'Cache expired');
         return null;
       }
 
       this.stats.hits++;
-      logger.debug('Cache hit', { key });
+      logger.debug({ key }, 'Cache hit');
 
       // Decompress if needed
       if (entry.compressed) {
@@ -87,7 +87,7 @@ export class AdvancedCachingService {
 
       return entry.value as T;
     } catch (error) {
-      logger.error('Cache get error', { error, key });
+      logger.error({ error, key }, 'Cache get error');
       this.stats.misses++;
       return null;
     }
@@ -134,11 +134,11 @@ export class AdvancedCachingService {
         tagKeys.add(key);
       }
 
-      logger.debug('Cache set', { key, ttl, tags, size });
+      logger.debug({ key, ttl, tags, size }, 'Cache set');
 
       return true;
     } catch (error) {
-      logger.error('Cache set error', { error, key });
+      logger.error({ error, key }, 'Cache set error');
       return false;
     }
   }
@@ -166,11 +166,11 @@ export class AdvancedCachingService {
       }
 
       this.cache.delete(key);
-      logger.debug('Cache delete', { key });
+      logger.debug({ key }, 'Cache delete');
 
       return true;
     } catch (error) {
-      logger.error('Cache delete error', { error, key });
+      logger.error({ error, key }, 'Cache delete error');
       return false;
     }
   }
@@ -200,11 +200,11 @@ export class AdvancedCachingService {
         }
       }
 
-      logger.info('Cache cleared by tags', { tags, count });
+      logger.info({ tags, count }, 'Cache cleared by tags');
 
       return count;
     } catch (error) {
-      logger.error('Cache clear by tags error', { error, tags });
+      logger.error({ error, tags }, 'Cache clear by tags error');
       return 0;
     }
   }
@@ -219,7 +219,7 @@ export class AdvancedCachingService {
       logger.info('Cache cleared');
       return true;
     } catch (error) {
-      logger.error('Cache clear error', { error });
+      logger.error({ error }, 'Cache clear error');
       return false;
     }
   }
@@ -245,7 +245,7 @@ export class AdvancedCachingService {
         hitRate,
       };
     } catch (error) {
-      logger.error('Cache stats error', { error });
+      logger.error({ error }, 'Cache stats error');
       return {
         hits: 0,
         misses: 0,
@@ -271,15 +271,15 @@ export class AdvancedCachingService {
             count++;
           }
         } catch (error) {
-          logger.error('Cache warm error for key', { error, key });
+          logger.error({ error, key }, 'Cache warm error for key');
         }
       }
 
-      logger.info('Cache warmed', { keys: keys.length, loaded: count });
+      logger.info({ keys: keys.length, loaded: count }, 'Cache warmed');
 
       return count;
     } catch (error) {
-      logger.error('Cache warm error', { error });
+      logger.error({ error }, 'Cache warm error');
       return 0;
     }
   }
@@ -303,7 +303,7 @@ export class AdvancedCachingService {
 
       return true;
     } catch (error) {
-      logger.error('Cache has error', { error, key });
+      logger.error({ error, key }, 'Cache has error');
       return false;
     }
   }
@@ -322,7 +322,7 @@ export class AdvancedCachingService {
       const remaining = entry.expiresAt - Date.now();
       return Math.max(0, remaining);
     } catch (error) {
-      logger.error('Cache getTTL error', { error, key });
+      logger.error({ error, key }, 'Cache getTTL error');
       return 0;
     }
   }
@@ -339,11 +339,11 @@ export class AdvancedCachingService {
       }
 
       entry.expiresAt = Date.now() + ttl;
-      logger.debug('Cache TTL extended', { key, ttl });
+      logger.debug({ key, ttl }, 'Cache TTL extended');
 
       return true;
     } catch (error) {
-      logger.error('Cache extendTTL error', { error, key });
+      logger.error({ error, key }, 'Cache extendTTL error');
       return false;
     }
   }
@@ -371,7 +371,7 @@ export class AdvancedCachingService {
 
       return value;
     } catch (error) {
-      logger.error('Cache getOrSet error', { error, key });
+      logger.error({ error, key }, 'Cache getOrSet error');
       return null;
     }
   }
@@ -433,7 +433,7 @@ export class AdvancedCachingService {
 
     if (oldestKey) {
       this.delete(oldestKey);
-      logger.debug('Cache evicted oldest entry', { key: oldestKey });
+      logger.debug({ key: oldestKey }, 'Cache evicted oldest entry');
     }
   }
 
@@ -453,10 +453,10 @@ export class AdvancedCachingService {
       }
 
       if (count > 0) {
-        logger.debug('Cache cleanup', { expired: count });
+        logger.debug({ expired: count }, 'Cache cleanup');
       }
     } catch (error) {
-      logger.error('Cache cleanup error', { error });
+      logger.error({ error }, 'Cache cleanup error');
     }
   }
 
@@ -468,9 +468,9 @@ export class AdvancedCachingService {
       this.cleanupExpired();
     }, this.cleanupInterval);
 
-    logger.info('Cache cleanup timer started', {
+    logger.info({
       interval: this.cleanupInterval,
-    });
+    }, 'Cache cleanup timer started');
   }
 
   /**

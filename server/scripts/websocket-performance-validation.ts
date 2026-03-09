@@ -9,7 +9,8 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { BatchingService } from '@shared/infrastructure/batching-service';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { BatchingService } from '@shared/infrastructure/batching-service';
 import { webSocketService } from '@server/infrastructure/websocket';
 import { Server } from 'http';
 import * as jwt from 'jsonwebtoken';
@@ -83,7 +84,7 @@ export class WebSocketPerformanceValidator {
   async initialize(): Promise<void> {
     await new Promise<void>((resolve) => {
       this.server.listen(this.serverPort, () => {
-        logger.info('Performance validation server started', { port: this.serverPort });
+        logger.info({ port: this.serverPort }, 'Performance validation server started');
         resolve();
       });
     });

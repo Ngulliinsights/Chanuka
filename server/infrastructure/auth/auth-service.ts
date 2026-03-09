@@ -3,7 +3,7 @@ import { getEmailService } from '@server/infrastructure/messaging/email/email-se
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
 import { oauth_providers, oauth_tokens, sessions, user_sessions,users } from '@server/infrastructure/schema';
-import { inputValidationService } from '@shared/validation/input-validation-service';
+import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { verifyJwtToken, verifyRefreshToken, JwtPayload, RefreshTokenPayload } from './jwt-types';
 import { userRoleSchema } from '@shared/validation';
 import * as bcrypt from 'bcryptjs';
@@ -190,11 +190,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Registration error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Registration error:');
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -262,11 +262,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Email verification error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Email verification error:');
       return {
         success: false,
         error: 'Email verification failed'
@@ -362,11 +362,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Login error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Login error:');
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -403,11 +403,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Logout error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Logout error:');
       return {
         success: false,
         error: 'Logout failed'
@@ -511,11 +511,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token refresh error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Token refresh error:');
       return {
         success: false,
         error: 'Token refresh failed'
@@ -576,11 +576,11 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset request error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Password reset request error:');
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -683,11 +683,11 @@ export class AuthService {
       return { success: true };
 
     } catch (error) {
-      logger.error('Password reset error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Password reset error:');
       if (error instanceof z.ZodError) {
         return {
           success: false,
@@ -765,11 +765,11 @@ export class AuthService {
       };
 
     } catch (error) {
-      logger.error('Token verification error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Token verification error:');
       return {
         success: false,
         error: 'Invalid token'
@@ -846,13 +846,13 @@ export class AuthService {
           lt(users.password_reset_expires_at, now)
         ));
 
-      logger.info('Expired tokens cleaned up successfully', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Expired tokens cleaned up successfully');
     } catch (error) {
-      logger.error('Token cleanup error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         component: 'Chanuka'
-      });
+      }, 'Token cleanup error:');
     }
   }
 
@@ -898,11 +898,11 @@ export class AuthService {
         backupCodes
       };
     } catch (error) {
-      logger.error('2FA setup error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, '2FA setup error:');
       return {
         success: false,
         error: 'Failed to setup two-factor authentication'
@@ -949,11 +949,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('2FA enable error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, '2FA enable error:');
       return {
         success: false,
         error: 'Failed to enable two-factor authentication'
@@ -1002,11 +1002,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('2FA disable error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, '2FA disable error:');
       return {
         success: false,
         error: 'Failed to disable two-factor authentication'
@@ -1072,11 +1072,11 @@ export class AuthService {
         refresh_token
       };
     } catch (error) {
-      logger.error('Complete 2FA login error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Complete 2FA login error:');
       return {
         success: false,
         error: 'Failed to complete two-factor login'
@@ -1131,11 +1131,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('2FA verification error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, '2FA verification error:');
       return {
         success: false,
         error: 'Failed to verify two-factor token'
@@ -1273,11 +1273,11 @@ export class AuthService {
         refresh_token
       };
     } catch (error) {
-      logger.error('OAuth callback error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         provider,
         component: 'Chanuka'
-      });
+      }, 'OAuth callback error:');
       return {
         success: false,
         error: 'OAuth authentication failed'
@@ -1322,11 +1322,11 @@ export class AuthService {
 
       return userSessions;
     } catch (error) {
-      logger.error('Get user sessions error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Get user sessions error:');
       return [];
     }
   }
@@ -1354,12 +1354,12 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Terminate session error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         sessionId,
         userId,
         component: 'Chanuka'
-      });
+      }, 'Terminate session error:');
       return {
         success: false,
         error: 'Failed to terminate session'
@@ -1391,11 +1391,11 @@ export class AuthService {
       await query;
       return { success: true };
     } catch (error) {
-      logger.error('Terminate all sessions error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Terminate all sessions error:');
       return {
         success: false,
         error: 'Failed to terminate sessions'
@@ -1423,11 +1423,11 @@ export class AuthService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Extend session error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         sessionId,
         component: 'Chanuka'
-      });
+      }, 'Extend session error:');
       return {
         success: false,
         error: 'Failed to extend session'
@@ -1456,11 +1456,11 @@ export class AuthService {
 
       return session.id;
     } catch (error) {
-      logger.error('Create user session error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Create user session error:');
       throw error;
     }
   }
@@ -1478,11 +1478,11 @@ export class AuthService {
       // For now, return empty array as placeholder
       return [];
     } catch (error) {
-      logger.error('Get security events error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Get security events error:');
       return [];
     }
   }
@@ -1496,11 +1496,11 @@ export class AuthService {
       // For now, return empty array as placeholder
       return [];
     } catch (error) {
-      logger.error('Get suspicious activity error:', {
+      logger.error({
         error: error instanceof Error ? error.message : String(error),
         userId,
         component: 'Chanuka'
-      });
+      }, 'Get suspicious activity error:');
       return [];
     }
   }

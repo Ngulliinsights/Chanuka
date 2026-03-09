@@ -1,6 +1,7 @@
 /**
- * Health Adapter V2 (REFACTORED)
- * IMPROVEMENTS: Comprehensive health checks, proper error handling
+ * Health Adapter
+ * 
+ * Comprehensive health checks for Neo4j database with proper error handling.
  */
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from './utils/session-manager';
@@ -23,7 +24,7 @@ export interface HealthCheck {
   details?: Record<string, unknown>;
 }
 
-export class HealthAdapterV2 {
+export class HealthAdapter {
   constructor(private driver: Driver) {}
 
   async checkHealth(): Promise<HealthStatus> {
@@ -74,7 +75,7 @@ export class HealthAdapterV2 {
         message: 'Database responding normally',
       };
     } catch (error) {
-      logger.error('Database health check failed', { error: error.message });
+      logger.error({ error: error.message }, 'Database health check failed');
       return {
         status: 'unhealthy',
         message: 'Database query failed',
@@ -92,7 +93,7 @@ export class HealthAdapterV2 {
         message: 'Connection pool healthy',
       };
     } catch (error) {
-      logger.error('Connectivity check failed', { error: error.message });
+      logger.error({ error: error.message }, 'Connectivity check failed');
       return {
         status: 'unhealthy',
         message: 'Connection pool unhealthy',
@@ -144,8 +145,8 @@ export class HealthAdapterV2 {
   }
 }
 
-export function createHealthAdapter(driver: Driver): HealthAdapterV2 {
-  return new HealthAdapterV2(driver);
+export function createHealthAdapter(driver: Driver): HealthAdapter {
+  return new HealthAdapter(driver);
 }
 
-export default HealthAdapterV2;
+export default HealthAdapter;

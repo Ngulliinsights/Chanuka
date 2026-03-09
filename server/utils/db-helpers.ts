@@ -107,13 +107,13 @@ export function normalizeRowNumbers<T extends Record<string, unknown>>(rows: T[]
           if (!isNaN(numValue)) {
             (normalized as unknown as Record<string, unknown>)[key] = numValue;
           } else {
-            logger.warn('Failed to normalize row number', {
+            logger.warn({
               component: 'db-helpers',
               operation: 'normalizeRowNumbers',
               key,
               value,
               rowId: (row as unknown as Record<string, unknown>).id || 'unknown'
-            });
+            }, 'Failed to normalize row number');
           }
         }
       }
@@ -145,12 +145,12 @@ export function groupByTime<T extends Record<string, unknown>>(
   data.forEach(item => {
     const timestamp = item[timestampField] as unknown;
     if (!(timestamp instanceof Date)) {
-      logger.warn('Invalid timestamp in groupByTime', {
+      logger.warn({
         component: 'db-helpers',
         operation: 'groupByTime',
         timestampField: String(timestampField),
         timestamp
-      });
+      }, 'Invalid timestamp in groupByTime');
       return;
     }
 

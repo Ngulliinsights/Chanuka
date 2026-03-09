@@ -80,7 +80,7 @@ export class UserGovernmentDataService {
       return result;
 
     } catch (error) {
-      logger.error(`❌ Government data query failed for user ${query.user_id}`, { error, query });
+      logger.error({ error, query }, `❌ Government data query failed for user ${query.user_id}`);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred',

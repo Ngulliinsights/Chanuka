@@ -1,6 +1,5 @@
 import { securityAuditService } from './security-audit.service';
 import { logger } from '@server/infrastructure/observability';
-import { z } from 'zod';
 
 /**
  * Data Privacy Service
@@ -90,18 +89,18 @@ export class DataPrivacyService {
         sanitized.preferences = this.sanitizePreferences(data.preferences);
       }
 
-      logger.debug('User data sanitized for analytics', {
+      logger.debug({
         component: 'data-privacy',
         originalFields: Object.keys(data).length,
         sanitizedFields: Object.keys(sanitized).length
-      });
+      }, 'User data sanitized for analytics');
 
       return sanitized;
     } catch (error) {
-      logger.error('Error sanitizing user data', {
+      logger.error({
         component: 'data-privacy',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error sanitizing user data');
       
       // Return minimal safe data on error
       return {
@@ -114,7 +113,8 @@ export class DataPrivacyService {
   /**
    * Check if user has access to specific data types
    */
-  public checkDataAccess(user_id: string, dataType: string, requestContext?: unknown): AccessResult { try {
+  public checkDataAccess(user_id: string, dataType: string, requestContext?: any): AccessResult { 
+    try {
       // Define access rules based on data type and user context
       const accessRules = this.getAccessRules(dataType);
       
@@ -160,12 +160,12 @@ export class DataPrivacyService {
         allowed: true,
         restrictions: restrictions.length > 0 ? restrictions : undefined
       };
-    } catch (error) { logger.error('Error checking data access', {
+    } catch (error) { logger.error({
         component: 'data-privacy',
         user_id,
         dataType,
         error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Error checking data access');
 
       // Deny access on error for security
       return {
@@ -183,31 +183,35 @@ export class DataPrivacyService {
     action: string,
     resource: string,
     metadata?: any
-  ): Promise<void> { try {
+  ): Promise<void> { 
+    try {
       await securityAuditService.logDataAccess(
-        user_id,
-        action,
         resource,
+        action as any,
+        undefined,
+        user_id,
+        undefined,
+        true,
         {
           timestamp: new Date().toISOString(),
           dataType: this.extractDataType(resource),
           accessLevel: this.determineAccessLevel(action),
           ...metadata
-         }
+        }
       );
 
-      logger.debug('Data access audited', { component: 'data-privacy',
+      logger.debug({ component: 'data-privacy',
         user_id,
         action,
         resource
-       });
-    } catch (error) { logger.error('Error auditing data access', {
+       }, 'Data access audited');
+    } catch (error) { logger.error({
         component: 'data-privacy',
         user_id,
         action,
         resource,
         error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Error auditing data access');
     }
   }
 
@@ -250,19 +254,19 @@ export class DataPrivacyService {
         return aggregated;
       });
 
-      logger.debug('Data aggregated with privacy compliance', {
+      logger.debug({
         component: 'data-privacy',
         originalGroups: Object.keys(groups).length,
         validGroups: validGroups.length,
         totalItems: data.length
-      });
+      }, 'Data aggregated with privacy compliance');
 
       return aggregatedResults;
     } catch (error) {
-      logger.error('Error in privacy-compliant aggregation', {
+      logger.error({
         component: 'data-privacy',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in privacy-compliant aggregation');
       return [];
     }
   }
@@ -311,7 +315,7 @@ export class DataPrivacyService {
   /**
    * Sanitize user preferences for analytics
    */
-  private sanitizePreferences(preferences: unknown): unknown {
+  private sanitizePreferences(preferences: any): any {
     if (!preferences || typeof preferences !== 'object') {
       return {};
     }
@@ -394,7 +398,7 @@ export class DataPrivacyService {
   /**
    * Check if user has given consent for data type
    */
-  private hasUserConsent(user_id: string, dataType: string): boolean {
+  private hasUserConsent(_user_id: string, dataType: string): boolean {
     // In a real implementation, this would check a consent database
     // For now, assume consent is given for non-sensitive analytics
     const consentRequiredTypes = ['personal_data', 'location_tracking', 'behavioral_analytics'];
@@ -418,7 +422,7 @@ export class DataPrivacyService {
   /**
    * Anonymize aggregation results
    */
-  private anonymizeAggregation<T>(aggregated: unknown, items: T[], excludeFields: string[]): unknown {
+  private anonymizeAggregation<T>(aggregated: any, items: T[], excludeFields: string[]): any {
     // Add statistical measures without exposing individual records
     const numericFields = this.getNumericFields(items[0]);
     

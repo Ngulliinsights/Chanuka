@@ -9,7 +9,7 @@
     "composite": true,
     "esModuleInterop": true,
     "downlevelIteration": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "module": "ESNext",
     "target": "ES2022",
     "baseUrl": ".",

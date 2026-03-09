@@ -56,7 +56,7 @@ class SimpleWebSocketValidator {
 
     const summary = this.generateSummary();
 
-    logger.info('✅ Simple WebSocket migration validation completed', { summary });
+    logger.info({ summary }, '✅ Simple WebSocket migration validation completed');
 
     return {
       results: this.results,

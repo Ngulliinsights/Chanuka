@@ -39,7 +39,7 @@ export class UserNotificationService {
       logger.info(`📱 User notification sent to ${data.user_id}: ${data.title}`);
       return notification;
     } catch (error) {
-      logger.error(`❌ Failed to send notification to user ${data.user_id}`, { error });
+      logger.error({ error }, `❌ Failed to send notification to user ${data.user_id}`);
       throw error;
     }
   }
@@ -60,7 +60,7 @@ export class UserNotificationService {
       logger.info(`📬 Bulk user notifications sent: ${result.success} success, ${result.failed} failed`);
       return result;
     } catch (error) {
-      logger.error('❌ Failed to send bulk user notifications', { error });
+      logger.error({ error }, '❌ Failed to send bulk user notifications');
       throw error;
     }
   }

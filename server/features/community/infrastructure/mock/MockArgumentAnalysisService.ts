@@ -13,10 +13,10 @@ import type { ArgumentAnalysis } from '../../application/community-validation.sc
 export class MockArgumentAnalysisService implements IArgumentAnalysisService {
   async analyzeComment(commentId: string, content: string): Promise<AsyncServiceResult<ArgumentAnalysis>> {
     return safeAsync(async () => {
-      logger.info('Analyzing comment (mock heuristic)', { 
+      logger.info({ 
         comment_id: commentId, 
         content_length: content.length 
-      });
+      }, 'Analyzing comment (mock heuristic)');
       
       // Heuristic-based analysis (simple pattern matching)
       const analysis = this.performHeuristicAnalysis(content);

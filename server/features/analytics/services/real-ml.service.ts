@@ -8,7 +8,7 @@ import type {
 import * as compromise from 'compromise';
 import * as natural from 'natural';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 /**
  * Real ML Analysis Service using simple NLP techniques
@@ -38,18 +38,18 @@ export class RealMLAnalysisService {
         if (this.isInitialized) return;
 
         try {
-            logger.info('Initializing Real ML Analysis Service', {
+            logger.info({
                 component: 'analytics',
                 operation: 'initialize'
-            });
+            }, 'Initializing Real ML Analysis Service');
 
             // TensorFlow.js initialization skipped due to native binding issues
             // await tf.ready();
-            logger.info('ML service initialized without TensorFlow.js (using NLP libraries)', {
+            logger.info({
                 component: 'analytics',
                 operation: 'initialize',
                 libraries: ['natural', 'compromise']
-            });
+            }, 'ML service initialized without TensorFlow.js (using NLP libraries)');
 
             // Initialize Natural language processing tools
             natural.PorterStemmer.attach();
@@ -60,12 +60,12 @@ export class RealMLAnalysisService {
 
             this.isInitialized = true;
 
-            logger.info('Real ML Analysis Service initialized successfully', {
+            logger.info({
                 component: 'analytics',
                 operation: 'initialize',
                 vocabularySize: this.vocabulary.length,
                 sentimentWordsCount: this.sentimentWords.positive.length + this.sentimentWords.negative.length
-            });
+            }, 'Real ML Analysis Service initialized successfully');
         } catch (error) {
             logger.error('Failed to initialize Real ML Analysis Service:', {
                 component: 'analytics',

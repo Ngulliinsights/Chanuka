@@ -33,7 +33,7 @@ router.post('/comments', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error creating comment', { error });
+    logger.error({ error }, 'Error creating comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -73,7 +73,7 @@ router.get('/comments/:id', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error fetching comment', { error });
+    logger.error({ error }, 'Error fetching comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -111,7 +111,7 @@ router.get('/bills/:billId/comments', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error fetching comments', { error });
+    logger.error({ error }, 'Error fetching comments');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -150,7 +150,7 @@ router.patch('/comments/:id', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error updating comment', { error });
+    logger.error({ error }, 'Error updating comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -180,7 +180,7 @@ router.delete('/comments/:id', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error deleting comment', { error });
+    logger.error({ error }, 'Error deleting comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -216,7 +216,7 @@ router.post('/comments/:id/vote', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error voting on comment', { error });
+    logger.error({ error }, 'Error voting on comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -251,7 +251,7 @@ router.post('/comments/:id/analyze', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error analyzing comment', { error });
+    logger.error({ error }, 'Error analyzing comment');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -285,7 +285,7 @@ router.get('/comments/:id/related', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error finding related arguments', { error });
+    logger.error({ error }, 'Error finding related arguments');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -318,7 +318,7 @@ router.get('/bills/:billId/argument-clusters', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error fetching argument clusters', { error });
+    logger.error({ error }, 'Error fetching argument clusters');
     res.status(500).json({
       success: false,
       error: 'Internal server error',
@@ -349,7 +349,7 @@ router.get('/bills/:billId/debate-quality', async (req, res) => {
       });
     }
   } catch (error) {
-    logger.error('Error fetching debate quality', { error });
+    logger.error({ error }, 'Error fetching debate quality');
     res.status(500).json({
       success: false,
       error: 'Internal server error',

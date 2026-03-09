@@ -3,7 +3,8 @@ import { gte, ilike, inArray, lte, or,SQL, sql } from 'drizzle-orm';
 
 // Alias for backward compatibility
 const bills = bill;
-import type { SearchFilters } from '@shared/domain/search.dto';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import type { SearchFilters } from '@shared/domain/search.dto';
 
 export class SearchQueryBuilder {
   static buildVector(query: string, type: 'simple' | 'phrase' | 'boolean' = 'simple'): SQL | undefined {

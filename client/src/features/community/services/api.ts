@@ -34,23 +34,10 @@
 import type {
   ActivityItem,
   Comment,
-  CommunityStats,
   DiscussionThread,
   DiscussionThreadMetadata,
   ExpertInsight,
-  LocalImpactMetrics,
-  VoteRequest,
   VoteResponse,
-  Attachment,
-  Mention,
-  ThreadParticipant,
-  Contributor,
-  Expert,
-  CreateCommentRequest,
-  CreateThreadRequest,
-  UpdateCommentRequest,
-  UpdateThreadRequest,
-  ShareRequest,
   CommentQueryOptions,
   CommentCreateData,
   CommentReportData,
@@ -63,39 +50,23 @@ import type {
   ExtendedLocalImpactMetrics,
   InsightSubmission,
   SearchOptions,
-  CommentsResponse,
-  ThreadsResponse,
-  ThreadEvent,
-  UserEvent,
+  CreateThreadRequest,
+  UpdateThreadRequest,
 } from '@client/lib/types/community';
 
 import type { TrendingTopic } from '@client/lib/types/analytics';
 import type { SearchResult } from '@client/lib/types/search';
 import { logger } from '@client/lib/utils/logger';
 
-import { globalApiClient } from '../../../infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api/client';
 import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 
 // Re-export community types from unified module
 export type {
-  Attachment,
-  Mention,
-  ThreadParticipant,
-  Contributor,
-  Expert,
-  CreateCommentRequest,
-  CreateThreadRequest,
-  UpdateCommentRequest,
-  UpdateThreadRequest,
-  ShareRequest,
-  CommentsResponse,
-  ThreadsResponse,
   CommentQueryOptions,
   ActivityFeedOptions,
   LocationFilter,
   SearchOptions,
-  ThreadEvent,
-  UserEvent,
 } from '@client/lib/types/community';
 
 // ============================================================================

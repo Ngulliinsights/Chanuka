@@ -56,11 +56,11 @@ export class ConflictDetectionEngineService {
 
       return [...directConflicts, ...indirectConflicts, ...familyConflicts];
      } catch (error) {
-      logger.error('Error analyzing financial conflicts:', {
+      logger.error({
         component: 'ConflictDetectionEngine',
         sponsor_id: sponsors.id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error analyzing financial conflicts:');
       return [];
     }
   }
@@ -108,11 +108,11 @@ export class ConflictDetectionEngineService {
 
       return conflicts;
     } catch (error) {
-      logger.error('Error analyzing professional conflicts:', {
+      logger.error({
         component: 'ConflictDetectionEngine',
         sponsor_id: sponsors.id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error analyzing professional conflicts:');
       return [];
     }
   }
@@ -143,11 +143,11 @@ export class ConflictDetectionEngineService {
 
       return anomalies;
     } catch (error) {
-      logger.error('Error analyzing voting patterns:', {
+      logger.error({
         component: 'ConflictDetectionEngine',
         sponsor_id: sponsors.id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error analyzing voting patterns:');
       return [];
     }
   }
@@ -364,7 +364,7 @@ export class ConflictDetectionEngineService {
       await cache.set(cacheKey, result, 1800);
       return result;
     } catch (error) {
-      logger.error('Error finding affected bills:', { organization, error });
+      logger.error({ organization, error }, 'Error finding affected bills:');
       return [];
     }
   }

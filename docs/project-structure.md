@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 6, 2026 at 07:16 PM
+**Generated:** March 9, 2026 at 01:32 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,093
+**Total Items:** 4,275
 
 ```
 .
@@ -1789,6 +1789,9 @@
 │   │   ├── index.css
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
+│   ├── BUG_FIXES_SUMMARY.md
+│   ├── fix-react-imports.sh
+│   ├── FIXES_COMPLETED.md
 │   ├── IMPLEMENTATION_COMPLETE_SUMMARY.md
 │   ├── index.html
 │   ├── legacy-imports.txt
@@ -1805,6 +1808,7 @@
 │   ├── playwright.visual.config.ts
 │   ├── postcss.config.js
 │   ├── project.json
+│   ├── QUICK_FIX_GUIDE.md
 │   ├── QUICK_START_PHASE_1.md
 │   ├── README.md
 │   ├── tailwind.config.ts
@@ -1871,6 +1875,7 @@
 │   │   ├── INFRASTRUCTURE_CONSISTENCY_ANALYSIS.md
 │   │   ├── INTEGRATION_ARCHITECTURE.md
 │   │   ├── MASTER_CONSOLIDATION_PLAN.md
+│   │   ├── ML_AI_ARCHITECTURE.md
 │   │   ├── monorepo.md
 │   │   ├── project-structure.md
 │   │   ├── SHARED_CLIENT_SERVER_BOUNDARIES.md
@@ -1900,6 +1905,7 @@
 │   │   │   ├── AUDIT_INSIGHTS_EXTRACTED.md
 │   │   │   ├── AUDIT_RESULTS_SUMMARY.md
 │   │   │   ├── AUDIT_STATUS_ANALYSIS_2026-03-06.md
+│   │   │   ├── CODE_AUDIT_2026-03-06_UPDATED.md
 │   │   │   ├── CODE_AUDIT_2026-03-06.md
 │   │   │   ├── DEEP_CODE_AUDIT_2026-03-06.md
 │   │   │   ├── DOCUMENTATION_AUDIT_COMPREHENSIVE_2026-03-06.md
@@ -2027,6 +2033,8 @@
 │   │   ├── archive/
 │   │   │   ├── leg_intel_scraper.js
 │   │   │   └── README.md
+│   │   ├── ml/
+│   │   │   └── MWANGA_STACK_DEPLOYMENT_SUMMARY.md
 │   │   ├── strategy/
 │   │   │   ├── 04-chanuka-scraping-strategy.md
 │   │   │   ├── 06-chanuka-founder-brief.md
@@ -2098,6 +2106,10 @@
 │   │   ├── REPOSITORY_PATTERN_IMPLEMENTATION_GUIDE.md
 │   │   ├── REPOSITORY_PATTERN.md
 │   │   └── SECURE_QUERY_BUILDER_MIGRATION_GUIDE.md
+│   ├── fixes/
+│   │   ├── INFRASTRUCTURE_FIXES_COMPLETED.md
+│   │   ├── INFRASTRUCTURE_GAPS_FIX_PLAN.md
+│   │   └── PORT_AND_CSP_FIXES.md
 │   ├── guides/
 │   │   ├── templates/
 │   │   │   ├── new-api-endpoint-template.md
@@ -2132,6 +2144,8 @@
 │   │   ├── architecture.md
 │   │   ├── constitutional-intelligence.md
 │   │   └── README.md
+│   ├── operations/
+│   │   └── BACKUP_RECOVERY.md
 │   ├── plans/
 │   │   ├── ERROR-FIXING-EXECUTION-PLAN.md
 │   │   ├── IMMEDIATE-EXECUTION-PLAN.md
@@ -2209,9 +2223,13 @@
 │   ├── DEVELOPER_ONBOARDING.md
 │   ├── DEVELOPMENT_WORKFLOW.md
 │   ├── DOCUMENTATION_REMEDIATION_PLAN.md
+│   ├── IMPLEMENTATION_COMPLETE_SUMMARY.md
+│   ├── PORT_CONFIGURATION.md
+│   ├── project-structure.md
 │   ├── README.md
 │   ├── SECURITY_AUDIT_CRITICAL_FIXES.md
-│   └── STRATEGIC_INSIGHTS.md
+│   ├── STRATEGIC_INSIGHTS.md
+│   └── SYSTEMS_ENGINEERING_READINESS.md
 ├── drizzle/
 │   ├── meta/
 │   │   ├── _journal.json
@@ -2268,6 +2286,9 @@
 │   │   ├── ensure-foundation-tables.ts
 │   │   ├── execute-sql-migrations-advanced.ts
 │   │   ├── execute-sql-migrations.ts
+│   │   ├── fix-migration-comprehensive.py
+│   │   ├── fix-migration-syntax.ts
+│   │   ├── fix-trailing-commas.py
 │   │   ├── fresh-start-migration.ts
 │   │   ├── generate-migration-with-types.ts
 │   │   ├── generate-migration.ts
@@ -2290,6 +2311,7 @@
 │   │   ├── reset.ts
 │   │   ├── rollback-with-verification.ts
 │   │   ├── run-migrations-sql.ts
+│   │   ├── run-mwanga-migration.ts
 │   │   ├── run-reset.sh
 │   │   ├── run-reset.ts
 │   │   ├── schema-drift-detection.ts
@@ -2326,6 +2348,7 @@
 │   ├── validation/
 │   │   └── audit-constraints.ts
 │   ├── accessibility-audit.js
+│   ├── add-js-extensions.ts
 │   ├── analyze-bundle.cjs
 │   ├── analyze-dependencies.ts
 │   ├── analyze-infrastructure.ts
@@ -2338,17 +2361,24 @@
 │   ├── bundle-analysis-plugin.js
 │   ├── bundle-analyzer.js
 │   ├── CHANUKA_MIGRATION_PLAN.md
+│   ├── check-bills.ts
 │   ├── check-db-status.ts
 │   ├── check-thresholds.js
 │   ├── CLASSIFICATION.md
 │   ├── cleanup-alert-preferences.ts
+│   ├── convert-server-imports.ts
 │   ├── db-fresh-start.sql
 │   ├── dependency-cruiser.js
 │   ├── deploy-production.js
 │   ├── domain-type-migration-plan.md
 │   ├── enum-alignment-audit.md
+│   ├── fix-all-server-imports.ts
 │   ├── fix-config.json
+│   ├── fix-critical-demo-errors.ts
+│   ├── fix-demo-errors.ts
+│   ├── fix-duplicate-react-imports.ts
 │   ├── fix-eslint-suppressions.ts
+│   ├── fix-react-forwardref.ts
 │   ├── fix-remaining-sql-injection.ts
 │   ├── fix-sql-injection.ts
 │   ├── fix-templates.ts
@@ -2823,31 +2853,48 @@
 │   │   │   ├── market.service.ts
 │   │   │   └── market.utils.ts
 │   │   ├── ml/
+│   │   │   ├── config/
+│   │   │   │   └── mwanga-config.ts
 │   │   │   ├── evaluation/
 │   │   │   │   └── evaluation-orchestrator.ts
 │   │   │   ├── models/
+│   │   │   │   ├── base-analyzer.ts
+│   │   │   │   ├── bill-summarizer.ts
 │   │   │   │   ├── conflict-detector.ts
 │   │   │   │   ├── constitutional-analyzer.ts
+│   │   │   │   ├── content-classifier.ts
+│   │   │   │   ├── electoral-accountability-analyzer.ts
 │   │   │   │   ├── engagement-predictor.ts
+│   │   │   │   ├── example-usage.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   ├── influence-mapper.ts
-│   │   │   │   ├── ml_models_readme.md
-│   │   │   │   ├── ml_usage_example.ts
-│   │   │   │   ├── real-time-classifier.ts
+│   │   │   │   ├── influence-network-analyzer.ts
+│   │   │   │   ├── OLD_VS_NEW_COMPARISON.md
+│   │   │   │   ├── README.md
 │   │   │   │   ├── sentiment-analyzer.ts
-│   │   │   │   ├── shared_utils.ts
-│   │   │   │   ├── transparency-scorer.ts
+│   │   │   │   ├── transparency-analyzer.ts
 │   │   │   │   ├── trojan-bill-detector.ts
-│   │   │   │   └── type-guards.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── python-service/
+│   │   │   │   ├── app.py
+│   │   │   │   └── requirements.txt
+│   │   │   ├── scripts/
+│   │   │   │   └── test-services.ts
 │   │   │   ├── services/
 │   │   │   │   ├── analysis-pipeline.ts
 │   │   │   │   ├── ml-integration.ts
-│   │   │   │   └── ml-orchestrator.ts
+│   │   │   │   ├── ml-orchestrator.ts
+│   │   │   │   ├── ollama-client.ts
+│   │   │   │   └── python-service-client.ts
 │   │   │   ├── testing/
 │   │   │   │   ├── cli-tester.ts
 │   │   │   │   └── test-server.ts
+│   │   │   ├── COMPLETE_IMPLEMENTATION_SUMMARY.md
+│   │   │   ├── IMPLEMENTATION_COMPARISON.md
 │   │   │   ├── index.ts
-│   │   │   └── README.md
+│   │   │   ├── MIGRATION_COMPLETE.md
+│   │   │   ├── README.md
+│   │   │   ├── SETUP_GUIDE.md
+│   │   │   └── SETUP.md
 │   │   ├── monitoring/
 │   │   │   ├── application/
 │   │   │   │   └── monitoring.routes.ts
@@ -3177,7 +3224,6 @@
 │   │   │   ├── auth.ts
 │   │   │   ├── index.ts
 │   │   │   ├── jwt-types.ts
-│   │   │   ├── passwordReset.ts
 │   │   │   ├── secure-session-service.ts
 │   │   │   └── session-cleanup.ts
 │   │   ├── cache/
@@ -3186,7 +3232,8 @@
 │   │   │   │   ├── browser-adapter.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── memory-adapter.ts
-│   │   │   │   └── multi-tier-adapter.ts
+│   │   │   │   ├── multi-tier-adapter.ts
+│   │   │   │   └── redis-adapter.ts
 │   │   │   ├── clustering/
 │   │   │   │   └── cluster-manager.ts
 │   │   │   ├── compression/
@@ -3342,7 +3389,9 @@
 │   │   │   │   ├── 20260224_pretext_detection.sql
 │   │   │   │   ├── 20260301_create_argument_analysis_table.sql
 │   │   │   │   ├── 20260301_create_comments_table.sql
-│   │   │   │   └── 20260301_seed_mock_community_data.sql
+│   │   │   │   ├── 20260301_seed_mock_community_data.sql
+│   │   │   │   ├── 20260306_mwanga_stack_schema.sql
+│   │   │   │   └── 20260306_mwanga_stack_schema.sql.backup
 │   │   │   ├── monitoring/
 │   │   │   │   ├── health-checker.ts
 │   │   │   │   ├── index.ts
@@ -3371,6 +3420,7 @@
 │   │   │   ├── example-usage.ts
 │   │   │   ├── index.ts
 │   │   │   ├── init.ts
+│   │   │   ├── initialize.ts
 │   │   │   ├── monitoring.ts
 │   │   │   ├── PHASE1_COMPLETION_SUMMARY.md
 │   │   │   ├── PHASE2_COMPLETION_SUMMARY.md
@@ -3431,6 +3481,8 @@
 │   │   │   ├── repository-deployment.service.ts
 │   │   │   ├── rollback.service.ts
 │   │   │   └── validation.service.ts
+│   │   ├── monitoring/
+│   │   │   └── index.ts
 │   │   ├── observability/
 │   │   │   ├── core/
 │   │   │   │   ├── index.ts
@@ -3493,6 +3545,8 @@
 │   │   │   ├── integrity_operations.ts
 │   │   │   ├── market_intelligence.ts
 │   │   │   ├── migration-state.ts
+│   │   │   ├── ml_intelligence.ts
+│   │   │   ├── ML_SCHEMA_INTEGRATION.md
 │   │   │   ├── parliamentary_process.ts
 │   │   │   ├── participation_oversight.ts
 │   │   │   ├── platform_operations.ts
@@ -3593,6 +3647,7 @@
 │   │   └── StorageTypes.ts
 │   ├── middleware/
 │   │   ├── api-contract-validation.ts
+│   │   ├── api-versioning.ts
 │   │   ├── app-middleware.ts
 │   │   ├── auth-types.ts
 │   │   ├── auth.ts
@@ -3619,12 +3674,16 @@
 │   │   ├── execute-websocket-migration.ts
 │   │   ├── final-migration-validation.ts
 │   │   ├── fix-constants-imports.ts
+│   │   ├── fix-invalid-imports.ts
+│   │   ├── fix-logger-calls.ts
 │   │   ├── fix-module-resolution.ts
+│   │   ├── fix-mvp-core-features.ts
 │   │   ├── fix-return-statements.js
 │   │   ├── fix-shared-core-imports.ts
 │   │   ├── fix-shared-imports.js
 │   │   ├── migrate-database-access.ts
 │   │   ├── migration-runner.ts
+│   │   ├── quick-fix-common-errors.ts
 │   │   ├── run-websocket-validation.ts
 │   │   ├── simple-websocket-validation.ts
 │   │   ├── test-conflict-analysis.ts
@@ -3677,16 +3736,112 @@
 │   │   ├── featureFlags.ts
 │   │   ├── metrics.ts
 │   │   ├── missing-modules-fallback.ts
+│   │   ├── port-manager.ts
+│   │   ├── preflight-check.ts
 │   │   ├── README.md
 │   │   ├── request-utils.ts
 │   │   ├── response-helpers.ts
 │   │   └── validation.ts
+│   ├── BUG_FIX_PLAN.md
+│   ├── BUG_FIX_PROGRESS_REPORT.md
+│   ├── BUG_FIX_SUMMARY.md
+│   ├── BUGS_FIXED_COMPREHENSIVE.md
+│   ├── BUGS_FIXED.md
+│   ├── core-features-errors.txt
+│   ├── DEMO_READY_CONFIRMATION.md
 │   ├── dev.ts
+│   ├── err.log
+│   ├── err2.log
+│   ├── err3.log
+│   ├── err4.log
+│   ├── err5.log
+│   ├── err6.log
+│   ├── err7.log
+│   ├── err8.log
+│   ├── err9.log
+│   ├── err10.log
+│   ├── err11.log
+│   ├── err12.log
+│   ├── err13.log
+│   ├── err14.log
+│   ├── err15.log
+│   ├── err16.log
+│   ├── err17.log
+│   ├── err18.log
+│   ├── err19.log
+│   ├── err21.log
+│   ├── err22.log
+│   ├── err23.log
+│   ├── err24.log
+│   ├── err25.log
+│   ├── err26.log
+│   ├── err27.log
+│   ├── err28.log
+│   ├── err29.log
+│   ├── err30.log
+│   ├── err31.log
+│   ├── FINAL_BUG_STATUS.md
+│   ├── fix_logger_ast.js
+│   ├── fix_logger.js
+│   ├── FIXES_APPLIED_2026-03-09.md
+│   ├── full_err_tsc_index.txt
+│   ├── full_err_tsc.txt
+│   ├── full_err_tsc2.txt
+│   ├── full_err.txt
+│   ├── full_err2.txt
+│   ├── full_err3.txt
+│   ├── full_err4.txt
+│   ├── full_err5.txt
+│   ├── full_err6.txt
+│   ├── full_err7.txt
+│   ├── full_err8.txt
+│   ├── full_err9.txt
+│   ├── full_err10.txt
+│   ├── full_err11.txt
+│   ├── full_err12.txt
+│   ├── full_err13.txt
+│   ├── full_err14.txt
+│   ├── full_err15.txt
+│   ├── full_err16.txt
+│   ├── full_err17.txt
+│   ├── full_err18.txt
+│   ├── full_err19.txt
+│   ├── full_err20.txt
+│   ├── full_err21.txt
+│   ├── full_err22.txt
+│   ├── full_err23.txt
+│   ├── full_err24.txt
+│   ├── full_err25.txt
+│   ├── full_err26.txt
+│   ├── full_err27.txt
+│   ├── full_err28.txt
+│   ├── full_err29.txt
 │   ├── index.ts
+│   ├── loader.mjs
+│   ├── MVP_CORE_FEATURES_STATUS.md
+│   ├── NETWORK_ERROR_DIAGNOSIS.md
+│   ├── out30.log
 │   ├── package.json
 │   ├── project.json
-│   ├── simple-server.ts
+│   ├── QUICK_START_AFTER_BUG_FIX.md
+│   ├── QUICK_START.md
+│   ├── README_BUG_FIXES.md
+│   ├── resolve-paths-hook.mjs
+│   ├── resolve-paths.mjs
+│   ├── SERVER_RUNNING_STATUS.md
+│   ├── server_startup.log
+│   ├── server-startup.log
+│   ├── server-startup.ts
+│   ├── start-server.ts
+│   ├── start.ts
+│   ├── startup_error.log
+│   ├── STARTUP_FIXES_2026-03-09.md
+│   ├── STARTUP_FIXES.md
+│   ├── test-startup.ts
 │   ├── tsconfig.json
+│   ├── type-check-after-logger-fix.txt
+│   ├── type-check-latest.txt
+│   ├── type-check-output.txt
 │   ├── vite.config.ts
 │   ├── vite.ts
 │   └── vitest.config.ts
@@ -4065,12 +4220,26 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
+├── ALL_REACT_ERRORS_FIXED.md
 ├── ARCHITECTURE.md
+├── BILLS_API_FIX_2026-03-09.md
+├── BILLS_INTEGRATION_STATUS.md
+├── BILLS_PORTAL_FIX_SUMMARY.md
+├── BROWSER_CACHE_FIX.md
 ├── CHANGELOG.md
+├── CLEAR_BROWSER_CACHE_NOW.md
+├── CLIENT_API_FIXES_COMPLETE_2026-03-09.md
+├── CLIENT_CONNECTION_FIX.md
+├── COMPLETE_FIX_SUMMARY_2026-03-09.md
+├── COMPLETE_FIX_SUMMARY.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
 ├── CURRENT_CAPABILITIES.md
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
+├── DEMO_FIXES_COMPLETE.md
+├── DEMO_QUICK_REFERENCE.md
+├── DEMO_READINESS_FINAL_REPORT.md
+├── DEMO_READINESS_FIXES_SUMMARY.md
 ├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
@@ -4079,7 +4248,12 @@
 ├── DOCS_CLEANUP_COMPLETE.md
 ├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
+├── DUPLICATE_REACT_IMPORT_FIXED.md
 ├── FEATURE_INTEGRATION_STATUS.md
+├── FINAL_ERROR_FIX_SUMMARY.md
+├── FINAL_FIX_GUIDE.md
+├── FINAL_FIX_SUMMARY_2026-03-09.md
+├── fix.cjs
 ├── generate-structure.mjs
 ├── knip.config.ts
 ├── nginx.conf
@@ -4089,9 +4263,17 @@
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
+├── QUICK_FIX_REFERENCE.md
+├── QUICK_START_GUIDE.md
 ├── QUICK_START.md
+├── REACT_FORWARDREF_FIX_COMPLETE.md
+├── README_FIXES.md
 ├── README.md
+├── RESTART_INSTRUCTIONS.md
 ├── SECURITY_FIXES_SUMMARY.md
+├── SERVER_FIXES_COMPLETE_2026-03-09.md
+├── SERVER_STARTUP_SOLUTION.md
+├── SESSION_SUMMARY_2026-03-09.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json

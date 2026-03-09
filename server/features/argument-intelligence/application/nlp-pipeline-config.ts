@@ -9,7 +9,8 @@ import { ClusteringService } from './clustering-service';
 import { SentimentAnalyzer } from '../infrastructure/nlp/sentiment-analyzer';
 import { QualityMetricsCalculator } from '../infrastructure/nlp/quality-metrics';
 import { nlpCacheManager } from '../infrastructure/cache/nlp-cache';
-import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
 
 export interface NLPPipelineConfig {
   clustering: {
@@ -117,10 +118,10 @@ export class NLPPipelineConfigService {
       quality: { count: 0, totalTime: 0 },
     };
 
-    logger.info('NLP Pipeline Configuration Service initialized', {
+    logger.info({
       component: 'NLPPipelineConfigService',
       config: this.config,
-    });
+    }, 'NLP Pipeline Configuration Service initialized');
   }
 
   /**
@@ -162,10 +163,10 @@ export class NLPPipelineConfigService {
       });
     }
 
-    logger.info('NLP Pipeline configuration updated', {
+    logger.info({
       component: 'NLPPipelineConfigService',
       config: this.config,
-    });
+    }, 'NLP Pipeline configuration updated');
   }
 
   /**
@@ -218,10 +219,10 @@ export class NLPPipelineConfigService {
 
       return result;
     } catch (error) {
-      logger.error('Sentiment analysis failed', {
+      logger.error({
         component: 'NLPPipelineConfigService',
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Sentiment analysis failed');
       throw error;
     }
   }
@@ -254,30 +255,30 @@ export class NLPPipelineConfigService {
 
       return result;
     } catch (error) {
-      logger.error('Quality calculation failed', {
+      logger.error({
         component: 'NLPPipelineConfigService',
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Quality calculation failed');
       throw error;
     }
   }
 
   /**
-   * Cluster arguments with caching
+   * Cluster argList with caching
    */
-  async clusterArguments(arguments: any[]): Promise<any> {
+  async clusterArguments(argList: any[]): Promise<any> {
     if (!this.config.clustering.enabled) {
       throw new Error('Clustering is disabled');
     }
 
     const startTime = Date.now();
     const cache = nlpCacheManager.getClusteringCache();
-    const cacheKey = `cluster:${arguments.length}:${arguments.map(a => a.id).join(',')}`;
+    const cacheKey = `cluster:${argList.length}:${argList.map(a => a.id).join(',')}`;
 
     try {
       // Try cache first
       const result = await cache.getOrCompute(cacheKey, async () => {
-        return await this.clusteringService.clusterArguments(arguments, {
+        return await this.clusteringService.clusterArguments(argList, {
           similarityThreshold: this.config.clustering.similarityThreshold,
           minClusterSize: this.config.clustering.minClusterSize,
           maxClusters: this.config.clustering.maxClusters,
@@ -292,10 +293,10 @@ export class NLPPipelineConfigService {
 
       return result;
     } catch (error) {
-      logger.error('Clustering failed', {
+      logger.error({
         component: 'NLPPipelineConfigService',
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Clustering failed');
       throw error;
     }
   }
@@ -346,9 +347,9 @@ export class NLPPipelineConfigService {
    */
   clearCaches(): void {
     nlpCacheManager.clearAll();
-    logger.info('All NLP caches cleared', {
+    logger.info({
       component: 'NLPPipelineConfigService',
-    });
+    }, 'All NLP caches cleared');
   }
 
   /**
@@ -356,10 +357,10 @@ export class NLPPipelineConfigService {
    */
   pruneExpiredCaches(): number {
     const pruned = nlpCacheManager.pruneAllExpired();
-    logger.info('Pruned expired cache entries', {
+    logger.info({
       component: 'NLPPipelineConfigService',
       pruned,
-    });
+    }, 'Pruned expired cache entries');
     return pruned;
   }
 

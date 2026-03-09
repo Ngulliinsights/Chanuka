@@ -65,7 +65,7 @@ function isSearchType(value: unknown): value is 'simple' | 'phrase' | 'boolean' 
   return typeof value === 'string' && ['simple', 'phrase', 'boolean'].includes(value);
 }
 
-const router: Router = Router();
+
 
 /**
  * GET /search - Search bills with advanced filtering and pagination

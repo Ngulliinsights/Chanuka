@@ -1,6 +1,7 @@
 /**
- * Cache Adapter V2 (REFACTORED)
- * IMPROVEMENTS: Type safety, error handling, TTL support
+ * Cache Adapter
+ * 
+ * In-memory cache with type safety, error handling, and TTL support.
  */
 import { logger } from '@server/infrastructure/observability';
 import { CACHE_CONFIG } from './config/graph-config';
@@ -11,7 +12,7 @@ export interface CacheEntry<T> {
   created: number;
 }
 
-export class CacheAdapterV2<T = any> {
+export class CacheAdapter<T = any> {
   private cache: Map<string, CacheEntry<T>> = new Map();
   private ttl: number;
 
@@ -29,24 +30,24 @@ export class CacheAdapterV2<T = any> {
       created: now,
     });
     
-    logger.debug('Cache set', { key, ttl: effectiveTtl });
+    logger.debug({ key, ttl: effectiveTtl }, 'Cache set');
   }
 
   get(key: string): T | null {
     const entry = this.cache.get(key);
     
     if (!entry) {
-      logger.debug('Cache miss', { key });
+      logger.debug({ key }, 'Cache miss');
       return null;
     }
     
     if (Date.now() > entry.expires) {
       this.cache.delete(key);
-      logger.debug('Cache expired', { key });
+      logger.debug({ key }, 'Cache expired');
       return null;
     }
     
-    logger.debug('Cache hit', { key });
+    logger.debug({ key }, 'Cache hit');
     return entry.value;
   }
 
@@ -85,4 +86,4 @@ export class CacheAdapterV2<T = any> {
   }
 }
 
-export default CacheAdapterV2;
+export default CacheAdapter;

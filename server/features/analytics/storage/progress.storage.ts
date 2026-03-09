@@ -6,7 +6,7 @@ import {
   type UserProgress} from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
-import { BaseStorage } from '@/infrastructure/database/base/BaseStorage';
+import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
 
 // Constants for cache configuration
 const CACHE_PREFIX = 'progress:';

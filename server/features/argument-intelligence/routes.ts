@@ -135,24 +135,24 @@ router.get('/bill/:billId/analysis', async (req, res) => {
   }
 });
 
-// Get arguments for a bill
+// Get argList for a bill
 router.get('/bill/:billId', async (req, res) => {
   try {
     const { billId } = req.params;
-    const arguments = await argumentIntelligenceService.getArgumentsByBill(billId);
+    const argList = await argumentIntelligenceService.getArgumentsByBill(billId);
 
     res.json({
       success: true,
-      count: arguments.length,
-      arguments
+      count: argList.length,
+      argList
     });
   } catch (error) {
-    console.error('Error fetching arguments:', error);
-    res.status(500).json({ error: 'Failed to fetch arguments' });
+    console.error('Error fetching argList:', error);
+    res.status(500).json({ error: 'Failed to fetch argList' });
   }
 });
 
-// Cluster arguments for a bill
+// Cluster argList for a bill
 router.post('/cluster/:billId', async (req, res) => {
   try {
     const { billId } = req.params;
@@ -176,8 +176,8 @@ router.post('/cluster/:billId', async (req, res) => {
       }))
     });
   } catch (error) {
-    console.error('Error clustering arguments:', error);
-    res.status(500).json({ error: 'Failed to cluster arguments' });
+    console.error('Error clustering argList:', error);
+    res.status(500).json({ error: 'Failed to cluster argList' });
   }
 });
 

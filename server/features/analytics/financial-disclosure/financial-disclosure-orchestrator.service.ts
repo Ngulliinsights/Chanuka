@@ -6,7 +6,8 @@ import { DatabaseError } from '@shared/core';
 import { cache } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
-import { sponsors } from "@shared/foundation";
+// FIXME: @shared/foundation does not exist
+// import { sponsors } from "@shared/foundation";
 import type {
   CompletenessReport,
   FinancialDisclosure,

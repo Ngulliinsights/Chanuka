@@ -118,7 +118,7 @@ export class UserPreferencesService {
    */
   async getUserPreferences(user_id: string): Promise<UserNotificationPreferences> { // Handle request for default preferences explicitly
     if (user_id === 'default') {
-      logger.debug("Returning default global preferences", { component: 'UserPreferencesService'  });
+      logger.debug({ component: 'UserPreferencesService'  }, "Returning default global preferences");
       return this.deepClone(DEFAULT_PREFERENCES); // Return a clone
     }
 

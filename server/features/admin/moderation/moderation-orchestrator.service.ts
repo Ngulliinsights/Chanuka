@@ -53,10 +53,10 @@ export class ModerationOrchestratorService {
     try {
       return await moderationQueueService.getModerationQueue(page, limit, filters);
     } catch (error) {
-      logger.error('Error in moderation orchestrator - getModerationQueue:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - getModerationQueue:');
       throw error;
     }
   }
@@ -99,10 +99,10 @@ export class ModerationOrchestratorService {
           // In a real implementation, we'd fetch the content and analyze it
           analysis = undefined;
         } catch (analysisError) {
-          logger.warn('Content analysis failed during report creation:', {
+          logger.warn({
             component: 'ModerationOrchestrator',
             error: analysisError instanceof Error ? analysisError.message : String(analysisError)
-          });
+          }, 'Content analysis failed during report creation:');
         }
       }
 
@@ -111,10 +111,10 @@ export class ModerationOrchestratorService {
         analysis
       };
     } catch (error) {
-      logger.error('Error in moderation orchestrator - createReport:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - createReport:');
       throw error;
     }
   }
@@ -135,10 +135,10 @@ export class ModerationOrchestratorService {
     try {
       return await contentAnalysisService.analyzeContent(content_type, content, additionalContext);
     } catch (error) {
-      logger.error('Error in moderation orchestrator - analyzeContent:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - analyzeContent:');
       throw error;
     }
   }
@@ -168,10 +168,10 @@ export class ModerationOrchestratorService {
         resolutionNotes
       );
     } catch (error) {
-      logger.error('Error in moderation orchestrator - reviewReport:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - reviewReport:');
       throw error;
     }
   }
@@ -190,10 +190,10 @@ export class ModerationOrchestratorService {
     try {
       return await moderationDecisionService.bulkModerateReports(operation);
     } catch (error) {
-      logger.error('Error in moderation orchestrator - bulkModerateReports:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - bulkModerateReports:');
       throw error;
     }
   }
@@ -218,10 +218,10 @@ export class ModerationOrchestratorService {
         limit
       );
     } catch (error) {
-      logger.error('Error in moderation orchestrator - getModerationHistory:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - getModerationHistory:');
       throw error;
     }
   }
@@ -253,10 +253,10 @@ export class ModerationOrchestratorService {
     try {
       return await moderationAnalyticsService.getModerationStats(start_date, end_date);
     } catch (error) {
-      logger.error('Error in moderation orchestrator - getModerationStats:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - getModerationStats:');
       throw error;
     }
   }
@@ -268,10 +268,10 @@ export class ModerationOrchestratorService {
     try {
       return await moderationAnalyticsService.getContentAnalytics();
     } catch (error) {
-      logger.error('Error in moderation orchestrator - getContentAnalytics:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - getContentAnalytics:');
       throw error;
     }
   }
@@ -324,10 +324,10 @@ export class ModerationOrchestratorService {
         analysis
       };
     } catch (error) {
-      logger.error('Error in moderation orchestrator - processContentSubmission:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - processContentSubmission:');
       throw error;
     }
   }
@@ -350,22 +350,22 @@ export class ModerationOrchestratorService {
       // 3. Update report priority
       // 4. Log escalation event
 
-      logger.info('Moderation escalation handled:', {
+      logger.info({
         component: 'ModerationOrchestrator',
         report_id,
         escalationReason,
         escalatedBy
-      });
+      }, 'Moderation escalation handled:');
 
       return {
         success: true,
         message: 'Escalation processed successfully'
       };
     } catch (error) {
-      logger.error('Error in moderation orchestrator - handleEscalation:', {
+      logger.error({
         component: 'ModerationOrchestrator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error in moderation orchestrator - handleEscalation:');
       return {
         success: false,
         message: 'Failed to process escalation'

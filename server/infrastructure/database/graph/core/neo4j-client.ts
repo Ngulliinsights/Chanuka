@@ -2,7 +2,7 @@
 import { Driver, Transaction, Result, SessionConfig } from 'neo4j-driver';
 
 import { logger } from '../../../observability';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 
 
@@ -67,11 +67,11 @@ export class Neo4jClient {
 
     try {
       if (this.config.logQueries) {
-        logger.debug('Executing query', {
+        logger.debug({
           cypher: cypher.substring(0, 100),
           mode,
           params: Object.keys(params)
-        });
+        }, 'Executing query');
       }
 
       const executeQuery = async () => {
@@ -141,7 +141,7 @@ export class Neo4jClient {
       const result = await this.executeRead('RETURN 1 as health');
       return result.records.length > 0;
     } catch (error) {
-      logger.error('Health check failed', { error: error instanceof Error ? error.message : String(error) });
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Health check failed');
       return false;
     }
   }
@@ -159,7 +159,7 @@ export class Neo4jClient {
         relationshipCount: Number(relResult.records[0]?.get('count')) || 0,
       };
     } catch (error) {
-      logger.error('Failed to get stats', { error: error instanceof Error ? error.message : String(error) });
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to get stats');
       return { nodeCount: 0, relationshipCount: 0 };
     }
   }

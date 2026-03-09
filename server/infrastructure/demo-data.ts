@@ -685,7 +685,7 @@ export class DemoDataService {
     const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
     
     if (isNaN(numericId)) {
-      logger.warn(`Invalid sponsor ID provided: ${id}`, { component: 'DemoDataService' });
+      logger.warn({ component: 'DemoDataService' }, `Invalid sponsor ID provided: ${id}`);
       return null;
     }
     
@@ -714,7 +714,7 @@ export class DemoDataService {
   public autoEnableDemoMode(): void {
     if (this.detectDemoMode() && !this.demoMode) {
       this.setDemoMode(true);
-      logger.info('🔄 Auto-enabled demo mode due to system conditions', { component: 'DemoDataService' });
+      logger.info({ component: 'DemoDataService' }, '🔄 Auto-enabled demo mode due to system conditions');
     }
   }
 
@@ -724,7 +724,7 @@ export class DemoDataService {
    */
   public getComprehensiveBillData(bill_id: number) { const bill = this.getBill(bill_id);
     if (!bill) {
-      logger.warn(`Bill with ID ${bill_id } not found`, { component: 'DemoDataService' });
+      logger.warn({ component: 'DemoDataService' }, `Bill with ID ${bill_id } not found`);
       return null;
     }
 
@@ -769,29 +769,29 @@ export class DemoDataService {
 
       for (const bill of bills) {
         if (bills.sponsor_id && !sponsor_ids.has(bills.sponsor_id)) {
-          logger.warn(`Bill ${bills.id} references non-existent sponsor ${bills.sponsor_id}`, { 
+          logger.warn({ 
             component: 'DemoDataService' 
-          });
+          }, `Bill ${bills.id} references non-existent sponsor ${bills.sponsor_id}`);
           return false;
         }
       }
 
       for (const bill of bills) {
         if (!bills.introduced_date || !bills.created_at || !bills.updated_at) {
-          logger.warn(`Bill ${bills.id} has invalid dates`, { component: 'DemoDataService' });
+          logger.warn({ component: 'DemoDataService' }, `Bill ${bills.id} has invalid dates`);
           return false;
         }
 
         if (bills.last_action_date && bills.introduced_date > bills.last_action_date) {
-          logger.warn(`Bill ${bills.id} has introduced_date after last_action_date`, { 
+          logger.warn({ 
             component: 'DemoDataService' 
-          });
+          }, `Bill ${bills.id} has introduced_date after last_action_date`);
           return false;
         }
       }
 
       if (sponsors.length !== sponsor_ids.size) {
-        logger.warn('Duplicate sponsor IDs detected', { component: 'DemoDataService' });
+        logger.warn({ component: 'DemoDataService' }, 'Duplicate sponsor IDs detected');
         return false;
       }
 

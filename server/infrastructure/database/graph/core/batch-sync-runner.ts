@@ -2,7 +2,7 @@
  * Batch Sync Runner (REFACTORED)
  * IMPROVEMENTS: Fixed session leaks, added retry logic, proper error handling
  */
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { SYNC_CONFIG } from '../config/graph-config';
 
 import { logger } from '@server/infrastructure/observability';
@@ -31,7 +31,7 @@ export async function runBatchSync(
   const batchId = `batch_${Date.now()}`;
   const startTime = Date.now();
 
-  logger.info('Starting batch sync', { batchId, batchSize });
+  logger.info({ batchId, batchSize }, 'Starting batch sync');
 
   try {
     // Implementation would query pending entities and sync them
@@ -64,11 +64,11 @@ export function startSyncScheduler(intervalMs: number): void {
 
   schedulerInterval = setInterval(() => {
     runBatchSync().catch(error => {
-      logger.error('Scheduled sync failed', { error: error.message });
+      logger.error({ error: error.message }, 'Scheduled sync failed');
     });
   }, intervalMs);
 
-  logger.info('Sync scheduler started', { intervalMs });
+  logger.info({ intervalMs }, 'Sync scheduler started');
 }
 
 export function stopSyncScheduler(): void {

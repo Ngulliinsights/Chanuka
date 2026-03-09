@@ -74,12 +74,12 @@ class Metrics {
         if (threshold !== undefined) {
           metricsInstance.thresholds.set(name, threshold);
           if (value > threshold) {
-            logger.warn(`Metric ${name} exceeded threshold: ${value} > ${threshold}`, {
+            logger.warn({
               component: 'legacy-metrics',
               metric: name,
               value,
               threshold
-            });
+            }, `Metric ${name} exceeded threshold: ${value} > ${threshold}`);
           }
         }
 
@@ -120,12 +120,12 @@ class Metrics {
           // Legacy threshold checking for backward compatibility
           if (threshold !== undefined) {
             if (duration > threshold) {
-              logger.warn(`Performance metric ${name} exceeded threshold: ${duration}ms > ${threshold}ms`, {
+              logger.warn({
                 component: 'legacy-metrics',
                 metric: name,
                 duration,
                 threshold
-              });
+              }, `Performance metric ${name} exceeded threshold: ${duration}ms > ${threshold}ms`);
             }
           }
         }
@@ -147,12 +147,12 @@ class Metrics {
     if (threshold !== undefined) {
       this.thresholds.set(name, threshold);
       if (value > threshold) {
-        logger.warn(`Metric ${name} exceeded threshold: ${value} > ${threshold}`, {
+        logger.warn({
           component: 'legacy-metrics',
           metric: name,
           value,
           threshold
-        });
+        }, `Metric ${name} exceeded threshold: ${value} > ${threshold}`);
       }
     }
   }
@@ -188,9 +188,9 @@ class Metrics {
     this.thresholds.clear();
     this.metrics.clear();
     // Note: The new performance monitoring service handles its own cleanup
-    logger.info('Legacy metrics reset (new service manages its own cleanup)', {
+    logger.info({
       component: 'legacy-metrics'
-    });
+    }, 'Legacy metrics reset (new service manages its own cleanup)');
   }
 }
 

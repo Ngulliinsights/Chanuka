@@ -123,8 +123,8 @@ describe('NLPPipelineConfigService', () => {
   });
 
   describe('Clustering', () => {
-    it('should cluster arguments', async () => {
-      const arguments = [
+    it('should cluster argList', async () => {
+      const argList = [
         {
           id: '1',
           text: 'I support this bill because it helps education.',
@@ -154,7 +154,7 @@ describe('NLPPipelineConfigService', () => {
         },
       ];
 
-      const result = await service.clusterArguments(arguments);
+      const result = await service.clusterArguments(argList);
 
       expect(result).toHaveProperty('clusters');
       expect(result).toHaveProperty('outliers');

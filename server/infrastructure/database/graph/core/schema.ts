@@ -124,7 +124,7 @@ async function createSchemaElement(
 ): Promise<boolean> {
   try {
     await executeCypherSafely(driver, element.query, {});
-    logger.debug(`Created ${type}`, { description: element.description });
+    logger.debug({ description: element.description }, `Created ${type}`);
     return true;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -132,14 +132,14 @@ async function createSchemaElement(
     // Distinguish between "already exists" and actual errors
     if (errorMessage.toLowerCase().includes('already exists') ||
         errorMessage.toLowerCase().includes('equivalent')) {
-      logger.debug(`${type} already exists`, { description: element.description });
+      logger.debug({ description: element.description }, `${type} already exists`);
       return true;
     }
 
-    logger.error(`Failed to create ${type}`, {
+    logger.error({
       description: element.description,
       error: errorMessage
-    });
+    }, `Failed to create ${type}`);
     return false;
   }
 }
@@ -162,18 +162,18 @@ export async function createConstraints(driver: Driver): Promise<number> {
     if (result.status === 'fulfilled' && result.value) {
       successCount++;
     } else if (result.status === 'rejected') {
-      logger.error('Constraint creation failed unexpectedly', {
+      logger.error({
         description: CONSTRAINTS[index]?.description ?? 'Unknown constraint',
         error: result.reason
-      });
+      }, 'Constraint creation failed unexpectedly');
     }
   });
 
-  logger.info('Constraints creation completed', {
+  logger.info({
     total: CONSTRAINTS.length,
     successful: successCount,
     failed: CONSTRAINTS.length - successCount
-  });
+  }, 'Constraints creation completed');
 
   return successCount;
 }
@@ -196,18 +196,18 @@ export async function createIndexes(driver: Driver): Promise<number> {
     if (result.status === 'fulfilled' && result.value) {
       successCount++;
     } else if (result.status === 'rejected') {
-      logger.error('Index creation failed unexpectedly', {
+      logger.error({
         description: INDEXES[index]?.description ?? 'Unknown index',
         error: result.reason
-      });
+      }, 'Index creation failed unexpectedly');
     }
   });
 
-  logger.info('Indexes creation completed', {
+  logger.info({
     total: INDEXES.length,
     successful: successCount,
     failed: INDEXES.length - successCount
-  });
+  }, 'Indexes creation completed');
 
   return successCount;
 }
@@ -231,26 +231,26 @@ export async function initializeGraphSchema(driver: Driver): Promise<void> {
 
     const duration = Date.now() - startTime;
 
-    logger.info('Graph schema initialization complete', {
+    logger.info({
       constraints: constraintCount,
       indexes: indexCount,
       durationMs: duration
-    });
+    }, 'Graph schema initialization complete');
 
     // Warn if not all elements were created
     if (constraintCount < CONSTRAINTS.length || indexCount < INDEXES.length) {
-      logger.warn('Schema initialization incomplete', {
+      logger.warn({
         expectedConstraints: CONSTRAINTS.length,
         actualConstraints: constraintCount,
         expectedIndexes: INDEXES.length,
         actualIndexes: indexCount
-      });
+      }, 'Schema initialization incomplete');
     }
   } catch (error) {
-    logger.error('Schema initialization failed', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
       durationMs: Date.now() - startTime
-    });
+    }, 'Schema initialization failed');
     throw error;
   }
 }
@@ -289,13 +289,13 @@ export async function verifyGraphSchema(driver: Driver): Promise<SchemaVerificat
     // Schema is valid if we have at least the expected number of constraints and indexes
     const valid = constraints >= expectedConstraints && indexes >= expectedIndexes;
 
-    logger.debug('Schema verification complete', {
+    logger.debug({
       constraints,
       indexes,
       expectedConstraints,
       expectedIndexes,
       valid
-    });
+    }, 'Schema verification complete');
 
     return {
       constraints,
@@ -305,9 +305,9 @@ export async function verifyGraphSchema(driver: Driver): Promise<SchemaVerificat
       expectedIndexes
     };
   } catch (error) {
-    logger.error('Schema verification failed', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Schema verification failed');
 
     return {
       constraints: 0,
@@ -369,18 +369,18 @@ export async function getDatabaseStats(driver: Driver): Promise<DatabaseStats> {
       }
     });
 
-    logger.debug('Database statistics retrieved', {
+    logger.debug({
       totalNodes,
       totalRelationships,
       nodeLabels: Object.keys(nodes).length,
       relationshipTypes: Object.keys(relationships).length
-    });
+    }, 'Database statistics retrieved');
 
     return { nodes, relationships, totalNodes, totalRelationships };
   } catch (error) {
-    logger.error('Failed to retrieve database statistics', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Failed to retrieve database statistics');
 
     return {
       nodes: {},
@@ -420,21 +420,21 @@ export async function clearGraphSchema(driver: Driver): Promise<void> {
     for (const record of constraintsResult.records) {
       const name = record.get('name') as string;
       await executeCypherSafely(driver, `DROP CONSTRAINT ${name} IF EXISTS`, {});
-      logger.debug('Dropped constraint', { name });
+      logger.debug({ name }, 'Dropped constraint');
     }
 
     // Drop all indexes
     for (const record of indexesResult.records) {
       const name = record.get('name') as string;
       await executeCypherSafely(driver, `DROP INDEX ${name} IF EXISTS`, {});
-      logger.debug('Dropped index', { name });
+      logger.debug({ name }, 'Dropped index');
     }
 
     logger.info('Graph schema cleared successfully');
   } catch (error) {
-    logger.error('Failed to clear graph schema', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Failed to clear graph schema');
     throw error;
   }
 }

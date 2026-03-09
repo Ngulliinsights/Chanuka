@@ -54,7 +54,7 @@ export {
   type ConnectionManagerConfig,
   type ConnectionMetrics,
   type DatabaseHealthStatus,
-} from '@server/infrastructure/database/core/connection-manager.ts';
+} from '@server/infrastructure/database/core/connection-manager';
 
 // ============================================================================
 // CONFIGURATION
@@ -76,7 +76,7 @@ export {
   
   // Types
   type DatabaseEnvironmentConfig,
-} from '@server/infrastructure/database/core/config.ts';
+} from '@server/infrastructure/database/core/config';
 
 // ============================================================================
 // HEALTH MONITORING
@@ -95,7 +95,7 @@ export {
   type AlertRule,
   type Alert,
   type HealthMonitorConfig,
-} from '@server/infrastructure/database/core/health-monitor.ts';
+} from '@server/infrastructure/database/core/health-monitor';
 
 // ============================================================================
 // CONVENIENCE EXPORTS

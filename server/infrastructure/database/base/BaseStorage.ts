@@ -68,7 +68,7 @@ export abstract class BaseStorage<T> {
       }
       return data;
     } catch (error) {
-      logger.error(`Storage Fetch Error [${fullKey}]`, { error });
+      logger.error({ error }, `Storage Fetch Error [${fullKey}]`);
       throw error;
     }
   }

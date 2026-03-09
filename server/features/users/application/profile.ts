@@ -5,8 +5,8 @@ import { z } from 'zod';
 import {
   AuthenticatedRequest,
   authenticateToken
-} from '../../../../AuthAlert';
-import { asyncHandler } from '@/middleware/error-management';
+} from '@server/middleware/auth';
+import { asyncHandler } from '@server/middleware/error-management';
 import { ValidationError } from '@shared/types/core/errors';
 import { userProfileService } from './UserProfileService';
 import { boomFromStandardized } from '@server/infrastructure/error-handling';

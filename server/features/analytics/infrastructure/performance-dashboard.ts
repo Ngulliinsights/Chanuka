@@ -21,10 +21,10 @@ router.get('/status', async (req, res) => {
       data: status,
     });
   } catch (error) {
-    logger.error('Failed to get performance status', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get performance status');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve performance status',
@@ -41,10 +41,10 @@ router.get('/report', async (req, res) => {
       data: report,
     });
   } catch (error) {
-    logger.error('Failed to generate performance report', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to generate performance report');
     res.status(500).json({
       success: false,
       error: 'Failed to generate performance report',
@@ -86,10 +86,10 @@ router.get('/core-web-vitals', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Failed to get Core Web Vitals', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get Core Web Vitals');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve Core Web Vitals',
@@ -117,10 +117,10 @@ router.get('/bundle-metrics', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Failed to get bundle metrics', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get bundle metrics');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve bundle metrics',
@@ -169,10 +169,10 @@ router.get('/violations', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Failed to get budget violations', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get budget violations');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve budget violations',
@@ -206,10 +206,10 @@ router.get('/trends', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Failed to get performance trends', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get performance trends');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve performance trends',
@@ -241,10 +241,10 @@ router.post('/record-metric', async (req, res) => {
       message: 'Metric recorded successfully',
     });
   } catch (error) {
-    logger.error('Failed to record metric', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to record metric');
     res.status(500).json({
       success: false,
       error: 'Failed to record metric',
@@ -266,10 +266,10 @@ router.get('/recommendations', async (req, res) => {
       },
     });
   } catch (error) {
-    logger.error('Failed to get recommendations', {
+    logger.error({
       component: 'performance-dashboard',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to get recommendations');
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve recommendations',

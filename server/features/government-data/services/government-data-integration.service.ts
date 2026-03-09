@@ -331,11 +331,11 @@ export class GovernmentDataIntegrationService {
     const results: IntegrationResult[] = [];
     const sourcesToUse = this.getActiveSources(options.sources);
     
-    logger.info('🏛️ Starting bill integration', {
+    logger.info({
       component: 'GovernmentDataIntegration',
       sources: sourcesToUse.length,
       options
-    });
+    }, '🏛️ Starting bill integration');
 
     for (const source of sourcesToUse) {
       try {
@@ -1152,12 +1152,12 @@ export class GovernmentDataIntegrationService {
       ? results.reduce((sum, r) => sum + r.metadata.dataQuality.overall, 0) / results.length 
       : 0;
     
-    logger.info(`📊 Integration complete: ${type}`, {
+    logger.info({
       totalRecords,
       successfulSources,
       totalSources: results.length,
       averageQuality: avgQuality
-    });
+    }, `📊 Integration complete: ${type}`);
   }
 
   /**
@@ -1325,7 +1325,7 @@ export class GovernmentDataIntegrationService {
 
   private async notifyDataGaps(type: string, errors: string[]): Promise<void> {
     // Notify administrators about data integration issues
-    logger.error(`Data gaps detected for ${type}`, { errors });
+    logger.error({ errors }, `Data gaps detected for ${type}`);
   }
 
   /**

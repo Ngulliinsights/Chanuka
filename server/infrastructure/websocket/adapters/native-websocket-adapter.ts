@@ -6,7 +6,8 @@
 
 import { Server } from 'http';
 
-import { WebSocketService } from '@server/infrastructure/core/websocket-service';
+// FIXME: Use @server/infrastructure/websocket
+// import { WebSocketService } from '@server/infrastructure/core/websocket-service';
 import { HealthStatus,ServiceStats, WebSocketAdapter } from './websocket-adapter';
 
 
@@ -84,9 +85,9 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
    */
   async initialize(server: Server): Promise<void> {
     if (this.isInitialized) {
-      logger.warn('NativeWebSocketAdapter already initialized', {
+      logger.warn({
         component: 'NativeWebSocketAdapter'
-      });
+      }, 'NativeWebSocketAdapter already initialized');
       return;
     }
 
@@ -94,9 +95,9 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
       await this.webSocketService.initialize(server);
       this.isInitialized = true;
 
-      logger.info('NativeWebSocketAdapter initialized successfully', {
+      logger.info({
         component: 'NativeWebSocketAdapter'
-      });
+      }, 'NativeWebSocketAdapter initialized successfully');
     } catch (error) {
       logger.error('Failed to initialize NativeWebSocketAdapter', {
         component: 'NativeWebSocketAdapter'
@@ -110,10 +111,10 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
    */
   broadcastBillUpdate(bill_id: number, update: BillUpdate): void {
     if (!this.isReady()) {
-      logger.warn('Adapter not ready for bill update broadcast', {
+      logger.warn({
         component: 'NativeWebSocketAdapter',
         bill_id
-      });
+      }, 'Adapter not ready for bill update broadcast');
       return;
     }
 
@@ -132,10 +133,10 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
    */
   sendUserNotification(user_id: string, notification: UserNotification): void {
     if (!this.isReady()) {
-      logger.warn('Adapter not ready for user notification', {
+      logger.warn({
         component: 'NativeWebSocketAdapter',
         user_id
-      });
+      }, 'Adapter not ready for user notification');
       return;
     }
 
@@ -144,10 +145,10 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
     // For example, you might need to use sendToUser or a similar method
     try {
       // Implementation would depend on the actual WebSocketService API
-      logger.warn('sendUserNotification not implemented in WebSocketService', {
+      logger.warn({
         user_id,
         notification
-      });
+      }, 'sendUserNotification not implemented in WebSocketService');
     } catch (error) {
       logger.error('Error sending user notification', {
         component: 'NativeWebSocketAdapter',
@@ -161,9 +162,9 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
    */
   broadcastToAll(_message: BroadcastMessage): void {
     if (!this.isReady()) {
-      logger.warn('Adapter not ready for broadcast', {
+      logger.warn({
         component: 'NativeWebSocketAdapter'
-      });
+      }, 'Adapter not ready for broadcast');
       return;
     }
 
@@ -262,9 +263,9 @@ export class NativeWebSocketAdapter extends WebSocketAdapter {
       await this.webSocketService.shutdown();
       this.isInitialized = false;
 
-      logger.info('NativeWebSocketAdapter shutdown complete', {
+      logger.info({
         component: 'NativeWebSocketAdapter'
-      });
+      }, 'NativeWebSocketAdapter shutdown complete');
     } catch (error) {
       logger.error('Error during NativeWebSocketAdapter shutdown', {
         component: 'NativeWebSocketAdapter'

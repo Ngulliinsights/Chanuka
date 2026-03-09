@@ -79,11 +79,11 @@ export class EvidenceValidatorService {
    */
   async validateEvidenceClaim(claim: EvidenceClaim): Promise<EvidenceValidationResult> {
     try {
-      logger.info(`🔍 Validating evidence claim`, {
+      logger.info({
         component: 'EvidenceValidator',
         claimId: claim.id,
         claimType: claim.claimType
-      });
+      }, `🔍 Validating evidence claim`);
 
       // Step 1: Extract and validate sources
       const sources = await this.validateSources(claim.citedSources);
@@ -112,21 +112,21 @@ export class EvidenceValidatorService {
         flaggedConcerns
       };
 
-      logger.info(`✅ Evidence validation completed`, {
+      logger.info({
         component: 'EvidenceValidator',
         claimId: claim.id,
         validationStatus,
         credibilityScore
-      });
+      }, `✅ Evidence validation completed`);
 
       return result;
 
     } catch (error) {
-      logger.error(`❌ Evidence validation failed`, {
+      logger.error({
         component: 'EvidenceValidator',
         claimId: claim.id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Evidence validation failed`);
 
       // Return failed validation result
       return {
@@ -146,15 +146,15 @@ export class EvidenceValidatorService {
   /**
    * Assess evidence base for an entire bill
    */
-  async assessEvidenceBase(arguments: unknown[]): Promise<EvidenceAssessment> {
+  async assessEvidenceBase(argList: unknown[]): Promise<EvidenceAssessment> {
     try {
-      logger.info(`📊 Assessing evidence base`, {
+      logger.info({
         component: 'EvidenceValidator',
-        argumentCount: arguments.length
-      });
+        argumentCount: argList.length
+      }, `📊 Assessing evidence base`);
 
-      // Extract evidence claims from arguments
-      const evidenceClaims = this.extractEvidenceClaims(arguments);
+      // Extract evidence claims from argList
+      const evidenceClaims = this.extractEvidenceClaims(argList);
 
       // Validate all evidence claims
       const validationResults: EvidenceValidationResult[] = [];
@@ -166,19 +166,19 @@ export class EvidenceValidatorService {
       // Calculate overall assessment
       const assessment = this.calculateEvidenceAssessment(validationResults);
 
-      logger.info(`✅ Evidence base assessment completed`, {
+      logger.info({
         component: 'EvidenceValidator',
         overallCredibility: assessment.overallCredibility,
         verifiedClaims: assessment.verifiedClaimsCount
-      });
+      }, `✅ Evidence base assessment completed`);
 
       return assessment;
 
     } catch (error) {
-      logger.error(`❌ Evidence base assessment failed`, {
+      logger.error({
         component: 'EvidenceValidator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Evidence base assessment failed`);
       throw error;
     }
   }
@@ -653,10 +653,10 @@ export class EvidenceValidatorService {
     return concerns;
   }
 
-  private extractEvidenceClaims(arguments: unknown[]): EvidenceClaim[] {
+  private extractEvidenceClaims(argList: unknown[]): EvidenceClaim[] {
     const claims: EvidenceClaim[] = [];
 
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       if (arg.type === 'evidence' || arg.evidenceQuality !== 'none') {
         claims.push({
           id: crypto.randomUUID(),

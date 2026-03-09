@@ -234,7 +234,7 @@ export class EnhancedAPIRaceConditionDetector {
 
   async analyzeCodebase(): Promise<AnalysisReport> {
     const startTime = performance.now();
-    logger.info('🔍 Starting enhanced API race condition analysis...\n', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🔍 Starting enhanced API race condition analysis...\n');
 
     try {
       const files = await this.findRelevantFiles(process.cwd());
@@ -719,7 +719,7 @@ async function main() {
   const detector = new EnhancedAPIRaceConditionDetector();
   try {
     const report = await detector.analyzeCodebase();
-    logger.info('\n✅ Analysis complete!', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n✅ Analysis complete!');
     console.log(`📊 Total API calls found: ${report.summary.totalAPICalls}`);
     await detector.saveReport(report);
   } catch (error) {

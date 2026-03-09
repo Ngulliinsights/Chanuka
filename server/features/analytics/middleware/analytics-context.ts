@@ -2,9 +2,9 @@ import { logger } from '@server/infrastructure/observability';
 import { randomUUID } from 'crypto';
 import { NextFunction,Request, Response } from 'express';
 
-import { errorTracker } from '@/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 
-import { AuthenticatedRequest } from '../../../../AuthAlert';
+import { AuthenticatedRequest } from '@server/middleware/auth';
 
 /**
  * Request context interface for analytics operations
@@ -65,7 +65,7 @@ export function analyticsContextMiddleware(
     next();
   } catch (error) {
     // Log error but don't fail the request. Use centralized logger and error tracker when available.
-    logger.error('Failed to create analytics context', { error });
+    logger.error({ error }, 'Failed to create analytics context');
 
     try {
       if ((errorTracker as any)?.trackRequestError) {
@@ -82,7 +82,7 @@ export function analyticsContextMiddleware(
         });
       }
     } catch (reportErr) {
-      logger.warn('Error reporting analytics context creation failure to errorTracker', { reportErr });
+      logger.warn({ reportErr }, 'Error reporting analytics context creation failure to errorTracker');
     }
 
     // Create minimal context to prevent downstream errors

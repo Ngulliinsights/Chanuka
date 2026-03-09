@@ -4,7 +4,8 @@ import * as dotenv from 'dotenv';
 import pkg from 'pg';
 const { Pool } = pkg;
 import { logger } from '@server/infrastructure/observability';
-import { MigrationService } from '@shared/infrastructure/database/migration-service';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { MigrationService } from '@shared/infrastructure/database/migration-service';
 import * as path from 'path';
 
 // Load environment variables
@@ -35,10 +36,10 @@ class MigrationRunner {
   }
 
   async runUp(options: RunnerOptions): Promise<void> {
-    logger.info('🚀 Running database migrations...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🚀 Running database migrations...');
     
     if (options.dryRun) {
-      logger.info('🔍 DRY RUN MODE - No changes will be made', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🔍 DRY RUN MODE - No changes will be made');
       const pending = await this.migrationService.getPendingMigrations();
       console.log(`Would execute ${pending.length} migrations:`);
       pending.forEach(filename => console.log(`  - ${filename}`));
@@ -51,7 +52,7 @@ class MigrationRunner {
       let successCount = 0;
       let failureCount = 0;
 
-      logger.info('\n📊 Migration Results:', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '\n📊 Migration Results:');
   logger.info('='.repeat(50), { component: 'Chanuka' });
 
       for (const result of results) {
@@ -70,10 +71,10 @@ class MigrationRunner {
       console.log(`❌ Failed: ${failureCount}`);
 
       if (failureCount > 0) {
-        logger.info('\n⚠️  Some migrations failed. Please review the errors above.', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '\n⚠️  Some migrations failed. Please review the errors above.');
         process.exit(1);
       } else {
-        logger.info('\n🎉 All migrations completed successfully!', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '\n🎉 All migrations completed successfully!');
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -85,21 +86,21 @@ class MigrationRunner {
 
   async runDown(options: RunnerOptions): Promise<void> {
     if (!options.target) {
-      logger.error('❌ Target migration filename is required for rollback', { component: 'Chanuka' });
+      logger.error({ component: 'Chanuka' }, '❌ Target migration filename is required for rollback');
       process.exit(1);
     }
 
     console.log(`🔄 Rolling back migration: ${options.target}`);
     
     if (options.dryRun) {
-      logger.info('🔍 DRY RUN MODE - No changes would be made', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🔍 DRY RUN MODE - No changes would be made');
       console.log(`Would rollback: ${options.target}`);
       return;
     }
 
     if (!options.force) {
-      logger.info('⚠️  This will rollback the specified migration and may result in data loss.', { component: 'Chanuka' });
-      logger.info('Use --force to confirm this action.', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '⚠️  This will rollback the specified migration and may result in data loss.');
+      logger.info({ component: 'Chanuka' }, 'Use --force to confirm this action.');
       process.exit(1);
     }
 
@@ -114,7 +115,7 @@ class MigrationRunner {
   }
 
   async showStatus(): Promise<void> {
-    logger.info('📋 Migration Status', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '📋 Migration Status');
   logger.info('='.repeat(50), { component: 'Chanuka' });
 
     const applied = await this.migrationService.getAppliedMigrations();
@@ -133,30 +134,30 @@ class MigrationRunner {
     });
 
     if (pending.length === 0) {
-      logger.info('\n🎉 Database is up to date!', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '\n🎉 Database is up to date!');
     }
   }
 
   async validateDatabase(): Promise<void> {
-    logger.info('🔍 Validating database integrity...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🔍 Validating database integrity...');
     
     const validation = await this.migrationService.validateDatabaseIntegrity();
     
   logger.info('='.repeat(50), { component: 'Chanuka' });
     
     if (validation.isValid) {
-      logger.info('✅ Database integrity check passed', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Database integrity check passed');
     } else {
-      logger.info('❌ Database integrity check failed', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '❌ Database integrity check failed');
     }
 
     if (validation.errors.length > 0) {
-      logger.info('\n🚨 Errors:', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '\n🚨 Errors:');
       validation.errors.forEach(error => console.log(`  - ${error}`));
     }
 
     if (validation.warnings.length > 0) {
-      logger.info('\n⚠️  Warnings:', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '\n⚠️  Warnings:');
       validation.warnings.forEach(warning => console.log(`  - ${warning}`));
     }
 
@@ -167,7 +168,7 @@ class MigrationRunner {
 
   async createMigration(name: string): Promise<void> {
     if (!name) {
-      logger.error('❌ Migration name is required', { component: 'Chanuka' });
+      logger.error({ component: 'Chanuka' }, '❌ Migration name is required');
       process.exit(1);
     }
 
@@ -202,7 +203,7 @@ class MigrationRunner {
     fs.writeFileSync(filepath, template);
     
     console.log(`✅ Created migration file: ${filepath}`);
-    logger.info('📝 Please edit the file to add your migration SQL and rollback instructions.', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '📝 Please edit the file to add your migration SQL and rollback instructions.');
   }
 
   async cleanup(): Promise<void> {

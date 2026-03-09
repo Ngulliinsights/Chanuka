@@ -2,7 +2,7 @@
  * Error Classifier (REFACTORED)
  * IMPROVEMENTS: Better classification, type safety
  */
-import { GraphErrorCode } from './error-adapter-v2';
+import { GraphErrorCode } from './error-adapter';
 
 export function classifyError(error: Error): GraphErrorCode {
   const message = error.message.toLowerCase();

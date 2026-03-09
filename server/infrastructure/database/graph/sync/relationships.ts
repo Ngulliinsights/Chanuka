@@ -19,7 +19,7 @@
 
 import type { Driver } from 'neo4j-driver';
 
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { executeCypherSafely } from '../utils/session-manager';
 

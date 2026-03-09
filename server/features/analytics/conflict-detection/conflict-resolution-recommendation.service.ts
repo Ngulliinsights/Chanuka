@@ -56,10 +56,10 @@ export class ConflictResolutionRecommendationService {
       const uniqueRecommendations = Array.from(new Set(recommendations));
       return this.prioritizeRecommendations(uniqueRecommendations, riskLevel);
     } catch (error) {
-      logger.error('Error generating conflict recommendations:', {
+      logger.error({
         component: 'ConflictResolutionRecommendation',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error generating conflict recommendations:');
       return ['Conduct comprehensive conflict of interest review'];
     }
   }

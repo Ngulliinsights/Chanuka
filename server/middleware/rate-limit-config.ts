@@ -17,11 +17,11 @@ export const nlpRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    logger.warn('Rate limit exceeded for NLP endpoint', {
+    logger.warn({
       component: 'RateLimitMiddleware',
       ip: req.ip,
       path: req.path,
-    });
+    }, 'Rate limit exceeded for NLP endpoint');
     res.status(429).json({
       error: 'Too many requests',
       message: 'Please try again later',
@@ -40,11 +40,11 @@ export const pretextAnalysisRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    logger.warn('Rate limit exceeded for pretext analysis', {
+    logger.warn({
       component: 'RateLimitMiddleware',
       ip: req.ip,
       userId: req.user?.id,
-    });
+    }, 'Rate limit exceeded for pretext analysis');
     res.status(429).json({
       error: 'Too many requests',
       message: 'Analysis rate limit exceeded. Please try again later',
@@ -74,11 +74,11 @@ export const clusteringRateLimit = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    logger.warn('Rate limit exceeded for clustering', {
+    logger.warn({
       component: 'RateLimitMiddleware',
       ip: req.ip,
       billId: req.params.billId,
-    });
+    }, 'Rate limit exceeded for clustering');
     res.status(429).json({
       error: 'Too many requests',
       message: 'Clustering is an expensive operation. Please try again later',

@@ -107,10 +107,10 @@ export class ModerationAnalyticsService {
         severityBreakdown
       };
     } catch (error) {
-      logger.error('Error fetching moderation stats:', {
+      logger.error({
         component: 'ModerationAnalytics',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching moderation stats:');
       throw error;
     }
   }
@@ -184,10 +184,10 @@ export class ModerationAnalyticsService {
         reportReasons
       };
     } catch (error) {
-      logger.error('Error fetching content analytics:', {
+      logger.error({
         component: 'ModerationAnalytics',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching content analytics:');
       throw error;
     }
   }

@@ -69,7 +69,7 @@ export class FeatureIntegrationHelper {
       
       return ok(query as any);
     } catch (error) {
-      logger.error('Secure query execution failed', { error, template });
+      logger.error({ error, template }, 'Secure query execution failed');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -102,7 +102,7 @@ export class FeatureIntegrationHelper {
       await cacheService.set(options.key, result, options.ttl);
       return ok(result);
     } catch (error) {
-      logger.error('Cached operation failed', { error, key: options.key });
+      logger.error({ error, key: options.key }, 'Cached operation failed');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }

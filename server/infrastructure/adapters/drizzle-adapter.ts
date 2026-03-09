@@ -377,10 +377,10 @@ export class DrizzleAdapter<TEntity, TRow> {
       .map(filter => {
         const column = this.table[filter.field];
         if (!column) {
-          logger.warn(`Unknown field in filter: ${filter.field}`, { 
+          logger.warn({ 
             table: this.tableName, 
             filter 
-          });
+          }, `Unknown field in filter: ${filter.field}`);
           return undefined;
         }
 
@@ -402,10 +402,10 @@ export class DrizzleAdapter<TEntity, TRow> {
           case 'isNull':
             return sql`${column} IS NULL`;
           default:
-            logger.warn(`Unknown operator in filter: ${filter.operator}`, { 
+            logger.warn({ 
               table: this.tableName, 
               filter 
-            });
+            }, `Unknown operator in filter: ${filter.operator}`);
             return undefined;
         }
       })
@@ -419,19 +419,19 @@ export class DrizzleAdapter<TEntity, TRow> {
     const duration = Date.now() - startTime;
     
     if (duration > 1000) { // Log slow queries
-      logger.warn(`Slow DrizzleAdapter operation`, {
+      logger.warn({
         table: this.tableName,
         operation,
         duration,
         ...metadata
-      });
+      }, `Slow DrizzleAdapter operation`);
     } else if (duration > 100) {
-      logger.info(`DrizzleAdapter operation`, {
+      logger.info({
         table: this.tableName,
         operation,
         duration,
         ...metadata
-      });
+      }, `DrizzleAdapter operation`);
     }
   }
 
@@ -439,13 +439,13 @@ export class DrizzleAdapter<TEntity, TRow> {
    * Log errors with context
    */
   private logError(operation: string, error: unknown, metadata: unknown = {}) {
-    logger.error(`DrizzleAdapter error`, {
+    logger.error({
       table: this.tableName,
       operation,
       error: error.message,
       stack: error.stack,
       ...metadata
-    });
+    }, `DrizzleAdapter error`);
   }
 }
 

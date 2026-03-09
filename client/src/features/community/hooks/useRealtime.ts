@@ -8,7 +8,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 
 import { WebSocketManager } from '@client/infrastructure/api';
-import type { WebSocketEvents } from '../../../infrastructure/community/types';
+import type { WebSocketEvents } from '@client/infrastructure/community/types';
 
 interface UseRealtimeOptions {
   autoConnect?: boolean;
@@ -124,7 +124,9 @@ export function useRealtime({
 
   const on = useCallback(
     <K extends keyof WebSocketEvents>(event: K, handler: (data: WebSocketEvents[K]) => void) => {
-      return wsManager.on(event, handler);
+      // WebSocketManager expects EventHandler with unknown data type
+      // We cast to match the expected signature
+      return wsManager.on(event, handler as (data: unknown) => void);
     },
     [wsManager]
   );

@@ -1,7 +1,8 @@
 import { NotificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 // UserRepository interface removed - using direct service calls
 import { logger } from '@server/infrastructure/observability';
-import { Bill } from '@shared/entities/bill';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { Bill } from '@shared/entities/bill';
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@server/features/bills/domain/events/bill-events';
 
 /**
@@ -19,11 +20,11 @@ export class BillNotificationService {
    */
   async handleBillCreated(event: BillCreatedEvent): Promise<void> {
     try {
-      logger.info('Handling bill created event', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         billNumber: event.billNumber
-      });
+      }, 'Handling bill created event');
 
       // Get stakeholders for the bill
       const stakeholders = await this.getBillStakeholders(event.bill_id);
@@ -48,11 +49,11 @@ export class BillNotificationService {
 
       await Promise.allSettled(notificationPromises);
 
-      logger.info('Bill created notifications sent', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
-      });
+      }, 'Bill created notifications sent');
 
     } catch (error) {
       logger.error('Failed to handle bill created event', {
@@ -67,12 +68,12 @@ export class BillNotificationService {
    */
   async handleBillStatusChanged(event: BillStatusChangedEvent): Promise<void> {
     try {
-      logger.info('Handling bill status changed event', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         oldStatus: event.oldStatus,
         newStatus: event.newStatus
-      });
+      }, 'Handling bill status changed event');
 
       // Get stakeholders for the bill
       const stakeholders = await this.getBillStakeholders(event.bill_id);
@@ -102,11 +103,11 @@ export class BillNotificationService {
 
       await Promise.allSettled(notificationPromises);
 
-      logger.info('Bill status change notifications sent', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
-      });
+      }, 'Bill status change notifications sent');
 
     } catch (error) {
       logger.error('Failed to handle bill status changed event', {
@@ -121,11 +122,11 @@ export class BillNotificationService {
    */
   async handleBillUpdated(event: BillUpdatedEvent): Promise<void> {
     try {
-      logger.info('Handling bill updated event', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         updateType: event.updateType
-      });
+      }, 'Handling bill updated event');
 
       // Only send notifications for significant updates
       if (!this.shouldNotifyOnUpdate(event.updateType)) {
@@ -158,11 +159,11 @@ export class BillNotificationService {
 
       await Promise.allSettled(notificationPromises);
 
-      logger.info('Bill updated notifications sent', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id: event.bill_id,
         stakeholdersCount: stakeholders.length
-      });
+      }, 'Bill updated notifications sent');
 
     } catch (error) {
       logger.error('Failed to handle bill updated event', {
@@ -292,11 +293,11 @@ export class BillNotificationService {
 
       await Promise.allSettled(notificationPromises);
 
-      logger.info('Urgent bill notifications sent', {
+      logger.info({
         component: 'BillNotificationService',
         bill_id,
         stakeholdersCount: targetStakeholders.length
-      });
+      }, 'Urgent bill notifications sent');
 
     } catch (error) {
       logger.error('Failed to send urgent bill notification', {
@@ -347,11 +348,11 @@ export class BillNotificationService {
         }
       );
 
-      logger.info('Bill digest notification sent', {
+      logger.info({
         component: 'BillNotificationService',
         user_id,
         updatesCount: billUpdates.length
-      });
+      }, 'Bill digest notification sent');
 
     } catch (error) {
       logger.error('Failed to send bill digest notification', {

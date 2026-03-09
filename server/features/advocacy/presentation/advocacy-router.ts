@@ -32,7 +32,7 @@ router.post('/campaigns', async (req, res) => {
       campaign
     });
   } catch (error) {
-    logger.error('Failed to create campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to create campaign');
     res.status(500).json({ error: 'Failed to create campaign' });
   }
 });
@@ -60,7 +60,7 @@ router.get('/campaigns', async (req, res) => {
       pagination
     });
   } catch (error) {
-    logger.error('Failed to get campaigns', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaigns');
     res.status(500).json({ error: 'Failed to get campaigns' });
   }
 });
@@ -76,7 +76,7 @@ router.get('/campaigns/:id', async (req, res) => {
       campaign
     });
   } catch (error) {
-    logger.error('Failed to get campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign');
     res.status(404).json({ error: 'Campaign not found' });
   }
 });
@@ -92,7 +92,7 @@ router.put('/campaigns/:id', async (req, res) => {
       campaign
     });
   } catch (error) {
-    logger.error('Failed to update campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to update campaign');
     res.status(500).json({ error: 'Failed to update campaign' });
   }
 });
@@ -108,7 +108,7 @@ router.delete('/campaigns/:id', async (req, res) => {
       message: 'Campaign deleted'
     });
   } catch (error) {
-    logger.error('Failed to delete campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to delete campaign');
     res.status(500).json({ error: 'Failed to delete campaign' });
   }
 });
@@ -124,7 +124,7 @@ router.post('/campaigns/:id/join', async (req, res) => {
       message: 'Joined campaign'
     });
   } catch (error) {
-    logger.error('Failed to join campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to join campaign');
     res.status(500).json({ error: 'Failed to join campaign' });
   }
 });
@@ -140,7 +140,7 @@ router.post('/campaigns/:id/leave', async (req, res) => {
       message: 'Left campaign'
     });
   } catch (error) {
-    logger.error('Failed to leave campaign', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to leave campaign');
     res.status(500).json({ error: 'Failed to leave campaign' });
   }
 });
@@ -156,7 +156,7 @@ router.get('/campaigns/:id/metrics', async (req, res) => {
       metrics
     });
   } catch (error) {
-    logger.error('Failed to get campaign metrics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign metrics');
     res.status(500).json({ error: 'Failed to get campaign metrics' });
   }
 });
@@ -172,7 +172,7 @@ router.get('/campaigns/:id/analytics', async (req, res) => {
       analytics
     });
   } catch (error) {
-    logger.error('Failed to get campaign analytics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign analytics');
     res.status(500).json({ error: 'Failed to get campaign analytics' });
   }
 });
@@ -187,7 +187,7 @@ router.get('/bills/:billId/campaigns', async (req, res) => {
       campaigns
     });
   } catch (error) {
-    logger.error('Failed to get campaigns by bill', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaigns by bill');
     res.status(500).json({ error: 'Failed to get campaigns by bill' });
   }
 });
@@ -202,7 +202,7 @@ router.get('/users/:userId/campaigns', async (req, res) => {
       ...campaigns
     });
   } catch (error) {
-    logger.error('Failed to get user campaigns', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get user campaigns');
     res.status(500).json({ error: 'Failed to get user campaigns' });
   }
 });
@@ -218,7 +218,7 @@ router.get('/campaigns/search', async (req, res) => {
       campaigns
     });
   } catch (error) {
-    logger.error('Failed to search campaigns', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to search campaigns');
     res.status(500).json({ error: 'Failed to search campaigns' });
   }
 });
@@ -234,7 +234,7 @@ router.get('/campaigns/trending', async (req, res) => {
       campaigns
     });
   } catch (error) {
-    logger.error('Failed to get trending campaigns', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get trending campaigns');
     res.status(500).json({ error: 'Failed to get trending campaigns' });
   }
 });
@@ -254,7 +254,7 @@ router.post('/actions', async (req, res) => {
       action
     });
   } catch (error) {
-    logger.error('Failed to create action', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to create action');
     res.status(500).json({ error: 'Failed to create action' });
   }
 });
@@ -274,7 +274,7 @@ router.get('/users/:userId/actions', async (req, res) => {
       actions
     });
   } catch (error) {
-    logger.error('Failed to get user actions', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get user actions');
     res.status(500).json({ error: 'Failed to get user actions' });
   }
 });
@@ -289,7 +289,7 @@ router.get('/users/:userId/dashboard', async (req, res) => {
       dashboard
     });
   } catch (error) {
-    logger.error('Failed to get user dashboard', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get user dashboard');
     res.status(500).json({ error: 'Failed to get user dashboard' });
   }
 });
@@ -305,7 +305,7 @@ router.get('/campaigns/:id/actions', async (req, res) => {
       actions
     });
   } catch (error) {
-    logger.error('Failed to get campaign actions', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign actions');
     res.status(500).json({ error: 'Failed to get campaign actions' });
   }
 });
@@ -321,7 +321,7 @@ router.post('/actions/:id/start', async (req, res) => {
       action
     });
   } catch (error) {
-    logger.error('Failed to start action', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to start action');
     res.status(500).json({ error: 'Failed to start action' });
   }
 });
@@ -342,7 +342,7 @@ router.post('/actions/:id/complete', async (req, res) => {
       action
     });
   } catch (error) {
-    logger.error('Failed to complete action', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to complete action');
     res.status(500).json({ error: 'Failed to complete action' });
   }
 });
@@ -358,7 +358,7 @@ router.post('/actions/:id/skip', async (req, res) => {
       action
     });
   } catch (error) {
-    logger.error('Failed to skip action', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to skip action');
     res.status(500).json({ error: 'Failed to skip action' });
   }
 });
@@ -374,7 +374,7 @@ router.post('/actions/:id/feedback', async (req, res) => {
       action
     });
   } catch (error) {
-    logger.error('Failed to add action feedback', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to add action feedback');
     res.status(500).json({ error: 'Failed to add action feedback' });
   }
 });
@@ -390,7 +390,7 @@ router.get('/action-templates', async (req, res) => {
       templates
     });
   } catch (error) {
-    logger.error('Failed to get action templates', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get action templates');
     res.status(500).json({ error: 'Failed to get action templates' });
   }
 });
@@ -406,7 +406,7 @@ router.get('/users/:userId/recommended-actions', async (req, res) => {
       actions
     });
   } catch (error) {
-    logger.error('Failed to get recommended actions', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get recommended actions');
     res.status(500).json({ error: 'Failed to get recommended actions' });
   }
 });
@@ -433,7 +433,7 @@ router.post('/campaigns/:id/impact', async (req, res) => {
       impact
     });
   } catch (error) {
-    logger.error('Failed to record impact', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to record impact');
     res.status(500).json({ error: 'Failed to record impact' });
   }
 });
@@ -448,7 +448,7 @@ router.get('/campaigns/:id/impact', async (req, res) => {
       metrics
     });
   } catch (error) {
-    logger.error('Failed to get campaign impact metrics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign impact metrics');
     res.status(500).json({ error: 'Failed to get campaign impact metrics' });
   }
 });
@@ -463,7 +463,7 @@ router.get('/campaigns/:id/impact/assessment', async (req, res) => {
       assessment
     });
   } catch (error) {
-    logger.error('Failed to generate impact assessment', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to generate impact assessment');
     res.status(500).json({ error: 'Failed to generate impact assessment' });
   }
 });
@@ -483,7 +483,7 @@ router.get('/impact/statistics', async (req, res) => {
       statistics
     });
   } catch (error) {
-    logger.error('Failed to get impact statistics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get impact statistics');
     res.status(500).json({ error: 'Failed to get impact statistics' });
   }
 });
@@ -502,7 +502,7 @@ router.get('/users/:userId/coalition-opportunities', async (req, res) => {
       opportunities
     });
   } catch (error) {
-    logger.error('Failed to find coalition opportunities', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to find coalition opportunities');
     res.status(500).json({ error: 'Failed to find coalition opportunities' });
   }
 });
@@ -517,7 +517,7 @@ router.get('/campaigns/:id/coalition-recommendations', async (req, res) => {
       recommendations
     });
   } catch (error) {
-    logger.error('Failed to get coalition recommendations', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get coalition recommendations');
     res.status(500).json({ error: 'Failed to get coalition recommendations' });
   }
 });
@@ -536,7 +536,7 @@ router.get('/statistics/campaigns', async (req, res) => {
       statistics: stats
     });
   } catch (error) {
-    logger.error('Failed to get campaign statistics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get campaign statistics');
     res.status(500).json({ error: 'Failed to get campaign statistics' });
   }
 });
@@ -556,7 +556,7 @@ router.get('/analytics/actions', async (req, res) => {
       analytics
     });
   } catch (error) {
-    logger.error('Failed to get action analytics', { error, component: 'AdvocacyRouter' });
+    logger.error({ error, component: 'AdvocacyRouter' }, 'Failed to get action analytics');
     res.status(500).json({ error: 'Failed to get action analytics' });
   }
 });

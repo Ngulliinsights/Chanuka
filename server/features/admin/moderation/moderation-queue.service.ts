@@ -99,10 +99,10 @@ export class ModerationQueueService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching moderation queue:', {
+      logger.error({
         component: 'ModerationQueue',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching moderation queue:');
       throw error;
     }
   }
@@ -177,10 +177,10 @@ export class ModerationQueueService {
         };
       }
     } catch (error) {
-      logger.error('Error creating report:', {
+      logger.error({
         component: 'ModerationQueue',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error creating report:');
       return { success: false, message: 'Failed to report content' };
     }
   }
@@ -209,11 +209,11 @@ export class ModerationQueueService {
         content: contentDetails
       } as ModerationItem;
     } catch (error) {
-      logger.error('Error fetching report by ID:', {
+      logger.error({
         component: 'ModerationQueue',
         report_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching report by ID:');
       return null;
     }
   }
@@ -361,12 +361,12 @@ export class ModerationQueueService {
       };
 
     } catch (error) {
-      logger.error('Error fetching content details:', {
+      logger.error({
         component: 'ModerationQueue',
         content_type,
         content_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching content details:');
       return {
         text: 'Error loading content',
         author: { id: '', name: 'Unknown', email: '' },

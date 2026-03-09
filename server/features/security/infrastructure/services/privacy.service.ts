@@ -1,9 +1,8 @@
-import { encryptionService } from '@server/features/security/domain/services/encryption.service';
 import { securityAuditService } from '@server/features/security/infrastructure/services/security-audit.service';
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { comments, notifications, sessions, user_profiles, users } from '@server/infrastructure/schema';
-import { and, eq, lt } from 'drizzle-orm';
+import { readDatabase } from '@server/infrastructure/database';
+import { user_profiles, users } from '@server/infrastructure/schema';
+import { eq } from 'drizzle-orm';
 import { Request } from 'express';
 
 export interface DataExportRequest { user_id: string;
@@ -49,13 +48,6 @@ export interface PrivacyPreferences {
  * Privacy controls and GDPR compliance service
  */
 export class PrivacyService {
-  private readonly defaultRetentionPeriods = {
-    userSessions: 30, // days
-    auditLogs: 2555, // 7 years
-    userActivity: 365, // 1 year
-    deletedUserData: 30, // days before permanent deletion
-  };
-
   /**
    * Export user data in requested format
    */
@@ -83,27 +75,29 @@ export class PrivacyService {
 
       // Export user profile data
       if (request.dataTypes.includes('profile')) {
-        const user = await db
+        const userRows: any = await ((readDatabase as any)
           .select()
           .from(users)
-          .where(eq(users.id, request.user_id))
-          .limit(1);
+          .where(eq(users.id, request.user_id as any))
+          .limit(1));
+        const user = userRows[0];
 
-        const profile = await db
+        const profileRows: any = await ((readDatabase as any)
           .select()
           .from(user_profiles)
-          .where(eq(user_profiles.user_id, request.user_id))
-          .limit(1);
+          .where(eq(user_profiles.user_id, request.user_id as any))
+          .limit(1));
+        const profile = profileRows[0];
 
-        userData.userData.profile = user[0] || null;
-        userData.userData.profileDetails = profile[0] || null;
+        userData.userData.profile = user || null;
+        userData.userData.profileDetails = profile || null;
       }
 
       // Additional data types (comments, notifications) can be added similarly.
 
       return userData;
     } catch (error) {
-      logger.error('Error exporting user data:', { component: 'PrivacyService' });
+      logger.error({ component: 'PrivacyService' }, 'Error exporting user data:');
       throw error;
     }
   }
@@ -111,11 +105,11 @@ export class PrivacyService {
   // Stub for deleting user data - conservative implementation
   async deleteUserData(request: DataDeletionRequest): Promise<boolean> {
     try {
-      logger.info(`Received data deletion request for user ${request.user_id}`, { component: 'PrivacyService' });
+      logger.info({ component: 'PrivacyService' }, `Received data deletion request for user ${request.user_id}`);
       // Implement deletion logic carefully to respect retention and audit.
       return true;
     } catch (err) {
-      logger.error('Error deleting user data:', { component: 'PrivacyService' });
+      logger.error({ component: 'PrivacyService' }, 'Error deleting user data:');
       return false;
     }
   }

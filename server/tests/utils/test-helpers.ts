@@ -419,11 +419,11 @@ export class SecurityTestHelper {
       throw new Error('XSS vulnerability detected: onload= attribute found in output');
     }
     
-    logger.debug('XSS prevention validated successfully', {
+    logger.debug({
       component: 'security-test-helper',
       inputLength: input.length,
       outputLength: output.length
-    });
+    }, 'XSS prevention validated successfully');
   }
 
   static validateSQLInjectionPrevention(response: any): void {
@@ -446,10 +446,10 @@ export class SecurityTestHelper {
       }
     }
     
-    logger.debug('SQL injection prevention validated successfully', {
+    logger.debug({
       component: 'security-test-helper',
       status: response.status
-    });
+    }, 'SQL injection prevention validated successfully');
   }
 }
 

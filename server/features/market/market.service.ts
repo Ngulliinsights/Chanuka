@@ -1,7 +1,8 @@
 import { db } from '@server/infrastructure/database';
 import { market_commodities,market_signals } from '@server/infrastructure/schema/market_intelligence';
 import { and, desc, eq, gte,sql } from 'drizzle-orm';
-import { injectable } from 'inversify';
+// FIXME: inversify not installed
+// import { injectable } from 'inversify';
 
 import { calculateMarketMetrics, validateMarketData } from './market.utils';
 

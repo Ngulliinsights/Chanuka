@@ -4,7 +4,7 @@
  */
 import { Driver, Transaction } from 'neo4j-driver';
 
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { withTransaction } from '../utils/session-manager';
 
@@ -58,10 +58,10 @@ export async function executeBatchInTransaction<T>(
       }
     });
 
-    logger.debug('Batch processed', {
+    logger.debug({
       processed: Math.min(i + batchSize, items.length),
       total: items.length
-    });
+    }, 'Batch processed');
   }
 }
 

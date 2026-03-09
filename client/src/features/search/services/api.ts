@@ -12,7 +12,7 @@ import type {
 } from '@client/lib/types/search';
 import type { SearchAnalytics } from '@client/lib/types/search-response';
 
-import { globalApiClient as api } from '../../../infrastructure/api/client';
+import { globalApiClient as api } from '@client/infrastructure/api/client';
 
 /**
  * Search API Client - Core API wrapper for search endpoints

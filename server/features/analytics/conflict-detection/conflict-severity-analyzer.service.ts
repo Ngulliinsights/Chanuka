@@ -72,7 +72,7 @@ export class ConflictSeverityAnalyzerService {
 
       const finalScore = Math.min(baseScore * multiplier, 1.0);
 
-      logger.debug('Risk score calculation:', {
+      logger.debug({
         component: 'ConflictSeverityAnalyzer',
         financialScore,
         professionalScore,
@@ -80,14 +80,14 @@ export class ConflictSeverityAnalyzerService {
         transparencyPenalty,
         multiplier,
         finalScore
-      });
+      }, 'Risk score calculation:');
 
       return Math.round(finalScore * 100) / 100;
     } catch (error) {
-      logger.error('Error calculating overall risk score:', {
+      logger.error({
         component: 'ConflictSeverityAnalyzer',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error calculating overall risk score:');
       return 0.5; // Default moderate risk
     }
   }
@@ -137,10 +137,10 @@ export class ConflictSeverityAnalyzerService {
 
       return Math.max(0.1, Math.min(confidence, 0.95));
     } catch (error) {
-      logger.error('Error calculating analysis confidence:', {
+      logger.error({
         component: 'ConflictSeverityAnalyzer',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error calculating analysis confidence:');
       return 0.5;
     }
   }

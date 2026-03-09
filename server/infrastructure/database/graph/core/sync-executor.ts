@@ -24,7 +24,7 @@ import { eq, and, desc } from 'drizzle-orm';
 import { runBatchSync, startSyncScheduler, stopSyncScheduler } from './batch-sync-runner';
 import * as neo4jSchema from './schema';
 import { withSession } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter.js';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { NEO4J_CONFIG, SYNC_CONFIG } from '../config/graph-config';
 import { logger } from '@server/infrastructure/observability';
@@ -87,10 +87,10 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
   validateConfig(config);
 
   serviceConfig = config;
-  logger.info('Initializing sync service...', {
+  logger.info({
     uri: config.neo4jUri,
     autoSync: config.enableAutoSync,
-  });
+  }, 'Initializing sync service...');
 
   try {
     // Connect to Neo4j with retry
@@ -123,27 +123,27 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
 
     // Verify data consistency
     const consistencyReport = await verifyDataConsistency();
-    logger.info('Data consistency check completed', {
+    logger.info({
       entitiesChecked: consistencyReport.entitiesChecked,
       conflicts: consistencyReport.conflictCount,
-    });
+    }, 'Data consistency check completed');
 
     if (consistencyReport.conflictCount > 0) {
-      logger.warn('Found data conflicts', { count: consistencyReport.conflictCount });
+      logger.warn({ count: consistencyReport.conflictCount }, 'Found data conflicts');
     }
 
     // Start auto-sync scheduler if enabled
     if (config.enableAutoSync) {
       startSyncScheduler(config.syncIntervalMs);
-      logger.info('Auto-sync scheduler started', { intervalMs: config.syncIntervalMs });
+      logger.info({ intervalMs: config.syncIntervalMs }, 'Auto-sync scheduler started');
     }
 
     isInitialized = true;
     logger.info('Sync service initialized successfully');
   } catch (error) {
-    logger.error('Failed to initialize sync service', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to initialize sync service');
 
     errorHandler.handle(error as Error, {
       operation: 'initializeSyncService',
@@ -185,9 +185,9 @@ export async function shutdownSyncService(): Promise<void> {
     isInitialized = false;
     logger.info('Sync service shut down successfully');
   } catch (error) {
-    logger.error('Error during shutdown', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Error during shutdown');
 
     errorHandler.handle(error as Error, {
       operation: 'shutdownSyncService',
@@ -220,9 +220,9 @@ export async function triggerFullSync(): Promise<any> {
     logger.info('Full sync completed', stats);
     return stats;
   } catch (error) {
-    logger.error('Full sync failed', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Full sync failed');
 
     errorHandler.handle(error as Error, {
       operation: 'triggerFullSync',
@@ -289,9 +289,9 @@ export async function getSyncServiceStatus(): Promise<{
       conflictCount: Number(conflictResult[0]?.count) || 0,
     };
   } catch (error) {
-    logger.error('Error fetching sync status', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Error fetching sync status');
 
     throw new GraphError({
       code: GraphErrorCode.QUERY_FAILED,
@@ -385,9 +385,9 @@ async function testNeo4jConnection(): Promise<boolean> {
       return true;
     });
   } catch (error) {
-    logger.error('Neo4j connection test failed', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Neo4j connection test failed');
     return false;
   }
 }
@@ -477,9 +477,9 @@ export async function verifyDataConsistency(): Promise<ConsistencyReport> {
     logger.info('Data consistency check completed', report);
     return report;
   } catch (error) {
-    logger.error('Error during consistency verification', {
+    logger.error({
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Error during consistency verification');
 
     throw new GraphError({
       code: GraphErrorCode.QUERY_FAILED,
@@ -574,7 +574,7 @@ export async function resolveConflict(
   entityType: string,
   entityId: string
 ): Promise<void> {
-  logger.info('Resolving conflict', { entityType, entityId });
+  logger.info({ entityType, entityId }, 'Resolving conflict');
 
   const entity = await fetchPostgresEntity(entityType, entityId);
   if (!entity) {
@@ -601,7 +601,7 @@ export async function resolveConflict(
         )
       );
 
-    logger.info('Conflict resolved', { entityType, entityId });
+    logger.info({ entityType, entityId }, 'Conflict resolved');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'resolveConflict',
@@ -647,15 +647,15 @@ async function fetchPostgresEntity(
           where: (bills, { eq }) => eq(bills.id, entityId),
         });
       default:
-        logger.warn('Unknown entity type', { entityType });
+        logger.warn({ entityType }, 'Unknown entity type');
         return null;
     }
   } catch (error) {
-    logger.error('Failed to fetch PostgreSQL entity', {
+    logger.error({
       entityType,
       entityId,
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to fetch PostgreSQL entity');
     return null;
   }
 }
@@ -688,11 +688,11 @@ async function fetchNeo4jEntity(
       return null;
     });
   } catch (error) {
-    logger.error('Failed to fetch Neo4j entity', {
+    logger.error({
       entityType,
       entityId,
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to fetch Neo4j entity');
     return null;
   }
 }

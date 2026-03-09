@@ -26,7 +26,7 @@ export function extractValue<T = any>(record: Neo4jRecord, key: string, defaultV
     const value = record.get(key);
     return normalizeValue(value) as T;
   } catch (error) {
-    logger.warn('Failed to extract value', { key, error: error.message });
+    logger.warn({ key, error: error.message }, 'Failed to extract value');
     return defaultValue !== undefined ? defaultValue : null;
   }
 }

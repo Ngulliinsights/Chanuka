@@ -16,56 +16,56 @@ import express from 'express';
 import { createServer } from 'http';
 
 async function runDemo() {
-  logger.info('🚀 Starting Real-Time Bill Tracking Demo...\n', { component: 'Chanuka' });
+  logger.info({ component: 'Chanuka' }, '🚀 Starting Real-Time Bill Tracking Demo...\n');
 
   try {
     // 1. Initialize the system
-    logger.info('1. Initializing Bill Status Monitor...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '1. Initializing Bill Status Monitor...');
     try {
       // The monitor is constructed on import; probe its stats to ensure it's available.
       const stats = billStatusMonitor.getStats();
-      logger.info('✅ Bill Status Monitor available', { 
+      logger.info({ 
         component: 'Chanuka',
         stats: JSON.stringify(stats, null, 2)
-      });
+      }, '✅ Bill Status Monitor available');
     } catch (error: unknown) {
-      logger.info('⚠️ Bill Status Monitor initialization skipped (error)', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '⚠️ Bill Status Monitor initialization skipped (error)');
     }
 
     // 2. Create a test HTTP server for WebSocket
-    logger.info('2. Setting up WebSocket server...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '2. Setting up WebSocket server...');
     const app = express();
     const server = createServer(app);
     
     try {
       webSocketService.initialize(server);
-      logger.info('✅ WebSocket service initialized', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ WebSocket service initialized');
     } catch (error: unknown) {
-      logger.info('⚠️ WebSocket service initialization failed', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '⚠️ WebSocket service initialization failed');
     }
     
     server.listen(3001, () => {
-      logger.info('✅ WebSocket server running on port 3001\n', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ WebSocket server running on port 3001\n');
     });
 
     // 3. Demonstrate WebSocket service functionality
-    logger.info('3. Testing WebSocket Service Features...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '3. Testing WebSocket Service Features...');
     
     // Test WebSocket statistics
     const wsStats = webSocketService.getStats();
-    logger.info('WebSocket stats:', { 
+    logger.info({ 
       component: 'Chanuka',
       stats: JSON.stringify(wsStats, null, 2)
-    });
+    }, 'WebSocket stats:');
     
     // Test broadcast functionality (simulated)
-    logger.info('Testing broadcast functionality...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Testing broadcast functionality...');
     webSocketService.broadcastBillUpdate(123, { type: 'status_change',
       data: {
         bill_id: 123,
@@ -75,48 +75,48 @@ async function runDemo() {
        },
       timestamp: new Date()
     });
-    logger.info('✅ Broadcast test completed', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '✅ Broadcast test completed');
     
     // Test user notification (simulated)
-    logger.info('Testing user notification...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Testing user notification...');
     webSocketService.sendUserNotification('test-user-id', {
       type: 'test',
       title: 'Test Notification',
       message: 'This is a test notification',
       data: { timestamp: new Date() }
     });
-    logger.info('✅ User notification test completed\n', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '✅ User notification test completed\n');
 
     // 4. Demonstrate bill status monitoring features
-    logger.info('4. Testing Bill Status Monitor Features...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '4. Testing Bill Status Monitor Features...');
     
     try {
       // Get monitoring stats - using getStats() instead of getMonitoringStats()
       const monitorStats = billStatusMonitor.getStats();
-      logger.info('Monitoring stats:', { 
+      logger.info({ 
         component: 'Chanuka',
         stats: JSON.stringify(monitorStats, null, 2)
-      });
+      }, 'Monitoring stats:');
       
       // Test adding bill to monitoring (simulated)
       // Note: If addBillToMonitoring doesn't exist, we'll use startMonitoring or similar
-      logger.info('Testing bill monitoring addition...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Testing bill monitoring addition...');
       // Assuming the service has a method to track bills - adjust based on actual API
       if ('startMonitoring' in billStatusMonitor && typeof billStatusMonitor.startMonitoring === 'function') {
         billStatusMonitor.startMonitoring();
-        logger.info('✅ Bill monitoring started', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '✅ Bill monitoring started');
       } else {
-        logger.info('⚠️ Bill monitoring method not available', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '⚠️ Bill monitoring method not available');
       }
       
       // Test status retrieval
       // Note: getBillStatus may not exist - using conditional check
-      logger.info('Testing status retrieval for bill 123...', { component: 'Chanuka',
+      logger.info({ component: 'Chanuka',
         bill_id: 123
-       });
+       }, 'Testing status retrieval for bill 123...');
       
       // Test status change trigger (simulated)
-      logger.info('Testing status change simulation...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Testing status change simulation...');
       try { // Since triggerStatusChange may not exist, we simulate the notification
         webSocketService.broadcastBillUpdate(123, {
           type: 'status_change',
@@ -128,60 +128,60 @@ async function runDemo() {
            },
           timestamp: new Date()
         });
-        logger.info('✅ Status change notification sent successfully', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '✅ Status change notification sent successfully');
       } catch (error) {
-        logger.info('⚠️ Status change skipped (database not available)', { 
+        logger.info({ 
           component: 'Chanuka',
           error: error instanceof Error ? error.message : 'Unknown error'
-        });
+        }, '⚠️ Status change skipped (database not available)');
       }
       
     } catch (error) {
-      logger.info('⚠️ Bill monitoring tests skipped', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '⚠️ Bill monitoring tests skipped');
     }
     logger.info('', { component: 'Chanuka' });
 
     // 5. Demonstrate user preferences functionality
-    logger.info('5. Testing User Preferences Features...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '5. Testing User Preferences Features...');
     
     try {
       // Test default preferences
-      logger.info('Testing default preferences...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Testing default preferences...');
       const defaultPrefs = await userPreferencesService.getUserPreferences('test-user-id');
-      logger.info('Default preferences loaded', { 
+      logger.info({ 
         component: 'Chanuka',
         billTracking: JSON.stringify(defaultPrefs.billTracking, null, 2)
-      });
+      }, 'Default preferences loaded');
       
       // Test preference updates
-      logger.info('Testing preference updates...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Testing preference updates...');
       const updatedPrefs = await userPreferencesService.updateBillTrackingPreferences('test-user-id', {
         updateFrequency: 'hourly',
         statusChanges: true,
         newComments: false
       });
-      logger.info('✅ Preferences updated successfully', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Preferences updated successfully');
       
       // Test notification eligibility
       const shouldNotify = await userPreferencesService.shouldNotifyUser('test-user-id', 'statusChanges');
-      logger.info('Notification eligibility checked', { 
+      logger.info({ 
         component: 'Chanuka',
         shouldNotify
-      });
+      }, 'Notification eligibility checked');
       
     } catch (error) {
-      logger.info('⚠️ User preferences tests skipped', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '⚠️ User preferences tests skipped');
     }
     logger.info('', { component: 'Chanuka' });
 
     // 6. Test error handling
-    logger.info('6. Testing Error Handling...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '6. Testing Error Handling...');
     
     // Test invalid bill notification
     try { webSocketService.broadcastBillUpdate(99999, {
@@ -194,51 +194,51 @@ async function runDemo() {
          },
         timestamp: new Date()
       });
-      logger.info('✅ Properly handled invalid bill ID scenario', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Properly handled invalid bill ID scenario');
     } catch (error) {
-      logger.info('✅ Caught error for invalid bill ID', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '✅ Caught error for invalid bill ID');
     }
 
     // Test invalid user preferences
     try {
       await userPreferencesService.getUserPreferences('invalid-user-id');
-      logger.info('✅ Handled invalid user gracefully (returned defaults)', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Handled invalid user gracefully (returned defaults)');
     } catch (error) {
-      logger.info('✅ Properly handled invalid user ID error', { 
+      logger.info({ 
         component: 'Chanuka',
         error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      }, '✅ Properly handled invalid user ID error');
     }
     logger.info('', { component: 'Chanuka' });
 
     // 7. Summary
-    logger.info('📊 Demo Summary:', { component: 'Chanuka' });
-    logger.info('================', { component: 'Chanuka' });
-    logger.info('✅ WebSocket service initialization', { component: 'Chanuka' });
-    logger.info('✅ Bill status monitoring system', { component: 'Chanuka' });
-    logger.info('✅ User preference management', { component: 'Chanuka' });
-    logger.info('✅ Real-time notification broadcasting', { component: 'Chanuka' });
-    logger.info('✅ Error handling and graceful degradation', { component: 'Chanuka' });
-    logger.info('✅ Service statistics and monitoring', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '📊 Demo Summary:');
+    logger.info({ component: 'Chanuka' }, '================');
+    logger.info({ component: 'Chanuka' }, '✅ WebSocket service initialization');
+    logger.info({ component: 'Chanuka' }, '✅ Bill status monitoring system');
+    logger.info({ component: 'Chanuka' }, '✅ User preference management');
+    logger.info({ component: 'Chanuka' }, '✅ Real-time notification broadcasting');
+    logger.info({ component: 'Chanuka' }, '✅ Error handling and graceful degradation');
+    logger.info({ component: 'Chanuka' }, '✅ Service statistics and monitoring');
     logger.info('', { component: 'Chanuka' });
 
-    logger.info('🎉 Real-Time Bill Tracking Demo Completed Successfully!', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🎉 Real-Time Bill Tracking Demo Completed Successfully!');
     logger.info('', { component: 'Chanuka' });
-    logger.info('Key Features Implemented for Task 7.1:', { component: 'Chanuka' });
-    logger.info('- ✅ WebSocket connections for live updates', { component: 'Chanuka' });
-    logger.info('- ✅ Bill status change detection system', { component: 'Chanuka' });
-    logger.info('- ✅ Real-time notifications for tracked bills', { component: 'Chanuka' });
-    logger.info('- ✅ User preference management for update frequency', { component: 'Chanuka' });
-    logger.info('- ✅ Enhanced authentication via token in WebSocket connection', { component: 'Chanuka' });
-    logger.info('- ✅ Batched notifications for non-immediate preferences', { component: 'Chanuka' });
-    logger.info('- ✅ Comprehensive error handling and graceful degradation', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Key Features Implemented for Task 7.1:');
+    logger.info({ component: 'Chanuka' }, '- ✅ WebSocket connections for live updates');
+    logger.info({ component: 'Chanuka' }, '- ✅ Bill status change detection system');
+    logger.info({ component: 'Chanuka' }, '- ✅ Real-time notifications for tracked bills');
+    logger.info({ component: 'Chanuka' }, '- ✅ User preference management for update frequency');
+    logger.info({ component: 'Chanuka' }, '- ✅ Enhanced authentication via token in WebSocket connection');
+    logger.info({ component: 'Chanuka' }, '- ✅ Batched notifications for non-immediate preferences');
+    logger.info({ component: 'Chanuka' }, '- ✅ Comprehensive error handling and graceful degradation');
     logger.info('', { component: 'Chanuka' });
 
     // Stop services
-    logger.info('🧹 Stopping services...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🧹 Stopping services...');
     
     // Only call stopMonitoring if it exists on the service
     if ('stopMonitoring' in billStatusMonitor && typeof billStatusMonitor.stopMonitoring === 'function') {
@@ -246,14 +246,14 @@ async function runDemo() {
     }
     
     server.close();
-    logger.info('✅ Services stopped', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '✅ Services stopped');
 
   } catch (error) {
-    logger.error('❌ Demo failed', { 
+    logger.error({ 
       component: 'Chanuka',
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
-    });
+    }, '❌ Demo failed');
     process.exit(1);
   }
 }
@@ -261,14 +261,14 @@ async function runDemo() {
 // Run the demo
 if (import.meta.url === `file://${process.argv[1]}`) {
   runDemo().then(() => {
-    logger.info('\n🏁 Demo finished. Exiting...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n🏁 Demo finished. Exiting...');
     process.exit(0);
   }).catch(error => {
-    logger.error('❌ Demo error', { 
+    logger.error({ 
       component: 'Chanuka',
       error: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined
-    });
+    }, '❌ Demo error');
     process.exit(1);
   });
 }

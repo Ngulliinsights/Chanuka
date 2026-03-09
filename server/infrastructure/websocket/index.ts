@@ -295,7 +295,7 @@ class BackwardCompatibleWebSocketService {
         } catch (error) {
           // Log error but continue with other connections
           if (process.env.NODE_ENV !== 'production') {
-            logger.error(`Failed to send notification to user ${user_id}`, { error });
+            logger.error({ error }, `Failed to send notification to user ${user_id}`);
           }
         }
       }
@@ -342,7 +342,7 @@ class BackwardCompatibleWebSocketService {
     
     // This is a simplified implementation - in practice, we'd need access to all connections
     if (process.env.NODE_ENV !== 'production') {
-      logger.info('Broadcasting to all clients', { message: formattedMessage });
+      logger.info({ message: formattedMessage }, 'Broadcasting to all clients');
     }
   }
 
@@ -483,11 +483,11 @@ export interface UnifiedServiceConfig {
 export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {}): BackwardCompatibleWebSocketService {
   const adapterType = config.adapter || 'native';
   
-  logger.info('Creating unified WebSocket service', {
+  logger.info({
     component: 'WebSocketServiceFactory',
     adapter: adapterType,
     redisEnabled: config.redis?.enabled || false
-  });
+  }, 'Creating unified WebSocket service');
 
   // Create the standard WebSocket service components
   const service = createWebSocketService();
@@ -577,10 +577,10 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
  * This provides an alternative transport while maintaining the same API
  */
 export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}): SocketIOAdapter {
-  logger.info('Creating Socket.IO WebSocket service', {
+  logger.info({
     component: 'WebSocketServiceFactory',
     redisEnabled: config.redis?.enabled || false
-  });
+  }, 'Creating Socket.IO WebSocket service');
 
   const socketIOAdapter = new SocketIOAdapter({
     redisUrl: config.redis?.url,

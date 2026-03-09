@@ -13,7 +13,7 @@
 
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -64,7 +64,7 @@ export async function syncNetworkNode(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced network node', { nodeId: node.id, type: node.type });
+    logger.debug({ nodeId: node.id, type: node.type }, 'Synced network node');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncNetworkNode',
@@ -110,11 +110,11 @@ export async function syncNetworkEdge(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced network edge', {
+    logger.debug({
       fromId: edge.fromId,
       toId: edge.toId,
       type: edge.relationshipType,
-    });
+    }, 'Synced network edge');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncNetworkEdge',
@@ -146,14 +146,14 @@ export async function batchSyncNetworkNodes(
       synced++;
     } catch (error) {
       failed++;
-      logger.error('Failed to sync network node', {
+      logger.error({
         nodeId: node.id,
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Failed to sync network node');
     }
   }
 
-  logger.info('Batch sync completed', { synced, failed, total: nodes.length });
+  logger.info({ synced, failed, total: nodes.length }, 'Batch sync completed');
   return { synced, failed };
 }
 
@@ -173,15 +173,15 @@ export async function batchSyncNetworkEdges(
       synced++;
     } catch (error) {
       failed++;
-      logger.error('Failed to sync network edge', {
+      logger.error({
         fromId: edge.fromId,
         toId: edge.toId,
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Failed to sync network edge');
     }
   }
 
-  logger.info('Batch edge sync completed', { synced, failed, total: edges.length });
+  logger.info({ synced, failed, total: edges.length }, 'Batch edge sync completed');
   return { synced, failed };
 }
 

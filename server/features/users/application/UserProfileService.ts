@@ -1,14 +1,14 @@
 /**
  * User Profile Service
+ * User Profile Service
  * 
  * Service layer for user profile operations using modern error handling.
  * Migrated from direct controller logic to service layer with AsyncServiceResult.
  */
 
-import { safeAsync, type AsyncServiceResult, createSystemError, createNotFoundError, createAuthorizationError } from '@server/infrastructure/error-handling';
-import { user_profileservice } from '@shared/domain/user-profile';
+import { safeAsync, type AsyncServiceResult, createNotFoundError, createAuthorizationError } from '@server/infrastructure/error-handling';
+import { user_profileservice } from '@server/features/users/domain/user-profile';
 import { logger } from '@server/infrastructure/observability';
-import type { z } from 'zod';
 
 /**
  * Profile data types
@@ -122,7 +122,7 @@ export class UserProfileService {
     return safeAsync(async () => {
       logger.info({ userId, interestCount: interests.length }, 'Updating user interests');
       
-      const updatedProfile = await user_profileservice.updateUserInterests(userId, { interests });
+      const updatedProfile = await user_profileservice.updateUserInterests(userId, interests);
       
       return updatedProfile;
     }, {
@@ -139,7 +139,7 @@ export class UserProfileService {
     return safeAsync(async () => {
       logger.info({ userId }, 'Fetching complete profile');
       
-      const profile = await user_profileservice.getCompleteProfile(userId);
+      const profile = await user_profileservice.getCompleteUserProfile(userId);
       
       if (!profile) {
         throw createNotFoundError('UserProfile', userId, {
@@ -270,7 +270,7 @@ export class UserProfileService {
     return safeAsync(async () => {
       logger.info({ userId, billId, engagementType }, 'Tracking bill engagement');
       
-      await user_profileservice.trackBillEngagement(userId, billId, { engagement_type: engagementType });
+      await user_profileservice.updateUserEngagement(userId, billId, engagementType);
     }, {
       service: 'UserProfileService',
       operation: 'trackBillEngagement',
@@ -302,7 +302,7 @@ export class UserProfileService {
     return safeAsync(async () => {
       logger.info({ userId }, 'Fetching public profile');
       
-      const profile = await user_profileservice.getPublicProfile(userId);
+      const profile = await user_profileservice.getUserPublicProfile(userId);
       
       if (!profile) {
         throw createNotFoundError('UserProfile', userId, {

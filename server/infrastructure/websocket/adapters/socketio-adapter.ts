@@ -116,9 +116,9 @@ export class SocketIOAdapter extends WebSocketAdapter {
 
       this.setupRedisEventHandlers();
 
-      logger.info('Redis clients initialized for Socket.IO adapter', {
+      logger.info({
         component: 'SocketIOAdapter'
-      });
+      }, 'Redis clients initialized for Socket.IO adapter');
     } catch (error) {
       logger.error('Failed to initialize Redis clients', {
         component: 'SocketIOAdapter'
@@ -135,7 +135,7 @@ export class SocketIOAdapter extends WebSocketAdapter {
     if (!this.redisClient || !this.redisSubClient) return;
 
     this.redisClient.on('connect', () => {
-      logger.info('Redis client connected', { component: 'SocketIOAdapter' });
+      logger.info({ component: 'SocketIOAdapter' }, 'Redis client connected');
     });
 
     this.redisClient.on('error', (error) => {
@@ -143,7 +143,7 @@ export class SocketIOAdapter extends WebSocketAdapter {
     });
 
     this.redisSubClient.on('connect', () => {
-      logger.info('Redis sub client connected', { component: 'SocketIOAdapter' });
+      logger.info({ component: 'SocketIOAdapter' }, 'Redis sub client connected');
     });
 
     this.redisSubClient.on('error', (error) => {
@@ -156,9 +156,9 @@ export class SocketIOAdapter extends WebSocketAdapter {
    */
   override async initialize(server: Server): Promise<void> {
     if (this.isInitialized) {
-      logger.info('Socket.IO adapter already initialized', {
+      logger.info({
         component: 'SocketIOAdapter'
-      });
+      }, 'Socket.IO adapter already initialized');
       return;
     }
 
@@ -191,9 +191,9 @@ export class SocketIOAdapter extends WebSocketAdapter {
           }
 
           this.io.adapter(createAdapter(this.redisClient, this.redisSubClient));
-          logger.info('Socket.IO Redis adapter configured', {
+          logger.info({
             component: 'SocketIOAdapter'
-          });
+          }, 'Socket.IO Redis adapter configured');
         } catch (error) {
           logger.error('Failed to setup Redis adapter', {
             component: 'SocketIOAdapter'
@@ -206,9 +206,9 @@ export class SocketIOAdapter extends WebSocketAdapter {
       this.io.on('connection', this.handleConnection.bind(this));
 
       this.isInitialized = true;
-      logger.info('Socket.IO adapter initialized', {
+      logger.info({
         component: 'SocketIOAdapter'
-      });
+      }, 'Socket.IO adapter initialized');
     } catch (error) {
       logger.error('Failed to initialize Socket.IO adapter', {
         component: 'SocketIOAdapter'
@@ -244,10 +244,10 @@ export class SocketIOAdapter extends WebSocketAdapter {
       socket.user_id = decoded.user_id;
       next();
     } catch (error) {
-      logger.warn('Socket.IO authentication failed', {
+      logger.warn({
         component: 'SocketIOAdapter',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Socket.IO authentication failed');
       next(new Error('Authentication failed'));
     }
   }
@@ -281,10 +281,10 @@ export class SocketIOAdapter extends WebSocketAdapter {
     }
     this.clients.get(user_id)!.add(socket);
 
-    logger.info(`New Socket.IO connection ${connectionId} for user: ${user_id}`, {
+    logger.info({
       component: 'SocketIOAdapter',
       activeConnections: this.stats.activeConnections
-    });
+    }, `New Socket.IO connection ${connectionId} for user: ${user_id}`);
 
     // Send connection confirmation
     socket.emit('connected', {
@@ -336,11 +336,11 @@ export class SocketIOAdapter extends WebSocketAdapter {
     try {
       await this.handleMessage(socket, message);
     } catch (error) {
-      logger.error('Error handling Socket.IO message', {
+      logger.error({
         component: 'SocketIOAdapter',
         connectionId: socket.connectionId,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error handling Socket.IO message');
       
       socket.emit('error', {
         type: 'error',
@@ -356,11 +356,11 @@ export class SocketIOAdapter extends WebSocketAdapter {
   private handleDisconnection(socket: AuthenticatedSocket, reason: string): void {
     this.stats.activeConnections--;
     
-    logger.info(`Socket.IO disconnected ${socket.connectionId}`, {
+    logger.info({
       component: 'SocketIOAdapter',
       reason,
       activeConnections: this.stats.activeConnections
-    });
+    }, `Socket.IO disconnected ${socket.connectionId}`);
     
     this.cleanupSocket(socket);
   }
@@ -634,10 +634,10 @@ export class SocketIOAdapter extends WebSocketAdapter {
     this.io.to(`bill:${billId}`).emit('bill_update', message);
 
     const subscriberCount = this.billSubscriptions.get(billId)?.size || 0;
-    logger.info(`Broadcast bill ${billId} update to ${subscriberCount} subscribers`, {
+    logger.info({
       component: 'SocketIOAdapter',
       updateType: update.type
-    });
+    }, `Broadcast bill ${billId} update to ${subscriberCount} subscribers`);
   }
 
   /**
@@ -654,10 +654,10 @@ export class SocketIOAdapter extends WebSocketAdapter {
       timestamp: message.timestamp || new Date()
     });
 
-    logger.info(`Broadcast to all clients: ${message.type}`, {
+    logger.info({
       component: 'SocketIOAdapter',
       activeConnections: this.stats.activeConnections
-    });
+    }, `Broadcast to all clients: ${message.type}`);
   }
 
   /**
@@ -690,10 +690,10 @@ export class SocketIOAdapter extends WebSocketAdapter {
       }
     }
 
-    logger.debug(`User notification sent to ${delivered}/${userSockets.size} connections`, {
+    logger.debug({
       component: 'SocketIOAdapter',
       user_id: userId
-    });
+    }, `User notification sent to ${delivered}/${userSockets.size} connections`);
   }
 
   /**
@@ -752,9 +752,9 @@ export class SocketIOAdapter extends WebSocketAdapter {
   override async shutdown(): Promise<void> {
     this.isShuttingDown = true;
 
-    logger.info('Shutting down Socket.IO adapter', {
+    logger.info({
       component: 'SocketIOAdapter'
-    });
+    }, 'Shutting down Socket.IO adapter');
 
     if (this.io) {
       this.io.close();
@@ -775,8 +775,8 @@ export class SocketIOAdapter extends WebSocketAdapter {
     this.billSubscriptions.clear();
     this.userSubscriptionIndex.clear();
 
-    logger.info('Socket.IO adapter shutdown complete', {
+    logger.info({
       component: 'SocketIOAdapter'
-    });
+    }, 'Socket.IO adapter shutdown complete');
   }
 }

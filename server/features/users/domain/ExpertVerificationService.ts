@@ -99,13 +99,13 @@ export class ExpertVerificationService {
       this.logger.info(`Expert ${expertId} submitted verification for analysis ${analysis_id}`);
       
       // Simplified implementation - just log the submission
-      this.logger.debug('Verification details:', {
+      this.logger.debug({
         analysis_id,
         expertId,
         verdict,
         confidence,
         reasoning: reasoning.substring(0, 100) + '...'
-      });
+      }, 'Verification details:');
       
     } catch (error) {
       this.logger.error('Error submitting expert verification: ' + String(error));

@@ -76,10 +76,10 @@ export class EvaluationOrchestrator {
       // Validate input
       const validatedInput = await validateData(RunEvaluationSchema, input);
 
-      logger.info('Starting model evaluation', {
+      logger.info({
         modelName: validatedInput.modelName,
         modelVersion: validatedInput.modelVersion,
-      });
+      }, 'Starting model evaluation');
 
       // Check cache for recent evaluation
       const cacheKey = cacheKeys.query('ml-evaluation', {
@@ -153,10 +153,10 @@ export class EvaluationOrchestrator {
       // Cache for 1 hour (evaluations are expensive)
       await cacheService.set(cacheKey, report, CACHE_TTL.LONG);
 
-      logger.info('Model evaluation completed', {
+      logger.info({
         modelName: validatedInput.modelName,
         overallScore: report.overallScore,
-      });
+      }, 'Model evaluation completed');
 
       return report;
     }, { service: 'EvaluationOrchestrator', operation: 'runEvaluation' });

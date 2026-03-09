@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 /**
  * Initialize ML service feature flag with default settings
@@ -25,12 +25,12 @@ export function initializeMLFeatureFlag(): void {
       }
     });
 
-    logger.info('ML service feature flag initialized', {
+    logger.info({
       component: 'analytics',
       operation: 'initializeMLFeatureFlag',
       rolloutPercentage: process.env.ML_SERVICE_ROLLOUT_PERCENTAGE || '10',
       environment: process.env.NODE_ENV
-    });
+    }, 'ML service feature flag initialized');
   } catch (error) {
     logger.error('Failed to initialize ML service feature flag:', {
       component: 'analytics',
@@ -46,11 +46,11 @@ export async function enableMLServiceRollout(percentage: number): Promise<void> 
   try {
     await featureFlagsService.enableGradualRollout('utilities-ml-service-migration', percentage);
     
-    logger.info('ML service rollout updated', {
+    logger.info({
       component: 'analytics',
       operation: 'enableMLServiceRollout',
       rolloutPercentage: percentage
-    });
+    }, 'ML service rollout updated');
   } catch (error) {
     logger.error('Failed to enable ML service rollout:', {
       component: 'analytics',
@@ -68,10 +68,10 @@ export async function rollbackMLService(): Promise<void> {
   try {
     await featureFlagsService.rollbackFeature('utilities-ml-service-migration');
     
-    logger.info('ML service rolled back to mock implementation', {
+    logger.info({
       component: 'analytics',
       operation: 'rollbackMLService'
-    });
+    }, 'ML service rolled back to mock implementation');
   } catch (error) {
     logger.error('Failed to rollback ML service:', {
       component: 'analytics',

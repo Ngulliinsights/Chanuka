@@ -13,7 +13,7 @@
 import { logger } from '@client/lib/utils/logger';
 import { ErrorFactory, errorHandler } from '@client/infrastructure/error';
 
-import { globalApiClient } from '../../../infrastructure/api/client';
+import { globalApiClient } from '@client/infrastructure/api/client';
 
 // ============================================================================
 // Type Re-exports

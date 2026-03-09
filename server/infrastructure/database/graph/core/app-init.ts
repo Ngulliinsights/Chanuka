@@ -51,7 +51,7 @@ export async function initializeGraphDatabase(): Promise<Driver> {
     logger.info('Graph database initialized successfully');
     return appDriver;
   } catch (error) {
-    logger.error('Failed to initialize graph database', { error: error.message });
+    logger.error({ error: error.message }, 'Failed to initialize graph database');
     throw error;
   }
 }
@@ -69,7 +69,7 @@ export async function shutdownGraphDatabase(): Promise<void> {
 
     logger.info('Graph database shut down successfully');
   } catch (error) {
-    logger.error('Error during shutdown', { error: error.message });
+    logger.error({ error: error.message }, 'Error during shutdown');
   }
 }
 

@@ -13,7 +13,7 @@ import type {
     ComprehensiveAnalysisResult,
     ImplementationWorkaroundDetection} from '@shared/types/ml';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 export class MLServiceAdapter {
     private static instance: MLServiceAdapter;
@@ -47,21 +47,21 @@ export class MLServiceAdapter {
             let result: AnalysisResult;
 
             if (shouldUseMigration) {
-                logger.info('Using real ML service for stakeholder influence analysis', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
                     user_id,
                     implementation: 'real'
-                });
+                }, 'Using real ML service for stakeholder influence analysis');
 
                 result = await this.realMLService.analyzeStakeholderInfluence(billContent);
             } else {
-                logger.info('Using mock ML service for stakeholder influence analysis', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
                     user_id,
                     implementation: 'mock'
-                });
+                }, 'Using mock ML service for stakeholder influence analysis');
 
                 result = await MLAnalysisService.analyzeStakeholderInfluence(billContent);
             }
@@ -85,11 +85,11 @@ export class MLServiceAdapter {
 
             // Fallback to mock service on error
             if (shouldUseMigration) {
-                logger.info('Falling back to mock ML service due to error', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeStakeholderInfluence',
                     user_id
-                });
+                }, 'Falling back to mock ML service due to error');
                 return await MLAnalysisService.analyzeStakeholderInfluence(billContent);
             }
 
@@ -108,21 +108,21 @@ export class MLServiceAdapter {
             let result: AnalysisResult;
 
             if (shouldUseMigration) {
-                logger.info('Using real ML service for conflict detection', {
+                logger.info({
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
                     user_id,
                     implementation: 'real'
-                });
+                }, 'Using real ML service for conflict detection');
 
                 result = await this.realMLService.detectConflictsOfInterest(billContent, sponsorData);
             } else {
-                logger.info('Using mock ML service for conflict detection', {
+                logger.info({
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
                     user_id,
                     implementation: 'mock'
-                });
+                }, 'Using mock ML service for conflict detection');
 
                 result = await MLAnalysisService.detectConflictsOfInterest(billContent, sponsorData);
             }
@@ -146,11 +146,11 @@ export class MLServiceAdapter {
 
             // Fallback to mock service on error
             if (shouldUseMigration) {
-                logger.info('Falling back to mock ML service due to error', {
+                logger.info({
                     component: 'analytics',
                     operation: 'detectConflictsOfInterest',
                     user_id
-                });
+                }, 'Falling back to mock ML service due to error');
                 return await MLAnalysisService.detectConflictsOfInterest(billContent, sponsorData);
             }
 
@@ -169,21 +169,21 @@ export class MLServiceAdapter {
             let result: AnalysisResult;
 
             if (shouldUseMigration) {
-                logger.info('Using real ML service for beneficiary analysis', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
                     user_id,
                     implementation: 'real'
-                });
+                }, 'Using real ML service for beneficiary analysis');
 
                 result = await this.realMLService.analyzeBeneficiaries(billContent);
             } else {
-                logger.info('Using mock ML service for beneficiary analysis', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
                     user_id,
                     implementation: 'mock'
-                });
+                }, 'Using mock ML service for beneficiary analysis');
 
                 result = await MLAnalysisService.analyzeBeneficiaries(billContent);
             }
@@ -207,11 +207,11 @@ export class MLServiceAdapter {
 
             // Fallback to mock service on error
             if (shouldUseMigration) {
-                logger.info('Falling back to mock ML service due to error', {
+                logger.info({
                     component: 'analytics',
                     operation: 'analyzeBeneficiaries',
                     user_id
-                });
+                }, 'Falling back to mock ML service due to error');
                 return await MLAnalysisService.analyzeBeneficiaries(billContent);
             }
 
@@ -252,13 +252,13 @@ export class MLServiceAdapter {
                 });
             }
 
-            logger.debug('Performance metrics recorded', {
+            logger.debug({
                 component: 'analytics',
                 operation: 'recordPerformanceMetrics',
                 operation_type: operation,
                 cohort,
                 metrics
-            });
+            }, 'Performance metrics recorded');
         } catch (error) {
             logger.error('Failed to record performance metrics:', {
                 component: 'analytics',

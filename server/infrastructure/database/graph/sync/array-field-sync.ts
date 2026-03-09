@@ -4,7 +4,7 @@
  */
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 
 const errorHandler = new GraphErrorHandler();

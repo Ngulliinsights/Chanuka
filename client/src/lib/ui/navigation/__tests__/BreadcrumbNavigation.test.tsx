@@ -10,10 +10,12 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import { navigationReducer } from '@client/infrastructure/store';
-import type { BreadcrumbItem } from '@client/lib/types/navigation';
-
-import { BreadcrumbNavigation, generateBreadcrumbs } from '../BreadcrumbNavigation';
+import { describe, it, expect } from 'vitest';
+import '@testing-library/jest-dom';
+import { navigationReducer } from '../../../../infrastructure/store';
+import type { BreadcrumbItem } from '../../../types/navigation';
+import { generateBreadcrumbs } from '../../../../infrastructure/navigation/breadcrumbs';
+import { BreadcrumbNavigation } from '../BreadcrumbNavigation';
 
 // Mock store setup
 const createMockStore = (initialState = {}) => {

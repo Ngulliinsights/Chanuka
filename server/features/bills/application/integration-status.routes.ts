@@ -4,17 +4,17 @@
  * Provides endpoints to monitor and control bill integrations
  */
 
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { billLifecycleHooks } from './bill-lifecycle-hooks';
 import { logger } from '@server/infrastructure/observability';
 
-const router = Router();
+const router: Router = Router();
 
 /**
  * GET /api/bills/integration/status
  * Get current integration status
  */
-router.get('/status', async (req, res) => {
+router.get('/status', async (_req: Request, res: Response) => {
   try {
     const status = {
       hooksEnabled: billLifecycleHooks.isHooksEnabled(),
@@ -39,7 +39,7 @@ router.get('/status', async (req, res) => {
  * POST /api/bills/integration/enable
  * Enable bill lifecycle hooks
  */
-router.post('/enable', async (req, res) => {
+router.post('/enable', async (_req: Request, res: Response) => {
   try {
     billLifecycleHooks.setEnabled(true);
     
@@ -62,7 +62,7 @@ router.post('/enable', async (req, res) => {
  * POST /api/bills/integration/disable
  * Disable bill lifecycle hooks
  */
-router.post('/disable', async (req, res) => {
+router.post('/disable', async (_req: Request, res: Response) => {
   try {
     billLifecycleHooks.setEnabled(false);
     
@@ -117,7 +117,7 @@ async function checkAvailableFeatures(): Promise<{
 
   // Check market intelligence
   try {
-    await import('@server/features/market');
+    await import('@server/features/market/market.service');
     features.marketIntelligence = true;
   } catch {
     // Feature not available

@@ -38,10 +38,10 @@ class SimpleSocketIOService {
       this.metrics.totalConnections++;
       this.metrics.activeConnections++;
 
-      logger.info('New Socket.IO connection', {
+      logger.info({
         socketId: socket.id,
         activeConnections: this.metrics.activeConnections
-      });
+      }, 'New Socket.IO connection');
 
       socket.emit('connected', {
         message: 'Socket.IO connection established',
@@ -51,10 +51,10 @@ class SimpleSocketIOService {
 
       socket.on('disconnect', () => {
         this.metrics.activeConnections--;
-        logger.info('Socket.IO connection disconnected', {
+        logger.info({
           socketId: socket.id,
           activeConnections: this.metrics.activeConnections
-        });
+        }, 'Socket.IO connection disconnected');
       });
 
       socket.on('test_message', (data) => {

@@ -16,7 +16,7 @@ class PrivacySchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      logger.info('Privacy scheduler already initialized or initialization in progress', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Privacy scheduler already initialized or initialization in progress');
       return;
     }
 
@@ -26,10 +26,10 @@ class PrivacySchedulerService {
       // Schedule daily data cleanup at 2 AM
       this.cleanupJob = cron.schedule('0 2 * * *', async () => {
         if (this.cleanupInProgress) {
-          logger.info('Data cleanup already in progress, skipping...', { component: 'Chanuka' });
+          logger.info({ component: 'Chanuka' }, 'Data cleanup already in progress, skipping...');
           return;
         }
-        logger.info('Running scheduled data cleanup...', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, 'Running scheduled data cleanup...');
         await this.runScheduledCleanup();
       }, {
         timezone: 'UTC'
@@ -38,17 +38,17 @@ class PrivacySchedulerService {
       // Schedule weekly compliance monitoring on Sundays at 3 AM
       this.complianceReportJob = cron.schedule('0 3 * * 0', async () => {
         if (this.complianceInProgress) {
-          logger.info('Compliance monitoring already in progress, skipping...', { component: 'Chanuka' });
+          logger.info({ component: 'Chanuka' }, 'Compliance monitoring already in progress, skipping...');
           return;
         }
-        logger.info('Running scheduled compliance monitoring...', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, 'Running scheduled compliance monitoring...');
         await this.runComplianceMonitoring();
       }, {
         timezone: 'UTC'
       });
 
       this.isInitialized = true;
-      logger.info('✅ Privacy scheduler service initialized', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Privacy scheduler service initialized');
     } catch (error) {
       logger.error('❌ Failed to initialize privacy scheduler service:', { component: 'Chanuka' }, { errorMessage: error instanceof Error ? error.message : String(error) });
       throw error;
@@ -67,12 +67,12 @@ class PrivacySchedulerService {
 
     if (this.cleanupJob) {
       this.cleanupJob.start();
-      logger.info('✅ Data cleanup job started (daily at 2 AM UTC)', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Data cleanup job started (daily at 2 AM UTC)');
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.start();
-      logger.info('✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Compliance monitoring job started (weekly on Sundays at 3 AM UTC)');
     }
   }
 
@@ -82,12 +82,12 @@ class PrivacySchedulerService {
   stop(): void {
     if (this.cleanupJob) {
       this.cleanupJob.stop();
-      logger.info('🛑 Data cleanup job stopped', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🛑 Data cleanup job stopped');
     }
 
     if (this.complianceReportJob) {
       this.complianceReportJob.stop();
-      logger.info('🛑 Compliance monitoring job stopped', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🛑 Compliance monitoring job stopped');
     }
   }
 
@@ -102,7 +102,7 @@ class PrivacySchedulerService {
       error?: string;
     }>;
   }> {
-    logger.info('Running manual data cleanup...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Running manual data cleanup...');
     return await this.runScheduledCleanup();
   }
 
@@ -118,7 +118,7 @@ class PrivacySchedulerService {
     }>;
   }> {
     if (this.cleanupInProgress) {
-      logger.info('Data cleanup already in progress', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Data cleanup already in progress');
       return { success: false, cleanupResults: [] };
     }
     
@@ -155,7 +155,7 @@ class PrivacySchedulerService {
           `✅ Scheduled data cleanup completed. Deleted ${totalRecordsDeleted} records.`
         );
       } else {
-        logger.error('❌ Scheduled data cleanup completed with errors', { component: 'Chanuka' });
+        logger.error({ component: 'Chanuka' }, '❌ Scheduled data cleanup completed with errors');
       }
 
       return result;
@@ -190,7 +190,7 @@ class PrivacySchedulerService {
    */
   private async runComplianceMonitoring(): Promise<void> {
     if (this.complianceInProgress) {
-      logger.info('Compliance monitoring already in progress', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Compliance monitoring already in progress');
       return;
     }
     
@@ -241,7 +241,7 @@ class PrivacySchedulerService {
           `⚠️  Found ${stalePolicies.length} stale retention policies that need attention`
         );
       } else {
-        logger.info('✅ All retention policies are up to date', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, '✅ All retention policies are up to date');
       }
 
     } catch (error) {
@@ -301,7 +301,7 @@ class PrivacySchedulerService {
     }
 
     this.isInitialized = false;
-    logger.info('🧹 Privacy scheduler service destroyed', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🧹 Privacy scheduler service destroyed');
   }
 }
 

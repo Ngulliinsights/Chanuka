@@ -152,13 +152,13 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       summary.migration.crossPhaseCompatibility = migrationResults.crossPhaseValidation.cross_compatibility;
       summary.migration.status = migrationResults.summary.overallStatus;
       
-      logger.info('✅ Migration validation completed', {
+      logger.info({
         total: summary.migration.totalValidations,
         passed: summary.migration.passed,
         failed: summary.migration.failed,
         crossPhaseCompatibility: summary.migration.crossPhaseCompatibility,
         status: summary.migration.status
-      });
+      }, '✅ Migration validation completed');
       
       if (summary.migration.failed > 0) {
         summary.overall.recommendations.push(`${summary.migration.failed} migration validations failed - review migration implementation`);
@@ -180,12 +180,12 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       summary.cleanup.failed = cleanupResults.summary.failed;
       summary.cleanup.status = cleanupResults.summary.failed === 0 ? 'passed' : 'failed';
       
-      logger.info('✅ Cleanup validation completed', {
+      logger.info({
         itemsProcessed: summary.cleanup.itemsProcessed,
         successful: summary.cleanup.successful,
         failed: summary.cleanup.failed,
         status: summary.cleanup.status
-      });
+      }, '✅ Cleanup validation completed');
       
       if (summary.cleanup.failed > 0) {
         summary.overall.recommendations.push(`${summary.cleanup.failed} cleanup items failed - review cleanup procedures`);

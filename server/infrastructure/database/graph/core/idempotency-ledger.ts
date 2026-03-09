@@ -13,7 +13,7 @@
 
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -108,7 +108,7 @@ export async function recordOperationStart(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Recorded operation start', { operationId, operationType });
+    logger.debug({ operationId, operationType }, 'Recorded operation start');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'recordOperationStart',
@@ -151,7 +151,7 @@ export async function recordOperationComplete(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Recorded operation complete', { operationId });
+    logger.debug({ operationId }, 'Recorded operation complete');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'recordOperationComplete',
@@ -196,7 +196,7 @@ export async function recordOperationFailure(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Recorded operation failure', { operationId, errorMessage });
+    logger.debug({ operationId, errorMessage }, 'Recorded operation failure');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'recordOperationFailure',
@@ -222,7 +222,7 @@ export async function executeIdempotent<T>(
   const alreadyExecuted = await isOperationExecuted(driver, operationId);
   
   if (alreadyExecuted) {
-    logger.info('Operation already executed, skipping', { operationId });
+    logger.info({ operationId }, 'Operation already executed, skipping');
     return null as T; // Return null for idempotent operations
   }
 
@@ -323,7 +323,7 @@ export async function cleanupOldOperations(
     );
 
     const deleted = Number(result.records[0]?.get('deleted')) || 0;
-    logger.info('Cleaned up old operations', { deleted, daysToKeep });
+    logger.info({ deleted, daysToKeep }, 'Cleaned up old operations');
     return deleted;
   } catch (error) {
     errorHandler.handle(error as Error, {

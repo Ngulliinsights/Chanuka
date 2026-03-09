@@ -73,11 +73,11 @@ export class AlertPreferenceManagementService {
       await this.storePreferenceInDatabase(user_id, newPreference);
       await this.clearUserCache(user_id);
 
-      logger.info(`Alert preference created: ${preferenceId}`, {
+      logger.info({
         component: 'AlertPreferenceManagement',
         user_id,
         preferenceId
-      });
+      }, `Alert preference created: ${preferenceId}`);
 
       return newPreference;
     } catch (error) {
@@ -101,10 +101,10 @@ export class AlertPreferenceManagementService {
         return cached as AlertPreference[];
       }
     } catch (err) {
-      logger.warn('Cache read failed for alert preferences', {
+      logger.warn({
         component: 'AlertPreferenceManagement',
         user_id
-      });
+      }, 'Cache read failed for alert preferences');
     }
 
     try {
@@ -168,11 +168,11 @@ export class AlertPreferenceManagementService {
       await this.updatePreferenceInDatabase(user_id, updatedPreference);
       await this.clearUserCache(user_id);
 
-      logger.info(`Alert preference updated: ${preferenceId}`, {
+      logger.info({
         component: 'AlertPreferenceManagement',
         user_id,
         preferenceId
-      });
+      }, `Alert preference updated: ${preferenceId}`);
 
       return updatedPreference;
     } catch (error) {
@@ -199,11 +199,11 @@ export class AlertPreferenceManagementService {
       await this.removePreferenceFromDatabase(user_id, preferenceId);
       await this.clearUserCache(user_id);
 
-      logger.info(`Alert preference deleted: ${preferenceId}`, {
+      logger.info({
         component: 'AlertPreferenceManagement',
         user_id,
         preferenceId
-      });
+      }, `Alert preference deleted: ${preferenceId}`);
     } catch (error) {
       logger.error('Error deleting alert preference', {
         component: 'AlertPreferenceManagement',
@@ -354,10 +354,10 @@ export class AlertPreferenceManagementService {
         return cached as any;
       }
     } catch (err) {
-      logger.warn('Cache read failed for alert stats', {
+      logger.warn({
         component: 'AlertPreferenceManagement',
         user_id
-      });
+      }, 'Cache read failed for alert stats');
     }
 
     try {
@@ -594,9 +594,9 @@ export class AlertPreferenceManagementService {
       try {
         await cacheService.delete(pattern);
       } catch (error) {
-        logger.warn(`Error clearing cache pattern ${pattern}`, {
+        logger.warn({
           component: 'AlertPreferenceManagement'
-        });
+        }, `Error clearing cache pattern ${pattern}`);
       }
     }
   }

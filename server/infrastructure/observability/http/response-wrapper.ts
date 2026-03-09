@@ -13,14 +13,14 @@ export type {
   PaginatedApiResponse,
   ResponseStatus,
   HttpStatusCode,
-} from '../../../../shared/types/api.js';
+} from '../../../../shared/types/api';
 
 // Export factory classes
 export {
   ApiResponseFactory,
   ApiRequestFactory,
   ApiTypeFactory,
-} from '../../../../shared/types/api.js';
+} from '../../../../shared/types/api';
 
 // Export error types
 export type {
@@ -28,4 +28,4 @@ export type {
   ApiErrorSeverity,
   ApiErrorContext,
   ValidationErrorDetail,
-} from '../../../../shared/types/api.js';
+} from '../../../../shared/types/api';

@@ -77,14 +77,14 @@ router.post('/process-comment', async (req, res) => {
     return res.json({
       success: true,
       data: result,
-      message: `Extracted ${result.extractedArguments.length} arguments from comment`
+      message: `Extracted ${result.extractedArguments.length} argList from comment`
     });
 
   } catch (error) {
-    logger.error('Comment processing failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Comment processing failed');
 
     return res.status(500).json({
       error: 'Comment processing failed',
@@ -120,7 +120,7 @@ router.post('/extract-structure', async (req, res) => {
     return res.json({
       success: true,
       data: {
-        arguments: extractedArguments,
+        argList: extractedArguments,
         argumentChains,
         extractionMetrics: {
           argumentsExtracted: extractedArguments.length,
@@ -131,10 +131,10 @@ router.post('/extract-structure', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Structure extraction failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Structure extraction failed');
 
     return res.status(500).json({
       error: 'Structure extraction failed',
@@ -148,7 +148,7 @@ router.post('/extract-structure', async (req, res) => {
 // ============================================================================
 
 /**
- * Synthesize arguments for a bill
+ * Synthesize argList for a bill
  * POST /api/argument-intelligence/synthesize-bill/:billId
  */
 router.post('/synthesize-bill/:bill_id', async (req, res) => {
@@ -164,11 +164,11 @@ router.post('/synthesize-bill/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Bill synthesis failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Bill synthesis failed');
 
     return res.status(500).json({
       error: 'Bill synthesis failed',
@@ -194,11 +194,11 @@ router.get('/argument-map/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Argument map retrieval failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Argument map retrieval failed');
 
     return res.status(500).json({
       error: 'Argument map retrieval failed',
@@ -212,16 +212,16 @@ router.get('/argument-map/:bill_id', async (req, res) => {
 // ============================================================================
 
 /**
- * Cluster arguments by similarity
- * POST /api/argument-intelligence/cluster-arguments
+ * Cluster argList by similarity
+ * POST /api/argument-intelligence/cluster-argList
  */
-router.post('/cluster-arguments', async (req, res) => {
+router.post('/cluster-argList', async (req, res) => {
   try {
-    const { arguments: args, config } = req.body;
+    const { argList: args, config } = req.body;
 
     if (!args || !Array.isArray(args)) {
       return res.status(400).json({
-        error: 'Invalid arguments array provided'
+        error: 'Invalid argList array provided'
       });
     }
 
@@ -230,14 +230,14 @@ router.post('/cluster-arguments', async (req, res) => {
     return res.json({
       success: true,
       data: clusteringResult,
-      message: `Formed ${clusteringResult.clusters.length} clusters from ${args.length} arguments`
+      message: `Formed ${clusteringResult.clusters.length} clusters from ${args.length} argList`
     });
 
   } catch (error) {
-    logger.error('Argument clustering failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Argument clustering failed');
 
     return res.status(500).json({
       error: 'Argument clustering failed',
@@ -247,17 +247,17 @@ router.post('/cluster-arguments', async (req, res) => {
 });
 
 /**
- * Find similar arguments
+ * Find similar argList
  * POST /api/argument-intelligence/find-similar
  */
 router.post('/find-similar', async (req, res) => {
   try {
-    const { query, arguments: args, threshold } = req.body;
+    const { query, argList: args, threshold } = req.body;
 
     if (!query || !args) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['query', 'arguments']
+        required: ['query', 'argList']
       });
     }
 
@@ -277,10 +277,10 @@ router.post('/find-similar', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Similar argument search failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Similar argument search failed');
 
     return res.status(500).json({
       error: 'Similar argument search failed',
@@ -299,11 +299,11 @@ router.post('/find-similar', async (req, res) => {
  */
 router.post('/find-coalitions', async (req, res) => {
   try {
-    const { arguments: args, userDemographics } = req.body;
+    const { argList: args, userDemographics } = req.body;
 
     if (!args || !Array.isArray(args)) {
       return res.status(400).json({
-        error: 'Invalid arguments array provided'
+        error: 'Invalid argList array provided'
       });
     }
 
@@ -319,10 +319,10 @@ router.post('/find-coalitions', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Coalition finding failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Coalition finding failed');
 
     return res.status(500).json({
       error: 'Coalition finding failed',
@@ -339,7 +339,7 @@ router.get('/coalition-opportunities/:bill_id', async (req, res) => {
   try {
     const { bill_id } = req.params;
 
-    // Get arguments for the bill
+    // Get argList for the bill
     const args = await argumentIntelligenceService.getArgumentsForBill(bill_id);
     // Cast coalitionFinder to any to access private method buildStakeholderProfiles
     const stakeholderProfiles = await (coalitionFinder as any).buildStakeholderProfiles(args);
@@ -356,11 +356,11 @@ router.get('/coalition-opportunities/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Coalition opportunity discovery failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Coalition opportunity discovery failed');
 
     return res.status(500).json({
       error: 'Coalition opportunity discovery failed',
@@ -396,10 +396,10 @@ router.post('/validate-evidence', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Evidence validation failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Evidence validation failed');
 
     return res.status(500).json({
       error: 'Evidence validation failed',
@@ -429,11 +429,11 @@ router.get('/evidence-assessment/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Evidence assessment failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Evidence assessment failed');
 
     return res.status(500).json({
       error: 'Evidence assessment failed',
@@ -487,10 +487,10 @@ router.post('/generate-brief', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Brief generation failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Brief generation failed');
 
     return res.status(500).json({
       error: 'Brief generation failed',
@@ -525,10 +525,10 @@ router.post('/generate-public-summary', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Public summary generation failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Public summary generation failed');
 
     return res.status(500).json({
       error: 'Public summary generation failed',
@@ -568,10 +568,10 @@ router.post('/balance-voices', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Voice balancing failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Voice balancing failed');
 
     return res.status(500).json({
       error: 'Voice balancing failed',
@@ -606,10 +606,10 @@ router.post('/detect-astroturfing', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Astroturfing detection failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Astroturfing detection failed');
 
     return res.status(500).json({
       error: 'Astroturfing detection failed',
@@ -623,10 +623,10 @@ router.post('/detect-astroturfing', async (req, res) => {
 // ============================================================================
 
 /**
- * Get arguments for a bill
- * GET /api/argument-intelligence/arguments/:billId
+ * Get argList for a bill
+ * GET /api/argument-intelligence/argList/:billId
  */
-router.get('/arguments/:bill_id', async (req, res) => {
+router.get('/argList/:bill_id', async (req, res) => {
   try {
     const { bill_id } = req.params;
     const {
@@ -655,7 +655,7 @@ router.get('/arguments/:bill_id', async (req, res) => {
     return res.json({
       success: true,
       data: {
-        arguments: args,
+        argList: args,
         count: args.length,
         pagination: {
           limit: options.limit,
@@ -665,11 +665,11 @@ router.get('/arguments/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Arguments retrieval failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Arguments retrieval failed');
 
     return res.status(500).json({
       error: 'Arguments retrieval failed',
@@ -679,7 +679,7 @@ router.get('/arguments/:bill_id', async (req, res) => {
 });
 
 /**
- * Search arguments by text
+ * Search argList by text
  * GET /api/argument-intelligence/search
  */
 router.get('/search', async (req, res) => {
@@ -702,16 +702,16 @@ router.get('/search', async (req, res) => {
       success: true,
       data: {
         query,
-        arguments: args,
+        argList: args,
         count: args.length
       }
     });
 
   } catch (error) {
-    logger.error('Argument search failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Argument search failed');
 
     return res.status(500).json({
       error: 'Argument search failed',
@@ -739,11 +739,11 @@ router.get('/statistics/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Statistics retrieval failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Statistics retrieval failed');
 
     return res.status(500).json({
       error: 'Statistics retrieval failed',
@@ -773,11 +773,11 @@ router.get('/briefs/:bill_id', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Briefs retrieval failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       bill_id: req.params.bill_id,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Briefs retrieval failed');
 
     return res.status(500).json({
       error: 'Briefs retrieval failed',
@@ -808,11 +808,11 @@ router.get('/brief/:briefId', async (req, res) => {
     });
 
   } catch (error) {
-    logger.error('Brief retrieval failed', {
+    logger.error({
       component: 'ArgumentIntelligenceRouter',
       briefId: req.params.briefId,
       error: error instanceof Error ? error.message : String(error)
-    });
+    }, 'Brief retrieval failed');
 
     return res.status(500).json({
       error: 'Brief retrieval failed',

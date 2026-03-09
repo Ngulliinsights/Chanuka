@@ -1,7 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { z } from 'zod';
 
-import { errorTracker } from '@server/infrastructure/error-handling/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 
 /**
  * Analytics Configuration Interface
@@ -330,13 +330,13 @@ export function initializeAnalyticsConfig(): AnalyticsConfig {
     const validatedConfig = validateAnalyticsConfig(config);
     return validatedConfig;
   } catch (error) {
-    logger.error('Failed to initialize analytics configuration', { error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined });
+    logger.error({ error: error instanceof Error ? error.message : String(error), stack: error instanceof Error ? error.stack : undefined }, 'Failed to initialize analytics configuration');
     try {
       if ((errorTracker as any)?.capture) {
         (errorTracker as any).capture(error instanceof Error ? error : new Error(String(error)), { component: 'analytics-config' });
       }
     } catch (reportErr) {
-      logger.warn('Failed to report analytics config initialization error to errorTracker', { reportErr });
+      logger.warn({ reportErr }, 'Failed to report analytics config initialization error to errorTracker');
     }
     throw new Error(`Analytics configuration initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }

@@ -1,9 +1,13 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
-import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
-import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
-import { User } from '@shared/domain/entities/user';
-import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { User } from '@shared/domain/entities/user';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
 import { inputSanitizationService, queryValidationService, securityAuditService } from '@server/features/security';
@@ -95,7 +99,7 @@ export class UserService {
 
       return user;
     } catch (error) {
-      logger.error('Error finding user by ID', { id, error });
+      logger.error({ id, error }, 'Error finding user by ID');
       throw error;
     }
   }
@@ -133,7 +137,7 @@ export class UserService {
 
       return user;
     } catch (error) {
-      logger.error('Error finding user by email', { email, error });
+      logger.error({ email, error }, 'Error finding user by email');
       throw error;
     }
   }
@@ -186,9 +190,9 @@ export class UserService {
         }
       });
 
-      logger.info('User saved successfully', { user_id: userData.id });
+      logger.info({ user_id: userData.id }, 'User saved successfully');
     } catch (error) {
-      logger.error('Error saving user', { user_id: user.id, error });
+      logger.error({ user_id: user.id, error }, 'Error saving user');
       throw error;
     }
   }
@@ -238,9 +242,9 @@ export class UserService {
         }
       });
 
-      logger.info('User updated successfully', { user_id: userData.id });
+      logger.info({ user_id: userData.id }, 'User updated successfully');
     } catch (error) {
-      logger.error('Error updating user', { user_id: user.id, error });
+      logger.error({ user_id: user.id, error }, 'Error updating user');
       throw error;
     }
   }
@@ -272,9 +276,9 @@ export class UserService {
         metadata: { operation: 'delete' }
       });
 
-      logger.info('User deleted successfully', { user_id: sanitizedId });
+      logger.info({ user_id: sanitizedId }, 'User deleted successfully');
     } catch (error) {
-      logger.error('Error deleting user', { user_id: id, error });
+      logger.error({ user_id: id, error }, 'Error deleting user');
       throw error;
     }
   }
@@ -293,7 +297,7 @@ export class UserService {
 
       return result[0] ? this.mapToUserProfile(result[0]) : null;
     } catch (error) {
-      logger.error('Error finding user profile', { user_id, error });
+      logger.error({ user_id, error }, 'Error finding user profile');
       throw error;
     }
   }
@@ -346,9 +350,9 @@ export class UserService {
         metadata: { operation: 'saveProfile' }
       });
 
-      logger.info('User profile saved successfully', { user_id: profileData.user_id });
+      logger.info({ user_id: profileData.user_id }, 'User profile saved successfully');
     } catch (error) {
-      logger.error('Error saving user profile', { user_id: profile.user_id, error });
+      logger.error({ user_id: profile.user_id, error }, 'Error saving user profile');
       throw error;
     }
   }
@@ -398,9 +402,9 @@ export class UserService {
         metadata: { operation: 'updateProfile' }
       });
 
-      logger.info('User profile updated successfully', { user_id: profileData.user_id });
+      logger.info({ user_id: profileData.user_id }, 'User profile updated successfully');
     } catch (error) {
-      logger.error('Error updating user profile', { user_id: profile.user_id, error });
+      logger.error({ user_id: profile.user_id, error }, 'Error updating user profile');
       throw error;
     }
   }
@@ -418,7 +422,7 @@ export class UserService {
 
       return results.map(result => this.mapToUser(result));
     } catch (error) {
-      logger.error('Error finding users by role', { role, error });
+      logger.error({ role, error }, 'Error finding users by role');
       throw error;
     }
   }
@@ -433,7 +437,7 @@ export class UserService {
 
       return results.map(result => this.mapToUser(result));
     } catch (error) {
-      logger.error('Error finding users by verification status', { status, error });
+      logger.error({ status, error }, 'Error finding users by verification status');
       throw error;
     }
   }
@@ -477,7 +481,7 @@ export class UserService {
 
       return results.map(result => this.mapToUser(result));
     } catch (error) {
-      logger.error('Error searching users', { query, error });
+      logger.error({ query, error }, 'Error searching users');
       throw error;
     }
   }
@@ -494,7 +498,7 @@ export class UserService {
 
       return Number(result[0]?.value ?? 0);
     } catch (error) {
-      logger.error('Error counting users', { error });
+      logger.error({ error }, 'Error counting users');
       throw error;
     }
   }
@@ -516,7 +520,7 @@ export class UserService {
 
       return roleCounts;
     } catch (error) {
-      logger.error('Error counting users by role', { error });
+      logger.error({ error }, 'Error counting users by role');
       throw error;
     }
   }
@@ -538,7 +542,7 @@ export class UserService {
 
       return statusCounts;
     } catch (error) {
-      logger.error('Error counting users by verification status', { error });
+      logger.error({ error }, 'Error counting users by verification status');
       throw error;
     }
   }
@@ -566,7 +570,7 @@ export class UserService {
 
       return aggregate;
     } catch (error) {
-      logger.error('Error finding user aggregate', { id, error });
+      logger.error({ id, error }, 'Error finding user aggregate');
       throw error;
     }
   }

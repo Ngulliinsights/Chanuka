@@ -1,4 +1,5 @@
-import { trackEngagement } from '@shared/application/EngagementTracker';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { trackEngagement } from '@shared/application/EngagementTracker';
 import {
   getCollaborativeRecommendations,
   getPersonalizedRecommendations,

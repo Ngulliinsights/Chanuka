@@ -9,7 +9,8 @@ import { DatabaseError } from '@shared/core';
 import { cache } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
-import { sponsors, sponsorTransparency } from "@shared/foundation";
+// FIXME: @shared/foundation does not exist
+// import { sponsors, sponsorTransparency } from "@shared/foundation";
 import { and, count,desc, eq, sql } from "drizzle-orm";
 
 import { disclosureProcessingService } from './disclosure-processing.service';

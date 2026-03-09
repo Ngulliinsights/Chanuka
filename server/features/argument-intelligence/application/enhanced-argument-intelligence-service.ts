@@ -24,7 +24,7 @@ export class EnhancedArgumentIntelligenceService {
         .where('bill_id', '=', sanitizedBillId)
         .limit(1);
 
-      const result = analysis[0] || { bill_id: sanitizedBillId, arguments: [] };
+      const result = analysis[0] || { bill_id: sanitizedBillId, argList: [] };
       await cacheService.set(cacheKey, result, CACHE_TTL.LONG);
       return result;
     }, { service: 'EnhancedArgumentIntelligenceService', operation: 'analyzeArguments' });

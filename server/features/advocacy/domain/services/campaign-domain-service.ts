@@ -5,7 +5,8 @@
 // Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-import { Campaign, CampaignEntity, NewCampaign } from '@shared/entities/campaign';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { Campaign, CampaignEntity, NewCampaign } from '@shared/entities/campaign';
 
 export class CampaignDomainService {
   constructor(
@@ -14,12 +15,12 @@ export class CampaignDomainService {
   ) {}
 
   async createCampaign(data: NewCampaign, creatorId: string): Promise<Campaign> {
-    logger.info('Creating new campaign', { 
+    logger.info({ 
       title: data.title, 
       bill_id: data.bill_id, 
       organizerId: data.organizerId,
       component: 'CampaignDomainService' 
-    });
+    }, 'Creating new campaign');
 
     if (data.organizerId !== creatorId) {
       throw new Error('User can only create campaigns for themselves');
@@ -51,10 +52,10 @@ export class CampaignDomainService {
 
     const campaign = await this.campaignRepository.create(data);
     
-    logger.info('Campaign created successfully', { 
+    logger.info({ 
       campaign_id: campaign.id,
       component: 'CampaignDomainService' 
-    });
+    }, 'Campaign created successfully');
 
     return campaign;
   }
@@ -86,12 +87,12 @@ export class CampaignDomainService {
       throw new Error('Failed to update campaign status');
     }
 
-    logger.info('Campaign status updated', { 
+    logger.info({ 
       campaign_id, 
       oldStatus: campaign.status, 
       newStatus,
       component: 'CampaignDomainService' 
-    });
+    }, 'Campaign status updated');
 
     return updatedCampaign;
   }
@@ -125,11 +126,11 @@ export class CampaignDomainService {
         updated_at: new Date()
       });
 
-      logger.info('User joined campaign', { 
+      logger.info({ 
         campaign_id, 
         user_id,
         component: 'CampaignDomainService' 
-      });
+      }, 'User joined campaign');
     }
 
     return success;

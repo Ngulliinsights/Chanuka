@@ -102,7 +102,8 @@ export function sanitizeString(input: string, options: {
     const sqlPatterns = [
       /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|EXECUTE|UNION|SCRIPT)\b)/gi,
       /(\b(OR|AND)\s+\d+\s*=\s*\d+)/gi,
-      /('|(\\')|(;)|(--)|(\s)|(\/\*)|(\*\/))/gi,
+      // Fixed: Only match dangerous SQL characters, not all whitespace
+      /('|(\\')|(;)|(--)|(\s*\/\*)|(\*\/\s*))/gi,
       /(INFORMATION_SCHEMA|SYSOBJECTS|SYSCOLUMNS)/gi,
       /(\bxp_\w+)/gi,
       /(\bsp_\w+)/gi,

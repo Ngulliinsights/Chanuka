@@ -11,10 +11,14 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { withTransaction } from '@server/infrastructure/database';
-import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
-import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
-import { User } from '@shared/domain/entities/user';
-import { UserInterest, UserProfile } from '@shared/domain/entities/user-profile';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { User } from '@shared/domain/entities/user';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { UserInterest, UserProfile } from '@shared/domain/entities/user-profile';
 import { user_profiles, users } from '@server/infrastructure/schema';
 
 // Infrastructure imports
@@ -66,7 +70,7 @@ export class UserService {
       
       return `${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
     } catch (error) {
-      logger.error('PII encryption failed', { error });
+      logger.error({ error }, 'PII encryption failed');
       throw new Error('Failed to encrypt sensitive data');
     }
   }
@@ -86,7 +90,7 @@ export class UserService {
       
       return decrypted;
     } catch (error) {
-      logger.error('PII decryption failed', { error });
+      logger.error({ error }, 'PII decryption failed');
       throw new Error('Failed to decrypt sensitive data');
     }
   }
@@ -191,7 +195,7 @@ export class UserService {
         },
       });
 
-      logger.info('User created successfully', { user_id: user.id });
+      logger.info({ user_id: user.id }, 'User created successfully');
 
       return user;
     }, { service: 'UserService', operation: 'createUser' });

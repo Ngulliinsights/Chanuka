@@ -1,6 +1,6 @@
 import { logger } from '@server/infrastructure/observability';
 
-import { config } from '@/config/index';
+import { config } from '@server/config/index';
 import { EmailResult, getEmailService, sendTemplatedEmail } from '@server/infrastructure/messaging/email/email-service';
 
 export interface UserEmailData { user_id: string;
@@ -51,7 +51,7 @@ export class UserEmailService {
       this.emailService = await getEmailService();
       logger.info('✅ User Email Service initialized');
     } catch (error) {
-      logger.error('❌ Failed to initialize User Email Service', { error });
+      logger.error({ error }, '❌ Failed to initialize User Email Service');
       throw error;
     }
   }
@@ -69,7 +69,7 @@ export class UserEmailService {
       logger.info(`📧 Welcome email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
-      logger.error(`❌ Failed to send welcome email to ${data.email}`, { error });
+      logger.error({ error }, `❌ Failed to send welcome email to ${data.email}`);
       throw error;
     }
   }
@@ -87,7 +87,7 @@ export class UserEmailService {
       logger.info(`🔐 Password reset email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
-      logger.error(`❌ Failed to send password reset email to ${data.email}`, { error });
+      logger.error({ error }, `❌ Failed to send password reset email to ${data.email}`);
       throw error;
     }
   }
@@ -107,7 +107,7 @@ export class UserEmailService {
       logger.info(`✅ Verification email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
-      logger.error(`❌ Failed to send verification email to ${data.email}`, { error });
+      logger.error({ error }, `❌ Failed to send verification email to ${data.email}`);
       throw error;
     }
   }
@@ -127,7 +127,7 @@ export class UserEmailService {
       logger.info(`🔄 Account change notification sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
-      logger.error(`❌ Failed to send account change notification to ${data.email}`, { error });
+      logger.error({ error }, `❌ Failed to send account change notification to ${data.email}`);
       throw error;
     }
   }
@@ -152,7 +152,7 @@ export class UserEmailService {
       logger.info(`📬 User notification email sent to ${email}`);
       return result;
     } catch (error) {
-      logger.error(`❌ Failed to send user notification email to ${email}`, { error });
+      logger.error({ error }, `❌ Failed to send user notification email to ${email}`);
       throw error;
     }
   }

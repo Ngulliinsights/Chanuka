@@ -10,7 +10,7 @@ import { Component, ReactNode, ErrorInfo } from 'react';
 import React from 'react';
 
 import { browserDetector } from '@client/infrastructure/browser/browser-detector';
-import { ErrorDomain, ErrorSeverity, coreErrorHandler } from '@client/infrastructure/error';
+import { ErrorDomain, ErrorSeverity, createError } from '@client/infrastructure/error';
 import { BaseError } from '@client/infrastructure/error/classes';
 
 
@@ -184,24 +184,28 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // });
 
     // Use unified error handler for comprehensive error processing
-    const appError = coreErrorHandler.handleError({
-      type: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      message: error.message,
-      details: {
-        name: error.name,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack,
-        reactErrorInfo: errorInfo,
-      },
-      context: {
-        component: this.props.context || 'ErrorBoundary',
-        url: window.location.href,
-        userAgent: navigator.userAgent,
-      },
-      recoverable: this.props.enableRecovery !== false,
-      retryable: false,
-    });
+    const appError = createError(
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      error.message,
+      {
+        details: {
+          name: error.name,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          reactErrorInfo: errorInfo,
+        },
+        context: {
+          component: this.props.context || 'ErrorBoundary',
+          metadata: {
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          },
+        },
+        recoverable: this.props.enableRecovery !== false,
+        retryable: false,
+      }
+    );
 
     // Update state with unified error data using shared BaseError system
     this.setState({

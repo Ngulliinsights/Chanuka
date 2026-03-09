@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 
-import { GovernmentDataValidationService } from '@server/infrastructure/core/validation/data-validation';
-import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/services/external-api-error-handler';
+// FIXME: Use @server/infrastructure/validation/data-validation
+// import { GovernmentDataValidationService } from '@server/infrastructure/core/validation/data-validation';
+// FIXME: Use @server/infrastructure/error-handling/external-api-error-handler
+// import { ExternalAPIErrorHandler, FallbackStrategy } from '@server/services/external-api-error-handler';
 import { ManagedGovernmentDataIntegrationService } from '@server/features/government-data/application/managed-integration.service';
 import { logger } from '@server/infrastructure/observability';
 import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
@@ -42,7 +44,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testIntegrationStatus(): Promise<void> {
-    logger.info('\n📊 Testing Integration Status...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n📊 Testing Integration Status...');
     try {
       const status = await this.integrationService.getIntegrationStatus();
       logger.info('✅ Integration Status:', { component: 'Chanuka' }, JSON.stringify(status, null, 2));
@@ -53,7 +55,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testBillIntegration(): Promise<void> {
-    logger.info('\n📋 Testing Bill Integration...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n📋 Testing Bill Integration...');
     try {
       const result = await this.integrationService.integrateBills({
         sources: ['parliament-ca'],
@@ -76,7 +78,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testSponsorIntegration(): Promise<void> {
-    logger.info('\n👥 Testing Sponsor Integration...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n👥 Testing Sponsor Integration...');
     try {
       const result = await this.integrationService.integrateSponsors({
         sources: ['parliament-ca'],
@@ -99,7 +101,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testDataTransformation(): Promise<void> {
-    logger.info('\n🔄 Testing Data Transformation...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n🔄 Testing Data Transformation...');
 
     // Test Parliament data transformation
     const mockParliamentData = {
@@ -137,7 +139,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testDataValidation(): Promise<void> {
-    logger.info('\n✅ Testing Data Validation...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n✅ Testing Data Validation...');
 
     const testBills = [
       {
@@ -168,7 +170,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testCrossValidation(): Promise<void> {
-    logger.info('\n🔍 Testing Cross-Validation...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n🔍 Testing Cross-Validation...');
 
     const testRecords = [
       {
@@ -203,7 +205,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testErrorHandling(): Promise<void> {
-    logger.info('\n🚨 Testing Error Handling...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n🚨 Testing Error Handling...');
 
     // Simulate different types of errors
     const errors = [
@@ -234,7 +236,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async testCaching(): Promise<void> {
-    logger.info('\n💾 Testing Caching...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n💾 Testing Caching...');
     
     // Cache some test data
     this.errorHandler.cacheData('test-source', { cached: 'data', timestamp: new Date() });
@@ -253,7 +255,7 @@ class GovernmentDataIntegrationCLI {
   }
 
   async runAllTests(): Promise<void> {
-    logger.info('🚀 Starting Government Data Integration Tests...\n', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🚀 Starting Government Data Integration Tests...\n');
     
     await this.testIntegrationStatus();
     await this.testDataTransformation();
@@ -264,7 +266,7 @@ class GovernmentDataIntegrationCLI {
     await this.testBillIntegration();
     await this.testSponsorIntegration();
     
-    logger.info('\n✅ All tests completed!', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '\n✅ All tests completed!');
   }
 }
 

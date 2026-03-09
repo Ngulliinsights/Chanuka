@@ -11,7 +11,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UserService } from '../user-service-direct';
 import { inputSanitizationService, queryValidationService, securityAuditService } from '@server/features/security';
-import { User } from '@shared/domain/entities/user';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { User } from '@shared/domain/entities/user';
 
 // Mock dependencies
 vi.mock('@server/infrastructure/observability');

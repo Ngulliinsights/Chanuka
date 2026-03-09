@@ -1,9 +1,9 @@
-import { analyticsConfig } from '@server/config/analytics.config';
+import { analyticsConfig } from '@server/features/analytics/config/analytics.config';
 import { logger } from '@server/infrastructure/observability';
-import { performanceMonitor } from '@shared/core/performance/index';
+import { performanceMonitor } from '@server/infrastructure/observability/monitoring/performance-monitor';
 import { NextFunction,Request, Response } from 'express';
 
-import { AuthenticatedRequest } from '../../../../AuthAlert';
+import { AuthenticatedRequest } from '@server/middleware/auth';
 
 /**
  * Performance tracking middleware for analytics endpoints
@@ -29,7 +29,7 @@ export function performanceTrackingMiddleware(
 
     // Log slow requests
     if (duration > analyticsConfig.performance.slowRequestThreshold) {
-      logger.warn('Slow analytics request detected', {
+      logger.warn({
         component: 'analytics-performance-tracking',
         traceId,
         method: req.method,
@@ -39,7 +39,7 @@ export function performanceTrackingMiddleware(
         user_id: req.analyticsContext?.user_id,
         user_agent: req.headers['user-agent'],
         statusCode: res.statusCode
-       });
+       }, 'Slow analytics request detected');
     }
 
     // Track API metrics using performance monitor

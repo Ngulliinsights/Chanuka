@@ -105,10 +105,10 @@ export class GovernmentDataSyncService {
         };
         
         try {
-          logger.info('Starting government data sync', {
+          logger.info({
             provider: config.provider,
             fullSync: config.fullSync,
-          });
+          }, 'Starting government data sync');
           
           // Get API client
           const client = getGovernmentAPIClient(config.provider);
@@ -163,7 +163,7 @@ export class GovernmentDataSyncService {
           result.endTime = endTime;
           result.duration = endTime.getTime() - startTime.getTime();
           
-          logger.info('Government data sync completed', {
+          logger.info({
             provider: config.provider,
             status: result.status,
             duration: result.duration,
@@ -171,7 +171,7 @@ export class GovernmentDataSyncService {
             recordsCreated: result.recordsCreated,
             recordsUpdated: result.recordsUpdated,
             recordsFailed: result.recordsFailed,
-          });
+          }, 'Government data sync completed');
           
           return result;
         } finally {
@@ -328,10 +328,10 @@ export class GovernmentDataSyncService {
             results.push(result.data);
           } else {
             // Log error but continue with other providers
-            logger.error('Provider sync failed', {
+            logger.error({
               provider: config.provider,
               error: result.error.message,
-            });
+            }, 'Provider sync failed');
             
             results.push({
               provider: config.provider,

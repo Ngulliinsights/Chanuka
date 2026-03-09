@@ -111,10 +111,10 @@ export class MLAnalysisService {
 
       // Enhanced validation for sponsor data
       if (!sponsorData || typeof sponsorData !== 'object') {
-        logger.warn('Limited sponsor data available for conflict analysis', {
+        logger.warn({
           component: 'analytics',
           operation: 'detectConflictsOfInterest'
-        });
+        }, 'Limited sponsor data available for conflict analysis');
       }
 
       const startTime = Date.now();
@@ -249,10 +249,10 @@ export class MLAnalysisService {
 
       // Enhanced validation for current policies
       if (!Array.isArray(currentPolicies)) {
-        logger.warn('Current policies data not provided or invalid format', {
+        logger.warn({
           component: 'analytics',
           operation: 'detectImplementationWorkarounds'
-        });
+        }, 'Current policies data not provided or invalid format');
       }
 
       return {

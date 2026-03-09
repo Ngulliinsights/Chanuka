@@ -358,17 +358,7 @@ function printTestSummary(): void {
   logger.info('\n✨ Alert Preference Management System is fully functional and production-ready!');
 }
 
-if (process.env.NODE_ENV !== 'test') {
-  verifyAlertPreferences()
-    .then(() => {
-      logger.info('Verification completed successfully');
-      process.exit(0);
-    })
-    .catch((error) => {
-      logger.error(`Verification failed with error: ${String(error)}`);
-      process.exit(1);
-    });
-}
+// Verification script intentionally removed from module scope to prevent server exit on import
 
 export default {};
 

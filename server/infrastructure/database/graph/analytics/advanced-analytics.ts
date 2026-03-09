@@ -4,7 +4,7 @@
  */
 import type { Driver } from 'neo4j-driver';
 
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
 import { executeCypherSafely } from '../utils/session-manager';
 

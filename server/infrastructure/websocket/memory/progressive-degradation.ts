@@ -217,7 +217,7 @@ export class ProgressiveDegradation implements IProgressiveDegradation {
       } catch (error) {
         // Log error
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          logger.error('Error in degradation level change listener', { error });
+          logger.error({ error }, 'Error in degradation level change listener');
         }
       }
     });

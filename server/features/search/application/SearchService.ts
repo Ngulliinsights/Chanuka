@@ -16,7 +16,8 @@ import { sql } from 'drizzle-orm';
 // Infrastructure imports
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
 import { InputSanitizationService, securityAuditService, secureQueryBuilderService } from '@server/features/security';
-import { cacheService, cacheKeys, CACHE_TTL, createCacheInvalidation } from '@server/infrastructure/cache';
+import { cacheService, CACHE_TTL } from '@server/infrastructure/cache';
+import { cacheKeys, createCacheInvalidation } from '@server/infrastructure/cache/cache-keys';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
 import {
   GlobalSearchSchema,

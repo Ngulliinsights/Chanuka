@@ -101,10 +101,10 @@ export class ModerationDecisionService {
         report: updatedReport || undefined
       };
     } catch (error) {
-      logger.error('Error reviewing report:', {
+      logger.error({
         component: 'ModerationDecision',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error reviewing report:');
       return {
         success: false,
         message: 'Failed to review report'
@@ -176,11 +176,11 @@ export class ModerationDecisionService {
 
           processedCount++;
         } catch (itemError) {
-          logger.error('Error processing bulk item:', {
+          logger.error({
             component: 'ModerationDecision',
             report_id,
             error: itemError instanceof Error ? itemError.message : String(itemError)
-          });
+          }, 'Error processing bulk item:');
           failedIds.push(report_id);
         }
       }
@@ -192,10 +192,10 @@ export class ModerationDecisionService {
         failedIds
       };
     } catch (error) {
-      logger.error('Error performing bulk moderation:', {
+      logger.error({
         component: 'ModerationDecision',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error performing bulk moderation:');
       return {
         success: false,
         message: 'Failed to perform bulk moderation',
@@ -273,10 +273,10 @@ export class ModerationDecisionService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching moderation history:', {
+      logger.error({
         component: 'ModerationDecision',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching moderation history:');
       throw error;
     }
   }
@@ -343,11 +343,11 @@ export class ModerationDecisionService {
           // 2. Hide/delete all their content
           // 3. Prevent them from posting
           // For now, we just log the action
-          logger.warn('User ban action required:', { component: 'ModerationDecision',
+          logger.warn({ component: 'ModerationDecision',
             user_id: reportedBy,
             content_type,
             content_id
-           });
+           }, 'User ban action required:');
           
           // Hide the specific content
           if (content_type === 'comment') {
@@ -378,27 +378,27 @@ export class ModerationDecisionService {
         case 'highlight':
           // In a full implementation, this might add a special badge
           // or increase visibility of quality content
-          logger.info('Content highlighted:', {
+          logger.info({
             component: 'ModerationDecision',
             content_type,
             content_id
-          });
+          }, 'Content highlighted:');
           break;
 
         default:
-          logger.warn('Unknown action type:', {
+          logger.warn({
             component: 'ModerationDecision',
             actionType
-          });
+          }, 'Unknown action type:');
       }
     } catch (error) {
-      logger.error('Error applying moderation action:', {
+      logger.error({
         component: 'ModerationDecision',
         content_type,
         content_id,
         actionType,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error applying moderation action:');
     }
   }
 }

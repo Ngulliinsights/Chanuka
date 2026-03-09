@@ -511,5 +511,5 @@ export async function getSecurityMonitoringService(): Promise<SecurityMonitoring
  * Default export for backward compatibility
  * Use getSecurityMonitoringService() in production code
  */
-export const securityMonitoringService = await getSecurityMonitoringService();
+export const securityMonitoringServicePromise = getSecurityMonitoringService();
 

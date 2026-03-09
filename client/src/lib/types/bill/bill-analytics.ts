@@ -7,7 +7,7 @@
  * @module shared/types/bill
  */
 
-import type { Bill } from './bill-base';
+// no imports needed from bill-base
 
 // ============================================================================
 // Bill Analytics Types

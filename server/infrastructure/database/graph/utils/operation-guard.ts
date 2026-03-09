@@ -46,13 +46,13 @@ export class OperationGuard {
       // Open circuit if too many failures
       if (failures >= this.maxFailures) {
         this.circuitOpen.set(operationId, true);
-        logger.warn('Circuit breaker opened', { operationId, failures });
+        logger.warn({ operationId, failures }, 'Circuit breaker opened');
         
         // Auto-reset after 60 seconds
         setTimeout(() => {
           this.circuitOpen.set(operationId, false);
           this.failures.set(operationId, 0);
-          logger.info('Circuit breaker reset', { operationId });
+          logger.info({ operationId }, 'Circuit breaker reset');
         }, 60000);
       }
 

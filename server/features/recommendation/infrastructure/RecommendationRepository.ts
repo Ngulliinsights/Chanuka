@@ -1,7 +1,8 @@
 import { BaseRepository } from '@server/infrastructure/database/repository/base-repository';
 import type { Result } from '@shared/core/result';
 import { Ok } from '@shared/core/result';
-import type { PlainBill } from '@shared/domain/recommendation.dto';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import type { PlainBill } from '@shared/domain/recommendation.dto';
 import {
   bill_engagement,
   bill_tags,

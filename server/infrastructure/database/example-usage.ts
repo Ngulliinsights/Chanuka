@@ -22,7 +22,7 @@ export const initializeApp = async (): Promise<void> => {
 
     logger.info('Application database layer initialized safely');
   } catch (error) {
-    logger.error('Error initializing app', { error });
+    logger.error({ error }, 'Error initializing app');
     throw error;
   }
 };
@@ -39,7 +39,7 @@ export const safeReadExample = async (user_id: string): Promise<void> => {
 
     return result;
   } catch (error) {
-    logger.error('Error in safeReadExample', { error });
+    logger.error({ error }, 'Error in safeReadExample');
     throw error;
   }
 };
@@ -60,7 +60,7 @@ export const safeWriteExample = async (userData: unknown): Promise<void> => {
       return insertedUserRows[0];
     });
   } catch (error) {
-    logger.error('Error in safeWriteExample', { error });
+    logger.error({ error }, 'Error in safeWriteExample');
     throw error;
   }
 };
@@ -78,7 +78,7 @@ export const safeRawQueryExample = async (bill_id: number): Promise<void> => {
 
     return result.rows;
   } catch (error) {
-    logger.error('Error in safeRawQueryExample', { error });
+    logger.error({ error }, 'Error in safeRawQueryExample');
     throw error;
   }
 };
@@ -100,7 +100,7 @@ export const safeConcurrentExample = async (): Promise<void> => {
     const results = await Promise.all(promises);
     return results.map(r => r.rows[0]);
   } catch (error) {
-    logger.error('Error in safeConcurrentExample', { error });
+    logger.error({ error }, 'Error in safeConcurrentExample');
     throw error;
   }
 };
@@ -113,7 +113,7 @@ export const shutdownApp = async (): Promise<void> => {
     await shutdownDatabaseSafety();
     logger.info('Application database layer shut down safely');
   } catch (error) {
-    logger.error('Error in shutdownApp', { error });
+    logger.error({ error }, 'Error in shutdownApp');
     throw error;
   }
 };
@@ -131,9 +131,9 @@ export const errorHandlingExample = async (): Promise<void> => {
     });
   } catch (error) {
     // Error is automatically classified and logged
-    logger.info('Error was handled gracefully', {
+    logger.info({
       message: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Error was handled gracefully');
   }
 };
 

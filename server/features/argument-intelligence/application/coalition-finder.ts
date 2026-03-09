@@ -4,7 +4,8 @@
 // Identifies potential coalitions based on shared concerns and compatible positions
 
 import { logger } from '@server/infrastructure/observability';
-import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
 
 export interface CoalitionMatch {
   stakeholderGroup: string;
@@ -70,20 +71,20 @@ export class CoalitionFinderService {
   ) {}
 
   /**
-   * Find potential coalitions for extracted arguments
+   * Find potential coalitions for extracted argList
    */
   async findPotentialCoalitions(
-    arguments: unknown[],
+    argList: unknown[],
     userDemographics?: UserDemographics
   ): Promise<CoalitionMatch[]> {
     try {
-      logger.info(`🤝 Finding potential coalitions`, {
+      logger.info({
         component: 'CoalitionFinder',
-        argumentCount: arguments.length
-      });
+        argumentCount: argList.length
+      }, `🤝 Finding potential coalitions`);
 
-      // Step 1: Build stakeholder profiles from arguments
-      const stakeholderProfiles = await this.buildStakeholderProfiles(arguments);
+      // Step 1: Build stakeholder profiles from argList
+      const stakeholderProfiles = await this.buildStakeholderProfiles(argList);
 
       // Step 2: Identify shared concerns across stakeholders
       const sharedConcerns = await this.identifySharedConcerns(stakeholderProfiles);
@@ -98,18 +99,18 @@ export class CoalitionFinderService {
       // Step 4: Filter and rank potential coalitions
       const viableCoalitions = this.filterViableCoalitions(coalitionMatches);
 
-      logger.info(`✅ Coalition finding completed`, {
+      logger.info({
         component: 'CoalitionFinder',
         coalitionsFound: viableCoalitions.length
-      });
+      }, `✅ Coalition finding completed`);
 
       return viableCoalitions;
 
     } catch (error) {
-      logger.error(`❌ Coalition finding failed`, {
+      logger.error({
         component: 'CoalitionFinder',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Coalition finding failed`);
       throw error;
     }
   }
@@ -122,11 +123,11 @@ export class CoalitionFinderService {
     stakeholderProfiles: StakeholderProfile[]
   ): Promise<CoalitionOpportunity[]> {
     try {
-      logger.info(`🔍 Discovering coalition opportunities`, {
+      logger.info({
         component: 'CoalitionFinder',
         bill_id,
         stakeholderCount: stakeholderProfiles.length
-      });
+      }, `🔍 Discovering coalition opportunities`);
 
       const opportunities: CoalitionOpportunity[] = [];
 
@@ -162,20 +163,20 @@ export class CoalitionFinderService {
         (b.potentialImpact * b.feasibilityScore) - (a.potentialImpact * a.feasibilityScore)
       );
 
-      logger.info(`✅ Coalition opportunity discovery completed`, {
+      logger.info({
         component: 'CoalitionFinder',
         bill_id,
         opportunitiesFound: rankedOpportunities.length
-      });
+      }, `✅ Coalition opportunity discovery completed`);
 
       return rankedOpportunities;
 
     } catch (error) {
-      logger.error(`❌ Coalition opportunity discovery failed`, {
+      logger.error({
         component: 'CoalitionFinder',
         bill_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Coalition opportunity discovery failed`);
       throw error;
     }
   }
@@ -238,11 +239,11 @@ export class CoalitionFinderService {
 
   // Private helper methods
 
-  private async buildStakeholderProfiles(arguments: unknown[]): Promise<StakeholderProfile[]> {
+  private async buildStakeholderProfiles(argList: unknown[]): Promise<StakeholderProfile[]> {
     const stakeholderMap = new Map<string, unknown[]>();
 
-    // Group arguments by stakeholder
-    arguments.forEach(arg => {
+    // Group argList by stakeholder
+    argList.forEach(arg => {
       arg.affectedGroups?.forEach((group: string) => {
         if (!stakeholderMap.has(group)) {
           stakeholderMap.set(group, []);
@@ -261,24 +262,24 @@ export class CoalitionFinderService {
     return profiles;
   }
 
-  private async createStakeholderProfile(group: string, arguments: unknown[]): Promise<StakeholderProfile> {
+  private async createStakeholderProfile(group: string, argList: unknown[]): Promise<StakeholderProfile> {
     // Extract primary concerns
-    const primaryConcerns = this.extractPrimaryConcerns(arguments);
+    const primaryConcerns = this.extractPrimaryConcerns(argList);
 
     // Determine overall position
-    const position = this.determineGroupPosition(arguments);
+    const position = this.determineGroupPosition(argList);
 
-    // Extract key arguments
-    const keyArguments = this.extractKeyArguments(arguments);
+    // Extract key argList
+    const keyArguments = this.extractKeyArguments(argList);
 
     // Build demographics
-    const demographics = this.buildDemographics(arguments);
+    const demographics = this.buildDemographics(argList);
 
     // Calculate participation level
-    const participationLevel = this.calculateParticipationLevel(arguments);
+    const participationLevel = this.calculateParticipationLevel(argList);
 
     // Calculate influence score
-    const influenceScore = this.calculateInfluenceScore(arguments, group);
+    const influenceScore = this.calculateInfluenceScore(argList, group);
 
     return {
       group,
@@ -291,10 +292,10 @@ export class CoalitionFinderService {
     };
   }
 
-  private extractPrimaryConcerns(arguments: unknown[]): string[] {
+  private extractPrimaryConcerns(argList: unknown[]): string[] {
     const concernCounts = new Map<string, number>();
 
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       // Extract concerns from argument text
       const concerns = this.extractConcernsFromText(arg.text);
       concerns.forEach(concern => {
@@ -333,8 +334,8 @@ export class CoalitionFinderService {
     return concerns;
   }
 
-  private determineGroupPosition(arguments: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
-    const positions = arguments.map(arg => arg.position || 'neutral');
+  private determineGroupPosition(argList: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
+    const positions = argList.map(arg => arg.position || 'neutral');
     const supportCount = positions.filter(p => p === 'support').length;
     const opposeCount = positions.filter(p => p === 'oppose').length;
     const conditionalCount = positions.filter(p => p === 'conditional').length;
@@ -346,20 +347,20 @@ export class CoalitionFinderService {
     return 'neutral';
   }
 
-  private extractKeyArguments(arguments: unknown[]): string[] {
-    return arguments
+  private extractKeyArguments(argList: unknown[]): string[] {
+    return argList
       .filter(arg => arg.type === 'claim' && arg.confidence > 0.7)
       .sort((a, b) => b.confidence - a.confidence)
       .slice(0, 3)
       .map(arg => arg.normalizedText);
   }
 
-  private buildDemographics(arguments: unknown[]): StakeholderProfile['demographics'] {
+  private buildDemographics(argList: unknown[]): StakeholderProfile['demographics'] {
     const geographicDistribution = new Map<string, number>();
     const occupationalBreakdown = new Map<string, number>();
     const organizationalAffiliations: string[] = [];
 
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       if (arg.userDemographics) {
         const demo = arg.userDemographics;
         
@@ -387,19 +388,19 @@ export class CoalitionFinderService {
     };
   }
 
-  private calculateParticipationLevel(arguments: unknown[]): number {
-    const uniqueUsers = new Set(arguments.map(arg => arg.user_id)).size;
-    const totalArguments = arguments.length;
+  private calculateParticipationLevel(argList: unknown[]): number {
+    const uniqueUsers = new Set(argList.map(arg => arg.user_id)).size;
+    const totalArguments = argList.length;
     
     // Normalize participation level (0-100)
     return Math.min(100, (uniqueUsers * 10) + (totalArguments * 2));
   }
 
-  private calculateInfluenceScore(arguments: unknown[], group: string): number {
+  private calculateInfluenceScore(argList: unknown[], group: string): number {
     let score = 50; // Base score
 
     // Boost for organized groups
-    const organizationalAffiliations = arguments
+    const organizationalAffiliations = argList
       .map(arg => arg.userDemographics?.organizationAffiliation)
       .filter(Boolean);
     
@@ -407,12 +408,12 @@ export class CoalitionFinderService {
       score += 20;
     }
 
-    // Boost for evidence-backed arguments
-    const evidenceCount = arguments.filter(arg => arg.evidenceQuality !== 'none').length;
+    // Boost for evidence-backed argList
+    const evidenceCount = argList.filter(arg => arg.evidenceQuality !== 'none').length;
     score += Math.min(20, evidenceCount * 2);
 
-    // Boost for high-confidence arguments
-    const avgConfidence = arguments.reduce((sum, arg) => sum + (arg.confidence || 0.5), 0) / arguments.length;
+    // Boost for high-confidence argList
+    const avgConfidence = argList.reduce((sum, arg) => sum + (arg.confidence || 0.5), 0) / argList.length;
     score += (avgConfidence - 0.5) * 20;
 
     return Math.min(100, score);

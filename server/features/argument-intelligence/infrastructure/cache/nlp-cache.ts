@@ -51,10 +51,10 @@ export class NLPCache<T = unknown> {
     this.accessOrder = [];
     this.stats = { hits: 0, misses: 0 };
 
-    logger.info('NLP Cache initialized', {
+    logger.info({
       component: 'NLPCache',
       config: this.config
-    });
+    }, 'NLP Cache initialized');
   }
 
   /**
@@ -85,12 +85,12 @@ export class NLPCache<T = unknown> {
     this.updateAccessOrder(key);
     this.stats.hits++;
 
-    logger.debug('Cache hit', {
+    logger.debug({
       component: 'NLPCache',
       key: this.truncateKey(key),
       hits: entry.hits,
       age: Math.floor(age)
-    });
+    }, 'Cache hit');
 
     return entry.value;
   }
@@ -117,12 +117,12 @@ export class NLPCache<T = unknown> {
     this.cache.set(key, entry);
     this.updateAccessOrder(key);
 
-    logger.debug('Cache set', {
+    logger.debug({
       component: 'NLPCache',
       key: this.truncateKey(key),
       size: entry.size,
       cacheSize: this.cache.size
-    });
+    }, 'Cache set');
   }
 
   /**
@@ -137,10 +137,10 @@ export class NLPCache<T = unknown> {
         this.accessOrder.splice(index, 1);
       }
 
-      logger.debug('Cache delete', {
+      logger.debug({
         component: 'NLPCache',
         key: this.truncateKey(key)
-      });
+      }, 'Cache delete');
     }
 
     return deleted;
@@ -174,10 +174,10 @@ export class NLPCache<T = unknown> {
     this.accessOrder = [];
     this.stats = { hits: 0, misses: 0 };
 
-    logger.info('Cache cleared', {
+    logger.info({
       component: 'NLPCache',
       entriesCleared: size
-    });
+    }, 'Cache cleared');
   }
 
   /**
@@ -254,11 +254,11 @@ export class NLPCache<T = unknown> {
     }
 
     if (pruned > 0) {
-      logger.info('Pruned expired cache entries', {
+      logger.info({
         component: 'NLPCache',
         pruned,
         remaining: this.cache.size
-      });
+      }, 'Pruned expired cache entries');
     }
 
     return pruned;
@@ -277,10 +277,10 @@ export class NLPCache<T = unknown> {
   updateConfig(config: Partial<CacheConfig>): void {
     this.config = { ...this.config, ...config };
 
-    logger.info('Cache configuration updated', {
+    logger.info({
       component: 'NLPCache',
       config: this.config
-    });
+    }, 'Cache configuration updated');
 
     // If cache was disabled, clear it
     if (!this.config.enabled) {
@@ -308,11 +308,11 @@ export class NLPCache<T = unknown> {
     const lruKey = this.accessOrder[0];
     this.delete(lruKey);
 
-    logger.debug('Evicted LRU entry', {
+    logger.debug({
       component: 'NLPCache',
       key: this.truncateKey(lruKey),
       cacheSize: this.cache.size
-    });
+    }, 'Evicted LRU entry');
   }
 
   private estimateSize(value: T): number {
@@ -367,9 +367,9 @@ export class NLPCacheManager {
       ttl: config.ttl || 3600 // 1 hour
     });
 
-    logger.info('NLP Cache Manager initialized', {
+    logger.info({
       component: 'NLPCacheManager'
-    });
+    }, 'NLP Cache Manager initialized');
   }
 
   /**
@@ -417,9 +417,9 @@ export class NLPCacheManager {
     this.similarityCache.clear();
     this.entityCache.clear();
 
-    logger.info('All NLP caches cleared', {
+    logger.info({
       component: 'NLPCacheManager'
-    });
+    }, 'All NLP caches cleared');
   }
 
   /**
@@ -476,10 +476,10 @@ export class NLPCacheManager {
       this.entityCache.pruneExpired();
 
     if (pruned > 0) {
-      logger.info('Pruned expired entries from all caches', {
+      logger.info({
         component: 'NLPCacheManager',
         totalPruned: pruned
-      });
+      }, 'Pruned expired entries from all caches');
     }
 
     return pruned;

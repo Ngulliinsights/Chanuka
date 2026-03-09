@@ -259,7 +259,7 @@ export function getDatabase(operation: DatabaseOperation = 'general'): DatabaseC
  *     maxRetries: 3,
  *     timeout: 5000,
  *     onError: (error, attempt) => {
- *       logger.warn(`Transaction attempt ${attempt} failed`, { error: error.message });
+ *       logger.warn({ error: error.message }, `Transaction attempt ${attempt} failed`);
  *     }
  *   }
  * );
@@ -538,7 +538,7 @@ export async function withWriteConnection<T>(
  * @example
  * const health = await checkDatabaseHealth();
  * if (!health.overall) {
- *   logger.error('Database unhealthy', { health });
+ *   logger.error({ health }, 'Database unhealthy');
  *   await alertOpsTeam(health);
  * }
  * 
@@ -546,7 +546,7 @@ export async function withWriteConnection<T>(
  * // Monitor latency for performance degradation
  * const health = await checkDatabaseHealth();
  * if (health.latencyMs && health.latencyMs > 1000) {
- *   logger.warn('Database latency elevated', { latency: health.latencyMs });
+ *   logger.warn({ latency: health.latencyMs }, 'Database latency elevated');
  * }
  */
 export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
@@ -607,7 +607,7 @@ export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
  *     await closeDatabaseConnections();
  *     process.exit(0);
  *   } catch (error) {
- *     logger.error('Shutdown error', { error });
+ *     logger.error({ error }, 'Shutdown error');
  *     process.exit(1);
  *   }
  * });

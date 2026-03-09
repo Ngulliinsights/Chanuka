@@ -2,7 +2,7 @@ import { EngagementController, getEngagementMetricsSchema, getEngagementTrendsSc
 import { analyticsContextMiddleware } from '@server/features/analytics/middleware/analytics-context';
 import { performanceTrackingMiddleware } from '@server/features/analytics/middleware/performance-tracking';
 import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
-import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
+import { engagementAnalyticsService } from '@server/features/analytics/application/engagement-analytics.service';
 import { controllerWrapper } from '@server/utils/analytics-controller-wrapper';
 import { logger } from '@server/infrastructure/observability';
 import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
@@ -10,7 +10,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 
 // Remove the duplicate export - keep only the default export at the end
-// export const router = Router();
+const router = Router();
 
 /**
  * Validation schema for general analytics queries

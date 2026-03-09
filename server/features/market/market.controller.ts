@@ -1,6 +1,8 @@
 import { Request, Response,Router } from 'express';
-import { inject } from 'inversify';
-import { controller, httpGet, httpPost } from 'inversify-express-utils';
+// FIXME: inversify not installed
+// import { inject } from 'inversify';
+// FIXME: inversify-express-utils not installed
+// import { controller, httpGet, httpPost } from 'inversify-express-utils';
 
 import { MarketService } from './market.service';
 

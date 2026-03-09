@@ -117,11 +117,11 @@ export class PowerBalancerService {
     argumentData: ArgumentData[]
   ): Promise<PowerBalancingResult> {
     try {
-      logger.info(`⚖️ Balancing stakeholder voices`, {
+      logger.info({
         component: 'PowerBalancer',
         stakeholderCount: stakeholderPositions.length,
         argumentCount: argumentData.length
-      });
+      }, `⚖️ Balancing stakeholder voices`);
 
       // Step 1: Detect coordinated campaigns
       const coordinatedCampaigns = await this.detectCoordinatedCampaigns(argumentData);
@@ -155,20 +155,20 @@ export class PowerBalancerService {
         equityMetrics
       };
 
-      logger.info(`✅ Power balancing completed`, {
+      logger.info({
         component: 'PowerBalancer',
         campaignsDetected: coordinatedCampaigns.length,
         minorityVoicesAmplified: minorityVoices.length,
         voiceEquityScore: equityMetrics.voiceEquityScore
-      });
+      }, `✅ Power balancing completed`);
 
       return result;
 
     } catch (error) {
-      logger.error(`❌ Power balancing failed`, {
+      logger.error({
         component: 'PowerBalancer',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Power balancing failed`);
       throw error;
     }
   }
@@ -856,7 +856,7 @@ export class PowerBalancerService {
       score += Math.min(20, position.evidenceProvided.length * 5);
     }
 
-    // Boost for diverse arguments
+    // Boost for diverse argList
     if (position.keyArguments.length > 3) {
       score += 10;
     }

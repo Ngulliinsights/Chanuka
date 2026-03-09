@@ -19,7 +19,7 @@ import type {
 export class MockCommentRepository implements ICommentRepository {
   async create(data: CreateCommentData): Promise<AsyncServiceResult<Comment>> {
     return safeAsync(async () => {
-      logger.info('Creating comment (mock)', { bill_id: data.bill_id });
+      logger.info({ bill_id: data.bill_id }, 'Creating comment (mock)');
       
       const result = await withTransaction(async (tx) => {
         const [comment] = await tx

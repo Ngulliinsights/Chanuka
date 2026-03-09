@@ -19,8 +19,8 @@ import type {
 } from '@client/lib/types/analytics';
 import { logger } from '@client/lib/utils/logger';
 
-import { globalErrorHandler } from '../../../infrastructure/api/errors';
-import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from '../../../infrastructure/api/types';
+import { globalErrorHandler } from '@client/infrastructure/api/errors';
+import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from '@client/infrastructure/api/types';
 
 /**
  * Centralized service for all analytics-related API operations.

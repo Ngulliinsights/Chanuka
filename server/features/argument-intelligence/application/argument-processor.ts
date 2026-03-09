@@ -1,7 +1,7 @@
 // ============================================================================
 // ARGUMENT INTELLIGENCE - Argument Processor
 // ============================================================================
-// Main orchestration service for processing citizen comments into structured arguments
+// Main orchestration service for processing citizen comments into structured argList
 
 import { logger } from '@server/infrastructure/observability';
 
@@ -111,11 +111,11 @@ export class ArgumentProcessor {
     const startTime = Date.now();
 
     try {
-      logger.info(`🧠 Processing comment for argument extraction`, {
+      logger.info({
         component: 'ArgumentProcessor',
         comment_id: request.comment_id,
         bill_id: request.bill_id
-      });
+      }, `🧠 Processing comment for argument extraction`);
 
       // Step 1: Extract argumentative structure from comment
       // Explicitly map properties to avoid strict type mismatch with optional undefined
@@ -142,7 +142,7 @@ export class ArgumentProcessor {
         request.userDemographics
       );
 
-      // Step 4: Store extracted arguments
+      // Step 4: Store extracted argList
       await this.storeExtractedArguments(request, extractedArguments);
 
       // Step 5: Calculate processing metrics
@@ -152,7 +152,7 @@ export class ArgumentProcessor {
         flaggedForReview: this.shouldFlagForReview(extractedArguments)
       };
 
-      // Step 6: Trigger bill synthesis update if significant new arguments
+      // Step 6: Trigger bill synthesis update if significant new argList
       if (this.shouldUpdateBillSynthesis(extractedArguments)) {
         this.triggerBillSynthesisUpdate(request.bill_id);
       }
@@ -166,21 +166,21 @@ export class ArgumentProcessor {
         processingMetrics
       };
 
-      logger.info(`✅ Comment processing completed`, {
+      logger.info({
         component: 'ArgumentProcessor',
         comment_id: request.comment_id,
         argumentsExtracted: extractedArguments.length,
         processingTime: processingMetrics.processingTime
-      });
+      }, `✅ Comment processing completed`);
 
       return result;
 
     } catch (error) {
-      logger.error(`❌ Comment processing failed`, {
+      logger.error({
         component: 'ArgumentProcessor',
         comment_id: request.comment_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Comment processing failed`);
       throw error;
     }
   }
@@ -190,15 +190,15 @@ export class ArgumentProcessor {
    */
   async synthesizeBillArguments(bill_id: string): Promise<BillArgumentSynthesis> {
     try {
-      logger.info(`🔄 Synthesizing arguments for bill`, {
+      logger.info({
         component: 'ArgumentProcessor',
         bill_id
-      });
+      }, `🔄 Synthesizing argList for bill`);
 
-      // Step 1: Retrieve all arguments for the bill
+      // Step 1: Retrieve all argList for the bill
       const billArguments = await this.argumentService.getArgumentsForBill(bill_id);
 
-      // Map DB arguments to Clustering arguments format
+      // Map DB argList to Clustering argList format
       // Note: In a real scenario, you'd map the DB entity to the service DTO explicitly.
       // Assuming billArguments are compatible enough for this context or passing as unknown for now
       // to resolve the immediate flow, though strict mapping is better.
@@ -211,14 +211,14 @@ export class ArgumentProcessor {
         userDemographics: undefined // Map if available
       }));
 
-      // Step 2: Cluster similar arguments
+      // Step 2: Cluster similar argList
       const clusteringResult = await this.clusteringService.clusterArguments(argumentsForClustering);
 
       // Step 3: Synthesize major claims
       const majorClaims = await this.synthesizeClaims(clusteringResult.clusters);
 
       // Step 4: Assess evidence base
-      // Use original DB arguments for evidence assessment
+      // Use original DB argList for evidence assessment
       const evidenceBase = await this.evidenceValidator.assessEvidenceBase(billArguments);
 
       // Step 5: Identify stakeholder positions
@@ -268,21 +268,21 @@ export class ArgumentProcessor {
       // Store the synthesis
       await this.argumentService.storeBillSynthesis(synthesis);
 
-      logger.info(`✅ Bill argument synthesis completed`, {
+      logger.info({
         component: 'ArgumentProcessor',
         bill_id,
         majorClaims: majorClaims.length,
         stakeholderGroups: balancedPositions.length
-      });
+      }, `✅ Bill argument synthesis completed`);
 
       return synthesis;
 
     } catch (error) {
-      logger.error(`❌ Bill argument synthesis failed`, {
+      logger.error({
         component: 'ArgumentProcessor',
         bill_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Bill argument synthesis failed`);
       throw error;
     }
   }
@@ -383,19 +383,19 @@ export class ArgumentProcessor {
 
   private async triggerBillSynthesisUpdate(bill_id: string): Promise<void> {
     // Queue background job to update bill synthesis
-    logger.info(`🔄 Queuing bill synthesis update`, {
+    logger.info({
       component: 'ArgumentProcessor',
       bill_id
-    });
+    }, `🔄 Queuing bill synthesis update`);
 
     // This would typically use a job queue like Bull or Agenda
     setTimeout(() => {
       this.synthesizeBillArguments(bill_id).catch(error => {
-        logger.error(`Background synthesis update failed`, {
+        logger.error({
           component: 'ArgumentProcessor',
           bill_id,
           error: error instanceof Error ? error.message : String(error)
-        });
+        }, `Background synthesis update failed`);
       });
     }, 1000);
   }
@@ -420,7 +420,7 @@ export class ArgumentProcessor {
   }
 
   private async identifyStakeholderPositions(args: unknown[]): Promise<StakeholderPosition[]> {
-    // Group arguments by stakeholder and analyze positions
+    // Group argList by stakeholder and analyze positions
     const stakeholderGroups = new Map<string, unknown[]>();
 
     args.forEach(arg => {
@@ -456,7 +456,7 @@ export class ArgumentProcessor {
     return args
       .filter((arg: unknown) => arg.type === 'claim' && (arg.confidence || 0) > 0.7)
       .map((arg: unknown) => arg.normalizedText || arg.extractedText || '')
-      .slice(0, 5); // Top 5 arguments
+      .slice(0, 5); // Top 5 argList
   }
 
   private extractEvidence(args: unknown[]): string[] {

@@ -3,15 +3,16 @@
 // Provides REST endpoints for monitoring, analytics, and data export
 
 import { FinancialDisclosureMonitoringService } from "@server/features/analytics/financial-disclosure/monitoring";
-import { FinancialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
-import { logger } from '@server/infrastructure/observability/logger';
+// FIXME: financial-disclosure-analytics service not implemented
+// import { FinancialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
+import { logger } from '@server/infrastructure/observability';
 import { ApiError,ApiSuccess  } from '@shared/types/api';
 import * as crypto from 'crypto';
 import { NextFunction,Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
 
-import { errorTracker } from '@/core/errors/error-tracker';
-import { BaseError,SponsorNotFoundError, ValidationError as InvalidInputError } from '@/utils/errors';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
+import { BaseError,SponsorNotFoundError, ValidationError as InvalidInputError } from '@server/infrastructure/error-handling';
 
 // ============================================================================
 // API Validation Schemas & Middleware
@@ -653,20 +654,20 @@ export function createFinancialDisclosureRouter(
     }
     
     // Log unexpected errors with full context for debugging
-    logger.error(`[Unhandled API Error]: ${err instanceof Error ? err.message : String(err)}`, {
+    logger.error({
       component: 'financial-disclosure',
       path: req.path,
       method: req.method,
       query: req.query,
       params: req.params,
       stack: err instanceof Error ? err.stack : undefined
-    });
+    }, `[Unhandled API Error]: ${err instanceof Error ? err.message : String(err)}`);
     try {
       if ((errorTracker as any)?.capture) {
         (errorTracker as any).capture(err instanceof Error ? err : new Error(String(err)), { component: 'financial-disclosure', path: req.path, method: req.method });
       }
     } catch (reportErr) {
-      logger.warn('Failed to report unhandled financial-disclosure error to errorTracker', { reportErr });
+      logger.warn({ reportErr }, 'Failed to report unhandled financial-disclosure error to errorTracker');
     }
     
     // Return generic error message to avoid leaking implementation details

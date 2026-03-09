@@ -15,7 +15,7 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { QUERY_CONFIG } from '../config/graph-config';
 import { logger } from '@server/infrastructure/observability';
 
@@ -438,7 +438,7 @@ export const Mutation = {
         { userId, billId, voteType }
       );
 
-      logger.info('Vote recorded', { userId, billId, voteType });
+      logger.info({ userId, billId, voteType }, 'Vote recorded');
       return true;
     } catch (error) {
       errorHandler.handle(error as Error, { operation: 'recordVote', userId, billId });
@@ -479,7 +479,7 @@ export const Mutation = {
         { userId, billId, commentId, text }
       );
 
-      logger.info('Comment added', { userId, billId, commentId });
+      logger.info({ userId, billId, commentId }, 'Comment added');
       return true;
     } catch (error) {
       errorHandler.handle(error as Error, { operation: 'addComment', userId, billId });

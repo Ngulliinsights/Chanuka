@@ -30,7 +30,7 @@ export class VotingPatternAnalysisService {
    */
   async analyzeVotingPatterns(sponsor_id?: number): Promise<VotingPattern[]> {
     try {
-      logger.info('Analyzing voting patterns', { sponsor_id });
+      logger.info({ sponsor_id }, 'Analyzing voting patterns');
 
       // Stub implementation - in a real system this would:
       // 1. Query voting records from database
@@ -71,10 +71,10 @@ export class VotingPatternAnalysisService {
     comparisonSponsorIds?: number[]
   ): Promise<ComparativeAnalysis> {
     try {
-      logger.info('Building comparative analysis', { 
+      logger.info({ 
         target_sponsor_id, 
         comparisonSponsorIds 
-      });
+      }, 'Building comparative analysis');
 
       // Stub implementation - in a real system this would:
       // 1. Analyze voting alignment between sponsors

@@ -41,7 +41,7 @@ export async function teardownGraphTestEnvironment(): Promise<void> {
     testDriver = null;
     logger.info('Test environment cleaned up');
   } catch (error) {
-    logger.error('Test cleanup failed', { error: error.message });
+    logger.error({ error: error.message }, 'Test cleanup failed');
   }
 }
 

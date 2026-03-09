@@ -7,7 +7,8 @@
  * @module infrastructure/external-data/government-api-client
  */
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+// FIXME: axios not installed - use node-fetch
+// import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { RateLimiter } from 'limiter';
 import { logger } from '../observability/logging-config';
 import {
@@ -118,21 +119,21 @@ export class GovernmentAPIClient {
     instance.interceptors.response.use(
       (response) => {
         this.requestCount++;
-        logger.debug('Government API request successful', {
+        logger.debug({
           provider: this.config.provider,
           url: response.config.url,
           status: response.status,
-        });
+        }, 'Government API request successful');
         return response;
       },
       (error) => {
         this.errorCount++;
-        logger.error('Government API request failed', {
+        logger.error({
           provider: this.config.provider,
           url: error.config?.url,
           status: error.response?.status,
           message: error.message,
-        });
+        }, 'Government API request failed');
         return Promise.reject(error);
       }
     );
@@ -217,11 +218,11 @@ export class GovernmentAPIClient {
         const delay = this.config.retryConfig.retryDelay * 
           Math.pow(this.config.retryConfig.backoffMultiplier, retryCount);
         
-        logger.warn('Retrying government API request', {
+        logger.warn({
           provider: this.config.provider,
           retryCount: retryCount + 1,
           delay,
-        });
+        }, 'Retrying government API request');
         
         await new Promise(resolve => setTimeout(resolve, delay));
         return this.executeRequest(requestFn, retryCount + 1);

@@ -263,32 +263,32 @@ export class BillStatusMonitorService {
       .then(result => {
         // Log outcome for observability
         if (!result.success) {
-          logger.warn(`Notification Orchestrator failed`, {
+          logger.warn({
             component: 'BillStatusMonitorService',
             user_id,
             type: template.notificationType,
             error: result.error
-          });
+          }, `Notification Orchestrator failed`);
         } else if (result.filtered) {
-          logger.debug(`Notification filtered by orchestrator`, {
+          logger.debug({
             component: 'BillStatusMonitorService',
             user_id,
             type: template.notificationType,
             reason: result.filterReason
-          });
+          }, `Notification filtered by orchestrator`);
         } else if (result.batched) {
-          logger.debug(`Notification batched by orchestrator`, {
+          logger.debug({
             component: 'BillStatusMonitorService',
             user_id,
             type: template.notificationType,
             batchId: result.batchId
-          });
+          }, `Notification batched by orchestrator`);
         } else {
-          logger.debug(`Notification sent immediately by orchestrator`, {
+          logger.debug({
             component: 'BillStatusMonitorService',
             user_id,
             type: template.notificationType
-          });
+          }, `Notification sent immediately by orchestrator`);
         }
       })
       .catch(err => {
@@ -440,13 +440,13 @@ export class BillStatusMonitorService {
    * Gracefully shuts down the service (if needed).
    */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Bill Status Monitor Service...', {
+    logger.info({
       component: 'BillStatusMonitorService'
-    });
+    }, 'Shutting down Bill Status Monitor Service...');
     // Add cleanup logic here if the service uses intervals, timers, or persistent connections
-    logger.info('Bill Status Monitor Service shutdown complete.', {
+    logger.info({
       component: 'BillStatusMonitorService'
-    });
+    }, 'Bill Status Monitor Service shutdown complete.');
   }
 }
 

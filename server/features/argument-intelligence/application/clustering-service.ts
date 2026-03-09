@@ -1,15 +1,16 @@
 // ============================================================================
 // ARGUMENT INTELLIGENCE - Clustering Service
 // ============================================================================
-// Clusters similar arguments using semantic similarity to reveal patterns
+// Clusters similar argList using semantic similarity to reveal patterns
 
 import { logger } from '@server/infrastructure/observability';
-import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
 
 export interface ArgumentCluster {
   id: string;
   representativeText: string;
-  arguments: ClusteredArgument[];
+  argList: ClusteredArgument[];
   topicTags: string[];
   position: 'support' | 'oppose' | 'neutral' | 'mixed';
   stakeholderGroups: string[];
@@ -81,24 +82,24 @@ export class ClusteringService {
   ) {}
 
   /**
-   * Cluster arguments by semantic similarity and position
+   * Cluster argList by semantic similarity and position
    */
   async clusterArguments(
-    arguments: ClusteredArgument[],
+    argList: ClusteredArgument[],
     config: Partial<ClusteringConfig> = {}
   ): Promise<ClusteringResult> {
     const startTime = Date.now();
     const finalConfig = { ...this.defaultConfig, ...config };
 
     try {
-      logger.info(`🔄 Starting argument clustering`, {
+      logger.info({
         component: 'ClusteringService',
-        argumentCount: arguments.length,
+        argumentCount: argList.length,
         config: finalConfig
-      });
+      }, `🔄 Starting argument clustering`);
 
-      // Step 1: Preprocess arguments for clustering
-      const preprocessedArgs = await this.preprocessArguments(arguments);
+      // Step 1: Preprocess argList for clustering
+      const preprocessedArgs = await this.preprocessArguments(argList);
 
       // Step 2: Calculate similarity matrix
       const similarityMatrix = await this.calculateSimilarityMatrix(
@@ -121,7 +122,7 @@ export class ClusteringService {
 
       // Step 6: Calculate clustering metrics
       const clusteringMetrics = this.calculateClusteringMetrics(
-        arguments,
+        argList,
         enhancedClusters,
         outliers,
         Date.now() - startTime
@@ -133,27 +134,27 @@ export class ClusteringService {
         clusteringMetrics
       };
 
-      logger.info(`✅ Argument clustering completed`, {
+      logger.info({
         component: 'ClusteringService',
         clustersFormed: enhancedClusters.length,
         outliers: outliers.length,
         processingTime: clusteringMetrics.processingTime
-      });
+      }, `✅ Argument clustering completed`);
 
       return result;
 
     } catch (error) {
-      logger.error(`❌ Argument clustering failed`, {
+      logger.error({
         component: 'ClusteringService',
-        argumentCount: arguments.length,
+        argumentCount: argList.length,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Argument clustering failed`);
       throw error;
     }
   }
 
   /**
-   * Deduplicate claims by finding near-identical arguments
+   * Deduplicate claims by finding near-identical argList
    */
   async deduplicateClaims(claims: string[]): Promise<string[]> {
     if (claims.length === 0) return [];
@@ -205,16 +206,16 @@ export class ClusteringService {
   }
 
   /**
-   * Find arguments similar to a given query
+   * Find argList similar to a given query
    */
   async findSimilarArguments(
     query: string,
-    arguments: ClusteredArgument[],
+    argList: ClusteredArgument[],
     threshold: number = 0.6
   ): Promise<ClusteredArgument[]> {
     const similarities: Array<{ argument: ClusteredArgument; similarity: number }> = [];
 
-    for (const argument of arguments) {
+    for (const argument of argList) {
       const similarity = await this.similarityCalculator.calculateSimilarity(
         query,
         argument.normalizedText
@@ -279,8 +280,8 @@ export class ClusteringService {
 
   // Private helper methods
 
-  private async preprocessArguments(arguments: ClusteredArgument[]): Promise<ClusteredArgument[]> {
-    return arguments.map(arg => ({
+  private async preprocessArguments(argList: ClusteredArgument[]): Promise<ClusteredArgument[]> {
+    return argList.map(arg => ({
       ...arg,
       normalizedText: this.normalizeForClustering(arg.normalizedText)
     }));
@@ -295,11 +296,11 @@ export class ClusteringService {
   }
 
   private async calculateSimilarityMatrix(
-    arguments: ClusteredArgument[],
+    argList: ClusteredArgument[],
     config: ClusteringConfig
   ): Promise<number[][]> {
     const matrix: number[][] = [];
-    const n = arguments.length;
+    const n = argList.length;
 
     for (let i = 0; i < n; i++) {
       matrix[i] = new Array(n).fill(0);
@@ -312,21 +313,21 @@ export class ClusteringService {
 
           if (config.useSemanticSimilarity) {
             similarity = await this.similarityCalculator.calculateSimilarity(
-              arguments[i].normalizedText,
-              arguments[j].normalizedText
+              argList[i].normalizedText,
+              argList[j].normalizedText
             );
           } else {
             similarity = this.calculateLexicalSimilarity(
-              arguments[i].normalizedText,
-              arguments[j].normalizedText
+              argList[i].normalizedText,
+              argList[j].normalizedText
             );
           }
 
           // Adjust similarity based on position agreement
           if (config.considerPosition) {
             const positionBonus = this.calculatePositionSimilarity(
-              arguments[i],
-              arguments[j]
+              argList[i],
+              argList[j]
             );
             similarity = similarity * 0.8 + positionBonus * 0.2;
           }
@@ -334,8 +335,8 @@ export class ClusteringService {
           // Adjust similarity based on demographics
           if (config.considerDemographics) {
             const demographicBonus = this.calculateDemographicSimilarity(
-              arguments[i].userDemographics,
-              arguments[j].userDemographics
+              argList[i].userDemographics,
+              argList[j].userDemographics
             );
             similarity = similarity * 0.9 + demographicBonus * 0.1;
           }
@@ -413,12 +414,12 @@ export class ClusteringService {
   }
 
   private async performHierarchicalClustering(
-    arguments: ClusteredArgument[],
+    argList: ClusteredArgument[],
     similarityMatrix: number[][],
     config: ClusteringConfig
   ): Promise<ArgumentCluster[]> {
     const clusters: ArgumentCluster[] = [];
-    const n = arguments.length;
+    const n = argList.length;
     
     // Initialize each argument as its own cluster
     const activeClusters: Set<number>[] = [];
@@ -463,7 +464,7 @@ export class ClusteringService {
     // Convert remaining clusters to ArgumentCluster objects
     for (const clusterIndices of activeClusters) {
       if (clusterIndices.size >= config.minClusterSize) {
-        const clusterArgs = Array.from(clusterIndices).map(i => arguments[i]);
+        const clusterArgs = Array.from(clusterIndices).map(i => argList[i]);
         const cluster = this.createArgumentCluster(clusterArgs);
         clusters.push(cluster);
       }
@@ -490,24 +491,24 @@ export class ClusteringService {
     return count === 0 ? 0 : totalSimilarity / count;
   }
 
-  private createArgumentCluster(arguments: ClusteredArgument[]): ArgumentCluster {
+  private createArgumentCluster(argList: ClusteredArgument[]): ArgumentCluster {
     // Find representative argument (most central)
-    const representative = this.findRepresentativeArgument(arguments);
+    const representative = this.findRepresentativeArgument(argList);
     
     // Calculate cluster metadata
-    const topicTags = this.aggregateTopicTags(arguments);
-    const position = this.determineClusterPosition(arguments);
-    const stakeholderGroups = this.aggregateStakeholderGroups(arguments);
-    const averageConfidence = this.calculateAverageConfidence(arguments);
-    const evidenceStrength = this.calculateEvidenceStrength(arguments);
-    const participantCount = new Set(arguments.map(arg => arg.user_id)).size;
-    const geographicDistribution = this.calculateGeographicDistribution(arguments);
-    const demographicBreakdown = this.calculateDemographicBreakdown(arguments);
+    const topicTags = this.aggregateTopicTags(argList);
+    const position = this.determineClusterPosition(argList);
+    const stakeholderGroups = this.aggregateStakeholderGroups(argList);
+    const averageConfidence = this.calculateAverageConfidence(argList);
+    const evidenceStrength = this.calculateEvidenceStrength(argList);
+    const participantCount = new Set(argList.map(arg => arg.user_id)).size;
+    const geographicDistribution = this.calculateGeographicDistribution(argList);
+    const demographicBreakdown = this.calculateDemographicBreakdown(argList);
 
     return {
       id: crypto.randomUUID(),
       representativeText: representative.text,
-      arguments: arguments.map(arg => ({
+      argList: argList.map(arg => ({
         ...arg,
         isRepresentative: arg.id === representative.id
       })),
@@ -522,22 +523,22 @@ export class ClusteringService {
     };
   }
 
-  private findRepresentativeArgument(arguments: ClusteredArgument[]): ClusteredArgument {
+  private findRepresentativeArgument(argList: ClusteredArgument[]): ClusteredArgument {
     // Find argument with highest average similarity to others
-    let bestArg = arguments[0];
+    let bestArg = argList[0];
     let bestScore = -1;
 
-    for (const candidate of arguments) {
+    for (const candidate of argList) {
       let totalSimilarity = 0;
       
-      for (const other of arguments) {
+      for (const other of argList) {
         if (candidate.id !== other.id) {
           // Use confidence as a proxy for centrality
           totalSimilarity += candidate.confidence;
         }
       }
 
-      const avgSimilarity = totalSimilarity / (arguments.length - 1);
+      const avgSimilarity = totalSimilarity / (argList.length - 1);
       if (avgSimilarity > bestScore) {
         bestScore = avgSimilarity;
         bestArg = candidate;
@@ -547,10 +548,10 @@ export class ClusteringService {
     return bestArg;
   }
 
-  private aggregateTopicTags(arguments: ClusteredArgument[]): string[] {
+  private aggregateTopicTags(argList: ClusteredArgument[]): string[] {
     const tagCounts = new Map<string, number>();
     
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       // Extract topic tags from argument text (simplified)
       const words = arg.normalizedText.split(' ');
       words.forEach(word => {
@@ -566,8 +567,8 @@ export class ClusteringService {
       .map(([tag]) => tag);
   }
 
-  private determineClusterPosition(arguments: ClusteredArgument[]): 'support' | 'oppose' | 'neutral' | 'mixed' {
-    const positions = arguments.map(arg => this.inferPosition(arg.text));
+  private determineClusterPosition(argList: ClusteredArgument[]): 'support' | 'oppose' | 'neutral' | 'mixed' {
+    const positions = argList.map(arg => this.inferPosition(arg.text));
     const supportCount = positions.filter(p => p === 'support').length;
     const opposeCount = positions.filter(p => p === 'oppose').length;
     const neutralCount = positions.filter(p => p === 'neutral').length;
@@ -579,10 +580,10 @@ export class ClusteringService {
     return 'mixed';
   }
 
-  private aggregateStakeholderGroups(arguments: ClusteredArgument[]): string[] {
+  private aggregateStakeholderGroups(argList: ClusteredArgument[]): string[] {
     const groups = new Set<string>();
     
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       if (arg.userDemographics?.occupation) {
         groups.add(arg.userDemographics.occupation);
       }
@@ -594,30 +595,30 @@ export class ClusteringService {
     return Array.from(groups);
   }
 
-  private calculateAverageConfidence(arguments: ClusteredArgument[]): number {
-    const total = arguments.reduce((sum, arg) => sum + arg.confidence, 0);
-    return total / arguments.length;
+  private calculateAverageConfidence(argList: ClusteredArgument[]): number {
+    const total = argList.reduce((sum, arg) => sum + arg.confidence, 0);
+    return total / argList.length;
   }
 
-  private calculateEvidenceStrength(arguments: ClusteredArgument[]): number {
+  private calculateEvidenceStrength(argList: ClusteredArgument[]): number {
     // Simplified evidence strength calculation
     const evidenceWords = ['study', 'research', 'data', 'statistics', 'report'];
     let evidenceCount = 0;
 
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       const lowerText = arg.text.toLowerCase();
       evidenceWords.forEach(word => {
         if (lowerText.includes(word)) evidenceCount++;
       });
     });
 
-    return Math.min(1.0, evidenceCount / arguments.length);
+    return Math.min(1.0, evidenceCount / argList.length);
   }
 
-  private calculateGeographicDistribution(arguments: ClusteredArgument[]): Map<string, number> {
+  private calculateGeographicDistribution(argList: ClusteredArgument[]): Map<string, number> {
     const distribution = new Map<string, number>();
     
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       const county = arg.userDemographics?.county || 'unknown';
       distribution.set(county, (distribution.get(county) || 0) + 1);
     });
@@ -625,13 +626,13 @@ export class ClusteringService {
     return distribution;
   }
 
-  private calculateDemographicBreakdown(arguments: ClusteredArgument[]): DemographicBreakdown {
+  private calculateDemographicBreakdown(argList: ClusteredArgument[]): DemographicBreakdown {
     const ageGroups = new Map<string, number>();
     const occupations = new Map<string, number>();
     const counties = new Map<string, number>();
     const organizationAffiliations = new Map<string, number>();
 
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       const demo = arg.userDemographics;
       if (demo) {
         if (demo.ageGroup) {
@@ -654,7 +655,7 @@ export class ClusteringService {
   }
 
   private identifyOutliers(
-    arguments: ClusteredArgument[],
+    argList: ClusteredArgument[],
     clusters: ArgumentCluster[],
     config: ClusteringConfig
   ): ClusteredArgument[] {
@@ -666,7 +667,7 @@ export class ClusteringService {
       });
     });
 
-    return arguments.filter(arg => !clusteredArgIds.has(arg.id));
+    return argList.filter(arg => !clusteredArgIds.has(arg.id));
   }
 
   private async enhanceClusters(clusters: ArgumentCluster[]): Promise<ArgumentCluster[]> {
@@ -718,7 +719,7 @@ export class ClusteringService {
   private mergeClusters(target: ArgumentCluster, source: ArgumentCluster): ArgumentCluster {
     return {
       ...target,
-      arguments: [...target.arguments, ...source.arguments],
+      argList: [...target.arguments, ...source.arguments],
       topicTags: [...new Set([...target.topicTags, ...source.topicTags])],
       stakeholderGroups: [...new Set([...target.stakeholderGroups, ...source.stakeholderGroups])],
       averageConfidence: (target.averageConfidence * target.arguments.length + 

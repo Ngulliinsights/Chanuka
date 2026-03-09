@@ -111,7 +111,7 @@ export async function registerRecommendationMonitoring(): Promise<void> {
     
     logger.info('Recommendation engine monitoring setup complete');
   } catch (error) {
-    logger.error('Failed to register recommendation engine monitoring', { error });
+    logger.error({ error }, 'Failed to register recommendation engine monitoring');
     throw error;
   }
 }
@@ -124,7 +124,7 @@ if (require.main === module) {
       process.exit(0);
     })
     .catch((error) => {
-      logger.error('Monitoring registration failed', { error });
+      logger.error({ error }, 'Monitoring registration failed');
       process.exit(1);
     });
 }

@@ -46,19 +46,28 @@ export interface PaginatedResponse<T> {
 // ============================================================================
 
 export interface ApiRequest {
+  readonly id?: string;
   readonly method: HttpMethod;
   readonly url: string;
   readonly data?: unknown;
+  readonly body?: unknown;
   readonly headers?: Record<string, string>;
   readonly params?: Record<string, string | number | boolean>;
+  readonly timeout?: number;
+  readonly timestamp?: string;
 }
 
 export interface ApiResponse<T = unknown> {
+  readonly id?: string;
+  readonly requestId?: string;
   readonly data: T;
   readonly status: number;
   readonly statusText: string;
   readonly headers: Record<string, string>;
-  readonly timestamp: number;
+  readonly timestamp: number | string;
+  readonly duration?: number;
+  readonly cached?: boolean;
+  readonly fromFallback?: boolean;
 }
 
 export interface RetryConfig {
@@ -99,6 +108,7 @@ export interface RequestOptions {
   readonly validate?: ValidationOptions;
   readonly responseSchema?: ZodSchema;
   readonly fallbackData?: unknown;
+  readonly skipCache?: boolean;
   /** @deprecated Use `cache` with `ttl` instead */
   readonly cacheTTL?: number;
   /** @deprecated Use `retry.maxRetries` instead */

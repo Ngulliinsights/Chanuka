@@ -26,13 +26,13 @@ import featureFlagRouter from '@server/features/feature-flags/application/routes
 import { router as recommendationRouter } from '@server/features/recommendation/RecommendationController';
 import { recommendationRouter as newRecommendationRouter } from '@server/features/recommendation';
 import { router as searchRouter } from '@server/features/search/SearchController';
-import { sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
+import { router as sponsorsRouter } from '@server/features/sponsors/sponsors.routes';
 import { router as usersRouter } from '@server/features/users/application/profile';
 import { router as verificationRouter } from '@server/features/users/application/verification';
-import { default as electoralAccountabilityRoutes } from '@server/features/electoral-accountability/application/electoral-accountability.routes';
-import { cacheManagementRoutes as cacheRouter } from '@server/infrastructure/cache/cache-management.routes';
+import { router as electoralAccountabilityRoutes } from '@server/features/electoral-accountability/application/electoral-accountability.routes';
+
 import { cacheCoordinator } from '@server/infrastructure/cache';
-import { monitoringScheduler } from '@server/infrastructure/monitoring/monitoring-scheduler';
+
 import { notificationSchedulerService, notificationRoutes as notificationsRouter, alertPreferenceRoutes } from '@server/features/notifications';
 import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
@@ -48,12 +48,12 @@ import { createServer, Server } from 'http';
 
 // Diagnostic logging at startup for debugging environment configuration
 logger.info('🔍 DIAGNOSTIC: Server startup initiated');
-logger.info('🔍 DIAGNOSTIC: Environment variables check:', {
+logger.info({
   DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
   JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
   ENCRYPTION_KEY: process.env.ENCRYPTION_KEY ? 'SET' : 'NOT SET',
   KEY_DERIVATION_SALT: process.env.KEY_DERIVATION_SALT ? 'SET' : 'NOT SET',
-});
+}, '🔍 DIAGNOSTIC: Environment variables check:');
 
 // Type definitions for better error handling
 interface AppError extends Error {
@@ -87,7 +87,7 @@ interface WebSocketServiceExtended {
 
 // Simple monitoring initialization
 const initializeMonitoring = (env: string): void => {
-  logger.info('Performance monitoring initialized', { environment: env } as LogContext);
+  logger.info({ environment: env } as LogContext, 'Performance monitoring initialized');
 };
 
 // Application instance with proper typing
@@ -197,7 +197,7 @@ app.get('/api/security/status', (req: Request, res: Response) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Security status error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Security status error:');
     res.status(500).json({
       success: false,
       error: 'Failed to get security status',
@@ -221,7 +221,7 @@ app.get('/api/security/csrf-token', (req: Request, res: Response) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('CSRF token generation error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'CSRF token generation error:');
     res.status(500).json({
       success: false,
       error: 'Failed to generate CSRF token',
@@ -236,11 +236,11 @@ app.post('/api/security/csp-report', (req: Request, res: Response) => {
   res.header('Access-Control-Allow-Credentials', 'true');
 
   try {
-    logger.warn('CSP Violation Report:', { violation: req.body, component: 'Chanuka' } as LogContext);
+    logger.warn({ violation: req.body, component: 'Chanuka' } as LogContext, 'CSP Violation Report:');
     res.status(204).send();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('CSP report error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'CSP report error:');
     res.status(500).json({
       success: false,
       error: 'Failed to process CSP report',
@@ -255,11 +255,11 @@ app.post('/api/security/vulnerability-report', (req: Request, res: Response) => 
   res.header('Access-Control-Allow-Credentials', 'true');
 
   try {
-    logger.warn('Vulnerability Report:', { vulnerabilities: req.body, component: 'Chanuka' } as LogContext);
+    logger.warn({ vulnerabilities: req.body, component: 'Chanuka' } as LogContext, 'Vulnerability Report:');
     res.status(204).send();
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Vulnerability report error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Vulnerability report error:');
     res.status(500).json({
       success: false,
       error: 'Failed to process vulnerability report',
@@ -282,7 +282,7 @@ app.post('/api/auth/validate-tokens', (req: Request, res: Response) => {
     });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Token validation error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Token validation error:');
     res.status(500).json({
       success: false,
       error: 'Failed to validate tokens',
@@ -294,7 +294,7 @@ app.post('/api/auth/validate-tokens', (req: Request, res: Response) => {
 // Memory analysis endpoint for debugging
 app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
   try {
-    logger.info('🔍 Triggering detailed memory analysis...', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, '🔍 Triggering detailed memory analysis...');
 
     const wsService = webSocketService as WebSocketServiceExtended;
     const wsAnalysis = wsService.getMemoryAnalysis ? wsService.getMemoryAnalysis() : { status: 'unavailable' };
@@ -319,7 +319,7 @@ app.get('/api/debug/memory-analysis', (req: Request, res: Response) => {
     res.json(analysis);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Error in memory analysis:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Error in memory analysis:');
     res.status(500).json({
       error: 'Failed to perform memory analysis',
       details: errorMessage
@@ -381,7 +381,7 @@ app.use('/api/notifications', notificationsRouter);
 app.use('/api/notifications/preferences', alertPreferenceRoutes);
 app.use('/api/search', searchRouter);
 app.use('/api/privacy', privacyRouter);
-app.use('/api/cache', cacheRouter);
+
 app.use('/api/external-api', externalApiManagementRouter);
 app.use('/api/admin/external-api', externalApiDashboardRouter);
 app.use('/api/coverage', coverageRouter);
@@ -402,11 +402,11 @@ async function testConnection(): Promise<void> {
     const client = await pool.connect();
     await client.query('SELECT 1');
     client.release();
-    logger.info('Database connection established successfully', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, 'Database connection established successfully');
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Database connection failed:', { error: errorMessage, component: 'Chanuka' } as LogContext);
-    logger.info('Server will continue in development mode without database', { component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Database connection failed:');
+    logger.info({ component: 'Chanuka' } as LogContext, 'Server will continue in development mode without database');
   }
 }
 
@@ -428,7 +428,7 @@ const createMockDatabaseFallbackService = (): DatabaseFallbackService => ({
     };
   },
   setDemoMode(_enabled: boolean): void {
-    logger.info('Demo mode set', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, 'Demo mode set');
   }
 });
 
@@ -453,7 +453,7 @@ async function ensureServerInitialized(): Promise<void> {
     })
     .catch(error => {
       serverInitializationPromise = null;
-      logger.error('Server initialization failed', { error, component: 'Chanuka' } as LogContext);
+      logger.error({ error, component: 'Chanuka' } as LogContext, 'Server initialization failed');
       throw error;
     });
 
@@ -461,42 +461,42 @@ async function ensureServerInitialized(): Promise<void> {
 }
 
 async function performStartupInitialization(): Promise<void> {
-  logger.info('🚀 Starting Chanuka Platform...', { component: 'Chanuka' } as LogContext);
+  logger.info({ component: 'Chanuka' } as LogContext, '🚀 Starting Chanuka Platform...');
 
   try {
     const dbConnected = await databaseFallbackService.initialize();
     const healthInfo = await databaseFallbackService.getHealthInfo();
 
     if (dbConnected) {
-      logger.info('🔍 Performing database schema validation...', { component: 'Chanuka' } as LogContext);
+      logger.info({ component: 'Chanuka' } as LogContext, '🔍 Performing database schema validation...');
       try {
         const report = await schemaValidationService.generateValidationReport();
         if (report.criticalIssues > 0) {
           logger.warn(`⚠️  Schema validation found ${report.criticalIssues} critical issues`, { component: 'Chanuka' } as LogContext);
-          logger.info('🔧 Attempting automatic schema repair...', { component: 'Chanuka' } as LogContext);
+          logger.info({ component: 'Chanuka' } as LogContext, '🔧 Attempting automatic schema repair...');
           const repairResult = await schemaValidationService.repairSchema();
           if (repairResult.success) {
-            logger.info('✅ Schema issues repaired successfully', { component: 'Chanuka' } as LogContext);
+            logger.info({ component: 'Chanuka' } as LogContext, '✅ Schema issues repaired successfully');
           } else {
-            logger.error('❌ Schema repair failed - manual intervention may be required', { component: 'Chanuka' } as LogContext);
+            logger.error({ component: 'Chanuka' } as LogContext, '❌ Schema repair failed - manual intervention may be required');
           }
         } else {
-          logger.info('✅ Database schema validation passed', { component: 'Chanuka' } as LogContext);
+          logger.info({ component: 'Chanuka' } as LogContext, '✅ Database schema validation passed');
         }
       } catch (schemaError) {
         const schemaErrorMessage = schemaError instanceof Error ? schemaError.message : String(schemaError);
-        logger.warn('⚠️  Schema validation failed during startup, continuing:', { error: schemaErrorMessage, component: 'Chanuka' } as LogContext);
+        logger.warn({ error: schemaErrorMessage, component: 'Chanuka' } as LogContext, '⚠️  Schema validation failed during startup, continuing:');
       }
 
-      logger.info('✅ Platform ready with full database functionality', { component: 'Chanuka' } as LogContext);
+      logger.info({ component: 'Chanuka' } as LogContext, '✅ Platform ready with full database functionality');
     } else {
-      logger.info('⚠️  Platform starting in demonstration mode with sample data', { component: 'Chanuka' } as LogContext);
+      logger.info({ component: 'Chanuka' } as LogContext, '⚠️  Platform starting in demonstration mode with sample data');
       logger.info(`💡 ${healthInfo.system.message}`, { component: 'Chanuka' } as LogContext);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('❌ Startup initialization error:', { error: errorMessage, component: 'Chanuka' } as LogContext);
-    logger.info('🔄 Continuing with fallback mode...', { component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, '❌ Startup initialization error:');
+    logger.info({ component: 'Chanuka' } as LogContext, '🔄 Continuing with fallback mode...');
     databaseFallbackService.setDemoMode(true);
   }
 }
@@ -504,7 +504,7 @@ async function performStartupInitialization(): Promise<void> {
 // Initialize startup without blocking
 ensureServerInitialized().catch(err => {
   const errorMessage = err instanceof Error ? err.message : String(err);
-  logger.info('Startup initialization error (non-blocking):', { component: 'Chanuka', error: errorMessage } as LogContext);
+  logger.info({ component: 'Chanuka', error: errorMessage } as LogContext, 'Startup initialization error (non-blocking):');
   databaseFallbackService.setDemoMode(true);
 });
 
@@ -515,15 +515,15 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
   logger.info(`\n${signal} received. Starting graceful shutdown...`, { component: 'Chanuka' } as LogContext);
 
   try {
-    logger.info('🛑 Stopping new connections...', { component: 'Chanuka' } as LogContext);
-    logger.info('🧹 Cleaning up services...', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, '🛑 Stopping new connections...');
+    logger.info({ component: 'Chanuka' } as LogContext, '🧹 Cleaning up services...');
 
     const wsService = webSocketService as WebSocketServiceExtended;
 
     const cleanupTasks = [
       { name: 'privacy scheduler', fn: async () => { privacySchedulerService.stop(); privacySchedulerService.destroy(); } },
       { name: 'session cleanup', fn: async () => { sessionCleanupService.stop(); } },
-      { name: 'monitoring scheduler', fn: async () => { monitoringScheduler.stop(); } },
+
       { name: 'notification scheduler', fn: async () => { notificationSchedulerService.cleanup(); } },
       { name: 'cache coordinator', fn: async () => { cacheCoordinator.stop(); } },
       { name: 'WebSocket service', fn: async () => { if (wsService.shutdown) await wsService.shutdown(); } },
@@ -538,25 +538,25 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
       }
     }
 
-    logger.info('✅ All services cleaned up', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, '✅ All services cleaned up');
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('Error during graceful shutdown:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+    logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Error during graceful shutdown:');
   }
 
   server.close((err) => {
     if (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
-      logger.error('Error closing server:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+      logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, 'Error closing server:');
       process.exit(1);
     }
-    logger.info('Server closed successfully', { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, 'Server closed successfully');
     process.exit(0);
   });
 
   setTimeout(() => {
-    logger.error('Forced shutdown after timeout', { component: 'Chanuka' } as LogContext);
+    logger.error({ component: 'Chanuka' } as LogContext, 'Forced shutdown after timeout');
     process.exit(1);
   }, 10000);
 };
@@ -566,22 +566,22 @@ process.on('SIGTERM', () => void gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => void gracefulShutdown('SIGINT'));
 
 process.on('uncaughtException', (error: Error) => {
-  logger.error('Uncaught Exception:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
+  logger.error({ error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext, 'Uncaught Exception:');
   void gracefulShutdown('UNCAUGHT_EXCEPTION');
 });
 
 process.on('unhandledRejection', (reason: unknown) => {
   const error = reason instanceof Error ? reason : new Error(String(reason));
-  logger.error('Unhandled Rejection:', { error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext);
+  logger.error({ error: error.message, stack: error.stack, component: 'Chanuka' } as LogContext, 'Unhandled Rejection:');
   void gracefulShutdown('UNHANDLED_REJECTION');
 });
 
 server.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
     logger.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`, { component: 'Chanuka' } as LogContext);
-    logger.info(`💡 You can try: PORT=4201 npm run dev`, { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka' } as LogContext, `💡 You can try: PORT=4201 npm run dev`);
   } else {
-    logger.error('❌ Server error:', { error: error.message, component: 'Chanuka' } as LogContext);
+    logger.error({ error: error.message, component: 'Chanuka' } as LogContext, '❌ Server error:');
   }
   process.exit(1);
 });
@@ -597,7 +597,7 @@ if (process.env.NODE_ENV !== 'test') {
       { name: 'Performance monitoring', init: () => { initializeMonitoring(config.server.nodeEnv); } },
       { name: 'WebSocket service', init: () => { if (wsService.initialize) wsService.initialize(server); } },
       { name: 'Notification scheduler', init: () => notificationSchedulerService.initialize() },
-      { name: 'Monitoring scheduler', init: () => monitoringScheduler.initialize() },
+
       { name: 'Session cleanup service', init: () => { sessionCleanupService.start(60); } },
       { name: 'Privacy scheduler service', init: async () => { await privacySchedulerService.initialize(); privacySchedulerService.start(); } },
       { name: 'Cache coordinator', init: () => { cacheCoordinator.start(); } }
@@ -615,10 +615,10 @@ if (process.env.NODE_ENV !== 'test') {
 
     try {
       setupVite(app);
-      logger.info('✅ Frontend serving configured successfully', { component: 'Chanuka' } as LogContext);
+      logger.info({ component: 'Chanuka' } as LogContext, '✅ Frontend serving configured successfully');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
-      logger.error('❌ Failed to setup frontend serving:', { error: errorMessage, component: 'Chanuka' } as LogContext);
+      logger.error({ error: errorMessage, component: 'Chanuka' } as LogContext, '❌ Failed to setup frontend serving:');
 
       app.use('*', (req: Request, res: Response, next: NextFunction) => {
         if (req.originalUrl.startsWith('/api/')) {

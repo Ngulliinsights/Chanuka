@@ -48,7 +48,18 @@ export class StateSyncService {
   syncCommentCreated(comment: SyncableComment): void {
     const billId =
       typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
-    this.updateCommentsCache(billId, comments => [comment as SyncableComment, ...comments]);
+    const threadId = comment.threadId
+      ? typeof comment.threadId === 'string'
+        ? parseInt(comment.threadId, 10)
+        : comment.threadId
+      : undefined;
+
+    const normalizedComment: SyncableComment = {
+      ...comment,
+      billId,
+      threadId,
+    };
+    this.updateCommentsCache(billId, comments => [normalizedComment, ...comments]);
 
     if (this.wsManager?.isConnected()) {
       this.wsManager.emit('comment:new', comment);
@@ -63,12 +74,24 @@ export class StateSyncService {
   syncCommentUpdated(comment: SyncableComment): void {
     const billId =
       typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
+    const threadId = comment.threadId
+      ? typeof comment.threadId === 'string'
+        ? parseInt(comment.threadId, 10)
+        : comment.threadId
+      : undefined;
+
+    const normalizedComment: SyncableComment = {
+      ...comment,
+      billId,
+      threadId,
+    };
+
     this.updateCommentsCache(billId, comments =>
-      comments.map(c => (c.id === comment.id ? comment : c))
+      comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
 
     if (this.wsManager?.isConnected()) {
-      this.wsManager.emit('comment:updated', comment);
+      this.wsManager.emit('comment:updated', normalizedComment);
     }
   }
 
@@ -110,15 +133,27 @@ export class StateSyncService {
   syncCommentVoted(comment: SyncableComment): void {
     const billId =
       typeof comment.billId === 'string' ? parseInt(comment.billId, 10) : comment.billId;
+    const threadId = comment.threadId
+      ? typeof comment.threadId === 'string'
+        ? parseInt(comment.threadId, 10)
+        : comment.threadId
+      : undefined;
+
+    const normalizedComment: SyncableComment = {
+      ...comment,
+      billId,
+      threadId,
+    };
+
     this.updateCommentsCache(billId, comments =>
-      comments.map(c => (c.id === comment.id ? comment : c))
+      comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
 
     if (this.wsManager?.isConnected()) {
       this.wsManager.emit('comment:voted', {
-        id: comment.id,
-        upvotes: comment.votes.up,
-        downvotes: comment.votes.down,
+        id: normalizedComment.id,
+        upvotes: normalizedComment.votes.up,
+        downvotes: normalizedComment.votes.down,
       });
     }
   }

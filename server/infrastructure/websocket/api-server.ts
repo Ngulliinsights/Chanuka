@@ -136,11 +136,11 @@ export class WebSocketAPIServer {
       this.startHeartbeat();
       this.startCleanup();
 
-      logger.info('WebSocket API server initialized', {
+      logger.info({
         component: 'WebSocketAPIServer',
         path: '/api/ws',
         config: this.config
-      });
+      }, 'WebSocket API server initialized');
     } catch (error) {
       logger.error('Failed to initialize WebSocket API server', {
         component: 'WebSocketAPIServer'
@@ -177,10 +177,10 @@ export class WebSocketAPIServer {
       // Clear connections
       this.connections.clear();
 
-      logger.info('WebSocket API server shut down gracefully', {
+      logger.info({
         component: 'WebSocketAPIServer',
         finalStats: this.stats
-      });
+      }, 'WebSocket API server shut down gracefully');
     } catch (error) {
       logger.error('Error during WebSocket API server shutdown', {
         component: 'WebSocketAPIServer'
@@ -201,10 +201,10 @@ export class WebSocketAPIServer {
       const token = this.extractToken(info.req);
       
       if (!token) {
-        logger.warn('WebSocket connection rejected: No token provided', {
+        logger.warn({
           component: 'WebSocketAPIServer',
           origin: info.origin
-        });
+        }, 'WebSocket connection rejected: No token provided');
         return false;
       }
 
@@ -215,12 +215,12 @@ export class WebSocketAPIServer {
       ]);
 
       if (!isValid || !withinLimits) {
-        logger.warn('WebSocket connection rejected: Authentication or rate limit failed', {
+        logger.warn({
           component: 'WebSocketAPIServer',
           origin: info.origin,
           isValid,
           withinLimits
-        });
+        }, 'WebSocket connection rejected: Authentication or rate limit failed');
         return false;
       }
 
@@ -280,10 +280,10 @@ export class WebSocketAPIServer {
     });
 
     this.wss.on('close', () => {
-      logger.info('WebSocket server closed', {
+      logger.info({
         component: 'WebSocketAPIServer',
         stats: this.stats
-      });
+      }, 'WebSocket server closed');
     });
   }
 
@@ -319,12 +319,12 @@ export class WebSocketAPIServer {
       this.stats.totalConnections++;
       if (userId) this.stats.authenticatedConnections++;
 
-      logger.info('WebSocket connection established', {
+      logger.info({
         component: 'WebSocketAPIServer',
         connectionId,
         userId,
         sessionId: ws.sessionId
-      });
+      }, 'WebSocket connection established');
 
       // Set up connection-specific event handlers
       ws.on('message', (data: Buffer) => {
@@ -393,10 +393,10 @@ export class WebSocketAPIServer {
   private handleMessage(connectionId: string, data: Buffer): void {
     const connection = this.connections.get(connectionId);
     if (!connection) {
-      logger.warn('Received message for non-existent connection', {
+      logger.warn({
         component: 'WebSocketAPIServer',
         connectionId
-      });
+      }, 'Received message for non-existent connection');
       return;
     }
 
@@ -418,11 +418,11 @@ export class WebSocketAPIServer {
 
       this.stats.messagesReceived++;
 
-      logger.debug('Received WebSocket message', {
+      logger.debug({
         component: 'WebSocketAPIServer',
         connectionId,
         messageType: message.type
-      });
+      }, 'Received WebSocket message');
 
       // Route message to the appropriate handler
       this.routeMessage(connection, message);
@@ -455,7 +455,7 @@ export class WebSocketAPIServer {
     // Update subscription count
     this.stats.totalSubscriptions -= connection.subscriptions.size;
 
-    logger.info('WebSocket connection closed', {
+    logger.info({
       component: 'WebSocketAPIServer',
       connectionId,
       userId: connection.userId,
@@ -463,7 +463,7 @@ export class WebSocketAPIServer {
       reason: reason.toString('utf8'),
       duration,
       subscriptionCount: connection.subscriptions.size
-    });
+    }, 'WebSocket connection closed');
   }
 
   /**
@@ -506,11 +506,11 @@ export class WebSocketAPIServer {
         this.sendError(connection.ws, 'Failed to process message');
       }
     } else {
-      logger.warn('Unknown message type received', {
+      logger.warn({
         component: 'WebSocketAPIServer',
         messageType: message.type,
         connectionId: connection.id
-      });
+      }, 'Unknown message type received');
       this.sendError(connection.ws, `Unknown message type: ${message.type}`);
     }
   }
@@ -524,17 +524,17 @@ export class WebSocketAPIServer {
    */
   registerMessageHandler(type: string, handler: MessageHandler): void {
     if (this.messageHandlers.has(type)) {
-      logger.warn('Overwriting existing message handler', {
+      logger.warn({
         component: 'WebSocketAPIServer',
         messageType: type
-      });
+      }, 'Overwriting existing message handler');
     }
     this.messageHandlers.set(type, handler);
     
-    logger.debug('Registered message handler', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       messageType: type
-    });
+    }, 'Registered message handler');
   }
 
   /**
@@ -544,10 +544,10 @@ export class WebSocketAPIServer {
     const existed = this.messageHandlers.delete(type);
     
     if (existed) {
-      logger.debug('Unregistered message handler', {
+      logger.debug({
         component: 'WebSocketAPIServer',
         messageType: type
-      });
+      }, 'Unregistered message handler');
     }
   }
 
@@ -561,11 +561,11 @@ export class WebSocketAPIServer {
   subscribeToTopic(connectionId: string, topic: string): boolean {
     const connection = this.connections.get(connectionId);
     if (!connection) {
-      logger.warn('Cannot subscribe non-existent connection', {
+      logger.warn({
         component: 'WebSocketAPIServer',
         connectionId,
         topic
-      });
+      }, 'Cannot subscribe non-existent connection');
       return false;
     }
 
@@ -575,11 +575,11 @@ export class WebSocketAPIServer {
     
     if (wasNew) {
       this.stats.totalSubscriptions++;
-      logger.info('Subscribed to topic', {
+      logger.info({
         component: 'WebSocketAPIServer',
         connectionId,
         topic
-      });
+      }, 'Subscribed to topic');
     }
 
     return wasNew;
@@ -591,11 +591,11 @@ export class WebSocketAPIServer {
   unsubscribeFromTopic(connectionId: string, topic: string): boolean {
     const connection = this.connections.get(connectionId);
     if (!connection) {
-      logger.warn('Cannot unsubscribe non-existent connection', {
+      logger.warn({
         component: 'WebSocketAPIServer',
         connectionId,
         topic
-      });
+      }, 'Cannot unsubscribe non-existent connection');
       return false;
     }
 
@@ -605,11 +605,11 @@ export class WebSocketAPIServer {
       connection.ws.subscriptions.delete(topic);
       this.stats.totalSubscriptions--;
 
-      logger.info('Unsubscribed from topic', {
+      logger.info({
         component: 'WebSocketAPIServer',
         connectionId,
         topic
-      });
+      }, 'Unsubscribed from topic');
     }
 
     return existed;
@@ -655,12 +655,12 @@ export class WebSocketAPIServer {
       }
     });
 
-    logger.debug('Broadcasted message to topic', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       topic,
       sentCount,
       excludedUser: excludeUserId
-    });
+    }, 'Broadcasted message to topic');
 
     return sentCount;
   }
@@ -679,11 +679,11 @@ export class WebSocketAPIServer {
       }
     });
 
-    logger.debug('Broadcasted message to user', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       userId,
       sentCount
-    });
+    }, 'Broadcasted message to user');
 
     return sentCount;
   }
@@ -704,11 +704,11 @@ export class WebSocketAPIServer {
       }
     });
 
-    logger.debug('Broadcasted message to all connections', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       sentCount,
       excludedUser: excludeUserId
-    });
+    }, 'Broadcasted message to all connections');
 
     return sentCount;
   }
@@ -768,11 +768,11 @@ export class WebSocketAPIServer {
         const timeSinceActivity = now - connection.lastActivity;
         
         if (timeSinceActivity > this.config.staleConnectionTimeout) {
-          logger.warn('Closing stale connection', {
+          logger.warn({
             component: 'WebSocketAPIServer',
             connectionId: connection.id,
             timeSinceActivity
-          });
+          }, 'Closing stale connection');
           connection.ws.close(1001, 'Connection timeout');
           return;
         }
@@ -791,10 +791,10 @@ export class WebSocketAPIServer {
       });
     }, this.config.heartbeatInterval);
 
-    logger.debug('Heartbeat mechanism started', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       interval: this.config.heartbeatInterval
-    });
+    }, 'Heartbeat mechanism started');
   }
 
   /**
@@ -804,9 +804,9 @@ export class WebSocketAPIServer {
     if (this.heartbeatInterval) {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
-      logger.debug('Heartbeat mechanism stopped', {
+      logger.debug({
         component: 'WebSocketAPIServer'
-      });
+      }, 'Heartbeat mechanism stopped');
     }
   }
 
@@ -821,20 +821,20 @@ export class WebSocketAPIServer {
         const connectionAge = now - connection.connectionTime;
         
         if (connectionAge > this.config.maxConnectionAge) {
-          logger.info('Closing old connection', {
+          logger.info({
             component: 'WebSocketAPIServer',
             connectionId: connection.id,
             age: connectionAge
-          });
+          }, 'Closing old connection');
           connection.ws.close(1001, 'Connection exceeded maximum age');
         }
       });
     }, this.config.cleanupInterval);
 
-    logger.debug('Cleanup task started', {
+    logger.debug({
       component: 'WebSocketAPIServer',
       interval: this.config.cleanupInterval
-    });
+    }, 'Cleanup task started');
   }
 
   /**
@@ -844,9 +844,9 @@ export class WebSocketAPIServer {
     if (this.cleanupInterval) {
       clearInterval(this.cleanupInterval);
       this.cleanupInterval = null;
-      logger.debug('Cleanup task stopped', {
+      logger.debug({
         component: 'WebSocketAPIServer'
-      });
+      }, 'Cleanup task stopped');
     }
   }
 
@@ -912,9 +912,9 @@ export class WebSocketAPIServer {
       messagesSent: 0,
       errors: 0
     };
-    logger.info('Statistics reset', {
+    logger.info({
       component: 'WebSocketAPIServer'
-    });
+    }, 'Statistics reset');
   }
 
   /**
@@ -976,11 +976,11 @@ export const defaultMessageHandlers = {
       }
     });
 
-    logger.info('Processed subscribe message', {
+    logger.info({
       component: 'WebSocketAPI',
       connectionId: connection.id,
       topics: subscribedTopics
-    });
+    }, 'Processed subscribe message');
 
     // Send confirmation
     connection.ws.send(JSON.stringify({
@@ -1007,11 +1007,11 @@ export const defaultMessageHandlers = {
       }
     });
 
-    logger.info('Processed unsubscribe message', {
+    logger.info({
       component: 'WebSocketAPI',
       connectionId: connection.id,
       topics: unsubscribedTopics
-    });
+    }, 'Processed unsubscribe message');
 
     // Send confirmation
     connection.ws.send(JSON.stringify({
@@ -1036,11 +1036,11 @@ export const defaultMessageHandlers = {
    * Handle client ready notifications
    */
   ready: (connection: WebSocketConnection) => {
-    logger.info('Client marked as ready', {
+    logger.info({
       component: 'WebSocketAPI',
       connectionId: connection.id,
       userId: connection.userId
-    });
+    }, 'Client marked as ready');
 
     // Send acknowledgment
     connection.ws.send(JSON.stringify({

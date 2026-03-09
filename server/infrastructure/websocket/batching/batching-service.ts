@@ -99,10 +99,10 @@ export class BatchingService {
 
     this.startBackgroundTasks();
 
-    logger.info('BatchingService initialized', {
+    logger.info({
       component: 'BatchingService',
       config: this.config
-    });
+    }, 'BatchingService initialized');
   }
 
   /**
@@ -114,10 +114,10 @@ export class BatchingService {
     deliveryCallback: (batch: BatchableMessage[]) => Promise<void>
   ): boolean {
     if (this.isShuttingDown) {
-      logger.warn('Rejected message during shutdown', {
+      logger.warn({
         component: 'BatchingService',
         user_id
-      });
+      }, 'Rejected message during shutdown');
       return false;
     }
 
@@ -144,12 +144,12 @@ export class BatchingService {
     // Check queue capacity
     if (queue.size() >= this.config.maxQueueSize) {
       this.metrics.droppedMessages++;
-      logger.warn('Message dropped - queue full', {
+      logger.warn({
         component: 'BatchingService',
         user_id,
         queueSize: queue.size(),
         maxQueueSize: this.config.maxQueueSize
-      });
+      }, 'Message dropped - queue full');
       return false;
     }
 
@@ -191,19 +191,19 @@ export class BatchingService {
       this.metrics.totalBatches++;
       this.trackLatency(Date.now() - queueEntryTime);
 
-      logger.debug('High-priority message sent immediately', {
+      logger.debug({
         component: 'BatchingService',
         user_id,
         messageType: message.type,
         latency: Date.now() - queueEntryTime
-      });
+      }, 'High-priority message sent immediately');
     } catch (error) {
       this.metrics.failedBatches++;
-      logger.error('Failed to send immediate message', {
+      logger.error({
         component: 'BatchingService',
         user_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Failed to send immediate message');
       throw error;
     }
   }
@@ -253,13 +253,13 @@ export class BatchingService {
       const oldestTimestamp = Math.min(...batch.map(m => m.timestamp || Date.now()));
       this.trackLatency(Date.now() - oldestTimestamp);
 
-      logger.debug('Batch processed successfully', {
+      logger.debug({
         component: 'BatchingService',
         user_id,
         batchSize: batch.length,
         queueRemaining: queue.size(),
         processingTime: Date.now() - batchStartTime
-      });
+      }, 'Batch processed successfully');
 
     } catch (error) {
       this.metrics.failedBatches++;
@@ -270,13 +270,13 @@ export class BatchingService {
         queue.enqueue(message, retryPriority);
       }
 
-      logger.error('Failed to process batch - messages re-queued', {
+      logger.error({
         component: 'BatchingService',
         user_id,
         batchSize: batch.length,
         queueSize: queue.size(),
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Failed to process batch - messages re-queued');
     }
   }
 
@@ -303,12 +303,12 @@ export class BatchingService {
         if (batch.length > 0) {
           flushPromises.push(
             deliveryCallback(user_id, batch).catch(error => {
-              logger.error('Failed to flush batch', {
+              logger.error({
                 component: 'BatchingService',
                 user_id,
                 batchSize: batch.length,
                 error: error instanceof Error ? error.message : String(error)
-              });
+              }, 'Failed to flush batch');
             })
           );
         }
@@ -324,11 +324,11 @@ export class BatchingService {
 
     await Promise.allSettled(flushPromises);
 
-    logger.info('All batches flushed', {
+    logger.info({
       component: 'BatchingService',
       batchesFlushed: flushPromises.length,
       users: userIds.length
-    });
+    }, 'All batches flushed');
   }
 
   /**
@@ -338,11 +338,11 @@ export class BatchingService {
     const oldConfig = { ...this.config };
     this.config = { ...this.config, ...newConfig };
 
-    logger.info('BatchingService configuration updated', {
+    logger.info({
       component: 'BatchingService',
       oldConfig,
       newConfig: this.config
-    });
+    }, 'BatchingService configuration updated');
   }
 
   /**
@@ -382,12 +382,12 @@ export class BatchingService {
     }
 
     if (totalRemoved > 0 || emptyQueues.length > 0) {
-      logger.info('Cleanup completed', {
+      logger.info({
         component: 'BatchingService',
         staleMessagesRemoved: totalRemoved,
         emptyQueuesRemoved: emptyQueues.length,
         activeQueues: this.messageQueues.size
-      });
+      }, 'Cleanup completed');
     }
 
     this.updateQueueDepth();
@@ -399,10 +399,10 @@ export class BatchingService {
   async shutdown(): Promise<void> {
     this.isShuttingDown = true;
 
-    logger.info('BatchingService shutting down', {
+    logger.info({
       component: 'BatchingService',
       pendingMessages: this.calculateTotalQueuedMessages()
-    });
+    }, 'BatchingService shutting down');
 
     // Stop background tasks
     if (this.memoryMonitorInterval) {
@@ -418,10 +418,10 @@ export class BatchingService {
     }
     this.batchTimers.clear();
 
-    logger.info('BatchingService shutdown complete', {
+    logger.info({
       component: 'BatchingService',
       finalMetrics: this.getMetrics()
-    });
+    }, 'BatchingService shutdown complete');
   }
 
   /**

@@ -4,7 +4,7 @@
  */
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely, executeBatch } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -28,7 +28,7 @@ export async function createEngagementNetwork(driver: Driver, billId: string): P
       ),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.info('Created engagement network', { billId });
+    logger.info({ billId }, 'Created engagement network');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createEngagementNetwork', billId });
     throw new GraphError({ code: GraphErrorCode.SYNC_FAILED, message: 'Failed to create engagement network', cause: error as Error });

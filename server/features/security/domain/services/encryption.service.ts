@@ -56,7 +56,7 @@ export class EncryptionService {
       const keyData = this.loadOrGenerateKeys();
       masterKeyHex = keyData.masterKey;
       saltHex = keyData.keyDerivationSalt;
-      logger.info('Loaded persistent keys for development', { component: 'EncryptionService' });
+      logger.info({ component: 'EncryptionService' }, 'Loaded persistent keys for development');
     }
 
     this.masterKey = Buffer.from(masterKeyHex, 'hex');
@@ -81,7 +81,7 @@ export class EncryptionService {
         return keyData;
       }
     } catch (error) {
-      logger.warn('Failed to load keys from file, generating new ones', { component: 'EncryptionService', error });
+      logger.warn({ component: 'EncryptionService', error }, 'Failed to load keys from file, generating new ones');
     }
 
     const newKeys: KeyData = {
@@ -91,9 +91,9 @@ export class EncryptionService {
 
     try {
       fs.writeFileSync(this.keyFilePath, JSON.stringify(newKeys, null, 2));
-      logger.info('Generated and saved new keys for development', { component: 'EncryptionService' });
+      logger.info({ component: 'EncryptionService' }, 'Generated and saved new keys for development');
     } catch (error) {
-      logger.error('Failed to save keys to file', { component: 'EncryptionService', error });
+      logger.error({ component: 'EncryptionService', error }, 'Failed to save keys to file');
       throw new Error('Unable to persist keys for development');
     }
 
@@ -123,7 +123,7 @@ export class EncryptionService {
 
       return `${iv.toString('hex')}:${tag.toString('hex')}:${encrypted.toString('hex')}`;
     } catch (error) {
-      logger.error('Encryption failed', { component: 'EncryptionService', error });
+      logger.error({ component: 'EncryptionService', error }, 'Encryption failed');
       throw new Error('Encryption operation failed');
     }
   }
@@ -149,7 +149,7 @@ export class EncryptionService {
       const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
       return decrypted.toString('utf8');
     } catch (error) {
-      logger.error('Decryption failed', { component: 'EncryptionService', error });
+      logger.error({ component: 'EncryptionService', error }, 'Decryption failed');
       throw new Error('Decryption operation failed or integrity check failed');
     }
   }

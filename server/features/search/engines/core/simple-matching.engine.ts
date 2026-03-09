@@ -32,7 +32,7 @@ export class SimpleMatchingEngine {
     // Check cache first
     const cachedResult = this.getCachedResult(cacheKey);
     if (cachedResult) {
-      logger.debug('Search cache hit', { query: query.query, cacheKey });
+      logger.debug({ query: query.query, cacheKey }, 'Search cache hit');
       return cachedResult;
     }
 
@@ -45,10 +45,10 @@ export class SimpleMatchingEngine {
       
       return results;
     } catch (error) {
-      logger.error('Simple search failed', { 
+      logger.error({ 
         error: (error as Error).message,
         query: query.query 
-      });
+      }, 'Simple search failed');
       
       return [];
     }

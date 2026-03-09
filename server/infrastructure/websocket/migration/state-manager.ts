@@ -16,9 +16,9 @@ export class StateManager {
    * Capture current connection states with detailed metadata
    */
   async captureStates(getConnectedUsers: () => string[], getUserSubscriptions: (userId: string) => number[], getConnectionCount: (userId: string) => number): Promise<Map<string, ConnectionState>> {
-    logger.info('Capturing connection states for migration', {
+    logger.info({
       component: 'StateManager'
-    });
+    }, 'Capturing connection states for migration');
 
     this.connectionStates.clear();
 
@@ -49,10 +49,10 @@ export class StateManager {
         }
       }
 
-      logger.info(`Captured ${this.connectionStates.size} connection states`, {
+      logger.info({
         component: 'StateManager',
         totalUsers: connectedUsers.length
-      });
+      }, `Captured ${this.connectionStates.size} connection states`);
 
       return new Map(this.connectionStates);
     } catch (error) {
@@ -104,11 +104,11 @@ export class StateManager {
 
       if (actual < expected) {
         usersWithLoss++;
-        logger.debug(`Subscription loss for user ${user_id}`, {
+        logger.debug({
           component: 'StateManager',
           expected,
           actual
-        });
+        }, `Subscription loss for user ${user_id}`);
 
         // Attempt restoration for critical loss
         if (actual < expected * 0.5) {
@@ -122,13 +122,13 @@ export class StateManager {
       ? (this.connectionStates.size - usersWithLoss) / this.connectionStates.size 
       : 1;
 
-    logger.info('Subscription preservation validation', {
+    logger.info({
       component: 'StateManager',
       overallRate: (overallRate * 100).toFixed(1) + '%',
       userRate: (userRate * 100).toFixed(1) + '%',
       usersWithLoss,
       totalUsers: this.connectionStates.size
-    });
+    }, 'Subscription preservation validation');
 
     return { 
       overallRate, 
@@ -147,10 +147,10 @@ export class StateManager {
     state: ConnectionState
   ): Promise<void> {
     try {
-      logger.warn(`Attempting subscription restoration for user ${user_id}`, {
+      logger.warn({
         component: 'StateManager',
         expectedSubscriptions: state.subscriptions.length
-      });
+      }, `Attempting subscription restoration for user ${user_id}`);
       
       // In production, trigger actual subscription restoration through service APIs
     } catch (error) {

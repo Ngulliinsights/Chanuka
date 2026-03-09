@@ -4,10 +4,12 @@
 
 import { CampaignFilters, CampaignMetrics,PaginationOptions } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-import { Campaign, NewCampaign } from '@shared/domain/entities/campaign';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { Campaign, NewCampaign } from '@shared/domain/entities/campaign';
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 // Repository interface removed - using direct service calls
-import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service';
 
 export class CampaignService {
   constructor(
@@ -90,11 +92,11 @@ export class CampaignService {
       throw new Error('Failed to update campaign');
     }
 
-    logger.info('Campaign updated', { 
+    logger.info({ 
       campaign_id, 
       updates: Object.keys(updates),
       component: 'CampaignService' 
-    });
+    }, 'Campaign updated');
 
     return updatedCampaign;
   }
@@ -117,7 +119,7 @@ export class CampaignService {
     const success = await this.campaignRepository.delete(campaign_id);
     
     if (success) {
-      logger.info('Campaign deleted', { campaign_id, component: 'CampaignService' });
+      logger.info({ campaign_id, component: 'CampaignService' }, 'Campaign deleted');
     }
 
     return success;
@@ -206,12 +208,12 @@ export class CampaignService {
     const success = await this.campaignRepository.flagForReview(campaign_id, reason, reporterId);
     
     if (success) {
-      logger.info('Campaign flagged for review', { 
+      logger.info({ 
         campaign_id, 
         reason, 
         reporterId,
         component: 'CampaignService' 
-      });
+      }, 'Campaign flagged for review');
     }
 
     return success;

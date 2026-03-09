@@ -14,7 +14,7 @@ import type {
 } from '@client/features/bills/services/api';
 import { billsApiService } from '@client/features/bills/services/api';
 import { useToast } from '@client/lib/hooks/use-toast';
-import { createQueryErrorHandler, createMutationErrorHandler } from '@client/infrastructure/error';
+import { createQueryErrorHandler } from '@client/infrastructure/error';
 
 import { BillsQueryParams } from './types';
 
@@ -357,7 +357,7 @@ export function useVoteOnComment() {
     mutationFn: ({
       commentId,
       voteType,
-      billId,
+      billId: _billId,
     }: {
       commentId: string | number;
       voteType: 'up' | 'down';
@@ -388,7 +388,7 @@ export function useEndorseComment() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ commentId, billId }: { commentId: string | number; billId: string }) =>
+    mutationFn: ({ commentId, billId: _billId }: { commentId: string | number; billId: string }) =>
       billsApiService.endorseComment(commentId),
 
     onSuccess: (_data, variables) => {

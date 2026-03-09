@@ -18,16 +18,19 @@ import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';
 
-import { errorTracker } from '@/core/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { buildTimeThreshold } from '@server/utils/db-helpers';
+// FIXME: Invalid import - Comment out non-existent AuthAlert import
+// import { AuthenticatedRequest, authenticateToken } from '../../../../AuthAlert';
 
-import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert';
+// from '../../../../AuthAlert';
 
 /**
  * Engagement Analytics Service
  * Provides detailed analytics on user and content engagement patterns
  */
-export class EngagementAnalyticsService { private readonly ANALYTICS_CACHE_TTL = 1800; // 30 minutes
+export class EngagementAnalyticsService {
+  private readonly ANALYTICS_CACHE_TTL = 1800; // 30 minutes
 
   /**
    * Get comprehensive user engagement metrics

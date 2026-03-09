@@ -98,7 +98,7 @@ export class BillLifecycleHooks {
 
       const result = await billIntegrationOrchestrator.processBill(bill);
       
-      if (result.isOk) {
+      if (result.isOk()) {
         logger.info({ billId: bill.id, event, result: result.value }, 
           'Bill integration pipeline completed successfully');
       } else {
@@ -120,20 +120,25 @@ export class BillLifecycleHooks {
     newStatus: string
   ): Promise<void> {
     try {
-      const { notificationsService } = await import('@server/features/notifications');
+      const notificationsModule = await import('@server/features/notifications');
       
       // Find users tracking this bill
       const trackingUsers = await this.findUsersTrackingBill(bill.id);
       
       const message = `Bill "${bill.title}" status changed: ${oldStatus} → ${newStatus}`;
       
-      for (const userId of trackingUsers) {
-        await notificationsService.sendNotification(
-          userId, 
-          message, 
-          'bill_status_change'
-        );
+      // Check if notificationsService exists in the module
+      if ('notificationsService' in notificationsModule) {
+        const notificationsService = (notificationsModule as any).notificationsService;
+        for (const userId of trackingUsers) {
+          await notificationsService.sendNotification(
+            userId, 
+            message, 
+            'bill_status_change'
+          );
+        }
       }
+      
       
       logger.info({ billId: bill.id, userCount: trackingUsers.length }, 
         'Status change notifications sent');
@@ -145,7 +150,7 @@ export class BillLifecycleHooks {
   /**
    * Find users tracking this bill
    */
-  private async findUsersTrackingBill(billId: string): Promise<string[]> {
+  private async findUsersTrackingBill(_billId: string): Promise<string[]> {
     // Placeholder implementation
     // In production, this would query user preferences, subscriptions, etc.
     return [];

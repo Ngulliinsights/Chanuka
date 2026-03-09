@@ -11,8 +11,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { globalApiClient } from '../../../infrastructure/api/client';
-import { StateSyncService } from '../../../infrastructure/community/services/state-sync.service';
+import { globalApiClient } from '@client/infrastructure/api/client';
+import { StateSyncService } from '@client/infrastructure/community/services/state-sync.service';
 import { WebSocketManager } from '@client/infrastructure/api';
 import type {
   CreateCommentRequest,
@@ -218,7 +218,16 @@ export function useUnifiedDiscussion({
     },
     onSuccess: newComment => {
       prependComment(newComment);
-      stateSyncService.syncCommentCreated(newComment);
+      // Normalize threadId before syncing
+      const normalizedComment = {
+        ...newComment,
+        threadId: newComment.threadId
+          ? typeof newComment.threadId === 'string'
+            ? parseInt(newComment.threadId, 10)
+            : newComment.threadId
+          : undefined,
+      };
+      stateSyncService.syncCommentCreated(normalizedComment);
     },
   });
 
@@ -231,7 +240,16 @@ export function useUnifiedDiscussion({
     },
     onSuccess: updatedComment => {
       replaceComment(updatedComment);
-      stateSyncService.syncCommentUpdated(updatedComment);
+      // Normalize threadId before syncing
+      const normalizedComment = {
+        ...updatedComment,
+        threadId: updatedComment.threadId
+          ? typeof updatedComment.threadId === 'string'
+            ? parseInt(updatedComment.threadId, 10)
+            : updatedComment.threadId
+          : undefined,
+      };
+      stateSyncService.syncCommentUpdated(normalizedComment);
     },
   });
 
@@ -253,7 +271,16 @@ export function useUnifiedDiscussion({
     },
     onSuccess: updatedComment => {
       replaceComment(updatedComment);
-      stateSyncService.syncCommentVoted(updatedComment);
+      // Normalize threadId before syncing
+      const normalizedComment = {
+        ...updatedComment,
+        threadId: updatedComment.threadId
+          ? typeof updatedComment.threadId === 'string'
+            ? parseInt(updatedComment.threadId, 10)
+            : updatedComment.threadId
+          : undefined,
+      };
+      stateSyncService.syncCommentVoted(normalizedComment);
     },
   });
 

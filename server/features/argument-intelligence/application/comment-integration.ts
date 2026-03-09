@@ -49,11 +49,11 @@ export class CommentIntegrationService {
     const startTime = Date.now();
 
     try {
-      logger.info('Processing comment through NLP pipeline', {
+      logger.info({
         component: 'CommentIntegrationService',
         commentId,
         billId,
-      });
+      }, 'Processing comment through NLP pipeline');
 
       // Run sentiment analysis and quality metrics in parallel
       const [sentiment, quality] = await Promise.all([
@@ -79,11 +79,11 @@ export class CommentIntegrationService {
             strength: processedArgument.strength,
           };
         } catch (error) {
-          logger.warn('Failed to process comment as argument', {
+          logger.warn({
             component: 'CommentIntegrationService',
             commentId,
             error: error instanceof Error ? error.message : String(error),
-          });
+          }, 'Failed to process comment as argument');
         }
       }
 
@@ -106,21 +106,21 @@ export class CommentIntegrationService {
         processingTime,
       };
 
-      logger.info('Comment processing completed', {
+      logger.info({
         component: 'CommentIntegrationService',
         commentId,
         processingTime,
         qualityScore: quality.overallScore,
         sentimentScore: sentiment.score,
-      });
+      }, 'Comment processing completed');
 
       return result;
     } catch (error) {
-      logger.error('Comment processing failed', {
+      logger.error({
         component: 'CommentIntegrationService',
         commentId,
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Comment processing failed');
 
       // Return default result on error
       return {
@@ -152,10 +152,10 @@ export class CommentIntegrationService {
       userId: string;
     }>
   ): Promise<CommentAnalysisResult[]> {
-    logger.info('Batch processing comments', {
+    logger.info({
       component: 'CommentIntegrationService',
       count: comments.length,
-    });
+    }, 'Batch processing comments');
 
     const results = await Promise.all(
       comments.map((comment) =>
@@ -163,12 +163,12 @@ export class CommentIntegrationService {
       )
     );
 
-    logger.info('Batch processing completed', {
+    logger.info({
       component: 'CommentIntegrationService',
       count: results.length,
       averageProcessingTime:
         results.reduce((sum, r) => sum + r.processingTime, 0) / results.length,
-    });
+    }, 'Batch processing completed');
 
     return results;
   }

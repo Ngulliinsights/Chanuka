@@ -9,7 +9,8 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
-import { BatchingService } from '@shared/infrastructure/batching-service';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { BatchingService } from '@shared/infrastructure/batching-service';
 import { webSocketService } from '@server/infrastructure/websocket';
 
 interface ValidationResult {
@@ -79,10 +80,10 @@ export class FinalMigrationValidator {
       // Generate summary
       const summary = this.generateSummary();
       
-      logger.info('✅ Final migration validation completed', {
+      logger.info({
         summary,
         crossPhaseValidation
-      });
+      }, '✅ Final migration validation completed');
 
       return {
         results: this.validationResults,

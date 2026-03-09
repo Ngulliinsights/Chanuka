@@ -60,15 +60,15 @@ export class ConflictDetectionOrchestratorService {
       try {
         await cache.set(cacheKey, computed, 3600);
       } catch (e) {
-        logger.warn('Failed to cache analysis result', { error: e });
+        logger.warn({ error: e }, 'Failed to cache analysis result');
       }
       
       return computed;
     } catch (error) {
-      logger.error(`Comprehensive analysis failed for sponsor ${sponsor_id}`, { error,
+      logger.error({ error,
         bill_id,
         timestamp: new Date().toISOString()
-       });
+       }, `Comprehensive analysis failed for sponsor ${sponsor_id}`);
       return this.generateFallbackAnalysis(sponsor_id, bill_id, error);
     }
   }
@@ -100,11 +100,11 @@ export class ConflictDetectionOrchestratorService {
       const conflicts = await stakeholderAnalysisService.identifyStakeholderConflicts(stakeholders);
 
       return { stakeholders, conflicts };
-    } catch (error) { logger.error('Error analyzing stakeholders:', {
+    } catch (error) { logger.error({
         component: 'ConflictDetectionOrchestrator',
         bill_id,
         error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Error analyzing stakeholders:');
       return { stakeholders: [], conflicts: [] };
     }
   }
@@ -129,12 +129,12 @@ export class ConflictDetectionOrchestratorService {
 
       const failures = results.filter(r => r.status === 'rejected');
       if (failures.length > 0) {
-        logger.warn(`Some cache invalidations failed for sponsor ${sponsor_id}`, { failures });
+        logger.warn({ failures }, `Some cache invalidations failed for sponsor ${sponsor_id}`);
       }
 
       logger.info(`Cache invalidated for sponsor ${sponsor_id}`);
     } catch (error) {
-      logger.error(`Failed to invalidate cache for sponsor ${sponsor_id}`, { error });
+      logger.error({ error }, `Failed to invalidate cache for sponsor ${sponsor_id}`);
     }
   }
 
@@ -158,12 +158,12 @@ export class ConflictDetectionOrchestratorService {
         allConflicts,
         analysis.riskLevel
       );
-     } catch (error) { logger.error('Error generating mitigation strategies:', {
+     } catch (error) { logger.error({
         component: 'ConflictDetectionOrchestrator',
         sponsor_id,
         bill_id,
         error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Error generating mitigation strategies:');
       return [];
     }
   }
@@ -254,7 +254,7 @@ export class ConflictDetectionOrchestratorService {
       
       return sponsor || null;
     } catch (error) {
-      logger.error('Error fetching sponsor:', { sponsor_id, error });
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor:');
       return null;
     }
   }
@@ -266,7 +266,7 @@ export class ConflictDetectionOrchestratorService {
         .from(sponsorAffiliations)
         .where(eq(sponsorAffiliations.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.error('Error fetching sponsor affiliations:', { sponsor_id, error });
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor affiliations:');
       return [];
     }
   }
@@ -278,7 +278,7 @@ export class ConflictDetectionOrchestratorService {
         .from(sponsorTransparency)
         .where(eq(sponsorTransparency.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.error('Error fetching sponsor disclosures:', { sponsor_id, error });
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor disclosures:');
       return [];
     }
   }
@@ -289,7 +289,7 @@ export class ConflictDetectionOrchestratorService {
       // For now, return empty array
       return [];
     } catch (error) {
-      logger.error('Error fetching voting history:', { sponsor_id, error });
+      logger.error({ sponsor_id, error }, 'Error fetching voting history:');
       return [];
     }
   }
@@ -301,7 +301,7 @@ export class ConflictDetectionOrchestratorService {
         .where(eq(bills.id, bill_id));
       
       return bill || null;
-     } catch (error) { logger.error('Error fetching bill:', { bill_id, error  });
+     } catch (error) { logger.error({ bill_id, error  }, 'Error fetching bill:');
       return null;
     }
   }
@@ -310,7 +310,7 @@ export class ConflictDetectionOrchestratorService {
     sponsor_id: number,
     bill_id?: number,
     error?: any
-  ): ConflictAnalysis { logger.warn('Generating fallback analysis due to error', { sponsor_id, bill_id, error  });
+  ): ConflictAnalysis { logger.warn({ sponsor_id, bill_id, error  }, 'Generating fallback analysis due to error');
 
     return { sponsor_id,
       sponsorName: 'Unknown Sponsor',

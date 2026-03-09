@@ -8,6 +8,7 @@
  */
 
 import { UserRole as SharedUserRole } from '@shared/types/core/enums';
+import type { User, OAuthProvider } from '@shared/types/domains/authentication/user';
 
 // ============================================================================
 // User Role Types
@@ -17,6 +18,9 @@ import { UserRole as SharedUserRole } from '@shared/types/core/enums';
  * @deprecated Import UserRole directly from shared/types/core/enums
  */
 export const UserRoleEnum = SharedUserRole;
+export type UserRole = SharedUserRole;
+
+export type { User, OAuthProvider };
 
 /**
  * User permission type
@@ -46,7 +50,7 @@ export interface ExtendedUser extends User {
   readonly bio?: string;
   readonly location?: string;
   readonly affiliation?: string;
-  readonly expertise?: readonly string[];
+  readonly expertise?: string[] | null;
   readonly website?: string;
   readonly socialLinks?: SocialLinks;
   readonly preferences?: UserPreferences;

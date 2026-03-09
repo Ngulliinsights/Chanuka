@@ -128,11 +128,11 @@ export class SentimentAnalyzer {
     const finalConfig = { ...this.defaultConfig, ...config };
 
     try {
-      logger.debug('Analyzing sentiment', {
+      logger.debug({
         component: 'SentimentAnalyzer',
         textLength: text.length,
         config: finalConfig
-      });
+      }, 'Analyzing sentiment');
 
       // Preprocess text
       const words = this.preprocessText(text);
@@ -171,20 +171,20 @@ export class SentimentAnalyzer {
         result.details = sentimentScores.details;
       }
 
-      logger.debug('Sentiment analysis completed', {
+      logger.debug({
         component: 'SentimentAnalyzer',
         score,
         label,
         confidence
-      });
+      }, 'Sentiment analysis completed');
 
       return result;
 
     } catch (error) {
-      logger.error('Sentiment analysis failed', {
+      logger.error({
         component: 'SentimentAnalyzer',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Sentiment analysis failed');
 
       return {
         score: 0,

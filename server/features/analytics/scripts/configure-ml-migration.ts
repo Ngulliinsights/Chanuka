@@ -6,7 +6,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 
-import { featureFlagsService } from '@/infrastructure/migration/feature-flags.service';
+import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 export interface MLMigrationConfig {
     enabled: boolean;
@@ -22,11 +22,11 @@ export class MLMigrationConfigurator {
      */
     static async configureGradualRollout(config: MLMigrationConfig): Promise<void> {
         try {
-            logger.info('Configuring ML service migration', {
+            logger.info({
                 component: 'analytics',
                 operation: 'configureGradualRollout',
                 config
-            });
+            }, 'Configuring ML service migration');
 
             // Update the ML service migration feature flag
             featureFlagsService.updateFlag('utilities-ml-service-migration', {
@@ -41,12 +41,12 @@ export class MLMigrationConfigurator {
                 fallbackEnabled: true
             });
 
-            logger.info('ML service migration configured successfully', {
+            logger.info({
                 component: 'analytics',
                 operation: 'configureGradualRollout',
                 enabled: config.enabled,
                 rolloutPercentage: config.rolloutPercentage
-            });
+            }, 'ML service migration configured successfully');
         } catch (error) {
             logger.error('Failed to configure ML service migration:', {
                 component: 'analytics',
@@ -69,11 +69,11 @@ export class MLMigrationConfigurator {
             { percentage: 100, description: 'Full rollout phase' }
         ];
 
-        logger.info('Starting gradual ML service rollout', {
+        logger.info({
             component: 'analytics',
             operation: 'startGradualRollout',
             phases: phases.length
-        });
+        }, 'Starting gradual ML service rollout');
 
         // Start with 1% rollout
         await this.configureGradualRollout({
@@ -82,10 +82,10 @@ export class MLMigrationConfigurator {
             environment: process.env.NODE_ENV
         });
 
-        logger.info('ML service migration started at 1% rollout', {
+        logger.info({
             component: 'analytics',
             operation: 'startGradualRollout'
-        });
+        }, 'ML service migration started at 1% rollout');
     }
 
     /**
@@ -101,12 +101,12 @@ export class MLMigrationConfigurator {
             throw new Error('ML service migration flag not found');
         }
 
-        logger.info('Increasing ML service rollout percentage', {
+        logger.info({
             component: 'analytics',
             operation: 'increaseRollout',
             currentPercentage: currentFlag.rolloutPercentage,
             newPercentage
-        });
+        }, 'Increasing ML service rollout percentage');
 
         await this.configureGradualRollout({
             enabled: true,
@@ -121,20 +121,20 @@ export class MLMigrationConfigurator {
      * Rollback to mock implementation
      */
     static async rollbackToMock(): Promise<void> {
-        logger.info('Rolling back ML service to mock implementation', {
+        logger.info({
             component: 'analytics',
             operation: 'rollbackToMock'
-        });
+        }, 'Rolling back ML service to mock implementation');
 
         await this.configureGradualRollout({
             enabled: false,
             rolloutPercentage: 0
         });
 
-        logger.info('ML service rolled back to mock implementation', {
+        logger.info({
             component: 'analytics',
             operation: 'rollbackToMock'
-        });
+        }, 'ML service rolled back to mock implementation');
     }
 
     /**
@@ -163,11 +163,11 @@ export class MLMigrationConfigurator {
      * Enable for specific test users
      */
     static async enableForTestUsers(userIds: string[]): Promise<void> {
-        logger.info('Enabling ML service for specific test users', {
+        logger.info({
             component: 'analytics',
             operation: 'enableForTestUsers',
             userCount: userIds.length
-        });
+        }, 'Enabling ML service for specific test users');
 
         const currentFlag = featureFlagsService.getFlag('utilities-ml-service-migration');
         

@@ -21,7 +21,8 @@ export {
 export { SimpleTransparencyDashboardService } from './application/transparency-dashboard.routes';
 export { simpleTransparencyDashboardService } from './application/transparency-dashboard.routes';
 export { DashboardService } from './application/dashboard.routes';
-export { LegalAnalysisService } from './domain/legal-analysis.servicenalysis.service';
+export { LegalAnalysisService } // FIXME: Invalid import - Comment out typo in legal-analysis service import
+// from './domain/legal-analysis.servicenalysis.service';
 export { conflictDetectionService as ConflictDetectionService } from './domain/conflict-detection.service';
 export { FinancialDisclosureMonitoringService } from './financial-disclosure/monitoring';
 

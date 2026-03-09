@@ -1,14 +1,8 @@
 /**
- * Error Adapter V2 (REFACTORED)
+ * Error Adapter
  * 
- * Standardized error handling for graph operations.
- * 
- * IMPROVEMENTS:
- * - ✅ Typed error codes
- * - ✅ Error classification
- * - ✅ Context preservation
- * - ✅ Logging integration
- * - ✅ Stack trace capture
+ * Standardized error handling for graph operations with typed error codes,
+ * error classification, context preservation, logging integration, and stack trace capture.
  */
 
 import { logger } from '@server/infrastructure/observability';
@@ -109,12 +103,12 @@ export class GraphErrorHandler {
         cause: error.cause?.message,
       });
     } else {
-      logger.error('Unexpected error', {
+      logger.error({
         message: error.message,
         name: error.name,
         context,
         stack: error.stack,
-      });
+      }, 'Unexpected error');
     }
   }
 

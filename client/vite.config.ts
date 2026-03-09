@@ -264,7 +264,7 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       // Proxy configuration to route API calls to the backend
       proxy: {
         '/api': {
-          target: 'http://localhost:4200',
+          target: 'http://127.0.0.1:4200',  // Use IPv4 explicitly instead of localhost
           changeOrigin: true,
           secure: false,
         },

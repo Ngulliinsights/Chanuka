@@ -80,10 +80,10 @@ export class ContentAnalysisService {
 
       return result;
     } catch (error) {
-      logger.error('Error analyzing content:', {
+      logger.error({
         component: 'ContentAnalysis',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error analyzing content:');
 
       return {
         shouldFlag: false,

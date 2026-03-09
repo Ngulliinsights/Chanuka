@@ -110,7 +110,7 @@ export class AnalyticsServiceIntegrated {
 
       return ok(sanitized as AnalyticsOverview);
     } catch (error) {
-      logger.error('Failed to get analytics overview', { error });
+      logger.error({ error }, 'Failed to get analytics overview');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -178,7 +178,7 @@ export class AnalyticsServiceIntegrated {
 
       return ok(sanitized as MetricRecord[]);
     } catch (error) {
-      logger.error('Failed to query metrics', { error, query });
+      logger.error({ error, query }, 'Failed to query metrics');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -223,11 +223,11 @@ export class AnalyticsServiceIntegrated {
 
       const created = record.rows[0] as MetricRecord;
 
-      logger.info('Metric recorded', { metric: sanitizedMetric, value: validatedData.value });
+      logger.info({ metric: sanitizedMetric, value: validatedData.value }, 'Metric recorded');
 
       return ok(created);
     } catch (error) {
-      logger.error('Failed to record metric', { error, data });
+      logger.error({ error, data }, 'Failed to record metric');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -265,7 +265,7 @@ export class AnalyticsServiceIntegrated {
 
       return ok(sanitized as MetricRecord);
     } catch (error) {
-      logger.error('Failed to get metric', { error, id });
+      logger.error({ error, id }, 'Failed to get metric');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -295,11 +295,11 @@ export class AnalyticsServiceIntegrated {
       // Execute query
       await db.execute(query.sql, query.params);
 
-      logger.info('Metric deleted', { id });
+      logger.info({ id }, 'Metric deleted');
 
       return ok(undefined);
     } catch (error) {
-      logger.error('Failed to delete metric', { error, id });
+      logger.error({ error, id }, 'Failed to delete metric');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
@@ -346,7 +346,7 @@ export class AnalyticsServiceIntegrated {
 
       return ok(sanitizedResults as MetricRecord[]);
     } catch (error) {
-      logger.error('Failed to search metrics', { error, searchTerm });
+      logger.error({ error, searchTerm }, 'Failed to search metrics');
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }

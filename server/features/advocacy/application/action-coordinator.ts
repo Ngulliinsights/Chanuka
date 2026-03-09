@@ -5,7 +5,8 @@
 // Repository interfaces removed - using direct service calls
 import { ActionFilters, ActionTemplate,PaginationOptions } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-import { ActionItem, ActionItemEntity,NewActionItem } from '@shared/domain/entities/action-item';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { ActionItem, ActionItemEntity,NewActionItem } from '@shared/domain/entities/action-item';
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 
 export class ActionCoordinator {
@@ -41,12 +42,12 @@ export class ActionCoordinator {
 
     const action = await this.actionRepository.create(data);
     
-    logger.info('Action created', { 
+    logger.info({ 
       actionId: action.id,
       campaign_id: data.campaign_id,
       actionType: data.actionType,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action created');
 
     return action;
   }
@@ -132,11 +133,11 @@ export class ActionCoordinator {
       throw new Error('Failed to start action');
     }
 
-    logger.info('Action started', { 
+    logger.info({ 
       actionId, 
       user_id,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action started');
 
     return updatedAction;
   }
@@ -173,12 +174,12 @@ export class ActionCoordinator {
       throw new Error('Failed to complete action');
     }
 
-    logger.info('Action completed', { 
+    logger.info({ 
       actionId, 
       user_id,
       successful: outcome?.successful,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action completed');
 
     return updatedAction;
   }
@@ -215,12 +216,12 @@ export class ActionCoordinator {
       throw new Error('Failed to skip action');
     }
 
-    logger.info('Action skipped', { 
+    logger.info({ 
       actionId, 
       user_id,
       reason,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action skipped');
 
     return updatedAction;
   }
@@ -277,12 +278,12 @@ export class ActionCoordinator {
       throw new Error('Failed to update action with feedback');
     }
 
-    logger.info('Action feedback added', { 
+    logger.info({ 
       actionId, 
       user_id,
       rating: feedback.rating,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action feedback added');
 
     return updatedAction;
   }
@@ -302,12 +303,12 @@ export class ActionCoordinator {
 
     const actionTemplate = await this.actionRepository.createActionTemplate(template);
     
-    logger.info('Action template created', { 
+    logger.info({ 
       templateId: actionTemplate.id,
       actionType: template.actionType,
       creatorId,
       component: 'ActionCoordinator' 
-    });
+    }, 'Action template created');
 
     return actionTemplate;
   }
@@ -335,12 +336,12 @@ export class ActionCoordinator {
 
     const actions = await this.actionRepository.createBulkActions(actionsToCreate);
     
-    logger.info('Bulk actions created', { 
+    logger.info({ 
       campaign_id,
       actionCount: actions.length,
       creatorId,
       component: 'ActionCoordinator' 
-    });
+    }, 'Bulk actions created');
 
     return actions;
   }

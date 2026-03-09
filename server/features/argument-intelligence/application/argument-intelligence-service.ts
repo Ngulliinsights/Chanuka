@@ -110,20 +110,20 @@ export class ArgumentIntelligenceService {
           .returning();
       });
 
-      logger.info('✅ Argument stored successfully', {
+      logger.info({
         ...logContext,
         argument_id: newArgument.id
-      });
+      }, '✅ Argument stored successfully');
 
       return newArgument;
     } catch (error) {
-      logger.error('Failed to store argument', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store argument');
       throw error;
     }
   }
 
   /**
-   * Get arguments for a specific bill
+   * Get argList for a specific bill
    */
   async getArgumentsForBill(bill_id: string): Promise<Argument[]> {
     const logContext = {
@@ -131,7 +131,7 @@ export class ArgumentIntelligenceService {
       operation: 'getArgumentsForBill',
       bill_id
     };
-    logger.debug('Fetching arguments for bill', logContext);
+    logger.debug('Fetching argList for bill', logContext);
 
     try {
       const results = await readDatabase(async (db) => {
@@ -142,16 +142,16 @@ export class ArgumentIntelligenceService {
           .orderBy(desc(argumentTable.created_at));
       });
 
-      logger.debug('✅ Arguments retrieved', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Arguments retrieved');
       return results;
     } catch (error) {
-      logger.error('Failed to fetch arguments for bill', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch argList for bill');
       throw error;
     }
   }
 
   /**
-   * Search arguments by text content
+   * Search argList by text content
    */
   async searchArguments(searchText: string, limit: number = 50): Promise<Argument[]> {
     const logContext = {
@@ -160,7 +160,7 @@ export class ArgumentIntelligenceService {
       searchText,
       limit
     };
-    logger.debug('Searching arguments', logContext);
+    logger.debug('Searching argList', logContext);
 
     try {
       const searchPattern = `%${searchText}%`;
@@ -178,10 +178,10 @@ export class ArgumentIntelligenceService {
           .orderBy(desc(argumentTable.created_at));
       });
 
-      logger.debug('✅ Argument search completed', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Argument search completed');
       return results;
     } catch (error) {
-      logger.error('Failed to search arguments', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to search argList');
       throw error;
     }
   }
@@ -217,14 +217,14 @@ export class ArgumentIntelligenceService {
           .returning();
       });
 
-      logger.info('✅ Claims stored successfully', {
+      logger.info({
         ...logContext,
         stored_count: newClaims.length
-      });
+      }, '✅ Claims stored successfully');
 
       return newClaims;
     } catch (error) {
-      logger.error('Failed to store claims', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store claims');
       throw error;
     }
   }
@@ -249,10 +249,10 @@ export class ArgumentIntelligenceService {
           .orderBy(asc(claims.position));
       });
 
-      logger.debug('✅ Claims retrieved', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Claims retrieved');
       return results;
     } catch (error) {
-      logger.error('Failed to fetch claims for argument', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch claims for argument');
       throw error;
     }
   }
@@ -288,14 +288,14 @@ export class ArgumentIntelligenceService {
           .returning();
       });
 
-      logger.info('✅ Evidence stored successfully', {
+      logger.info({
         ...logContext,
         stored_count: newEvidence.length
-      });
+      }, '✅ Evidence stored successfully');
 
       return newEvidence;
     } catch (error) {
-      logger.error('Failed to store evidence', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store evidence');
       throw error;
     }
   }
@@ -320,10 +320,10 @@ export class ArgumentIntelligenceService {
           .orderBy(desc(evidence.credibility_score));
       });
 
-      logger.debug('✅ Evidence retrieved', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Evidence retrieved');
       return results;
     } catch (error) {
-      logger.error('Failed to fetch evidence for claim', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch evidence for claim');
       throw error;
     }
   }
@@ -357,14 +357,14 @@ export class ArgumentIntelligenceService {
           .returning();
       });
 
-      logger.info('✅ Legislative brief stored successfully', {
+      logger.info({
         ...logContext,
         brief_id: newBrief.id
-      });
+      }, '✅ Legislative brief stored successfully');
 
       return newBrief;
     } catch (error) {
-      logger.error('Failed to store legislative brief', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store legislative brief');
       throw error;
     }
   }
@@ -389,10 +389,10 @@ export class ArgumentIntelligenceService {
           .orderBy(desc(legislative_briefs.created_at));
       });
 
-      logger.debug('✅ Briefs retrieved', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Briefs retrieved');
       return results;
     } catch (error) {
-      logger.error('Failed to fetch briefs for bill', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch briefs for bill');
       throw error;
     }
   }
@@ -423,7 +423,7 @@ export class ArgumentIntelligenceService {
 
       return brief || null;
     } catch (error) {
-      logger.error('Failed to fetch brief by ID', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch brief by ID');
       throw error;
     }
   }
@@ -469,7 +469,7 @@ export class ArgumentIntelligenceService {
 
       logger.info('✅ Bill synthesis stored successfully', logContext);
     } catch (error) {
-      logger.error('Failed to store bill synthesis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store bill synthesis');
       throw error;
     }
   }
@@ -519,7 +519,7 @@ export class ArgumentIntelligenceService {
         lastUpdated: synthesis.completed_at || synthesis.updated_at
       };
     } catch (error) {
-      logger.error('Failed to fetch bill synthesis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch bill synthesis');
       return null;
     }
   }
@@ -555,20 +555,20 @@ export class ArgumentIntelligenceService {
           .returning();
       });
 
-      logger.info('✅ Argument relationships stored successfully', {
+      logger.info({
         ...logContext,
         stored_count: newRelationships.length
-      });
+      }, '✅ Argument relationships stored successfully');
 
       return newRelationships;
     } catch (error) {
-      logger.error('Failed to store argument relationships', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to store argument relationships');
       throw error;
     }
   }
 
   /**
-   * Get related arguments for clustering and similarity analysis
+   * Get related argList for clustering and similarity analysis
    */
   async getRelatedArguments(argumentId: string, relationshipType?: string): Promise<ArgumentRelationship[]> {
     const logContext = {
@@ -577,7 +577,7 @@ export class ArgumentIntelligenceService {
       argumentId,
       relationshipType
     };
-    logger.debug('Fetching related arguments', logContext);
+    logger.debug('Fetching related argList', logContext);
 
     try {
       const results = await readDatabase(async (db) => {
@@ -598,10 +598,10 @@ export class ArgumentIntelligenceService {
         return query.orderBy(desc(argument_relationships.strength));
       });
 
-      logger.debug('✅ Related arguments retrieved', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, '✅ Related argList retrieved');
       return results;
     } catch (error) {
-      logger.error('Failed to fetch related arguments', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to fetch related argList');
       throw error;
     }
   }
@@ -659,7 +659,7 @@ export class ArgumentIntelligenceService {
       const [evidenceStatsResult] = evidenceStats;
 
       const statistics = {
-        arguments: {
+        argList: {
           total: statsResult.totalArguments,
           avgConfidenceScore: statsResult.avgConfidenceScore,
           avgSentimentScore: statsResult.avgSentimentScore
@@ -673,10 +673,10 @@ export class ArgumentIntelligenceService {
         }
       };
 
-      logger.debug('✅ Argument statistics calculated', { ...logContext, statistics });
+      logger.debug({ ...logContext, statistics }, '✅ Argument statistics calculated');
       return statistics;
     } catch (error) {
-      logger.error('Failed to calculate argument statistics', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to calculate argument statistics');
       throw error;
     }
   }
@@ -695,11 +695,11 @@ export class ArgumentIntelligenceService {
     try {
       return JSON.parse(jsonString);
     } catch (error) {
-      logger.warn('Failed to parse JSON, using fallback', {
+      logger.warn({
         component: 'ArgumentIntelligenceService',
         jsonString: jsonString?.substring(0, 100),
         error
-      });
+      }, 'Failed to parse JSON, using fallback');
       return fallback;
     }
   }
@@ -797,12 +797,12 @@ export class ArgumentIntelligenceService {
         evidenceFound: evidence.length,
       });
 
-      logger.info('Comment processed successfully', {
+      logger.info({
         ...logContext,
         argumentId: argument.id,
         claimsExtracted: claims.length,
         evidenceFound: evidence.length,
-      });
+      }, 'Comment processed successfully');
 
       return {
         argumentId: argument.id,
@@ -814,10 +814,10 @@ export class ArgumentIntelligenceService {
     } catch (error) {
       performanceMonitor.endOperation(operationId, false, error as Error);
 
-      logger.error('Failed to process comment', {
+      logger.error({
         ...logContext,
         error: error instanceof Error ? error.message : String(error),
-      });
+      }, 'Failed to process comment');
       throw error;
     }
   }
@@ -868,7 +868,7 @@ export class ArgumentIntelligenceService {
   private calculateStrength(text: string): number {
     let strength = 0.5; // Base strength
 
-    // Length factor (longer arguments tend to be more detailed)
+    // Length factor (longer argList tend to be more detailed)
     if (text.length > 200) strength += 0.1;
     if (text.length > 500) strength += 0.1;
 
@@ -996,10 +996,10 @@ export class ArgumentIntelligenceService {
         timestamp: new Date()
       };
     } catch (error) {
-      logger.error('Health check failed', {
+      logger.error({
         component: 'ArgumentIntelligenceService',
         error
-      });
+      }, 'Health check failed');
 
       return {
         status: 'unhealthy',

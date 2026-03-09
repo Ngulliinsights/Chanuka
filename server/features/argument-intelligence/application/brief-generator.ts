@@ -1,7 +1,7 @@
 // ============================================================================
 // ARGUMENT INTELLIGENCE - Brief Generator
 // ============================================================================
-// Generates structured legislative briefs from synthesized citizen arguments
+// Generates structured legislative briefs from synthesized citizen argList
 
 import { logger } from '@server/infrastructure/observability';
 
@@ -123,12 +123,12 @@ export class BriefGeneratorService {
     const startTime = Date.now();
     
     try {
-      logger.info(`📄 Generating legislative brief`, {
+      logger.info({
         component: 'BriefGenerator',
         bill_id: request.bill_id,
         briefType: request.briefType || 'committee',
         targetAudience: request.targetAudience || 'legislators'
-      });
+      }, `📄 Generating legislative brief`);
 
       // Step 1: Generate executive summary
       const executiveSummary = this.generateExecutiveSummary(request);
@@ -166,22 +166,22 @@ export class BriefGeneratorService {
         generatedAt: new Date()
       };
 
-      logger.info(`✅ Legislative brief generated successfully`, {
+      logger.info({
         component: 'BriefGenerator',
         bill_id: request.bill_id,
         briefLength: executiveSummary.length,
         keyFindings: keyFindings.length,
         processingTime: metadata.processingTime
-      });
+      }, `✅ Legislative brief generated successfully`);
 
       return brief;
 
     } catch (error) {
-      logger.error(`❌ Brief generation failed`, {
+      logger.error({
         component: 'BriefGenerator',
         bill_id: request.bill_id,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `❌ Brief generation failed`);
       throw error;
     }
   }
@@ -795,7 +795,7 @@ export class BriefGeneratorService {
 This brief was generated using automated argument intelligence analysis with the following methodology:
 
 1. **Argument Extraction**: Natural language processing to identify claims, evidence, and reasoning from citizen comments
-2. **Clustering**: Semantic similarity analysis to group related arguments and identify patterns
+2. **Clustering**: Semantic similarity analysis to group related argList and identify patterns
 3. **Evidence Validation**: Automated verification of cited sources and fact-checking where possible
 4. **Stakeholder Analysis**: Demographic and positional analysis of participant groups
 5. **Coalition Identification**: Analysis of shared concerns and potential alliances
@@ -803,7 +803,7 @@ This brief was generated using automated argument intelligence analysis with the
 
 **Confidence Levels**: Analysis confidence is calculated based on argument extraction accuracy, evidence quality, and stakeholder representation diversity.
 
-**Limitations**: Automated analysis may miss nuanced arguments or context. Expert review is recommended for complex or controversial findings.`;
+**Limitations**: Automated analysis may miss nuanced argList or context. Expert review is recommended for complex or controversial findings.`;
   }
 
   private calculateAnalysisConfidence(request: BriefGenerationRequest): number {

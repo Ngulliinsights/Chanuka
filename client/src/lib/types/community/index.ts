@@ -115,7 +115,6 @@ export type {
   UseExpertResult,
   ExpertActions,
   UseCommunityNotificationsResult,
-  Notification,
   NotificationActions,
   UseCommunityOptions,
   UseDiscussionOptions,

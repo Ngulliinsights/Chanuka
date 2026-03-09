@@ -42,7 +42,7 @@ export const firewallMiddleware = async (req: Request, res: Response, next: Next
   } catch (error) {
     // Fail Open (Allow) to prevent blocking legitimate users on service error
     // But log heavily
-    logger.error('Firewall analysis failed', { error });
+    logger.error({ error }, 'Firewall analysis failed');
     next();
   }
 };

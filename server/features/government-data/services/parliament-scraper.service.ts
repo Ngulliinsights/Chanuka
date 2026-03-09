@@ -9,7 +9,8 @@
 
 import puppeteer, { Browser, Page } from "puppeteer";
 import * as cheerio from "cheerio";
-import axios, { AxiosInstance } from "axios";
+// FIXME: axios not installed - use node-fetch
+// import axios, { AxiosInstance } from "axios";
 import pdfParse from "pdf-parse";
 import Fuse from "fuse.js";
 import pino from "pino";

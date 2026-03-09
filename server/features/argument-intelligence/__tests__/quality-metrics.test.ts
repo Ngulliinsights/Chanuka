@@ -65,7 +65,7 @@ describe('QualityMetricsCalculator', () => {
 
   describe('calculateDebateQuality', () => {
     it('should calculate quality for debate', async () => {
-      const arguments = [
+      const argList = [
         {
           text: 'According to research, this bill will improve healthcare access.',
           userId: 'user1',
@@ -78,14 +78,14 @@ describe('QualityMetricsCalculator', () => {
         }
       ];
 
-      const result = await calculator.calculateDebateQuality(arguments);
+      const result = await calculator.calculateDebateQuality(argList);
 
       expect(result.overallQuality).toBeGreaterThan(0);
       expect(result.diversity).toBeGreaterThan(0);
       expect(result.civility).toBeGreaterThan(0.5);
     });
 
-    it('should handle empty arguments array', async () => {
+    it('should handle empty argList array', async () => {
       const result = await calculator.calculateDebateQuality([]);
 
       expect(result.overallQuality).toBe(0);
@@ -94,7 +94,7 @@ describe('QualityMetricsCalculator', () => {
   });
 
   describe('quality metrics accuracy', () => {
-    it('should correctly identify high-quality arguments', async () => {
+    it('should correctly identify high-quality argList', async () => {
       const highQualityTexts = [
         'According to a 2023 study, this bill will reduce costs by 25%. The evidence shows success in other countries.',
         'Research data indicates 70% support. Surveys show strong approval in three counties.',

@@ -292,7 +292,7 @@ export class ConfigurationService {
    */
   private getDefaultApiUrl(): string {
     if (typeof window === 'undefined') {
-      return 'http://localhost:4200';
+      return '/api';
     }
 
     const isDevelopment =
@@ -810,7 +810,7 @@ export class EnvironmentConfigLoader {
   static load(): Partial<ServiceConfig> {
     return {
       api: {
-        baseUrl: this.getEnvString('VITE_API_URL') || 'http://localhost:4200',
+        baseUrl: this.getEnvString('VITE_API_URL') || '/api',
         timeout: this.getEnvNumber('VITE_API_TIMEOUT') || 10000,
         retry: {
           maxRetries: this.getEnvNumber('VITE_API_MAX_RETRIES') || 3,

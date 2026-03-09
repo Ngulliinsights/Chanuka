@@ -70,20 +70,20 @@ export class SentenceClassifier {
       // Select the best classification
       const bestClassification = this.selectBestClassification(classifications);
 
-      logger.debug(`Classified sentence as ${bestClassification.type}`, {
+      logger.debug({
         component: 'SentenceClassifier',
         confidence: bestClassification.confidence,
         sentence: sentence.substring(0, 100)
-      });
+      }, `Classified sentence as ${bestClassification.type}`);
 
       return bestClassification;
 
     } catch (error) {
-      logger.error(`Sentence classification failed`, {
+      logger.error({
         component: 'SentenceClassifier',
         error: error instanceof Error ? error.message : String(error),
         sentence: sentence.substring(0, 100)
-      });
+      }, `Sentence classification failed`);
 
       // Return default classification
       return {
@@ -352,9 +352,9 @@ export class SentenceClassifier {
   }>): Promise<void> {
     // In a real implementation, this would update model weights
     // For now, we'll just log the training data
-    logger.info(`Training classifier with ${examples.length} examples`, {
+    logger.info({
       component: 'SentenceClassifier'
-    });
+    }, `Training classifier with ${examples.length} examples`);
 
     // Analyze training examples to improve classification rules
     const typeStats = new Map<string, { count: number; avgLength: number; commonWords: string[] }>();
@@ -369,10 +369,10 @@ export class SentenceClassifier {
       typeStats.set(example.type, stats);
     });
 
-    logger.info(`Training analysis completed`, {
+    logger.info({
       component: 'SentenceClassifier',
       typeStats: Object.fromEntries(typeStats)
-    });
+    }, `Training analysis completed`);
   }
 
   /**

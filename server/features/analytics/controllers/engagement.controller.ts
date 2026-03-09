@@ -1,7 +1,7 @@
-import { engagementAnalyticsService } from '@server/features/analytics/engagement/engagement-analytics.service';
+import { engagementAnalyticsService } from '@server/features/analytics/application/engagement-analytics.service';
 import { z } from 'zod';
 
-import { AuthenticatedRequest } from '@/middleware/auth';
+import { AuthenticatedRequest } from '@server/middleware/auth';
 
 // Validation schemas for engagement endpoints
 export const getEngagementMetricsSchema = z.object({
@@ -294,16 +294,20 @@ export class EngagementController {
     }
 
     // Get leaderboard data as sample export
-    const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard('30d', 50);
+    const response = await engagementAnalyticsService.getEngagementLeaderboard('30d', 50);
+    if (response.isErr()) {
+      throw new Error(response.error.message || 'Failed to get leaderboard');
+    }
+    const leaderboard = response.value;
 
     if (input.format === 'json') {
-      return JSON.stringify(leaderboard, null, 2);
+      return JSON.stringify({ topCommenters: leaderboard }, null, 2);
     } else {
       // Simple CSV format
       const csv = [
-        'User ID,Name,Comments,Votes,Avg Votes',
-        ...leaderboard.topCommenters.map(user =>
-          `${users.user_id},${users.userName},${users.comment_count},${users.totalVotes},${users.averageVotes}`
+        'User ID,Engagement Score',
+        ...leaderboard.map(user =>
+          `${user.userId},${user.engagementScore}`
         )
       ].join('\n');
       return csv;
@@ -361,17 +365,22 @@ export class EngagementController {
   /**
    * Get engagement leaderboard
    */
-  static async getEngagementLeaderboard(input: { limit?: number }) { const limit = Math.min(input.limit || 10, 100);
-    const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard('30d', limit);
-
+  static async getEngagementLeaderboard(input: { limit?: number }) { 
+    const limit = Math.min(input.limit || 10, 100);
+    const response = await engagementAnalyticsService.getEngagementLeaderboard('30d', limit);
+    
+    if (response.isErr()) {
+      throw new Error(response.error.message || 'Failed to get leaderboard');
+    }
+    
     // Transform to expected format
-    const transformedLeaderboard = leaderboard.topCommenters.slice(0, limit).map((user, index) => ({
+    const transformedLeaderboard = response.value.slice(0, limit).map((user, index) => ({
       rank: index + 1,
-      user_id: users.user_id,
-      userName: users.userName,
-      totalEngagements: users.comment_count,
-      engagement_score: users.averageVotes,
-      lastActive: new Date() // Would need proper implementation
+      user_id: user.userId,
+      userName: 'Unknown', // Need user service integration for real names
+      totalEngagements: 0, // Placeholder
+      engagement_score: user.engagementScore,
+      lastActive: new Date() // Placeholder
      }));
 
     return {

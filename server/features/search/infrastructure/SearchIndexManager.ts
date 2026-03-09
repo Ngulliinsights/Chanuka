@@ -172,11 +172,11 @@ export class SearchIndexManager {
 
       return { success: true, billsProcessed, billsUpdated, errors, duration };
     } catch (error) {
-      logger.error('Failed to rebuild search indexes', {
+      logger.error({
         error,
         component: 'SearchIndexManager',
         operation: 'rebuildAllIndexes'
-      });
+      }, 'Failed to rebuild search indexes');
       errors = 1;
       errorDetails.push(error instanceof Error ? error.message : String(error));
       logger.error({ component: 'SearchIndexManager', error }, '❌ Search index rebuild failed');
@@ -281,11 +281,11 @@ export class SearchIndexManager {
         recommendations,
       };
     } catch (error) {
-      logger.error('Failed to get index health', {
+      logger.error({
         error,
         component: 'SearchIndexManager',
         operation: 'getIndexHealth'
-      });
+      }, 'Failed to get index health');
       return this.offlineHealth('Database connection unavailable');
     }
   }
@@ -336,11 +336,11 @@ export class SearchIndexManager {
       logger.info({ component: 'SearchIndexManager', duration }, `✅ Search index optimisation completed in ${duration}ms`);
       return { success: true, operations, duration };
     } catch (error) {
-      logger.error('Failed to optimize indexes', {
+      logger.error({
         error,
         component: 'SearchIndexManager',
         operation: 'optimizeIndexes'
-      });
+      }, 'Failed to optimize indexes');
       logger.error({ component: 'SearchIndexManager', error }, '❌ Search index optimisation failed');
       return {
         success: false,
@@ -412,11 +412,11 @@ export class SearchIndexManager {
         lastAnalyze: stats.last_analyze ? new Date(stats.last_analyze as string) : null,
       };
     } catch (error) {
-      logger.error('Failed to get index statistics', {
+      logger.error({
         error,
         component: 'SearchIndexManager',
         operation: 'getIndexStatistics'
-      });
+      }, 'Failed to get index statistics');
       logger.error({ component: 'SearchIndexManager', error }, 'Error getting index statistics');
       return { ...fallback, indexSize: 'Error' };
     }

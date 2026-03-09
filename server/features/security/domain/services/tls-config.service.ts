@@ -56,7 +56,7 @@ export class TLSConfigService {
         config.ca = fs.readFileSync(caPath);
       }
 
-      logger.info('✅ TLS certificates loaded successfully', { component: 'TLSConfigService' });
+      logger.info({ component: 'TLSConfigService' }, '✅ TLS certificates loaded successfully');
     } catch (error) {
       logger.error('❌ Failed to load TLS certificates:', { component: 'TLSConfigService' }, error);
       throw new Error('TLS configuration failed');
@@ -91,7 +91,7 @@ export class TLSConfigService {
 
   private generateSelfSignedCertificate(certPath: string, keyPath: string): void {
     try {
-      logger.info('🔧 Generating self-signed certificate for development...', { component: 'TLSConfigService' });
+      logger.info({ component: 'TLSConfigService' }, '🔧 Generating self-signed certificate for development...');
 
       const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
         modulusLength: 2048,
@@ -110,7 +110,7 @@ export class TLSConfigService {
       fs.writeFileSync(keyPath, privateKey);
       fs.writeFileSync(certPath, cert);
 
-      logger.info('✅ Self-signed certificate generated successfully', { component: 'TLSConfigService' });
+      logger.info({ component: 'TLSConfigService' }, '✅ Self-signed certificate generated successfully');
     } catch (error) {
       logger.error('❌ Failed to generate self-signed certificate:', { component: 'TLSConfigService' }, error);
       throw new Error('Certificate generation failed');
@@ -146,21 +146,21 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
   validateTLSConfig(options: TLSOptions): boolean {
     try {
       if (!options.cert || !options.key) {
-        logger.error('❌ TLS certificate or key missing', { component: 'TLSConfigService' });
+        logger.error({ component: 'TLSConfigService' }, '❌ TLS certificate or key missing');
         return false;
       }
 
       if (typeof options.cert === 'string' && !options.cert.includes('BEGIN CERTIFICATE')) {
-        logger.error('❌ Invalid certificate format', { component: 'TLSConfigService' });
+        logger.error({ component: 'TLSConfigService' }, '❌ Invalid certificate format');
         return false;
       }
 
       if (typeof options.key === 'string' && !options.key.includes('BEGIN PRIVATE KEY') && !options.key.includes('BEGIN RSA PRIVATE KEY')) {
-        logger.error('❌ Invalid private key format', { component: 'TLSConfigService' });
+        logger.error({ component: 'TLSConfigService' }, '❌ Invalid private key format');
         return false;
       }
 
-      logger.info('✅ TLS configuration validated successfully', { component: 'TLSConfigService' });
+      logger.info({ component: 'TLSConfigService' }, '✅ TLS configuration validated successfully');
       return true;
     } catch (error) {
       logger.error('❌ TLS configuration validation failed:', { component: 'TLSConfigService' }, error);

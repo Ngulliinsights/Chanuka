@@ -98,7 +98,7 @@ export class ConstitutionalAnalysisServiceComplete {
       const provision = rows[0] as ConstitutionalProvision | undefined;
       return provision || null;
     } catch (error) {
-      logger.error('Failed to find constitutional provision by ID', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find constitutional provision by ID');
       throw error;
     }
   }
@@ -159,13 +159,13 @@ export class ConstitutionalAnalysisServiceComplete {
           .limit(limit);
       });
 
-      logger.debug('Constitutional provisions search completed', { 
+      logger.debug({ 
         ...logContext, 
         count: results.length 
-      });
+      }, 'Constitutional provisions search completed');
       return results;
     } catch (error) {
-      logger.error('Failed to search constitutional provisions', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to search constitutional provisions');
       throw error;
     }
   }
@@ -192,7 +192,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       if (articleNum === undefined || Number.isNaN(articleNum)) {
-        logger.warn('Invalid article value provided to findProvisionsByArticle', { article });
+        logger.warn({ article }, 'Invalid article value provided to findProvisionsByArticle');
         return [];
       }
 
@@ -204,10 +204,10 @@ export class ConstitutionalAnalysisServiceComplete {
           .orderBy(asc(constitutional_provisions.section_number));
       });
 
-      logger.debug('Found provisions by article', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, 'Found provisions by article');
       return results;
     } catch (error) {
-      logger.error('Failed to find provisions by article', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find provisions by article');
       throw error;
     }
   }
@@ -239,7 +239,7 @@ export class ConstitutionalAnalysisServiceComplete {
       const precedent = rows[0] as LegalPrecedent | undefined;
       return precedent || null;
     } catch (error) {
-      logger.error('Failed to find legal precedent by ID', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find legal precedent by ID');
       throw error;
     }
   }
@@ -335,10 +335,10 @@ export class ConstitutionalAnalysisServiceComplete {
           .limit(limit);
       });
 
-      logger.debug('Found legal precedents', { ...logContext, count: results.length });
+      logger.debug({ ...logContext, count: results.length }, 'Found legal precedents');
       return results;
     } catch (error) {
-      logger.error('Failed to search precedents', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to search precedents');
       throw error;
     }
   }
@@ -403,11 +403,11 @@ export class ConstitutionalAnalysisServiceComplete {
           }
         });
 
-        logger.info('✅ Updated constitutional analysis', {
+        logger.info({
           ...logContext,
           analysis_id: savedAnalysis.id,
           confidence_delta: analysis.confidence_score - existing.confidence_score
-        });
+        }, '✅ Updated constitutional analysis');
       } else {
         // This is a new analysis
         savedAnalysis = await this.insertNewAnalysis(analysis);
@@ -417,16 +417,16 @@ export class ConstitutionalAnalysisServiceComplete {
           initial_risk: analysis.risk_level
         });
 
-        logger.info('✅ Created new constitutional analysis', {
+        logger.info({
           ...logContext,
           analysis_id: savedAnalysis.id,
           confidence: analysis.confidence_score
-        });
+        }, '✅ Created new constitutional analysis');
       }
 
       return savedAnalysis;
     } catch (error) {
-      logger.error('Failed to save constitutional analysis', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to save constitutional analysis');
       throw error;
     }
   }
@@ -460,10 +460,10 @@ export class ConstitutionalAnalysisServiceComplete {
           );
       });
 
-      logger.debug('Found analyses for bill', { ...logContext, count: analyses.length });
+      logger.debug({ ...logContext, count: analyses.length }, 'Found analyses for bill');
       return analyses;
     } catch (error) {
-      logger.error('Failed to find analyses for bill', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find analyses for bill');
       throw error;
     }
   }
@@ -490,7 +490,7 @@ export class ConstitutionalAnalysisServiceComplete {
 
       return analysis || null;
     } catch (error) {
-      logger.error('Failed to find analysis by ID', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to find analysis by ID');
       throw error;
     }
   }
@@ -554,13 +554,13 @@ export class ConstitutionalAnalysisServiceComplete {
           });
       });
 
-      logger.info('✅ Queued analysis for expert review', { 
+      logger.info({ 
         ...logContext,
         due_date,
         uncertaintyFlagCount: request.uncertainty_flags.length
-      });
+      }, '✅ Queued analysis for expert review');
     } catch (error) {
-      logger.error('Failed to queue analysis for expert review', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to queue analysis for expert review');
       throw error;
     }
   }
@@ -595,10 +595,10 @@ export class ConstitutionalAnalysisServiceComplete {
         highPriorityCount: Number(statusResult?.highPriorityCount) || 0
       };
 
-      logger.debug('Retrieved queue status', { ...logContext, status });
+      logger.debug({ ...logContext, status }, 'Retrieved queue status');
       return status;
     } catch (error) {
-      logger.error('Failed to get queue status', { ...logContext, error });
+      logger.error({ ...logContext, error }, 'Failed to get queue status');
       throw error;
     }
   }
@@ -695,7 +695,7 @@ export class ConstitutionalAnalysisServiceComplete {
       });
     } catch (error) {
       // Audit trail failures shouldn't break the main operation
-      logger.warn('Failed to log audit trail', { analysis_id, changeType, error });
+      logger.warn({ analysis_id, changeType, error }, 'Failed to log audit trail');
     }
   }
 

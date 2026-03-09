@@ -308,7 +308,7 @@ export class SecureSessionService {
         .delete(sessions)
         .where(lt(sessions.expires_at, now));
 
-      logger.info('Expired sessions cleaned up', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Expired sessions cleaned up');
     } catch (error) {
       logger.error('Session cleanup failed:', { component: 'Chanuka' }, error);
     }

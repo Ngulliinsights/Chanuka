@@ -15,6 +15,7 @@ import type {
   ResponseInterceptor,
   BaseClientRequest,
   BaseClientResponse,
+  RequestBody,
 } from './types/interceptors';
 
 // Circuit Breaker State
@@ -319,7 +320,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
     let baseRequest: BaseClientRequest = {
       method: request.method,
       url: request.url,
-      body: request.body,
+      body: (request.body || request.data) as RequestBody | undefined,
       headers: request.headers,
     };
 
@@ -481,12 +482,12 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       return this.createFallbackResponse<T>(requestId, options.fallbackData as T, startTime);
     }
 
-    // Log error through global handler
-    globalErrorHandler.handleError({
-      message: (error as Error).message,
-      type: ErrorDomain.NETWORK,
+    // Log error
+    logger.error('Request failed', {
+      component: 'ApiClient',
+      error: (error as Error).message,
+      domain: ErrorDomain.NETWORK,
       context: {
-        component: 'api-client',
         operation: 'request',
         requestId,
         method,
@@ -664,16 +665,18 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
   // Execute single HTTP request with timeout and error handling
   private async executeRequest(request: ApiRequest): Promise<ApiResponse> {
     const controller = new AbortController();
-    this.activeRequests.set(request.id, controller);
+    const requestId = request.id || this.generateRequestId();
+    this.activeRequests.set(requestId, controller);
 
+    const timeoutMs = request.timeout || this.timeout;
     const timeoutId = setTimeout(() => {
       controller.abort();
       logger.warn('Request timeout', {
         component: 'ApiClient',
-        requestId: request.id,
-        timeout: request.timeout,
+        requestId,
+        timeout: timeoutMs,
       });
-    }, request.timeout);
+    }, timeoutMs);
 
     try {
       // Apply request interceptors to get fetch config
@@ -685,7 +688,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       });
 
       clearTimeout(timeoutId);
-      this.activeRequests.delete(request.id);
+      this.activeRequests.delete(requestId);
 
       // Handle 401 with token refresh attempt
       if (response.status === 401) {
@@ -699,7 +702,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 
       return {
         id: this.generateRequestId(),
-        requestId: request.id,
+        requestId,
         status: response.status,
         statusText: response.statusText,
         headers: this.headersToObject(response.headers),
@@ -711,10 +714,10 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
       };
     } catch (error) {
       clearTimeout(timeoutId);
-      this.activeRequests.delete(request.id);
+      this.activeRequests.delete(requestId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        throw ErrorFactory.createNetworkError(`Request timeout after ${request.timeout}ms`);
+        throw ErrorFactory.createNetworkError(`Request timeout after ${timeoutMs}ms`);
       }
 
       throw error;
@@ -940,7 +943,7 @@ export const createAuthRequestInterceptor = (getToken: () => string | null): Req
 
 // Helper function to create logging response interceptor
 export const createLoggingResponseInterceptor = (): ResponseInterceptor => {
-  return async (response: BaseClientResponse): Promise<BaseClientResponse> => {
+  return async <T>(response: BaseClientResponse<T>): Promise<BaseClientResponse<T>> => {
     const logLevel = response.status >= 400 ? 'warn' : 'debug';
     logger[logLevel]('API Response received', {
       component: 'ApiClient',

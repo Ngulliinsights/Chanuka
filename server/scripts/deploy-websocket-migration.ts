@@ -74,10 +74,10 @@ export class SocketIOWebSocketService {
       return;
     }
 
-    logger.info('Initializing Socket.IO WebSocket service', {
+    logger.info({
       component: 'SocketIOWebSocketService',
       environment: config.environment
-    });
+    }, 'Initializing Socket.IO WebSocket service');
 
     try {
       // Create Socket.IO server
@@ -131,10 +131,10 @@ export class SocketIOWebSocketService {
           next();
 
         } catch (error) {
-          logger.warn('Socket.IO authentication failed', {
+          logger.warn({
             component: 'SocketIOWebSocketService',
             error: error instanceof Error ? error.message : String(error)
-          });
+          }, 'Socket.IO authentication failed');
           next(new Error('Authentication failed'));
         }
       });
@@ -146,11 +146,11 @@ export class SocketIOWebSocketService {
 
       this.isInitialized = true;
 
-      logger.info('Socket.IO WebSocket service initialized successfully', {
+      logger.info({
         component: 'SocketIOWebSocketService',
         redisEnabled: !!this.redisAdapter,
         path: '/socket.io'
-      });
+      }, 'Socket.IO WebSocket service initialized successfully');
 
     } catch (error) {
       logger.error('Failed to initialize Socket.IO service', {
@@ -176,10 +176,10 @@ export class SocketIOWebSocketService {
       this.redisAdapter = createAdapter(this.redisClient, subClient);
       this.io!.adapter(this.redisAdapter);
 
-      logger.info('Redis adapter configured for Socket.IO', {
+      logger.info({
         component: 'SocketIOWebSocketService',
         redisUrl: redisUrl.replace(/\/\/.*@/, '//***@') // Hide credentials
-      });
+      }, 'Redis adapter configured for Socket.IO');
 
     } catch (error) {
       logger.error('Failed to setup Redis adapter', {
@@ -207,12 +207,12 @@ export class SocketIOWebSocketService {
     this.userSockets.get(user_id)!.add(socketId);
     this.socketUsers.set(socketId, user_id);
 
-    logger.info('New Socket.IO connection established', {
+    logger.info({
       component: 'SocketIOWebSocketService',
       user_id,
       socketId,
       activeConnections: this.metrics.activeConnections
-    });
+    }, 'New Socket.IO connection established');
 
     // Send connection confirmation
     socket.emit('connected', {
@@ -274,12 +274,12 @@ export class SocketIOWebSocketService {
     // Join Socket.IO room for efficient broadcasting
     socket.join(`bill:${bill_id}`);
 
-    logger.debug('Socket subscribed to bill', {
+    logger.debug({
       component: 'SocketIOWebSocketService',
       socketId,
       bill_id,
       subscriberCount: this.billSubscriptions.get(bill_id)!.size
-    });
+    }, 'Socket subscribed to bill');
 
     socket.emit('subscribed', {
       bill_id,
@@ -308,11 +308,11 @@ export class SocketIOWebSocketService {
     // Leave Socket.IO room
     socket.leave(`bill:${bill_id}`);
 
-    logger.debug('Socket unsubscribed from bill', {
+    logger.debug({
       component: 'SocketIOWebSocketService',
       socketId,
       bill_id
-    });
+    }, 'Socket unsubscribed from bill');
 
     socket.emit('unsubscribed', {
       bill_id,
@@ -403,13 +403,13 @@ export class SocketIOWebSocketService {
       }
     }
 
-    logger.info('Socket.IO connection disconnected', {
+    logger.info({
       component: 'SocketIOWebSocketService',
       socketId,
       user_id,
       reason,
       activeConnections: this.metrics.activeConnections
-    });
+    }, 'Socket.IO connection disconnected');
   }
 
   /**
@@ -497,9 +497,9 @@ export class SocketIOWebSocketService {
    * Shutdown the service
    */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Socket.IO WebSocket service', {
+    logger.info({
       component: 'SocketIOWebSocketService'
-    });
+    }, 'Shutting down Socket.IO WebSocket service');
 
     if (this.io) {
       this.io.close();
@@ -511,9 +511,9 @@ export class SocketIOWebSocketService {
 
     this.isInitialized = false;
 
-    logger.info('Socket.IO WebSocket service shutdown complete', {
+    logger.info({
       component: 'SocketIOWebSocketService'
-    });
+    }, 'Socket.IO WebSocket service shutdown complete');
   }
 }
 
@@ -559,11 +559,11 @@ export class WebSocketMigrationDeployer {
     this.httpServer = httpServer;
 
     try {
-      logger.info('Starting WebSocket migration deployment', {
+      logger.info({
         component: 'WebSocketMigrationDeployer',
         strategy: this.config.deploymentStrategy,
         environment: this.config.environment
-      });
+      }, 'Starting WebSocket migration deployment');
 
       // Phase 1: Prepare new Socket.IO service
       await this.prepareSocketIOService();
@@ -588,16 +588,16 @@ export class WebSocketMigrationDeployer {
   private async prepareSocketIOService(): Promise<void> {
     this.migrationState.phase = 'preparing';
 
-    logger.info('Preparing Socket.IO service', {
+    logger.info({
       component: 'WebSocketMigrationDeployer'
-    });
+    }, 'Preparing Socket.IO service');
 
     try {
       await this.socketIOService.initialize(this.httpServer!, this.config);
 
-      logger.info('Socket.IO service prepared successfully', {
+      logger.info({
         component: 'WebSocketMigrationDeployer'
-      });
+      }, 'Socket.IO service prepared successfully');
 
     } catch (error) {
       this.migrationState.errors.push(`Preparation failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -611,10 +611,10 @@ export class WebSocketMigrationDeployer {
   private async deployNewService(): Promise<void> {
     this.migrationState.phase = 'deploying';
 
-    logger.info('Deploying Socket.IO service with immediate switch', {
+    logger.info({
       component: 'WebSocketMigrationDeployer',
       strategy: this.config.deploymentStrategy
-    });
+    }, 'Deploying Socket.IO service with immediate switch');
 
     // For development, we do an immediate switch
     // In production, this would involve gradual traffic shifting
@@ -622,10 +622,10 @@ export class WebSocketMigrationDeployer {
     // The Socket.IO service is already initialized and listening
     // Clients will need to reconnect to the new endpoint
 
-    logger.info('Socket.IO service deployed successfully', {
+    logger.info({
       component: 'WebSocketMigrationDeployer',
       endpoint: '/socket.io'
-    });
+    }, 'Socket.IO service deployed successfully');
   }
 
   /**
@@ -634,9 +634,9 @@ export class WebSocketMigrationDeployer {
   private async validateDeployment(): Promise<void> {
     this.migrationState.phase = 'validating';
 
-    logger.info('Validating Socket.IO deployment', {
+    logger.info({
       component: 'WebSocketMigrationDeployer'
-    });
+    }, 'Validating Socket.IO deployment');
 
     // Wait a moment for any immediate issues to surface
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -653,10 +653,10 @@ export class WebSocketMigrationDeployer {
       throw new Error(`Deployment validation failed. Errors: ${this.migrationState.errors.join(', ')}`);
     }
 
-    logger.info('Deployment validation passed', {
+    logger.info({
       component: 'WebSocketMigrationDeployer',
       metrics
-    });
+    }, 'Deployment validation passed');
   }
 
   /**
@@ -704,16 +704,16 @@ export class WebSocketMigrationDeployer {
   private async rollback(): Promise<void> {
     this.migrationState.phase = 'rolled_back';
 
-    logger.info('Rolling back WebSocket migration', {
+    logger.info({
       component: 'WebSocketMigrationDeployer'
-    });
+    }, 'Rolling back WebSocket migration');
 
     try {
       await this.socketIOService.shutdown();
 
-      logger.info('WebSocket migration rollback completed', {
+      logger.info({
         component: 'WebSocketMigrationDeployer'
-      });
+      }, 'WebSocket migration rollback completed');
 
     } catch (rollbackError) {
       logger.error('Rollback failed', {
@@ -728,10 +728,10 @@ export class WebSocketMigrationDeployer {
   private broadcastMigrationStatus(status: string): void {
     // This would broadcast to any connected clients about the migration status
     // For now, we'll just log it since we're in the deployment phase
-    logger.info('Broadcasting migration status', {
+    logger.info({
       component: 'WebSocketMigrationDeployer',
       status
-    });
+    }, 'Broadcasting migration status');
   }
 
   /**

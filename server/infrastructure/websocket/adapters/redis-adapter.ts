@@ -108,7 +108,7 @@ export class RedisAdapter {
     // Main client events
     this.client.on('connect', () => {
       this.connected = true;
-      logger.info('Redis client connected', { component: 'RedisAdapter' });
+      logger.info({ component: 'RedisAdapter' }, 'Redis client connected');
     });
 
     this.client.on('ready', () => {
@@ -127,7 +127,7 @@ export class RedisAdapter {
 
     // Subscription client events
     this.subClient.on('connect', () => {
-      logger.info('Redis subscription client connected', { component: 'RedisAdapter' });
+      logger.info({ component: 'RedisAdapter' }, 'Redis subscription client connected');
     });
 
     this.subClient.on('error', (error) => {
@@ -168,10 +168,10 @@ export class RedisAdapter {
           'websocket:broadcasts'
         );
 
-        logger.info('Redis adapter connected and subscribed', {
+        logger.info({
           component: 'RedisAdapter',
           serverId: this.serverId
-        });
+        }, 'Redis adapter connected and subscribed');
       })
       .catch((error) => {
         this.connectionPromise = null;
@@ -194,10 +194,10 @@ export class RedisAdapter {
       }
       this.connected = false;
 
-      logger.info('Redis adapter disconnected', {
+      logger.info({
         component: 'RedisAdapter',
         serverId: this.serverId
-      });
+      }, 'Redis adapter disconnected');
     } catch (error) {
       logger.error('Error disconnecting Redis adapter', {
         component: 'RedisAdapter'
@@ -224,10 +224,10 @@ export class RedisAdapter {
    */
   async publishBillUpdate(billId: number, update: unknown): Promise<void> {
     if (!this.connected) {
-      logger.warn('Cannot publish bill update - Redis not connected', {
+      logger.warn({
         component: 'RedisAdapter',
         billId
-      });
+      }, 'Cannot publish bill update - Redis not connected');
       return;
     }
 
@@ -245,11 +245,11 @@ export class RedisAdapter {
       this.stats.messagesPublished++;
       this.stats.lastActivity = Date.now();
 
-      logger.debug('Published bill update to Redis', {
+      logger.debug({
         component: 'RedisAdapter',
         billId,
         serverId: this.serverId
-      });
+      }, 'Published bill update to Redis');
     } catch (error) {
       logger.error('Error publishing bill update', {
         component: 'RedisAdapter',
@@ -263,10 +263,10 @@ export class RedisAdapter {
    */
   async publishUserNotification(userId: string, notification: unknown): Promise<void> {
     if (!this.connected) {
-      logger.warn('Cannot publish user notification - Redis not connected', {
+      logger.warn({
         component: 'RedisAdapter',
         userId
-      });
+      }, 'Cannot publish user notification - Redis not connected');
       return;
     }
 
@@ -284,11 +284,11 @@ export class RedisAdapter {
       this.stats.messagesPublished++;
       this.stats.lastActivity = Date.now();
 
-      logger.debug('Published user notification to Redis', {
+      logger.debug({
         component: 'RedisAdapter',
         userId,
         serverId: this.serverId
-      });
+      }, 'Published user notification to Redis');
     } catch (error) {
       logger.error('Error publishing user notification', {
         component: 'RedisAdapter',
@@ -302,9 +302,9 @@ export class RedisAdapter {
    */
   async publishBroadcast(message: unknown): Promise<void> {
     if (!this.connected) {
-      logger.warn('Cannot publish broadcast - Redis not connected', {
+      logger.warn({
         component: 'RedisAdapter'
-      });
+      }, 'Cannot publish broadcast - Redis not connected');
       return;
     }
 
@@ -322,10 +322,10 @@ export class RedisAdapter {
       this.stats.messagesPublished++;
       this.stats.lastActivity = Date.now();
 
-      logger.debug('Published broadcast to Redis', {
+      logger.debug({
         component: 'RedisAdapter',
         serverId: this.serverId
-      });
+      }, 'Published broadcast to Redis');
     } catch (error) {
       logger.error('Error publishing broadcast', {
         component: 'RedisAdapter'
@@ -360,11 +360,11 @@ export class RedisAdapter {
       if (handler) {
         handler(redisMessage);
       } else {
-        logger.warn('No handler for Redis message type', {
+        logger.warn({
           component: 'RedisAdapter',
           type: redisMessage.type,
           channel
-        });
+        }, 'No handler for Redis message type');
       }
     } catch (error) {
       logger.error('Error handling Redis message', {
@@ -626,17 +626,17 @@ export class RedisAdapter {
    * Cleanup and shutdown
    */
   async shutdown(): Promise<void> {
-    logger.info('Shutting down Redis adapter', {
+    logger.info({
       component: 'RedisAdapter',
       serverId: this.serverId
-    });
+    }, 'Shutting down Redis adapter');
 
     await this.disconnect();
     this.messageHandlers.clear();
 
-    logger.info('Redis adapter shutdown complete', {
+    logger.info({
       component: 'RedisAdapter',
       finalStats: this.getStats()
-    });
+    }, 'Redis adapter shutdown complete');
   }
 }

@@ -4,7 +4,7 @@
  */
 import { Driver } from 'neo4j-driver';
 import { executeBatch } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { parallelLimit } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -27,15 +27,15 @@ export async function syncInParallel<T>(
         synced++;
       } catch (error) {
         failed++;
-        logger.error('Parallel sync failed', {
+        logger.error({
           error: error instanceof Error ? error.message : String(error),
-        });
+        }, 'Parallel sync failed');
       }
     },
     concurrency
   );
 
-  logger.info('Parallel sync completed', { synced, failed, total: items.length });
+  logger.info({ synced, failed, total: items.length }, 'Parallel sync completed');
   return { synced, failed };
 }
 

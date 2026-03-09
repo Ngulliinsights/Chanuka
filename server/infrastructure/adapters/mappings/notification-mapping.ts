@@ -8,7 +8,7 @@
 import { EntityMapping } from '@server/infrastructure/adapters/drizzle-adapter';
 import { notifications } from '@server/infrastructure/schema';
 
-import { Notification } from '@/features/notifications/domain/entities/notification';
+import { Notification } from '@server/features/notifications/domain/entities/notification';
 
 type NotificationRow = typeof notifications.$inferSelect;
 type NotificationInsert = typeof notifications.$inferInsert;

@@ -45,11 +45,11 @@ export class StakeholderAnalysisService {
       await cache.set(cacheKey, stakeholders, 3600);
       
       return stakeholders;
-    } catch (error) { logger.error('Error identifying stakeholders:', {
+    } catch (error) { logger.error({
         component: 'StakeholderAnalysis',
         bill_id: bills.id,
         error: error instanceof Error ? error.message : String(error)
-       });
+       }, 'Error identifying stakeholders:');
       return [];
     }
   }
@@ -68,10 +68,10 @@ export class StakeholderAnalysisService {
 
       return interests;
     } catch (error) {
-      logger.error('Error analyzing stakeholder interests:', {
+      logger.error({
         component: 'StakeholderAnalysis',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error analyzing stakeholder interests:');
       return [];
     }
   }
@@ -179,7 +179,7 @@ export class StakeholderAnalysisService {
         transparency: 0.7
       }));
     } catch (error) {
-      logger.error('Error identifying individual stakeholders:', { error });
+      logger.error({ error }, 'Error identifying individual stakeholders:');
       return [];
     }
   }
@@ -209,7 +209,7 @@ export class StakeholderAnalysisService {
 
       return stakeholders;
     } catch (error) {
-      logger.error('Error identifying organizational stakeholders:', { error });
+      logger.error({ error }, 'Error identifying organizational stakeholders:');
       return [];
     }
   }
@@ -232,7 +232,7 @@ export class StakeholderAnalysisService {
         transparency: 0.4
       }));
     } catch (error) {
-      logger.error('Error identifying industry stakeholders:', { error });
+      logger.error({ error }, 'Error identifying industry stakeholders:');
       return [];
     }
   }

@@ -8,8 +8,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-import { globalApiClient } from '../../../infrastructure/api/client';
-import type { UseUnifiedCommunityReturn, UnifiedComment } from '../../../infrastructure/community/types';
+import { globalApiClient } from '@client/infrastructure/api/client';
+import type { UseUnifiedCommunityReturn, UnifiedComment } from '@client/infrastructure/community/types';
 
 import { useUnifiedDiscussion } from './useUnifiedDiscussion';
 

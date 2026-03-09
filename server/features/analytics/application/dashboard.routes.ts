@@ -79,10 +79,10 @@ function safeErrorCapture(error: Error, context: Record<string, unknown>): void 
     }
   } catch (captureError) {
     // If error capture itself fails, log it but don't throw
-    logger.warn('Failed to capture error with error tracker', { 
+    logger.warn({ 
       originalError: error.message,
       captureError 
-    });
+    }, 'Failed to capture error with error tracker');
   }
 }
 
@@ -316,11 +316,11 @@ class DashboardStorageService {
         hasMore,
       };
     } catch (error) {
-      logger.error('Error fetching evaluations', { 
+      logger.error({ 
         component: 'Chanuka',
         options,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Error fetching evaluations');
       
       if (error instanceof Error) {
         throw new Error(`Failed to fetch evaluations: ${error.message}`);
@@ -447,12 +447,12 @@ class DashboardStorageService {
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       
-      logger.error('Error updating evaluation status', {
+      logger.error({
         component: 'dashboard',
         evaluationId: id,
         targetStatus: status,
         error: err.message,
-      });
+      }, 'Error updating evaluation status');
       
       // Safely attempt to capture error in tracking system
       safeErrorCapture(err, {
@@ -526,10 +526,10 @@ class DashboardStorageService {
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       
-      logger.error('Error fetching department statistics', {
+      logger.error({
         component: 'dashboard',
         error: err.message,
-      });
+      }, 'Error fetching department statistics');
 
       // Attempt to capture in error tracking system
       safeErrorCapture(err, {
@@ -598,11 +598,11 @@ class DashboardStorageService {
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       
-      logger.error('Error fetching competency metrics', {
+      logger.error({
         component: 'dashboard',
         candidateId,
         error: err.message,
-      });
+      }, 'Error fetching competency metrics');
 
       // Capture in error tracking system
       safeErrorCapture(err, {

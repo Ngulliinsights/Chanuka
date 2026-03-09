@@ -74,10 +74,10 @@ export class SimilarityCalculator {
       const result = await this.calculateDetailedSimilarity(text1, text2, finalConfig);
       return result.similarity;
     } catch (error) {
-      logger.error(`Similarity calculation failed`, {
+      logger.error({
         component: 'SimilarityCalculator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `Similarity calculation failed`);
       return 0;
     }
   }
@@ -113,11 +113,11 @@ export class SimilarityCalculator {
           throw new Error(`Unknown similarity method: ${finalConfig.method}`);
       }
     } catch (error) {
-      logger.error(`Detailed similarity calculation failed`, {
+      logger.error({
         component: 'SimilarityCalculator',
         method: finalConfig.method,
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, `Detailed similarity calculation failed`);
 
       return {
         similarity: 0,

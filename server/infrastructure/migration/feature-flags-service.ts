@@ -168,12 +168,12 @@ export class FeatureFlagsService {
       this.validateFlag(flag);
       this.flags.set(flag.name, flag);
 
-      logger.info('Feature flag created', {
+      logger.info({
         component: 'FeatureFlagsService',
         flagName: flag.name,
         enabled: flag.enabled,
         rolloutPercentage: flag.rolloutPercentage
-      });
+      }, 'Feature flag created');
 
       return flag;
     }, { service: 'FeatureFlagsService', operation: 'createFlag' });
@@ -198,11 +198,11 @@ export class FeatureFlagsService {
       this.validateFlag(updatedFlag);
       this.flags.set(flagName, updatedFlag);
 
-      logger.info('Feature flag updated', {
+      logger.info({
         component: 'FeatureFlagsService',
         flagName,
         changes: Object.keys(updates)
-      });
+      }, 'Feature flag updated');
 
       return updatedFlag;
     }, { service: 'FeatureFlagsService', operation: 'updateFlag' });
@@ -332,12 +332,12 @@ export class FeatureFlagsService {
       // Start with first stage
       await this.advanceToStage(flagName, 0);
 
-      logger.info('Gradual rollout enabled', {
+      logger.info({
         component: 'FeatureFlagsService',
         flagName,
         targetPercentage,
         stages: defaultStages.length
-      });
+      }, 'Gradual rollout enabled');
 
       return rolloutConfig;
     }, { service: 'FeatureFlagsService', operation: 'enableGradualRollout' });
@@ -378,12 +378,12 @@ export class FeatureFlagsService {
         // Rollback to previous stage
         await this.advanceToStage(flagName, rolloutConfig.currentStage - 1);
         
-        logger.warn('Feature flag rolled back to previous stage', {
+        logger.warn({
           component: 'FeatureFlagsService',
           flagName,
           currentStage: rolloutConfig.currentStage,
           reason
-        });
+        }, 'Feature flag rolled back to previous stage');
       } else {
         // Disable flag completely
         await this.updateFlag(flagName, { 
@@ -391,11 +391,11 @@ export class FeatureFlagsService {
           rolloutPercentage: 0 
         });
         
-        logger.warn('Feature flag disabled due to rollback', {
+        logger.warn({
           component: 'FeatureFlagsService',
           flagName,
           reason
-        });
+        }, 'Feature flag disabled due to rollback');
       }
     }, { service: 'FeatureFlagsService', operation: 'rollbackFlag' });
   }
@@ -669,12 +669,12 @@ export class FeatureFlagsService {
       enabled: true
     });
 
-    logger.info('Advanced to rollout stage', {
+    logger.info({
       component: 'FeatureFlagsService',
       flagName,
       stage: stage.name,
       percentage: stage.percentage
-    });
+    }, 'Advanced to rollout stage');
 
     // Schedule auto-advance if configured
     if (rolloutConfig.autoAdvance && stage.duration && stageIndex < rolloutConfig.stages.length - 1) {
@@ -686,11 +686,11 @@ export class FeatureFlagsService {
             await this.advanceRolloutStage(flagName);
           }
         } catch (error) {
-          logger.error('Auto-advance failed', {
+          logger.error({
             component: 'FeatureFlagsService',
             flagName,
             error: error instanceof Error ? error.message : 'Unknown error'
-          });
+          }, 'Auto-advance failed');
         }
       }, stage.duration * 60 * 1000); // Convert minutes to milliseconds
     }
@@ -713,14 +713,14 @@ export class FeatureFlagsService {
       const conditionMet = this.evaluateMetricCondition(metricValue, condition);
       
       if (!conditionMet) {
-        logger.warn('Advance condition not met', {
+        logger.warn({
           component: 'FeatureFlagsService',
           flagName,
           metric: condition.metric,
           value: metricValue,
           threshold: condition.threshold,
           operator: condition.operator
-        });
+        }, 'Advance condition not met');
         return false;
       }
     }
@@ -739,14 +739,14 @@ export class FeatureFlagsService {
       const shouldRollback = this.evaluateMetricCondition(metricValue, condition);
       
       if (shouldRollback) {
-        logger.error('Rollback condition triggered', {
+        logger.error({
           component: 'FeatureFlagsService',
           flagName,
           metric: condition.metric,
           value: metricValue,
           threshold: condition.threshold,
           severity: condition.severity
-        });
+        }, 'Rollback condition triggered');
 
         if (condition.severity === 'critical') {
           await this.rollbackFlag(flagName, `Critical condition: ${condition.metric} ${condition.operator} ${condition.threshold}`);

@@ -196,10 +196,10 @@ export class NotificationOrchestratorService {
     this.startBatchProcessor();
     this.startCleanupTasks();
     
-    logger.info('Notification Orchestrator initialized', {
+    logger.info({
       component: 'NotificationOrchestrator',
       config: this.config
-    });
+    }, 'Notification Orchestrator initialized');
   }
 
   // ============================================================================
@@ -231,12 +231,12 @@ export class NotificationOrchestratorService {
 
     const startTime = Date.now();
 
-    try { logger.info('Processing notification request', {
+    try { logger.info({
         component: 'NotificationOrchestrator',
         user_id: request.user_id,
         type: request.notificationType,
         priority: request.priority
-       });
+       }, 'Processing notification request');
 
       // Step 1: Validate request structure and required fields
       const validationError = this.validateRequest(request);
@@ -252,11 +252,11 @@ export class NotificationOrchestratorService {
       // Step 2: Check rate limits (can be bypassed for critical notifications)
       if (!request.config?.skipFiltering) { const rateLimitCheck = this.checkRateLimit(request.user_id, request.priority);
         if (!rateLimitCheck.allowed) {
-          logger.warn('Rate limit exceeded', {
+          logger.warn({
             component: 'NotificationOrchestrator',
             user_id: request.user_id,
             reason: rateLimitCheck.reason
-           });
+           }, 'Rate limit exceeded');
           return {
             success: false,
             filtered: true,
@@ -276,11 +276,11 @@ export class NotificationOrchestratorService {
       const filterResult = await this.applySmartFiltering(request, combinedPreferences);
       
       if (!filterResult.shouldNotify) { this.metrics.totalFiltered++;
-        logger.info('Notification filtered', {
+        logger.info({
           component: 'NotificationOrchestrator',
           user_id: request.user_id,
           reasons: filterResult.reasons
-         });
+         }, 'Notification filtered');
         return {
           success: true,
           filtered: true,
@@ -357,11 +357,11 @@ export class NotificationOrchestratorService {
       return result;
     }
 
-    logger.info('Starting bulk notification', {
+    logger.info({
       component: 'NotificationOrchestrator',
       totalUsers: user_ids.length,
       notificationType: notificationTemplate.notificationType
-    });
+    }, 'Starting bulk notification');
 
     // Process in chunks to avoid overwhelming the system
     const chunks = this.chunkArray(user_ids, this.config.processing.bulkChunkSize);
@@ -407,10 +407,10 @@ export class NotificationOrchestratorService {
       }
     }
 
-    logger.info('Bulk notification completed', {
+    logger.info({
       component: 'NotificationOrchestrator',
       ...result
-    });
+    }, 'Bulk notification completed');
 
     return result;
   }
@@ -442,9 +442,9 @@ export class NotificationOrchestratorService {
    * Should be called during application shutdown to prevent data loss.
    */
   async cleanup(): Promise<void> {
-    logger.info('Starting Notification Orchestrator cleanup', {
+    logger.info({
       component: 'NotificationOrchestrator'
-    });
+    }, 'Starting Notification Orchestrator cleanup');
 
     this.isShuttingDown = true;
 
@@ -466,10 +466,10 @@ export class NotificationOrchestratorService {
     this.rateLimits.clear();
     this.processingBatches.clear();
 
-    logger.info('Notification Orchestrator cleanup completed', {
+    logger.info({
       component: 'NotificationOrchestrator',
       finalMetrics: this.metrics
-    });
+    }, 'Notification Orchestrator cleanup completed');
   }
 
   // ============================================================================
@@ -567,17 +567,17 @@ export class NotificationOrchestratorService {
           _perBillSettingsApplied: true
         };
 
-        logger.debug(`Using merged preferences for user ${ user_id }, bill ${ bill_id }`, {
+        logger.debug({
           component: 'NotificationOrchestrator',
           hasPerBillOverrides: true
-        });
+        }, `Using merged preferences for user ${ user_id }, bill ${ bill_id }`);
         
         return { billTracking: combined };
       } else { // No per-bill settings or they're inactive - use global preferences
-        logger.debug(`Using global preferences for user ${user_id }, bill ${ bill_id }`, {
+        logger.debug({
           component: 'NotificationOrchestrator',
           hasPerBillOverrides: false
-        });
+        }, `Using global preferences for user ${user_id }, bill ${ bill_id }`);
         
         // Create a combined object that maintains type consistency
         const globalCombined: CombinedBillTrackingPreferences = {
@@ -805,9 +805,9 @@ export class NotificationOrchestratorService {
 
       // Validate we have at least one delivery channel
       if (targetChannels.length === 0) {
-        logger.warn(`No active delivery channels for user ${request.user_id}`, {
+        logger.warn({
           component: 'NotificationOrchestrator'
-        });
+        }, `No active delivery channels for user ${request.user_id}`);
         return {
           success: false,
           filtered: true,
@@ -857,9 +857,9 @@ export class NotificationOrchestratorService {
           if (attempt <= maxRetries) {
             this.metrics.totalRetried++;
             const delayMs = Math.pow(2, attempt - 1) * 1000; // Exponential backoff: 1s, 2s, 4s
-            logger.warn(`Retrying channel ${channel} delivery in ${delayMs}ms (${attempt}/${maxRetries})`, { component: 'NotificationOrchestrator',
+            logger.warn({ component: 'NotificationOrchestrator',
               user_id: request.user_id
-             });
+             }, `Retrying channel ${channel} delivery in ${delayMs}ms (${attempt}/${maxRetries})`);
             await this.delay(delayMs);
           }
         }
@@ -882,9 +882,9 @@ export class NotificationOrchestratorService {
         this.metrics.totalFailed++;
       }
 
-      logger.info('Immediate delivery processed', { component: 'NotificationOrchestrator',
+      logger.info({ component: 'NotificationOrchestrator',
         user_id: request.user_id,
-        results: deliveryResults.map(r => ({ channel: r.channel, success: r.success  })),
+        results: deliveryResults.map(r => ({ channel: r.channel, success: r.success  }, 'Immediate delivery processed')),
         overallSuccess: anySucceeded
       });
 
@@ -948,21 +948,21 @@ export class NotificationOrchestratorService {
     // Add notification to batch
     batch.notifications.push(request);
 
-    logger.info('Added notification to batch', {
+    logger.info({
       component: 'NotificationOrchestrator',
       batchId: batch.id,
       batchSize: batch.notifications.length,
       scheduledFor: batch.scheduledFor.toISOString()
-    });
+    }, 'Added notification to batch');
 
     // Check if batch should be processed early due to size
     const maxBatchSize = combinedPrefs.billTracking.advancedSettings?.batchingRules?.maxBatchSize
       || this.config.batching.maxBatchSize;
 
     if (batch.notifications.length >= maxBatchSize) {
-      logger.info(`Batch ${batch.id} reached max size, processing early`, {
+      logger.info({
         component: 'NotificationOrchestrator'
-      });
+      }, `Batch ${batch.id} reached max size, processing early`);
       
       // Process batch asynchronously without blocking
       this.processBatch(batch).catch(err => {
@@ -990,10 +990,10 @@ export class NotificationOrchestratorService {
 
     // Respect concurrent batch processing limit
     if (this.processingBatches.size >= this.config.processing.maxConcurrentBatches) {
-      logger.warn('Max concurrent batch processing limit reached, deferring', {
+      logger.warn({
         component: 'NotificationOrchestrator',
         batchId: batch.id
-      });
+      }, 'Max concurrent batch processing limit reached, deferring');
       return;
     }
 
@@ -1001,11 +1001,11 @@ export class NotificationOrchestratorService {
     this.processingBatches.add(batch.id);
 
     try {
-      logger.info('Processing notification batch', {
+      logger.info({
         component: 'NotificationOrchestrator',
         batchId: batch.id,
         notificationCount: batch.notifications.length
-      });
+      }, 'Processing notification batch');
 
       // Fetch CURRENT preferences (not cached) for accurate delivery channel selection
       const currentCombinedPrefs = await this.getCombinedPreferences(batch.user_id);
@@ -1051,10 +1051,10 @@ export class NotificationOrchestratorService {
       if (result.success) {
         batch.status = 'sent';
         this.batches.delete(batch.id);
-        logger.info('Batch processed and sent successfully', {
+        logger.info({
           component: 'NotificationOrchestrator',
           batchId: batch.id
-        });
+        }, 'Batch processed and sent successfully');
       } else {
         // Handle failure with retry logic
         batch.status = 'failed';
@@ -1067,17 +1067,17 @@ export class NotificationOrchestratorService {
           batch.scheduledFor = new Date(
             Date.now() + Math.pow(2, batch.retryCount) * 60 * 1000
           );
-          logger.warn(`Batch processing failed, scheduled for retry at ${batch.scheduledFor.toISOString()}`, {
+          logger.warn({
             component: 'NotificationOrchestrator',
             batchId: batch.id,
             retryCount: batch.retryCount
-          });
+          }, `Batch processing failed, scheduled for retry at ${batch.scheduledFor.toISOString()}`);
         } else {
-          logger.error(`Batch processing failed after max retries, discarding`, {
+          logger.error({
             component: 'NotificationOrchestrator',
             batchId: batch.id,
             error: batch.lastError
-          });
+          }, `Batch processing failed after max retries, discarding`);
           this.batches.delete(batch.id);
         }
       }
@@ -1236,10 +1236,10 @@ export class NotificationOrchestratorService {
       }
     }, this.config.batching.checkIntervalMs);
 
-    logger.info('Batch processor started', {
+    logger.info({
       component: 'NotificationOrchestrator',
       intervalMs: this.config.batching.checkIntervalMs
-    });
+    }, 'Batch processor started');
   }
 
   /**
@@ -1259,10 +1259,10 @@ export class NotificationOrchestratorService {
       return;
     }
 
-    logger.info('Processing scheduled batches', {
+    logger.info({
       component: 'NotificationOrchestrator',
       count: dueBatches.length
-    });
+    }, 'Processing scheduled batches');
 
     // Process batches with concurrency control
     for (const batch of dueBatches) {
@@ -1295,10 +1295,10 @@ export class NotificationOrchestratorService {
       return;
     }
 
-    logger.info('Processing pending batches during shutdown', {
+    logger.info({
       component: 'NotificationOrchestrator',
       count: pendingBatches.length
-    });
+    }, 'Processing pending batches during shutdown');
 
     // Process all pending batches in parallel
     await Promise.allSettled(
@@ -1325,10 +1325,10 @@ export class NotificationOrchestratorService {
       }
       
       if (cleaned > 0) {
-        logger.debug('Cleaned expired rate limits', {
+        logger.debug({
           component: 'NotificationOrchestrator',
           count: cleaned
-        });
+        }, 'Cleaned expired rate limits');
       }
     }, this.config.cleanup.rateLimitCleanupIntervalMs);
 
@@ -1345,10 +1345,10 @@ export class NotificationOrchestratorService {
       }
       
       if (cleaned > 0) {
-        logger.debug('Cleaned old failed batches', {
+        logger.debug({
           component: 'NotificationOrchestrator',
           count: cleaned
-        });
+        }, 'Cleaned old failed batches');
       }
     }, this.config.cleanup.batchCleanupIntervalMs);
 

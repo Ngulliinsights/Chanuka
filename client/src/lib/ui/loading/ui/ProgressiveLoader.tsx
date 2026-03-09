@@ -57,7 +57,7 @@ export const ProgressiveLoader = React.memo<ProgressiveLoaderProps>(
 
         {/* Stage list */}
         <div className="w-full max-w-md space-y-2">
-          {stages.map((stage: unknown, index: number) => {
+          {stages.map((stage: any, index: number) => {
             const isCompleted = index < currentStage;
             const isCurrent = index === currentStage;
             const isPending = index > currentStage;

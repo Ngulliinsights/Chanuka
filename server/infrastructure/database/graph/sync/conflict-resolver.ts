@@ -15,7 +15,7 @@
 
 import { Driver } from 'neo4j-driver';
 import { withSession, withReadSession, executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -129,7 +129,7 @@ export async function detectDataDivergence(
       );
 
       if (graphResult.records.length === 0) {
-        logger.warn('Entity missing in graph', { entityType, entityId });
+        logger.warn({ entityType, entityId }, 'Entity missing in graph');
         return {
           conflict_id: `${entityType}_${entityId}_missing`,
           entity_type: entityType,
@@ -256,7 +256,7 @@ export async function resolveConflict(
     });
   }
 
-  logger.info('Resolving conflict', { conflictId, resolutionStrategy });
+  logger.info({ conflictId, resolutionStrategy }, 'Resolving conflict');
 
   try {
     const conflictDetails = await getConflictDetails(driver, conflictId);
@@ -304,7 +304,7 @@ export async function resolveConflict(
       );
     });
 
-    logger.info('Conflict resolved', { conflictId, changesApplied });
+    logger.info({ conflictId, changesApplied }, 'Conflict resolved');
 
     return {
       success: true,
@@ -477,7 +477,7 @@ export async function logConflict(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.info('Logged conflict', { conflictId: divergence.conflict_id });
+    logger.info({ conflictId: divergence.conflict_id }, 'Logged conflict');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'logConflict',
@@ -504,17 +504,17 @@ export async function resolvePendingConflicts(driver: Driver): Promise<number> {
           resolvedCount++;
         }
       } catch (error) {
-        logger.error('Failed to resolve conflict', {
+        logger.error({
           conflictId: conflict.conflict_id,
           error: error instanceof Error ? error.message : String(error),
-        });
+        }, 'Failed to resolve conflict');
       }
     }
 
-    logger.info('Resolved pending conflicts', { 
+    logger.info({ 
       total: unresolvedConflicts.length,
       resolved: resolvedCount 
-    });
+    }, 'Resolved pending conflicts');
 
     return resolvedCount;
   } catch (error) {

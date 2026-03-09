@@ -64,7 +64,7 @@ export interface ArgumentCluster {
   billId: string;
   name: string;
   description: string;
-  arguments: string[]; // argument IDs
+  argList: string[]; // argument IDs
   representativeClaims: Claim[];
   size: number;
   cohesion: number; // 0-1

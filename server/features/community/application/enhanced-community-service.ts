@@ -140,11 +140,11 @@ export class EnhancedCommunityService {
       // 5. Invalidate caches
       await this.invalidateCommentCaches(comment.id, sanitizedBillId);
 
-      logger.info('Comment created successfully', { 
+      logger.info({ 
         comment_id: comment.id,
         bill_id: sanitizedBillId,
         user_id: sanitizedUserId,
-      });
+      }, 'Comment created successfully');
 
       return comment;
     }, { service: 'EnhancedCommunityService', operation: 'createComment' });

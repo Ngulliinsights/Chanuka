@@ -3,20 +3,20 @@ import { pool } from '@server/infrastructure/database';
 
 export async function initializeDatabase(): Promise<boolean> {
   try {
-    logger.info("Initializing database connection", {
+    logger.info({
       component: "database",
       operation: "initialize"
-    });
+    }, "Initializing database connection");
 
     // Test basic connectivity
     const client = await pool.connect();
     await client.query('SELECT NOW()');
     client.release();
 
-    logger.info("Database connection successful", {
+    logger.info({
       component: "database",
       operation: "connect"
-    });
+    }, "Database connection successful");
 
     // Check if required tables exist
     const tableCheck = await pool.query(`
@@ -27,20 +27,20 @@ export async function initializeDatabase(): Promise<boolean> {
     `);
 
     if (tableCheck.rows.length < 4) {
-      logger.warn("Some required tables are missing. Running in sample data mode", {
+      logger.warn({
         component: "database",
         operation: "table_check",
         foundTables: tableCheck.rows.length,
         requiredTables: 4
-      });
+      }, "Some required tables are missing. Running in sample data mode");
       return false;
     }
 
-    logger.info("All required tables found", {
+    logger.info({
       component: "database",
       operation: "table_check",
       tableCount: tableCheck.rows.length
-    });
+    }, "All required tables found");
     return true;
 
   } catch (error) {
@@ -53,10 +53,10 @@ export async function initializeDatabase(): Promise<boolean> {
       detail: (error as Record<string, unknown>)?.detail
     });
 
-    logger.info("Falling back to sample data mode", {
+    logger.info({
       component: "database",
       operation: "fallback"
-    });
+    }, "Falling back to sample data mode");
     return false;
   }
 }

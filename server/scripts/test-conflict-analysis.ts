@@ -1,12 +1,13 @@
-import { sponsorConflictAnalysisService } from '@server/features/bills/sponsor-conflict-analysis';
+// FIXME: sponsor-conflict-analysis not implemented
+// import { sponsorConflictAnalysisService } from '@server/features/bills/sponsor-conflict-analysis';
 import { logger } from '@server/infrastructure/observability';
 
 async function testConflictAnalysis() {
-  logger.info('🔍 Testing Sponsor Conflict Analysis Service...\n', { component: 'Chanuka' });
+  logger.info({ component: 'Chanuka' }, '🔍 Testing Sponsor Conflict Analysis Service...\n');
 
   try {
     // Test 1: Severity Calculation
-    logger.info('1. Testing severity calculation...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '1. Testing severity calculation...');
     const criticalSeverity = sponsorConflictAnalysisService.calculateConflictSeverity(
       'financial_direct',
       15000000,
@@ -29,7 +30,7 @@ async function testConflictAnalysis() {
     console.log(`   Low conflict severity: ${lowSeverity}\n`);
 
     // Test 2: Conflict Detection
-    logger.info('2. Testing conflict detection...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '2. Testing conflict detection...');
     const conflicts = await sponsorConflictAnalysisService.detectConflicts();
     console.log(`   Detected ${conflicts.length} conflicts`);
     
@@ -49,7 +50,7 @@ async function testConflictAnalysis() {
     console.log();
 
     // Test 3: Conflict Mapping
-    logger.info('3. Testing conflict mapping...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '3. Testing conflict mapping...');
     const mapping = await sponsorConflictAnalysisService.createConflictMapping();
     console.log(`   Network has ${mapping.nodes.length} nodes and ${mapping.edges.length} edges`);
     console.log(`   Network density: ${Math.round(mapping.metrics.density * 100)}%`);
@@ -63,7 +64,7 @@ async function testConflictAnalysis() {
     console.log();
 
     // Test 4: Trend Analysis
-    logger.info('4. Testing trend analysis...', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '4. Testing trend analysis...');
     const trends = await sponsorConflictAnalysisService.analyzeConflictTrends(undefined, 6);
     console.log(`   Analyzed trends for ${trends.length} sponsors`);
     
@@ -82,8 +83,8 @@ async function testConflictAnalysis() {
     }
     console.log();
 
-    logger.info('✅ All tests completed successfully!', { component: 'Chanuka' });
-    logger.info('\n📊 Summary:', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '✅ All tests completed successfully!');
+    logger.info({ component: 'Chanuka' }, '\n📊 Summary:');
     console.log(`   - Conflict detection: ${conflicts.length} conflicts found`);
     console.log(`   - Network analysis: ${mapping.nodes.length} entities, ${mapping.edges.length} relationships`);
     console.log(`   - Trend analysis: ${trends.length} sponsors analyzed`);
@@ -97,7 +98,7 @@ async function testConflictAnalysis() {
 
 // Run the test
 testConflictAnalysis().then(() => {
-  logger.info('\n🎉 Test script completed', { component: 'Chanuka' });
+  logger.info({ component: 'Chanuka' }, '\n🎉 Test script completed');
   process.exit(0);
 }).catch((error) => {
   logger.error('💥 Test script failed:', { component: 'Chanuka' }, error);

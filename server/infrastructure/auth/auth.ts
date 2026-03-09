@@ -10,9 +10,12 @@
  */
 
 import { authService } from '@server/infrastructure/auth/auth-service';
-import { errorTracker } from '@server/errors/error-tracker';
+import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { securityAuditService } from '@server/features/security';
-import { authRateLimit, legacyPasswordResetRateLimit as passwordResetRateLimit, legacyRegistrationRateLimit as registrationRateLimit } from '@server/middleware/rate-limiter';
+import { standardRateLimits } from '@server/middleware/rate-limiter';
+const authRateLimit = standardRateLimits.auth;
+const registrationRateLimit = standardRateLimits.auth;
+const passwordResetRateLimit = standardRateLimits.auth;
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';

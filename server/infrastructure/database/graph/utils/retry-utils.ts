@@ -94,12 +94,12 @@ export async function retryWithBackoff<T>(
       // Calculate delay
       const delay = calculateDelay(attempt, finalConfig);
 
-      logger.debug('Retrying operation', {
+      logger.debug({
         attempt: attempt + 1,
         maxRetries: finalConfig.maxRetries,
         delay,
         error: (error as Error).message,
-      });
+      }, 'Retrying operation');
 
       // Call onRetry callback if provided
       if (finalConfig.onRetry) {
@@ -112,10 +112,10 @@ export async function retryWithBackoff<T>(
   }
 
   // All retries exhausted
-  logger.error('All retry attempts exhausted', {
+  logger.error({
     maxRetries: finalConfig.maxRetries,
     lastError: lastError?.message,
-  });
+  }, 'All retry attempts exhausted');
 
   throw lastError;
 }

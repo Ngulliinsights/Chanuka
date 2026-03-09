@@ -11,7 +11,7 @@ export class SessionCleanupService {
    */
   start(intervalMinutes: number = 60): void {
     if (this.isRunning) {
-      logger.info('Session cleanup service is already running', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Session cleanup service is already running');
       return;
     }
 
@@ -38,7 +38,7 @@ export class SessionCleanupService {
       this.cleanupInterval = null;
     }
     this.isRunning = false;
-    logger.info('🛑 Session cleanup service stopped', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, '🛑 Session cleanup service stopped');
   }
 
   /**
@@ -46,9 +46,9 @@ export class SessionCleanupService {
    */
   async runCleanup(): Promise<void> {
     try {
-      logger.info('🧹 Running session cleanup...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '🧹 Running session cleanup...');
       await authService.cleanupExpiredTokens();
-      logger.info('✅ Session cleanup completed', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, '✅ Session cleanup completed');
     } catch (error) {
       logger.error('❌ Session cleanup failed:', { component: 'Chanuka' }, error);
     }

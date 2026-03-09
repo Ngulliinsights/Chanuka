@@ -1,7 +1,7 @@
 // ============================================================================
 // ARGUMENT INTELLIGENCE - Quality Metrics Calculator
 // ============================================================================
-// Calculates quality metrics for arguments and debates
+// Calculates quality metrics for argList and debates
 
 import { logger } from '@server/infrastructure/observability';
 
@@ -96,10 +96,10 @@ export class QualityMetricsCalculator {
     const finalConfig = { ...this.defaultConfig, ...config };
 
     try {
-      logger.debug('Calculating argument quality', {
+      logger.debug({
         component: 'QualityMetricsCalculator',
         textLength: text.length
-      });
+      }, 'Calculating argument quality');
 
       // Calculate individual dimensions
       const clarity = this.calculateClarity(text);
@@ -137,19 +137,19 @@ export class QualityMetricsCalculator {
         result.details = this.calculateDetailedMetrics(text);
       }
 
-      logger.debug('Quality metrics calculated', {
+      logger.debug({
         component: 'QualityMetricsCalculator',
         overallScore,
         confidence
-      });
+      }, 'Quality metrics calculated');
 
       return result;
 
     } catch (error) {
-      logger.error('Quality metrics calculation failed', {
+      logger.error({
         component: 'QualityMetricsCalculator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Quality metrics calculation failed');
 
       return {
         overallScore: 0,
@@ -169,28 +169,28 @@ export class QualityMetricsCalculator {
    * Calculate quality metrics for a debate/discussion
    */
   async calculateDebateQuality(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>,
+    argList: Array<{ text: string; userId: string; timestamp: Date }>,
     config: Partial<QualityConfig> = {}
   ): Promise<DebateQualityMetrics> {
     const finalConfig = { ...this.defaultConfig, ...config };
 
     try {
-      logger.debug('Calculating debate quality', {
+      logger.debug({
         component: 'QualityMetricsCalculator',
-        argumentCount: arguments.length
-      });
+        argumentCount: argList.length
+      }, 'Calculating debate quality');
 
       // Calculate individual argument qualities
       const argumentQualities = await Promise.all(
-        arguments.map(arg => this.calculateArgumentQuality(arg.text, config))
+        argList.map(arg => this.calculateArgumentQuality(arg.text, config))
       );
 
       // Calculate debate-level metrics
-      const diversity = this.calculateDiversity(arguments);
-      const depth = this.calculateDepth(arguments, argumentQualities);
-      const civility = this.calculateCivility(arguments);
+      const diversity = this.calculateDiversity(argList);
+      const depth = this.calculateDepth(argList, argumentQualities);
+      const civility = this.calculateCivility(argList);
       const evidenceQuality = this.calculateAverageEvidenceQuality(argumentQualities);
-      const participationBalance = this.calculateParticipationBalance(arguments);
+      const participationBalance = this.calculateParticipationBalance(argList);
 
       // Calculate overall quality
       const overallQuality = this.calculateDebateOverallQuality({
@@ -213,28 +213,28 @@ export class QualityMetricsCalculator {
       // Add details if requested
       if (finalConfig.includeDetails) {
         result.details = {
-          totalArguments: arguments.length,
-          uniqueParticipants: new Set(arguments.map(a => a.userId)).size,
+          totalArguments: argList.length,
+          uniqueParticipants: new Set(argList.map(a => a.userId)).size,
           averageArgumentQuality: argumentQualities.reduce((sum, q) => sum + q.overallScore, 0) / argumentQualities.length,
           perspectiveDiversity: diversity,
-          threadDepth: this.calculateThreadDepth(arguments),
-          civilityViolations: this.countCivilityViolations(arguments)
+          threadDepth: this.calculateThreadDepth(argList),
+          civilityViolations: this.countCivilityViolations(argList)
         };
       }
 
-      logger.debug('Debate quality calculated', {
+      logger.debug({
         component: 'QualityMetricsCalculator',
         overallQuality,
-        argumentCount: arguments.length
-      });
+        argumentCount: argList.length
+      }, 'Debate quality calculated');
 
       return result;
 
     } catch (error) {
-      logger.error('Debate quality calculation failed', {
+      logger.error({
         component: 'QualityMetricsCalculator',
         error: error instanceof Error ? error.message : String(error)
-      });
+      }, 'Debate quality calculation failed');
 
       return {
         overallQuality: 0,
@@ -367,7 +367,7 @@ export class QualityMetricsCalculator {
     const relevantWordCount = words.filter(w => policyTerms.has(w.toLowerCase())).length;
     const relevanceRatio = relevantWordCount / words.length;
 
-    // Penalize very short arguments
+    // Penalize very short argList
     const lengthPenalty = words.length < 10 ? 0.5 : 1.0;
 
     return Math.min(1.0, relevanceRatio * 10 * lengthPenalty);
@@ -446,14 +446,14 @@ export class QualityMetricsCalculator {
   // Private calculation methods for debate quality
 
   private calculateDiversity(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>
+    argList: Array<{ text: string; userId: string; timestamp: Date }>
   ): number {
     // Measure diversity of perspectives
-    const uniqueUsers = new Set(arguments.map(a => a.userId)).size;
-    const userDiversity = Math.min(1.0, uniqueUsers / Math.max(1, arguments.length));
+    const uniqueUsers = new Set(argList.map(a => a.userId)).size;
+    const userDiversity = Math.min(1.0, uniqueUsers / Math.max(1, argList.length));
 
     // Measure vocabulary diversity (simplified)
-    const allWords = arguments.flatMap(a => this.tokenize(a.text));
+    const allWords = argList.flatMap(a => this.tokenize(a.text));
     const uniqueWords = new Set(allWords.map(w => w.toLowerCase()));
     const vocabularyDiversity = Math.min(1.0, uniqueWords.size / Math.max(1, allWords.length) * 2);
 
@@ -461,31 +461,31 @@ export class QualityMetricsCalculator {
   }
 
   private calculateDepth(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>,
+    argList: Array<{ text: string; userId: string; timestamp: Date }>,
     qualities: QualityMetrics[]
   ): number {
-    if (arguments.length === 0) return 0;
+    if (argList.length === 0) return 0;
 
     // Average argument length
-    const avgLength = arguments.reduce((sum, a) => sum + this.tokenize(a.text).length, 0) / arguments.length;
+    const avgLength = argList.reduce((sum, a) => sum + this.tokenize(a.text).length, 0) / argList.length;
     const lengthScore = Math.min(1.0, avgLength / 100);
 
     // Average quality
     const avgQuality = qualities.reduce((sum, q) => sum + q.overallScore, 0) / qualities.length;
 
-    // Number of arguments (more = deeper discussion)
-    const volumeScore = Math.min(1.0, arguments.length / 20);
+    // Number of argList (more = deeper discussion)
+    const volumeScore = Math.min(1.0, argList.length / 20);
 
     return (lengthScore * 0.3 + avgQuality * 0.5 + volumeScore * 0.2);
   }
 
   private calculateCivility(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>
+    argList: Array<{ text: string; userId: string; timestamp: Date }>
   ): number {
-    if (arguments.length === 0) return 1.0;
+    if (argList.length === 0) return 1.0;
 
-    const violations = this.countCivilityViolations(arguments);
-    const violationRate = violations / arguments.length;
+    const violations = this.countCivilityViolations(argList);
+    const violationRate = violations / argList.length;
 
     // Exponential penalty for violations
     return Math.max(0, 1.0 - violationRate * 2);
@@ -497,13 +497,13 @@ export class QualityMetricsCalculator {
   }
 
   private calculateParticipationBalance(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>
+    argList: Array<{ text: string; userId: string; timestamp: Date }>
   ): number {
-    if (arguments.length === 0) return 1.0;
+    if (argList.length === 0) return 1.0;
 
-    // Count arguments per user
+    // Count argList per user
     const userCounts = new Map<string, number>();
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       userCounts.set(arg.userId, (userCounts.get(arg.userId) || 0) + 1);
     });
 
@@ -539,18 +539,18 @@ export class QualityMetricsCalculator {
   }
 
   private calculateThreadDepth(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>
+    argList: Array<{ text: string; userId: string; timestamp: Date }>
   ): number {
     // Simplified thread depth calculation
     // In a real implementation, would analyze reply chains
-    return Math.min(10, Math.floor(arguments.length / 3));
+    return Math.min(10, Math.floor(argList.length / 3));
   }
 
   private countCivilityViolations(
-    arguments: Array<{ text: string; userId: string; timestamp: Date }>
+    argList: Array<{ text: string; userId: string; timestamp: Date }>
   ): number {
     let violations = 0;
-    arguments.forEach(arg => {
+    argList.forEach(arg => {
       const lowerText = arg.text.toLowerCase();
       this.civilityViolations.forEach(violation => {
         if (lowerText.includes(violation)) {

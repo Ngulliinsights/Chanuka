@@ -85,10 +85,10 @@ export class CommunityApplicationService {
     return safeAsync(async () => {
       const validatedInput = await validateData(CreateCommentSchema, input);
       
-      logger.info('Creating comment', {
+      logger.info({
         bill_id: validatedInput.bill_id,
         has_parent: !!validatedInput.parent_id,
-      });
+      }, 'Creating comment');
       
       // Create comment in database
       const commentResult = await this.commentRepo.create({
@@ -119,11 +119,11 @@ export class CommunityApplicationService {
         cacheService.delete(cacheKeys.query('debate-quality', { bill_id: validatedInput.bill_id })),
       ]);
       
-      logger.info('Comment created', {
+      logger.info({
         comment_id: comment.id,
         quality_score: analysis?.quality_metrics.overall_score,
         has_fallacies: (analysis?.structure.fallacies.length || 0) > 0,
-      });
+      }, 'Comment created');
       
       return {
         ...comment,
@@ -311,11 +311,11 @@ export class CommunityApplicationService {
     return safeAsync(async () => {
       const validatedInput = await validateData(VoteCommentSchema, input);
       
-      logger.info('Processing vote', {
+      logger.info({
         comment_id: validatedInput.comment_id,
         vote: validatedInput.vote,
         has_reason: !!validatedInput.reason,
-      });
+      }, 'Processing vote');
       
       // Record vote in database
       const voteResult = await this.commentRepo.vote(validatedInput.comment_id, validatedInput.vote);

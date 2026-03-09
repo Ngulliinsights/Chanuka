@@ -1,6 +1,6 @@
 # Core 8 Features Definition & Status
 
-**Extracted From:** FINAL_MVP_STATUS_REPORT.md (March 3, 2026)  
+**Last Updated:** March 9, 2026  
 **Purpose:** Define MVP scope and track feature integration progress  
 **For Questions About:** What features exist, what needs building, integration status
 
@@ -8,9 +8,24 @@
 
 ## Overview
 
-The Chanuka platform has **8 core features** serving as hubs for different user interactions. All have **server-side infrastructure** complete but lack **client-side integration** and **shared types**.
+The Chanuka platform has **8 core MVP features** serving as hubs for different user interactions. All have **server-side infrastructure** complete and **DEMO-READY** but lack **client-side integration** and **shared types**.
 
-**Current Integration Score:** 33% (server only, client and shared types incomplete)
+**Server Status:** ✅ DEMO-READY (2,015 non-blocking TypeScript errors)  
+**Current Integration Score:** 33% (server functional, client and shared types incomplete)
+
+### The 8 Core MVP Features
+
+**Tier 0: Critical Foundation**
+1. Bills - View, list, filter, track legislative bills
+2. Users - Authentication, profiles, permissions
+3. Search - Bill search, filtering, advanced queries
+4. Notifications - Real-time alerts, message delivery, preferences
+
+**Tier 1: Core Engagement**
+5. Community - Comments, voting, discussion threads
+6. Sponsors - Bill sponsors, political entities, funding tracking (absorbed accountability)
+7. Recommendation - Personalized bill recommendations
+8. Analysis - Bill impact analysis, comprehensive assessment (renamed from bill-assessment)
 
 ---
 

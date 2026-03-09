@@ -113,7 +113,7 @@ export class DisclosureProcessingService {
         .from(sponsorAffiliations)
         .where(eq(sponsorAffiliations.sponsor_id, sponsor_id));
     } catch (error) {
-      logger.warn('Failed to fetch affiliations:', { sponsor_id, error });
+      logger.warn({ sponsor_id, error }, 'Failed to fetch affiliations:');
       return [];
     }
   }

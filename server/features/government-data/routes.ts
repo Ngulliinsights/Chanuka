@@ -300,11 +300,11 @@ export class KenyanGovernmentDataIntegrationService {
     // Determine which sources to use based on options and configuration
     const sourcesToUse = this.getActiveSources(options.sources);
     
-    logger.info('Starting bill integration', {
+    logger.info({
       sources: sourcesToUse.map(s => s.name),
       since: options.since,
       dryRun: options.dryRun
-    });
+    }, 'Starting bill integration');
 
     // Process each source sequentially to respect rate limits
     for (const source of sourcesToUse) {
@@ -314,16 +314,16 @@ export class KenyanGovernmentDataIntegrationService {
         const result = await this.integrateBillsFromSource(source.name, options);
         results.push(result);
         
-        logger.info(`Completed integration from ${source.name}`, {
+        logger.info({
           itemsProcessed: result.itemsProcessed,
           duration: result.duration
-        });
+        }, `Completed integration from ${source.name}`);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         
-        logger.error(`Failed to integrate from ${source.name}`, {
+        logger.error({
           error: errorMessage
-        });
+        }, `Failed to integrate from ${source.name}`);
         
         results.push({
           source: source.name,
@@ -354,10 +354,10 @@ export class KenyanGovernmentDataIntegrationService {
     const results: IntegrationResult[] = [];
     const sourcesToUse = this.getActiveSources(options.sources);
     
-    logger.info('Starting sponsor integration', {
+    logger.info({
       sources: sourcesToUse.map(s => s.name),
       dryRun: options.dryRun
-    });
+    }, 'Starting sponsor integration');
 
     for (const source of sourcesToUse) {
       const startTime = Date.now();
@@ -368,9 +368,9 @@ export class KenyanGovernmentDataIntegrationService {
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         
-        logger.error(`Failed to integrate sponsors from ${source.name}`, {
+        logger.error({
           error: errorMessage
-        });
+        }, `Failed to integrate sponsors from ${source.name}`);
         
         results.push({
           source: source.name,
@@ -644,12 +644,12 @@ export class KenyanGovernmentDataIntegrationService {
 
   private async createBill(bill: KenyanBill): Promise<void> {
     // Create bill record in database
-    logger.info('Creating bill', { bill_number: bills.bill_number });
+    logger.info({ bill_number: bills.bill_number }, 'Creating bill');
   }
 
   private async updateBill(id: string, bill: KenyanBill): Promise<boolean> {
     // Update bill record in database
-    logger.info('Updating bill', { id, bill_number: bills.bill_number });
+    logger.info({ id, bill_number: bills.bill_number }, 'Updating bill');
     return true;
   }
 
@@ -658,11 +658,11 @@ export class KenyanGovernmentDataIntegrationService {
   }
 
   private async createSponsor(sponsor: BillSponsor): Promise<void> {
-    logger.info('Creating sponsor', { sponsor_id: sponsors.id });
+    logger.info({ sponsor_id: sponsors.id }, 'Creating sponsor');
   }
 
   private async updateSponsor(id: string, sponsor: BillSponsor): Promise<boolean> {
-    logger.info('Updating sponsor', { id, sponsor_id: sponsors.id });
+    logger.info({ id, sponsor_id: sponsors.id }, 'Updating sponsor');
     return true;
   }
 

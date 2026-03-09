@@ -60,11 +60,11 @@ export class AdvocacyMonitoring {
   recordCampaignCreated(campaignId: string, status: string): void {
     this.metrics.campaigns.set(`${status}_count`, (this.metrics.campaigns.get(`${status}_count`) || 0) + 1);
     
-    logger.info('Campaign created', {
+    logger.info({
       component: 'AdvocacyMonitoring',
       campaignId,
       status,
-    });
+    }, 'Campaign created');
   }
 
   /**
@@ -74,12 +74,12 @@ export class AdvocacyMonitoring {
     this.metrics.campaigns.set(`${oldStatus}_count`, (this.metrics.campaigns.get(`${oldStatus}_count`) || 1) - 1);
     this.metrics.campaigns.set(`${newStatus}_count`, (this.metrics.campaigns.get(`${newStatus}_count`) || 0) + 1);
     
-    logger.info('Campaign status changed', {
+    logger.info({
       component: 'AdvocacyMonitoring',
       campaignId,
       oldStatus,
       newStatus,
-    });
+    }, 'Campaign status changed');
   }
 
   /**
@@ -89,11 +89,11 @@ export class AdvocacyMonitoring {
     this.metrics.actions.set('completed', (this.metrics.actions.get('completed') || 0) + 1);
     this.metrics.actions.set('total_time', (this.metrics.actions.get('total_time') || 0) + timeToComplete);
     
-    logger.info('Action completed', {
+    logger.info({
       component: 'AdvocacyMonitoring',
       actionId,
       timeToComplete,
-    });
+    }, 'Action completed');
   }
 
   /**
@@ -102,12 +102,12 @@ export class AdvocacyMonitoring {
   recordImpact(campaignId: string, impactType: string, value: number): void {
     this.metrics.impacts++;
     
-    logger.info('Impact recorded', {
+    logger.info({
       component: 'AdvocacyMonitoring',
       campaignId,
       impactType,
       value,
-    });
+    }, 'Impact recorded');
   }
 
   /**
@@ -121,12 +121,12 @@ export class AdvocacyMonitoring {
       this.metrics.errors++;
     }
     
-    logger.debug('API call recorded', {
+    logger.debug({
       component: 'AdvocacyMonitoring',
       endpoint,
       responseTime,
       success,
-    });
+    }, 'API call recorded');
   }
 
   /**
@@ -135,11 +135,11 @@ export class AdvocacyMonitoring {
   recordError(error: Error, context: Record<string, any>): void {
     this.metrics.errors++;
     
-    logger.error('Advocacy error recorded', {
+    logger.error({
       component: 'AdvocacyMonitoring',
       error: error.message,
       ...context,
-    });
+    }, 'Advocacy error recorded');
   }
 
   /**
@@ -192,9 +192,9 @@ export class AdvocacyMonitoring {
       totalResponseTime: 0,
     };
     
-    logger.info('Advocacy monitoring metrics reset', {
+    logger.info({
       component: 'AdvocacyMonitoring',
-    });
+    }, 'Advocacy monitoring metrics reset');
   }
 
   /**

@@ -1,16 +1,21 @@
-import { Router } from 'express';
+import { Router, type Request, type Response } from 'express';
 import { translationService } from './services/translation-service';
 import { impactCalculator } from './services/impact-calculator';
 
-export const translationRouter = Router();
+export const translationRouter: Router = Router();
 
 /**
  * POST /api/bills/:billId/translate
  * Translate bill clauses to plain language
  */
-translationRouter.post('/:billId/translate', async (req, res) => {
+translationRouter.post('/:billId/translate', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { billId } = req.params;
+    const billId = req.params.billId;
+    if (!billId) {
+      res.status(400).json({ error: 'billId is required' });
+      return;
+    }
+    
     const { clauseRef, fullBill } = req.body;
 
     const translation = await translationService.translate({
@@ -33,9 +38,14 @@ translationRouter.post('/:billId/translate', async (req, res) => {
  * GET /api/bills/:billId/clauses
  * Get available clauses for translation
  */
-translationRouter.get('/:billId/clauses', async (req, res) => {
+translationRouter.get('/:billId/clauses', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { billId } = req.params;
+    const billId = req.params.billId;
+    if (!billId) {
+      res.status(400).json({ error: 'billId is required' });
+      return;
+    }
+    
     const clauses = await translationService.getAvailableClauses(billId);
     res.json({ clauses });
   } catch (error: any) {
@@ -51,9 +61,14 @@ translationRouter.get('/:billId/clauses', async (req, res) => {
  * POST /api/bills/:billId/calculate-impact
  * Calculate personal impact of a bill
  */
-translationRouter.post('/:billId/calculate-impact', async (req, res) => {
+translationRouter.post('/:billId/calculate-impact', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { billId } = req.params;
+    const billId = req.params.billId;
+    if (!billId) {
+      res.status(400).json({ error: 'billId is required' });
+      return;
+    }
+    
     const userContext = req.body;
 
     const impact = await impactCalculator.calculateImpact({

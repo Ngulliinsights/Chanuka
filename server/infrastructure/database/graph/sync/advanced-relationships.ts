@@ -15,7 +15,7 @@
 
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
@@ -109,7 +109,7 @@ export async function createOrUpdateFinancialInterest(
       () => executeCypherSafely(driver, cypher, { personId, orgId, interest }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created financial interest', { personId, orgId, type: interest.type });
+    logger.debug({ personId, orgId, type: interest.type }, 'Created financial interest');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createOrUpdateFinancialInterest', personId, orgId });
     throw new GraphError({
@@ -140,7 +140,7 @@ export async function createOrUpdateLobbyingRelationship(
       () => executeCypherSafely(driver, cypher, { orgId, personId, lobbying }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created lobbying relationship', { orgId, personId });
+    logger.debug({ orgId, personId }, 'Created lobbying relationship');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createOrUpdateLobbyingRelationship', orgId, personId });
     throw new GraphError({
@@ -171,7 +171,7 @@ export async function createMediaInfluenceRelationship(
       () => executeCypherSafely(driver, cypher, { mediaOrgId, personId, influence }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created media influence relationship', { mediaOrgId, personId });
+    logger.debug({ mediaOrgId, personId }, 'Created media influence relationship');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createMediaInfluenceRelationship', mediaOrgId, personId });
     throw new GraphError({
@@ -202,7 +202,7 @@ export async function createCampaignContributionRelationship(
       () => executeCypherSafely(driver, cypher, { donorId, personId, contribution }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created campaign contribution', { donorId, personId, amount: contribution.amount });
+    logger.debug({ donorId, personId, amount: contribution.amount }, 'Created campaign contribution');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createCampaignContributionRelationship', donorId, personId });
     throw new GraphError({
@@ -233,7 +233,7 @@ export async function createOrUpdateVotingCoalition(
       () => executeCypherSafely(driver, cypher, { person1Id, person2Id, coalition }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created voting coalition', { person1Id, person2Id });
+    logger.debug({ person1Id, person2Id }, 'Created voting coalition');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createOrUpdateVotingCoalition', person1Id, person2Id });
     throw new GraphError({
@@ -266,7 +266,7 @@ export async function createProfessionalNetworkRelationship(
       () => executeCypherSafely(driver, cypher, { person1Id, person2Id, connectionType, startDate: startDate || new Date().toISOString() }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created professional network', { person1Id, person2Id, connectionType });
+    logger.debug({ person1Id, person2Id, connectionType }, 'Created professional network');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createProfessionalNetworkRelationship', person1Id, person2Id });
     throw new GraphError({
@@ -299,7 +299,7 @@ export async function createPolicyInfluenceRelationship(
       () => executeCypherSafely(driver, cypher, { orgId, billId, influenceScore, methods }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created policy influence', { orgId, billId, influenceScore });
+    logger.debug({ orgId, billId, influenceScore }, 'Created policy influence');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createPolicyInfluenceRelationship', orgId, billId });
     throw new GraphError({
@@ -330,7 +330,7 @@ export async function createMediaCoverageRelationship(
       () => executeCypherSafely(driver, cypher, { mediaOrgId, billId, coverage }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created media coverage', { mediaOrgId, billId });
+    logger.debug({ mediaOrgId, billId }, 'Created media coverage');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createMediaCoverageRelationship', mediaOrgId, billId });
     throw new GraphError({
@@ -361,7 +361,7 @@ export async function createExpertOpinionRelationship(
       () => executeCypherSafely(driver, cypher, { expertId, billId, opinion }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created expert opinion', { expertId, billId });
+    logger.debug({ expertId, billId }, 'Created expert opinion');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createExpertOpinionRelationship', expertId, billId });
     throw new GraphError({
@@ -397,7 +397,7 @@ export async function createSectorInfluenceRelationship(
       () => executeCypherSafely(driver, cypher, { industryTag, billId, impact }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created sector influence', { industryTag, billId });
+    logger.debug({ industryTag, billId }, 'Created sector influence');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createSectorInfluenceRelationship', industryTag, billId });
     throw new GraphError({
@@ -433,7 +433,7 @@ export async function createStakeholderInfluenceRelationship(
       () => executeCypherSafely(driver, cypher, { stakeholderId, billId, influence }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created stakeholder influence', { stakeholderId, billId });
+    logger.debug({ stakeholderId, billId }, 'Created stakeholder influence');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createStakeholderInfluenceRelationship', stakeholderId, billId });
     throw new GraphError({
@@ -470,7 +470,7 @@ export async function createCrossPartyAllianceRelationship(
       () => executeCypherSafely(driver, cypher, { person1Id, person2Id, alliance }),
       RETRY_PRESETS.DATABASE_OPERATION
     );
-    logger.debug('Created cross-party alliance', { person1Id, person2Id });
+    logger.debug({ person1Id, person2Id }, 'Created cross-party alliance');
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'createCrossPartyAllianceRelationship', person1Id, person2Id });
     throw new GraphError({

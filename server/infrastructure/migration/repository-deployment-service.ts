@@ -15,7 +15,8 @@ import {
   AsyncServiceResult, 
   ResultAdapter, 
   withResultHandling} from '@server/infrastructure/error-handling';
-import { monitorOperation,performanceMonitor } from '@shared/monitoring/performance-monitor';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { monitorOperation,performanceMonitor } from '@shared/monitoring/performance-monitor';
 
 // Types for deployment and validation
 export interface DeploymentMetrics {
@@ -235,10 +236,10 @@ export class RepositoryDeploymentService {
    */
   async deployRepositoryMigration(): AsyncServiceResult<DeploymentStatus> {
     return withResultHandling(async () => {
-      logger.info('Starting repository migration deployment', { 
+      logger.info({ 
         component: 'RepositoryDeploymentService',
         operation: 'deployRepositoryMigration'
-      });
+      }, 'Starting repository migration deployment');
 
       // Initialize deployment status
       this.deploymentStatus = {
@@ -270,11 +271,11 @@ export class RepositoryDeploymentService {
         this.deploymentStatus.phase = 'completed';
         this.deploymentStatus.completionTime = new Date();
 
-        logger.info('Repository migration deployment completed successfully', {
+        logger.info({
           component: 'RepositoryDeploymentService',
           duration: Date.now() - this.deploymentStatus.startTime.getTime(),
           rolloutPercentage: this.deploymentStatus.rolloutPercentage
-        });
+        }, 'Repository migration deployment completed successfully');
 
         return this.deploymentStatus;
 
@@ -282,11 +283,11 @@ export class RepositoryDeploymentService {
         this.deploymentStatus.phase = 'failed';
         this.deploymentStatus.completionTime = new Date();
         
-        logger.error('Repository migration deployment failed', {
+        logger.error({
           component: 'RepositoryDeploymentService',
           error: error instanceof Error ? error.message : 'Unknown error',
           phase: this.deploymentStatus.phase
-        });
+        }, 'Repository migration deployment failed');
 
         // Trigger automatic rollback if configured
         await this.handleDeploymentFailure(error);
@@ -303,9 +304,9 @@ export class RepositoryDeploymentService {
       'RepositoryDeploymentService',
       'establishBaselines',
       async () => {
-        logger.info('Establishing performance and complexity baselines', {
+        logger.info({
           component: 'RepositoryDeploymentService'
-        });
+        }, 'Establishing performance and complexity baselines');
 
         // Collect performance baseline
         this.performanceBaseline = await this.collectPerformanceBaseline();
@@ -345,11 +346,11 @@ export class RepositoryDeploymentService {
         this.validationCheckpoints.push(checkpoint);
         this.deploymentStatus!.validationCheckpoints.push(checkpoint);
 
-        logger.info('Baselines established successfully', {
+        logger.info({
           component: 'RepositoryDeploymentService',
           performanceBaseline: this.performanceBaseline,
           complexityBaseline: this.complexityBaseline
-        });
+        }, 'Baselines established successfully');
       }
     );
   }
@@ -367,10 +368,10 @@ export class RepositoryDeploymentService {
         const rolloutStages = [1, 5, 10, 25, 50, 100];
         
         for (const percentage of rolloutStages) {
-          logger.info(`Deploying to ${percentage}% of traffic`, {
+          logger.info({
             component: 'RepositoryDeploymentService',
             rolloutPercentage: percentage
-          });
+          }, `Deploying to ${percentage}% of traffic`);
 
           // Update rollout percentage
           this.deploymentStatus!.rolloutPercentage = percentage;
@@ -393,10 +394,10 @@ export class RepositoryDeploymentService {
             throw new Error(`Rollback triggered at ${percentage}% deployment`);
           }
 
-          logger.info(`Successfully deployed to ${percentage}% of traffic`, {
+          logger.info({
             component: 'RepositoryDeploymentService',
             rolloutPercentage: percentage
-          });
+          }, `Successfully deployed to ${percentage}% of traffic`);
         }
       }
     );
@@ -412,9 +413,9 @@ export class RepositoryDeploymentService {
       async () => {
         this.deploymentStatus!.phase = 'validation';
 
-        logger.info('Executing comprehensive validation', {
+        logger.info({
           component: 'RepositoryDeploymentService'
-        });
+        }, 'Executing comprehensive validation');
 
         // Data integrity validation
         await this.validateDataIntegrity();
@@ -428,10 +429,10 @@ export class RepositoryDeploymentService {
         // System stability validation
         await this.validateSystemStability();
 
-        logger.info('Comprehensive validation completed', {
+        logger.info({
           component: 'RepositoryDeploymentService',
           checkpointsCount: this.validationCheckpoints.length
-        });
+        }, 'Comprehensive validation completed');
       }
     );
   }
@@ -444,9 +445,9 @@ export class RepositoryDeploymentService {
       'RepositoryDeploymentService',
       'validatePerformanceAndComplexity',
       async () => {
-        logger.info('Validating performance improvement and complexity reduction', {
+        logger.info({
           component: 'RepositoryDeploymentService'
-        });
+        }, 'Validating performance improvement and complexity reduction');
 
         // Collect current performance metrics
         const currentPerformance = await this.collectPerformanceBaseline();
@@ -474,11 +475,11 @@ export class RepositoryDeploymentService {
         await this.validatePerformanceRequirements(performanceImprovement);
         await this.validateComplexityRequirements(complexityReduction);
 
-        logger.info('Performance and complexity validation completed', {
+        logger.info({
           component: 'RepositoryDeploymentService',
           performanceImprovement: performanceImprovement.improvementPercentage,
           complexityReduction: complexityReduction.reductionPercentage
-        });
+        }, 'Performance and complexity validation completed');
       }
     );
   }
@@ -491,9 +492,9 @@ export class RepositoryDeploymentService {
       'RepositoryDeploymentService',
       'executeCrossPhaseValidation',
       async () => {
-        logger.info('Executing cross-phase validation', {
+        logger.info({
           component: 'RepositoryDeploymentService'
-        });
+        }, 'Executing cross-phase validation');
 
         const crossPhaseResult = await this.validateCrossPhaseConsistency();
         
@@ -537,10 +538,10 @@ export class RepositoryDeploymentService {
           throw new Error(`Cross-phase validation failed: ${crossPhaseResult.overallConsistency * 100}% consistency`);
         }
 
-        logger.info('Cross-phase validation completed successfully', {
+        logger.info({
           component: 'RepositoryDeploymentService',
           overallConsistency: crossPhaseResult.overallConsistency
-        });
+        }, 'Cross-phase validation completed successfully');
       }
     );
   }
@@ -572,10 +573,10 @@ export class RepositoryDeploymentService {
    */
   async triggerRollback(reason: string): AsyncServiceResult<void> {
     return withResultHandling(async () => {
-      logger.warn('Manual rollback triggered', {
+      logger.warn({
         component: 'RepositoryDeploymentService',
         reason
-      });
+      }, 'Manual rollback triggered');
 
       if (this.deploymentStatus) {
         this.deploymentStatus.phase = 'rolled_back';
@@ -594,10 +595,10 @@ export class RepositoryDeploymentService {
       // Execute rollback procedures
       await this.executeRollback(reason);
 
-      logger.info('Rollback completed', {
+      logger.info({
         component: 'RepositoryDeploymentService',
         reason
-      });
+      }, 'Rollback completed');
     }, { service: 'RepositoryDeploymentService', operation: 'triggerRollback' });
   }
 
@@ -801,10 +802,10 @@ export class RepositoryDeploymentService {
     // Simulate deployment to percentage of traffic
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    logger.info(`Deployed to ${percentage}% of traffic`, {
+    logger.info({
       component: 'RepositoryDeploymentService',
       rolloutPercentage: percentage
-    });
+    }, `Deployed to ${percentage}% of traffic`);
   }
 
   private async waitForStabilization(percentage: number): Promise<void> {
@@ -901,12 +902,12 @@ export class RepositoryDeploymentService {
         trigger.triggered = true;
         trigger.timestamp = new Date();
 
-        logger.warn('Rollback trigger activated', {
+        logger.warn({
           component: 'RepositoryDeploymentService',
           trigger: trigger.condition,
           currentValue: trigger.currentValue,
           threshold: trigger.threshold
-        });
+        }, 'Rollback trigger activated');
 
         if (trigger.action === 'automatic_rollback') {
           return true;
@@ -1119,10 +1120,10 @@ export class RepositoryDeploymentService {
   }
 
   private async handleDeploymentFailure(error: unknown): Promise<void> {
-    logger.error('Handling deployment failure', {
+    logger.error({
       component: 'RepositoryDeploymentService',
       error: error instanceof Error ? error.message : 'Unknown error'
-    });
+    }, 'Handling deployment failure');
 
     // Check if automatic rollback is configured
     const automaticRollbackTrigger = this.deploymentStatus!.rollbackTriggers.find(
@@ -1135,18 +1136,18 @@ export class RepositoryDeploymentService {
   }
 
   private async executeRollback(reason: string): Promise<void> {
-    logger.info('Executing rollback', {
+    logger.info({
       component: 'RepositoryDeploymentService',
       reason
-    });
+    }, 'Executing rollback');
 
     // Simulate rollback procedures
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    logger.info('Rollback completed', {
+    logger.info({
       component: 'RepositoryDeploymentService',
       reason
-    });
+    }, 'Rollback completed');
   }
 }
 

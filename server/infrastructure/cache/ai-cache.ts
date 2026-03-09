@@ -12,7 +12,7 @@
 // CacheHealthStatus is not used in this file
 import { performance } from 'perf_hooks';
 
-import { logger } from '../../../core/src/index';
+import { logger } from '@shared/core';
 
 import { cacheFactory } from './simple-factory';
 import { CacheService } from './types';

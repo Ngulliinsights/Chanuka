@@ -12,7 +12,7 @@
 
 import { Response, Router } from 'express';
 import { z } from 'zod';
-import { asyncHandler } from '@/middleware/error-management';
+import { asyncHandler } from '@server/middleware/error-management';
 import { boomFromStandardized } from '@server/infrastructure/error-handling';
 import { verificationService } from './VerificationService';
 

@@ -21,7 +21,7 @@
 
 import type { Driver } from 'neo4j-driver';
 import { withWriteSession, withReadSession, executeCypherSafely } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter-v2';
+import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { ENGAGEMENT_CONFIG } from '../config/graph-config';
 
@@ -168,7 +168,7 @@ export async function syncVoteRelationship(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced vote relationship', { userId, billId, voteType });
+    logger.debug({ userId, billId, voteType }, 'Synced vote relationship');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncVoteRelationship',
@@ -241,7 +241,7 @@ export async function syncCommentEvent(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced comment event', { commentId: comment.id, userId: comment.user_id });
+    logger.debug({ commentId: comment.id, userId: comment.user_id }, 'Synced comment event');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncCommentEvent',
@@ -301,7 +301,7 @@ export async function syncBookmarkRelationship(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced bookmark relationship', { userId, billId });
+    logger.debug({ userId, billId }, 'Synced bookmark relationship');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncBookmarkRelationship',
@@ -378,7 +378,7 @@ export async function syncFollowRelationship(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced follow relationship', { userId, targetId, targetType });
+    logger.debug({ userId, targetId, targetType }, 'Synced follow relationship');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncFollowRelationship',
@@ -437,7 +437,7 @@ export async function syncCivicScore(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced civic score', { userId: score.user_id });
+    logger.debug({ userId: score.user_id }, 'Synced civic score');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncCivicScore',
@@ -500,10 +500,10 @@ export async function syncAchievement(
       RETRY_PRESETS.DATABASE_OPERATION
     );
 
-    logger.debug('Synced achievement', {
+    logger.debug({
       achievementId: achievement.id,
       userId: achievement.user_id,
-    });
+    }, 'Synced achievement');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'syncAchievement',
@@ -572,7 +572,7 @@ export async function createEngagementCommunity(
       );
     });
 
-    logger.info('Created engagement community', { billId });
+    logger.info({ billId }, 'Created engagement community');
   } catch (error) {
     errorHandler.handle(error as Error, {
       operation: 'createEngagementCommunity',
@@ -606,7 +606,7 @@ export async function batchSyncEngagementEvents(
   let failed = 0;
   const errors: string[] = [];
 
-  logger.info('Starting batch engagement sync', { eventCount: events.length });
+  logger.info({ eventCount: events.length }, 'Starting batch engagement sync');
 
   for (const event of events) {
     try {
@@ -662,21 +662,21 @@ export async function batchSyncEngagementEvents(
           break;
         }
         default:
-          logger.warn('Unknown event type', { eventType: event.event_type, eventId: event.id });
+          logger.warn({ eventType: event.event_type, eventId: event.id }, 'Unknown event type');
       }
     } catch (error) {
       failed++;
       const errorMsg = `Event ${event.id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
       errors.push(errorMsg);
-      logger.error('Failed to sync event', {
+      logger.error({
         eventId: event.id,
         eventType: event.event_type,
         error: errorMsg,
-      });
+      }, 'Failed to sync event');
     }
   }
 
-  logger.info('Batch engagement sync completed', { synced, failed, total: events.length });
+  logger.info({ synced, failed, total: events.length }, 'Batch engagement sync completed');
 
   return { synced, failed, errors };
 }
@@ -809,12 +809,12 @@ export async function isEngagementDuplicate(
       return result.records[0]?.get('exists') || false;
     });
   } catch (error) {
-    logger.error('Failed to check duplicate engagement', {
+    logger.error({
       eventType,
       userId,
       entityId,
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to check duplicate engagement');
     // Don't throw - return false to allow sync to proceed
     return false;
   }

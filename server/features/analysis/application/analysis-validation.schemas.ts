@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { CommonSchemas } from '@server/infrastructure/validation/common-schemas';
+import { commonSchemas as CommonSchemas } from '@server/infrastructure/validation/input-validation-service';
 
 // ============================================================================
 // INPUT SCHEMAS

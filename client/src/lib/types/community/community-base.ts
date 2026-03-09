@@ -8,6 +8,10 @@
  * @module shared/types/community/community-base
  */
 
+import type { TrendingTopic } from '../analytics';
+
+export type { TrendingTopic };
+
 // ============================================================================
 // Discussion Thread Types
 // ============================================================================
@@ -76,6 +80,22 @@ export interface ThreadParticipant {
 // ============================================================================
 // Comment Types
 // ============================================================================
+
+export interface Comment {
+  readonly id: number | string;
+  readonly threadId?: number | string;
+  readonly billId: number | string;
+  readonly content: string;
+  readonly authorId: number | string;
+  readonly authorName: string;
+  readonly authorAvatar?: string;
+  readonly parentId?: number | string;
+  readonly createdAt: string;
+  readonly edited?: boolean;
+  readonly votes: CommentVotes;
+  readonly replyCount?: number;
+  readonly isAuthorExpert?: boolean;
+}
 
 /**
  * Vote counts for a comment

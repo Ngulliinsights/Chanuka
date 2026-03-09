@@ -57,14 +57,14 @@ export class NotificationSchedulerService {
    */
   async initialize(): Promise<void> {
     if (this.isInitialized || this.initializationLock) {
-      logger.info('Notification scheduler already initialized or initialization in progress', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Notification scheduler already initialized or initialization in progress');
       return;
     }
 
     this.initializationLock = true;
     
     try {
-      logger.info('Initializing notification scheduler...', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Initializing notification scheduler...');
 
     // Schedule digest notifications
     await this.scheduleDigestNotifications();
@@ -76,7 +76,7 @@ export class NotificationSchedulerService {
     this.scheduleEngagementAnalysis();
 
       this.isInitialized = true;
-      logger.info('Notification scheduler initialized successfully', { component: 'Chanuka' });
+      logger.info({ component: 'Chanuka' }, 'Notification scheduler initialized successfully');
     } finally {
       this.initializationLock = false;
     }
@@ -360,7 +360,7 @@ export class NotificationSchedulerService {
     const cleanupJob = cron.schedule('0 2 * * *', async () => {
       try {
         await this.cleanupOldNotifications();
-        logger.info('Completed notification cleanup', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, 'Completed notification cleanup');
       } catch (error) {
         logger.error('Error during notification cleanup:', { component: 'Chanuka' }, error);
       }
@@ -377,7 +377,7 @@ export class NotificationSchedulerService {
     const analysisJob = cron.schedule('0 3 * * 0', async () => {
       try {
         await this.analyzeEngagementPatterns();
-        logger.info('Completed engagement analysis', { component: 'Chanuka' });
+        logger.info({ component: 'Chanuka' }, 'Completed engagement analysis');
       } catch (error) {
         logger.error('Error during engagement analysis:', { component: 'Chanuka' }, error);
       }
@@ -568,12 +568,12 @@ export class NotificationSchedulerService {
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     
     // This would typically delete old notifications
-    logger.info('Cleaning up notifications older than 30 days', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Cleaning up notifications older than 30 days');
   }
 
   private async analyzeEngagementPatterns(): Promise<void> {
     // Analyze user engagement patterns to optimize notification timing
-    logger.info('Analyzing engagement patterns for notification optimization', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Analyzing engagement patterns for notification optimization');
   }
 
   /**
@@ -614,7 +614,7 @@ export class NotificationSchedulerService {
     this.scheduledJobs.clear();
     this.jobUpdateLock.clear();
     this.isInitialized = false;
-    logger.info('Notification scheduler cleanup completed', { component: 'Chanuka' });
+    logger.info({ component: 'Chanuka' }, 'Notification scheduler cleanup completed');
   }
 }
 

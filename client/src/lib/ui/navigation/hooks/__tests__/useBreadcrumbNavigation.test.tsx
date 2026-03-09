@@ -10,8 +10,10 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
-import { navigationReducer } from '@client/infrastructure/store';
-import type { BreadcrumbItem } from '@client/lib/types/navigation';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import '@testing-library/jest-dom';
+import { navigationReducer } from '../../../../../infrastructure/store';
+import type { BreadcrumbItem } from '../../../../types/navigation';
 
 import {
   useBreadcrumbNavigation,
@@ -68,8 +70,8 @@ const TestWrapper: React.FC<{ children: React.ReactNode; store?: any; initialPat
 );
 
 // Mock useLocation to return controlled pathname
-vitest.mock('react-router-dom', () => ({
-  ...vitest.requireActual('react-router-dom'),
+vi.mock('react-router-dom', async () => ({
+  ...(await vi.importActual<any>('react-router-dom')),
   useLocation: () => ({
     pathname: '/bills/123',
     search: '',
@@ -347,7 +349,7 @@ describe('useBreadcrumbNavigation', () => {
   });
 
   it('should use custom generator when provided', () => {
-    const customGenerator = vitest.fn((pathname: string) => [
+    const customGenerator = vi.fn((pathname: string) => [
       { label: 'Custom Home', path: '/', is_active: false },
       { label: 'Custom Page', path: pathname, is_active: true },
     ]);

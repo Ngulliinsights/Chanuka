@@ -60,21 +60,31 @@ export class SecurityMiddleware {
           }
         }
 
-        // Audit logging
+        // Audit logging (non-blocking, fire-and-forget)
         if (auditLog) {
-          await securityAuditService.logSecurityEvent({
+          // Don't await - let it run in background to avoid blocking requests
+          securityAuditService.logSecurityEvent({
             event_type: 'api_request',
-            userId: ((req as unknown as Record<string, unknown>).user as Record<string, unknown> | undefined)?.id,
-            ipAddress: req.ip || req.socket.remoteAddress || 'unknown',
-            userAgent: req.get('user-agent') || 'unknown',
+            severity: 'low',
+            userId: ((req as unknown as Record<string, unknown>).user as Record<string, unknown> | undefined)?.id as string | undefined,
+            ip_address: req.ip || req.socket.remoteAddress || 'unknown',
+            user_agent: req.get('user-agent') || 'unknown',
             resource: req.path,
             action: req.method,
-            timestamp: new Date(),
-            metadata: {
+            success: true,
+            details: {
               requestId,
               query: req.query,
               params: req.params
-            }
+            },
+            session_id: (req as unknown as { sessionID?: string }).sessionID,
+            timestamp: new Date()
+          }).catch(err => {
+            // Silently log audit failures without blocking the request
+            logger.debug({
+              error: err instanceof Error ? err.message : String(err),
+              requestId
+            }, 'Audit logging failed (non-critical)');
           });
         }
 
@@ -155,6 +165,11 @@ export class SecurityMiddleware {
    */
   private validateRequest(req: Request): { isValid: boolean; errors?: string[] } {
     const errors: string[] = [];
+
+    // Skip validation for safe GET requests to API root endpoints
+    if (req.method === 'GET' && (req.path === '/api' || req.path === '/api/')) {
+      return { isValid: true };
+    }
 
     // Validate body
     if (req.body && Object.keys(req.body).length > 0) {

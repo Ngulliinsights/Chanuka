@@ -13,8 +13,10 @@ import * as Boom from '@hapi/boom';
 import { abTestingService } from '@server/infrastructure/migration/ab-testing.service';
 import { featureFlagsService } from '@server/infrastructure/migration/feature-flags-service';
 import { logger } from '@server/infrastructure/observability';
-import { errorAdapter } from '@shared/errors/error-adapter';
-import { errorHandler } from '@shared/errors/error-standardization';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { errorAdapter } from '@shared/errors/error-adapter';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { errorHandler } from '@shared/errors/error-standardization';
 import { err,ok, Result } from 'neverthrow';
 
 export interface ErrorHandlingMetrics {
@@ -126,7 +128,7 @@ export class ErrorHandlingDeploymentService {
 
       logger.info('Error handling deployment completed successfully');
     } catch (error) {
-      logger.error('Error handling deployment failed', { error });
+      logger.error({ error }, 'Error handling deployment failed');
       await this.rollbackErrorHandling();
       throw error;
     }
@@ -207,7 +209,7 @@ export class ErrorHandlingDeploymentService {
       throw new Error(`Response consistency too low for ${component}: ${metrics.responseConsistency}`);
     }
 
-    logger.info(`${component} deployment validation passed`, { metrics });
+    logger.info({ metrics }, `${component} deployment validation passed`);
   }
 
   /**
@@ -228,7 +230,7 @@ export class ErrorHandlingDeploymentService {
         const metrics = await this.collectPerformanceMetrics(component);
         
         if (metrics.errorRate > 0.005) { // 0.5% error rate threshold during monitoring
-          logger.error(`High error rate detected during monitoring for ${component}`, { metrics });
+          logger.error({ metrics }, `High error rate detected during monitoring for ${component}`);
           throw new Error(`Monitoring failed for ${component}: high error rate`);
         }
       }
@@ -327,11 +329,11 @@ export class ErrorHandlingDeploymentService {
 
     currentComplexity.reductionPercentage = Math.round((complexityReduction + locReduction + cognitiveReduction) / 3);
 
-    logger.info('Code complexity analysis completed', {
+    logger.info({
       baseline,
       current: currentComplexity,
       reductionPercentage: currentComplexity.reductionPercentage
-    });
+    }, 'Code complexity analysis completed');
 
     return currentComplexity;
   }
@@ -359,10 +361,10 @@ export class ErrorHandlingDeploymentService {
 
     const overallConsistency = Object.values(consistencyResults).reduce((sum, val) => sum + val, 0) / errorTypes.length;
     
-    logger.info('Response consistency validation completed', {
+    logger.info({
       byErrorType: consistencyResults,
       overall: overallConsistency
-    });
+    }, 'Response consistency validation completed');
 
     if (overallConsistency < 0.95) {
       throw new Error(`Overall response consistency below threshold: ${overallConsistency * 100}%`);
@@ -428,14 +430,14 @@ export class ErrorHandlingDeploymentService {
         responseConsistency: checkpoint.isConsistent ? 1 : 0
       });
 
-      logger.debug(`Parallel error handling test completed for ${errorType}`, {
+      logger.debug({
         responseTime,
         isConsistent: checkpoint.isConsistent,
         differences: checkpoint.differences
-      });
+      }, `Parallel error handling test completed for ${errorType}`);
 
     } catch (error) {
-      logger.error(`Parallel error handling test failed for ${errorType}`, { error });
+      logger.error({ error }, `Parallel error handling test failed for ${errorType}`);
       throw error;
     }
   }
@@ -712,15 +714,15 @@ export class ErrorHandlingDeploymentService {
           
           // Alert if metrics degrade
           if (metrics.errorRate > 0.01) {
-            logger.warn(`High error rate detected for ${component}`, { metrics });
+            logger.warn({ metrics }, `High error rate detected for ${component}`);
           }
           
           if (metrics.responseTime > 200) {
-            logger.warn(`High response time detected for ${component}`, { metrics });
+            logger.warn({ metrics }, `High response time detected for ${component}`);
           }
         }
       } catch (error) {
-        logger.error('Error in performance monitoring', { error });
+        logger.error({ error }, 'Error in performance monitoring');
       }
     }, 60000); // Every minute
   }
@@ -738,7 +740,7 @@ export class ErrorHandlingDeploymentService {
 
       logger.info('Error handling rollback completed');
     } catch (error) {
-      logger.error('Error during rollback', { error });
+      logger.error({ error }, 'Error during rollback');
       throw error;
     }
   }

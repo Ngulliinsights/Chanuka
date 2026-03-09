@@ -103,10 +103,10 @@ export class RepresentativeContactService {
       const cached = this.representativeCache.get(representativeId);
       
       if (cached && this.isCacheValid(cached.cachedAt)) {
-        logger.debug('Representative retrieved from cache', { 
+        logger.debug({ 
           representativeId,
           component: 'RepresentativeContactService' 
-        });
+        }, 'Representative retrieved from cache');
         return cached.data;
       }
 
@@ -136,21 +136,21 @@ export class RepresentativeContactService {
     constituency?: string
   ): Promise<RepresentativeContact[]> {
     if (!county && !constituency) {
-      logger.warn('Location search called without parameters', {
+      logger.warn({
         component: 'RepresentativeContactService'
-      });
+      }, 'Location search called without parameters');
       return [];
     }
 
     try {
       const representatives = await this.searchRepresentatives({ county, constituency });
       
-      logger.info('Representatives found by location', { 
+      logger.info({ 
         county,
         constituency,
         count: representatives.length,
         component: 'RepresentativeContactService' 
-      });
+      }, 'Representatives found by location');
 
       return representatives;
     } catch (error) {
@@ -170,20 +170,20 @@ export class RepresentativeContactService {
    */
   async findRepresentativesByCommittee(committee: string): Promise<RepresentativeContact[]> {
     if (!committee?.trim()) {
-      logger.warn('Committee search called with empty committee name', {
+      logger.warn({
         component: 'RepresentativeContactService'
-      });
+      }, 'Committee search called with empty committee name');
       return [];
     }
 
     try {
       const representatives = await this.searchRepresentatives({ committee });
       
-      logger.info('Representatives found by committee', { 
+      logger.info({ 
         committee,
         count: representatives.length,
         component: 'RepresentativeContactService' 
-      });
+      }, 'Representatives found by committee');
 
       return representatives;
     } catch (error) {
@@ -241,14 +241,14 @@ export class RepresentativeContactService {
 
       this.updateRateLimit(senderInfo.user_id);
 
-      logger.info('Representative contact attempted', { 
+      logger.info({ 
         attemptId: attempt.id,
         actionId,
         representativeId,
         contactMethod,
         status: attempt.status,
         component: 'RepresentativeContactService' 
-      });
+      }, 'Representative contact attempted');
 
       return attempt;
     } catch (error) {
@@ -273,22 +273,22 @@ export class RepresentativeContactService {
     responseType: ResponseType
   ): Promise<boolean> {
     if (!contactAttemptId || !responseContent?.trim()) {
-      logger.warn('Invalid response recording attempt', {
+      logger.warn({
         contactAttemptId,
         hasContent: !!responseContent,
         component: 'RepresentativeContactService'
-      });
+      }, 'Invalid response recording attempt');
       return false;
     }
 
     try {
       // In production, this would update the database record
-      logger.info('Representative response recorded', { 
+      logger.info({ 
         contactAttemptId,
         responseType,
         responseLength: responseContent.length,
         component: 'RepresentativeContactService' 
-      });
+      }, 'Representative response recorded');
 
       return true;
     } catch (error) {
@@ -446,10 +446,10 @@ Sincerely,
     // Warn about any remaining unfilled placeholders
     const remainingPlaceholders = customized.match(/\{[^}]+\}/g);
     if (remainingPlaceholders) {
-      logger.warn('Unfilled placeholders in message', {
+      logger.warn({
         placeholders: remainingPlaceholders,
         component: 'RepresentativeContactService'
-      });
+      }, 'Unfilled placeholders in message');
     }
 
     return customized;
@@ -469,11 +469,11 @@ Sincerely,
   ): Promise<ContactAttempt[]> {
     try {
       // In production, this would query the database with appropriate filters
-      logger.debug('Contact history requested', {
+      logger.debug({
         representativeId,
         user_id,
         component: 'RepresentativeContactService'
-      });
+      }, 'Contact history requested');
       
       return [];
     } catch (error) {
@@ -506,11 +506,11 @@ Sincerely,
         }
       };
 
-      logger.debug('Response statistics calculated', {
+      logger.debug({
         representativeId,
         stats,
         component: 'RepresentativeContactService'
-      });
+      }, 'Response statistics calculated');
 
       return stats;
     } catch (error) {
@@ -540,7 +540,7 @@ Sincerely,
   clearCache(representativeId?: string): void {
     if (representativeId) {
       this.representativeCache.delete(representativeId);
-      logger.debug('Cache cleared for representative', { representativeId });
+      logger.debug({ representativeId }, 'Cache cleared for representative');
     } else {
       this.representativeCache.clear();
       logger.debug('All representative cache cleared');
@@ -748,7 +748,7 @@ Sincerely,
         case 'social_media':
           return await this.sendSocialMediaMessage(representative, message, senderInfo);
         default:
-          logger.warn('Unknown contact method', { method });
+          logger.warn({ method }, 'Unknown contact method');
           return false;
       }
     } catch (error) {
@@ -768,12 +768,12 @@ Sincerely,
   ): Promise<boolean> {
     // In production, this would integrate with email service providers
     // like SendGrid, AWS SES, or similar services
-    logger.info('Email prepared for representative', { 
+    logger.info({ 
       representativeId: representative.id,
       email: representative.contactInfo.email,
       senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
-    });
+    }, 'Email prepared for representative');
     return true;
   }
 
@@ -784,12 +784,12 @@ Sincerely,
   ): Promise<boolean> {
     // Phone contacts are logged for users to make the call themselves,
     // as automated phone calls would require additional permissions
-    logger.info('Phone contact logged for user action', { 
+    logger.info({ 
       representativeId: representative.id,
       phone: representative.contactInfo.phone,
       senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
-    });
+    }, 'Phone contact logged for user action');
     return true;
   }
 
@@ -800,12 +800,12 @@ Sincerely,
   ): Promise<boolean> {
     // Office visits require appointment scheduling, which would typically
     // integrate with calendar systems or send requests to staff
-    logger.info('Office visit request created', { 
+    logger.info({ 
       representativeId: representative.id,
       office: representative.contactInfo.office,
       senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
-    });
+    }, 'Office visit request created');
     return true;
   }
 
@@ -817,12 +817,12 @@ Sincerely,
     // Social media contacts would integrate with platform APIs
     // (Twitter API, Facebook Graph API, etc.)
     const platforms = Object.keys(representative.contactInfo.socialMedia || {});
-    logger.info('Social media message prepared', { 
+    logger.info({ 
       representativeId: representative.id,
       platforms,
       senderUserId: senderInfo.user_id,
       component: 'RepresentativeContactService' 
-    });
+    }, 'Social media message prepared');
     return true;
   }
 }

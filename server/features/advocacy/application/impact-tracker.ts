@@ -5,7 +5,8 @@
 // Repository interfaces removed - using direct service calls
 import { ImpactAssessment } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-import { AdvocacyEventPublisher, ImpactAchievedEvent } from '@shared/domain/events/advocacy-events';
+// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
+// import { AdvocacyEventPublisher, ImpactAchievedEvent } from '@shared/domain/events/advocacy-events';
 
 export interface ImpactMetric {
   id: string;
@@ -97,14 +98,14 @@ export class ImpactTracker {
 
       // Store impact metric (in real implementation, this would go to database)
       // For now, we'll just log it
-      logger.info('Impact metric recorded', { 
+      logger.info({ 
         impactId: impact.id,
         campaign_id,
         impactType,
         value,
         attributionScore,
         component: 'ImpactTracker' 
-      });
+      }, 'Impact metric recorded');
 
       // Publish impact achieved event
       await this.eventPublisher.publish(new ImpactAchievedEvent(
@@ -156,12 +157,12 @@ export class ImpactTracker {
         }
       }
 
-      logger.info('Bill outcome tracked', { 
+      logger.info({ 
         bill_id,
         outcomeType,
         relatedCampaigns: relatedCampaigns.length,
         component: 'ImpactTracker' 
-      });
+      }, 'Bill outcome tracked');
     } catch (error) {
       logger.error('Failed to track bill outcome', error, { 
         bill_id,
@@ -205,12 +206,12 @@ export class ImpactTracker {
         participantFeedback
       };
 
-      logger.info('Impact assessment generated', { 
+      logger.info({ 
         campaign_id,
         outcomes,
         attribution,
         component: 'ImpactTracker' 
-      });
+      }, 'Impact assessment generated');
 
       return assessment;
     } catch (error) {
@@ -289,11 +290,11 @@ export class ImpactTracker {
   ): Promise<boolean> {
     try {
       // In real implementation, this would update the impact record
-      logger.info('Impact verified', { 
+      logger.info({ 
         impactId,
         verifiedBy,
         component: 'ImpactTracker' 
-      });
+      }, 'Impact verified');
 
       return true;
     } catch (error) {
@@ -529,11 +530,11 @@ export class ImpactTracker {
         updated_at: new Date()
       } as any);
 
-      logger.info('Campaign impact score updated', { 
+      logger.info({ 
         campaign_id,
         impactScore,
         component: 'ImpactTracker' 
-      });
+      }, 'Campaign impact score updated');
     } catch (error) {
       logger.error('Failed to update campaign impact score', error, { 
         campaign_id,

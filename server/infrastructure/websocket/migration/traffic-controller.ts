@@ -32,15 +32,15 @@ export class TrafficController {
       ? [10, 25, 50, 75, 100]
       : [75, 50, 25, 0];
 
-    logger.info(`Starting ${direction} traffic shift`, {
+    logger.info({
       component: 'TrafficController',
       steps
-    });
+    }, `Starting ${direction} traffic shift`);
 
     for (const percentage of steps) {
-      logger.info(`Shifting to ${percentage}% traffic on new service`, {
+      logger.info({
         component: 'TrafficController'
-      });
+      }, `Shifting to ${percentage}% traffic on new service`);
 
       // Update feature flag rollout
       updateRolloutPercentage(percentage);
@@ -82,9 +82,9 @@ export class TrafficController {
       }
     }
 
-    logger.info(`${direction} traffic shift completed successfully`, {
+    logger.info({
       component: 'TrafficController'
-    });
+    }, `${direction} traffic shift completed successfully`);
   }
 
   /**
@@ -101,11 +101,11 @@ export class TrafficController {
       messageDropRate: 0.0001 // 0.01% drop rate
     };
 
-    logger.debug('Collected health metrics', {
+    logger.debug({
       component: 'TrafficController',
       trafficPercentage,
       ...metrics
-    });
+    }, 'Collected health metrics');
 
     return metrics;
   }

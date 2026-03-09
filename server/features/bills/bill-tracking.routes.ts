@@ -1,12 +1,12 @@
 // cspell:words untracking
 // Correct import path for the new service location
-import { billTrackingService } from '@shared/application/bill-tracking.service';
+import { billTrackingService } from '@server/features/bills/application/bill-tracking.service';
 import { logger } from '@server/infrastructure/observability';
 import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
 import { NextFunction,Request, Response, Router } from 'express';
 import { z } from 'zod';
 
-import { AuthenticatedRequest,authenticateToken } from '../../../../AuthAlert';
+import { AuthenticatedRequest,authenticateToken } from '@server/middleware/auth';
 
 const router = Router();
 

@@ -3,20 +3,20 @@
 // Handles automated monitoring cycles, alert generation, and operational data access
 
 import { FinancialDisclosureConfig } from '@server/features/analytics/financial-disclosure/config';
-import { logger } from '@server/infrastructure/observability/logger';
+import { logger } from '@server/infrastructure/observability';
 import {
   notifications,
   sponsors,
-  sponsorTransparency} from '@server/infrastructure/schema/schema';
+  sponsorTransparency} from '@server/infrastructure/schema';
 import { and, desc, eq, gte, inArray,sql } from "drizzle-orm";
 import { PgDatabase } from "drizzle-orm/pg-core";
 
-import { CacheService } from '@/infrastructure/cache/cache-service';
+import { CacheService } from '@server/infrastructure/cache';
 import {
   DatabaseError,
   NotFoundError as SponsorNotFoundError,
   ValidationError as InvalidInputError
-} from '@/utils/errors';
+} from '@server/infrastructure/error-handling';
 
 import type {
   CompletenessScore,
@@ -118,10 +118,10 @@ export class FinancialDisclosureMonitoringService {
       return;
     }
 
-    this.logger.info('Starting automated financial disclosure monitoring', {
+    this.logger.info({
       interval: this.config.monitoring.dailyCheckInterval,
       batchSize: this.config.monitoring.batchSize
-    });
+    }, 'Starting automated financial disclosure monitoring');
 
     this.isShuttingDown = false;
     this.status.isRunning = true;
@@ -139,13 +139,13 @@ export class FinancialDisclosureMonitoringService {
         );
       } catch (error) {
         this.status.errorsEncountered++;
-        this.logger.error('Error in monitoring cycle', { error });
+        this.logger.error({ error }, 'Error in monitoring cycle');
         
         // Implement exponential backoff for repeated failures
         if (this.status.errorsEncountered > this.config.monitoring.maxRetries) {
-          this.logger.error('Max retries exceeded. Stopping monitoring.', {
+          this.logger.error({
             errorsEncountered: this.status.errorsEncountered
-          });
+          }, 'Max retries exceeded. Stopping monitoring.');
           this.stopAutomatedMonitoring();
         }
       }
@@ -196,11 +196,11 @@ export class FinancialDisclosureMonitoringService {
     this.status.isRunning = false;
     this.status.next_checkTime = null;
     
-    this.logger.info('Monitoring stopped successfully', {
+    this.logger.info({
       checksPerformed: this.status.checksPerformed,
       alertsGenerated: this.status.alertsGenerated,
       errorsEncountered: this.status.errorsEncountered
-    });
+    }, 'Monitoring stopped successfully');
   }
 
   /**
@@ -217,7 +217,7 @@ export class FinancialDisclosureMonitoringService {
       return alerts;
     } catch (error) {
       this.status.errorsEncountered++;
-      this.logger.error('Error in manual monitoring check', { error });
+      this.logger.error({ error }, 'Error in manual monitoring check');
       throw error;
     }
   }
@@ -303,7 +303,7 @@ export class FinancialDisclosureMonitoringService {
       await this.cache.set(cacheKey, disclosures, this.config.cache.ttl.disclosureData);
       return disclosures;
     } catch (error) {
-      this.logger.error('Error collecting financial disclosures', { sponsor_id, error });
+      this.logger.error({ sponsor_id, error }, 'Error collecting financial disclosures');
       throw new DatabaseError('Failed to collect financial disclosures.');
     }
   }
@@ -399,12 +399,12 @@ export class FinancialDisclosureMonitoringService {
     await this.persistAlerts([alert]);
     this.status.alertsGenerated++;
     
-    this.logger.info('Manual alert created', {
+    this.logger.info({
       alertId: alert.id,
       sponsor_id,
       type,
       severity
-    });
+    }, 'Manual alert created');
     
     return alert;
   }
@@ -450,7 +450,7 @@ export class FinancialDisclosureMonitoringService {
       const limit = options?.limit || 50;
       return filtered.slice(0, limit);
     } catch (error) {
-      this.logger.error('Error fetching recent alerts', { error });
+      this.logger.error({ error }, 'Error fetching recent alerts');
       return [];
     }
   }
@@ -477,13 +477,13 @@ export class FinancialDisclosureMonitoringService {
 
       await this.cache.set(cacheKey, alert, this.config.cache.ttl.alerts);
       
-      this.logger.info('Alert resolved', { 
+      this.logger.info({ 
         alertId, 
         sponsor_id: alert.sponsor_id,
         resolution 
-      });
+      }, 'Alert resolved');
     } catch (error) {
-      this.logger.error('Error resolving alert', { alertId, error });
+      this.logger.error({ alertId, error }, 'Error resolving alert');
       throw new DatabaseError('Failed to resolve alert');
     }
   }
@@ -562,11 +562,11 @@ export class FinancialDisclosureMonitoringService {
       const batchSize = this.config.monitoring.batchSize;
       const totalBatches = Math.ceil(totalSponsors / batchSize);
 
-      this.logger.info('Processing sponsors in batches', {
+      this.logger.info({
         totalSponsors,
         batchSize,
         totalBatches
-      });
+      }, 'Processing sponsors in batches');
 
       // Process sponsors in batches to avoid overwhelming the system
       for (let i = 0; i < totalSponsors; i += batchSize) {
@@ -582,9 +582,9 @@ export class FinancialDisclosureMonitoringService {
         const batch = activeSponsors.slice(i, i + batchSize);
         const sponsor_ids = batch.map(s => s.id);
 
-        this.logger.info(`Processing batch ${currentBatch}/${totalBatches}`, {
+        this.logger.info({
           sponsorCount: sponsor_ids.length
-        });
+        }, `Processing batch ${currentBatch}/${totalBatches}`);
 
         // Run all check types in parallel for this batch
         const [
@@ -629,7 +629,7 @@ export class FinancialDisclosureMonitoringService {
       this.status.alertsGenerated += allAlerts.length;
 
     } catch (error) {
-      this.logger.error('Critical error in monitoring cycle', { error });
+      this.logger.error({ error }, 'Critical error in monitoring cycle');
       throw error;
     } finally {
       this.isCycleRunning = false;
@@ -691,7 +691,7 @@ export class FinancialDisclosureMonitoringService {
         );
       }
     } catch (error) {
-      this.logger.error('Error checking new disclosures', { error });
+      this.logger.error({ error }, 'Error checking new disclosures');
     }
 
     return alerts;
@@ -766,7 +766,7 @@ export class FinancialDisclosureMonitoringService {
         );
       }
     } catch (error) {
-      this.logger.error('Error checking threshold violations', { error });
+      this.logger.error({ error }, 'Error checking threshold violations');
     }
 
     return alerts;
@@ -814,11 +814,11 @@ export class FinancialDisclosureMonitoringService {
             );
           }
         } catch (error) {
-          this.logger.error('Error checking completeness for sponsor', { sponsor_id, error });
+          this.logger.error({ sponsor_id, error }, 'Error checking completeness for sponsor');
         }
       }
     } catch (error) {
-      this.logger.error('Error checking missing disclosures', { error });
+      this.logger.error({ error }, 'Error checking missing disclosures');
     }
 
     return alerts;
@@ -899,7 +899,7 @@ export class FinancialDisclosureMonitoringService {
         );
       }
     } catch (error) {
-      this.logger.error('Error checking stale disclosures', { error });
+      this.logger.error({ error }, 'Error checking stale disclosures');
     }
 
     return alerts;
@@ -943,12 +943,12 @@ export class FinancialDisclosureMonitoringService {
         await this.createNotifications(notificationsToCreate);
       }
 
-      this.logger.info('Alerts persisted successfully', {
+      this.logger.info({
         totalAlerts: alerts.length,
         notificationsCreated: notificationsToCreate.length
-      });
+      }, 'Alerts persisted successfully');
     } catch (error) {
-      this.logger.error('Error persisting alerts', { error });
+      this.logger.error({ error }, 'Error persisting alerts');
       throw new DatabaseError('Failed to persist alerts');
     }
   }
@@ -980,11 +980,11 @@ export class FinancialDisclosureMonitoringService {
         }
       });
 
-      this.logger.info('Notifications created', {
+      this.logger.info({
         count: notificationValues.length
-      });
+      }, 'Notifications created');
     } catch (error) {
-      this.logger.error('Error creating notifications', { error });
+      this.logger.error({ error }, 'Error creating notifications');
       // Don't throw - notification failure shouldn't block alert persistence
     }
   }
@@ -1016,7 +1016,7 @@ export class FinancialDisclosureMonitoringService {
 
       return { name, status: 'healthy' };
     } catch (error) {
-      this.logger.error(`${name} health check failed`, { error });
+      this.logger.error({ error }, `${name} health check failed`);
       return {
         name,
         status: 'unhealthy',
