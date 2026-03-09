@@ -160,9 +160,7 @@ export const realTimeSlice = createSlice({
       const timestamp = update.timestamp;
       state.lastUpdateTimestamp = typeof timestamp === 'string' 
         ? timestamp 
-        : timestamp instanceof Date 
-          ? timestamp.toISOString() 
-          : new Date().toISOString();
+        : (timestamp as Date).toISOString();
     },
 
     addCommunityUpdate: (state, action: PayloadAction<CommunityRealTimeUpdate>) => {
@@ -177,9 +175,7 @@ export const realTimeSlice = createSlice({
       const timestamp = update.timestamp;
       state.lastUpdateTimestamp = typeof timestamp === 'string' 
         ? timestamp 
-        : timestamp instanceof Date 
-          ? timestamp.toISOString() 
-          : new Date().toISOString();
+        : (timestamp as Date).toISOString();
     },
 
     updateEngagementMetrics: (state, action: PayloadAction<EngagementMetricsUpdate>) => {
@@ -189,9 +185,7 @@ export const realTimeSlice = createSlice({
       const timestamp = metrics.timestamp;
       state.lastUpdateTimestamp = typeof timestamp === 'string' 
         ? timestamp 
-        : timestamp instanceof Date 
-          ? timestamp.toISOString() 
-          : new Date().toISOString();
+        : (timestamp as Date).toISOString();
     },
 
     addExpertActivity: (state, action: PayloadAction<ExpertActivityUpdate>) => {
@@ -200,9 +194,7 @@ export const realTimeSlice = createSlice({
       const timestamp = action.payload.timestamp;
       state.lastUpdateTimestamp = typeof timestamp === 'string' 
         ? timestamp 
-        : timestamp instanceof Date 
-          ? timestamp.toISOString() 
-          : new Date().toISOString();
+        : (timestamp as Date).toISOString();
     },
 
     addNotification: (state, action: PayloadAction<RealTimeNotification>) => {
