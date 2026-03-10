@@ -97,13 +97,6 @@ export {
   createWebSocketClient,
 } from './websocket/client';
 
-// Legacy WebSocket manager (for backward compatibility)
-export {
-  WebSocketManagerImpl as WebSocketManager,
-  WebSocketManagerImpl,
-  createWebSocketManager,
-  type ReconnectionConfig,
-} from './websocket/manager';
 
 // ============================================================================
 // Realtime Client Sub-Module

@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { globalApiClient } from '@client/infrastructure/api/client';
 import { StateSyncService } from '@client/infrastructure/community/services/state-sync.service';
-import { WebSocketManager } from '@client/infrastructure/api';
+import { realTimeService } from '@client/infrastructure/api/realtime';
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
@@ -112,14 +112,9 @@ export function useUnifiedDiscussion({
     enableTypingIndicators,
   });
 
-  const wsManager = useMemo(
-    () => (enableRealtime ? WebSocketManager.getInstance() : null),
-    [enableRealtime]
-  );
-
   const stateSyncService = useMemo(
-    () => new StateSyncService(queryClient, wsManager),
-    [queryClient, wsManager]
+    () => new StateSyncService(queryClient),
+    [queryClient]
   );
 
   const commentsQueryKey = useMemo(
@@ -333,29 +328,29 @@ export function useUnifiedDiscussion({
   const [activeUsers, setActiveUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!wsManager || !enableRealtime) return;
+    if (!enableRealtime) return;
 
-    const unsubscribers = [
-      wsManager.on('comment:new', (payload: unknown) => {
+    const subs = [
+      realTimeService.subscribe('comment:new', (payload: unknown) => {
         const comment = payload as WsCommentPayload;
         if (String(comment.billId) === String(billId)) {
           prependComment(comment);
         }
       }),
 
-      wsManager.on('comment:updated', (payload: unknown) => {
+      realTimeService.subscribe('comment:updated', (payload: unknown) => {
         const updatedComment = payload as WsCommentPayload;
         if (String(updatedComment.billId) === String(billId)) {
           replaceComment(updatedComment);
         }
       }),
 
-      wsManager.on('comment:deleted', (payload: unknown) => {
+      realTimeService.subscribe('comment:deleted', (payload: unknown) => {
         const { id } = payload as WsCommentDeletedPayload;
         removeComment(id);
       }),
 
-      wsManager.on('typing:indicator', (payload: unknown) => {
+      realTimeService.subscribe('typing:indicator', (payload: unknown) => {
         const data = payload as WsTypingPayload;
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -364,7 +359,7 @@ export function useUnifiedDiscussion({
       }),
 
       // Clear the typing indicator immediately when a peer explicitly stops.
-      wsManager.on('typing:stop', (payload: unknown) => {
+      realTimeService.subscribe('typing:stop', (payload: unknown) => {
         const data = payload as WsTypingStopPayload;
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -372,7 +367,7 @@ export function useUnifiedDiscussion({
         }
       }),
 
-      wsManager.on('presence:update', (payload: unknown) => {
+      realTimeService.subscribe('presence:update', (payload: unknown) => {
         const data = payload as WsPresencePayload;
         if (data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -383,22 +378,18 @@ export function useUnifiedDiscussion({
           }
         }
       }),
+      
+      realTimeService.subscribe(`bill:${billId}`, () => {})
     ];
 
-    wsManager.joinRoom(`bill:${billId}`);
     if (discussionState.currentThreadId) {
-      wsManager.joinRoom(`thread:${discussionState.currentThreadId}`);
+      subs.push(realTimeService.subscribe(`thread:${discussionState.currentThreadId}`, () => {}));
     }
 
     return () => {
-      unsubscribers.forEach(unsub => unsub());
-      wsManager.leaveRoom(`bill:${billId}`);
-      if (discussionState.currentThreadId) {
-        wsManager.leaveRoom(`thread:${discussionState.currentThreadId}`);
-      }
+      subs.forEach(sub => sub.unsubscribe());
     };
   }, [
-    wsManager,
     billId,
     discussionState.currentThreadId,
     enableRealtime,
@@ -472,27 +463,27 @@ export function useUnifiedDiscussion({
   }, [stateSyncService, billId]);
 
   const startTyping = useCallback(() => {
-    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
-      wsManager.emit('typing:indicator', {
+    if (enableTypingIndicators && discussionState.currentThreadId) {
+      realTimeService.publish('typing:indicator', {
         threadId: discussionState.currentThreadId,
         userId: CURRENT_USER_ID,
         userName: 'Current User', // Replace with real auth context when available
       } satisfies WsTypingPayload);
     }
-  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
+  }, [enableTypingIndicators, discussionState.currentThreadId]);
 
   /**
    * Emit an explicit stop signal so peers clear the typing indicator
    * immediately rather than waiting for the server-side timeout.
    */
   const stopTyping = useCallback(() => {
-    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
-      wsManager.emit('typing:stop', {
+    if (enableTypingIndicators && discussionState.currentThreadId) {
+      realTimeService.publish('typing:stop', {
         threadId: discussionState.currentThreadId,
         userId: CURRENT_USER_ID,
       } satisfies WsTypingStopPayload);
     }
-  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
+  }, [enableTypingIndicators, discussionState.currentThreadId]);
 
   // ============================================================================
   // RETURN INTERFACE

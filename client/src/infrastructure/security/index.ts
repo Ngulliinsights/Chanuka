@@ -5,21 +5,14 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-// Import legacy components for backward compatibility
+// Import core components
 import { CSRFProtection } from './csrf-protection';
 import { InputSanitizer } from './input-sanitizer';
 import { RateLimiter } from './rate-limiter';
 import { SecurityMonitor } from './security-monitor';
 import { VulnerabilityScanner } from './vulnerability-scanner';
-import {
-  UnifiedCSPManager,
-  UnifiedInputSanitizer,
-  SecurityErrorHandler,
-  SecurityErrorMiddleware,
-  DEFAULT_UNIFIED_CONFIG,
-  UnifiedRateLimiter
-} from './unified';
-
+import { CSPManager } from './csp-manager';
+import { getCSPConfig } from './csp-config';
 
 export interface SecurityConfig {
   enableCSP: boolean;
@@ -31,87 +24,50 @@ export interface SecurityConfig {
 }
 
 export interface SecuritySystem {
-  csp: UnifiedCSPManager;
+  csp: CSPManager;
   csrf: CSRFProtection;
-  sanitizer: InputSanitizer | UnifiedInputSanitizer;
-  rateLimiter: RateLimiter | UnifiedRateLimiter;
+  sanitizer: InputSanitizer;
+  rateLimiter: RateLimiter;
   vulnerabilityScanner: VulnerabilityScanner;
   monitor: SecurityMonitor;
-  errorHandler?: SecurityErrorHandler;
-  errorMiddleware?: SecurityErrorMiddleware;
 }
 
 let securitySystem: SecuritySystem | null = null;
 
 /**
- * Initialize the security infrastructure with unified approach
+ * Initialize the security infrastructure
  */
 export async function initializeSecurity(config: SecurityConfig): Promise<SecuritySystem> {
   try {
-    logger.info('Initializing unified security infrastructure', {
+    logger.info('Initializing security infrastructure', {
       config,
       environment: process.env.NODE_ENV
     });
 
-    // Initialize unified security system
-    const unifiedConfig = {
-      csp: {
-        enabled: config.enableCSP,
-        reportOnly: process.env.NODE_ENV === 'development',
-        directives: DEFAULT_UNIFIED_CONFIG.csp.directives,
-        nonce: undefined,
-      },
-      inputSanitization: {
-        enabled: config.enableInputSanitization,
-        mode: 'comprehensive' as const,
-        allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br', 'ul', 'ol', 'li'],
-        allowedAttributes: {
-          a: ['href', 'title'],
-          img: ['src', 'alt', 'title'],
-        },
-      },
-      rateLimiting: {
-        enabled: config.enableRateLimit,
-        windowMs: 15 * 60 * 1000, // 15 minutes
-        maxRequests: 100,
-        skipSuccessfulRequests: false,
-      },
-      errorHandling: {
-        mode: 'strict' as const,
-        logLevel: 'info' as const,
-        reportToBackend: true,
-      },
-    };
-
-    // Initialize unified components
-    const csp = new UnifiedCSPManager({
-      enabled: unifiedConfig.csp.enabled,
-      reportOnly: unifiedConfig.csp.reportOnly,
-      directives: unifiedConfig.csp.directives,
+    const csp = new CSPManager({
+      enabled: config.enableCSP,
+      reportOnly: process.env.NODE_ENV === 'development',
+      directives: getCSPConfig(process.env.NODE_ENV),
       reportUri: '/api/security/csp-report',
     });
 
-    const sanitizer = new UnifiedInputSanitizer({
-      enabled: unifiedConfig.inputSanitization.enabled,
-      mode: unifiedConfig.inputSanitization.mode,
-      allowedTags: unifiedConfig.inputSanitization.allowedTags,
-      allowedAttributes: unifiedConfig.inputSanitization.allowedAttributes,
-    });
-
-    const errorHandler = new SecurityErrorHandler(unifiedConfig.errorHandling);
-    const errorMiddleware = new SecurityErrorMiddleware(unifiedConfig.errorHandling);
-
-    // Initialize legacy components for compatibility
     const csrf = new CSRFProtection({
       enabled: config.enableCSRF,
       tokenName: 'chanuka-csrf-token',
       headerName: 'X-CSRF-Token',
     });
 
-    const rateLimiter = new UnifiedRateLimiter({
+    const sanitizer = new InputSanitizer({
+      enabled: config.enableInputSanitization,
+      allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br'],
+      allowedAttributes: { 'a': ['href'] },
+    });
+
+    const rateLimiter = new RateLimiter({
       enabled: config.enableRateLimit,
       windowMs: 15 * 60 * 1000,
       maxRequests: 100,
+      skipSuccessfulRequests: false,
     });
 
     const vulnerabilityScanner = new VulnerabilityScanner({
@@ -133,23 +89,16 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
       rateLimiter,
       vulnerabilityScanner,
       monitor,
-      errorHandler,
-      errorMiddleware,
     };
 
-    // Start unified components
+    // Start components
     await csp.initialize();
-    await sanitizer.shutdown(); // UnifiedInputSanitizer doesn't have initialize, using shutdown as placeholder
-    await errorHandler.shutdown(); // SecurityErrorHandler doesn't have initialize, using shutdown as placeholder
-    await errorMiddleware.shutdown(); // SecurityErrorMiddleware doesn't have initialize, using shutdown as placeholder
-
-    // Start legacy components
     await csrf.initialize();
     await rateLimiter.initialize();
     await vulnerabilityScanner.initialize();
     await monitor.initialize();
 
-    logger.info('Unified security infrastructure initialized successfully');
+    logger.info('Security infrastructure initialized successfully');
 
     return securitySystem;
   } catch (error) {
@@ -157,8 +106,6 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
     throw error;
   }
 }
-
-
 
 /**
  * Get the current security system instance
@@ -183,7 +130,6 @@ export function getSecurityStatus(): {
     };
   }
 
-  // Basic status check
   return {
     components: {
       csp: { enabled: true, status: 'active' },
@@ -199,14 +145,6 @@ export function getSecurityStatus(): {
  */
 export async function shutdownSecurity(): Promise<void> {
   if (securitySystem) {
-    if (securitySystem.errorHandler) {
-      await securitySystem.errorHandler.shutdown();
-    }
-
-    if (securitySystem.errorMiddleware) {
-      await securitySystem.errorMiddleware.shutdown();
-    }
-
     await securitySystem.vulnerabilityScanner.shutdown();
     await securitySystem.monitor.shutdown();
     securitySystem = null;
@@ -214,13 +152,9 @@ export async function shutdownSecurity(): Promise<void> {
   }
 }
 
-// Export unified components
-export * from './unified';
-
-// Export UnifiedCSPManager as CSPManager for backward compatibility
-export { UnifiedCSPManager as CSPManager } from './unified/csp-manager';
-
-// Export legacy components for backward compatibility
+// Export core components
+export { CSPManager } from './csp-manager';
+export * from './csp-config';
 export { CSRFProtection } from './csrf-protection';
 export { InputSanitizer } from './input-sanitizer';
 export { RateLimiter } from './rate-limiter';

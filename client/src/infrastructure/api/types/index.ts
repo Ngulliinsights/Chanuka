@@ -12,7 +12,7 @@
 // ============================================================================
 
 // Common types (base exports)
-export type { HttpMethod, LogLevel, SortOrder, ErrorCode } from './common';
+export type { HttpMethod, LogLevel, SortOrder } from './common';
 export type { PaginationParams, PaginationInfo, PaginatedResponse, VoteType } from './common';
 export { ErrorDomain, ErrorSeverity } from './common';
 export type { UnifiedError } from './common';
@@ -87,9 +87,9 @@ export type ErrorContext = Record<string, unknown>;
 
 export type {
   PrivacySettings,
-  DataExportResponse,
-  DataDeletionResponse,
-} from './auth-types';
+  DataExportRequest as DataExportResponse,
+  DataDeletionRequest as DataDeletionResponse,
+} from '../../auth';
 
 // Preferences types
 export type {
@@ -129,33 +129,35 @@ export * from './performance';
 // Authentication types
 export {
   ExpertStatus,
-  type Badge,
-  type LoginCredentials,
-  type UpdateUserProfile,
-  type AuthResult,
-} from './auth';
+} from '../../auth'; // Points to infrastructure/auth
 
-// Bill types (prefer bill module for Sponsor to avoid conflict)
+export type {
+  Badge,
+  LoginCredentials,
+  UpdateUserProfile,
+} from '../../auth'; // Points to infrastructure/auth
+
+// Bill types (canonical source: @client/lib/types/bill)
 export type {
   BillStatus,
   UrgencyLevel,
   ComplexityLevel,
-} from './bill';
+} from '@client/lib/types/bill';
 
 export type {
   Bill,
   Sponsor,
   BillsQueryParams,
-} from './bill';
+} from '@client/lib/types/bill';
 
-// Community types
+// Community types (canonical source: @client/lib/types/community)
 export type {
   DiscussionThread,
   CommunityUpdate,
   CommentSortField,
   CommentsQueryParams,
   CommentFormData,
-} from './community';
+} from '@client/lib/types/community';
 
 // Engagement types
 export { EngagementType, type EngagementMetrics, type EngagementAction } from './engagement';

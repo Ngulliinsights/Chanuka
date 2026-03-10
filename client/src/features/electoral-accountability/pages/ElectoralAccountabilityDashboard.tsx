@@ -5,28 +5,35 @@
  */
 
 import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { MPScorecard } from '../ui/mp-scorecard/MPScorecard';
 import { VotingRecordTimeline } from '../ui/mp-scorecard/VotingRecordTimeline';
 import { Shield, TrendingUp, Users, AlertTriangle } from 'lucide-react';
+import { useAuth } from '@client/infrastructure/auth';
 
 export function ElectoralAccountabilityDashboard() {
-  // TODO: Get these from route params or user context
-  const [sponsorId] = useState('demo-sponsor-id');
-  const [constituency] = useState('Westlands');
+  const { sponsorId: routeSponsorId } = useParams<{ sponsorId?: string }>();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Get sponsorId from route params or use demo data
+  const [sponsorId] = useState(routeSponsorId || 'demo-sponsor-id');
+  // Get constituency from user profile or use default
+  const [constituency] = useState(user?.constituency || 'Westlands');
 
   const handleViewDetails = () => {
-    console.log('View details clicked');
-    // TODO: Navigate to detailed analysis page
+    // Navigate to detailed MP accountability page
+    navigate(`/accountability/mp/${sponsorId}`);
   };
 
   const handleCreateCampaign = () => {
     console.log('Create campaign clicked');
-    // TODO: Open campaign creation modal
+    // TODO: Open campaign creation modal (to be implemented)
   };
 
   const handleVoteClick = (record: any) => {
     console.log('Vote clicked:', record);
-    // TODO: Show vote details modal
+    // TODO: Show vote details modal (to be implemented)
   };
 
   return (

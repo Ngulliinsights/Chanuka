@@ -44,7 +44,7 @@ export class SponsorsApiService {
     try {
       const queryParams: Record<string, string> = {
         limit: params.limit?.toString() || '50',
-        offset: ((params.page || 1) - 1) * (params.limit || 50)).toString(),
+        offset: (((params.page || 1) - 1) * (params.limit || 50)).toString(),
       };
 
       // Add optional parameters if they exist

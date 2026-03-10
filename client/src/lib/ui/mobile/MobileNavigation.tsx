@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, FileText, User, Menu } from 'lucide-react';
+import { Home, Search, FileText, User, Scale } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@client/lib/design-system/utils/cn';
 
@@ -13,6 +13,7 @@ const navItems: NavItem[] = [
   { icon: <Home className="h-5 w-5" />, label: 'Home', path: '/' },
   { icon: <Search className="h-5 w-5" />, label: 'Search', path: '/search' },
   { icon: <FileText className="h-5 w-5" />, label: 'Bills', path: '/bills' },
+  { icon: <Scale className="h-5 w-5" />, label: 'Accountability', path: '/accountability' },
   { icon: <User className="h-5 w-5" />, label: 'Profile', path: '/profile' },
 ];
 

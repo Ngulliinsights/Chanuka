@@ -5,9 +5,35 @@
  * Consolidated from client/src/types/auth.ts into core/auth module
  */
 
-import { VerificationStatus } from '@shared/types/domains/authentication';
+// Empty - imported in index.ts directly
+import type { User } from '@shared/types/domains/authentication/user';
+
+export type { User };
 
 // Define a local UserProfile that matches our needs
+
+export enum ExpertStatus {
+  NONE = 'none',
+  VERIFIED = 'verified',
+  CONTRIBUTOR = 'contributor',
+  MODERATOR = 'moderator',
+  ADMIN = 'admin',
+}
+
+export interface Badge {
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly icon: string;
+  readonly earnedAt: string;
+}
+
+export interface UpdateUserProfile {
+  readonly displayName?: string;
+  readonly avatar?: string;
+  readonly bio?: string;
+  readonly preferences?: Readonly<Record<string, unknown>>;
+}
 
 export interface PrivacySettings {
   profile_visibility: 'public' | 'registered' | 'private';

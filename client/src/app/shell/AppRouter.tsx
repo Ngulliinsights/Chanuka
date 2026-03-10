@@ -156,6 +156,10 @@ const WorkspaceDetailPage = createLazyComponent(
   () => import('@client/features/collaboration/pages/WorkspaceDetailPage'),
   'Workspace Detail'
 );
+const ElectoralAccountabilityDashboard = createLazyComponent(
+  () => import('@client/features/electoral-accountability/pages/ElectoralAccountabilityDashboard'),
+  'Electoral Accountability Dashboard'
+);
 
 interface RouteConfig {
   path: string;
@@ -568,6 +572,18 @@ const routes: RouteConfig[] = [
     id: 'pretext-detection',
     path: '/analysis/pretext-detection',
     element: <PretextDetectionPage />,
+  },
+
+  // Electoral Accountability routes
+  {
+    id: 'electoral-accountability',
+    path: '/accountability',
+    element: <ElectoralAccountabilityDashboard />,
+  },
+  {
+    id: 'electoral-accountability-mp',
+    path: '/accountability/mp/:sponsorId',
+    element: <ElectoralAccountabilityDashboard />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility

@@ -19,7 +19,7 @@ import { ConstitutionalIntelligenceTab } from '@client/features/constitutional-i
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@client/services/apiService';
+import { api } from '@client/infrastructure/api';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();

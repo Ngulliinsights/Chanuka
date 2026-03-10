@@ -817,5 +817,36 @@ function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetail
   );
 }
 
+/**
+ * HOC wrapper for functional components that need error boundary protection.
+ * Merged from lib/ui/error-boundary for consolidation.
+ */
+export function withErrorBoundary<P extends object>(
+  WrappedComponent: React.ComponentType<P>,
+  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
+): React.ComponentType<P> {
+  const WithErrorBoundary = (props: P) => (
+    <ErrorBoundary {...errorBoundaryProps}>
+      <WrappedComponent {...props} />
+    </ErrorBoundary>
+  );
+
+  WithErrorBoundary.displayName = `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
+
+  return WithErrorBoundary;
+}
+
+/**
+ * Factory to create a pre-configured error boundary component.
+ * Merged from lib/ui/error-boundary for consolidation.
+ */
+export function createErrorBoundary(
+  config: Omit<ErrorBoundaryProps, 'children'>
+): React.ComponentType<{ children: ReactNode }> {
+  return function ConfiguredErrorBoundary({ children }: { children: ReactNode }) {
+    return <ErrorBoundary {...config}>{children}</ErrorBoundary>;
+  };
+}
+
 // Default export for convenience
 export default ErrorBoundary;

@@ -19,6 +19,8 @@ export type {
   // User and Auth Types
   User,
   AuthUser,
+  Badge,
+  UpdateUserProfile,
   LoginCredentials,
   RegisterData,
   AuthResponse,
@@ -58,6 +60,9 @@ export type {
 // ============================================================================
 // Core Services (Consolidated)
 // ============================================================================
+
+export { ExpertStatus } from './types';
+export { VerificationStatus } from '@shared/types/domains/authentication';
 
 export {
   // Primary Auth Service (consolidated API service)
@@ -185,6 +190,10 @@ export {
 
 export {
   // Authenticated API Client
+  /**
+   * @deprecated Use globalApiClient with createAuthRequestInterceptor instead.
+   * Will be removed in v2.0.0
+   */
   AuthenticatedApiClient,
   type AuthenticatedApiClientConfig,
 } from './http/authenticated-client';

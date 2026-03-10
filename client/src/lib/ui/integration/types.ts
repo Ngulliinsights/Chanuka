@@ -4,7 +4,6 @@
 
 
 import type { PrivacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
-import type { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/lib/utils/security';
 
 import type { DeviceDetector } from '@client/infrastructure/mobile';
 // TouchHandler is deprecated - using SwipeGestures instead
@@ -17,10 +16,6 @@ export interface IntegrationStatus {
 }
 
 export interface IntegrationServices {
-  cspManager?: CSPManager;
-  domSanitizer?: DOMSanitizer;
-  inputValidator?: InputValidator;
-  passwordValidator?: PasswordValidator;
   privacyAnalytics?: PrivacyAnalyticsService;
   deviceDetector?: DeviceDetector;
   // touchHandler removed - use SwipeGestures component instead

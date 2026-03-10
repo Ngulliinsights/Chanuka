@@ -15,14 +15,6 @@ export {
   createWebSocketClient,
 } from './client';
 
-// Legacy WebSocket manager (for backward compatibility)
-export {
-  WebSocketManager,
-  WebSocketManagerImpl,
-  createWebSocketManager,
-  type ReconnectionConfig,
-  type ConnectionState as LegacyConnectionState,
-} from './manager';
 
 // WebSocket types
 export type {

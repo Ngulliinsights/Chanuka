@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@client/services/apiService';
+import { api } from '@client/infrastructure/api';
 import type { PersonalImpact, UserContext } from '@shared/types/bills/translation.types';
 
 interface ImpactCalculatorProps {

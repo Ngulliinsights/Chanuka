@@ -8,7 +8,7 @@
  * 80% of testing value with 20% of implementation effort.
  */
 
-import { useOfflineDetection } from '@client/lib/hooks/useOfflineDetection';
+import { useOfflineDetection } from '@client/lib/hooks/use-offline-detection';
 import { ErrorBoundary } from '@client/lib/components/ErrorBoundary';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';

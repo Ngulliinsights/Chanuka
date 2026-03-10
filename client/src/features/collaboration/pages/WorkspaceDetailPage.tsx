@@ -1,14 +1,39 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Users, Settings } from 'lucide-react';
 import { Button } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { workspaceService } from '@client/features/collaboration/services/workspace-service';
-import { ActivityFeed } from '@client/features/collaboration/ui/ActivityFeed';
+import { activityService } from '@client/features/collaboration/services/activity-service';
+import ActivityFeedComponent from '@client/features/community/ui/activity/ActivityFeed';
+import type { ActivityItem } from '@client/lib/types/community';
 
 export default function WorkspaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const workspace = id ? workspaceService.getWorkspace(id) : null;
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+    if (workspace?.id) {
+      // Fetch collaboration activities and map them to community ActivityItem format
+      const rawActivities = activityService.getActivity(workspace.id);
+      const mappedActivities: ActivityItem[] = rawActivities.map(act => ({
+        id: act.id,
+        type: act.type as any, // Mapped generic activity type
+        userId: act.userId,
+        userName: act.userName,
+        userAvatar: '',
+        title: act.description,
+        content: '',
+        timestamp: act.timestamp,
+        likes: 0,
+        replies: 0,
+        shares: 0,
+        userHasLiked: false
+      }));
+      setActivities(mappedActivities);
+    }
+  }, [workspace?.id]);
 
   if (!workspace) {
     return (
@@ -44,7 +69,7 @@ export default function WorkspaceDetailPage() {
         </TabsList>
 
         <TabsContent value="activity" className="mt-6">
-          <ActivityFeed workspaceId={workspace.id} />
+          <ActivityFeedComponent activities={activities} />
         </TabsContent>
 
         <TabsContent value="members" className="mt-6">

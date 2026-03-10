@@ -5,7 +5,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@client/services/apiService';
+import { api } from '@client/infrastructure/api';
 import { logger } from '@client/lib/utils/logger';
 
 export interface ConstitutionalViolation {

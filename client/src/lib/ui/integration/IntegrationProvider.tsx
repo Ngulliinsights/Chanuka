@@ -6,7 +6,6 @@
  */
 
 import { PrivacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
-import { CSPManager, DOMSanitizer, InputValidator, PasswordValidator } from '@client/lib/utils/security';
 import React, { useEffect, useState, useCallback } from 'react';
 
 import { DeviceDetector } from '@client/infrastructure/mobile';
@@ -68,10 +67,6 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
 
         // Step 1: Initialize Security Utilities (Low Risk, High Impact)
         setStatus(prev => ({ ...prev, security: 'loading' }));
-
-        const domSanitizer = DOMSanitizer.getInstance();
-        const inputValidator = InputValidator.getInstance();
-        const passwordValidator = PasswordValidator.getInstance();
 
         // CSP is now handled server-side via HTTP headers
         // Client-side CSP management is disabled to avoid conflicts
@@ -146,9 +141,6 @@ export function IntegrationProvider({ children, fallback }: IntegrationProviderP
         // Update services
         if (!isCancelled) {
           setServices({
-            domSanitizer,
-            inputValidator,
-            passwordValidator,
             privacyAnalytics,
             deviceDetector,
             // touchHandler removed - use SwipeGestures component instead

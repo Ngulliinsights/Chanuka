@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@client/services/apiService';
+import { api } from '@client/infrastructure/api';
 
 interface Argument {
   id: string;
