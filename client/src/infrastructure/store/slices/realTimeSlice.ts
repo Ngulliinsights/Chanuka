@@ -60,6 +60,27 @@ const initialState: RealTimeState = {
   lastUpdateTimestamp: null,
 };
 
+// Helper function for safe timestamp conversion
+const safeTimestampToString = (timestamp: string | Date | unknown): string | null => {
+  try {
+    if (typeof timestamp === 'string') {
+      const parsed = new Date(timestamp);
+      if (isNaN(parsed.getTime())) {
+        return new Date().toISOString();
+      }
+      return timestamp;
+    } else if (timestamp instanceof Date) {
+      return timestamp.toISOString();
+    } else if (timestamp && typeof timestamp === 'object' && 'toISOString' in timestamp) {
+      return (timestamp as Date).toISOString();
+    }
+    return new Date().toISOString();
+  } catch (error) {
+    console.warn('Failed to convert timestamp:', timestamp, error);
+    return new Date().toISOString();
+  }
+};
+
 export const realTimeSlice = createSlice({
   name: 'realTime',
   initialState,
@@ -158,9 +179,7 @@ export const realTimeSlice = createSlice({
       state.billUpdates[billId] = updates;
 
       const timestamp = update.timestamp;
-      state.lastUpdateTimestamp = typeof timestamp === 'string' 
-        ? timestamp 
-        : (timestamp as Date).toISOString();
+      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
     },
 
     addCommunityUpdate: (state, action: PayloadAction<CommunityRealTimeUpdate>) => {
@@ -173,9 +192,7 @@ export const realTimeSlice = createSlice({
       state.communityUpdates[discussionId] = updates;
 
       const timestamp = update.timestamp;
-      state.lastUpdateTimestamp = typeof timestamp === 'string' 
-        ? timestamp 
-        : (timestamp as Date).toISOString();
+      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
     },
 
     updateEngagementMetrics: (state, action: PayloadAction<EngagementMetricsUpdate>) => {
@@ -183,18 +200,14 @@ export const realTimeSlice = createSlice({
       state.engagementMetrics[metrics.bill_id] = metrics;
       
       const timestamp = metrics.timestamp;
-      state.lastUpdateTimestamp = typeof timestamp === 'string' 
-        ? timestamp 
-        : (timestamp as Date).toISOString();
+      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
     },
 
     addExpertActivity: (state, action: PayloadAction<ExpertActivityUpdate>) => {
       // Keep only last 200 expert activities
       state.expertActivities = [...state.expertActivities, action.payload].slice(-200);
       const timestamp = action.payload.timestamp;
-      state.lastUpdateTimestamp = typeof timestamp === 'string' 
-        ? timestamp 
-        : (timestamp as Date).toISOString();
+      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
     },
 
     addNotification: (state, action: PayloadAction<RealTimeNotification>) => {
@@ -206,11 +219,7 @@ export const realTimeSlice = createSlice({
       state.notificationCount = state.notifications.filter(n => !n.read).length;
 
       const createdAt = notification.created_at;
-      state.lastUpdateTimestamp = typeof createdAt === 'string' 
-        ? createdAt 
-        : (createdAt && typeof createdAt === 'object' && 'toISOString' in createdAt)
-          ? (createdAt as Date).toISOString() 
-          : new Date().toISOString();
+      state.lastUpdateTimestamp = safeTimestampToString(createdAt);
     },
 
     // Notification management
@@ -265,6 +274,25 @@ export const {
   resetRealTimeState,
 } = realTimeSlice.actions;
 
+// Helper function for safe timestamp parsing
+const safeParseTimestamp = (timestamp: string | Date): number => {
+  try {
+    if (typeof timestamp === 'string') {
+      const parsed = new Date(timestamp);
+      if (isNaN(parsed.getTime())) {
+        return 0; // Invalid date, treat as oldest
+      }
+      return parsed.getTime();
+    } else if (timestamp instanceof Date) {
+      return timestamp.getTime();
+    }
+    return 0;
+  } catch (error) {
+    console.warn('Failed to parse timestamp:', timestamp, error);
+    return 0;
+  }
+};
+
 // Selectors
 export const selectConnectionState = (state: { realTime: RealTimeState }) =>
   state.realTime.connection;
@@ -291,7 +319,7 @@ export const selectRecentActivity = (state: { realTime: RealTimeState }) => {
 
   // Sort by timestamp and return recent ones
   return allUpdates
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .sort((a, b) => safeParseTimestamp(b.timestamp) - safeParseTimestamp(a.timestamp))
     .slice(0, 20);
 };
 

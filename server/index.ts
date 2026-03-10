@@ -30,6 +30,7 @@ import { router as sponsorsRouter } from '@server/features/sponsors/sponsors.rou
 import { router as usersRouter } from '@server/features/users/application/profile';
 import { router as verificationRouter } from '@server/features/users/application/verification';
 import { router as electoralAccountabilityRoutes } from '@server/features/electoral-accountability/application/electoral-accountability.routes';
+import governmentDataRoutes from '@server/features/government-data/presentation/routes';
 
 import { cacheCoordinator } from '@server/infrastructure/cache';
 
@@ -129,7 +130,8 @@ app.get('/api', (_req: Request, res: Response) => {
       community: "/api/community",
       "constitutional-analysis": "/api/constitutional-analysis",
       "argument-intelligence": "/api/argument-intelligence",
-      "electoral-accountability": "/api/electoral-accountability"
+      "electoral-accountability": "/api/electoral-accountability",
+      "government-data": "/api/government-data"
     }
   });
 });
@@ -391,6 +393,7 @@ app.use('/api/recommendation', newRecommendationRouter);
 app.use('/api/pretext-detection', pretextDetectionRouter);
 app.use('/api/feature-flags', featureFlagRouter);
 app.use('/api/electoral-accountability', electoralAccountabilityRoutes);
+app.use('/api', governmentDataRoutes);
 
 // Unified error handling middleware (MUST BE LAST!)
 // This integrates @shared/core error management with server configuration

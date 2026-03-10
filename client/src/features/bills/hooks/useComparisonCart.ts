@@ -7,6 +7,7 @@
 
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '@client/lib/hooks/store';
+import { RootState } from '@client/infrastructure/store';
 import {
   addBill,
   removeBill,
@@ -31,9 +32,9 @@ export interface UseComparisonCartReturn {
 export const useComparisonCart = (): UseComparisonCartReturn => {
   const dispatch = useAppDispatch();
   
-  // Use inline selectors to avoid type issues with redux-persist
-  const billIds = useAppSelector((state) => (state as any).comparisonCart?.billIds || []);
-  const maxBills = useAppSelector((state) => (state as any).comparisonCart?.maxBills || 4);
+  // Use typed selector with proper RootState
+  const billIds = useAppSelector((state: RootState) => state.comparisonCart?.billIds || []);
+  const maxBills = useAppSelector((state: RootState) => state.comparisonCart?.maxBills || 4);
   const count = billIds.length;
   const canAddMore = billIds.length < maxBills;
 

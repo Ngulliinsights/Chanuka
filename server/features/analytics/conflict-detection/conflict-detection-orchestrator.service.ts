@@ -11,13 +11,20 @@ import { conflictSeverityAnalyzerService } from '@server/features/analytics/conf
 import { stakeholderAnalysisService } from '@server/features/analytics/conflict-detection/stakeholder-analysis.service';
 import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache } from '@server/infrastructure/cache/index';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { readDatabase } from '@server/infrastructure/database';
 import { eq } from 'drizzle-orm';
 
 import {
-type Bill,
-bills,
-  type Sponsor, type SponsorAffiliation, sponsorAffiliations,   sponsors, type SponsorTransparency, sponsorTransparency} from '@server/infrastructure/schema';
+  type Bill,
+  bills,
+  type Sponsor,
+  sponsors,
+} from '@server/infrastructure/schema/foundation';
+
+import {
+  type PoliticalAppointment,
+  political_appointments,
+} from '@server/infrastructure/schema/political_economy';
 
 import {
   ConflictAnalysis,
@@ -27,13 +34,41 @@ import {
 
 export class ConflictDetectionOrchestratorService {
   private static instance: ConflictDetectionOrchestratorService;
-  private readonly memoCache = new Map<string, any>();
+  private readonly memoCache = new Map<string, { data: any; timestamp: number }>();
+  private readonly MEMO_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly MAX_MEMO_CACHE_SIZE = 100;
 
   public static getInstance(): ConflictDetectionOrchestratorService {
     if (!ConflictDetectionOrchestratorService.instance) {
       ConflictDetectionOrchestratorService.instance = new ConflictDetectionOrchestratorService();
     }
     return ConflictDetectionOrchestratorService.instance;
+  }
+
+  /**
+   * Clean up expired entries from memoization cache
+   */
+  private cleanupMemoCache(): void {
+    const now = Date.now();
+    const entries = Array.from(this.memoCache.entries());
+    
+    // Remove expired entries
+    for (const [key, value] of entries) {
+      if (now - value.timestamp > this.MEMO_CACHE_TTL) {
+        this.memoCache.delete(key);
+      }
+    }
+    
+    // If still too large, remove oldest entries
+    if (this.memoCache.size > this.MAX_MEMO_CACHE_SIZE) {
+      const sortedEntries = entries
+        .sort((a, b) => a[1].timestamp - b[1].timestamp)
+        .slice(0, entries.length - this.MAX_MEMO_CACHE_SIZE);
+      
+      for (const [key] of sortedEntries) {
+        this.memoCache.delete(key);
+      }
+    }
   }
 
   /**
@@ -45,8 +80,8 @@ export class ConflictDetectionOrchestratorService {
   ): Promise<ConflictAnalysis> {
     const cacheKey = `comprehensive_analysis:${sponsor_id}:${ bill_id || 'all' }`;
 
-    // Clear memoization cache at the start of each new analysis
-    this.memoCache.clear();
+    // Clean up expired memoization cache entries
+    this.cleanupMemoCache();
 
     try {
       logger.info(`📊 Performing comprehensive analysis for sponsor ${sponsor_id}${ bill_id ? ` and bill ${bill_id }` : ''}`);
@@ -85,11 +120,17 @@ export class ConflictDetectionOrchestratorService {
       severity: 'low' | 'medium' | 'high';
       description: string;
     }>;
-  }> { try {
+    error?: {
+      message: string;
+      code: string;
+      details?: unknown;
+    };
+  }> {
+    try {
       const bill = await this.getBill(bill_id);
       if (!bill) {
         throw new ConflictDetectionError(
-          `Bill with ID ${bill_id } not found`,
+          `Bill with ID ${bill_id} not found`,
           'BILL_NOT_FOUND',
           undefined,
           bill_id
@@ -100,12 +141,26 @@ export class ConflictDetectionOrchestratorService {
       const conflicts = await stakeholderAnalysisService.identifyStakeholderConflicts(stakeholders);
 
       return { stakeholders, conflicts };
-    } catch (error) { logger.error({
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorCode = error instanceof ConflictDetectionError ? error.code : 'ANALYSIS_FAILED';
+      
+      logger.error({
         component: 'ConflictDetectionOrchestrator',
         bill_id,
-        error: error instanceof Error ? error.message : String(error)
-       }, 'Error analyzing stakeholders:');
-      return { stakeholders: [], conflicts: [] };
+        error: errorMessage,
+        code: errorCode
+      }, 'Error analyzing stakeholders');
+      
+      return {
+        stakeholders: [],
+        conflicts: [],
+        error: {
+          message: `Failed to analyze stakeholders for bill ${bill_id}: ${errorMessage}`,
+          code: errorCode,
+          details: error instanceof Error ? { stack: error.stack } : undefined
+        }
+      };
     }
   }
 
@@ -144,27 +199,50 @@ export class ConflictDetectionOrchestratorService {
   async generateMitigationStrategies(
     sponsor_id: number,
     bill_id?: number
-  ): Promise<Array<{
-    conflictId: string;
-    strategy: string;
-    timeline: string;
-    priority: 'low' | 'medium' | 'high' | 'critical';
-    stakeholders: string[];
-  }>> { try {
+  ): Promise<{
+    strategies: Array<{
+      conflictId: string;
+      strategy: string;
+      timeline: string;
+      priority: 'low' | 'medium' | 'high' | 'critical';
+      stakeholders: string[];
+    }>;
+    error?: {
+      message: string;
+      code: string;
+      details?: unknown;
+    };
+  }> {
+    try {
       const analysis = await this.performComprehensiveAnalysis(sponsor_id, bill_id);
       const allConflicts = [...analysis.financialConflicts, ...analysis.professionalConflicts];
       
-      return conflictResolutionRecommendationService.generateMitigationStrategies(
+      const strategies = await conflictResolutionRecommendationService.generateMitigationStrategies(
         allConflicts,
         analysis.riskLevel
       );
-     } catch (error) { logger.error({
+      
+      return { strategies };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorCode = error instanceof ConflictDetectionError ? error.code : 'MITIGATION_FAILED';
+      
+      logger.error({
         component: 'ConflictDetectionOrchestrator',
         sponsor_id,
         bill_id,
-        error: error instanceof Error ? error.message : String(error)
-       }, 'Error generating mitigation strategies:');
-      return [];
+        error: errorMessage,
+        code: errorCode
+      }, 'Error generating mitigation strategies');
+      
+      return {
+        strategies: [],
+        error: {
+          message: `Failed to generate mitigation strategies for sponsor ${sponsor_id}: ${errorMessage}`,
+          code: errorCode,
+          details: error instanceof Error ? { stack: error.stack } : undefined
+        }
+      };
     }
   }
 
@@ -228,8 +306,9 @@ export class ConflictDetectionOrchestratorService {
     // Only fetch bill details if we need them (lazy loading optimization)
     const billTitle = bill_id ? (await this.getBill(bill_id))?.title : undefined;
 
-    return { sponsor_id,
-      sponsorName: sponsors.name,
+    return {
+      sponsor_id,
+      sponsorName: sponsor.name,
       bill_id,
       billTitle,
       overallRiskScore,
@@ -242,66 +321,75 @@ export class ConflictDetectionOrchestratorService {
       recommendations,
       lastAnalyzed: new Date(),
       confidence,
-     };
+    };
   }
 
   private async getSponsor(sponsor_id: number): Promise<Sponsor | null> {
     try {
+      const db = readDatabase;
       const [sponsor] = await db
         .select()
         .from(sponsors)
-        .where(eq(sponsors.id, sponsor_id));
+        .where(eq(sponsors.id, String(sponsor_id)));
       
       return sponsor || null;
     } catch (error) {
-      logger.error({ sponsor_id, error }, 'Error fetching sponsor:');
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor');
       return null;
     }
   }
 
-  private async getSponsorAffiliations(sponsor_id: number): Promise<SponsorAffiliation[]> {
+  private async getSponsorAffiliations(sponsor_id: number): Promise<PoliticalAppointment[]> {
     try {
+      const db = readDatabase;
       return await db
         .select()
-        .from(sponsorAffiliations)
-        .where(eq(sponsorAffiliations.sponsor_id, sponsor_id));
+        .from(political_appointments)
+        .where(eq(political_appointments.sponsor_id, String(sponsor_id)));
     } catch (error) {
-      logger.error({ sponsor_id, error }, 'Error fetching sponsor affiliations:');
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor affiliations');
       return [];
     }
   }
 
-  private async getSponsorDisclosures(sponsor_id: number): Promise<SponsorTransparency[]> {
+  private async getSponsorDisclosures(sponsor_id: number): Promise<PoliticalAppointment[]> {
     try {
+      const db = readDatabase;
+      // Using political_appointments as proxy for transparency disclosures
+      // This should be replaced with actual transparency table when available
       return await db
         .select()
-        .from(sponsorTransparency)
-        .where(eq(sponsorTransparency.sponsor_id, sponsor_id));
+        .from(political_appointments)
+        .where(eq(political_appointments.sponsor_id, String(sponsor_id)));
     } catch (error) {
-      logger.error({ sponsor_id, error }, 'Error fetching sponsor disclosures:');
+      logger.error({ sponsor_id, error }, 'Error fetching sponsor disclosures');
       return [];
     }
   }
 
   private async getVotingHistory(sponsor_id: number): Promise<unknown[]> {
     try {
-      // This would be implemented based on your voting history schema
+      // TODO: Implement voting history when schema is available
       // For now, return empty array
+      logger.debug({ sponsor_id }, 'Voting history not yet implemented');
       return [];
     } catch (error) {
-      logger.error({ sponsor_id, error }, 'Error fetching voting history:');
+      logger.error({ sponsor_id, error }, 'Error fetching voting history');
       return [];
     }
   }
 
-  private async getBill(bill_id: number): Promise<Bill | null> { try {
+  private async getBill(bill_id: number): Promise<Bill | null> {
+    try {
+      const db = readDatabase;
       const [bill] = await db
         .select()
         .from(bills)
-        .where(eq(bills.id, bill_id));
+        .where(eq(bills.id, String(bill_id)));
       
       return bill || null;
-     } catch (error) { logger.error({ bill_id, error  }, 'Error fetching bill:');
+    } catch (error) {
+      logger.error({ bill_id, error }, 'Error fetching bill');
       return null;
     }
   }

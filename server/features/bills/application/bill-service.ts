@@ -1,4 +1,3 @@
-// cSpell:ignore upvotes downvotes
 import { logger } from '@server/infrastructure/observability';
 import { Bill, bills } from '@server/infrastructure/schema';
 import { bill_engagement, comments } from '@server/infrastructure/schema';
@@ -19,6 +18,7 @@ import {
   RecordEngagementSchema,
 } from './bill-validation.schemas';
 import { billLifecycleHooks } from './bill-lifecycle-hooks';
+import { getBillDataSource } from '../infrastructure/data-sources/bill-data-source-factory';
 
 // Module-level sanitization service instance
 const inputSanitizationService = new InputSanitizationService();
@@ -108,49 +108,11 @@ const wdb = writeDatabase as any;
 export class CachedBillService {
 
   // --------------------------------------------------------------------------
-  // Fallback Data
-  // --------------------------------------------------------------------------
-
-  private getFallbackBills(): BillWithEngagement[] {
-    const now = new Date();
-    const twentyDaysAgo = new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000);
-
-    return [
-      {
-        id: '550e8400-e29b-41d4-a716-446655440001',
-        title: 'Digital Economy and Data Protection Act 2024',
-        summary:
-          'Comprehensive legislation to regulate digital platforms and protect citizen data privacy rights.',
-        status: 'committee_stage',
-        category: 'technology',
-        introduced_date: '2024-01-15',
-        bill_number: 'HR-2024-001',
-        full_text: 'Full text of the Digital Economy and Data Protection Act...',
-        sponsor_id: null,
-        tags: ['technology', 'privacy', 'digital rights'],
-        last_action_date: '2024-01-20',
-        created_at: twentyDaysAgo,
-        updated_at: now,
-        comment_count: 45,
-        search_vector: null,
-        view_count: 1250,
-        share_count: 89,
-        engagement_score: '156',
-        complexity_score: 7,
-        constitutionalConcerns: {
-          concerns: ['First Amendment implications', 'Commerce Clause considerations'],
-          riskLevel: 'medium',
-        },
-      } as unknown as BillWithEngagement,
-    ];
-  }
-
-  // --------------------------------------------------------------------------
   // Core CRUD Operations
   // --------------------------------------------------------------------------
 
   /**
-   * Retrieves a bill by ID with multi-layer caching.
+   * Retrieves a bill by ID with multi-layer caching and intelligent data source selection.
    */
   async getBillById(id: string): Promise<AsyncServiceResult<BillWithEngagement | null>> {
     return safeAsync(async () => {
@@ -165,38 +127,13 @@ export class CachedBillService {
       }
 
       try {
-        const billResults = (await db
-          .select({
-            id: bills.id,
-            title: bills.title,
-            summary: bills.summary,
-            status: bills.status,
-            category: bills.category,
-            introduced_date: bills.introduced_date,
-            bill_number: bills.bill_number,
-            full_text: bills.full_text,
-            sponsor_id: bills.sponsor_id,
-            tags: bills.tags,
-            last_action_date: bills.last_action_date,
-            created_at: bills.created_at,
-            updated_at: bills.updated_at,
-            comment_count: sql<number>`COUNT(DISTINCT ${comments.id})::int`,
-            view_count: sql<number>`COALESCE(SUM(${bill_engagement.view_count}), 0)::int`,
-            share_count: sql<number>`COALESCE(SUM(${bill_engagement.share_count}), 0)::int`,
-            engagement_score: sql<string>`COALESCE(AVG(${bill_engagement.engagement_score}), 0)::text`,
-          })
-          .from(bills)
-          .leftJoin(comments, eq(bills.id, comments.bill_id))
-          .leftJoin(bill_engagement, eq(bills.id, bill_engagement.bill_id))
-          .where(eq(bills.id, sanitizedId))
-          .groupBy(bills.id)
-          .limit(1)) as any[];
-
-        const bill = billResults[0];
+        // Use intelligent data source (database with mock fallback)
+        const dataSource = await getBillDataSource();
+        const bill = await dataSource.findById(sanitizedId);
 
         if (!bill) return null;
 
-        const result: BillWithEngagement = { ...bill, complexity_score: 5 } as BillWithEngagement;
+        const result: BillWithEngagement = bill as BillWithEngagement;
 
         await cacheService.set(cacheKey, result, CACHE_TTL.BILLS);
 
@@ -209,14 +146,23 @@ export class CachedBillService {
           resource: `bill:${sanitizedId}`,
           action: 'read',
           success: true,
-          details: { bill_id: sanitizedId },
+          details: { 
+            bill_id: sanitizedId,
+            data_source: dataSource.getStatus().type,
+          },
         });
 
         return result;
 
       } catch (error) {
-        logger.warn({ error, id: sanitizedId }, 'Database error in getBillById, using fallback');
-        return this.getFallbackBills().find(b => b.id === sanitizedId) ?? null;
+        logger.error({ 
+          error, 
+          id: sanitizedId,
+          operation: 'getBillById' 
+        }, 'Failed to retrieve bill - no fallback available');
+        
+        // Don't return fake data - let the error propagate
+        throw new Error(`Failed to retrieve bill ${sanitizedId}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }, { service: 'CachedBillService', operation: 'getBillById' });
   }
@@ -437,7 +383,7 @@ export class CachedBillService {
   // --------------------------------------------------------------------------
 
   /**
-   * Searches bills with caching support.
+   * Searches bills with caching support and intelligent data source selection.
    */
   async searchBills(
     query: string,
@@ -455,8 +401,6 @@ export class CachedBillService {
       const sanitizedQuery = inputSanitizationService.sanitizeString(validatedInput.query);
       validateStringInputs([sanitizedQuery]);
 
-      const searchPattern = inputSanitizationService.createSafeLikePattern(sanitizedQuery);
-
       const cacheKey = cacheKeys.search(sanitizedQuery, validatedInput.filters || {});
       const cached = await cacheService.get<Bill[]>(cacheKey);
       if (cached) {
@@ -464,47 +408,46 @@ export class CachedBillService {
         return cached;
       }
 
-      const searchTerm = `%${searchPattern.toLowerCase()}%`;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const conditions: any[] = [
-        or(
-          sql`LOWER(${bills.title}) LIKE ${searchTerm}`,
-          sql`LOWER(${bills.summary}) LIKE ${searchTerm}`,
-          sql`LOWER(${bills.full_text}) LIKE ${searchTerm}`,
-        ),
-      ];
+      try {
+        // Use intelligent data source (database with mock fallback)
+        const dataSource = await getBillDataSource();
+        const searchFilters = {
+          ...validatedInput.filters,
+          search: sanitizedQuery,
+        };
+        
+        const results = await dataSource.findAll(searchFilters);
 
-      const validatedFilters = validatedInput.filters || {};
-      if (validatedFilters.status)     conditions.push(eq(bills.status, validatedFilters.status));
-      if (validatedFilters.category)   conditions.push(eq(bills.category, validatedFilters.category));
-      if (validatedFilters.sponsor_id) conditions.push(eq(bills.sponsor_id, validatedFilters.sponsor_id));
+        await cacheService.set(cacheKey, results, CACHE_TTL.SEARCH);
 
-      const results = (await db
-        .select()
-        .from(bills)
-        .where(and(...conditions))
-        .orderBy(desc(bills.created_at))
-        .limit(50)) as any[];
+        await securityAuditService.logSecurityEvent({
+          event_type: 'bill_search',
+          severity: 'low',
+          user_id: undefined,
+          ip_address: 'internal',
+          user_agent: 'bill-service',
+          resource: 'bills',
+          action: 'search',
+          success: true,
+          details: {
+            query: sanitizedQuery,
+            filters: validatedInput.filters,
+            result_count: results.length,
+            data_source: dataSource.getStatus().type,
+          },
+        });
 
-      await cacheService.set(cacheKey, results, CACHE_TTL.SEARCH);
-
-      await securityAuditService.logSecurityEvent({
-        event_type: 'bill_search',
-        severity: 'low',
-        user_id: undefined,
-        ip_address: 'internal',
-        user_agent: 'bill-service',
-        resource: 'bills',
-        action: 'search',
-        success: true,
-        details: {
+        return results as Bill[];
+      } catch (error) {
+        logger.error({ 
+          error, 
           query: sanitizedQuery,
-          filters,
-          result_count: results.length,
-        },
-      });
-
-      return results as Bill[];
+          filters: validatedInput.filters,
+          operation: 'searchBills' 
+        }, 'Failed to search bills');
+        
+        throw new Error(`Failed to search bills: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }, { service: 'CachedBillService', operation: 'searchBills' });
   }
 
@@ -716,7 +659,7 @@ export class CachedBillService {
   // --------------------------------------------------------------------------
 
   /**
-   * Gets bill statistics with extended caching.
+   * Gets bill statistics with extended caching and intelligent data source selection.
    */
   async getBillStats(): Promise<AsyncServiceResult<BillStats>> {
     return safeAsync(async () => {
@@ -727,42 +670,27 @@ export class CachedBillService {
         return cached;
       }
 
-      const totalResults = (await db
-        .select({ count: sql<number>`COUNT(*)::int` })
-        .from(bills)) as any[];
+      try {
+        // Use intelligent data source (database with mock fallback)
+        const dataSource = await getBillDataSource();
+        const result = await dataSource.getStats();
 
-      const totalResult = totalResults[0];
-
-      const statusResults = (await db
-        .select({ status: bills.status, count: sql<number>`COUNT(*)::int` })
-        .from(bills)
-        .groupBy(bills.status)) as any[];
-
-      const categoryResults = (await db
-        .select({ category: bills.category, count: sql<number>`COUNT(*)::int` })
-        .from(bills)
-        .groupBy(bills.category)) as any[];
-
-      const result: BillStats = {
-        total: totalResult?.count ?? 0,
-        byStatus: statusResults.reduce<Record<string, number>>(
-          (acc: Record<string, number>, row: any) => {
-            acc[row.status] = row.count;
-            return acc;
-          },
-          {},
-        ),
-        byCategory: categoryResults.reduce<Record<string, number>>(
-          (acc: Record<string, number>, row: any) => {
-            acc[row.category ?? 'uncategorized'] = row.count;
-            return acc;
-          },
-          {},
-        ),
-      };
-
-      await cacheService.set(cacheKey, result, CACHE_TTL.HOUR);
-      return result;
+        await cacheService.set(cacheKey, result, CACHE_TTL.HOUR);
+        
+        logger.debug({ 
+          stats: result,
+          dataSource: dataSource.getStatus().type 
+        }, 'Bill stats retrieved successfully');
+        
+        return result;
+      } catch (error) {
+        logger.error({ 
+          error,
+          operation: 'getBillStats' 
+        }, 'Failed to retrieve bill statistics');
+        
+        throw new Error(`Failed to retrieve bill statistics: ${error instanceof Error ? error.message : String(error)}`);
+      }
     }, { service: 'CachedBillService', operation: 'getBillStats' });
   }
 
