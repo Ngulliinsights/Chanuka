@@ -33,12 +33,13 @@ const createVoteSchema = z.object({
   type: z.enum(['upvote', 'downvote'])
 });
 
-const createReportSchema = z.object({
-  targetId: z.string().uuid(),
-  targetType: z.enum(['comment', 'user', 'bill']),
-  reason: z.enum(['spam', 'harassment', 'inappropriate_content', 'misinformation', 'off_topic', 'duplicate', 'other']),
-  description: z.string().max(1000).optional()
-});
+// TODO: Implement report functionality
+// const createReportSchema = z.object({
+//   targetId: z.string().uuid(),
+//   targetType: z.enum(['comment', 'user', 'bill']),
+//   reason: z.enum(['spam', 'harassment', 'inappropriate_content', 'misinformation', 'off_topic', 'duplicate', 'other']),
+//   description: z.string().max(1000).optional()
+// });
 
 // ==========================================================================
 // Comment Routes
@@ -110,6 +111,17 @@ router.get('/comments', async (req: Request, res: Response): Promise<void> => {
 router.get('/comments/:id', async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    if (!id) {
+      res.status(400).json({
+        success: false,
+        error: {
+          type: 'VALIDATION_ERROR',
+          message: 'Comment ID is required',
+          code: 'MISSING_ID'
+        }
+      });
+      return;
+    }
 
     const result = await communityService.getCommentById(id);
 
@@ -154,7 +166,18 @@ router.post('/comments',
   validateRequest(createCommentSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            type: 'UNAUTHORIZED',
+            message: 'User not authenticated',
+            code: 'UNAUTHORIZED'
+          }
+        });
+        return;
+      }
       const data = req.body;
 
       const result = await communityService.createComment(data, userId);
@@ -202,7 +225,29 @@ router.patch('/comments/:id',
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const userId = (req as any).user.id;
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: {
+            type: 'VALIDATION_ERROR',
+            message: 'Comment ID is required',
+            code: 'MISSING_ID'
+          }
+        });
+        return;
+      }
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            type: 'UNAUTHORIZED',
+            message: 'User not authenticated',
+            code: 'UNAUTHORIZED'
+          }
+        });
+        return;
+      }
       const data = req.body;
 
       const result = await communityService.updateComment(id, data, userId);
@@ -249,7 +294,29 @@ router.delete('/comments/:id',
   async (req: Request, res: Response): Promise<void> => {
     try {
       const { id } = req.params;
-      const userId = (req as any).user.id;
+      if (!id) {
+        res.status(400).json({
+          success: false,
+          error: {
+            type: 'VALIDATION_ERROR',
+            message: 'Comment ID is required',
+            code: 'MISSING_ID'
+          }
+        });
+        return;
+      }
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            type: 'UNAUTHORIZED',
+            message: 'User not authenticated',
+            code: 'UNAUTHORIZED'
+          }
+        });
+        return;
+      }
 
       const result = await communityService.deleteComment(id, userId);
 
@@ -296,7 +363,18 @@ router.post('/votes',
   validateRequest(createVoteSchema),
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const userId = (req as any).user.id;
+      const userId = (req as any).user?.id;
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          error: {
+            type: 'UNAUTHORIZED',
+            message: 'User not authenticated',
+            code: 'UNAUTHORIZED'
+          }
+        });
+        return;
+      }
       const data = req.body;
 
       const result = await communityService.createVote(data, userId);
@@ -340,7 +418,7 @@ router.post('/votes',
  * GET /api/community/health
  * Health check endpoint
  */
-router.get('/health', async (req: Request, res: Response): Promise<void> => {
+router.get('/health', async (_req: Request, res: Response): Promise<void> => {
   try {
     res.json({
       status: 'healthy',
@@ -365,7 +443,7 @@ router.get('/health', async (req: Request, res: Response): Promise<void> => {
  * GET /api/community/metadata
  * Get metadata about community features
  */
-router.get('/metadata', async (req: Request, res: Response): Promise<void> => {
+router.get('/metadata', async (_req: Request, res: Response): Promise<void> => {
   try {
     res.json({
       schema: {
