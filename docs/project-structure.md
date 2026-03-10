@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 9, 2026 at 08:57 PM
+**Generated:** March 10, 2026 at 07:40 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,253
+**Total Items:** 4,363
 
 ```
 .
@@ -134,8 +134,12 @@
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── hooks/
 │   │   │   │   │   │   ├── index.ts
-│   │   │   │   │   │   └── useConflictAnalysis.ts
+│   │   │   │   │   │   ├── useAnalysisHistory.ts
+│   │   │   │   │   │   ├── useComprehensiveAnalysis.ts
+│   │   │   │   │   │   ├── useConflictAnalysis.ts
+│   │   │   │   │   │   └── useTriggerAnalysis.ts
 │   │   │   │   │   ├── services/
+│   │   │   │   │   │   ├── analysis-api.service.ts
 │   │   │   │   │   │   ├── conflict-detection.ts
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   └── index.ts
@@ -170,6 +174,7 @@
 │   │   │   │   │   └── user-journey-tracker.ts
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── analysis.ts
+│   │   │   │   │   ├── analytics-api.service.ts
 │   │   │   │   │   ├── analytics.ts
 │   │   │   │   │   ├── api.ts
 │   │   │   │   │   └── index.ts
@@ -222,11 +227,15 @@
 │   │   │   │       ├── ResetPasswordPage.tsx
 │   │   │   │       └── SecurityPage.tsx
 │   │   │   ├── bills/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── useBillComparison.ts
+│   │   │   │   │   └── useComparisonCart.ts
 │   │   │   │   ├── model/
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── bill-analysis.tsx
 │   │   │   │   │   ├── bill-detail.tsx
 │   │   │   │   │   ├── bill-sponsorship-analysis.tsx
+│   │   │   │   │   ├── BillComparisonPage.tsx
 │   │   │   │   │   ├── bills-dashboard-page.tsx
 │   │   │   │   │   ├── BillsPortalPage.tsx
 │   │   │   │   │   └── CollectionsPage.tsx
@@ -237,6 +246,8 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── pagination.ts
 │   │   │   │   │   └── tracking.ts
+│   │   │   │   ├── store/
+│   │   │   │   │   └── comparisonCartSlice.ts
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── action-prompts/
 │   │   │   │   │   │   ├── ActionPromptCard.tsx
@@ -253,6 +264,7 @@
 │   │   │   │   │   │   ├── BillAnalysis.tsx
 │   │   │   │   │   │   ├── BillAnalysisTab.tsx
 │   │   │   │   │   │   ├── comments.tsx
+│   │   │   │   │   │   ├── ComprehensiveAnalysisPanel.tsx
 │   │   │   │   │   │   ├── ConstitutionalAnalysisPanel.tsx
 │   │   │   │   │   │   ├── section.tsx
 │   │   │   │   │   │   ├── stats.tsx
@@ -261,6 +273,13 @@
 │   │   │   │   │   │   ├── AddToCollectionButton.tsx
 │   │   │   │   │   │   ├── CollectionsDialog.tsx
 │   │   │   │   │   │   └── CollectionsList.tsx
+│   │   │   │   │   ├── comparison/
+│   │   │   │   │   │   ├── BillSelector.tsx
+│   │   │   │   │   │   ├── ComparisonFloatingBar.tsx
+│   │   │   │   │   │   ├── ComparisonModal.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── MetadataComparison.tsx
+│   │   │   │   │   │   └── TextDiff.tsx
 │   │   │   │   │   ├── components/
 │   │   │   │   │   │   ├── ImplementationWorkarounds.tsx
 │   │   │   │   │   │   └── index.ts
@@ -347,6 +366,7 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   ├── api.ts
 │   │   │   │   │   ├── backend.ts
+│   │   │   │   │   ├── community-api.service.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── store/
 │   │   │   │   │   └── slices/
@@ -417,6 +437,20 @@
 │   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
+│   │   │   ├── government-data/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useGovernmentData.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── GovernmentDataPage.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── api.ts
+│   │   │   │   │   └── government-data-api.service.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── GovernmentDataCard.tsx
+│   │   │   │   │   └── GovernmentDataList.tsx
+│   │   │   │   ├── hooks.ts
+│   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── home/
 │   │   │   │   └── pages/
@@ -599,6 +633,21 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   └── sitemap.ts
 │   │   │   │   └── index.ts
+│   │   │   ├── sponsors/
+│   │   │   │   ├── pages/
+│   │   │   │   │   ├── SponsorDetailPage.tsx
+│   │   │   │   │   └── SponsorsPage.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── api.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── ConflictVisualization.tsx
+│   │   │   │   │   ├── RiskProfile.tsx
+│   │   │   │   │   ├── SponsorCard.tsx
+│   │   │   │   │   └── SponsorList.tsx
+│   │   │   │   ├── hooks.ts
+│   │   │   │   ├── IMPLEMENTATION_COMPLETE.md
+│   │   │   │   ├── index.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── status/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -663,6 +712,7 @@
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
+│   │   │   ├── api-services.ts
 │   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
@@ -1835,6 +1885,7 @@
 │   ├── adr/
 │   │   ├── 010-natural-branching-architecture.md
 │   │   ├── 011-bills-feature-server-implementation.md
+│   │   ├── 012-analysis-feature-client-implementation.md
 │   │   ├── ADR-001-api-client-consolidation.md
 │   │   ├── ADR-001-DDD-Feature-Structure.md
 │   │   ├── ADR-002-client-api-architecture.md
@@ -1856,6 +1907,7 @@
 │   │   ├── ADR-017-repository-pattern-standardization.md
 │   │   ├── ADR-018-analytics-analysis-separation.md
 │   │   ├── ADR-019-orphaned-infrastructure-cleanup.md
+│   │   ├── ADR-020-root-documentation-consolidation.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -1944,6 +1996,34 @@
 │   │   │   ├── orphan-evaluation-report.md
 │   │   │   ├── README.md
 │   │   │   └── TIER_1_INTEGRATION_STATUS.md
+│   │   ├── root-cleanup-2026-03-09/
+│   │   │   ├── ALL_REACT_ERRORS_FIXED.md
+│   │   │   ├── BILLS_API_FIX_2026-03-09.md
+│   │   │   ├── BILLS_PORTAL_FIX_SUMMARY.md
+│   │   │   ├── BROWSER_CACHE_FIX.md
+│   │   │   ├── CLEAR_BROWSER_CACHE_NOW.md
+│   │   │   ├── CLIENT_API_FIXES_COMPLETE_2026-03-09.md
+│   │   │   ├── CLIENT_CONNECTION_FIX.md
+│   │   │   ├── COMPLETE_FIX_SUMMARY_2026-03-09.md
+│   │   │   ├── COMPLETE_FIX_SUMMARY.md
+│   │   │   ├── DEMO_FIXES_COMPLETE.md
+│   │   │   ├── DEMO_QUICK_REFERENCE.md
+│   │   │   ├── DEMO_READINESS_FINAL_REPORT.md
+│   │   │   ├── DEMO_READINESS_FIXES_SUMMARY.md
+│   │   │   ├── DOCS_CLEANUP_COMPLETE.md
+│   │   │   ├── DUPLICATE_REACT_IMPORT_FIXED.md
+│   │   │   ├── FINAL_ERROR_FIX_SUMMARY.md
+│   │   │   ├── FINAL_FIX_GUIDE.md
+│   │   │   ├── FINAL_FIX_SUMMARY_2026-03-09.md
+│   │   │   ├── QUICK_FIX_REFERENCE.md
+│   │   │   ├── REACT_FORWARDREF_FIX_COMPLETE.md
+│   │   │   ├── README_FIXES.md
+│   │   │   ├── README.md
+│   │   │   ├── RESTART_INSTRUCTIONS.md
+│   │   │   ├── SECURITY_FIXES_SUMMARY.md
+│   │   │   ├── SERVER_FIXES_COMPLETE_2026-03-09.md
+│   │   │   ├── SERVER_STARTUP_SOLUTION.md
+│   │   │   └── SESSION_SUMMARY_2026-03-09.md
 │   │   ├── ACCESSIBILITY_AUDIT_STATUS.md
 │   │   ├── baseline_analysis.md
 │   │   ├── baseline_unused_exports.txt
@@ -2084,15 +2164,20 @@
 │   │   ├── sponsorbyreal.html
 │   │   └── strategy_template_flow.mermaid
 │   ├── DCS/
+│   │   ├── ANALYSIS_FEATURE_CLIENT_COMPLETE.md
+│   │   ├── ANALYSIS_ROUTES_STATUS.md
 │   │   ├── ARCHITECTURE.md
+│   │   ├── BILL_COMPARISON_FEATURE_COMPLETE.md
 │   │   ├── BILLS_FEATURE_COMPLETE.md
 │   │   ├── CLEANUP_PLAN.md
 │   │   ├── CORE_FEATURES.md
 │   │   ├── DEVELOPMENT_WORKFLOW.md
 │   │   ├── EXTRACTION_COMPLETE.md
 │   │   ├── INDEX.md
+│   │   ├── LANDING_PAGES_STRATEGIC_ANALYSIS.md
 │   │   ├── QUICK_REFERENCE.md
-│   │   └── SECURITY_STATUS.md
+│   │   ├── SECURITY_STATUS.md
+│   │   └── STRATEGIC_PATH_FORWARD.md
 │   ├── development/
 │   │   └── CIRCULAR_DEPENDENCY_PREVENTION.md
 │   ├── features/
@@ -2101,6 +2186,7 @@
 │   │   │   ├── SEARCH_INTEGRATION_SUMMARY.md
 │   │   │   ├── SEARCH_INTEGRATION_TEST_PLAN.md
 │   │   │   └── SEARCH_QUICK_START.md
+│   │   ├── ANALYSIS_FEATURE_CLIENT_IMPLEMENTATION.md
 │   │   ├── CODE_QUALITY_DEEP_DIVE_SECURE_QUERY_BUILDER.md
 │   │   ├── ELECTORAL_ACCOUNTABILITY.md
 │   │   ├── NOTIFICATION_SYSTEM_CONSOLIDATION.md
@@ -2215,16 +2301,20 @@
 │   │   ├── docs-module.md
 │   │   ├── IMPORT_PATH_GOVERNANCE.md
 │   │   ├── MIGRATION_LOG.md
+│   │   ├── MODERNIZATION_GUIDE.md
 │   │   ├── PERFORMANCE_OPTIMIZATIONS.md
 │   │   ├── PERFORMANCE_QUICK_REFERENCE.md
 │   │   ├── race-condition-analysis.md
 │   │   ├── schema-domain-relationships.md
 │   │   └── TYPE_SYSTEM_CLEANUP_COMPLETE.md
+│   ├── ADR_DCS_INTEGRATION_COMPLETE.md
 │   ├── ARCHITECTURAL_LESSONS_LEARNED.md
+│   ├── DESIGN_DECISIONS_EXTRACTED.md
 │   ├── DESIGN_DECISIONS.md
 │   ├── DEVELOPER_GUIDE_Feature_Creation.md
 │   ├── DEVELOPER_ONBOARDING.md
 │   ├── DEVELOPMENT_WORKFLOW.md
+│   ├── DOCUMENTATION_NAVIGATION.md
 │   ├── DOCUMENTATION_REMEDIATION_PLAN.md
 │   ├── IMPLEMENTATION_COMPLETE_SUMMARY.md
 │   ├── PORT_CONFIGURATION.md
@@ -2514,13 +2604,15 @@
 │   │   │   │   └── index.ts
 │   │   │   ├── analysis-validation.schemas.ts
 │   │   │   ├── analysis.routes.ts
-│   │   │   └── architecture-analysis-report.md
+│   │   │   ├── architecture-analysis-report.md
+│   │   │   └── ENDPOINT_TESTING.md
 │   │   ├── analytics/
 │   │   │   ├── application/
 │   │   │   │   ├── analytics-routes-integrated.ts
 │   │   │   │   ├── analytics-service-integrated.ts
 │   │   │   │   ├── analytics-validation.schemas.ts
 │   │   │   │   ├── analytics.routes.ts
+│   │   │   │   ├── analytics.service.ts
 │   │   │   │   ├── dashboard.routes.ts
 │   │   │   │   ├── engagement-analytics.routes.ts
 │   │   │   │   ├── engagement-analytics.service.ts
@@ -2586,6 +2678,8 @@
 │   │   │   │   ├── dashboard-config.json
 │   │   │   │   ├── runbooks.md
 │   │   │   │   └── setup-guide.md
+│   │   │   ├── presentation/
+│   │   │   │   └── analytics.routes.ts
 │   │   │   ├── scripts/
 │   │   │   │   ├── configure-ml-migration.ts
 │   │   │   │   └── demo-ml-migration.ts
@@ -2611,6 +2705,7 @@
 │   │   │   │   └── progress-storage.d.ts
 │   │   │   ├── FIXES_APPLIED.md
 │   │   │   ├── index.ts
+│   │   │   ├── MODERNIZATION_COMPLETE_NEW.md
 │   │   │   └── MODERNIZATION_COMPLETE.md
 │   │   ├── argument-intelligence/
 │   │   │   ├── application/
@@ -2645,6 +2740,7 @@
 │   │   │   └── routes.ts
 │   │   ├── bills/
 │   │   │   ├── application/
+│   │   │   │   ├── bill-health.service.ts
 │   │   │   │   ├── bill-integration-orchestrator.ts
 │   │   │   │   ├── bill-lifecycle-hooks.ts
 │   │   │   │   ├── bill-service-adapter.ts
@@ -2674,7 +2770,14 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── LegislativeStorageTypes.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── data-sources/
+│   │   │   │   │   ├── bill-data-source-factory.ts
+│   │   │   │   │   ├── bill-data-source.interface.ts
+│   │   │   │   │   ├── database-bill-data-source.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── mock-bill-data-source.ts
 │   │   │   │   ├── mocks/
+│   │   │   │   │   ├── bill-mock-data.ts
 │   │   │   │   │   ├── impact-mock-data.ts
 │   │   │   │   │   └── translation-mock-data.ts
 │   │   │   │   ├── repositories/
@@ -2719,6 +2822,7 @@
 │   │   │   │   │   ├── create-comment.use-case.ts
 │   │   │   │   │   └── vote-on-comment.use-case.ts
 │   │   │   │   ├── community-validation.schemas.ts
+│   │   │   │   ├── community.service.ts
 │   │   │   │   ├── CommunityApplicationService.ts
 │   │   │   │   ├── enhanced-community-service.ts
 │   │   │   │   └── index.ts
@@ -2742,9 +2846,10 @@
 │   │   │   │       ├── MockArgumentAnalysisService.ts
 │   │   │   │       └── MockCommentRepository.ts
 │   │   │   ├── presentation/
-│   │   │   │   └── http/
-│   │   │   │       ├── community-routes.ts
-│   │   │   │       └── community-validation.middleware.ts
+│   │   │   │   ├── http/
+│   │   │   │   │   ├── community-routes.ts
+│   │   │   │   │   └── community-validation.middleware.ts
+│   │   │   │   └── community.routes.ts
 │   │   │   ├── comment-voting.ts
 │   │   │   ├── comment.ts
 │   │   │   ├── community.ts
@@ -2845,10 +2950,32 @@
 │   │   │   │   └── institutional/
 │   │   │   │       └── api-gateway-service.ts
 │   │   │   ├── application/
+│   │   │   │   ├── services/
+│   │   │   │   │   └── government-data.service.ts
 │   │   │   │   ├── enhanced-government-data-service.ts
 │   │   │   │   ├── government-data-validation.schemas.ts
 │   │   │   │   ├── managed-integration.service.ts
 │   │   │   │   └── sync-service.ts
+│   │   │   ├── domain/
+│   │   │   │   ├── entities/
+│   │   │   │   │   └── government-data.entity.ts
+│   │   │   │   └── repositories/
+│   │   │   │       ├── government-data.repository.interface.ts
+│   │   │   │       └── government-data.repository.ts
+│   │   │   ├── infrastructure/
+│   │   │   │   ├── data-sources/
+│   │   │   │   │   └── external-api-client.ts
+│   │   │   │   ├── repositories/
+│   │   │   │   │   └── government-data.repository.impl.ts
+│   │   │   │   ├── transformers/
+│   │   │   │   │   └── data-transformer.service.ts
+│   │   │   │   └── validation/
+│   │   │   │       └── data-validator.service.ts
+│   │   │   ├── presentation/
+│   │   │   │   ├── routes/
+│   │   │   │   │   └── government-data.routes.ts
+│   │   │   │   ├── government-data.routes.ts
+│   │   │   │   └── routes.ts
 │   │   │   ├── services/
 │   │   │   │   ├── api-integrations.service.ts
 │   │   │   │   ├── data-validation-pipeline.service.ts
@@ -2856,8 +2983,8 @@
 │   │   │   │   ├── government-data-integration.service.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── parliament-scraper.service.ts
-│   │   │   ├── index.ts
-│   │   │   └── routes.ts
+│   │   │   ├── IMPLEMENTATION_COMPLETE.md
+│   │   │   └── index.ts
 │   │   ├── market/
 │   │   │   ├── market.controller.ts
 │   │   │   ├── market.service.ts
@@ -3840,6 +3967,8 @@
 │   │   ├── index.ts
 │   │   └── limits.ts
 │   ├── core/
+│   │   ├── api/
+│   │   │   └── base-api-service.ts
 │   │   ├── primitives/
 │   │   │   ├── constants/
 │   │   │   │   ├── http-status.ts
@@ -3914,13 +4043,17 @@
 │   │   │   │   ├── admin.contract.ts
 │   │   │   │   ├── admin.schemas.ts
 │   │   │   │   ├── analytics.contract.ts
+│   │   │   │   ├── analytics.contracts.ts
 │   │   │   │   ├── analytics.schemas.ts
 │   │   │   │   ├── bill.contract.ts
 │   │   │   │   ├── bill.schemas.ts
 │   │   │   │   ├── comment.contract.ts
 │   │   │   │   ├── comment.schemas.ts
+│   │   │   │   ├── community.contracts.ts
+│   │   │   │   ├── core.contracts.ts
 │   │   │   │   ├── endpoint-registry.ts
 │   │   │   │   ├── endpoint.ts
+│   │   │   │   ├── government-data.contracts.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── notification.contract.ts
 │   │   │   │   ├── notification.schemas.ts
@@ -3988,6 +4121,8 @@
 │   │   │   └── safeguards/
 │   │   │       ├── index.ts
 │   │   │       └── moderation.ts
+│   │   ├── features/
+│   │   │   └── analysis.ts
 │   │   ├── migration/
 │   │   │   ├── breaking-changes.ts
 │   │   │   ├── deprecation-warnings.ts
@@ -4100,6 +4235,7 @@
 │   │   ├── error-scenarios.integration.test.ts
 │   │   ├── graph-module.integration.test.ts
 │   │   ├── index.ts
+│   │   ├── modernized-features.integration.test.ts
 │   │   ├── notification-e2e.test.ts
 │   │   ├── phase1-integration.test.ts
 │   │   ├── README.md
@@ -4198,39 +4334,21 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
-├── ALL_REACT_ERRORS_FIXED.md
 ├── ARCHITECTURE.md
-├── BILLS_API_FIX_2026-03-09.md
 ├── BILLS_INTEGRATION_STATUS.md
-├── BILLS_PORTAL_FIX_SUMMARY.md
-├── BROWSER_CACHE_FIX.md
 ├── CHANGELOG.md
-├── CLEAR_BROWSER_CACHE_NOW.md
-├── CLIENT_API_FIXES_COMPLETE_2026-03-09.md
-├── CLIENT_CONNECTION_FIX.md
-├── COMPLETE_FIX_SUMMARY_2026-03-09.md
-├── COMPLETE_FIX_SUMMARY.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
 ├── CURRENT_CAPABILITIES.md
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
-├── DEMO_FIXES_COMPLETE.md
-├── DEMO_QUICK_REFERENCE.md
-├── DEMO_READINESS_FINAL_REPORT.md
-├── DEMO_READINESS_FIXES_SUMMARY.md
 ├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
-├── DOCS_CLEANUP_COMPLETE.md
 ├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
-├── DUPLICATE_REACT_IMPORT_FIXED.md
 ├── FEATURE_INTEGRATION_STATUS.md
-├── FINAL_ERROR_FIX_SUMMARY.md
-├── FINAL_FIX_GUIDE.md
-├── FINAL_FIX_SUMMARY_2026-03-09.md
 ├── fix.cjs
 ├── generate-structure.mjs
 ├── knip.config.ts
@@ -4241,17 +4359,9 @@
 ├── pnpm-lock.yaml
 ├── pnpm-workspace.yaml
 ├── postcss.config.js
-├── QUICK_FIX_REFERENCE.md
 ├── QUICK_START_GUIDE.md
 ├── QUICK_START.md
-├── REACT_FORWARDREF_FIX_COMPLETE.md
-├── README_FIXES.md
 ├── README.md
-├── RESTART_INSTRUCTIONS.md
-├── SECURITY_FIXES_SUMMARY.md
-├── SERVER_FIXES_COMPLETE_2026-03-09.md
-├── SERVER_STARTUP_SOLUTION.md
-├── SESSION_SUMMARY_2026-03-09.md
 ├── start-dev.js
 ├── tailwind.config.js
 ├── tsconfig.json

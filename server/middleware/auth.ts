@@ -63,3 +63,11 @@ export const requireRole = (roles: string[]) => {
     next();
   };
 };
+
+export const requireAuth = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    res.status(401).json({ error: 'Authentication required' });
+    return;
+  }
+  next();
+};

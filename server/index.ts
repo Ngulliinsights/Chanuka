@@ -9,7 +9,7 @@ import { router as externalApiDashboardRouter } from '@server/features/admin/app
 import { router as externalApiManagementRouter } from '@server/features/admin/application/external-api-dashboard.routes';
 import { router as systemRouter } from '@server/features/admin/application/system.routes';
 import { analysisRouter } from '@server/features/analysis/analysis.routes';
-import analyticsRouter from '@server/features/analytics/application/analytics.routes';
+import analyticsRouter from '@server/features/analytics/presentation/analytics.routes';
 import { argumentIntelligenceRouter } from '@server/features/argument-intelligence/argument-intelligence-router';
 import { billTrackingRouter } from '@server/features/bills/presentation/http/bill-tracking.routes';
 import { router as billsRouter } from '@server/features/bills/presentation/http/bills.routes';
@@ -31,6 +31,7 @@ import { router as usersRouter } from '@server/features/users/application/profil
 import { router as verificationRouter } from '@server/features/users/application/verification';
 import { router as electoralAccountabilityRoutes } from '@server/features/electoral-accountability/application/electoral-accountability.routes';
 import governmentDataRoutes from '@server/features/government-data/presentation/routes';
+import communityRoutes from '@server/features/community/presentation/community.routes';
 
 import { cacheCoordinator } from '@server/infrastructure/cache';
 
@@ -378,7 +379,7 @@ app.use('/api/bill-tracking', billTrackingRouter);
 app.use('/api/analytics', analyticsRouter);
 app.use('/api/sponsors', sponsorsRouter);
 app.use('/api/users', usersRouter);
-app.use('/api/community', communityRouter);
+app.use('/api/community', communityRoutes);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/notifications/preferences', alertPreferenceRoutes);
 app.use('/api/search', searchRouter);

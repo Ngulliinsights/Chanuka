@@ -1,21 +1,21 @@
 /**
  * API Contracts Index
- * Centralized exports for all API contract definitions
+ * Centralized exports for all API contracts
  */
 
-export * from './user.contract';
-export * from './bill.contract';
-export * from './comment.contract';
-export * from './notification.contract';
-export * from './analytics.contract';
-export * from './search.contract';
-export * from './admin.contract';
-export * from './endpoint';
-export * from './endpoint-registry';
-export * from './user.schemas';
-export * from './bill.schemas';
-export * from './comment.schemas';
-export * from './notification.schemas';
-export * from './analytics.schemas';
-export * from './search.schemas';
-export * from './admin.schemas';
+// Core contracts
+export * from './core.contracts';
+
+// Feature-specific contracts
+export * from './government-data.contracts';
+export * from './community.contracts';
+export * from './analytics.contracts';
+
+// Bills contracts (existing)
+// export * from './bills.contracts'; // TODO: Create when modernizing bills API contracts
+
+// Users contracts (existing)
+// export * from './users.contracts'; // TODO: Create when modernizing users API contracts
+
+// Admin contracts (existing)  
+// export * from './admin.contracts'; // TODO: Create when modernizing admin API contracts

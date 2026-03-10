@@ -1,530 +1,465 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+/**
+ * Community Hooks
+ * React hooks for community features (comments, voting, reports) with real-time updates
+ */
 
-import { communityApiService } from '@client/features/community/services/api';
-import { useToast } from '@client/lib/hooks/use-toast';
-import type {
-  CommentQueryOptions,
-  VoteResponse,
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback, useEffect } from 'react';
+import { communityApiService } from '../services/community-api.service';
+import {
   Comment,
-  DiscussionThread,
+  Vote,
+  Report,
   CreateCommentRequest,
   UpdateCommentRequest,
-  VoteRequest,
-  CreateThreadRequest,
-  ShareRequest,
-} from '@client/lib/types/community';
+  CreateVoteRequest,
+  CreateReportRequest,
+  CommentQueryParams,
+  VoteQueryParams,
+  ReportQueryParams,
+  VoteType
+} from '@shared/types/api/contracts/community.contracts';
+import { useToast } from '@client/components/ui/use-toast';
 
-// Define CommunityFilters interface locally since it's not exported from types
-interface CommunityFilters {
-  contentTypes?: Array<'comments' | 'expert_insights' | 'threads'>;
-  timeRange?: 'day' | 'week' | 'month' | 'all';
-  geography?: {
-    states?: string[];
-    districts?: string[];
-    counties?: string[];
-  };
-}
+// Query Keys
+export const communityKeys = {
+  all: ['community'] as const,
+  comments: () => [...communityKeys.all, 'comments'] as const,
+  commentsList: (params: Partial<CommentQueryParams>) => [...communityKeys.comments(), 'list', params] as const,
+  comment: (id: string) => [...communityKeys.comments(), 'detail', id] as const,
+  commentTree: (billId: string, params?: any) => [...communityKeys.comments(), 'tree', billId, params] as const,
+  votes: () => [...communityKeys.all, 'votes'] as const,
+  votesList: (params: Partial<VoteQueryParams>) => [...communityKeys.votes(), 'list', params] as const,
+  userVote: (targetId: string, targetType: string) => [...communityKeys.votes(), 'user', targetType, targetId] as const,
+  reports: () => [...communityKeys.all, 'reports'] as const,
+  reportsList: (params: Partial<ReportQueryParams>) => [...communityKeys.reports(), 'list', params] as const,
+  stats: () => [...communityKeys.all, 'stats'] as const,
+  trends: (params: any) => [...communityKeys.all, 'trends', params] as const,
+  contributors: (params: any) => [...communityKeys.all, 'contributors', params] as const,
+};
 
-interface ShareResponse {
-  platform: string;
-  success: boolean;
-}
-
-/**
- * Hook for comments management
- */
-export function useComments(bill_id?: string, filters?: CommentQueryOptions) {
-  const queryClient = useQueryClient();
-
-  const comments = useQuery({
-    queryKey: ['community', 'comments', bill_id, filters],
-    queryFn: () =>
-      bill_id
-        ? communityApiService.getBillComments(parseInt(bill_id), filters)
-        : Promise.resolve([]),
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-
-  const createComment = useMutation<Comment, Error, CreateCommentRequest>({
-    mutationFn: async (request: CreateCommentRequest) => {
-      // Adapt the request to match API service expectations
-      const apiRequest = {
-        billId: request.billId,
-        content: request.content,
-        parentId: request.parentId,
-      };
-      return await communityApiService.addComment(apiRequest);
-    },
-    onSuccess: newComment => {
-      queryClient.invalidateQueries({
-        queryKey: ['community', 'comments', newComment.billId],
-      });
-      queryClient.setQueryData(
-        ['community', 'comments', newComment.billId],
-        (old: Comment[] | undefined) => [newComment, ...(old || [])]
-      );
-    },
-    onError: (error: Error) => {
-      console.error('Failed to create comment:', error);
-    },
-  });
-
-  const updateComment = useMutation<
-    Comment,
-    Error,
-    { comment_id: string; request: UpdateCommentRequest }
-  >({
-    mutationFn: ({ comment_id, request }: { comment_id: string; request: UpdateCommentRequest }) =>
-      communityApiService.updateComment(comment_id, request.content),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['community', 'comments'],
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Failed to update comment:', error);
-    },
-  });
-
-  const deleteComment = useMutation({
-    mutationFn: (comment_id: string) => communityApiService.deleteComment(comment_id),
-    onSuccess: (_, comment_id) => {
-      // Remove from cache
-      queryClient.setQueryData(
-        ['community', 'comments'],
-        (old: Comment[] | undefined) => old?.filter((c: Comment) => String(c.id) !== comment_id) || []
-      );
-    },
-    onError: (error: Error) => {
-      console.error('Failed to delete comment:', error);
-    },
-  });
-
-  const voteOnComment = useMutation<VoteResponse | null, Error, VoteRequest>({
-    mutationFn: async (request: VoteRequest) => {
-      const result = await communityApiService.voteComment(String(request.commentId), request.voteType as 'up' | 'down');
-      return result; // API returns VoteResponse | null
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['community', 'comments'],
-      });
-    },
-    onError: (error: Error) => {
-      console.error('Failed to vote on comment:', error);
-    },
-  });
-
-  return {
-    comments,
-    createComment,
-    updateComment,
-    deleteComment,
-    voteOnComment,
-  };
-}
-
-/**
- * Hook for discussion threads
- */
-export function useThreads(billId?: number) {
-  const queryClient = useQueryClient();
-
-  const threads = useQuery({
-    queryKey: ['community', 'threads', billId],
-    queryFn: () => {
-      if (billId) {
-        return communityApiService.getBillThreads(billId);
-      }
-      return Promise.resolve([]);
-    },
-    enabled: !!billId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  const createThread = useMutation({
-    mutationFn: (request: CreateThreadRequest) => {
-      return communityApiService.createThread({
-        billId: request.billId,
-        title: request.title,
-        description: request.description,
-      });
-    },
-    onSuccess: newThread => {
-      queryClient.invalidateQueries({ queryKey: ['community', 'threads', newThread.billId] });
-      queryClient.setQueryData(
-        ['community', 'threads', newThread.billId],
-        (old: DiscussionThread[] | undefined) => [newThread, ...(old || [])]
-      );
-    },
-    onError: (error: Error) => {
-      console.error('Failed to create thread:', error);
-    },
-  });
-
-  const updateThread = useMutation({
-    mutationFn: ({
-      threadId,
-      updates,
-    }: {
-      threadId: string;
-      updates: { title?: string; description?: string };
-    }) => {
-      return communityApiService.updateThread(threadId, updates);
-    },
-    onSuccess: updatedThread => {
-      queryClient.invalidateQueries({ queryKey: ['community', 'threads', updatedThread.billId] });
-    },
-    onError: (error: Error) => {
-      console.error('Failed to update thread:', error);
-    },
-  });
-
-  const deleteThread = useMutation({
-    mutationFn: (threadId: string) => {
-      return communityApiService.deleteThread(threadId);
-    },
-    onSuccess: (_, threadId) => {
-      // Remove from all thread queries
-      queryClient.invalidateQueries({ queryKey: ['community', 'threads'] });
-    },
-    onError: (error: Error) => {
-      console.error('Failed to delete thread:', error);
-    },
-  });
-
-  return {
-    threads,
-    createThread,
-    updateThread,
-    deleteThread,
-  };
-}
-
-/**
- * Hook for individual thread details
- */
-export function useThread(threadId: string | undefined) {
+// Comment Hooks
+export function useComments(params?: Partial<CommentQueryParams>) {
   return useQuery({
-    queryKey: ['community', 'thread', threadId],
-    queryFn: () => {
-      if (!threadId) return Promise.resolve(null);
-      return communityApiService.getThread(threadId);
-    },
-    enabled: !!threadId,
+    queryKey: communityKeys.commentsList(params || {}),
+    queryFn: () => communityApiService.getComments(params),
     staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 
-/**
- * Hook for social sharing
- */
-export function useSocialSharing() {
+export function useComment(id: string) {
+  return useQuery({
+    queryKey: communityKeys.comment(id),
+    queryFn: () => communityApiService.getComment(id),
+    enabled: !!id,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+export function useCommentTree(billId: string, params?: { 
+  maxDepth?: number; 
+  sortBy?: 'newest' | 'oldest' | 'popular'; 
+  limit?: number 
+}) {
+  return useQuery({
+    queryKey: communityKeys.commentTree(billId, params),
+    queryFn: () => communityApiService.getCommentTree(billId, params),
+    enabled: !!billId,
+    staleTime: 1 * 60 * 1000, // 1 minute
+  });
+}
+
+export function useCommentReplies(commentId: string, params?: Partial<CommentQueryParams>) {
+  return useQuery({
+    queryKey: [...communityKeys.comment(commentId), 'replies', params],
+    queryFn: () => communityApiService.getCommentReplies(commentId, params),
+    enabled: !!commentId,
+    staleTime: 2 * 60 * 1000,
+  });
+}
+
+// Comment Mutations
+export function useCreateComment() {
+  const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const shareContent = useMutation<ShareResponse, Error, ShareRequest>({
-    mutationFn: (request: ShareRequest) => {
-      // Note: communityApiService doesn't have sharing methods
-      // This would need to be added
-      console.log('Share content:', request);
-      return Promise.resolve({ platform: request.platform, success: true } as ShareResponse);
-    },
-    onSuccess: (share: ShareResponse) => {
+  return useMutation({
+    mutationFn: (data: CreateCommentRequest) => 
+      communityApiService.createComment(data),
+    onSuccess: (response, variables) => {
+      // Invalidate related queries
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      queryClient.invalidateQueries({ queryKey: communityKeys.commentTree(variables.billId) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.stats() });
+      
+      if (variables.parentId) {
+        queryClient.invalidateQueries({ 
+          queryKey: [...communityKeys.comment(variables.parentId), 'replies'] 
+        });
+      }
+
       toast({
-        title: 'Content shared!',
-        description: `Shared to ${share.platform}`,
+        title: 'Comment Posted',
+        description: 'Your comment has been posted successfully',
       });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Share failed',
-        description: error.message,
+        title: 'Failed to Post Comment',
+        description: error.message || 'Unable to post comment. Please try again.',
         variant: 'destructive',
       });
     },
   });
-
-  const trackClick = useMutation({
-    mutationFn: (shareId: string) => {
-      // Note: communityApiService doesn't have tracking methods
-      console.log('Track share click:', shareId);
-      return Promise.resolve();
-    },
-    // Silent operation, no user feedback needed
-  });
-
-  return {
-    shareContent,
-    trackClick,
-  };
 }
 
-/**
- * Hook for community statistics
- */
-export function useCommunityStats() {
-  const stats = useQuery({
-    queryKey: ['community', 'stats'],
-    queryFn: () => communityApiService.getCommunityStats(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-  });
+export function useUpdateComment() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
-  const topContributors = useQuery({
-    queryKey: ['community', 'contributors'],
-    queryFn: () => {
-      // Note: communityApiService doesn't have getTopContributors method
-      return Promise.resolve([]);
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateCommentRequest }) =>
+      communityApiService.updateComment(id, data),
+    onSuccess: (response, { id }) => {
+      queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      
+      toast({
+        title: 'Comment Updated',
+        description: 'Your comment has been updated successfully',
+      });
     },
+    onError: (error: Error) => {
+      toast({
+        title: 'Failed to Update Comment',
+        description: error.message || 'Unable to update comment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+export function useDeleteComment() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (id: string) => communityApiService.deleteComment(id),
+    onSuccess: (response, id) => {
+      queryClient.removeQueries({ queryKey: communityKeys.comment(id) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      queryClient.invalidateQueries({ queryKey: communityKeys.stats() });
+      
+      toast({
+        title: 'Comment Deleted',
+        description: 'Your comment has been deleted',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Failed to Delete Comment',
+        description: error.message || 'Unable to delete comment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+// Vote Hooks
+export function useUserVote(targetId: string, targetType: 'comment' | 'bill' | 'amendment') {
+  return useQuery({
+    queryKey: communityKeys.userVote(targetId, targetType),
+    queryFn: () => communityApiService.getUserVote(targetId, targetType),
+    enabled: !!(targetId && targetType),
+    staleTime: 1 * 60 * 1000, // 1 minute
+  });
+}
+
+export function useVoteOnComment() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ commentId, type }: { commentId: string; type: VoteType }) =>
+      communityApiService.voteOnComment(commentId, type),
+    onSuccess: (response, { commentId, type }) => {
+      // Update user vote cache
+      queryClient.setQueryData(
+        communityKeys.userVote(commentId, 'comment'),
+        response
+      );
+      
+      // Invalidate comment to refresh vote counts
+      queryClient.invalidateQueries({ queryKey: communityKeys.comment(commentId) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      
+      toast({
+        title: type === 'upvote' ? 'Upvoted' : 'Downvoted',
+        description: `You ${type === 'upvote' ? 'upvoted' : 'downvoted'} this comment`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Vote Failed',
+        description: error.message || 'Unable to record your vote. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+export function useVoteOnBill() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ billId, type }: { billId: string; type: VoteType }) =>
+      communityApiService.voteOnBill(billId, type),
+    onSuccess: (response, { billId, type }) => {
+      queryClient.setQueryData(
+        communityKeys.userVote(billId, 'bill'),
+        response
+      );
+      
+      toast({
+        title: type === 'upvote' ? 'Supported' : 'Opposed',
+        description: `You ${type === 'upvote' ? 'support' : 'oppose'} this bill`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Vote Failed',
+        description: error.message || 'Unable to record your vote. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+// Report Hooks
+export function useCreateReport() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: (data: CreateReportRequest) =>
+      communityApiService.createReport(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: communityKeys.reports() });
+      
+      toast({
+        title: 'Report Submitted',
+        description: 'Thank you for reporting. We will review this content.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Report Failed',
+        description: error.message || 'Unable to submit report. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+// Statistics and Analytics Hooks
+export function useCommunityStats(params?: {
+  dateFrom?: string;
+  dateTo?: string;
+  billId?: string;
+  userId?: string;
+}) {
+  return useQuery({
+    queryKey: [...communityKeys.stats(), params],
+    queryFn: () => communityApiService.getCommunityStats(params),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useEngagementTrends(params: {
+  period: 'day' | 'week' | 'month';
+  dateFrom?: string;
+  dateTo?: string;
+}) {
+  return useQuery({
+    queryKey: communityKeys.trends(params),
+    queryFn: () => communityApiService.getEngagementTrends(params),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+export function useTopContributors(params?: {
+  period?: 'day' | 'week' | 'month' | 'all';
+  limit?: number;
+}) {
+  return useQuery({
+    queryKey: communityKeys.contributors(params || {}),
+    queryFn: () => communityApiService.getTopContributors(params),
     staleTime: 15 * 60 * 1000, // 15 minutes
   });
-
-  const recentActivity = useQuery({
-    queryKey: ['community', 'activity'],
-    queryFn: () => {
-      // Note: communityApiService doesn't have getRecentActivity method
-      return Promise.resolve([]);
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-    refetchInterval: 60 * 1000, // Refetch every minute
-  });
-
-  return {
-    stats,
-    topContributors,
-    recentActivity,
-  };
 }
 
-/**
- * Hook for thread participation
- */
-export function useThreadParticipation(threadId: string) {
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  const participants = useQuery({
-    queryKey: ['community', 'thread', threadId, 'participants'],
-    queryFn: () => {
-      // Note: communityApiService doesn't have thread participation methods
-      return Promise.resolve([]);
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
-  const joinThread = useMutation({
-    mutationFn: () => {
-      // Note: communityApiService doesn't have thread participation methods
-      console.log('Join thread:', threadId);
-      return Promise.resolve();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['community', 'thread', threadId, 'participants'],
-      });
-      toast({
-        title: 'Joined discussion',
-        description: 'You are now participating in this thread.',
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Failed to join',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
-
-  const leaveThread = useMutation({
-    mutationFn: () => {
-      // Note: communityApiService doesn't have thread participation methods
-      console.log('Leave thread:', threadId);
-      return Promise.resolve();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['community', 'thread', threadId, 'participants'],
-      });
-      toast({
-        title: 'Left discussion',
-        description: 'You are no longer participating in this thread.',
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Failed to leave',
-        description: error.message,
-        variant: 'destructive',
-      });
-    },
-  });
-
-  return {
-    participants,
-    joinThread,
-    leaveThread,
-  };
-}
-
-/**
- * Hook for community search
- */
-export function useCommunitySearch(
-  query: string,
-  options?: {
-    contentTypes?: Array<'comment' | 'thread' | 'insight'>;
-    billId?: number;
+// Search Hook
+export function useCommentSearch() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [searchParams, setSearchParams] = useState<{
+    billId?: string;
+    userId?: string;
+    dateFrom?: string;
+    dateTo?: string;
     limit?: number;
-    offset?: number;
-  }
-) {
-  return useQuery({
-    queryKey: ['community', 'search', query, options],
-    queryFn: () => {
-      if (query.length < 3) return Promise.resolve([]);
-      return communityApiService.searchCommunity(query, options);
-    },
-    enabled: query.length > 2,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-}
+  }>({});
 
-/**
- * Hook for popular tags
- */
-export function usePopularTags(limit = 20) {
-  return useQuery({
-    queryKey: ['community', 'tags', limit],
-    queryFn: () => {
-      // Note: communityApiService doesn't have tags method
-      return Promise.resolve([]);
-    },
-    staleTime: 30 * 60 * 1000, // 30 minutes
-  });
-}
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
 
-/**
- * Hook for activity feed
- */
-export function useActivityFeed(filters?: CommunityFilters, page: number = 1, limit: number = 20) {
-  return useQuery({
-    queryKey: ['community', 'activity', filters, page, limit],
-    queryFn: () => {
-      // Adapt filters to API expectations
-      const apiFilters = {
-        limit,
-        offset: (page - 1) * limit,
-        contentTypes: filters?.contentTypes?.map((type: string) => {
-          // Map content types to API expected values
-          switch (type) {
-            case 'comments':
-              return 'comment' as const;
-            case 'expert_insights':
-              return 'expert_insight' as const;
-            default:
-              return 'comment' as const; // fallback
-          }
-        }),
-        timeRange: filters?.timeRange,
-        geography: filters?.geography
-          ? {
-              state: filters.geography.states?.[0], // Take first state
-              district: filters.geography.districts?.[0], // Take first district
-              county: filters.geography.counties?.[0], // Take first county
-            }
-          : undefined,
-        followedOnly: false,
-      };
-      return communityApiService.getActivityFeed(apiFilters);
-    },
-    staleTime: 3 * 60 * 1000, // 3 minutes
-  });
-}
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
-/**
- * Hook for trending topics
- */
-export function useTrendingTopics(limit: number = 10) {
-  return useQuery({
-    queryKey: ['community', 'trending', limit],
-    queryFn: () => communityApiService.getTrendingTopics(limit),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+  const searchResult = useQuery({
+    queryKey: [...communityKeys.comments(), 'search', debouncedQuery, searchParams],
+    queryFn: () => communityApiService.searchComments(debouncedQuery, searchParams),
+    enabled: debouncedQuery.length > 2,
+    staleTime: 2 * 60 * 1000,
   });
-}
-
-/**
- * Hook for expert insights
- */
-export function useExpertInsights(billId?: number, filters?: CommunityFilters) {
-  return useQuery({
-    queryKey: ['community', 'insights', billId, filters],
-    queryFn: () => {
-      if (billId) {
-        return communityApiService.getExpertInsights(billId);
-      }
-      // If no billId, return empty array for now
-      return Promise.resolve([]);
-    },
-    enabled: !!billId,
-    staleTime: 15 * 60 * 1000, // 15 minutes
-  });
-}
-
-/**
- * Hook for campaigns
- */
-export function useCampaigns() {
-  return useQuery({
-    queryKey: ['community', 'campaigns'],
-    queryFn: () => {
-      // Note: communityApiService doesn't have campaigns method
-      // This would need to be added to the API service
-      return Promise.resolve([]);
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-}
-
-/**
- * Hook for petitions
- */
-export function usePetitions() {
-  return useQuery({
-    queryKey: ['community', 'petitions'],
-    queryFn: () => {
-      // Note: communityApiService doesn't have petitions method
-      // This would need to be added to the API service
-      return Promise.resolve([]);
-    },
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-}
-
-/**
- * Hook for local impact metrics
- */
-export function useLocalImpact(location?: { state?: string; district?: string; county?: string }) {
-  return useQuery({
-    queryKey: ['community', 'local-impact', location],
-    queryFn: () => communityApiService.getLocalImpactMetrics(location || {}),
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-}
-
-/**
- * Hook for real-time community updates (would integrate with WebSocket)
- */
-export function useRealtimeCommunity(_threadId?: string) {
-  // This would integrate with WebSocket for real-time updates
-  // For now, return a placeholder structure
-  console.log('Real-time community hook initialized for thread:', _threadId);
 
   return {
-    isConnected: false,
-    connectionStatus: 'disconnected' as const,
-    subscribeToThread: (_id: string) => {},
-    subscribeToComments: (_bill_id?: string) => {},
-    unsubscribe: () => {},
+    searchQuery,
+    setSearchQuery,
+    searchParams,
+    setSearchParams,
+    updateSearchParams: useCallback((updates: Partial<typeof searchParams>) => {
+      setSearchParams(prev => ({ ...prev, ...updates }));
+    }, []),
+    clearSearch: useCallback(() => {
+      setSearchQuery('');
+      setSearchParams({});
+    }, []),
+    ...searchResult,
   };
+}
+
+// Real-time Hooks
+export function useRealTimeComments(billId: string) {
+  const queryClient = useQueryClient();
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    if (!billId) return;
+
+    const unsubscribe = communityApiService.subscribeToComments(billId, (comment) => {
+      // Add new comment to cache
+      queryClient.setQueryData(
+        communityKeys.commentTree(billId),
+        (oldData: any) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              // Add new comment to the tree
+              // This would need more sophisticated logic for proper tree insertion
+            }
+          };
+        }
+      );
+
+      // Invalidate queries to refresh
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      queryClient.invalidateQueries({ queryKey: communityKeys.stats() });
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      unsubscribe();
+      setIsConnected(false);
+    };
+  }, [billId, queryClient]);
+
+  return { isConnected };
+}
+
+export function useRealTimeVotes(targetId: string, targetType: string) {
+  const queryClient = useQueryClient();
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    if (!targetId || !targetType) return;
+
+    const unsubscribe = communityApiService.subscribeToVotes(targetId, targetType, (vote) => {
+      // Update vote counts in cache
+      if (targetType === 'comment') {
+        queryClient.invalidateQueries({ queryKey: communityKeys.comment(targetId) });
+      }
+      queryClient.invalidateQueries({ queryKey: communityKeys.userVote(targetId, targetType) });
+    });
+
+    setIsConnected(true);
+
+    return () => {
+      unsubscribe();
+      setIsConnected(false);
+    };
+  }, [targetId, targetType, queryClient]);
+
+  return { isConnected };
+}
+
+// Moderation Hooks (for admin users)
+export function useHighlightComment() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, highlight }: { id: string; highlight: boolean }) =>
+      communityApiService.highlightComment(id, highlight),
+    onSuccess: (response, { id, highlight }) => {
+      queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      
+      toast({
+        title: highlight ? 'Comment Highlighted' : 'Highlight Removed',
+        description: highlight ? 'Comment has been highlighted' : 'Comment highlight has been removed',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Moderation Failed',
+        description: error.message || 'Unable to update comment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
+}
+
+export function usePinComment() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: ({ id, pin }: { id: string; pin: boolean }) =>
+      communityApiService.pinComment(id, pin),
+    onSuccess: (response, { id, pin }) => {
+      queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
+      queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
+      
+      toast({
+        title: pin ? 'Comment Pinned' : 'Comment Unpinned',
+        description: pin ? 'Comment has been pinned' : 'Comment has been unpinned',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Moderation Failed',
+        description: error.message || 'Unable to update comment. Please try again.',
+        variant: 'destructive',
+      });
+    },
+  });
 }

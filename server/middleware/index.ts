@@ -5,7 +5,7 @@
  */
 
 // Auth
-export { authenticateToken, requireRole } from './auth';
+export { authenticateToken, requireRole, requireAuth } from './auth';
 export type { AuthenticatedRequest } from './auth';
 export {
   isAuthenticatedRequest,
