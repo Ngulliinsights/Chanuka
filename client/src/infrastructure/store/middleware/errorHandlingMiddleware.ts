@@ -31,7 +31,9 @@ export const errorHandlingMiddleware: Middleware = store => next => (action: unk
         context: {
           component: 'ReduxMiddleware',
           operation: 'action_execution',
-          actionType: reduxAction.type,
+          metadata: {
+            actionType: reduxAction.type,
+          }
         },
         recoverable: false,
         retryable: false,

@@ -11,6 +11,7 @@ import {
   Sponsor as SharedSponsor,
   BillsQueryParams as SharedBillsQueryParams
 } from '@client/lib/types';
+import type { StakeholderImpact } from '@shared/validation/schemas/analytics.schema';
 
 // Re-export shared types
 export type { Bill, BillStatus, UrgencyLevel };

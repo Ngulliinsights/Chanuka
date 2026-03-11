@@ -1,0 +1,76 @@
+src/infrastructure/store/middleware/errorHandlingMiddleware.ts(34,11): error TS2353: Object literal may only specify known properties, and 'actionType' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/store/middleware/navigationPersistenceMiddleware.ts(218,13): error TS6133: 'validRoles' is declared but its value is never read.
+src/infrastructure/store/slices/discussionSlice.ts(155,52): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(157,24): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(159,7): error TS2353: Object literal may only specify known properties, and 'parentId' does not exist in type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(159,37): error TS2339: Property 'parentId' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(166,71): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(186,25): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(187,21): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(196,80): error TS2339: Property 'authorId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(225,9): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(269,27): error TS2339: Property 'upvotes' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(270,29): error TS2339: Property 'downvotes' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(382,7): error TS2322: Type 'ExtendedComment' is not assignable to type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(382,30): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(384,51): error TS2339: Property 'billId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(387,19): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(389,47): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(391,39): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(396,51): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(400,37): error TS2339: Property 'createdAt' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(414,21): error TS2339: Property 'content' does not exist on type 'Partial<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(415,55): error TS2339: Property 'billId' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(429,15): error TS2339: Property 'status' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(430,15): error TS2339: Property 'content' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(432,51): error TS2339: Property 'billId' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(447,17): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(447,47): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(449,17): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(449,49): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(457,19): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(459,19): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(546,19): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(547,19): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(645,60): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(648,55): error TS2339: Property 'qualityScore' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(648,73): error TS2339: Property 'qualityScore' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(653,44): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(662,36): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(662,70): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(663,36): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(663,70): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(665,26): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(665,38): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(666,26): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(666,38): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(672,27): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(672,39): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(674,29): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(674,40): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(679,15): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(679,37): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(680,20): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(682,27): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(682,61): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(15,3): error TS2440: Import declaration conflicts with local declaration of 'ErrorOverviewMetrics'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(135,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(136,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(140,12): error TS2352: Conversion of type '{ totalErrors: number; errorRate: number; affectedUsers: number; criticalErrors: any; trends: { daily: number; weekly: number; }; }' to type 'ErrorOverviewMetrics' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(144,52): error TS2551: Property 'CRITICAL' does not exist on type 'Record<ErrorSeverity, number>'. Did you mean 'critical'?
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(159,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(160,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(176,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(177,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(198,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(199,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(144,13): error TS2353: Object literal may only specify known properties, and 'reduxAction' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(155,9): error TS2322: Type 'Date' is not assignable to type 'number'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(281,9): error TS2322: Type '{ id?: string | undefined; timestamp?: number | undefined; type?: ErrorDomain | undefined; severity?: ErrorSeverity | undefined; message?: string | undefined; ... 9 more ...; retryable?: boolean | undefined; }' is not assignable to type 'WritableDraft<ReduxErrorDetails>'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(342,13): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(359,13): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(408,49): error TS2339: Property 'recovered' does not exist on type 'ErrorMetrics'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(408,80): error TS2339: Property 'total' does not exist on type 'ErrorMetrics'.
+src/infrastructure/store/slices/sessionSlice.ts(68,11): error TS2304: Cannot find name 'SessionConfig'.
+src/infrastructure/store/slices/sessionSlice.ts(96,22): error TS2304: Cannot find name 'SessionConfig'.
+src/infrastructure/store/slices/sessionSlice.ts(562,64): error TS2304: Cannot find name 'SessionConfig'.

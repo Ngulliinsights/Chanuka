@@ -34,7 +34,7 @@ The following services have been successfully migrated from `client/src/services
 - **From:** `client/src/services/PageRelationshipService.ts`
 - **To:** `client/src/features/navigation/model/page-relationship-service.ts`
 - **Reason:** Navigation feature-specific logic
-- **Export:** Available via `@client/features/navigation/model/page-relationship-service`
+- **Export:** Available via `@client/infrastructure/navigation/model/page-relationship-service`
 
 ## 🔄 Backward Compatibility
 

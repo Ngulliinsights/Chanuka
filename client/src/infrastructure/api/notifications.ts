@@ -33,7 +33,7 @@ export type { NotificationType } from '@shared/types/core/enums';
 
 export type {
   NotificationPreferences,
-} from '@client/features/notifications/model/notification-service';
+} from '@client/infrastructure/notifications/model/notification-service';
 
 // ============================================================================
 // API-Specific Types

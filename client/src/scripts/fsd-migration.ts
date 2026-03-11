@@ -211,7 +211,7 @@ const IMPORT_MAPPINGS = {
   '@client/lib/components/search': '@client/features/search/ui',
   '@client/lib/components/auth': '@client/features/users/ui/auth',
   '@client/lib/components/user': '@client/features/users/ui/profile',
-  '@client/lib/components/analytics': '@client/features/analytics/ui',
+  '@client/lib/components/analytics': '@client/infrastructure/analytics/ui',
 };
 
 /**

@@ -13,7 +13,7 @@
  * Domain-specific API services have been moved to their respective feature modules:
  * - Bills API → @client/features/bills/services/api
  * - Community API → @client/features/community/services/api
- * - Analytics API → @client/features/analytics/services/api
+ * - Analytics API → @client/infrastructure/analytics/services/api
  * - User API → @client/features/users/services/api
  * - Search API → @client/features/search/services/api
  */
@@ -134,9 +134,9 @@ export {
 // Global clients
 export { contractApiClient } from './contract-client';
 export const analyticsApiService = {
-  trackEvent: async (event: unknown) => ({ data: {} }),
+  trackEvent: async (_event: unknown) => ({ data: {} }),
   getEvents: async () => ({ data: [] }),
-  getDashboard: async (filters?: Record<string, unknown>) => ({
+  getDashboard: async (_filters?: Record<string, unknown>) => ({
     data: {
       summary: {
         total_bills: 0,
@@ -153,7 +153,7 @@ export const analyticsApiService = {
       performance_metrics: { page_load_time: 0, api_response_time: 0, error_rate: 0, uptime: 100 }
     }
   }),
-  getSummary: async (filters?: any) => ({
+  getSummary: async (_filters?: any) => ({
     data: {
       total_bills: 0,
       total_views: 0,
@@ -164,7 +164,7 @@ export const analyticsApiService = {
       user_demographics: { total_users: 0, active_users: 0, new_users: 0, returning_users: 0 }
     }
   }),
-  getBillAnalytics: async (bill_id: string, filters?: any) => ({
+  getBillAnalytics: async (bill_id: string, _filters?: any) => ({
     data: {
       bill_id,
       title: '',
@@ -190,7 +190,7 @@ export const analyticsApiService = {
       network_analysis: { nodes: [], edges: [] }
     }
   }),
-  getEngagementReport: async (bill_id: string, filters?: any) => ({
+  getEngagementReport: async (bill_id: string, _filters?: any) => ({
     data: {
       bill_id,
       total_engagement: 0,
@@ -200,17 +200,17 @@ export const analyticsApiService = {
       peak_engagement_times: []
     }
   }),
-  getUserActivity: async (userId?: string, filters?: any) => ({
+  getUserActivity: async (_userId?: string, _filters?: any) => ({
     data: [],
     meta: { total: 0, page: 1, limit: 10, has_more: false },
     execution_time: 0,
     cached: false
   }),
-  getTopBills: async (limit?: number, filters?: any) => ({ data: [] }),
-  getAlerts: async (acknowledged?: boolean) => ({ data: [] }),
-  getTrendingTopics: async (limit?: number) => ({ data: [] }),
-  getStakeholderAnalysis: async (billId?: string) => ({ data: [] }),
-  exportAnalytics: async (filters?: any, format?: string) => ({
+  getTopBills: async (_limit?: number, _filters?: any) => ({ data: [] }),
+  getAlerts: async (_acknowledged?: boolean) => ({ data: [] }),
+  getTrendingTopics: async (_limit?: number) => ({ data: [] }),
+  getStakeholderAnalysis: async (_billId?: string) => ({ data: [] }),
+  exportAnalytics: async (_filters?: any, _format?: string) => ({
     data: {
       format: 'json',
       data: {},
@@ -231,7 +231,7 @@ export const analyticsApiService = {
       metrics: { page_views_per_minute: 0, api_calls_per_minute: 0, error_rate_per_minute: 0, average_response_time: 0 }
     }
   }),
-  acknowledgeAlert: async (alertId: string) => ({ data: {} }),
+  acknowledgeAlert: async (_alertId: string) => ({ data: {} }),
 };
 
 // Types

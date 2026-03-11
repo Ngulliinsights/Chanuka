@@ -141,7 +141,9 @@ export const reportError = createAsyncThunk(
             ...errorDetails.details,
           },
           context: {
-            reduxAction: 'reportError',
+            metadata: {
+              reduxAction: 'reportError',
+            },
             ...errorDetails.context,
           },
           recoverable: true,
@@ -152,7 +154,7 @@ export const reportError = createAsyncThunk(
       // Convert to Redux format
       const reduxError: ReduxErrorDetails = {
         id: coreError.id,
-        timestamp: coreError.timestamp,
+        timestamp: coreError.timestamp.getTime(),
         type: coreError.type,
         severity: coreError.severity,
         message: coreError.message,
@@ -277,8 +279,9 @@ const errorHandlingSlice = createSlice({
 
       // Update in errors list
       const index = state.errors.findIndex(e => e.id === id);
-      if (index !== -1) {
-        state.errors[index] = { ...state.errors[index], ...updates };
+      const target = state.errors[index];
+      if (index !== -1 && target) {
+        Object.assign(target, updates);
       }
     },
 
@@ -339,7 +342,7 @@ const errorHandlingSlice = createSlice({
 
       // Remove from active errors
       Object.keys(state.activeErrors).forEach(id => {
-        if (state.activeErrors[id].source === source) {
+        if (state.activeErrors[id]?.source === source) {
           delete state.activeErrors[id];
         }
       });
@@ -356,7 +359,7 @@ const errorHandlingSlice = createSlice({
 
       // Remove from active errors
       Object.keys(state.activeErrors).forEach(id => {
-        if (state.activeErrors[id].type === domain) {
+        if (state.activeErrors[id]?.type === domain) {
           delete state.activeErrors[id];
         }
       });
@@ -405,7 +408,7 @@ const errorHandlingSlice = createSlice({
       const coreStats = errorHandler.getMetrics();
 
       // Update stats from core system
-      state.errorStats.recoveryRate = coreStats.recovered / Math.max(coreStats.total, 1);
+      state.errorStats.totalErrors = coreStats.totalCount;
       state.errorStats.lastUpdated = Date.now();
     },
   },

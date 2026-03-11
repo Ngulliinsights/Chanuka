@@ -10,7 +10,7 @@
 import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 
-import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/monitoring/model/performance-benchmarking';
+import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/admin/monitoring/model/performance-benchmarking';
 import {
   Badge,
   Card,

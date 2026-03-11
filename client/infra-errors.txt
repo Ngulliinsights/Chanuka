@@ -1,0 +1,207 @@
+src/infrastructure/api/auth.ts(20,8): error TS2307: Cannot find module './types/auth-types' or its corresponding type declarations.
+src/infrastructure/api/circuit-breaker-monitor.ts(103,33): error TS2339: Property 'metadata' does not exist on type 'BaseError'.
+src/infrastructure/api/circuit-breaker-monitor.ts(125,31): error TS2339: Property 'metadata' does not exist on type 'BaseError'.
+src/infrastructure/api/circuit-breaker-monitor.ts(326,23): error TS2693: 'BaseError' only refers to a type, but is being used as a value here.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(10,10): error TS6133: 'BaseError' is declared but its value is never read.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(14,50): error TS2307: Cannot find module '../types/request' or its corresponding type declarations.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(130,40): error TS2345: Argument of type '{ code: "NETWORK_ERROR"; message: any; type: ErrorDomain.NETWORK; severity: ErrorSeverity.MEDIUM; recoverable: true; retryable: true; }' is not assignable to parameter of type 'ClientError'.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(138,18): error TS2345: Argument of type 'ClientError' is not assignable to parameter of type 'SetStateAction<AppError | null>'.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(139,30): error TS2345: Argument of type 'ClientError' is not assignable to parameter of type 'AppError'.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(326,41): error TS2345: Argument of type '{ code: "NETWORK_ERROR"; message: any; type: ErrorDomain.NETWORK; severity: ErrorSeverity.MEDIUM; recoverable: true; retryable: true; }' is not assignable to parameter of type 'ClientError'.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(334,11): error TS2740: Type 'ClientError' is missing the following properties from type 'AppError': domain, recoveryStrategies, retryCount, toJSON, and 4 more.
+src/infrastructure/api/hooks/use-api-with-fallback.ts(336,32): error TS2345: Argument of type 'AppError | null' is not assignable to parameter of type 'AppError'.
+src/infrastructure/api/hooks/useApiConnection.ts(529,11): error TS6133: '__handleConnectionUpdate' is declared but its value is never read.
+src/infrastructure/api/index.ts(137,22): error TS6133: 'event' is declared but its value is never read.
+src/infrastructure/api/index.ts(139,24): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(156,22): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(167,45): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(193,48): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(203,27): error TS6133: 'userId' is declared but its value is never read.
+src/infrastructure/api/index.ts(203,44): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(209,23): error TS6133: 'limit' is declared but its value is never read.
+src/infrastructure/api/index.ts(209,39): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(210,21): error TS6133: 'acknowledged' is declared but its value is never read.
+src/infrastructure/api/index.ts(211,29): error TS6133: 'limit' is declared but its value is never read.
+src/infrastructure/api/index.ts(212,34): error TS6133: 'billId' is declared but its value is never read.
+src/infrastructure/api/index.ts(213,27): error TS6133: 'filters' is declared but its value is never read.
+src/infrastructure/api/index.ts(213,42): error TS6133: 'format' is declared but its value is never read.
+src/infrastructure/api/index.ts(234,28): error TS6133: 'alertId' is declared but its value is never read.
+src/infrastructure/api/interceptors.ts(17,10): error TS6133: 'BaseError' is declared but its value is never read.
+src/infrastructure/api/interceptors.ts(19,1): error TS6133: 'CircuitBreakerState' is declared but its value is never read.
+src/infrastructure/api/interceptors.ts(262,15): error TS2693: 'BaseError' only refers to a type, but is being used as a value here.
+src/infrastructure/api/performance.ts(235,48): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(261,97): error TS2345: Argument of type '{ sessionId: string; metricsCount: number; originalError: unknown; component: string; operation: string; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/performance.ts(307,48): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(315,48): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(346,94): error TS2345: Argument of type '{ userId: string; dateRange: { start: string; end: string; } | undefined; originalError: unknown; component: string; operation: string; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/performance.ts(389,90): error TS2345: Argument of type '{ originalError: unknown; component: string; operation: string; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/performance.ts(430,9): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(437,9): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(459,83): error TS2345: Argument of type '{ issue: PerformanceIssue; originalError: unknown; component: string; operation: string; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/performance.ts(498,9): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/performance.ts(516,95): error TS2345: Argument of type '{ sessionId: string; originalError: unknown; component: string; operation: string; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/registry.ts(95,26): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/registry.ts(102,9): error TS2345: Argument of type 'string' is not assignable to parameter of type '{ field: string; message: string; }[]'.
+src/infrastructure/api/registry.ts(145,26): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/registry.ts(224,44): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/registry.ts(288,28): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/registry.ts(302,28): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/registry.ts(474,26): error TS2339: Property 'createBusinessError' does not exist on type 'typeof ErrorFactory'.
+src/infrastructure/api/retry.ts(117,99): error TS2345: Argument of type '{ domain: ErrorDomain; severity: ErrorSeverity; context: { attempts: number; originalError: Error | null; }; }' is not assignable to parameter of type 'number'.
+src/infrastructure/api/services/bill.service.ts(6,10): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'BillEndpoints'.
+src/infrastructure/api/services/bill.service.ts(8,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'CreateBillRequest'.
+src/infrastructure/api/services/bill.service.ts(9,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'CreateBillResponse'.
+src/infrastructure/api/services/bill.service.ts(10,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'UpdateBillRequest'.
+src/infrastructure/api/services/bill.service.ts(11,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'UpdateBillResponse'.
+src/infrastructure/api/services/bill.service.ts(12,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetBillRequest'.
+src/infrastructure/api/services/bill.service.ts(12,3): error TS6196: 'GetBillRequest' is declared but never used.
+src/infrastructure/api/services/bill.service.ts(13,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetBillResponse'.
+src/infrastructure/api/services/bill.service.ts(14,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'ListBillsRequest'.
+src/infrastructure/api/services/bill.service.ts(15,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'ListBillsResponse'.
+src/infrastructure/api/services/bill.service.ts(16,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'DeleteBillRequest'.
+src/infrastructure/api/services/bill.service.ts(16,3): error TS6196: 'DeleteBillRequest' is declared but never used.
+src/infrastructure/api/services/bill.service.ts(17,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'DeleteBillResponse'.
+src/infrastructure/api/services/bill.service.ts(18,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetBillEngagementRequest'.
+src/infrastructure/api/services/bill.service.ts(18,3): error TS6196: 'GetBillEngagementRequest' is declared but never used.
+src/infrastructure/api/services/bill.service.ts(19,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetBillEngagementResponse'.
+src/infrastructure/api/services/user.service.ts(6,10): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'UserEndpoints'.
+src/infrastructure/api/services/user.service.ts(8,3): error TS2724: '"@shared/types/api/contracts"' has no exported member named 'CreateUserRequest'. Did you mean 'CreateVoteRequest'?
+src/infrastructure/api/services/user.service.ts(9,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'CreateUserResponse'.
+src/infrastructure/api/services/user.service.ts(10,3): error TS2724: '"@shared/types/api/contracts"' has no exported member named 'UpdateUserRequest'. Did you mean 'UpdateReportRequest'?
+src/infrastructure/api/services/user.service.ts(11,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'UpdateUserResponse'.
+src/infrastructure/api/services/user.service.ts(12,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetUserRequest'.
+src/infrastructure/api/services/user.service.ts(12,3): error TS6196: 'GetUserRequest' is declared but never used.
+src/infrastructure/api/services/user.service.ts(13,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'GetUserResponse'.
+src/infrastructure/api/services/user.service.ts(14,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'ListUsersRequest'.
+src/infrastructure/api/services/user.service.ts(15,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'ListUsersResponse'.
+src/infrastructure/api/services/user.service.ts(16,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'DeleteUserRequest'.
+src/infrastructure/api/services/user.service.ts(16,3): error TS6196: 'DeleteUserRequest' is declared but never used.
+src/infrastructure/api/services/user.service.ts(17,3): error TS2305: Module '"@shared/types/api/contracts"' has no exported member 'DeleteUserResponse'.
+src/infrastructure/api/types/service.ts(7,70): error TS2307: Cannot find module './auth' or its corresponding type declarations.
+src/infrastructure/api/types/service.ts(8,58): error TS2307: Cannot find module './bill' or its corresponding type declarations.
+src/infrastructure/api/types/service.ts(10,77): error TS2307: Cannot find module './community' or its corresponding type declarations.
+src/infrastructure/api/types/service.ts(12,37): error TS2307: Cannot find module './request' or its corresponding type declarations.
+src/infrastructure/auth/hooks/use-auth.tsx(115,13): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/http/authenticated-client.ts(37,23): error TS6138: Property '_config' is declared but its value is never read.
+src/infrastructure/auth/http/authentication-interceptors.ts(29,23): error TS6138: Property '_config' is declared but its value is never read.
+src/infrastructure/auth/http/authentication-interceptors.ts(71,37): error TS2769: No overload matches this call.
+src/infrastructure/auth/rbac.ts(35,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(46,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(136,50): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(157,22): error TS18048: 'role' is possibly 'undefined'.
+src/infrastructure/auth/rbac.ts(157,31): error TS2345: Argument of type 'Role | undefined' is not assignable to parameter of type 'Role'.
+src/infrastructure/auth/rbac.ts(244,48): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(253,17): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(350,27): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(363,28): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(392,26): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(400,26): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(400,50): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(411,15): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(418,66): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(549,41): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(553,62): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(557,42): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(561,40): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(561,64): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(567,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/service.ts(17,1): error TS6192: All imports in import declaration are unused.
+src/infrastructure/auth/service.ts(58,5): error TS2322: Type '"unverified" | "verified"' is not assignable to type 'VerificationStatus | undefined'.
+src/infrastructure/auth/service.ts(67,5): error TS2322: Type 'unknown' is not assignable to type 'UserRole'.
+src/infrastructure/auth/service.ts(73,7): error TS2561: Object literal may only specify known properties, but 'notifications' does not exist in type 'UserPreferences'. Did you mean to write 'smsNotifications'?
+src/infrastructure/auth/services/auth-api-service.ts(82,22): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(91,24): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(352,22): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(565,7): error TS2741: Property 'name' is missing in type 'ClientError' but required in type 'Error'.
+src/infrastructure/auth/services/auth-api-service.ts(570,5): error TS2741: Property 'name' is missing in type 'ClientError' but required in type 'Error'.
+src/infrastructure/auth/store/auth-slice.ts(11,22): error TS6133: 'ThunkResult' is declared but its value is never read.
+src/infrastructure/auth/store/auth-slice.ts(94,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(108,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(124,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(145,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(190,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(248,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(276,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(290,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(306,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(590,22): error TS2339: Property 'twoFactorEnabled' does not exist on type 'WritableDraft<User>'.
+src/infrastructure/auth/store/auth-slice.ts(610,22): error TS2339: Property 'twoFactorEnabled' does not exist on type 'WritableDraft<User>'.
+src/infrastructure/auth/store/auth-slice.ts(774,20): error TS2339: Property 'name' does not exist on type 'User'.
+src/infrastructure/auth/store/auth-slice.ts(776,32): error TS2339: Property 'twoFactorEnabled' does not exist on type 'User'.
+src/infrastructure/auth/utils/security-helpers.ts(30,22): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/store/middleware/errorHandlingMiddleware.ts(34,11): error TS2353: Object literal may only specify known properties, and 'actionType' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/store/middleware/navigationPersistenceMiddleware.ts(218,13): error TS6133: 'validRoles' is declared but its value is never read.
+src/infrastructure/store/slices/discussionSlice.ts(155,52): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(157,24): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(159,7): error TS2353: Object literal may only specify known properties, and 'parentId' does not exist in type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(159,37): error TS2339: Property 'parentId' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(166,71): error TS2339: Property 'id' does not exist on type 'Comment'.
+src/infrastructure/store/slices/discussionSlice.ts(186,25): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(187,21): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(196,80): error TS2339: Property 'authorId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(225,9): error TS2353: Object literal may only specify known properties, and 'id' does not exist in type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(269,27): error TS2339: Property 'upvotes' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(270,29): error TS2339: Property 'downvotes' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(382,7): error TS2322: Type 'ExtendedComment' is not assignable to type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(382,30): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(384,51): error TS2339: Property 'billId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(387,19): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(389,47): error TS2339: Property 'parentId' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(391,39): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(396,51): error TS2339: Property 'id' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(400,37): error TS2339: Property 'createdAt' does not exist on type 'ExtendedComment'.
+src/infrastructure/store/slices/discussionSlice.ts(414,21): error TS2339: Property 'content' does not exist on type 'Partial<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(415,55): error TS2339: Property 'billId' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(429,15): error TS2339: Property 'status' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(430,15): error TS2339: Property 'content' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(432,51): error TS2339: Property 'billId' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(447,17): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(447,47): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(449,17): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(449,49): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(457,19): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(459,19): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(546,19): error TS2339: Property 'upvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(547,19): error TS2339: Property 'downvotes' does not exist on type 'WritableDraft<ExtendedComment>'.
+src/infrastructure/store/slices/discussionSlice.ts(645,60): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(648,55): error TS2339: Property 'qualityScore' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(648,73): error TS2339: Property 'qualityScore' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(653,44): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(662,36): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(662,70): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(663,36): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(663,70): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(665,26): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(665,38): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(666,26): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(666,38): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(672,27): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(672,39): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(674,29): error TS2339: Property 'upvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(674,40): error TS2339: Property 'downvotes' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(679,15): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(679,37): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(680,20): error TS2339: Property 'isExpertComment' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(682,27): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/discussionSlice.ts(682,61): error TS2339: Property 'createdAt' does not exist on type 'CommentTreeNode'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(15,3): error TS2440: Import declaration conflicts with local declaration of 'ErrorOverviewMetrics'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(135,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(136,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(140,12): error TS2352: Conversion of type '{ totalErrors: number; errorRate: number; affectedUsers: number; criticalErrors: any; trends: { daily: number; weekly: number; }; }' to type 'ErrorOverviewMetrics' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(144,52): error TS2551: Property 'CRITICAL' does not exist on type 'Record<ErrorSeverity, number>'. Did you mean 'critical'?
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(159,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(160,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(176,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(177,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(198,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorSeverity[]'.
+src/infrastructure/store/slices/errorAnalyticsSlice.ts(199,7): error TS2322: Type 'unknown[]' is not assignable to type 'ErrorDomain[]'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(144,13): error TS2353: Object literal may only specify known properties, and 'reduxAction' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(155,9): error TS2322: Type 'Date' is not assignable to type 'number'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(281,9): error TS2322: Type '{ id?: string | undefined; timestamp?: number | undefined; type?: ErrorDomain | undefined; severity?: ErrorSeverity | undefined; message?: string | undefined; ... 9 more ...; retryable?: boolean | undefined; }' is not assignable to type 'WritableDraft<ReduxErrorDetails>'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(342,13): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(359,13): error TS2532: Object is possibly 'undefined'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(408,49): error TS2339: Property 'recovered' does not exist on type 'ErrorMetrics'.
+src/infrastructure/store/slices/errorHandlingSlice.ts(408,80): error TS2339: Property 'total' does not exist on type 'ErrorMetrics'.
+src/infrastructure/store/slices/sessionSlice.ts(68,11): error TS2304: Cannot find name 'SessionConfig'.
+src/infrastructure/store/slices/sessionSlice.ts(96,22): error TS2304: Cannot find name 'SessionConfig'.
+src/infrastructure/store/slices/sessionSlice.ts(562,64): error TS2304: Cannot find name 'SessionConfig'.

@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 10, 2026 at 07:40 PM
+**Generated:** March 10, 2026 at 08:52 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,363
+**Total Items:** 4,367
 
 ```
 .
@@ -814,6 +814,7 @@
 │   │   │   │   │   └── validation.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── initialization.ts
+│   │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   │   ├── rbac.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── service.ts
@@ -4348,9 +4349,12 @@
 ├── Dockerfile.client
 ├── DOCUMENTATION_INDEX.md
 ├── drizzle.config.ts
+├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_ANALYSIS.md
+├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_COMPLETE.md
 ├── FEATURE_INTEGRATION_STATUS.md
 ├── fix.cjs
 ├── generate-structure.mjs
+├── INTEGRATION_SUMMARY.md
 ├── knip.config.ts
 ├── nginx.conf
 ├── nx.json

@@ -7,8 +7,7 @@
  * Note: Using selective exports to avoid naming conflicts
  */
 
-// Analytics Features
-export * from './analytics';
+// Analytics Features moved to infrastructure
 
 // Bills Features - selective exports to avoid conflicts
 export { 
@@ -22,8 +21,7 @@ export {
 // Community Features
 export * from './community';
 
-// Pretext Detection Features
-export * from './pretext-detection';
+// Pretext Detection moved to analysis
 
 // Search Features
 export * from './search';
@@ -32,11 +30,8 @@ export * from './search';
 export * from './security';
 
 // Users Features - selective exports to avoid conflicts
-export type {
-  UserProfile,
-} from './users';
 export {
-  useUserProfile,
+  useProfile,
   useUpdateUserProfile,
   // NotificationPreferences, UserSettings excluded due to conflicts or missing exports
 } from './users';
@@ -45,10 +40,11 @@ export {
 export * from './admin';
 
 // Monitoring Features
-export * from './monitoring';
+// Monitoring Features moved to admin
 
-// Notifications Features
-export * from './notifications';
+// Notifications Features moved to infrastructure
 
-// Realtime Features
-export * from './realtime';
+// Realtime Features moved or don't exist
+
+// Accountability Features
+export * from './accountability';

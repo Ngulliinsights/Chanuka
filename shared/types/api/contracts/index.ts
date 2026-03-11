@@ -6,6 +6,9 @@
 // Core contracts
 export * from './core.contracts';
 
+// Endpoint contract system
+export * from './endpoint';
+
 // Feature-specific contracts
 export * from './government-data.contracts';
 export * from './community.contracts';

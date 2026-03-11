@@ -72,7 +72,7 @@ const CommunityHub = createLazyComponent(
   'Community Hub'
 );
 const ExpertVerificationPage = createLazyComponent(
-  () => import('@client/features/expert/pages/expert-verification'),
+  () => import('@client/features/community/expert/pages/expert-verification'),
   'Expert Verification'
 );
 const UniversalSearchPage = createLazyComponent(
@@ -98,10 +98,10 @@ const CookiePolicyPage = createLazyComponent(() => import('@client/features/lega
 const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility-statement'), 'Accessibility Statement');
 const CivicEducationPage = createLazyComponent(() => import('@client/features/onboarding/pages/civic-education'), 'Civic Education');
 const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
-const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
-const ApiAccessPage = createLazyComponent(() => import('@client/features/api/pages/api-access'), 'API Access');
-const SystemStatusPage = createLazyComponent(() => import('@client/features/status/pages/system-status'), 'System Status');
-const SitemapPage = createLazyComponent(() => import('@client/features/sitemap/pages/sitemap'), 'Sitemap');
+const ExpertInsightsPage = createLazyComponent(() => import('@client/features/community/expert/pages/expert-insights'), 'Expert Insights');
+const ApiAccessPage = createLazyComponent(() => import('@client/lib/api/api-access'), 'API Access');
+const SystemStatusPage = createLazyComponent(() => import('@client/features/admin/pages/system-status'), 'System Status');
+const SitemapPage = createLazyComponent(() => import('@client/features/legal/pages/sitemap'), 'Sitemap');
 const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
 const UserProfile = createLazyComponent(
   () => import('@client/features/users/pages/user-account'),
@@ -125,15 +125,15 @@ const WorkaroundAnalysisPage = createLazyComponent(
   'Workaround Analysis'
 );
 const PretextDetectionPage = createLazyComponent(
-  () => import('@client/features/pretext-detection/pages/pretext-detection'),
+  () => import('@client/features/analysis/pretext-detection/pages/pretext-detection'),
   'Pretext Detection'
 );
 const FeatureFlagManager = createLazyComponent(
-  () => import('@client/features/feature-flags/pages/FeatureFlagManagerPage'),
+  () => import('@client/features/admin/feature-flags/pages/FeatureFlagManagerPage'),
   'Feature Flag Manager'
 );
 const IntegrationMonitoringDashboard = createLazyComponent(
-  () => import('@client/features/monitoring/pages/integration-monitoring'),
+  () => import('@client/features/admin/monitoring/pages/integration-monitoring'),
   'Integration Monitoring'
 );
 const PerformanceDashboard = createLazyComponent(
@@ -141,7 +141,7 @@ const PerformanceDashboard = createLazyComponent(
   'Performance Dashboard'
 );
 const ArgumentIntelligencePage = createLazyComponent(
-  () => import('@client/features/argument-intelligence/pages/argument-intelligence'),
+  () => import('@client/features/analysis/argument-intelligence/pages/argument-intelligence'),
   'Argument Intelligence'
 );
 const CollectionsPage = createLazyComponent(
@@ -149,15 +149,15 @@ const CollectionsPage = createLazyComponent(
   'Collections'
 );
 const WorkspacesPage = createLazyComponent(
-  () => import('@client/features/collaboration/pages/WorkspacesPage'),
+  () => import('@client/features/community/collaboration/pages/WorkspacesPage'),
   'Workspaces'
 );
 const WorkspaceDetailPage = createLazyComponent(
-  () => import('@client/features/collaboration/pages/WorkspaceDetailPage'),
+  () => import('@client/features/community/collaboration/pages/WorkspaceDetailPage'),
   'Workspace Detail'
 );
 const ElectoralAccountabilityDashboard = createLazyComponent(
-  () => import('@client/features/electoral-accountability/pages/ElectoralAccountabilityDashboard'),
+  () => import('@client/features/accountability/pages/ElectoralAccountabilityDashboard'),
   'Electoral Accountability Dashboard'
 );
 

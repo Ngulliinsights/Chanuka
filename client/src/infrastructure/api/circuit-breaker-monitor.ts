@@ -7,7 +7,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
+import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 import { getCircuitBreakerStats } from './circuit-breaker/core';
 import type { CircuitBreakerState, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation } from './circuit-breaker/types';
 
@@ -99,8 +99,8 @@ export class CircuitBreakerMonitor {
   /**
    * Records an error for correlation tracking
    */
-  recordError(error: BaseError): void {
-    const correlationId = error.metadata.correlationId;
+  recordError(error: any): void {
+    const correlationId = error.correlationId;
     if (!correlationId) {
       return;
     }
@@ -122,7 +122,7 @@ export class CircuitBreakerMonitor {
     correlation.errors.push(error);
 
     // Extract service name from error context
-    const serviceName = error.metadata.context?.serviceName as string;
+    const serviceName = error.context?.serviceName as string;
     if (serviceName && !correlation.services.includes(serviceName)) {
       correlation.services.push(serviceName);
     }
@@ -323,18 +323,24 @@ export class CircuitBreakerMonitor {
     });
 
     // Create error for circuit breaker opening
-    const error = new BaseError(`Circuit breaker opened for ${event.serviceName}`, {
-      statusCode: 503,
-      code: 'CIRCUIT_BREAKER_OPENED',
-      domain: ErrorDomain.SYSTEM,
-      severity: ErrorSeverity.HIGH,
-      correlationId: event.correlationId,
-      context: {
-        serviceName: event.serviceName,
-        metrics: event.metrics,
-      },
-      retryable: true,
-    });
+    const error = ErrorFactory.createClientError(
+      'CIRCUIT_BREAKER_OPENED' as any,
+      `Circuit breaker opened for ${event.serviceName}`,
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      {
+        statusCode: 503,
+        context: {
+          component: 'CircuitBreakerMonitor',
+          metadata: {
+            correlationId: event.correlationId,
+            serviceName: event.serviceName,
+            metrics: event.metrics,
+          }
+        },
+        retryable: true,
+      }
+    );
 
     if (event.correlationId) {
       this.recordError(error);
@@ -401,7 +407,7 @@ export function recordCircuitBreakerEvent(event: CircuitBreakerEvent): void {
   circuitBreakerMonitor.recordEvent(event);
 }
 
-export function recordError(error: BaseError): void {
+export function recordError(error: any): void {
   circuitBreakerMonitor.recordError(error);
 }
 

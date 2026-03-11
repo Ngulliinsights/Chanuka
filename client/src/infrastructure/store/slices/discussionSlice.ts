@@ -18,6 +18,7 @@ interface RootState {
 }
 
 // Base types (normally imported from @client/lib/types)
+import { Comment } from '@client/lib/types/community/community-base';
 
 interface DiscussionThread {
   id: number;
@@ -92,12 +93,23 @@ const logger = {
 };
 
 // Extended Comment type with computed properties for efficient tree operations
-interface ExtendedComment extends Comment {
+interface ExtendedComment extends Omit<Comment, 'id' | 'parentId' | 'authorId' | 'threadId' | 'billId'> {
+  id: string;
+  parentId?: string;
+  authorId: string;
+  threadId?: string;
+  billId: string;
   replies: string[]; // Store IDs instead of full objects for normalized state
   replyCount: number;
   userVote: 'up' | 'down' | null;
   isEdited?: boolean;
   editHistory?: Array<{ timestamp: string; content: string }>;
+  upvotes: number;
+  downvotes: number;
+  status?: string;
+  qualityScore?: number;
+  isExpertComment?: boolean;
+  updatedAt?: string;
 }
 
 // Extended DiscussionThread type optimized for normalized storage
@@ -152,18 +164,27 @@ const normalizeComments = (comments: Comment[]): Record<string, ExtendedComment>
 
   const processComment = (comment: Comment, parentId?: string): void => {
     const replies = (comment as Comment & { replies?: Comment[] }).replies || [];
-    const replyIds = replies.map((r: Comment) => r.id);
+    const replyIds = replies.map((r: Comment) => String(r.id));
 
-    normalized[comment.id] = {
+    normalized[String(comment.id)] = {
       ...comment,
-      parentId: parentId || comment.parentId,
+      id: String(comment.id),
+      billId: String(comment.billId),
+      authorId: String(comment.authorId),
+      parentId: parentId || (comment.parentId ? String(comment.parentId) : undefined),
+      threadId: comment.threadId ? String(comment.threadId) : undefined,
       replies: replyIds,
       replyCount: replies.length,
       userVote: (comment as Comment & { userVote?: 'up' | 'down' | null }).userVote || null,
-    };
+      upvotes: comment.votes?.up || 0,
+      downvotes: comment.votes?.down || 0,
+      status: 'active',
+      isExpertComment: comment.isAuthorExpert || false,
+      qualityScore: 0.5,
+    } as ExtendedComment;
 
     // Recursively process nested replies
-    replies.forEach((reply: Comment) => processComment(reply, comment.id));
+    replies.forEach((reply: Comment) => processComment(reply, String(comment.id)));
   };
 
   comments.forEach(comment => processComment(comment));
@@ -223,13 +244,14 @@ export const addCommentAsync = createAsyncThunk<ExtendedComment, CommentFormData
       const now = new Date().toISOString();
       const newComment: ExtendedComment = {
         id: `temp-${Date.now()}`, // Use temporary ID until backend responds
-        billId: data.billId,
+        billId: String(data.billId),
         content: data.content,
-        parentId: data.parentId || undefined,
+        parentId: data.parentId ? String(data.parentId) : undefined,
         authorId: 'current-user-id', // Should come from auth context
         authorName: 'Current User', // Should come from auth context
         createdAt: now,
         updatedAt: now,
+        votes: { up: 0, down: 0, userVote: null },
         upvotes: 0,
         downvotes: 0,
         replies: [],
@@ -445,20 +467,26 @@ const discussionSlice = createSlice({
       // Remove previous vote if exists
       if (previousVote === 'up') {
         comment.upvotes = Math.max(0, comment.upvotes - 1);
+        comment.votes.up = Math.max(0, comment.votes.up - 1);
       } else if (previousVote === 'down') {
         comment.downvotes = Math.max(0, comment.downvotes - 1);
+        comment.votes.down = Math.max(0, comment.votes.down - 1);
       }
 
       // Toggle or apply new vote
       if (previousVote === voteType) {
         comment.userVote = null;
+        comment.votes.userVote = null;
       } else {
         if (voteType === 'up') {
           comment.upvotes += 1;
+          comment.votes.up += 1;
         } else {
           comment.downvotes += 1;
+          comment.votes.down += 1;
         }
         comment.userVote = voteType;
+        comment.votes.userVote = voteType;
       }
     },
 

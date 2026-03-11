@@ -23,8 +23,8 @@ import {
 import React, { useState, useEffect } from 'react';
 
 import { useComprehensiveAnalytics } from '@client/infrastructure/observability/analytics';
-import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
-import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
+import { userJourneyTracker } from '@client/infrastructure/analytics/model/user-journey-tracker';
+import { AnalyticsDashboard } from '@client/infrastructure/analytics/ui/dashboard/AnalyticsDashboard';
 import {
   Card,
   CardContent,

@@ -1,0 +1,55 @@
+src/infrastructure/auth/hooks/use-auth.tsx(115,13): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/http/authenticated-client.ts(37,23): error TS6138: Property '_config' is declared but its value is never read.
+src/infrastructure/auth/http/authentication-interceptors.ts(29,23): error TS6138: Property '_config' is declared but its value is never read.
+src/infrastructure/auth/http/authentication-interceptors.ts(71,37): error TS2769: No overload matches this call.
+src/infrastructure/auth/rbac.ts(35,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(46,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(136,50): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(157,22): error TS18048: 'role' is possibly 'undefined'.
+src/infrastructure/auth/rbac.ts(157,31): error TS2345: Argument of type 'Role | undefined' is not assignable to parameter of type 'Role'.
+src/infrastructure/auth/rbac.ts(244,48): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(253,17): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(350,27): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(363,28): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(392,26): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(400,26): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(400,50): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(411,15): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(418,66): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(549,41): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(553,62): error TS2304: Cannot find name 'PermissionCheckResult'.
+src/infrastructure/auth/rbac.ts(557,42): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(561,40): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(561,64): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/rbac.ts(567,13): error TS2304: Cannot find name 'UserRole'.
+src/infrastructure/auth/service.ts(17,1): error TS6192: All imports in import declaration are unused.
+src/infrastructure/auth/service.ts(51,29): error TS2339: Property 'name' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(58,5): error TS2322: Type '"unverified" | "verified"' is not assignable to type 'VerificationStatus | undefined'.
+src/infrastructure/auth/service.ts(58,28): error TS2339: Property 'verified' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(61,25): error TS2551: Property 'createdAt' does not exist on type 'User'. Did you mean 'created_at'?
+src/infrastructure/auth/service.ts(62,25): error TS2339: Property 'lastLogin' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(65,20): error TS2339: Property 'name' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(66,24): error TS2339: Property 'verified' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(67,5): error TS2322: Type 'unknown' is not assignable to type 'UserRole'.
+src/infrastructure/auth/service.ts(70,32): error TS2339: Property 'twoFactorEnabled' does not exist on type 'User'.
+src/infrastructure/auth/service.ts(73,7): error TS2561: Object literal may only specify known properties, but 'notifications' does not exist in type 'UserPreferences'. Did you mean to write 'smsNotifications'?
+src/infrastructure/auth/services/auth-api-service.ts(82,22): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(91,24): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(352,22): error TS2353: Object literal may only specify known properties, and 'field' does not exist in type 'Partial<ErrorContext>'.
+src/infrastructure/auth/services/auth-api-service.ts(565,7): error TS2741: Property 'name' is missing in type 'ClientError' but required in type 'Error'.
+src/infrastructure/auth/services/auth-api-service.ts(570,5): error TS2741: Property 'name' is missing in type 'ClientError' but required in type 'Error'.
+src/infrastructure/auth/store/auth-slice.ts(11,22): error TS6133: 'ThunkResult' is declared but its value is never read.
+src/infrastructure/auth/store/auth-slice.ts(94,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(108,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(124,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(145,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(190,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(248,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(276,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(290,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(306,3): error TS7030: Not all code paths return a value.
+src/infrastructure/auth/store/auth-slice.ts(590,22): error TS2339: Property 'twoFactorEnabled' does not exist on type 'WritableDraft<User>'.
+src/infrastructure/auth/store/auth-slice.ts(610,22): error TS2339: Property 'twoFactorEnabled' does not exist on type 'WritableDraft<User>'.
+src/infrastructure/auth/store/auth-slice.ts(774,20): error TS2339: Property 'name' does not exist on type 'User'.
+src/infrastructure/auth/store/auth-slice.ts(776,32): error TS2339: Property 'twoFactorEnabled' does not exist on type 'User'.
+src/infrastructure/auth/utils/security-helpers.ts(30,22): error TS2532: Object is possibly 'undefined'.

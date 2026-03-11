@@ -11,7 +11,7 @@ import {
   type Notification as NotificationData, // Renamed to avoid conflict with browser Notification API
   type NotificationPreferences,
   type NotificationType,
-} from '@client/features/notifications/model/notification-service';
+} from '@client/infrastructure/notifications/model/notification-service';
 import { logger } from '@client/lib/utils/logger';
 
 /**

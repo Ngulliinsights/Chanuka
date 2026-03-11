@@ -14,6 +14,14 @@ import { logger } from '@client/lib/utils/logger';
 // Types and Interfaces
 // ============================================================================
 
+export interface SessionConfig {
+  maxIdleTime: number;
+  warningTime: number;
+  checkInterval: number;
+  enableActivityTracking: boolean;
+  enableSecurityMonitoring: boolean;
+}
+
 // Define SessionInfo interface since it's not available in the auth module
 export interface SessionInfo {
   id: string;

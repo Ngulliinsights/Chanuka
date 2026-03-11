@@ -12,8 +12,9 @@ import {
   errorAnalyticsBridge,
   type Alert as RealTimeAlert,
   type CoreError as ErrorAnalyticsData,
-  type ErrorOverviewMetrics,
-} from '@client/features/analytics/model/error-analytics-bridge';
+  type ErrorOverviewMetrics as ModelErrorOverviewMetrics,
+} from '@client/infrastructure/analytics/model/error-analytics-bridge';
+import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
 
 // Define extended types for dashboard features
 export interface DashboardFilters {
@@ -132,8 +133,8 @@ export const fetchOverviewMetrics = createAsyncThunk(
     // Use the comprehensive analytics bridge
     const metrics = await errorAnalyticsBridge.getOverviewMetrics({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown[],
-      domain: filters.domain as unknown[],
+      severity: filters.severity as unknown as ErrorSeverity[],
+      domain: filters.domain as unknown as ErrorDomain[],
       component: filters.component,
     });
     
@@ -141,7 +142,7 @@ export const fetchOverviewMetrics = createAsyncThunk(
       totalErrors: metrics.totalErrors,
       errorRate: metrics.errorRate,
       affectedUsers: metrics.affectedUsers,
-      criticalErrors: metrics.severityDistribution.CRITICAL || 0,
+      criticalErrors: (metrics.severityDistribution as Record<string, number>)[ErrorSeverity.CRITICAL] || 0,
       trends: {
         daily: metrics.totalErrors,
         weekly: metrics.totalErrors,
@@ -156,8 +157,8 @@ export const fetchTrendData = createAsyncThunk(
     // Use comprehensive trend analysis
     const trendData = await errorAnalyticsBridge.getTrendData(period, {
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown[],
-      domain: filters.domain as unknown[],
+      severity: filters.severity as unknown as ErrorSeverity[],
+      domain: filters.domain as unknown as ErrorDomain[],
       component: filters.component,
     });
     
@@ -173,8 +174,8 @@ export const fetchPatterns = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const patterns = await errorAnalyticsBridge.getPatterns({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown[],
-      domain: filters.domain as unknown[],
+      severity: filters.severity as unknown as ErrorSeverity[],
+      domain: filters.domain as unknown as ErrorDomain[],
       component: filters.component,
     });
 
@@ -195,8 +196,8 @@ export const fetchRecoveryAnalytics = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const analytics = await errorAnalyticsBridge.getRecoveryAnalytics({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown[],
-      domain: filters.domain as unknown[],
+      severity: filters.severity as unknown as ErrorSeverity[],
+      domain: filters.domain as unknown as ErrorDomain[],
       component: filters.component,
     });
     

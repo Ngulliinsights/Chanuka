@@ -248,7 +248,7 @@ class BillsPaginationService {
   /**
    * Handle infinite scroll trigger
    */
-  handleInfiniteScroll = (threshold = 0.8): void => {
+  handleInfiniteScroll = (_threshold = 0.8): void => {
     if (this.loadingDebounceTimer) {
       clearTimeout(this.loadingDebounceTimer);
     }
@@ -409,7 +409,7 @@ class BillsPaginationService {
   }
 
   private parseCacheKey(cacheKey: string): { page: number; searchParams: BillsSearchParams } {
-    const [, pageStr, paramsStr] = cacheKey.split(':');
+    const [, pageStr, paramsStr] = cacheKey.split(':') as [string, string, string];
     const page = parseInt(pageStr, 10);
     const searchParams = JSON.parse(atob(paramsStr));
     return { page, searchParams };
@@ -445,8 +445,8 @@ class BillsPaginationService {
 
     const toRemove = this.pageCache.size - this.config.maxCachedPages;
     for (let i = 0; i < toRemove; i++) {
-      const [key] = entries[i];
-      this.pageCache.delete(key);
+      const entry = entries[i];
+      if (entry) this.pageCache.delete(entry[0]);
     }
 
     logger.debug('Page cache size limit enforced', {

@@ -15,9 +15,9 @@ import type {
   AuthUser,
   AuthTokens,
   UserPreferences,
-  DataExportResponse,
-  DataDeletionResponse,
-} from './types/auth-types';
+  DataExportRequest as DataExportResponse,
+  DataDeletionRequest as DataDeletionResponse,
+} from '../auth/types';
 
 // Re-export types for convenience
 export type {

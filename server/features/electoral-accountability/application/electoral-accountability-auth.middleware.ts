@@ -20,19 +20,18 @@ export interface AuthenticatedRequest extends Request {
  * Middleware to require authentication
  * TODO: Integrate with actual JWT authentication system
  */
-export const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+export const requireAuth = (req: Request, res: Response, next: NextFunction): void | Response => {
   // TODO: Replace with actual JWT verification
   // For now, check for Authorization header
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     logger.warn({ path: req.path }, 'Unauthorized access attempt');
-    res.status(401).json({
+    return res.status(401).json({
       success: false,
       error: 'Authentication required',
       message: 'Please provide a valid authentication token',
     });
-    return;
   }
 
   // TODO: Verify JWT token and extract user info
@@ -50,15 +49,14 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction): vo
  * Middleware to require specific roles
  */
 export const requireRole = (...allowedRoles: string[]) => {
-  return (req: Request, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void | Response => {
     const user = (req as AuthenticatedRequest).user;
 
     if (!user) {
-      res.status(401).json({
+      return res.status(401).json({
         success: false,
         error: 'Authentication required',
       });
-      return;
     }
 
     if (!allowedRoles.includes(user.role)) {
@@ -69,12 +67,11 @@ export const requireRole = (...allowedRoles: string[]) => {
         path: req.path,
       }, 'Insufficient permissions');
 
-      res.status(403).json({
+      return res.status(403).json({
         success: false,
         error: 'Insufficient permissions',
         message: `This action requires one of the following roles: ${allowedRoles.join(', ')}`,
       });
-      return;
     }
 
     next();
