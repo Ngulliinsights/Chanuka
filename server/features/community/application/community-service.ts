@@ -1,5 +1,5 @@
 /**
- * Enhanced Community Service - Complete Infrastructure Integration
+ * Community Service - Complete Infrastructure Integration
  * 
  * Integrates ALL infrastructure components:
  * - ✅ Validation (Zod schemas)
@@ -37,9 +37,9 @@ import {
 import { Comment } from '../domain/entities/comment.entity';
 
 /**
- * Enhanced CommunityService with complete infrastructure integration
+ * CommunityService with complete infrastructure integration
  */
-export class EnhancedCommunityService {
+export class CommunityService {
   private inputSanitizer = new InputSanitizationService();
   private cacheInvalidation = createCacheInvalidation(cacheService);
 
@@ -126,7 +126,7 @@ export class EnhancedCommunityService {
         severity: 'low',
         user_id: sanitizedUserId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${comment.id}`,
         action: 'create',
         success: true,
@@ -147,7 +147,7 @@ export class EnhancedCommunityService {
       }, 'Comment created successfully');
 
       return comment;
-    }, { service: 'EnhancedCommunityService', operation: 'createComment' });
+    }, { service: 'CommunityService', operation: 'createComment' });
   }
 
   /**
@@ -192,7 +192,7 @@ export class EnhancedCommunityService {
       await cacheService.set(cacheKey, comment, CACHE_TTL.COMMUNITY);
 
       return comment;
-    }, { service: 'EnhancedCommunityService', operation: 'getCommentById' });
+    }, { service: 'CommunityService', operation: 'getCommentById' });
   }
 
   /**
@@ -296,7 +296,7 @@ export class EnhancedCommunityService {
       await cacheService.set(cacheKey, comments, CACHE_TTL.COMMUNITY);
 
       return comments;
-    }, { service: 'EnhancedCommunityService', operation: 'getComments' });
+    }, { service: 'CommunityService', operation: 'getComments' });
   }
 
   /**
@@ -347,7 +347,7 @@ export class EnhancedCommunityService {
         severity: 'low',
         user_id: sanitizedUserId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${sanitizedId}`,
         action: 'update',
         success: true,
@@ -357,7 +357,7 @@ export class EnhancedCommunityService {
       await this.invalidateCommentCaches(sanitizedId, updatedComment.bill_id);
 
       return comment;
-    }, { service: 'EnhancedCommunityService', operation: 'updateComment' });
+    }, { service: 'CommunityService', operation: 'updateComment' });
   }
 
   /**
@@ -414,7 +414,7 @@ export class EnhancedCommunityService {
         severity: 'medium',
         user_id: sanitizedUserId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${sanitizedId}`,
         action: 'delete',
         success: true,
@@ -427,7 +427,7 @@ export class EnhancedCommunityService {
       await this.invalidateCommentCaches(sanitizedId, result.billId);
 
       return true;
-    }, { service: 'EnhancedCommunityService', operation: 'deleteComment' });
+    }, { service: 'CommunityService', operation: 'deleteComment' });
   }
 
   // ============================================================================
@@ -501,7 +501,7 @@ export class EnhancedCommunityService {
         severity: 'low',
         user_id: sanitizedUserId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${sanitizedCommentId}`,
         action: 'interact',
         success: true,
@@ -511,7 +511,7 @@ export class EnhancedCommunityService {
       await cacheService.delete(cacheKeys.community('comment', sanitizedCommentId));
 
       return result;
-    }, { service: 'EnhancedCommunityService', operation: 'toggleLike' });
+    }, { service: 'CommunityService', operation: 'toggleLike' });
   }
 
   /**
@@ -562,7 +562,7 @@ export class EnhancedCommunityService {
         severity: 'high',
         user_id: sanitizedUserId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${sanitizedCommentId}`,
         action: 'flag',
         success: true,
@@ -576,7 +576,7 @@ export class EnhancedCommunityService {
       await cacheService.delete(cacheKeys.community('comment', sanitizedCommentId));
 
       return true;
-    }, { service: 'EnhancedCommunityService', operation: 'flagComment' });
+    }, { service: 'CommunityService', operation: 'flagComment' });
   }
 
   // ============================================================================
@@ -619,7 +619,7 @@ export class EnhancedCommunityService {
         severity: 'high',
         user_id: sanitizedModeratorId,
         ip_address: 'internal',
-        user_agent: 'enhanced-community-service',
+        user_agent: 'community-service',
         resource: `comment:${sanitizedCommentId}`,
         action: 'moderate',
         success: true,
@@ -633,18 +633,18 @@ export class EnhancedCommunityService {
       await cacheService.delete(cacheKeys.community('comment', sanitizedCommentId));
 
       return true;
-    }, { service: 'EnhancedCommunityService', operation: 'moderateComment' });
+    }, { service: 'CommunityService', operation: 'moderateComment' });
   }
 }
 
 /**
- * Factory function to create enhanced community service instance
+ * Factory function to create community service instance
  */
-export function createEnhancedCommunityService(): EnhancedCommunityService {
-  return new EnhancedCommunityService();
+export function createCommunityService(): CommunityService {
+  return new CommunityService();
 }
 
 /**
  * Singleton instance
  */
-export const enhancedCommunityService = createEnhancedCommunityService();
+export const communityService = createCommunityService();

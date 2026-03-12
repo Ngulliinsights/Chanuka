@@ -69,11 +69,11 @@ describe('Phase 2: Infrastructure Integration Validation', () => {
       expect(PostCreateSchema).toBeDefined();
     });
 
-    it('should have enhanced service with XSS prevention', async () => {
-      const { EnhancedCommunityService } = await import(
-        '@server/features/community/application/enhanced-community-service'
+    it('should have community service with XSS prevention', async () => {
+      const { CommunityService } = await import(
+        '@server/features/community/application/community-service'
       );
-      expect(EnhancedCommunityService).toBeDefined();
+      expect(CommunityService).toBeDefined();
     });
   });
 
@@ -101,11 +101,11 @@ describe('Phase 2: Infrastructure Integration Validation', () => {
       expect(AnalyticsQuerySchema).toBeDefined();
     });
 
-    it('should have enhanced service with caching', async () => {
-      const { EnhancedAnalyticsService } = await import(
-        '@server/features/analytics/application/enhanced-analytics-service'
+    it('should have analytics service with caching', async () => {
+      const { AnalyticsServiceIntegrated } = await import(
+        '@server/features/analytics/application/analytics-service-integrated'
       );
-      expect(EnhancedAnalyticsService).toBeDefined();
+      expect(AnalyticsServiceIntegrated).toBeDefined();
     });
   });
 
@@ -181,11 +181,11 @@ describe('Phase 2: Infrastructure Integration Validation', () => {
       expect(schemas).toBeDefined();
     });
 
-    it('should have enhanced service', async () => {
-      const { EnhancedArgumentIntelligenceService } = await import(
-        '@server/features/argument-intelligence/application/enhanced-argument-intelligence-service'
+    it('should have argument intelligence service', async () => {
+      const { ArgumentIntelligenceService } = await import(
+        '@server/features/argument-intelligence/application/argument-intelligence-service'
       );
-      expect(EnhancedArgumentIntelligenceService).toBeDefined();
+      expect(ArgumentIntelligenceService).toBeDefined();
     });
   });
 

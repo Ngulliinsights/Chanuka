@@ -1,6 +1,6 @@
 import { withTransaction } from '@server/infrastructure/database';
 /**
- * Enhanced Community Service - Integration Tests
+ * Community Service - Integration Tests
  * 
  * Tests all infrastructure components:
  * - Validation
@@ -11,18 +11,18 @@ import { withTransaction } from '@server/infrastructure/database';
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { EnhancedCommunityService } from '../application/enhanced-community-service';
+import { CommunityService } from '../application/community-service';
 import { cacheService } from '@server/infrastructure/cache';
 import { securityAuditService } from '@server/features/security';
 import type { CreateCommentInput, UpdateCommentInput, GetCommentsInput } from '../application/community-validation.schemas';
 
-describe('EnhancedCommunityService Integration Tests', () => {
-  let service: EnhancedCommunityService;
+describe('CommunityService Integration Tests', () => {
+  let service: CommunityService;
   const testUserId = 'test-user-123';
   const testBillId = 'test-bill-456';
 
   beforeEach(() => {
-    service = new EnhancedCommunityService();
+    service = new CommunityService();
     vi.clearAllMocks();
   });
 

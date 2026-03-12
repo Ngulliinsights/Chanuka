@@ -140,8 +140,8 @@ describe('MVP Critical Features - Integration Tests', () => {
     
     it('should use Result types for error handling', async () => {
       // Import community service
-      const { EnhancedCommunityService } = await import('../features/community/application/community-service.js');
-      const service = new EnhancedCommunityService();
+      const { CommunityService } = await import('../features/community/application/community-service.js');
+      const service = new CommunityService();
       
       // Test that methods return Result types
       const result = await service.getCommentsByBillId('test-bill-id', { page: 1, limit: 10 });
@@ -220,14 +220,14 @@ describe('MVP Critical Features - Integration Tests', () => {
       // Import all services
       const { CachedBillService } = await import('../features/bills/application/bill-service.js
       const { EnhancedUserService } = await import('../features/users/application/user-service.js');
-      const { EnhancedCommunityService } = await import('../features/community/application/community-service.js');
+      const { CommunityService } = await import('../features/community/application/community-service.js');
       const { EnhancedSearchService } = await import('../features/search/application/search-service.js');
       const { NotificationsService } = await import('../features/notifications/application/NotificationsService.js
       
       // All services should be instantiable
       expect(new CachedBillService()).toBeDefined();
       expect(new EnhancedUserService()).toBeDefined();
-      expect(new EnhancedCommunityService()).toBeDefined();
+      expect(new CommunityService()).toBeDefined();
       expect(new EnhancedSearchService()).toBeDefined();
       expect(new NotificationsService()).toBeDefined();
     });
