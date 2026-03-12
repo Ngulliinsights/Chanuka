@@ -6,13 +6,13 @@
  */
 
 export { ussdService } from './ussd.service';
-export { ussdController } from './ussd.controller';
+export { ussdController } from './presentation/http/controller';
 export { ussdValidator } from './ussd.validator';
 export { ussdAnalytics } from './ussd.analytics';
 export { USSD_CONFIG, USSD_MENUS } from './ussd.config';
 
 export * from './ussd.types';
-export { default as ussdRoutes } from './ussd.routes';
+export { default as ussdRoutes } from './presentation/http/routes';
 
 // Re-export middleware
 export {

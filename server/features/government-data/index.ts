@@ -17,7 +17,7 @@ export { governmentDataService } from './application/government-data.service';
 export { governmentDataSyncService } from './application/sync-service';
 
 // Routes
-export { default as governmentDataRoutes } from './presentation/government-data.routes';
+export { default as governmentDataRoutes } from './presentation/http/government-data.routes';
 
 // Types
 export type { 

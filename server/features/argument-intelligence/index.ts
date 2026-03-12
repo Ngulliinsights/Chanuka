@@ -26,7 +26,7 @@ export { QualityMetricsCalculator } from './infrastructure/nlp/quality-metrics';
 export { NLPCache, NLPCacheManager, nlpCacheManager } from './infrastructure/cache/nlp-cache';
 
 // Presentation
-export { argumentIntelligenceRouter } from './presentation/argument-intelligence-router';
+export { argumentIntelligenceRouter } from './presentation/http/argument-intelligence-router';
 
 // Types and Interfaces
 export type {

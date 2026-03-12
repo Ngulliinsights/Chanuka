@@ -8,7 +8,7 @@
 export { electoralAccountabilityService } from './domain/electoral-accountability.service';
 export { votingRecordRepository } from './infrastructure/voting-record.repository';
 export { electoralAccountabilityCacheService } from './infrastructure/electoral-accountability-cache.service';
-export { default as electoralAccountabilityRoutes } from './application/electoral-accountability.routes';
+export { default as electoralAccountabilityRoutes } from './presentation/http/routes';
 
 // Re-export types
 export type {

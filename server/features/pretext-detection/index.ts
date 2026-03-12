@@ -5,7 +5,7 @@
  */
 
 export { PretextDetectionService } from './application/pretext-detection.service';
-export { PretextDetectionController } from './application/pretext-detection.controller';
-export { default as pretextDetectionRoutes } from './application/pretext-detection.routes';
+export { PretextDetectionController } from './presentation/http/controller';
+export { default as pretextDetectionRoutes } from './presentation/http/routes';
 export { PretextHealthCheck } from './infrastructure/pretext-health-check';
 export * from './domain/types';

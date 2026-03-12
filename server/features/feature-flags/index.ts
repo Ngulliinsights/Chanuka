@@ -3,7 +3,7 @@
 // ============================================================================
 
 export { FeatureFlagService } from './domain/service';
-export { FeatureFlagController } from './application/controller';
+export { FeatureFlagController } from './presentation/http/controller';
 export { FeatureFlagRepository } from './infrastructure/repository';
 export type {
   FeatureFlagConfig,
@@ -14,5 +14,5 @@ export type {
   FlagMetrics
 } from './domain/types';
 
-import routes from './application/routes';
+import routes from './presentation/http/routes';
 export { routes as featureFlagRoutes };

@@ -12,6 +12,9 @@ export * from './domain';
 // Application Layer
 export * from './application';
 
+// Presentation Layer
+export { default as constitutionalIntelligenceRouter } from './presentation/http/routes';
+
 // Feature metadata
 export const FEATURE_NAME = 'constitutional-intelligence';
 export const FEATURE_VERSION = '1.0.0';

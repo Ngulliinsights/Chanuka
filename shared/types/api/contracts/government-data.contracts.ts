@@ -3,7 +3,7 @@
  * Request/response types for government data endpoints
  */
 
-import { ApiResponse, BaseQueryParams, HealthCheckResponse, MetadataResponse, SyncResponse } from './core.contracts';
+import { ApiResponse, BaseQueryParams, HealthCheckResponse, HealthStatus, MetadataResponse, SyncResponse } from './core.contracts';
 
 // Government Data Entity
 export interface GovernmentData {
@@ -118,14 +118,14 @@ export interface GovernmentDataStatsResponse extends ApiResponse<{
   };
 }> {}
 
-export interface GovernmentDataHealthResponse extends HealthCheckResponse {
+export interface GovernmentDataHealthResponse extends Omit<HealthCheckResponse, 'checks'> {
   checks: {
-    database: any;
-    cache: any;
+    database: HealthStatus;
+    cache: HealthStatus;
     externalApis: {
-      parliamentKenya: any;
-      senateKenya: any;
-      countyAssemblies: any;
+      parliamentKenya: HealthStatus;
+      senateKenya: HealthStatus;
+      countyAssemblies: HealthStatus;
     };
   };
 }

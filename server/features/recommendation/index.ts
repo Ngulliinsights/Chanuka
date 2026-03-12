@@ -17,7 +17,7 @@ export type {
 } from './domain/recommendation.dto';
 
 // Export new routes
-export { default as recommendationRouter } from './application/recommendation.routes';
+export { default as recommendationRouter } from './presentation/http/routes';
 
 
 

@@ -25,7 +25,7 @@ export {
 } from './services/constitutional-analysis-factory';
 
 // Presentation
-export { constitutionalAnalysisRouter } from './constitutional-analysis-router';
+export { constitutionalAnalysisRouter } from './presentation/http/routes';
 
 // Configuration
 export { 

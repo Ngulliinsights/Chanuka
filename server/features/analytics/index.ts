@@ -7,7 +7,7 @@
 export { analyticsService } from './application/analytics.service';
 
 // Routes
-export { default as analyticsRoutes } from './presentation/analytics.routes';
+export { default as analyticsRoutes } from './presentation/http/routes/analytics.routes';
 
 // Types (re-export from shared contracts)
 export type {
