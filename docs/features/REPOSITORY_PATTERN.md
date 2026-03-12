@@ -1,8 +1,8 @@
 # Repository Pattern Documentation
 
-**Version:** 1.0  
-**Last Updated:** 2026-02-27  
-**Status:** Phase 1 Complete
+**Version:** 2.0  
+**Last Updated:** 2026-03-12  
+**Status:** Phase 2 — Security Integration Complete
 
 ---
 
@@ -14,9 +14,10 @@
 4. [Creating Domain-Specific Repositories](#creating-domain-specific-repositories)
 5. [Error Handling](#error-handling)
 6. [Caching Strategy](#caching-strategy)
-7. [Testing Repositories](#testing-repositories)
-8. [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
-9. [Migration Guide](#migration-guide)
+7. [Security Integration](#security-integration)
+8. [Testing Repositories](#testing-repositories)
+9. [Anti-Patterns to Avoid](#anti-patterns-to-avoid)
+10. [Migration Guide](#migration-guide)
 
 ---
 
@@ -54,10 +55,21 @@ The repository pattern provides a clean abstraction layer between domain logic a
 │  (Infrastructure: caching, logging, error handling)          │
 └─────────────────────────────────────────────────────────────┘
                               │
+                    ┌─────────┴──────────┐
+                    ▼                    ▼
+┌──────────────────────────┐ ┌──────────────────────────────┐
+│  readDatabase /          │ │  secureQueryBuilderService    │
+│  withTransaction         │ │  (ADR-012 / ADR-021)         │
+│  (Simple, typed CRUD)    │ │  (Dynamic / user-input       │
+│                          │ │   queries, search, bulk ops) │
+└──────────────────────────┘ └──────────────────────────────┘
+                    │                    │
+                    └─────────┬──────────┘
                               ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Week 1 Database Access Patterns                 │
-│  readDatabase, withTransaction (proven patterns)             │
+│               Security Services (ADR-012)                    │
+│  inputSanitizationService · queryValidationService           │
+│  securityAuditService · secureQueryBuilderService            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -486,6 +498,126 @@ super({ entityName: 'County', enableCache: true, cacheTTL: 3600 });
 
 ---
 
+## Security Integration
+
+> **Related:** [ADR-012](../adr/ADR-012-infrastructure-security-pattern.md), [ADR-021](../adr/ADR-021-query-pipeline-usage-guide.md)
+
+Repositories are a data access boundary — all inputs entering the repository must be sanitized, and security-relevant operations must be audited. The repository pattern integrates security at two levels:
+
+### When to Use Each Query Pipeline
+
+| Scenario | Pipeline | Example |
+|---|---|---|
+| Known-column CRUD (`eq()`, `and()`) | `readDatabase` inside `executeRead()`/`executeWrite()` | `findByBillNumber`, `findByEmail` |
+| User-supplied search terms | `secureQueryBuilderService.createSafeLikePattern()` + Drizzle `like()` | `searchByKeywords` |
+| Dynamic WHERE from user filters | `secureQueryBuilderService.buildParameterizedQuery()` | Report builders, filter UIs |
+| Dynamic table/column references | `secureQueryBuilderService.validateIdentifier()` | Admin data explorers |
+| Bulk import/update | `secureQueryBuilderService.executeBulkOperation()` | CSV import, batch sync |
+
+### Input Sanitization in Repository Methods
+
+All user-supplied string inputs must be sanitized before reaching the database layer:
+
+```typescript
+import { inputSanitizationService } from '@server/features/security';
+import { secureQueryBuilderService } from '@server/features/security';
+
+class BillRepository extends BaseRepository<Bill> {
+  /**
+   * Search bills — uses secureQueryBuilderService for LIKE safety
+   */
+  async searchByKeywords(keywords: string[]): Promise<Result<Bill[], Error>> {
+    return this.executeRead(async (db) => {
+      // Step 1: Sanitize each keyword
+      const sanitized = keywords.map(k =>
+        inputSanitizationService.sanitizeString(k)
+      );
+
+      // Step 2: Create safe LIKE patterns
+      const patterns = sanitized.map(k =>
+        secureQueryBuilderService.createSafeLikePattern(k)
+      );
+
+      // Step 3: Execute with Drizzle (parameterized)
+      return db
+        .select()
+        .from(bills)
+        .where(
+          or(...patterns.map(p => like(bills.title, p)))
+        );
+    }, `bill:search:${keywords.sort().join(',')}`);
+  }
+
+  /**
+   * Simple CRUD — Drizzle eq() is inherently safe
+   */
+  async findByBillNumber(billNumber: string): Promise<Result<Maybe<Bill>, Error>> {
+    return this.executeRead(async (db) => {
+      // Sanitize even for simple lookups (defense in depth)
+      const sanitized = inputSanitizationService.sanitizeString(billNumber);
+      const results = await db
+        .select()
+        .from(bills)
+        .where(eq(bills.billNumber, sanitized))
+        .limit(1);
+      return results[0] ?? null;
+    }, `bill:number:${billNumber}`);
+  }
+}
+```
+
+### Output Sanitization
+
+When repository results contain user-generated content (comments, descriptions, HTML), sanitize outputs before caching or returning:
+
+```typescript
+async findCommentsByBill(billId: string): Promise<Result<Comment[], Error>> {
+  return this.executeRead(async (db) => {
+    const results = await db
+      .select()
+      .from(comments)
+      .where(eq(comments.bill_id, billId));
+
+    // Sanitize HTML content before returning
+    return results.map(r => ({
+      ...r,
+      content: inputSanitizationService.sanitizeHtml(r.content),
+    }));
+  }, `comment:bill:${billId}`);
+}
+```
+
+### Audit Logging for Mutations
+
+Write operations on sensitive entities should emit an audit event:
+
+```typescript
+import { securityAuditService } from '@server/features/security';
+
+async create(data: InsertBill, userId: string): Promise<Result<Bill, Error>> {
+  const result = await this.executeWrite(async (tx) => {
+    const [bill] = await tx.insert(bills).values(data).returning();
+    return bill;
+  }, ['bill:*']);
+
+  // Audit log after successful write
+  if (result.isOk) {
+    await securityAuditService.logSecurityEvent({
+      event_type: 'bill_created',
+      severity: 'medium',
+      user_id: userId,
+      resource: `bill:${result.value.id}`,
+      action: 'create',
+      success: true,
+    });
+  }
+
+  return result;
+}
+```
+
+---
+
 ## Testing Repositories
 
 ### Unit Tests
@@ -603,6 +735,33 @@ async findByCriteria(criteria: any): Promise<any> {
 
 **Why:** Loses type safety and makes code harder to maintain.
 
+### 5. Skipping Input Sanitization (Security)
+
+❌ **DON'T:**
+```typescript
+async searchBills(userInput: string): Promise<Result<Bill[], Error>> {
+  return this.executeRead(async (db) => {
+    // DANGEROUS: user input directly in LIKE without sanitization
+    return db.select().from(bills)
+      .where(like(bills.title, `%${userInput}%`));
+  });
+}
+```
+
+✅ **DO:**
+```typescript
+async searchBills(userInput: string): Promise<Result<Bill[], Error>> {
+  return this.executeRead(async (db) => {
+    const sanitized = inputSanitizationService.sanitizeString(userInput);
+    const pattern = secureQueryBuilderService.createSafeLikePattern(sanitized);
+    return db.select().from(bills)
+      .where(like(bills.title, pattern));
+  });
+}
+```
+
+**Why:** User input in LIKE patterns can contain wildcard characters (`%`, `_`) that alter query semantics. The `createSafeLikePattern()` method escapes these. See [ADR-021](../adr/ADR-021-query-pipeline-usage-guide.md).
+
 ---
 
 ## Migration Guide
@@ -660,7 +819,8 @@ class BillRepository extends BaseRepository<Bill> {
 2. **Domain-Specific** - Repository methods reflect business operations
 3. **Explicit Errors** - Use Result<T, Error> for explicit error handling
 4. **Caching** - Optional caching with configurable TTL
-5. **Testing** - Comprehensive unit and property tests
+5. **Security** - All inputs sanitized, user-driven queries routed through `secureQueryBuilderService`, mutations audit-logged
+6. **Testing** - Comprehensive unit and property tests
 
 ### Best Practices
 
@@ -669,6 +829,10 @@ class BillRepository extends BaseRepository<Bill> {
 - ✅ Use Maybe<T> for nullable values
 - ✅ Cache read operations with descriptive keys
 - ✅ Invalidate caches after write operations
+- ✅ Sanitize all user inputs with `inputSanitizationService` before DB queries
+- ✅ Use `secureQueryBuilderService` for dynamic/search/bulk queries (see [ADR-021](../adr/ADR-021-query-pipeline-usage-guide.md))
+- ✅ Audit-log sensitive mutations via `securityAuditService`
+- ✅ Sanitize HTML/UGC outputs before caching or returning
 - ✅ Write comprehensive tests (unit + property)
 - ✅ Keep business logic in domain services
 
@@ -679,10 +843,14 @@ class BillRepository extends BaseRepository<Bill> {
 - [Result Type](../shared/core/result.ts)
 - [Maybe Type](../shared/core/maybe.ts)
 - [Test Utils](../server/infrastructure/database/repository/test-utils.ts)
+- [ADR-012: Infrastructure Security Pattern](../adr/ADR-012-infrastructure-security-pattern.md)
+- [ADR-017: Repository Pattern Standardization](../adr/ADR-017-repository-pattern-standardization.md)
+- [ADR-021: Secure Query Pipeline Usage Guide](../adr/ADR-021-query-pipeline-usage-guide.md)
 
 ---
 
 **Prepared by:** Kiro AI Assistant  
-**Date:** 2026-02-27  
-**Version:** 1.0  
-**Status:** Phase 1 Complete
+**Updated by:** Antigravity AI  
+**Date:** 2026-03-12  
+**Version:** 2.0  
+**Status:** Phase 2 — Security Integration Complete
