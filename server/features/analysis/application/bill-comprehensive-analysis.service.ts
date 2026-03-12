@@ -20,6 +20,7 @@ import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import { and, eq } from 'drizzle-orm';
 import * as schema from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 // ============================================================================
 // TYPES

@@ -2,6 +2,8 @@ import { logger } from '@server/infrastructure/observability';
 import { withTransaction } from '@server/infrastructure/database/connection';
 import { db } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 
 // ============================================================================

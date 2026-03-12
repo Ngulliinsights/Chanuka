@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 import type { PlainBill } from './search.dto';
 
 export class RelevanceScorer {

@@ -7,6 +7,7 @@
 import { logger } from '@server/infrastructure/observability';
 
 import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
+import { users } from '@server/infrastructure/schema';
 
 export interface MLMigrationConfig {
     enabled: boolean;

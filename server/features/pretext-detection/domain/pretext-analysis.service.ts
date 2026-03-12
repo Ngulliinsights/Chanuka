@@ -5,6 +5,7 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 import { TrojanBillDetector } from '@server/features/ml/models/trojan-bill-detector';
 import type { PretextAnalysisInput, PretextAnalysisResult, PretextDetection } from './types';
 

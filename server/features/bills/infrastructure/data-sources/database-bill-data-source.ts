@@ -8,6 +8,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { bills, bill_engagement, comments } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { and, desc, eq, or, sql } from 'drizzle-orm';
 import {
   BillDataSource,

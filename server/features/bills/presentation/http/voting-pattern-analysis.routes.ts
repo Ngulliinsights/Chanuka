@@ -3,6 +3,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import type { AuthenticatedRequest } from '@server/middleware/auth';
 import { VotingPatternAnalysisService } from '@server/features/bills/application/voting-pattern-analysis.service';
 import { logger } from '@server/infrastructure/observability';
+import { sponsors } from '@server/infrastructure/schema';
 
 // ─── Service singleton ────────────────────────────────────────────────────────
 

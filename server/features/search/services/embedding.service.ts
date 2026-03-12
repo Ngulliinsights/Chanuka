@@ -1,3 +1,4 @@
+import { db } from '@server/infrastructure/database';
 // ============================================================================
 // EMBEDDING SERVICE - AI-Powered Text Embeddings with Caching
 // ============================================================================

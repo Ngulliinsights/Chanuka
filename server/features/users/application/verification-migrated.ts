@@ -1,3 +1,4 @@
+import { AsyncServiceResult } from '@server/utils/api-utils';
 /**
  * Verification Routes - Migrated to Modern Error Handling
  * 

@@ -10,6 +10,7 @@ import { logger } from '@server/infrastructure/observability';
 import { Request, Response } from 'express';
 import { readDatabase } from '@server/infrastructure/database';
 import { bills } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { sql, desc, asc, like, and, or, gte, lte, inArray } from 'drizzle-orm';
 
 // Placeholder types - these should match your actual domain types

@@ -9,8 +9,7 @@ import { ClusteringService } from './clustering-service';
 import { SentimentAnalyzer } from '../infrastructure/nlp/sentiment-analyzer';
 import { QualityMetricsCalculator } from '../infrastructure/nlp/quality-metrics';
 import { nlpCacheManager } from '../infrastructure/cache/nlp-cache';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+
 
 export interface NLPPipelineConfig {
   clustering: {

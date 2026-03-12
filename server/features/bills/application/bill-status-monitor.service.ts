@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { cacheService } from '@server/infrastructure/cache';
 import { notificationOrchestratorService, NotificationRequest } from '@server/features/notifications/application/notification-orchestrator';
 import { webSocketService } from '@server/infrastructure/websocket';
@@ -5,6 +6,9 @@ import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
 import { Bill } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 // --- Cache Configuration ---

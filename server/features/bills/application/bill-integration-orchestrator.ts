@@ -22,6 +22,8 @@
 import { logger } from '@server/infrastructure/observability';
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
 import type { Bill } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 
 interface BillAnalysisResult {
   billId: string;

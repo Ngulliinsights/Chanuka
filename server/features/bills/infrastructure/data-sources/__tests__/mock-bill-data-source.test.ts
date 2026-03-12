@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 /**
  * Mock Bill Data Source Tests
  * 

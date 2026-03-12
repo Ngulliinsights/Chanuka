@@ -1,3 +1,4 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 // ============================================================================
 // USER REPOSITORY - Domain-Specific Repository
 // ============================================================================
@@ -9,6 +10,7 @@ import type { Result } from '@shared/core/result';
 import { Ok } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { users, user_profiles } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, and, inArray, desc, asc, sql, like } from 'drizzle-orm';
 
 /**

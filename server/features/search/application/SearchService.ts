@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Enhanced Search Service - Complete Infrastructure Integration
  * 
@@ -19,6 +20,8 @@ import { InputSanitizationService, securityAuditService, secureQueryBuilderServi
 import { cacheService, CACHE_TTL } from '@server/infrastructure/cache';
 import { cacheKeys, createCacheInvalidation } from '@server/infrastructure/cache/cache-keys';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import {
   GlobalSearchSchema,
   BillSearchSchema,

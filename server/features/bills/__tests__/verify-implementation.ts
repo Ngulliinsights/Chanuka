@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 /**
  * Implementation Verification Script
  * Verifies that all bills feature components are properly implemented

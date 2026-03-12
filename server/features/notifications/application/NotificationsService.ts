@@ -8,6 +8,7 @@ import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys, CACHE_TTL } from '@server/infrastructure/cache/cache-keys';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { notifications } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, desc } from 'drizzle-orm';
 
 export class NotificationsService {

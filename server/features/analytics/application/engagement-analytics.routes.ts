@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 // Security Services
 import { dataPrivacyService } from '@server/features/security/infrastructure/services/data-privacy.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
@@ -6,9 +7,11 @@ import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache  } from '@server/infrastructure/cache';
 import { cacheKeys  } from '@server/infrastructure/cache/key-generator';
 import { AuthenticatedRequest  } from '@shared/core/types/auth.types';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
+import { ApiError, ApiValidationError } from '@shared/types/api';
+import { ApiResponseWrapper, ApiSuccess } from '@server/utils/api-utils';
 import { database, getDatabase,withTransaction } from '@server/infrastructure/database';
 import { bills,comments, user_profiles, users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';

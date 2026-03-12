@@ -1,3 +1,5 @@
+import { User } from '@server/features/users/domain/entities/user';
+import { bills } from '@server/infrastructure/schema';
 export interface RecommendationValidationResult {
   isValid: boolean;
   errors: string[];

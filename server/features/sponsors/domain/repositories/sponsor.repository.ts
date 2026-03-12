@@ -8,6 +8,7 @@ import { BaseRepository } from '@server/infrastructure/database/repository/base-
 import type { Result } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { sponsors } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, and, or, inArray, desc, asc, sql, like } from 'drizzle-orm';
 
 /**

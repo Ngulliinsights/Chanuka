@@ -76,6 +76,9 @@ export const cacheService = createSimpleCacheService();
 // Server-specific cache wrapper with convenience methods
 export { ServerCacheWrapper, serverCache } from './server-cache-wrapper';
 
+// Cache key generation and invalidation
+export { cacheKeys, createCacheInvalidation } from './cache-keys';
+
 // Cache TTL constants for common use cases
 export const CACHE_TTL = {
   SHORT: 60,              // 1 minute

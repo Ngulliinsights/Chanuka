@@ -1,3 +1,4 @@
+import { sponsors } from '@server/infrastructure/schema';
 // Barrel export for sponsors feature
 export { sponsorService } from './application/sponsor-service-direct';
 export { sponsorConflictAnalysisService } from './application/sponsor-conflict-analysis.service';

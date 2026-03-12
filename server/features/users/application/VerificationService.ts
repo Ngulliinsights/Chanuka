@@ -9,6 +9,7 @@ import { safeAsync, type AsyncServiceResult, createValidationError, createNotFou
 import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { user_verification, users } from '@server/infrastructure/schema';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
 import { desc, eq, sql } from 'drizzle-orm';
 
 /**

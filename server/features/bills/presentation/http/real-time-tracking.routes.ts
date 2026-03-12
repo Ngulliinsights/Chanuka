@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 import { NextFunction, Request, Response, Router } from 'express';
 
 import type { AuthenticatedRequest } from '@server/middleware/auth';

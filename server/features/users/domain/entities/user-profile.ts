@@ -1,3 +1,4 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 import { Interest,Organization, UserBio, UserLocation } from './value-objects';
 
 export class UserProfile {

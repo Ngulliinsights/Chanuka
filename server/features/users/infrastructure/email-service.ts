@@ -1,7 +1,9 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
 
 import { config } from '@server/config/index';
 import { EmailResult, getEmailService, sendTemplatedEmail } from '@server/infrastructure/messaging/email/email-service';
+import { users } from '@server/infrastructure/schema';
 
 export interface UserEmailData { user_id: string;
   email: string;

@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * User Profile Service
  * User Profile Service
@@ -9,6 +10,7 @@
 import { safeAsync, type AsyncServiceResult, createNotFoundError, createAuthorizationError } from '@server/infrastructure/error-handling';
 import { user_profileservice } from '@server/features/users/domain/user-profile';
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 
 /**
  * Profile data types

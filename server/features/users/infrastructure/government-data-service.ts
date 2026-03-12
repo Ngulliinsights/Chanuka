@@ -1,8 +1,11 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
 
 import { GovernmentDataIntegrationService } from '@server/features/government-data/services/government-data-integration.service';
 import { BillData, DataSource, SponsorData } from '@server/features/government-data/services/government-data-integration.service';
 import { ApiResponse } from '@server/infrastructure/external-data/types';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 export interface UserGovernmentDataQuery { user_id: string;
   queryType: 'bill_search' | 'sponsor_lookup' | 'legislative_tracking' | 'committee_info';

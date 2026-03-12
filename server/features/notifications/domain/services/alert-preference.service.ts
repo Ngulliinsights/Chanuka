@@ -29,6 +29,7 @@ import type {
 } from '../entities/alert-preference';
 import { AlertPreferenceEntity } from '../entities/alert-preference';
 import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
+import { users } from '@server/infrastructure/schema';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 
 // Type augmentation for schema.users.preferences

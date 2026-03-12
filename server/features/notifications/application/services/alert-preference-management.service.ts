@@ -12,6 +12,7 @@ import { logger } from '@server/infrastructure/observability';
 import { cacheService } from '@server/infrastructure/cache';
 import { db } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 import type {

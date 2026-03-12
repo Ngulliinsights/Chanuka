@@ -5,8 +5,7 @@
 // Repository interfaces removed - using direct service calls
 import { ImpactAssessment } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { AdvocacyEventPublisher, ImpactAchievedEvent } from '@shared/domain/events/advocacy-events';
+
 
 export interface ImpactMetric {
   id: string;

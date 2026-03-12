@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
 import { randomUUID } from 'crypto';
 import { NextFunction,Request, Response } from 'express';

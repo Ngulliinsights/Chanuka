@@ -1,12 +1,13 @@
+import { UserAggregate } from '@server/features/users/domain/aggregates/user-aggregate';
+import { CitizenVerification } from '@server/features/users/domain/entities/citizen-verification';
 // Using repository pattern with Drizzle-based implementation for decoupling
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { UserAggregate } from '@shared/aggregates/user-aggregate';
+
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { CitizenVerification, VerificationType } from '@shared/entities/citizen-verification';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { Evidence, ExpertiseLevel } from '@shared/entities/value-objects';
+
+
 import { user_verification } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { users } from '@server/infrastructure/schema';
 import { desc,eq, sql } from 'drizzle-orm';
 
 import { UserService } from '../../application/user-service-direct';

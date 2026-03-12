@@ -1,8 +1,10 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { cacheService } from '@server/infrastructure/cache';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { bills, comments, user_profiles, users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import {
   and,
   asc,

@@ -5,6 +5,7 @@ import { type Bill, bills, bill_tags } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import type * as schema from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 
 // Cache configuration constants
 const CACHE_TTL = 300; // Cache time-to-live in seconds (5 minutes default)

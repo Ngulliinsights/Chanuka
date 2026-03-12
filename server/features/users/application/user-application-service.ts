@@ -1,3 +1,4 @@
+import { users } from '@server/infrastructure/schema';
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';
 import { User } from '../domain/entities/user';

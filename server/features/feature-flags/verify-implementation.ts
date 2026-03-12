@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Feature Flag System Implementation Verification
  * 

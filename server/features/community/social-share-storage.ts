@@ -7,6 +7,8 @@ import {
   type InsertSocialShare,
   social_shares,
   type SocialShare} from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import { desc, eq, sql } from 'drizzle-orm';
 
 const CACHE_TTL = 3600; // 1 hour in seconds

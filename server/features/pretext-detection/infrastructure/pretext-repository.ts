@@ -7,6 +7,8 @@
 import { BaseRepository } from '@server/infrastructure/database/repository/base-repository';
 import type { Result } from '@shared/core/result';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
+import { users } from '@server/infrastructure/schema';
 import type { PretextAlert, PretextAnalysisResult } from '../domain/types';
 
 export class PretextRepository extends BaseRepository<PretextAnalysisResult> {

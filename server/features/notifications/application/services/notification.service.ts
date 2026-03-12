@@ -34,6 +34,7 @@ import { notifications } from '@server/infrastructure/schema';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 
 import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
+import { users } from '@server/infrastructure/schema';
 import { smartNotificationFilterService } from '@server/features/notifications/domain/services/smart-notification-filter';
 import type { FilterCriteria }                from '@server/features/notifications/domain/services/smart-notification-filter';
 import type { CombinedBillTrackingPreferences } from '@server/features/notifications/domain/types';

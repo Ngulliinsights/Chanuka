@@ -10,6 +10,7 @@ import { InputSanitizationService, securityAuditService } from '@server/features
 import { cacheKeys, CACHE_TTL, createCacheInvalidation } from '@server/infrastructure/cache/cache-keys';
 import { cacheService } from '@server/infrastructure/cache';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
+import { db } from '@server/infrastructure/database';
 import {
   CreateBillSchema,
   UpdateBillSchema,

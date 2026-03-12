@@ -14,6 +14,8 @@
 
 import { logger } from '@server/infrastructure/observability';
 import type { Bill } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { billIntegrationOrchestrator } from './bill-integration-orchestrator';
 
 export class BillLifecycleHooks {

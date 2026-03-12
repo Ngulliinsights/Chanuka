@@ -1,13 +1,12 @@
+import { UserAggregate } from '@server/features/users/domain/aggregates/user-aggregate';
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
+import { CitizenVerification } from '@server/features/users/domain/entities/citizen-verification';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { User } from '@shared/domain/entities/user';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { UserInterest,UserProfile } from '@shared/domain/entities/user-profile';
+
+
+
+
 import { user_profiles,users } from '@server/infrastructure/schema';
 import { and, eq, like, or,sql } from 'drizzle-orm';
 import { inputSanitizationService, queryValidationService, securityAuditService } from '@server/features/security';

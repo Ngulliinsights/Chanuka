@@ -1,3 +1,4 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 /**
  * Users Domain Types
  * 

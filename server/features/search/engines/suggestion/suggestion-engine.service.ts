@@ -2,6 +2,10 @@
 import { logger } from '../../../../infrastructure/observability/core/logger';
 import { readDatabase } from '../../../../infrastructure/database/connection';
 import * as schema from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, count, desc, gte, like, or, sql } from "drizzle-orm";
 
 import { cacheService } from '../../../../infrastructure/cache';

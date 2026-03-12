@@ -1,6 +1,8 @@
 
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { user_verification,users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { CitizenVerification } from '@server/features/users/domain/entities/citizen-verification';
 import { desc, eq, sql } from 'drizzle-orm';
 
 export interface CitizenVerification {

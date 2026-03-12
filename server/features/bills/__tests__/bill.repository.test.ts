@@ -8,6 +8,7 @@ import { BillRepository } from '../domain/repositories/bill.repositoryries/bill.
 import type { Bill, InsertBill, BillStatus } from '../domain/repositories/bill.repositoryries/bill.repository';
 import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { cacheService } from '@server/infrastructure/cache';
+import { bills } from '@server/infrastructure/schema';
 
 // Mock dependencies
 vi.mock('@server/infrastructure/database', () => ({

@@ -23,6 +23,9 @@ import { ERROR_CODES } from '@shared/constants';
 import { BaseError, ErrorDomain, ErrorSeverity, ValidationError } from '@shared/types/core/errors';
 import { createErrorContext } from '@server/utils/createErrorContext';
 import { logger } from '@server/infrastructure/observability/core/logger';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 // Initialize storage services
 const billStorage = BillStorage.getInstance();
@@ -119,10 +122,10 @@ router.get('/', asyncHandler(async (req, res) => {
     }
   } catch (error) {
     // Return empty array if database is not available (development mode)
-    logger.warn('Failed to fetch bills from database, returning empty array', {
+    logger.warn({
       component: 'BillsRouter',
       error: error instanceof Error ? error.message : String(error),
-    });
+    }, 'Failed to fetch bills from database, returning empty array');
     bills = [];
   }
 

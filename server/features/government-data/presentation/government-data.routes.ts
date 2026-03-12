@@ -5,7 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { logger } from '@server/infrastructure/observability';
-import { enhancedGovernmentDataService } from '../application/enhanced-government-data-service';
+import { governmentDataService } from '../application/government-data.service';
 
 const router: Router = Router();
 
@@ -43,7 +43,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
         : 'desc',
     };
 
-    const result = await enhancedGovernmentDataService.getGovernmentData(queryParams);
+    const result = await governmentDataService.getGovernmentData(queryParams);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -55,7 +55,7 @@ router.get('/', async (req: Request, res: Response): Promise<void> => {
     }
 
     // Get total count for pagination
-    const countResult = await enhancedGovernmentDataService.countGovernmentData({
+    const countResult = await governmentDataService.countGovernmentData({
       dataType: queryParams.dataType,
       source: queryParams.source,
       status: queryParams.status,
@@ -118,7 +118,7 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
     };
     logger.info(logContext, 'Getting government data by ID');
 
-    const result = await enhancedGovernmentDataService.getGovernmentDataById(id);
+    const result = await governmentDataService.getGovernmentDataById(id);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -178,7 +178,7 @@ router.get('/external/:source/:externalId', async (req: Request, res: Response):
     };
     logger.info(logContext, 'Getting government data by external ID');
 
-    const result = await enhancedGovernmentDataService.getGovernmentDataByExternalId(externalId, source);
+    const result = await governmentDataService.getGovernmentDataByExternalId(externalId, source);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -224,7 +224,7 @@ router.get('/metadata/data-types', async (_req: Request, res: Response): Promise
     };
     logger.debug(logContext, 'Getting data types');
 
-    const result = await enhancedGovernmentDataService.getDataTypes();
+    const result = await governmentDataService.getDataTypes();
     
     if (result.isErr()) {
       res.status(500).json({
@@ -261,7 +261,7 @@ router.get('/metadata/sources', async (_req: Request, res: Response): Promise<vo
     };
     logger.debug(logContext, 'Getting sources');
 
-    const result = await enhancedGovernmentDataService.getSources();
+    const result = await governmentDataService.getSources();
     
     if (result.isErr()) {
       res.status(500).json({
@@ -298,7 +298,7 @@ router.get('/metadata/statistics', async (_req: Request, res: Response): Promise
     };
     logger.debug(logContext, 'Getting statistics');
 
-    const result = await enhancedGovernmentDataService.getStatistics();
+    const result = await governmentDataService.getStatistics();
     
     if (result.isErr()) {
       res.status(500).json({
@@ -335,7 +335,7 @@ router.get('/health', async (_req: Request, res: Response): Promise<void> => {
     };
     logger.debug(logContext, 'Getting health status');
 
-    const result = await enhancedGovernmentDataService.getHealthStatus();
+    const result = await governmentDataService.getHealthStatus();
     
     if (result.isErr()) {
       res.status(500).json({
@@ -383,11 +383,11 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     const input = {
       ...req.body,
-      published_date: req.body.published_date ? new Date(req.body.published_date) : undefined,
-      effective_date: req.body.effective_date ? new Date(req.body.effective_date) : undefined,
+      publishedDate: req.body.published_date ? new Date(req.body.published_date) : undefined,
+      effectiveDate: req.body.effective_date ? new Date(req.body.effective_date) : undefined,
     };
 
-    const result = await enhancedGovernmentDataService.createGovernmentData(input);
+    const result = await governmentDataService.createGovernmentData(input);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -447,11 +447,11 @@ router.patch('/:id', async (req: Request, res: Response): Promise<void> => {
 
     const input = {
       ...req.body,
-      published_date: req.body.published_date ? new Date(req.body.published_date) : undefined,
-      effective_date: req.body.effective_date ? new Date(req.body.effective_date) : undefined,
+      publishedDate: req.body.published_date ? new Date(req.body.published_date) : undefined,
+      effectiveDate: req.body.effective_date ? new Date(req.body.effective_date) : undefined,
     };
 
-    const result = await enhancedGovernmentDataService.updateGovernmentData(id, input);
+    const result = await governmentDataService.updateGovernmentData(id, input);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -509,7 +509,7 @@ router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
     };
     logger.info(logContext, 'Deleting government data');
 
-    const result = await enhancedGovernmentDataService.deleteGovernmentData(id);
+    const result = await governmentDataService.deleteGovernmentData(id);
     
     if (result.isErr()) {
       res.status(500).json({
@@ -564,7 +564,7 @@ router.get('/sync/logs', async (req: Request, res: Response): Promise<void> => {
     };
     logger.debug(logContext, 'Getting sync logs');
 
-    const result = await enhancedGovernmentDataService.getSyncLogs(source, limit);
+    const result = await governmentDataService.getSyncLogs(source, limit);
     
     if (result.isErr()) {
       res.status(500).json({

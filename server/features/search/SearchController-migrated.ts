@@ -1,3 +1,4 @@
+import { AsyncServiceResult } from '@server/utils/api-utils';
 /**
  * Search Controller - Migrated to Modern Error Handling
  * 
@@ -15,6 +16,7 @@ import { z } from 'zod';
 import { asyncHandler } from '../../middleware/error-management';
 import { authenticateToken, requireRole } from '../../middleware/auth';
 import { boomFromStandardized } from '@server/infrastructure/error-handling';
+import { bills } from '@server/infrastructure/schema';
 import { logger } from '../../infrastructure/observability/core/logger';
 import { searchRepository } from './infrastructure/SearchRepository';
 import { searchService } from './application/SearchServiceWrapper';

@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 // src/config/financial-disclosure-config.ts
 // Centralized Configuration for Financial Disclosure System
 // This file serves as the single source of truth for all system-wide settings

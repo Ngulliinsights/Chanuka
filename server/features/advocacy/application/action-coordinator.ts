@@ -5,8 +5,7 @@
 // Repository interfaces removed - using direct service calls
 import { ActionFilters, ActionTemplate,PaginationOptions } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { ActionItem, ActionItemEntity,NewActionItem } from '@shared/domain/entities/action-item';
+
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 
 export class ActionCoordinator {

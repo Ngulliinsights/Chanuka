@@ -1,3 +1,4 @@
+import { sponsors } from '@server/infrastructure/schema';
 /**
  * Quick HTTP Test for Bills Feature
  * Tests all 11 new endpoints via HTTP requests

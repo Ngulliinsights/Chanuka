@@ -7,6 +7,8 @@ import { and, count as drizzleCount, desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
 import { cacheService } from '@server/infrastructure/cache';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import type { BillRepository } from '../domain/repositories/bill.repository';
 
 // ============================================================================

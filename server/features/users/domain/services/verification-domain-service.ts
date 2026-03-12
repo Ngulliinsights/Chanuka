@@ -1,3 +1,5 @@
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 /**
  * Domain Service for Citizen Verification Operations
  *

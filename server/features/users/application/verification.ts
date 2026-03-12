@@ -8,6 +8,7 @@ import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES, ErrorDomain, ErrorSeverity  } from '@shared/core';
 import { createErrorContext } from '@server/infrastructure/observability';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
 
 const router = Router();
 

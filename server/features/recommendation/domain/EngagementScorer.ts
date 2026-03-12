@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
  export class EngagementScorer {
   private static readonly WEIGHTS = { VIEW: 0.1, COMMENT: 0.5, SHARE: 0.3 } as const;
 

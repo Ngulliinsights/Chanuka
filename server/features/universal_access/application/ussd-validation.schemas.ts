@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * USSD (Universal Access) Feature - Validation Schemas
  * 

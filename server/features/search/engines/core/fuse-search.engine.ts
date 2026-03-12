@@ -8,6 +8,7 @@ import { logger } from '@server/infrastructure/observability';
 import { SearchEngine, SearchQuery, SearchResult } from '../types/search.types';
 import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills, comments, sponsors, users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { sql, and, eq } from 'drizzle-orm';
 import Fuse from 'fuse.js';
 

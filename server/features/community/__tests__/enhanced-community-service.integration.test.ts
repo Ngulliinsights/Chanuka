@@ -1,3 +1,4 @@
+import { withTransaction } from '@server/infrastructure/database';
 /**
  * Enhanced Community Service - Integration Tests
  * 

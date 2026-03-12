@@ -10,6 +10,7 @@ import { DatabaseError, NotFoundError } from '@shared/core';
 import { cache } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
+import { sponsors } from '@server/infrastructure/schema';
 import {
 sponsorAffiliations,
   sponsors, sponsorTransparency} from "@shared/foundation";

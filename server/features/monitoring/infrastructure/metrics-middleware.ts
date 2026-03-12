@@ -11,6 +11,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { integrationMonitor } from '../domain/integration-monitor.service';
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 
 // ============================================================================
 // TYPES

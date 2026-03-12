@@ -1,3 +1,5 @@
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import { cacheService } from '../../../infrastructure/cache';
 import { demoDataService } from '../../../infrastructure/demo-data';
 import { logger } from '../../../infrastructure/observability/core/logger';

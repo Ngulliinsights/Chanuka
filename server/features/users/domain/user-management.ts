@@ -1,6 +1,8 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { comments, notifications, sessions, users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import bcrypt from 'bcrypt';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 

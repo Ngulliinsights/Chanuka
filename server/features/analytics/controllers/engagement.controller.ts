@@ -1,3 +1,6 @@
+import { User } from '@server/features/users/domain/entities/user';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { engagementAnalyticsService } from '@server/features/analytics/application/engagement-analytics.service';
 import { z } from 'zod';
 

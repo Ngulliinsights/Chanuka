@@ -1,8 +1,8 @@
 import { NotificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
 // UserRepository interface removed - using direct service calls
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { Bill } from '@shared/entities/bill';
+import { bills } from '@server/infrastructure/schema';
+
 import { BillCreatedEvent, BillStatusChangedEvent, BillUpdatedEvent } from '@server/features/bills/domain/events/bill-events';
 
 /**

@@ -6,6 +6,7 @@
 import { SearchQuery, SearchResult } from '../types/search.types';
 import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { sql } from 'drizzle-orm';
 
 export class FuzzyMatchingEngine {

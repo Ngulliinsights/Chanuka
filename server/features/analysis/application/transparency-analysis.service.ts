@@ -1,6 +1,9 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 // Import the result type from sponsor conflict analysis
 // Ensure this path is correct based on your final structure

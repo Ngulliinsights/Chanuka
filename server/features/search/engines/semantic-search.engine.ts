@@ -1,3 +1,4 @@
+import { db } from '@server/infrastructure/database';
 // ============================================================================
 // SEMANTIC SEARCH ENGINE - AI-Powered Vector Similarity Search
 // ============================================================================

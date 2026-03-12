@@ -1,3 +1,6 @@
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import type { PlainBill } from './recommendation.dto';
 
 export interface RecommendationContext { user_id: string;

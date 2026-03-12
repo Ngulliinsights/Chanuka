@@ -6,6 +6,7 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 import type { USSDSession, USSDResponse, USSDRequest, USSDLanguage } from './ussd.types';
 import { USSD_CONFIG, USSD_MENUS } from './ussd.config';
 

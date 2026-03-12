@@ -1,4 +1,5 @@
 import { BillStatus, BillVoteType, EngagementType } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
 import { v4 as uuidv4 } from 'uuid';
 
 /**

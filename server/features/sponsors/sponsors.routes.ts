@@ -7,6 +7,7 @@
 import { sponsorConflictAnalysisService } from './application/sponsor-conflict-analysis.service';
 import { type SponsorAffiliationInput, sponsorService, type SponsorTransparencyInput } from './application/sponsor-service-direct';
 import { logger } from '@server/infrastructure/observability';
+import { sponsors } from '@server/infrastructure/schema';
 import express, { type Request, type Response, type Router } from 'express';
 import { asyncHandler } from '@server/middleware';
 

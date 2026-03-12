@@ -8,6 +8,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { sponsorService } from './sponsor-service-direct';
 import type { Sponsor } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 // ============================================================================
 // TYPE DEFINITIONS

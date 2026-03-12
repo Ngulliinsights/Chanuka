@@ -14,6 +14,7 @@ import {
   type LegislativeBrief,
   synthesis_jobs
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================

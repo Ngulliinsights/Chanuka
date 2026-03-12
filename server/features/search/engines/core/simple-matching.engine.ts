@@ -9,6 +9,7 @@ import { readDatabase } from '../../../../infrastructure/database/connection';
 import { bills } from '@server/infrastructure/schema';
 import { desc, ilike, or } from 'drizzle-orm';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
 
 interface CacheEntry {
   results: SearchResult[];

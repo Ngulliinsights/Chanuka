@@ -1,9 +1,11 @@
+import { User } from '@server/features/users/domain/entities/user';
 // ============================================================================
 // ARGUMENT INTELLIGENCE - Power Balancer
 // ============================================================================
 // Ensures minority voices remain visible and prevents coordinated campaigns from drowning out legitimate concerns
 
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 
 export interface PowerBalancingResult {
   balancedPositions: BalancedStakeholderPosition[];

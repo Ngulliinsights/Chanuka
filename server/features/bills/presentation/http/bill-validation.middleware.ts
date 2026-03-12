@@ -8,6 +8,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidationError } from '@shared/types/core/errors';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
+import { bills } from '@server/infrastructure/schema';
 import {
   CreateBillSchema,
   UpdateBillSchema,

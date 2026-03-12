@@ -1,3 +1,5 @@
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 // ============================================================================
 // BILL DOMAIN SERVICE
 // ============================================================================

@@ -1,3 +1,5 @@
+import { writeDatabase } from '@server/infrastructure/database';
+import { readDatabase } from '@server/infrastructure/database';
 // ============================================================================
 // FEATURE FLAGS REPOSITORY - Database Access Layer
 // ============================================================================
@@ -15,6 +17,7 @@ import {
   type FeatureFlagMetric,
   type NewFeatureFlagMetric
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 
 export class FeatureFlagRepository {
   private db = getDatabase();

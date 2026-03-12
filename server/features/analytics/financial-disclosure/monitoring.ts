@@ -1,3 +1,5 @@
+import { writeDatabase } from '@server/infrastructure/database';
+import { readDatabase } from '@server/infrastructure/database';
 // financial-disclosure-monitoring.ts
 // Production-Ready Financial Disclosure Monitoring Service
 // Handles automated monitoring cycles, alert generation, and operational data access
@@ -17,6 +19,8 @@ import {
   NotFoundError as SponsorNotFoundError,
   ValidationError as InvalidInputError
 } from '@server/infrastructure/error-handling';
+import { db } from '@server/infrastructure/database';
+import { sponsors } from '@server/infrastructure/schema';
 
 import type {
   CompletenessScore,

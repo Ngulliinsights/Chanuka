@@ -10,6 +10,7 @@ import type { Result } from '@shared/core/result';
 import { Ok } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { ml_analysis_results } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, desc, and, gte, sql } from 'drizzle-orm';
 
 /**

@@ -1,3 +1,4 @@
+import { AsyncServiceResult } from '@server/utils/api-utils';
 import { withTransaction } from '@server/infrastructure/database';
 import {
   AsyncServiceResult,
@@ -8,6 +9,7 @@ import {
   createNotFoundError,
   boomFromStandardized,
 } from '@server/infrastructure/error-handling';
+import { users } from '@server/infrastructure/schema';
 
 import { UserAggregate } from '../domain/aggregates/user-aggregate';
 import { CitizenVerification, VerificationType } from '../domain/entities/citizen-verification';

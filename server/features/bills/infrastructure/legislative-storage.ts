@@ -1,3 +1,4 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import {
   type Bill, bills,
@@ -12,6 +13,10 @@ import {
   sponsorAffiliations,
   sponsorTransparency,
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
 
 // ============================================================================

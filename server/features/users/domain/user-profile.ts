@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { cacheKeys, cacheService } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
@@ -10,6 +11,9 @@ import {
   user_verification,
   users,
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 

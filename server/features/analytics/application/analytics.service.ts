@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Analytics Service (Engagement Metrics)
  * Modernized service following standardized patterns
@@ -26,6 +27,7 @@ import {
   EngagementEventType
 } from '../../../../shared/types/api/contracts/analytics.contracts';
 import { cacheService } from '@server/infrastructure/cache';
+import { bills } from '@server/infrastructure/schema';
 
 export class AnalyticsService {
   private readonly cachePrefix = 'analytics';

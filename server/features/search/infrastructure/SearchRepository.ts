@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Search Repository - Domain-Specific Repository
  * 
@@ -11,6 +12,7 @@ import type { Maybe } from '@shared/core/maybe';
 import { searchQueries, savedSearches } from '@server/infrastructure/schema/search_system';
 import { sql, desc, eq, and } from 'drizzle-orm';
 import { bills } from '@server/infrastructure/schema/foundation';
+import { db } from '@server/infrastructure/database';
 
 /**
  * Search query entity type (inferred from schema)

@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Smart Notification Filter Service
  *
@@ -38,6 +39,8 @@ import {
   sponsors,
   user_interests,
 } from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, desc, eq, inArray } from 'drizzle-orm';
 
 // ---------------------------------------------------------------------------

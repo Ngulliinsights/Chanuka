@@ -19,6 +19,8 @@ export default router;
 
 // Also export the integration service for backward compatibility
 // import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 /**
  * Kenyan Government Data Integration Service

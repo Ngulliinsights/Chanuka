@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { z } from 'zod';
 import { emailSchema } from '@shared/validation';
 

@@ -6,8 +6,16 @@
 
 export * from './contracts';
 export * from './request-types';
-export * from './response-types';
-export * from './error-types';
+export * from './serialization';
+export * from './websocket';
 export * from './factories';
+
+// Resolve naming conflicts by prioritizing core contracts
+export type { 
+  ApiResponse, 
+  ApiError, 
+  ResponseMetadata, 
+  PaginationMeta 
+} from './contracts/core.contracts';
 export * from './serialization';
 export * from './websocket';

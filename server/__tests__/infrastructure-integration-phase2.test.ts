@@ -198,10 +198,10 @@ describe('Phase 2: Infrastructure Integration Validation', () => {
     });
 
     it('should have enhanced service', async () => {
-      const { EnhancedConstitutionalIntelligenceService } = await import(
-        '@server/features/constitutional-intelligence/application/enhanced-constitutional-intelligence-service'
+      const { ConstitutionalIntelligenceService } = await import(
+        '@server/features/constitutional-intelligence/application/constitutional-intelligence-service'
       );
-      expect(EnhancedConstitutionalIntelligenceService).toBeDefined();
+      expect(ConstitutionalIntelligenceService).toBeDefined();
     });
   });
 

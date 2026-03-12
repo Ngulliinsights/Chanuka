@@ -3,6 +3,8 @@
  */
 
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 import { InputSanitizationService } from '@server/features/security';
 import { RecommendationRepository } from '../infrastructure/RecommendationRepository';
 import type { PlainBill } from '../domain/recommendation.dto';

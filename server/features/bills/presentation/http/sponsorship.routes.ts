@@ -1,4 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
+import { sponsors } from '@server/infrastructure/schema';
 import { asyncHandler } from '@server/middleware/error-management';
 import { Router, Request, Response } from 'express';
 

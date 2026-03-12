@@ -4,6 +4,7 @@ import { bill_engagement,bills, notifications, users } from '@server/infrastruct
 import { and, eq, gte, lt, sql } from 'drizzle-orm';
 import * as cron from 'node-cron';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
 
 // Temporary stub implementation until enhanced-notification service is created
 const enhancedNotificationService = {

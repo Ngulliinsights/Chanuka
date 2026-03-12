@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 // ============================================================================
 // ADVOCACY COORDINATION - Campaign Domain Service
 // ============================================================================
@@ -5,8 +6,7 @@
 // Repository interfaces removed - using direct service calls
 import { CampaignMetrics, CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { Campaign, CampaignEntity, NewCampaign } from '@shared/entities/campaign';
+
 
 export class CampaignDomainService {
   constructor(

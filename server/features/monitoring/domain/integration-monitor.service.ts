@@ -33,6 +33,7 @@ import {
   type IntegrationLog,
   type NewIntegrationLog,
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, and, gte, desc, sql } from 'drizzle-orm';
 
 // ============================================================================

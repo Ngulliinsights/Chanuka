@@ -3,22 +3,36 @@
  * Standardized request/response types for all features
  */
 
+/**
+ * Metadata for API responses
+ */
+export interface ResponseMetadata {
+  timestamp: string;
+  requestId?: string;
+  version?: string;
+  pagination?: PaginationMeta;
+  performance?: {
+    duration: number;
+    cached?: boolean;
+    cacheHit?: boolean;
+  };
+}
+
 // Base API Response Structure
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApiError;
-  pagination?: PaginationMeta;
-  quotaRemaining?: QuotaInfo;
-  timestamp?: string;
+  message?: string;
+  metadata?: ResponseMetadata;
 }
 
 export interface ApiError {
-  type: string;
-  message: string;
   code: string;
+  message: string;
   details?: Record<string, any>;
   correlationId?: string;
+  stack?: string; // Development only
 }
 
 export interface PaginationMeta {

@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { BaseRepository } from '@server/infrastructure/database/repository/base-repository';
 import type { Result } from '@shared/core/result';
 import { Ok } from '@shared/core/result';
@@ -9,6 +10,8 @@ import {
   bills,
   user_interests,
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import { and, desc, eq, gt, inArray, sql } from 'drizzle-orm';
 
 export class RecommendationRepository extends BaseRepository<PlainBill> {

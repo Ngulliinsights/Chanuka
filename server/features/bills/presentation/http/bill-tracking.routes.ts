@@ -2,7 +2,9 @@
 // Correct import path for the new service location
 import { billTrackingService } from '@server/features/bills/application/bill-tracking.service';
 import { logger } from '@server/infrastructure/observability';
-import { ApiError, ApiResponseWrapper,ApiSuccess, ApiValidationError  } from '@shared/types/api';
+import { bills } from '@server/infrastructure/schema';
+import { ApiError, ApiValidationError } from '@shared/types/api';
+import { ApiResponseWrapper, ApiSuccess } from '@server/utils/api-utils';
 import { NextFunction,Request, Response, Router } from 'express';
 import { z } from 'zod';
 

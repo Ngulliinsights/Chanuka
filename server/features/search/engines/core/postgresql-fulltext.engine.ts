@@ -1,3 +1,6 @@
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 // ============================================================================
 // POSTGRESQL FULL-TEXT SEARCH ENGINE - PHASE 2 ENHANCED
 // ============================================================================

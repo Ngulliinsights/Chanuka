@@ -1,6 +1,11 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { user_profiles } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
 // --- Interface Definitions ---

@@ -17,6 +17,7 @@ import {
 
 import { boomFromStandardized } from '@server/infrastructure/error-handling';
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 
 export class BillServiceAdapter {
   private billService: CachedBillService;

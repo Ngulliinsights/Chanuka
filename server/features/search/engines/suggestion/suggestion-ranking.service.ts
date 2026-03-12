@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { SearchContext, SearchSuggestion } from "../types/search.types";
 
 export interface RankingWeights {

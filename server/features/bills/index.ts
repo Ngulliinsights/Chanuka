@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 // Bills Feature - Main Exports
 // This is the public API for the bills feature
 

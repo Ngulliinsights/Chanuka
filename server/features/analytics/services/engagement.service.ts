@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
 import { cacheService } from '@server/infrastructure/cache';
 // FIXED: Import plural table names and correct type references
@@ -5,9 +6,9 @@ import { bills, comment_votes,comments, user_profiles, users } from '@server/inf
 import { bill_engagement } from '@server/infrastructure/schema';
 // FIXED: Import cacheKeys from the correct location
 import { cache, cacheKeys } from '@server/infrastructure/cache';
-import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse   } from '@shared/core';
+import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse } from '@server/utils/api-utils';
 import { logger } from '@server/infrastructure/observability';
-import { ApiResponseWrapper  } from '@shared/types/api';
+import { ApiResponseWrapper } from '@server/utils/api-utils';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import type {
   BillEngagementMetrics,
@@ -19,6 +20,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
+import { db } from '@server/infrastructure/database';
 import { buildTimeThreshold } from '@server/utils/db-helpers';
 // FIXME: Invalid import - Comment out non-existent AuthAlert import
 // import { AuthenticatedRequest, authenticateToken } from '../../../../AuthAlert';

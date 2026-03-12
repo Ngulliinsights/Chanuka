@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Recommendation Engine Routes
  * 
@@ -13,6 +14,7 @@ import type { Router as ExpressRouter } from 'express';
 import { RecommendationService } from './RecommendationService';
 import { logger } from '@server/infrastructure/observability';
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
+import { bills } from '@server/infrastructure/schema';
 import { integrationMonitor } from '@server/features/monitoring/domain/integration-monitor.service';
 
 const router: ExpressRouter = Router();

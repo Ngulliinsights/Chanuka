@@ -7,6 +7,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { notificationService } from '../application/services/notification.service';
 import { notificationChannelService } from '@server/infrastructure/messaging/delivery/channel.service';
+import { users } from '@server/infrastructure/schema';
 import { smartNotificationFilterService } from '../domain/services/smart-notification-filter';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 import type { NotificationRequest } from '../application/services/notification.service';

@@ -4,8 +4,7 @@
 // Clusters similar argList using semantic similarity to reveal patterns
 
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+
 
 export interface ArgumentCluster {
   id: string;

@@ -5,6 +5,7 @@ import { db } from '@server/infrastructure/database/pool';
 import { eq } from 'drizzle-orm';
 
 import * as schema from '@server/infrastructure/schema';
+import { bills } from '@server/infrastructure/schema';
 
 // --- Interface Definitions ---
 export interface StakeholderGroup {

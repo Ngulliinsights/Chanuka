@@ -1,3 +1,4 @@
+import { db } from '@server/infrastructure/database';
 /**
  * Conflict Detector - MWANGA Stack
  * 

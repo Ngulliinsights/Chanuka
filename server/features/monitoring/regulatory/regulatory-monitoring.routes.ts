@@ -1,6 +1,6 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { regulatoryChangeMonitoringService } from '@server/features/analytics/domain/regulatory-change-monitoring.service';
-import { ApiResponseWrapper   } from '@shared/core';
+import { ApiResponseWrapper } from '@server/utils/api-utils';
 import { logger } from '@server/infrastructure/observability';
 import { NextFunction,Request, Response, Router } from 'express';
 import { z } from 'zod'; // For runtime validation

@@ -1,4 +1,6 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 
 import { NotificationData, notificationService } from '@server/features/notifications';
 

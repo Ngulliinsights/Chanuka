@@ -10,6 +10,8 @@ import type { Result } from '@shared/core/result';
 import { Ok, Err } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { analysis } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import { eq, desc, and, gte, lte } from 'drizzle-orm';
 
 /**

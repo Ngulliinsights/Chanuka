@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 // ============================================================================
 // FEATURE FLAGS SERVICE - Business Logic Layer
 // ============================================================================
@@ -12,6 +13,7 @@ import type {
   ABTestConfig
 } from './types';
 import type { NewFeatureFlag } from '@server/infrastructure/schema/feature_flags';
+import { users } from '@server/infrastructure/schema';
 
 export class FeatureFlagService {
   private repository: FeatureFlagRepository;

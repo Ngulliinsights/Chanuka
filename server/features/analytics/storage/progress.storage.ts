@@ -7,6 +7,7 @@ import {
 import { desc, eq, sql } from 'drizzle-orm';
 
 import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
+import { db } from '@server/infrastructure/database';
 
 // Constants for cache configuration
 const CACHE_PREFIX = 'progress:';

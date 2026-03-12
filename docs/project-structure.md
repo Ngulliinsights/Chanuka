@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 10, 2026 at 08:52 PM
+**Generated:** March 12, 2026 at 10:52 AM
 **Max Depth:** 7 levels
-**Total Items:** 4,367
+**Total Items:** 4,309
 
 ```
 .
@@ -88,17 +88,110 @@
 │   │   │   ├── providers/
 │   │   │   │   ├── AppProviders.tsx
 │   │   │   │   └── queryClient.ts
-│   │   │   ├── shell/
-│   │   │   │   ├── AppRouter.tsx
-│   │   │   │   ├── AppShell.tsx
-│   │   │   │   ├── BrandedFooter.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── NavigationBar.tsx
-│   │   │   │   ├── ProtectedRoute.tsx
-│   │   │   │   └── SkipLinks.tsx
-│   │   │   └── OnboardingTrigger.tsx
+│   │   │   └── shell/
+│   │   │       ├── AppRouter.tsx
+│   │   │       ├── AppShell.tsx
+│   │   │       ├── BrandedFooter.tsx
+│   │   │       ├── index.ts
+│   │   │       ├── NavigationBar.tsx
+│   │   │       ├── ProtectedRoute.tsx
+│   │   │       └── SkipLinks.tsx
 │   │   ├── features/
+│   │   │   ├── accountability/
+│   │   │   │   ├── advocacy/
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   └── use-advocacy.ts
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   └── AdvocacyDashboard.tsx
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── ActionCard.tsx
+│   │   │   │   │   │   └── CampaignCard.tsx
+│   │   │   │   │   ├── ElectoralPressure.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useElectoralAccountability.ts
+│   │   │   │   ├── pages/
+│   │   │   │   │   └── ElectoralAccountabilityDashboard.tsx
+│   │   │   │   ├── services/
+│   │   │   │   │   └── electoral-accountability-api.ts
+│   │   │   │   ├── sponsors/
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   ├── SponsorDetailPage.tsx
+│   │   │   │   │   │   └── SponsorsPage.tsx
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   └── api.ts
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── ConflictVisualization.tsx
+│   │   │   │   │   │   ├── RiskProfile.tsx
+│   │   │   │   │   │   ├── SponsorCard.tsx
+│   │   │   │   │   │   └── SponsorList.tsx
+│   │   │   │   │   ├── hooks.ts
+│   │   │   │   │   ├── IMPLEMENTATION_COMPLETE.md
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── types/
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── campaigns/
+│   │   │   │   │   ├── constituency/
+│   │   │   │   │   ├── gap-analysis/
+│   │   │   │   │   ├── mp-scorecard/
+│   │   │   │   │   │   ├── MPScorecard.tsx
+│   │   │   │   │   │   └── VotingRecordTimeline.tsx
+│   │   │   │   │   └── shared/
+│   │   │   │   │       ├── AccountabilityMetricCard.tsx
+│   │   │   │   │       └── GapSeverityBadge.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── README.md
 │   │   │   ├── admin/
+│   │   │   │   ├── feature-flags/
+│   │   │   │   │   ├── api/
+│   │   │   │   │   │   └── feature-flags-api.ts
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   └── useFeatureFlags.ts
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   ├── feature-flags.tsx
+│   │   │   │   │   │   └── FeatureFlagManagerPage.tsx
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── FeatureFlagManager.tsx
+│   │   │   │   │   │   ├── FlagAnalyticsDashboard.tsx
+│   │   │   │   │   │   ├── FlagEditor.tsx
+│   │   │   │   │   │   ├── FlagList.tsx
+│   │   │   │   │   │   └── RolloutControls.tsx
+│   │   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── monitoring/
+│   │   │   │   │   ├── api/
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── monitoring-api.ts
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   └── use-monitoring.ts
+│   │   │   │   │   ├── model/
+│   │   │   │   │   │   ├── continuous-performance-monitor.ts
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── performance-benchmarking.ts
+│   │   │   │   │   │   ├── performance-regression-tester.ts
+│   │   │   │   │   │   ├── render-tracker.ts
+│   │   │   │   │   │   ├── render-tracking-integration.ts
+│   │   │   │   │   │   └── route-profiler.ts
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   ├── integration-monitoring.tsx
+│   │   │   │   │   │   └── monitoring-dashboard.tsx
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── AlertManagement.tsx
+│   │   │   │   │   │   ├── ErrorTrackingDisplay.tsx
+│   │   │   │   │   │   ├── FeatureUsageCharts.tsx
+│   │   │   │   │   │   ├── HealthStatusDisplay.tsx
+│   │   │   │   │   │   ├── index.ts
+│   │   │   │   │   │   ├── IntegrationMonitoringDashboard.tsx
+│   │   │   │   │   │   ├── MetricsVisualization.tsx
+│   │   │   │   │   │   └── PerformanceMetrics.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── dashboard-validation/
 │   │   │   │   │   │   ├── config.property.test.ts
@@ -113,24 +206,41 @@
 │   │   │   │   │   ├── dashboard.tsx
 │   │   │   │   │   ├── database-manager.tsx
 │   │   │   │   │   ├── integration-status.tsx
-│   │   │   │   │   └── onboarding-analytics.tsx
+│   │   │   │   │   ├── onboarding-analytics.tsx
+│   │   │   │   │   └── system-status.tsx
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── migration/
 │   │   │   │   │   │   └── MigrationManager.tsx
 │   │   │   │   │   ├── admin-dashboard.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
-│   │   │   ├── advocacy/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── use-advocacy.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── AdvocacyDashboard.tsx
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── ActionCard.tsx
-│   │   │   │   │   └── CampaignCard.tsx
-│   │   │   │   ├── ElectoralPressure.tsx
-│   │   │   │   └── index.ts
 │   │   │   ├── analysis/
+│   │   │   │   ├── argument-intelligence/
+│   │   │   │   │   ├── api/
+│   │   │   │   │   │   └── argument-intelligence-api.ts
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   └── useArgumentIntelligence.ts
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   └── argument-intelligence.tsx
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── ArgumentClusterDisplay.tsx
+│   │   │   │   │   │   ├── ArgumentFilters.tsx
+│   │   │   │   │   │   ├── ArgumentIntelligenceDashboard.tsx
+│   │   │   │   │   │   ├── ArgumentIntelligenceWidget.tsx
+│   │   │   │   │   │   ├── PositionTrackingChart.tsx
+│   │   │   │   │   │   ├── QualityMetricsDisplay.tsx
+│   │   │   │   │   │   └── SentimentHeatmap.tsx
+│   │   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── constitutional/
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   └── use-constitutional-analysis.ts
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── ConstitutionalAnalysisDisplay.tsx
+│   │   │   │   │   │   └── ConstitutionalIntelligenceTab.tsx
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── model/
 │   │   │   │   │   ├── hooks/
 │   │   │   │   │   │   ├── index.ts
@@ -146,6 +256,24 @@
 │   │   │   │   ├── pages/
 │   │   │   │   │   ├── analysis-tools.tsx
 │   │   │   │   │   └── WorkaroundAnalysisPage.tsx
+│   │   │   │   ├── pretext-detection/
+│   │   │   │   │   ├── api/
+│   │   │   │   │   │   └── pretext-detection-api.ts
+│   │   │   │   │   ├── hooks/
+│   │   │   │   │   │   ├── usePretextAnalysis.ts
+│   │   │   │   │   │   └── usePretextDetectionApi.ts
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   └── pretext-detection.tsx
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   └── PretextAnalysisService.ts
+│   │   │   │   │   ├── ui/
+│   │   │   │   │   │   ├── CivicActionToolbox.tsx
+│   │   │   │   │   │   ├── PretextDetectionPanel.tsx
+│   │   │   │   │   │   └── PretextWatchCard.tsx
+│   │   │   │   │   ├── demo.md
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── types/
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── ui/
@@ -156,66 +284,6 @@
 │   │   │   │   │   │   └── index.ts
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── analytics/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── use-analytics.ts
-│   │   │   │   │   ├── use-comprehensive-analytics.ts
-│   │   │   │   │   ├── use-error-analytics.ts
-│   │   │   │   │   ├── use-journey-tracker.ts
-│   │   │   │   │   ├── use-render-tracker.ts
-│   │   │   │   │   └── use-web-vitals.ts
-│   │   │   │   ├── model/
-│   │   │   │   │   ├── error-analytics-bridge.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── offline-analytics.ts
-│   │   │   │   │   ├── privacy-analytics.ts
-│   │   │   │   │   └── user-journey-tracker.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── analysis.ts
-│   │   │   │   │   ├── analytics-api.service.ts
-│   │   │   │   │   ├── analytics.ts
-│   │   │   │   │   ├── api.ts
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── dashboard/
-│   │   │   │   │   │   ├── AnalyticsDashboard.tsx
-│   │   │   │   │   │   └── EngagementAnalyticsDashboard.tsx
-│   │   │   │   │   ├── metrics/
-│   │   │   │   │   │   └── CivicScoreCard.tsx
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── api/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── useApiDocumentation.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── api-access.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── api-documentation.ts
-│   │   │   │   ├── types/
-│   │   │   │   │   └── index.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── argument-intelligence/
-│   │   │   │   ├── api/
-│   │   │   │   │   └── argument-intelligence-api.ts
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── useArgumentIntelligence.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── argument-intelligence.tsx
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── ArgumentClusterDisplay.tsx
-│   │   │   │   │   ├── ArgumentFilters.tsx
-│   │   │   │   │   ├── ArgumentIntelligenceDashboard.tsx
-│   │   │   │   │   ├── ArgumentIntelligenceWidget.tsx
-│   │   │   │   │   ├── PositionTrackingChart.tsx
-│   │   │   │   │   ├── QualityMetricsDisplay.tsx
-│   │   │   │   │   └── SentimentHeatmap.tsx
-│   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
 │   │   │   │   └── types.ts
 │   │   │   ├── auth/
 │   │   │   │   └── pages/
@@ -338,17 +406,21 @@
 │   │   │   │   ├── README.md
 │   │   │   │   ├── services.ts
 │   │   │   │   └── types.ts
-│   │   │   ├── collaboration/
-│   │   │   │   ├── pages/
-│   │   │   │   │   ├── WorkspaceDetailPage.tsx
-│   │   │   │   │   └── WorkspacesPage.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── activity-service.ts
-│   │   │   │   │   └── workspace-service.ts
-│   │   │   │   └── ui/
-│   │   │   │       ├── ActivityFeed.tsx
-│   │   │   │       └── WorkspaceCard.tsx
 │   │   │   ├── community/
+│   │   │   │   ├── collaboration/
+│   │   │   │   │   ├── pages/
+│   │   │   │   │   │   ├── WorkspaceDetailPage.tsx
+│   │   │   │   │   │   └── WorkspacesPage.tsx
+│   │   │   │   │   ├── services/
+│   │   │   │   │   │   ├── activity-service.ts
+│   │   │   │   │   │   └── workspace-service.ts
+│   │   │   │   │   └── ui/
+│   │   │   │   │       ├── ActivityFeed.tsx
+│   │   │   │   │       └── WorkspaceCard.tsx
+│   │   │   │   ├── expert/
+│   │   │   │   │   └── pages/
+│   │   │   │   │       ├── expert-insights.tsx
+│   │   │   │   │       └── expert-verification.tsx
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   ├── useArgumentClusters.ts
@@ -357,7 +429,6 @@
 │   │   │   │   │   ├── useCommunityIntegration.ts
 │   │   │   │   │   ├── useDiscussion.ts
 │   │   │   │   │   ├── useLegislativeBrief.ts
-│   │   │   │   │   ├── useRealtime.ts
 │   │   │   │   │   ├── useUnifiedCommunity.ts
 │   │   │   │   │   └── useUnifiedDiscussion.ts
 │   │   │   │   ├── pages/
@@ -385,59 +456,6 @@
 │   │   │   │   │   │   └── CommunityHub.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   └── index.ts
-│   │   │   ├── constitutional-intelligence/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── use-constitutional-analysis.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── ConstitutionalAnalysisDisplay.tsx
-│   │   │   │   │   └── ConstitutionalIntelligenceTab.tsx
-│   │   │   │   └── index.ts
-│   │   │   ├── design-system/
-│   │   │   │   └── pages/
-│   │   │   │       └── design-system-test.tsx
-│   │   │   ├── electoral-accountability/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── useElectoralAccountability.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── ElectoralAccountabilityDashboard.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── electoral-accountability-api.ts
-│   │   │   │   ├── types/
-│   │   │   │   │   └── index.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── campaigns/
-│   │   │   │   │   ├── constituency/
-│   │   │   │   │   ├── gap-analysis/
-│   │   │   │   │   ├── mp-scorecard/
-│   │   │   │   │   │   ├── MPScorecard.tsx
-│   │   │   │   │   │   └── VotingRecordTimeline.tsx
-│   │   │   │   │   └── shared/
-│   │   │   │   │       ├── AccountabilityMetricCard.tsx
-│   │   │   │   │       └── GapSeverityBadge.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── README.md
-│   │   │   ├── expert/
-│   │   │   │   └── pages/
-│   │   │   │       ├── expert-insights.tsx
-│   │   │   │       └── expert-verification.tsx
-│   │   │   ├── feature-flags/
-│   │   │   │   ├── api/
-│   │   │   │   │   └── feature-flags-api.ts
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── useFeatureFlags.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   ├── feature-flags.tsx
-│   │   │   │   │   └── FeatureFlagManagerPage.tsx
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── FeatureFlagManager.tsx
-│   │   │   │   │   ├── FlagAnalyticsDashboard.tsx
-│   │   │   │   │   ├── FlagEditor.tsx
-│   │   │   │   │   ├── FlagList.tsx
-│   │   │   │   │   └── RolloutControls.tsx
-│   │   │   │   ├── IMPLEMENTATION_SUMMARY.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
-│   │   │   │   └── types.ts
 │   │   │   ├── government-data/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   └── useGovernmentData.ts
@@ -465,7 +483,6 @@
 │   │   │   │       └── support.tsx
 │   │   │   ├── legal/
 │   │   │   │   ├── hooks/
-│   │   │   │   │   ├── use-constitutional-analysis.ts
 │   │   │   │   │   ├── useConflicts.ts
 │   │   │   │   │   ├── useLegalRisks.ts
 │   │   │   │   │   └── usePrecedents.ts
@@ -479,8 +496,10 @@
 │   │   │   │   │   ├── data-retention.tsx
 │   │   │   │   │   ├── dmca.tsx
 │   │   │   │   │   ├── documentation.tsx
+│   │   │   │   │   ├── privacy-center.tsx
 │   │   │   │   │   ├── privacy.tsx
 │   │   │   │   │   ├── security.tsx
+│   │   │   │   │   ├── sitemap.tsx
 │   │   │   │   │   └── terms.tsx
 │   │   │   │   ├── ui/
 │   │   │   │   │   ├── ConflictAlertCard.tsx
@@ -494,49 +513,6 @@
 │   │   │   │   │   └── market.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   └── SokoHaki.tsx
-│   │   │   ├── monitoring/
-│   │   │   │   ├── api/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── monitoring-api.ts
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── use-monitoring.ts
-│   │   │   │   ├── model/
-│   │   │   │   │   ├── continuous-performance-monitor.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── performance-benchmarking.ts
-│   │   │   │   │   ├── performance-regression-tester.ts
-│   │   │   │   │   ├── render-tracker.ts
-│   │   │   │   │   ├── render-tracking-integration.ts
-│   │   │   │   │   └── route-profiler.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   ├── integration-monitoring.tsx
-│   │   │   │   │   └── monitoring-dashboard.tsx
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── AlertManagement.tsx
-│   │   │   │   │   ├── ErrorTrackingDisplay.tsx
-│   │   │   │   │   ├── FeatureUsageCharts.tsx
-│   │   │   │   │   ├── HealthStatusDisplay.tsx
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── IntegrationMonitoringDashboard.tsx
-│   │   │   │   │   ├── MetricsVisualization.tsx
-│   │   │   │   │   └── PerformanceMetrics.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
-│   │   │   │   └── types.ts
-│   │   │   ├── navigation/
-│   │   │   │   └── model/
-│   │   │   │       └── index.ts
-│   │   │   ├── notifications/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── useNotifications.ts
-│   │   │   │   ├── model/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── notification-service.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   └── notifications.ts
-│   │   │   │   └── index.ts
 │   │   │   ├── onboarding/
 │   │   │   │   ├── components/
 │   │   │   │   │   └── OnboardingTrigger.tsx
@@ -550,42 +526,6 @@
 │   │   │   │   ├── services/
 │   │   │   │   │   └── onboarding.ts
 │   │   │   │   └── index.ts
-│   │   │   ├── pretext-detection/
-│   │   │   │   ├── api/
-│   │   │   │   │   └── pretext-detection-api.ts
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── use-safe-query.ts
-│   │   │   │   │   ├── usePretextAnalysis.ts
-│   │   │   │   │   └── usePretextDetectionApi.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── pretext-detection.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── PretextAnalysisService.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── CivicActionToolbox.tsx
-│   │   │   │   │   ├── PretextDetectionPanel.tsx
-│   │   │   │   │   └── PretextWatchCard.tsx
-│   │   │   │   ├── demo.md
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── README.md
-│   │   │   │   └── types.ts
-│   │   │   ├── privacy/
-│   │   │   │   └── pages/
-│   │   │   │       └── privacy-center.tsx
-│   │   │   ├── recommendation/
-│   │   │   │   ├── api/
-│   │   │   │   │   └── recommendation-api.ts
-│   │   │   │   ├── hooks/
-│   │   │   │   │   └── useRecommendations.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── PersonalizedRecommendationsWidget.tsx
-│   │   │   │   │   ├── RecommendationCard.tsx
-│   │   │   │   │   ├── RecommendationList.tsx
-│   │   │   │   │   ├── RecommendationWidget.tsx
-│   │   │   │   │   ├── SimilarBillsWidget.tsx
-│   │   │   │   │   └── TrendingBillsWidget.tsx
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
 │   │   │   ├── search/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── useIntelligentSearch.ts
@@ -624,39 +564,6 @@
 │   │   │   │   ├── pages/
 │   │   │   │   │   └── security-demo.tsx
 │   │   │   │   └── index.ts
-│   │   │   ├── sitemap/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── useSitemap.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── sitemap.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── sitemap.ts
-│   │   │   │   └── index.ts
-│   │   │   ├── sponsors/
-│   │   │   │   ├── pages/
-│   │   │   │   │   ├── SponsorDetailPage.tsx
-│   │   │   │   │   └── SponsorsPage.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── api.ts
-│   │   │   │   ├── ui/
-│   │   │   │   │   ├── ConflictVisualization.tsx
-│   │   │   │   │   ├── RiskProfile.tsx
-│   │   │   │   │   ├── SponsorCard.tsx
-│   │   │   │   │   └── SponsorList.tsx
-│   │   │   │   ├── hooks.ts
-│   │   │   │   ├── IMPLEMENTATION_COMPLETE.md
-│   │   │   │   ├── index.ts
-│   │   │   │   └── types.ts
-│   │   │   ├── status/
-│   │   │   │   ├── hooks/
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   └── useSystemStatus.ts
-│   │   │   │   ├── pages/
-│   │   │   │   │   └── system-status.tsx
-│   │   │   │   ├── services/
-│   │   │   │   │   └── status.ts
-│   │   │   │   └── index.ts
 │   │   │   ├── users/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
@@ -689,7 +596,6 @@
 │   │   │   │   │   │   ├── index.ts
 │   │   │   │   │   │   └── useLoginForm.ts
 │   │   │   │   │   ├── icons/
-│   │   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   │   ├── onboarding/
 │   │   │   │   │   │   └── UserJourneyOptimizer.tsx
 │   │   │   │   │   ├── profile/
@@ -716,6 +622,29 @@
 │   │   │   ├── FEATURE_STRUCTURE_GUIDE.md
 │   │   │   └── index.ts
 │   │   ├── infrastructure/
+│   │   │   ├── analytics/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── use-analytics.ts
+│   │   │   │   │   ├── use-comprehensive-analytics.ts
+│   │   │   │   │   ├── use-error-analytics.ts
+│   │   │   │   │   ├── use-journey-tracker.ts
+│   │   │   │   │   ├── use-render-tracker.ts
+│   │   │   │   │   └── use-web-vitals.ts
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── error-analytics-bridge.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── offline-analytics.ts
+│   │   │   │   │   ├── privacy-analytics.ts
+│   │   │   │   │   └── user-journey-tracker.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   ├── analysis.ts
+│   │   │   │   │   ├── analytics-api.service.ts
+│   │   │   │   │   ├── analytics.ts
+│   │   │   │   │   ├── api.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── api/
 │   │   │   │   ├── circuit-breaker/
 │   │   │   │   │   ├── core.ts
@@ -723,7 +652,6 @@
 │   │   │   │   ├── examples/
 │   │   │   │   ├── hooks/
 │   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── use-api-with-fallback.ts
 │   │   │   │   │   ├── use-safe-mutation.ts
 │   │   │   │   │   ├── use-safe-query.ts
 │   │   │   │   │   ├── useApiConnection.ts
@@ -740,12 +668,8 @@
 │   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── user.service.ts
 │   │   │   │   ├── types/
-│   │   │   │   │   ├── auth-types.ts
-│   │   │   │   │   ├── auth.ts
-│   │   │   │   │   ├── bill.ts
 │   │   │   │   │   ├── cache.ts
 │   │   │   │   │   ├── common.ts
-│   │   │   │   │   ├── community.ts
 │   │   │   │   │   ├── config.ts
 │   │   │   │   │   ├── engagement.ts
 │   │   │   │   │   ├── error-response.ts
@@ -754,14 +678,10 @@
 │   │   │   │   │   ├── performance.ts
 │   │   │   │   │   ├── preferences.ts
 │   │   │   │   │   ├── realtime.ts
-│   │   │   │   │   ├── request.ts
-│   │   │   │   │   ├── service.ts
-│   │   │   │   │   ├── shared-imports.ts
-│   │   │   │   │   └── sponsor.ts
+│   │   │   │   │   └── service.ts
 │   │   │   │   ├── websocket/
 │   │   │   │   │   ├── client.ts
 │   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── manager.ts
 │   │   │   │   │   └── types.ts
 │   │   │   │   ├── auth.ts
 │   │   │   │   ├── authentication.ts
@@ -879,8 +799,7 @@
 │   │   │   │   │   ├── RecoveryUI.tsx
 │   │   │   │   │   ├── ServiceUnavailable.tsx
 │   │   │   │   │   ├── SimpleErrorBoundary.tsx
-│   │   │   │   │   ├── types.ts
-│   │   │   │   │   └── UnifiedErrorBoundary.tsx
+│   │   │   │   │   └── types.ts
 │   │   │   │   ├── core/
 │   │   │   │   │   ├── factory.ts
 │   │   │   │   │   ├── handler.ts
@@ -918,10 +837,10 @@
 │   │   │   │   ├── classes.ts
 │   │   │   │   ├── constants.ts
 │   │   │   │   ├── dashboard-errors.ts
+│   │   │   │   ├── error-rate-limiter.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── MIGRATION_HISTORY.md
 │   │   │   │   ├── monitoring.tsx
-│   │   │   │   ├── rate-limiter.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── recovery.ts
 │   │   │   │   ├── reporting.ts
@@ -949,6 +868,8 @@
 │   │   │   │   │   ├── use-navigation-performance.ts
 │   │   │   │   │   ├── use-navigation-preferences.tsx
 │   │   │   │   │   └── use-unified-navigation.ts
+│   │   │   │   ├── model/
+│   │   │   │   │   └── index.ts
 │   │   │   │   ├── access-control.ts
 │   │   │   │   ├── analytics.ts
 │   │   │   │   ├── breadcrumbs.ts
@@ -972,6 +893,16 @@
 │   │   │   │   ├── types.ts
 │   │   │   │   ├── utils.ts
 │   │   │   │   └── validation.ts
+│   │   │   ├── notifications/
+│   │   │   │   ├── hooks/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── useNotifications.ts
+│   │   │   │   ├── model/
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── notification-service.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── notifications.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── observability/
 │   │   │   │   ├── analytics/
 │   │   │   │   │   └── index.ts
@@ -995,6 +926,20 @@
 │   │   │   │   ├── CONSOLIDATION_SUMMARY.md
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── README.md
+│   │   │   │   └── types.ts
+│   │   │   ├── recommendation/
+│   │   │   │   ├── api/
+│   │   │   │   │   └── recommendation-api.ts
+│   │   │   │   ├── hooks/
+│   │   │   │   │   └── useRecommendations.ts
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── PersonalizedRecommendationsWidget.tsx
+│   │   │   │   │   ├── RecommendationCard.tsx
+│   │   │   │   │   ├── RecommendationList.tsx
+│   │   │   │   │   ├── RecommendationWidget.tsx
+│   │   │   │   │   ├── SimilarBillsWidget.tsx
+│   │   │   │   │   └── TrendingBillsWidget.tsx
+│   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── scripts/
 │   │   │   │   ├── analyze-internal-imports.sh
@@ -1021,7 +966,6 @@
 │   │   │   │   │   │   ├── SecurityDashboard.tsx
 │   │   │   │   │   │   └── SecuritySettings.tsx
 │   │   │   │   │   ├── icons/
-│   │   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   │   ├── privacy/
 │   │   │   │   │   │   ├── CookieConsentBanner.tsx
 │   │   │   │   │   │   ├── DataUsageReportDashboard.tsx
@@ -1030,16 +974,8 @@
 │   │   │   │   │   │   ├── privacy-policy.tsx
 │   │   │   │   │   │   └── README.md
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── unified/
-│   │   │   │   │   ├── csp-config.ts
-│   │   │   │   │   ├── csp-manager.ts
-│   │   │   │   │   ├── error-handler.ts
-│   │   │   │   │   ├── error-middleware.ts
-│   │   │   │   │   ├── index.ts
-│   │   │   │   │   ├── input-sanitizer.ts
-│   │   │   │   │   ├── rate-limiter.ts
-│   │   │   │   │   ├── security-interface.ts
-│   │   │   │   │   └── system.ts
+│   │   │   │   ├── csp-config.ts
+│   │   │   │   ├── csp-manager.ts
 │   │   │   │   ├── csp-nonce.ts
 │   │   │   │   ├── csrf-protection.ts
 │   │   │   │   ├── index.ts
@@ -1047,7 +983,6 @@
 │   │   │   │   ├── rate-limiter.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── security-monitor.ts
-│   │   │   │   ├── security-monitoring.ts
 │   │   │   │   ├── security-service.ts
 │   │   │   │   ├── security-utils.ts
 │   │   │   │   ├── types.ts
@@ -1060,7 +995,7 @@
 │   │   │   │   ├── sync/
 │   │   │   │   │   ├── background-sync-manager.ts
 │   │   │   │   │   └── index.ts
-│   │   │   │   ├── cache-manager.ts
+│   │   │   │   ├── cache-invalidation-manager.ts
 │   │   │   │   ├── cache-storage.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── offline-data-manager.ts
@@ -1110,13 +1045,14 @@
 │   │   │   ├── MIGRATION_GUIDE.md
 │   │   │   ├── MODULE_VALIDATION_REPORT.md
 │   │   │   ├── quality-optimizer.ts
-│   │   │   ├── roleGuard.ts
 │   │   │   └── TYPEDOC_SETUP.md
 │   │   ├── lib/
 │   │   │   ├── a11y/
 │   │   │   │   ├── focus-trap.tsx
 │   │   │   │   ├── live-region.tsx
 │   │   │   │   └── skip-links.tsx
+│   │   │   ├── api/
+│   │   │   │   └── api-access.tsx
 │   │   │   ├── components/
 │   │   │   │   ├── home/
 │   │   │   │   │   ├── PersonalizedDashboardPreview.tsx
@@ -1155,8 +1091,6 @@
 │   │   │   │       ├── real-kenya-data.ts
 │   │   │   │       ├── realtime.ts
 │   │   │   │       └── users.ts
-│   │   │   ├── demo/
-│   │   │   │   └── community-integration-demo.ts
 │   │   │   ├── design-system/
 │   │   │   │   ├── accessibility/
 │   │   │   │   │   ├── contrast.ts
@@ -1183,6 +1117,8 @@
 │   │   │   │   │   ├── Toast.tsx
 │   │   │   │   │   ├── Toaster.tsx
 │   │   │   │   │   └── Tooltip.tsx
+│   │   │   │   ├── icons/
+│   │   │   │   │   └── ChanukaIcons.tsx
 │   │   │   │   ├── interactive/
 │   │   │   │   │   ├── Button.stories.tsx
 │   │   │   │   │   ├── Button.tsx
@@ -1202,10 +1138,8 @@
 │   │   │   │   │   ├── recovery.ts
 │   │   │   │   │   ├── scroll-area.tsx
 │   │   │   │   │   ├── Select.tsx
-│   │   │   │   │   ├── separator.tsx
 │   │   │   │   │   ├── Sheet.tsx
 │   │   │   │   │   ├── Sidebar.tsx
-│   │   │   │   │   ├── skeleton.tsx
 │   │   │   │   │   ├── Switch.tsx
 │   │   │   │   │   ├── Tabs.tsx
 │   │   │   │   │   ├── Textarea.tsx
@@ -1215,8 +1149,6 @@
 │   │   │   │   ├── layout/
 │   │   │   │   │   ├── BentoGrid.tsx
 │   │   │   │   │   └── LogoPattern.tsx
-│   │   │   │   ├── lib/
-│   │   │   │   │   └── utils.ts
 │   │   │   │   ├── media/
 │   │   │   │   │   ├── Avatar.tsx
 │   │   │   │   │   ├── BrandAssets.tsx
@@ -1314,6 +1246,7 @@
 │   │   │   │   ├── COMPLETION_REPORT.md
 │   │   │   │   ├── COMPONENT_FLATTENING_EXECUTION_REPORT.md
 │   │   │   │   ├── COMPONENT_FLATTENING_STRATEGY.md
+│   │   │   │   ├── design-system-test.tsx
 │   │   │   │   ├── DIRECTORY_VALIDATION_FRAMEWORK.md
 │   │   │   │   ├── IMPLEMENTATION_GUIDE.md
 │   │   │   │   ├── index.ts
@@ -1327,8 +1260,6 @@
 │   │   │   │   ├── responsive.css
 │   │   │   │   ├── responsive.ts
 │   │   │   │   └── strategy.ts
-│   │   │   ├── examples/
-│   │   │   │   └── render-tracking-usage.tsx
 │   │   │   ├── hooks/
 │   │   │   │   ├── mobile/
 │   │   │   │   │   ├── index.ts
@@ -1383,16 +1314,12 @@
 │   │   │   │   ├── use-service.ts
 │   │   │   │   ├── use-system.ts
 │   │   │   │   ├── use-toast.ts
-│   │   │   │   ├── use-validation.ts
-│   │   │   │   ├── use-websocket.ts
-│   │   │   │   └── useOfflineDetection.ts
+│   │   │   │   └── use-validation.ts
 │   │   │   ├── interfaces/
 │   │   │   │   ├── index.ts
 │   │   │   │   └── unified-interfaces.ts
 │   │   │   ├── pages/
 │   │   │   │   └── not-found.tsx
-│   │   │   ├── recovery/
-│   │   │   │   └── index.ts
 │   │   │   ├── services/
 │   │   │   │   ├── auth-service-init.ts
 │   │   │   │   ├── cache.ts
@@ -1404,25 +1331,17 @@
 │   │   │   │   ├── interfaces.ts
 │   │   │   │   ├── mockUserData.ts
 │   │   │   │   ├── navigation.ts
-│   │   │   │   ├── notification-service.ts
 │   │   │   │   ├── notification-system-integration-summary.md
 │   │   │   │   ├── privacyAnalyticsService.ts
 │   │   │   │   ├── realistic-demo-data.ts
 │   │   │   │   ├── services-monitoring.ts
 │   │   │   │   └── userService.ts
-│   │   │   ├── stubs/
-│   │   │   │   ├── database-stub.ts
-│   │   │   │   └── middleware-stub.ts
-│   │   │   ├── templates/
-│   │   │   │   ├── component-templates.ts
-│   │   │   │   └── index.ts
 │   │   │   ├── testing/
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── mock-data.ts
 │   │   │   │   └── mock-users.ts
 │   │   │   ├── types/
 │   │   │   │   ├── bill/
-│   │   │   │   │   ├── auth-types.ts
 │   │   │   │   │   ├── bill-analytics.ts
 │   │   │   │   │   ├── bill-base.ts
 │   │   │   │   │   ├── bill-services.ts
@@ -1580,7 +1499,6 @@
 │   │   │   │   │   ├── ProcessEducation.tsx
 │   │   │   │   │   └── README.md
 │   │   │   │   ├── error-boundary/
-│   │   │   │   │   ├── ErrorBoundary.tsx
 │   │   │   │   │   └── index.ts
 │   │   │   │   ├── examples/
 │   │   │   │   │   ├── index.ts
@@ -1826,9 +1744,6 @@
 │   │   │   ├── validate-home-page.ts
 │   │   │   ├── validate-migration.ts
 │   │   │   └── validate-websocket-consolidation.ts
-│   │   ├── services/
-│   │   │   ├── apiService.ts
-│   │   │   └── websocket-manager.ts
 │   │   ├── tests/
 │   │   │   ├── accessibility/
 │   │   │   │   └── home-page-accessibility.test.ts
@@ -1840,11 +1755,14 @@
 │   │   ├── index.css
 │   │   ├── main.tsx
 │   │   └── vite-env.d.ts
+│   ├── auth-errors.txt
 │   ├── BUG_FIXES_SUMMARY.md
+│   ├── error-dist.txt
 │   ├── fix-react-imports.sh
 │   ├── FIXES_COMPLETED.md
 │   ├── IMPLEMENTATION_COMPLETE_SUMMARY.md
 │   ├── index.html
+│   ├── infra-errors.txt
 │   ├── legacy-imports.txt
 │   ├── missing.txt
 │   ├── missing4.txt
@@ -1862,16 +1780,24 @@
 │   ├── QUICK_FIX_GUIDE.md
 │   ├── QUICK_START_PHASE_1.md
 │   ├── README.md
+│   ├── store-errors.txt
 │   ├── tailwind.config.ts
+│   ├── ts-errors-triage.txt
+│   ├── ts-errors.txt
+│   ├── tsc_output.txt
 │   ├── tsconfig.json
 │   ├── tsconfig.test.json
+│   ├── tsconfig.test.tsbuildinfo
 │   ├── tsconfig.tsbuildinfo
 │   ├── UX_IMPROVEMENTS_COMPLETE.md
 │   ├── vite-plugin-suppress-warnings.js
 │   ├── vite.config.ts
+│   ├── vite.config.ts.timestamp-1773170213922-6ac010af471eb.mjs
 │   ├── vite.production.config.ts
 │   ├── vitest.a11y.config.ts
 │   ├── vitest.config.ts
+│   ├── vitest.config.ts.timestamp-1773171503227-c84bdae83e5f4.mjs
+│   ├── vitest.config.ts.timestamp-1773171507227-e46a1568f855d.mjs
 │   └── vitest.setup.ts
 ├── deployment/
 │   ├── environment-configs/
@@ -2951,10 +2877,8 @@
 │   │   │   │   └── institutional/
 │   │   │   │       └── api-gateway-service.ts
 │   │   │   ├── application/
-│   │   │   │   ├── services/
-│   │   │   │   │   └── government-data.service.ts
-│   │   │   │   ├── enhanced-government-data-service.ts
 │   │   │   │   ├── government-data-validation.schemas.ts
+│   │   │   │   ├── government-data.service.ts
 │   │   │   │   ├── managed-integration.service.ts
 │   │   │   │   └── sync-service.ts
 │   │   │   ├── domain/
@@ -2973,8 +2897,6 @@
 │   │   │   │   └── validation/
 │   │   │   │       └── data-validator.service.ts
 │   │   │   ├── presentation/
-│   │   │   │   ├── routes/
-│   │   │   │   │   └── government-data.routes.ts
 │   │   │   │   ├── government-data.routes.ts
 │   │   │   │   └── routes.ts
 │   │   │   ├── services/
@@ -3812,6 +3734,7 @@
 │   │   ├── execute-websocket-migration.ts
 │   │   ├── final-migration-validation.ts
 │   │   ├── fix-constants-imports.ts
+│   │   ├── fix-db-imports.ts
 │   │   ├── fix-invalid-imports.ts
 │   │   ├── fix-logger-calls.ts
 │   │   ├── fix-module-resolution.ts
@@ -3826,6 +3749,7 @@
 │   │   ├── simple-websocket-validation.ts
 │   │   ├── test-conflict-analysis.ts
 │   │   ├── test-government-integration.ts
+│   │   ├── test-logger.ts
 │   │   ├── test-websocket-migration.ts
 │   │   ├── update-schema-imports.ts
 │   │   ├── validate-connection-migration.ts
@@ -3936,8 +3860,10 @@
 │   ├── resolve-paths.mjs
 │   ├── SERVER_RUNNING_STATUS.md
 │   ├── server_startup.log
+│   ├── server-fresh-errors.txt
 │   ├── server-startup.log
 │   ├── server-startup.ts
+│   ├── server-test.log
 │   ├── start-server.ts
 │   ├── start.ts
 │   ├── startup_error.log
@@ -3946,6 +3872,9 @@
 │   ├── test-startup.ts
 │   ├── tsconfig.json
 │   ├── type-check-after-logger-fix.txt
+│   ├── type-check-after-shebang-fix.txt
+│   ├── type-check-direct.txt
+│   ├── type-check-final.txt
 │   ├── type-check-latest.txt
 │   ├── type-check-output.txt
 │   ├── vite.config.ts
@@ -4207,7 +4136,8 @@
 │   ├── project.json
 │   ├── tsconfig.json
 │   ├── vite.config.ts
-│   └── vitest.config.ts
+│   ├── vitest.config.ts
+│   └── vitest.config.ts.timestamp-1773170209356-4515c2fab4e16.mjs
 ├── tests/
 │   ├── e2e/
 │   │   └── test-results/
@@ -4341,6 +4271,7 @@
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
 ├── CURRENT_CAPABILITIES.md
+├── CUsersAccess
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
 ├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
@@ -4351,9 +4282,12 @@
 ├── drizzle.config.ts
 ├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_ANALYSIS.md
 ├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_COMPLETE.md
+├── error_implementation_plan
+├── feature_consolidation_analysis.md
 ├── FEATURE_INTEGRATION_STATUS.md
 ├── fix.cjs
 ├── generate-structure.mjs
+├── implementation_plan.md
 ├── INTEGRATION_SUMMARY.md
 ├── knip.config.ts
 ├── nginx.conf
@@ -4366,8 +4300,16 @@
 ├── QUICK_START_GUIDE.md
 ├── QUICK_START.md
 ├── README.md
+├── server_ts_errors.txt
+├── server-fresh-errors.txt
+├── server-phase1-errors.txt
+├── server-type-errors.txt
+├── servertype-check-post-fixer.txt
+├── servertype-check-post-v3-fixer.txt
 ├── start-dev.js
+├── start-error.log
 ├── tailwind.config.js
+├── tmp_missing_names.txt
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json

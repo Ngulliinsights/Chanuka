@@ -25,6 +25,9 @@ import {
   type PoliticalAppointment,
   political_appointments,
 } from '@server/infrastructure/schema/political_economy';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 
 import {
   ConflictAnalysis,

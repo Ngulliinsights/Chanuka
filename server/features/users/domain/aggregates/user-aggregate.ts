@@ -1,3 +1,4 @@
+import { UserAggregate } from '@server/features/users/domain/aggregates/user-aggregate';
 import { CitizenVerification } from '../entities/citizen-verification';
 import { User } from '../entities/user';
 import { UserInterest,UserProfile } from '../entities/user-profile';

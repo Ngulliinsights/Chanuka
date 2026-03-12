@@ -4,8 +4,7 @@
 // Identifies potential coalitions based on shared concerns and compatible positions
 
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+
 
 export interface CoalitionMatch {
   stakeholderGroup: string;

@@ -4,12 +4,10 @@
 // Extracts argumentative structure from informal citizen comments
 
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { EntityExtractor } from '@shared/infrastructure/nlp/entity-extractor';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { SentenceClassifier } from '@shared/infrastructure/nlp/sentence-classifier';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { SimilarityCalculator } from '@shared/infrastructure/nlp/similarity-calculator';
+import { users } from '@server/infrastructure/schema';
+
+
+
 
 export interface ExtractionContext {
   bill_id: string;

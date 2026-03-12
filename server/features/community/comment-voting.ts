@@ -1,3 +1,4 @@
+import { writeDatabase } from '@server/infrastructure/database';
 import { cacheService } from '@server/infrastructure/cache';
 import { CACHE_TTL_SHORT } from '@shared/core/primitives';
 import { logger } from '@server/infrastructure/observability';

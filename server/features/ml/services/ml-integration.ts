@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 // ============================================================================
 // ML INTEGRATION SERVICE - Database Integration for ML Models
 // ============================================================================

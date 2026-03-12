@@ -1,3 +1,6 @@
+import { withTransaction } from '@server/infrastructure/database';
+import { readDatabase } from '@server/infrastructure/database';
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 import { logger } from '@server/infrastructure/observability';
 import {
   type InsertUser,
@@ -15,6 +18,7 @@ import { and, eq, or, sql } from 'drizzle-orm';
 
 import type { StorageConfig } from '@server/infrastructure/database/base/BaseStorage';
 import { BaseStorage } from '@server/infrastructure/database/base/BaseStorage';
+import { users } from '@server/infrastructure/schema';
 
 // Additional type definitions needed
 export type OAuthProvider = 'google' | 'github' | 'twitter';

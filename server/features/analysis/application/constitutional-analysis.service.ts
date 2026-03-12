@@ -1,6 +1,8 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import * as schema from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 import { eq, SQL } from 'drizzle-orm';
 
 // ============================================================================

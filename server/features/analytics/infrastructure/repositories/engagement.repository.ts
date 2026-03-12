@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Engagement Repository
  * 
@@ -16,6 +17,10 @@ import {
   users,
   bills 
 } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { comment_votes } from '@server/infrastructure/schema';
 import { eq, and, gte, desc, sql, count, sum } from 'drizzle-orm';
 
 /**

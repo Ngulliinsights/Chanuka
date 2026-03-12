@@ -4,12 +4,10 @@
 
 import { CampaignFilters, CampaignMetrics,PaginationOptions } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { Campaign, NewCampaign } from '@shared/domain/entities/campaign';
+
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
 // Repository interface removed - using direct service calls
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { CampaignDomainService } from '@shared/domain/services/campaign-domain-service';
+
 
 export class CampaignService {
   constructor(

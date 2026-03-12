@@ -1,3 +1,4 @@
+import { CitizenVerification } from '@server/features/users/domain/entities/citizen-verification';
 import { Evidence, ExpertiseLevel } from './value-objects';
 
 export type VerificationType = 'fact_check' | 'impact_assessment' | 'source_validation' | 'claim_verification';

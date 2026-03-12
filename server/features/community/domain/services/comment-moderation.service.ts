@@ -1,3 +1,4 @@
+import { users } from '@server/infrastructure/schema';
 /**
  * Comment Moderation Domain Service
  * 

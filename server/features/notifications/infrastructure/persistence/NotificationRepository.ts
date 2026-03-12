@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Notification Repository - Domain-Specific Repository
  * 
@@ -9,6 +10,7 @@ import { BaseRepository } from '@server/infrastructure/database/repository/base-
 import type { Result } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { notifications } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, and, inArray, desc, asc, gte, lte, between } from 'drizzle-orm';
 import type {
   NotificationType,

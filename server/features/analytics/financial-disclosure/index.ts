@@ -6,13 +6,15 @@ import { FinancialDisclosureMonitoringService } from "@server/features/analytics
 // FIXME: financial-disclosure-analytics service not implemented
 // import { FinancialDisclosureAnalyticsService } from '@server/features/analytics/financial-disclosure/financial-disclosure-analytics.service';
 import { logger } from '@server/infrastructure/observability';
-import { ApiError,ApiSuccess  } from '@shared/types/api';
+import { ApiError } from '@shared/types/api';
+import { ApiSuccess } from '@server/utils/api-utils';
 import * as crypto from 'crypto';
 import { NextFunction,Request, Response, Router } from "express";
 import { z, ZodError } from "zod";
 
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { BaseError,SponsorNotFoundError, ValidationError as InvalidInputError } from '@server/infrastructure/error-handling';
+import { sponsors } from '@server/infrastructure/schema';
 
 // ============================================================================
 // API Validation Schemas & Middleware

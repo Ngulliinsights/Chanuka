@@ -1,6 +1,7 @@
 import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service';
 import { sponsorService } from '@server/features/sponsors/application/sponsor-service-direct';
 import { logger } from '@server/infrastructure/observability';
+import { sponsors } from '@server/infrastructure/schema';
 import {
   getSectionConflictsForBill,
   getSponsorAffiliations,

@@ -26,7 +26,7 @@
     "build:client": "nx build client && npm run performance:check-runtime:safe",
     "build:server": "nx build server",
     "build:shared": "nx build shared",
-    "start": "ts-node --transpile-only --esm --project server/tsconfig.json server/index.ts",
+    "start": "tsx --tsconfig server/tsconfig.json server/index.ts",
     "preview": "vite preview",
     "// --- DATABASE OPERATIONS (CANONICAL SCRIPTS) ---": "",
     "db:init": "tsx --tsconfig scripts/tsconfig.json scripts/database/initialize-database-integration.ts",

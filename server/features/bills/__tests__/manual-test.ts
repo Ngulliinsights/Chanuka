@@ -12,6 +12,8 @@ import { billTrackingService } from '@server/features/bills/bill.factory';
 import { legislativeStorage } from '@server/features/bills/infrastructure/legislative-storage';
 import { BillStorage } from '@server/features/bills/infrastructure/bill-storage';
 import { cacheService } from '@server/infrastructure/cache';
+import { db } from '@server/infrastructure/database';
+import { sponsors } from '@server/infrastructure/schema';
 
 const billStorage = BillStorage.getInstance();
 

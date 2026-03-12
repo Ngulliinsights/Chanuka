@@ -13,11 +13,14 @@ export type {
 } from './domain/repositories/government-data.repository';
 
 // Services
-export { enhancedGovernmentDataService } from './application/enhanced-government-data-service';
+export { governmentDataService } from './application/government-data.service';
 export { governmentDataSyncService } from './application/sync-service';
 
 // Routes
 export { default as governmentDataRoutes } from './presentation/government-data.routes';
 
-// Types (re-export from schema)
-export type { GovernmentData, GovernmentSyncLog } from '@server/infrastructure/schema';
+// Types
+export type { 
+  GovernmentDataEntity as GovernmentData, 
+  GovernmentSyncLogEntity as GovernmentSyncLog 
+} from './domain/entities/government-data.entity';

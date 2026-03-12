@@ -5,6 +5,7 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 import { integrationMonitor } from '@server/features/monitoring/domain/integration-monitor.service';
 import { NotificationService as EnhancedNotificationService } from '@server/features/notifications';
 import { PretextAnalysisService } from '../domain/pretext-analysis.service';

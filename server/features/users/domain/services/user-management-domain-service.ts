@@ -1,3 +1,4 @@
+import { users } from '@server/infrastructure/schema';
 import { UserService } from '../../application/user-service-direct';
 import { User } from '../entities/user';
 import { UserInterest,UserProfile } from '../entities/user-profile';

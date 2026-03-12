@@ -1,6 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase } from '@server/infrastructure/database';
 import { searchAnalytics, searchQueries } from '@server/infrastructure/schema/advanced_discovery';
+import { users } from '@server/infrastructure/schema';
 import { sql, and, like, gte, desc, eq, lt } from 'drizzle-orm';
 
 import type { SearchQuery, SearchResponseDto } from './search.dto';

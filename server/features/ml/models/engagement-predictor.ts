@@ -1,3 +1,6 @@
+import { User } from '@server/features/users/domain/entities/user';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 /**
  * Engagement Predictor - MWANGA Stack
  * 

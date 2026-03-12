@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 // --- Constitutional Analysis ---
 export interface ConstitutionalConcern {
     section: string;

@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { BaseError  } from '@shared/core';
 
 /**

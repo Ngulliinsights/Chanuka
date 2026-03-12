@@ -1,12 +1,12 @@
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { trackEngagement } from '@shared/application/EngagementTracker';
+
 import {
   getCollaborativeRecommendations,
   getPersonalizedRecommendations,
   getSimilarBills,
   getTrendingBills,
 } from '@shared/application/RecommendationService';
-import { ApiError, ApiSuccess, ApiValidationError  } from '@shared/types/api';
+import { ApiError, ApiValidationError } from '@shared/types/api';
+import { ApiSuccess } from '@server/utils/api-utils';
  import { Router } from 'express';
 
 const router = Router();

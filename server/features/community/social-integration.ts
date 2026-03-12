@@ -2,6 +2,7 @@ import { readDatabase, writeDatabase, withTransaction } from '@server/infrastruc
 import type { User } from '@server/infrastructure/schema';
 
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 
 // Define cache service interface locally if the module doesn't exist
 interface CacheService {

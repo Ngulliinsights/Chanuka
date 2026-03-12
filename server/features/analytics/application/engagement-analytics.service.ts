@@ -8,6 +8,7 @@
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
 import { validateData } from '@server/infrastructure/validation/validation-helpers';
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 import { InputSanitizationService, securityAuditService } from '@server/features/security';
 import { engagementRepository } from '../infrastructure/repositories/engagement.repository';
 import type {

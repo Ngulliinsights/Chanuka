@@ -9,6 +9,7 @@ import { logger } from '@server/infrastructure/observability';
 import { billDataSourceFactory } from '../infrastructure/data-sources/bill-data-source-factory';
 import { cacheService } from '@server/infrastructure/cache';
 import { safeAsync, type AsyncServiceResult } from '@server/infrastructure/error-handling';
+import { bills } from '@server/infrastructure/schema';
 
 export interface BillHealthStatus {
   service: 'bills';

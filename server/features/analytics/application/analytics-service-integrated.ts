@@ -22,6 +22,8 @@ import { logger } from '@server/infrastructure/observability';
 import { validateData, CommonSchemas } from '@server/infrastructure/validation/validation-helpers';
 import { Cacheable, InvalidateCache } from '@server/infrastructure/integration/feature-integration-helper';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { db } from '@server/infrastructure/database';
+import { users } from '@server/infrastructure/schema';
 
 // Validation Schemas
 const AnalyticsQuerySchema = z.object({

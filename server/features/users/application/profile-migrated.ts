@@ -1,3 +1,5 @@
+import { User } from '@server/features/users/domain/entities/user';
+import { AsyncServiceResult } from '@server/utils/api-utils';
 /**
  * User Profile Routes (MIGRATED TO MODERN ERROR HANDLING)
  * 
@@ -17,6 +19,7 @@ import { asyncHandler } from '@server/middleware/error-management';
 import { ValidationError } from '@shared/types/core/errors';
 import { userProfileService } from './UserProfileService';
 import { boomFromStandardized } from '@server/infrastructure/error-handling';
+import { users } from '@server/infrastructure/schema';
 
 export const router = Router();
 

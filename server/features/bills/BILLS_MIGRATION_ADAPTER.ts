@@ -15,6 +15,7 @@ import { Request, Response, Router } from 'express';
 import { BaseError, ValidationError } from '@shared/types/core/errors';
 import { ERROR_CODES } from '@shared/constants';
 import { createErrorContext } from '@server/infrastructure/error-handling';
+import { bills } from '@server/infrastructure/schema';
 import { asyncHandler } from '@server/middleware/error-management';
 
 /**

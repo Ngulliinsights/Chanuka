@@ -7,6 +7,7 @@
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
+import { db } from '@server/infrastructure/database';
 import type { IArgumentAnalysisService } from '../../domain/interfaces/IArgumentAnalysisService';
 import type { ArgumentAnalysis } from '../../application/community-validation.schemas';
 

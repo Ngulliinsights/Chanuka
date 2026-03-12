@@ -9,6 +9,7 @@ import type { Result } from '@shared/core/result';
 import { Ok } from '@shared/core/result';
 import type { Maybe } from '@shared/core/maybe';
 import { bills } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 import { eq, and, or, inArray, arrayOverlaps, desc, asc, sql, like } from 'drizzle-orm';
 
 /**

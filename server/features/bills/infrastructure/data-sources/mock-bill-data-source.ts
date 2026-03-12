@@ -6,6 +6,7 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 import { mockBillDataService } from '../mocks/bill-mock-data';
 import {
   BillDataSource,

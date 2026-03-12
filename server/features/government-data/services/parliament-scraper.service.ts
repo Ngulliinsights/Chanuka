@@ -1,3 +1,4 @@
+import { bills } from '@server/infrastructure/schema';
 /**
  * CHANUKA PLATFORM — PARLIAMENTARY DATA SCRAPER
  * Full TypeScript implementation for Kenyan parliament.go.ke

@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
+import { sponsors } from '@server/infrastructure/schema';
 
 export interface VotingPattern {
   sponsor_id: number;

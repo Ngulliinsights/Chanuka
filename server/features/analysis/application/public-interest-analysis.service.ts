@@ -2,6 +2,7 @@
 import type { EconomicImpact, SocialImpact,StakeholderAnalysisResult } from '@server/features/analysis/application/stakeholder-analysis.service';
 import type { TransparencyScoreResult } from '@server/features/analysis/application/transparency-analysis.service';
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
 
 // --- Interface Definitions ---
 export interface PublicInterestScoreResult {

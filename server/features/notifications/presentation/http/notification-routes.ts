@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { userPreferencesService } from '@server/features/users/domain/user-preferences';
 import { notificationService } from '@server/features/notifications/application/services/notification.service';
 import { smartNotificationFilterService } from '@server/features/notifications/domain/services/smart-notification-filter';

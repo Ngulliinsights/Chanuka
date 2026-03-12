@@ -8,6 +8,8 @@
 
 import { RepresentativeContact } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
 
 // ============================================================================
 // Configuration Types

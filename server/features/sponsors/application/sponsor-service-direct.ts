@@ -5,6 +5,7 @@ import {
   type Sponsor,
   sponsors
 } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, inArray, isNotNull, like, or } from 'drizzle-orm';
 
 // ============================================================================

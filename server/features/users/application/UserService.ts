@@ -1,3 +1,4 @@
+import { UserProfile } from '@server/features/users/domain/entities/user-profile';
 /**
  * User Service - Complete Infrastructure Integration
  * 
@@ -11,14 +12,10 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { withTransaction } from '@server/infrastructure/database';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { UserAggregate } from '@shared/domain/aggregates/user-aggregate';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { CitizenVerification } from '@shared/domain/entities/citizen-verification';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { User } from '@shared/domain/entities/user';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { UserInterest, UserProfile } from '@shared/domain/entities/user-profile';
+
+
+
+
 import { user_profiles, users } from '@server/infrastructure/schema';
 
 // Infrastructure imports

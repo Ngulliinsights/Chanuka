@@ -1,3 +1,4 @@
+import { sponsors } from '@server/infrastructure/schema';
 // src/types/financial-disclosure-types.ts
 // Shared type definitions for the financial disclosure system
 // This prevents type duplication and ensures consistency across all modules

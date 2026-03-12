@@ -12,6 +12,7 @@ import {
   sponsorAffiliations,
   sponsors,
   sponsorTransparency} from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { desc,eq, inArray } from 'drizzle-orm';
 import { z } from 'zod';
 

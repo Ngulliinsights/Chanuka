@@ -6,8 +6,7 @@
 import { CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { AdvocacyEventPublisher, CoalitionFormedEvent,CoalitionOpportunityIdentifiedEvent } from '@shared/domain/events/advocacy-events';
+
 
 export interface CoalitionProposal {
   id: string;

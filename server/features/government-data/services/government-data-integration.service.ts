@@ -7,6 +7,8 @@ import { readDatabase, writeDatabase, withTransaction } from '@server/infrastruc
 import { logger } from '@server/infrastructure/observability';
 import { cache } from '@server/infrastructure/cache';
 import { bills, sponsors, bill_cosponsors, sponsors as sponsorAffiliations } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { users } from '@server/infrastructure/schema';
 import { and, desc, eq, isNull, sql, or } from 'drizzle-orm';
 import { 
   billStatusConverter, 
