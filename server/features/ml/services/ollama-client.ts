@@ -6,6 +6,7 @@
  */
 
 import { MWANGA_CONFIG } from '../config/mwanga-config';
+import { logger } from '@server/infrastructure/observability';
 
 // ============================================================================
 // Types
@@ -79,7 +80,7 @@ export class OllamaClient {
       // Check if our model is available
       return models.some((m: OllamaModel) => m.name.startsWith(this.model));
     } catch (error) {
-      console.error('Ollama health check failed:', error);
+      logger.error({ component: 'OllamaClient', error }, 'Ollama health check failed');
       return false;
     }
   }
@@ -120,7 +121,7 @@ export class OllamaClient {
       const data: OllamaGenerateResponse = await response.json();
       return data.response;
     } catch (error) {
-      console.error('Ollama generation failed:', error);
+      logger.error({ component: 'OllamaClient', error }, 'Ollama generation failed');
       throw new Error(`Failed to generate with Ollama: ${error}`);
     }
   }
@@ -149,7 +150,7 @@ export class OllamaClient {
 
       return JSON.parse(jsonMatch[0]);
     } catch (error) {
-      console.error('Ollama JSON generation failed:', error);
+      logger.error({ component: 'OllamaClient', error }, 'Ollama JSON generation failed');
       throw new Error(`Failed to generate JSON with Ollama: ${error}`);
     }
   }
@@ -241,7 +242,7 @@ Keep it under 300 words, focused on actionable insights for Kenyan citizens.`;
       const data = await response.json();
       return data.models || [];
     } catch (error) {
-      console.error('Failed to list Ollama models:', error);
+      logger.error({ component: 'OllamaClient', error }, 'Failed to list Ollama models');
       throw new Error(`Failed to list models: ${error}`);
     }
   }
@@ -262,9 +263,9 @@ Keep it under 300 words, focused on actionable insights for Kenyan citizens.`;
         throw new Error(`Ollama error: ${response.statusText}`);
       }
 
-      console.log(`✅ Model ${modelName} pulled successfully`);
+      logger.info({ component: 'OllamaClient', modelName }, 'Model pulled successfully');
     } catch (error) {
-      console.error('Failed to pull Ollama model:', error);
+      logger.error({ component: 'OllamaClient', error }, 'Failed to pull Ollama model');
       throw new Error(`Failed to pull model: ${error}`);
     }
   }

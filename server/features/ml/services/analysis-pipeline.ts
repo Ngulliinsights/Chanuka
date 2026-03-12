@@ -4,6 +4,7 @@
 // Orchestrates complex analysis workflows with enhanced safety and performance
 
 import { z } from 'zod';
+import { logger } from '@server/infrastructure/observability';
 
 import { mlOrchestrator, type MLRequest } from './ml-orchestrator';
 
@@ -819,7 +820,7 @@ export class AnalysisPipeline {
       try {
         mappedInput[key] = SafeExpressionEvaluator.evaluate(expression, context);
       } catch (error) {
-        console.warn(`Failed to map input '${key}':`, error);
+        logger.warn({ component: 'AnalysisPipeline', key, error }, 'Failed to map input');
         mappedInput[key] = null;
       }
     }
@@ -862,7 +863,7 @@ export class AnalysisPipeline {
           finalOutput[key] = SafeExpressionEvaluator.evaluate(expression, context);
         }
       } catch (error) {
-        console.warn(`Failed to generate output '${key}':`, error);
+        logger.warn({ component: 'AnalysisPipeline', key, error }, 'Failed to generate output');
         finalOutput[key] = null;
       }
     }

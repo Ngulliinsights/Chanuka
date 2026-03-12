@@ -133,7 +133,7 @@ class AlertingService {
 
     const alertRule: AlertRule = { ...rule, id: ruleId, created_at: now, updated_at: now };
     this.alertRules.set(ruleId, alertRule);
-    console.log(`[Alerting] Added alert rule: ${rule.name}`);
+    logger.info({ component: 'Alerting', ruleName: rule.name }, 'Added alert rule');
     return ruleId;
   }
 
@@ -143,7 +143,7 @@ class AlertingService {
     if (!rule) return false;
 
     Object.assign(rule, updates, { updated_at: new Date() });
-    console.log(`[Alerting] Updated alert rule: ${rule.name}`);
+    logger.info({ component: 'Alerting', ruleName: rule.name }, 'Updated alert rule');
     return true;
   }
 
@@ -153,7 +153,7 @@ class AlertingService {
     if (!rule) return false;
 
     this.alertRules.delete(ruleId);
-    console.log(`[Alerting] Deleted alert rule: ${rule.name}`);
+    logger.info({ component: 'Alerting', ruleName: rule.name }, 'Deleted alert rule');
     return true;
   }
 
@@ -191,7 +191,7 @@ class AlertingService {
     alert.acknowledgedBy = acknowledgedBy;
     alert.status = 'acknowledged';
 
-    console.log(`[Alerting] Alert acknowledged: ${alert.message}`);
+    logger.info({ component: 'Alerting', alertId, message: alert.message }, 'Alert acknowledged');
     return true;
   }
 
@@ -211,7 +211,7 @@ class AlertingService {
       this.alertHistory = this.alertHistory.slice(-(this.MAX_HISTORY / 2));
     }
 
-    console.log(`[Alerting] Alert resolved: ${alert.message}`);
+    logger.info({ component: 'Alerting', alertId, message: alert.message }, 'Alert resolved');
     return true;
   }
 
@@ -388,11 +388,7 @@ class AlertingService {
     this.activeAlerts.set(alertId, alert);
     this.executeAlertActions(rule, alert);
 
-    console.warn(`[Alerting] ALERT TRIGGERED: ${alert.message}`, {
-      alertId,
-      severity: alert.severity,
-      rule: rule.name,
-    });
+    logger.warn({ component: 'Alerting', alertId, severity: alert.severity, rule: rule.name }, `ALERT TRIGGERED: ${alert.message}`);
   }
 
   private generateAlertMessage(rule: AlertRule, metrics: APMMetrics, errorStats: ErrorStats): string {
@@ -419,19 +415,19 @@ class AlertingService {
 
       switch (action.type) {
         case 'log':
-          console.error(`[ALERT] ${alert.message}`, alert.details);
+          logger.error({ component: 'Alerting', ...alert.details }, alert.message);
           break;
         case 'email':
           // TODO: wire up email provider
-          console.log(`[Alerting] Would send email to: ${action.target}`);
+          logger.info({ component: 'Alerting', target: action.target }, 'Would send email');
           break;
         case 'webhook':
           // TODO: wire up HTTP client
-          console.log(`[Alerting] Would POST webhook to: ${action.target}`);
+          logger.info({ component: 'Alerting', target: action.target }, 'Would POST webhook');
           break;
         case 'slack':
           // TODO: wire up Slack SDK
-          console.log(`[Alerting] Would send Slack message to: ${action.target}`);
+          logger.info({ component: 'Alerting', target: action.target }, 'Would send Slack message');
           break;
       }
     }

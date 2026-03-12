@@ -1,4 +1,5 @@
 import { bills } from '@server/infrastructure/schema';
+import { logger } from '@server/infrastructure/observability';
 // ============================================================================
 // ML INTEGRATION SERVICE - Database Integration for ML Models
 // ============================================================================
@@ -342,7 +343,7 @@ export class MLIntegrationService {
           results.trojanAnalysis
         );
       } catch (error) {
-        console.error('Failed to transform trojan analysis:', error);
+        logger.error({ component: 'MLIntegration', error }, 'Failed to transform trojan analysis');
         transformed.trojanBillAnalysis = null;
       }
     }
@@ -355,7 +356,7 @@ export class MLIntegrationService {
           results.constitutionalAnalysis
         );
       } catch (error) {
-        console.error('Failed to transform constitutional analysis:', error);
+        logger.error({ component: 'MLIntegration', error }, 'Failed to transform constitutional analysis');
         transformed.constitutionalAnalysis = null;
       }
     }
@@ -368,7 +369,7 @@ export class MLIntegrationService {
           results.conflictAnalysis
         );
       } catch (error) {
-        console.error('Failed to transform conflict analysis:', error);
+        logger.error({ component: 'MLIntegration', error }, 'Failed to transform conflict analysis');
         transformed.conflictDetection = null;
       }
     }

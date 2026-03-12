@@ -13,7 +13,7 @@ export interface LedgerFilters {
   limit?: number;
 }
 
-@injectable()
+// @injectable() — removed: inversify not installed; using manual DI
 export class LedgerService {
 
   /**

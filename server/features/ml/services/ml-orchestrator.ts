@@ -4,6 +4,7 @@
 // Coordinates and manages all ML models with enhanced performance and reliability
 
 import { z } from 'zod';
+import { logger } from '@server/infrastructure/observability';
 
 import {
   trojanBillDetector,
@@ -509,7 +510,7 @@ export class MLOrchestrator {
     }
     
     if (keysToDelete.length > 0) {
-      console.log(`Cleaned up ${keysToDelete.length} expired cache entries`);
+      logger.info({ component: 'MLOrchestrator', count: keysToDelete.length }, 'Cleaned up expired cache entries');
     }
   }
 
@@ -676,7 +677,7 @@ export class MLOrchestrator {
   // ============================================================================
 
   async warmUp(): Promise<Map<ModelType, boolean>> {
-    console.log('Warming up ML models...');
+    logger.info({ component: 'MLOrchestrator' }, 'Warming up ML models...');
     const results = new Map<ModelType, boolean>();
     
     const warmupPromises = Array.from(this.modelInstances.entries()).map(
@@ -686,17 +687,17 @@ export class MLOrchestrator {
           if (testInput) {
             await this.callModelMethod(model, modelType, testInput);
             results.set(modelType, true);
-            console.log(`✓ ${modelType} warmed up successfully`);
+            logger.info({ component: 'MLOrchestrator', modelType }, 'Model warmed up successfully');
           }
         } catch (error) {
           results.set(modelType, false);
-          console.warn(`⚠ Failed to warm up ${modelType}:`, error);
+          logger.warn({ component: 'MLOrchestrator', modelType, error }, 'Failed to warm up model');
         }
       }
     );
     
     await Promise.allSettled(warmupPromises);
-    console.log('ML model warmup completed');
+    logger.info({ component: 'MLOrchestrator' }, 'ML model warmup completed');
     
     return results;
   }

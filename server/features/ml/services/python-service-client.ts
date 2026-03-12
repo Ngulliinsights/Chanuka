@@ -9,6 +9,7 @@
  */
 
 import { MWANGA_CONFIG } from '../config/mwanga-config';
+import { logger } from '@server/infrastructure/observability';
 
 // ============================================================================
 // Types
@@ -102,7 +103,7 @@ export class PythonServiceClient {
       const data = await response.json();
       return data.status === 'healthy';
     } catch (error) {
-      console.error('Python service health check failed:', error);
+      logger.error({ component: 'PythonServiceClient', error }, 'Python service health check failed');
       return false;
     }
   }
@@ -127,7 +128,7 @@ export class PythonServiceClient {
 
       return await response.json();
     } catch (error) {
-      console.error('Sentiment analysis failed:', error);
+      logger.error({ component: 'PythonServiceClient', error }, 'Sentiment analysis failed');
       throw new Error(`Failed to analyze sentiment: ${error}`);
     }
   }
@@ -152,7 +153,7 @@ export class PythonServiceClient {
 
       return await response.json();
     } catch (error) {
-      console.error('Constitutional query failed:', error);
+      logger.error({ component: 'PythonServiceClient', error }, 'Constitutional query failed');
       throw new Error(`Failed to query constitution: ${error}`);
     }
   }
@@ -177,7 +178,7 @@ export class PythonServiceClient {
 
       return await response.json();
     } catch (error) {
-      console.error('spaCy analysis failed:', error);
+      logger.error({ component: 'PythonServiceClient', error }, 'spaCy analysis failed');
       throw new Error(`Failed to analyze with spaCy: ${error}`);
     }
   }
@@ -202,7 +203,7 @@ export class PythonServiceClient {
 
       return await response.json();
     } catch (error) {
-      console.error('Graph analysis failed:', error);
+      logger.error({ component: 'PythonServiceClient', error }, 'Graph analysis failed');
       throw new Error(`Failed to analyze graph: ${error}`);
     }
   }
