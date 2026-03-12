@@ -63,3 +63,5 @@ export * from './moderation';
 
 
 
+
+export * from './application/services/moderation-service';

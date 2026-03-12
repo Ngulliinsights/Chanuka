@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Admin Router - Unified Error Handling System
  * 
@@ -24,6 +25,7 @@ import { ERROR_CODES } from '@shared/constants';
 import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { bills, users } from '@server/infrastructure/schema';
 import type * as schema from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
 
 // Simple error class for admin operations
 class AdminError extends Error {

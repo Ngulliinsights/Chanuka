@@ -1,78 +1,98 @@
-import { db } from '@server/infrastructure/database';
-import { market_commodities,market_signals } from '@server/infrastructure/schema/market_intelligence';
-import { and, desc, eq, gte,sql } from 'drizzle-orm';
-// FIXME: inversify not installed
-// import { injectable } from 'inversify';
+import { logger } from '@server/infrastructure/observability';
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
+import { market_signals } from '@server/infrastructure/schema/market_intelligence';
+import { desc, eq } from 'drizzle-orm';
+import { safeAsync } from '@server/infrastructure/error-handling/result-types';
+import { inputSanitizationService } from '@server/features/security';
+import { createNotFoundError } from '@server/infrastructure/error-handling/error-factory';
+import { calculateMarketMetrics } from './market.utils';
 
-import { calculateMarketMetrics, validateMarketData } from './market.utils';
-
-@injectable()
-export class MarketService {
-
+export const marketService = {
   /**
-   * Ingest a new price signal (The Sensor)
+   * Ingest a new price signal
    */
-  async addPrice(productId: string, price: number, currency: string, location?: string): Promise<void> {
-    if (!validateMarketData({ productId, price, currency })) {
-      throw new Error("Invalid market data payload");
-    }
+  addPrice: async (productId: string, price: number, currency: string, location?: string) => {
+    return safeAsync(async () => {
+      // Validate and sanitize inputs
+      const safeProductId = inputSanitizationService.sanitizeString(productId);
+      const safeCurrency = inputSanitizationService.sanitizeString(currency);
+      const safeLocation = typeof location === 'string' && location.trim() 
+        ? inputSanitizationService.sanitizeString(location.trim())
+        : 'nairobi';
 
-    // Validate and sanitize location
-    const sanitizedLocation = typeof location === 'string' && location.trim() 
-      ? location.trim() 
-      : 'nairobi';
+      await writeDatabase.insert(market_signals).values({
+        commodity_id: safeProductId,
+        price_reported: price.toString(),
+        location_county: safeLocation,
+        trust_weight: '1.0',
+        created_at: new Date()
+      });
 
-    await writeDatabase.insert(market_signals).values({
-      commodity_id: productId, // Mapped to commodity_id
-      price_reported: price.toString(),
-      location_county: sanitizedLocation, // Default or sanitized
-      trust_weight: '1.0', // Default for anonymous
-      created_at: new Date()
-    });
-  }
+      logger.info({ 
+        context: { service: 'MarketService', productId: safeProductId }
+      }, 'Price signal recorded successfully');
+    }, { service: 'MarketService', operation: 'addPrice' });
+  },
 
   /**
    * Get realtime metrics for a specific commodity
    */
-  async getMarketMetrics(productId: string) {
-    // Fetch last 100 signals for this product to calculate live metrics
-    const signals = await db.query.market_signals.findMany({
-      where: eq(market_signals.commodity_id, productId),
-      orderBy: [desc(market_signals.created_at)],
-      limit: 100
-    });
+  getMarketMetrics: async (productId: string) => {
+    return safeAsync(async () => {
+      const safeProductId = inputSanitizationService.sanitizeString(productId);
 
-    if (signals.length === 0) return null;
+      const signals = await readDatabase.query.market_signals.findMany({
+        where: eq(market_signals.commodity_id, safeProductId),
+        orderBy: [desc(market_signals.created_at)],
+        limit: 100
+      });
 
-    // Map DB result to PriceData interface expected by utils
-    const priceData = signals.map(s => ({
-      productId: s.commodity_id,
-      price: Number(s.price_reported),
-      currency: 'KES', // Defaulting for MVP
-      updatedAt: s.created_at
-    }));
+      if (signals.length === 0) {
+        throw createNotFoundError('Insufficient data for this commodity', { productId: safeProductId });
+      }
 
-    return calculateMarketMetrics(priceData);
-  }
+      const priceData = signals.map(s => ({
+        productId: s.commodity_id,
+        price: Number(s.price_reported),
+        currency: 'KES',
+        updatedAt: s.created_at
+      }));
+
+      return calculateMarketMetrics(priceData);
+    }, { service: 'MarketService', operation: 'getMarketMetrics' });
+  },
 
   /**
    * Get the absolute latest price signal
    */
-  async getLatestPrice(productId: string) {
-    return await db.query.market_signals.findFirst({
-      where: eq(market_signals.commodity_id, productId),
-      orderBy: [desc(market_signals.created_at)]
-    });
-  }
+  getLatestPrice: async (productId: string) => {
+    return safeAsync(async () => {
+      const safeProductId = inputSanitizationService.sanitizeString(productId);
+
+      const result = await readDatabase.query.market_signals.findFirst({
+        where: eq(market_signals.commodity_id, safeProductId),
+        orderBy: [desc(market_signals.created_at)]
+      });
+
+      if (!result) {
+         throw createNotFoundError('No signals found for this commodity', { productId: safeProductId });
+      }
+      return result;
+    }, { service: 'MarketService', operation: 'getLatestPrice' });
+  },
 
   /**
-   * Get historical trend (Optimized with SQL aggregation)
+   * Get historical trend
    */
-  async getPriceHistory(productId: string, limit: number = 30) {
-    return await db.query.market_signals.findMany({
-      where: eq(market_signals.commodity_id, productId),
-      orderBy: [desc(market_signals.created_at)],
-      limit: limit
-    });
+  getPriceHistory: async (productId: string, limit: number = 30) => {
+    return safeAsync(async () => {
+      const safeProductId = inputSanitizationService.sanitizeString(productId);
+      
+      return await readDatabase.query.market_signals.findMany({
+        where: eq(market_signals.commodity_id, safeProductId),
+        orderBy: [desc(market_signals.created_at)],
+        limit: limit
+      });
+    }, { service: 'MarketService', operation: 'getPriceHistory' });
   }
-}
+};

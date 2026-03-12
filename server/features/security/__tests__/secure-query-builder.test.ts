@@ -1,3 +1,4 @@
+import { users } from '@server/infrastructure/schema';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { secureQueryBuilderService } from '../application/services/secure-query-builder.service';
 import {

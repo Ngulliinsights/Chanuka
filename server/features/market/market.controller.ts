@@ -1,60 +1,43 @@
-import { Request, Response,Router } from 'express';
-// FIXME: inversify not installed
-// import { inject } from 'inversify';
-// FIXME: inversify-express-utils not installed
-// import { controller, httpGet, httpPost } from 'inversify-express-utils';
+import { Request, Response } from 'express';
+import { logger } from '@server/infrastructure/observability';
+import { marketService } from './market.service';
 
-import { MarketService } from './market.service';
+export const marketController = {
+  addPrice: async (req: Request, res: Response): Promise<void> => {
+    const { productId, price, currency, location } = req.body;
+    const result = await marketService.addPrice(productId, price, currency, location);
 
-@controller('/api/market')
-export class MarketController {
-  constructor(@inject(MarketService) private marketService: MarketService) {}
-
-  @httpPost('/price')
-  async addPrice(req: Request, res: Response): Promise<void> {
-    try {
-      const { productId, price, currency, location } = req.body;
-
-      if (!productId || !price || !currency) {
-        res.status(400).json({ error: 'Missing required fields: productId, price, currency' });
-        return;
-      }
-
-      await this.marketService.addPrice(productId, Number(price), currency, location);
+    if (result.isOk()) {
       res.status(201).json({ message: 'Price signal recorded successfully' });
-    } catch (error) {
-      console.error("Market Signal Error:", error);
+    } else {
+      logger.error({ error: result.error }, 'Failed to record price signal');
       res.status(500).json({ error: 'Failed to record price signal' });
     }
-  }
+  },
 
-  @httpGet('/metrics/:productId')
-  async getMetrics(req: Request, res: Response): Promise<void> {
-    try {
-      const { productId } = req.params;
-      const metrics = await this.marketService.getMarketMetrics(productId);
+  getMetrics: async (req: Request, res: Response): Promise<void> => {
+    const { productId } = req.params;
+    const result = await marketService.getMarketMetrics(productId);
 
-      if (!metrics) {
-        res.status(404).json({ error: 'Insufficient data for this commodity' });
-        return;
-      }
-
-      res.json(metrics);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to calculate metrics' });
+    if (result.isOk()) {
+      res.json(result.value);
+    } else {
+      const error = result.error;
+      const status = error.name === 'NotFoundError' ? 404 : 500;
+      res.status(status).json({ error: error.message });
     }
-  }
+  },
 
-  @httpGet('/history/:productId')
-  async getPriceHistory(req: Request, res: Response): Promise<void> {
-    try {
-      const { productId } = req.params;
-      const limit = parseInt(req.query.limit as string) || 30;
+  getPriceHistory: async (req: Request, res: Response): Promise<void> => {
+    const { productId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 30;
 
-      const history = await this.marketService.getPriceHistory(productId, limit);
-      res.json(history);
-    } catch (error) {
+    const result = await marketService.getPriceHistory(productId, limit);
+
+    if (result.isOk()) {
+      res.json(result.value);
+    } else {
       res.status(500).json({ error: 'Failed to retrieve price history' });
     }
   }
-}
+};

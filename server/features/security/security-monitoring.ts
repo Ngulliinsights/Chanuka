@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import { bills, user_interests, users } from '@server/infrastructure/schema';

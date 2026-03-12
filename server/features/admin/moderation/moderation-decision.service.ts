@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 /**
  * Moderation Decision Handler Service
  * 
@@ -12,6 +13,8 @@ import { comments,
   moderation_action,
   users
  } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 import { 

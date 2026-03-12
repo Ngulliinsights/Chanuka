@@ -1,4 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
+import { users } from '@server/infrastructure/schema';
 import cors from 'cors';
 import { NextFunction,Request, Response } from 'express';
 import helmet from 'helmet';

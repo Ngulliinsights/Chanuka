@@ -8,6 +8,7 @@ import { PrecedentFinderService } from '@server/features/constitutional-analysis
 import { ProvisionMatcherService } from '@server/features/constitutional-analysis/application/provision-matcher';
 import { logger } from '@server/infrastructure/observability';
 import type { ConstitutionalProvision, LegalPrecedent } from '@server/infrastructure/schema/index';
+import { bills } from '@server/infrastructure/schema';
 
 // Define the ConstitutionalAnalysis interface based on the schema
 export interface ConstitutionalAnalysis {

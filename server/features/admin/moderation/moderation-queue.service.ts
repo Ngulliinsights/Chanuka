@@ -13,6 +13,10 @@ import { bill,
   content_report, 
   sponsor, 
   users } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
+import { users } from '@server/infrastructure/schema';
+import { sponsors } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, SQL,sql } from 'drizzle-orm';
 
 export class ModerationQueueService {

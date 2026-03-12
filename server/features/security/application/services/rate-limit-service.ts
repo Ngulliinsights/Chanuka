@@ -1,6 +1,6 @@
 import { and, eq, gte, or, sql } from 'drizzle-orm';
-
 import { logger } from '@server/infrastructure/observability';
+import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import {
   readDatabase,
   withTransaction,
@@ -17,21 +17,10 @@ import {
 
 // ==================== Type Definitions ====================
 
-// Re-export shared domain types directly — avoids an import that the compiler
-// would otherwise flag as unused (the types are consumed only at the type level).
 export type { RateLimitRule, RateLimitEvent, RateLimitId } from '@shared/types/domains/safeguards';
 
-/**
- * Opaque branded type for user identifiers.
- * Use `UserId` from `@shared/types/core/common` once it is exported there.
- */
 export type UserId = string & { readonly __brand: unique symbol };
 
-// ---------------------------------------------------------------------------
-// Tx — augments DatabaseTransaction with the Drizzle ORM query-builder API.
-// The connection module exposes a narrower type; we widen it here so that the
-// service can use the full ORM surface inside transactions.
-// ---------------------------------------------------------------------------
 type Tx = DatabaseTransaction & {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   select: (...args: unknown[]) => any;
@@ -44,15 +33,9 @@ type Tx = DatabaseTransaction & {
   execute: (query: ReturnType<typeof sql>) => Promise<{ rows: unknown[] }>;
 };
 
-// ---------------------------------------------------------------------------
-// The rate_limit_config table uses `is_active`; the service originally queried
-// `is_enabled`.  Alias it here until the schema or service is aligned.
-// ---------------------------------------------------------------------------
 type WithIsEnabled = { is_enabled: typeof rateLimitConfig.is_active };
 const configTable = rateLimitConfig as typeof rateLimitConfig & WithIsEnabled;
 
-// The RateLimit row type is missing a few columns that exist in the DB but are
-// not yet reflected in the generated types.
 interface RateLimitExtended extends RateLimit {
   consecutive_violations: number | null;
   penalty_multiplier: string | null;
@@ -99,7 +82,6 @@ export interface RateLimitConfigResult {
 
 // ==================== Helper Functions ====================
 
-/** Ensure the context contains at least one identifier and an action type. */
 function validateRateLimitContext(context: RateLimitContext): void {
   if (!context.userId && !context.ipAddress && !context.deviceFingerprint && !context.sessionId) {
     throw new Error(
@@ -111,24 +93,12 @@ function validateRateLimitContext(context: RateLimitContext): void {
   }
 }
 
-/** Safely extract a string message from an unknown thrown value. */
 function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
 // ==================== Service Class ====================
 
-/**
- * Service for rate limiting with atomic operations and race condition prevention.
- *
- * SECURITY & CONCURRENCY FEATURES:
- * - Atomic check-and-increment using database transactions
- * - Row-level locking (FOR UPDATE) to prevent concurrent modifications
- * - Whitelist / blacklist support for exemptions and bans
- * - Progressive penalties with escalation
- * - Emergency mode for platform-wide restrictions
- * - Comprehensive audit trail
- */
 export class RateLimitService {
   private static instance: RateLimitService;
 
@@ -139,15 +109,10 @@ export class RateLimitService {
     return RateLimitService.instance;
   }
 
-  /**
-   * Atomically check the rate limit and record the attempt.
-   * Uses FOR UPDATE row-level locking to prevent race conditions.
-   */
-  async checkAndRecordRateLimit(context: RateLimitContext): Promise<RateLimitResult> {
-    try {
+  async checkAndRecordRateLimit(context: RateLimitContext) {
+    return safeAsync(async () => {
       validateRateLimitContext(context);
 
-      // Fast-path: blacklist → immediate block.
       if (await this.isBlacklisted(context)) {
         return {
           allowed: false,
@@ -156,12 +121,10 @@ export class RateLimitService {
         };
       }
 
-      // Fast-path: whitelist → immediate allow.
       if (await this.isWhitelisted(context)) {
         return { allowed: true };
       }
 
-      // No config → no rate limiting for this action type.
       const config = await this.getRateLimitConfig(context.actionType);
       if (!config) {
         return { allowed: true };
@@ -171,7 +134,6 @@ export class RateLimitService {
         const tx = rawTx as Tx;
         const existingLimit = await this.findExistingRateLimitWithLock(tx, context, config);
 
-        // ── First attempt ────────────────────────────────────────────────────
         if (!existingLimit) {
           await this.createRateLimitRecordInTransaction(tx, context, config);
           return {
@@ -181,7 +143,6 @@ export class RateLimitService {
           };
         }
 
-        // ── Currently blocked ────────────────────────────────────────────────
         if (
           existingLimit.is_blocked &&
           existingLimit.blocked_until &&
@@ -200,7 +161,6 @@ export class RateLimitService {
           };
         }
 
-        // ── Window expired — reset ────────────────────────────────────────────
         const windowExpiry = new Date(
           existingLimit.window_start.getTime() +
           existingLimit.window_duration_minutes * 60 * 1000
@@ -215,7 +175,6 @@ export class RateLimitService {
           };
         }
 
-        // ── Increment attempt count (atomic) ─────────────────────────────────
         const updatedRows = await tx
           .update(rateLimits)
           .set({
@@ -235,7 +194,6 @@ export class RateLimitService {
           throw new Error('Failed to update rate limit record');
         }
 
-        // ── Threshold exceeded → block ────────────────────────────────────────
         if (updated.attempt_count >= updated.limit_threshold) {
           const extendedExisting = existingLimit as RateLimitExtended;
           const blockResult = await this.applyRateLimitBlockInTransaction(
@@ -261,39 +219,20 @@ export class RateLimitService {
           ),
         };
       });
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Atomic rate limit check failed'
-      );
-      // Fail open — allow the action when rate limiting itself errors.
-      return { allowed: true };
-    }
+    }, { service: 'RateLimitService', operation: 'checkAndRecordRateLimit', ...context });
   }
-
-  // ── Blacklist check ──────────────────────────────────────────────────────
 
   private async isBlacklisted(context: RateLimitContext): Promise<boolean> {
     try {
       const now = new Date();
       const conditions: ReturnType<typeof sql>[] = [];
 
-      // Use raw sql fragments — the blacklist/whitelist tables expose
-      // `identifier_value` as a plain string type in the schema cast, so
-      // Drizzle's `eq()` helper cannot accept it as a Column.  Parameterised
-      // sql`` fragments are equally safe and avoid the type mismatch.
-      if (context.userId) {
-        conditions.push(sql`identifier_value = ${context.userId}`);
-      }
-      if (context.ipAddress) {
-        conditions.push(sql`identifier_value = ${context.ipAddress}`);
-      }
-      if (context.deviceFingerprint) {
-        conditions.push(sql`identifier_value = ${context.deviceFingerprint}`);
-      }
+      if (context.userId) conditions.push(sql`identifier_value = ${context.userId}`);
+      if (context.ipAddress) conditions.push(sql`identifier_value = ${context.ipAddress}`);
+      if (context.deviceFingerprint) conditions.push(sql`identifier_value = ${context.deviceFingerprint}`);
+      
       if (conditions.length === 0) return false;
 
-      // @ts-expect-error - readDatabase returns unknown, but we know the shape
       const result = await readDatabase
         .select()
         .from(rateLimitBlacklist)
@@ -311,30 +250,20 @@ export class RateLimitService {
 
       return result.length > 0;
     } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Failed to check blacklist'
-      );
+      logger.error({ error: getErrorMessage(error), context }, 'Failed to check blacklist');
       return false;
     }
   }
-
-  // ── Whitelist check ──────────────────────────────────────────────────────
 
   private async isWhitelisted(context: RateLimitContext): Promise<boolean> {
     try {
       const now = new Date();
       const conditions: ReturnType<typeof sql>[] = [];
 
-      if (context.userId) {
-        conditions.push(sql`identifier_value = ${context.userId}`);
-      }
-      if (context.ipAddress) {
-        conditions.push(sql`identifier_value = ${context.ipAddress}`);
-      }
+      if (context.userId) conditions.push(sql`identifier_value = ${context.userId}`);
+      if (context.ipAddress) conditions.push(sql`identifier_value = ${context.ipAddress}`);
       if (conditions.length === 0) return false;
 
-      // @ts-expect-error - readDatabase returns unknown, but we know the shape
       const result = await readDatabase
         .select()
         .from(rateLimitWhitelist)
@@ -352,20 +281,11 @@ export class RateLimitService {
 
       return result.length > 0;
     } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Failed to check whitelist'
-      );
+      logger.error({ error: getErrorMessage(error), context }, 'Failed to check whitelist');
       return false;
     }
   }
 
-  // ── FOR UPDATE locking ───────────────────────────────────────────────────
-
-  /**
-   * Retrieve an existing rate-limit record with a row-level FOR UPDATE lock,
-   * preventing concurrent modifications within the same transaction.
-   */
   private async findExistingRateLimitWithLock(
     tx: Tx,
     context: RateLimitContext,
@@ -376,15 +296,11 @@ export class RateLimitService {
 
       if (context.userId) conditions.push(sql`user_id = ${context.userId}`);
       if (context.ipAddress) conditions.push(sql`ip_address = ${context.ipAddress}`);
-      if (context.deviceFingerprint) {
-        conditions.push(sql`device_fingerprint = ${context.deviceFingerprint}`);
-      }
+      if (context.deviceFingerprint) conditions.push(sql`device_fingerprint = ${context.deviceFingerprint}`);
       if (context.sessionId) conditions.push(sql`session_id = ${context.sessionId}`);
 
       conditions.push(sql`action_type = ${context.actionType}`);
-      if (context.actionResource) {
-        conditions.push(sql`action_resource = ${context.actionResource}`);
-      }
+      if (context.actionResource) conditions.push(sql`action_resource = ${context.actionResource}`);
 
       const windowStart = new Date(Date.now() - config.windowMinutes * 60 * 1000);
       conditions.push(sql`window_start >= ${windowStart}`);
@@ -400,159 +316,115 @@ export class RateLimitService {
       const result = await tx.execute(query);
       if (!result.rows || result.rows.length === 0) return null;
 
-      // Row comes back as `unknown` from raw SQL execution; cast through
-      // unknown to RateLimit which matches the actual DB column layout.
       return result.rows[0] as unknown as RateLimit;
     } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Failed to find existing rate limit with lock'
-      );
+      logger.error({ error: getErrorMessage(error), context }, 'Failed to find existing rate limit with lock');
       return null;
     }
   }
-
-  // ── Create record ────────────────────────────────────────────────────────
 
   private async createRateLimitRecordInTransaction(
     tx: Tx,
     context: RateLimitContext,
     config: RateLimitConfigResult
   ): Promise<void> {
-    try {
-      const windowStart = new Date();
+    const windowStart = new Date();
 
-      const newRecord: NewRateLimit = {
-        user_id: context.userId,
-        ip_address: context.ipAddress,
-        device_fingerprint: context.deviceFingerprint,
-        // Cast required because RateLimitContext.actionType is `string` while
-        // the schema column is a Postgres enum.  The caller is responsible for
-        // passing a valid enum value.
-        action_type: context.actionType as NewRateLimit['action_type'],
-        window_start: windowStart,
-        window_duration_minutes: config.windowMinutes,
-        attempt_count: 1,
-        limit_threshold: config.maxAttempts,
-        is_blocked: false,
-        block_escalation_count: 0,
-        is_verified_user: false,
-        access_method: 'web',
-        metadata: {
-          last_attempt_time: new Date().toISOString(),
-          user_agent: context.userAgent,
-          geo_location: context.geoLocation,
-        },
-      };
+    const newRecord: NewRateLimit = {
+      user_id: context.userId,
+      ip_address: context.ipAddress,
+      device_fingerprint: context.deviceFingerprint,
+      action_type: context.actionType as NewRateLimit['action_type'],
+      window_start: windowStart,
+      window_duration_minutes: config.windowMinutes,
+      attempt_count: 1,
+      limit_threshold: config.maxAttempts,
+      is_blocked: false,
+      block_escalation_count: 0,
+      is_verified_user: false,
+      access_method: 'web',
+      metadata: {
+        last_attempt_time: new Date().toISOString(),
+        user_agent: context.userAgent,
+        geo_location: context.geoLocation,
+      },
+    };
 
-      await tx.insert(rateLimits).values(newRecord);
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Failed to create rate limit record'
-      );
-      throw error;
-    }
+    await tx.insert(rateLimits).values(newRecord);
   }
-
-  // ── Reset window ─────────────────────────────────────────────────────────
 
   private async resetRateLimitWindowInTransaction(
     tx: Tx,
     rateLimitId: string,
     config: RateLimitConfigResult
   ): Promise<void> {
-    try {
-      await tx
-        .update(rateLimits)
-        .set({
-          window_start: new Date(),
-          window_duration_minutes: config.windowMinutes,
-          attempt_count: 1,
-          is_blocked: false,
-          blocked_until: null,
-          block_escalation_count: 0,
-          updated_at: new Date(),
-        })
-        .where(eq(rateLimits.id, rateLimitId));
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), rateLimitId },
-        'Failed to reset rate limit window'
-      );
-      throw error;
-    }
+    await tx
+      .update(rateLimits)
+      .set({
+        window_start: new Date(),
+        window_duration_minutes: config.windowMinutes,
+        attempt_count: 1,
+        is_blocked: false,
+        blocked_until: null,
+        block_escalation_count: 0,
+        updated_at: new Date(),
+      })
+      .where(eq(rateLimits.id, rateLimitId));
   }
-
-  // ── Apply block ──────────────────────────────────────────────────────────
 
   private async applyRateLimitBlockInTransaction(
     tx: Tx,
     existingLimit: RateLimitExtended,
     config: RateLimitConfigResult
   ): Promise<{ blockedUntil: Date; blockReason: string; violationSeverity: string }> {
-    try {
-      const now = new Date();
-      const consecutiveViolations = (existingLimit.consecutive_violations ?? 0) + 1;
+    const now = new Date();
+    const consecutiveViolations = (existingLimit.consecutive_violations ?? 0) + 1;
 
-      const penaltyMultiplier = config.enableProgressivePenalties
-        ? Math.min(
-            parseFloat(existingLimit.penalty_multiplier ?? '1.0') * config.escalationMultiplier,
-            config.maxEscalationLevel
-          )
-        : 1.0;
+    const penaltyMultiplier = config.enableProgressivePenalties
+      ? Math.min(
+          parseFloat(existingLimit.penalty_multiplier ?? '1.0') * config.escalationMultiplier,
+          config.maxEscalationLevel
+        )
+      : 1.0;
 
-      const effectiveMultiplier = config.emergencyMode
-        ? penaltyMultiplier * config.emergencyMultiplier
-        : penaltyMultiplier;
+    const effectiveMultiplier = config.emergencyMode
+      ? penaltyMultiplier * config.emergencyMultiplier
+      : penaltyMultiplier;
 
-      const blockDurationMinutes = Math.floor(config.blockDurationMinutes * effectiveMultiplier);
-      const blockedUntil = new Date(now.getTime() + blockDurationMinutes * 60 * 1000);
+    const blockDurationMinutes = Math.floor(config.blockDurationMinutes * effectiveMultiplier);
+    const blockedUntil = new Date(now.getTime() + blockDurationMinutes * 60 * 1000);
 
-      let violationSeverity = 'low';
-      if (consecutiveViolations >= 15) violationSeverity = 'critical';
-      else if (consecutiveViolations >= 10) violationSeverity = 'high';
-      else if (consecutiveViolations >= 5) violationSeverity = 'medium';
+    let violationSeverity = 'low';
+    if (consecutiveViolations >= 15) violationSeverity = 'critical';
+    else if (consecutiveViolations >= 10) violationSeverity = 'high';
+    else if (consecutiveViolations >= 5) violationSeverity = 'medium';
 
-      const blockReason = `Exceeded ${existingLimit.limit_threshold} attempts in ${existingLimit.window_duration_minutes} minutes`;
+    const blockReason = `Exceeded ${existingLimit.limit_threshold} attempts in ${existingLimit.window_duration_minutes} minutes`;
 
-      await tx
-        .update(rateLimits)
-        .set({
-          is_blocked: true,
-          blocked_until: blockedUntil,
-          block_escalation_count: sql`${rateLimits.block_escalation_count} + 1`,
-          last_violation: now,
-          updated_at: now,
-        })
-        .where(eq(rateLimits.id, existingLimit.id));
+    await tx
+      .update(rateLimits)
+      .set({
+        is_blocked: true,
+        blocked_until: blockedUntil,
+        block_escalation_count: sql`${rateLimits.block_escalation_count} + 1`,
+        last_violation: now,
+        updated_at: now,
+      })
+      .where(eq(rateLimits.id, existingLimit.id));
 
-      logger.warn(
-        {
-          rateLimitId: existingLimit.id,
-          consecutiveViolations,
-          penaltyMultiplier: effectiveMultiplier,
-          blockedUntilMinutes: blockDurationMinutes,
-          violationSeverity,
-        },
-        'Rate limit block applied'
-      );
+    logger.warn({
+      rateLimitId: existingLimit.id,
+      consecutiveViolations,
+      penaltyMultiplier: effectiveMultiplier,
+      blockedUntilMinutes: blockDurationMinutes,
+      violationSeverity,
+    }, 'Rate limit block applied');
 
-      return { blockedUntil, blockReason, violationSeverity };
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), existingLimit },
-        'Failed to apply rate limit block'
-      );
-      throw error;
-    }
+    return { blockedUntil, blockReason, violationSeverity };
   }
-
-  // ── Config lookup ────────────────────────────────────────────────────────
 
   private async getRateLimitConfig(actionType: string): Promise<RateLimitConfigResult | null> {
     try {
-      // @ts-expect-error - readDatabase returns unknown, but we know the shape
       const result = await readDatabase
         .select()
         .from(rateLimitConfig)
@@ -581,22 +453,13 @@ export class RateLimitService {
         emergencyMultiplier: 1.0,
       };
     } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), actionType },
-        'Failed to get rate limit config'
-      );
+      logger.error({ error: getErrorMessage(error), actionType }, 'Failed to get rate limit config');
       return null;
     }
   }
 
-  // ── Cleanup ──────────────────────────────────────────────────────────────
-
-  /**
-   * Delete expired, non-blocked rate-limit records.
-   * Intended to be called by a background / cron job.
-   */
-  async cleanupExpiredRecords(batchSize = 1_000): Promise<number> {
-    try {
+  async cleanupExpiredRecords(batchSize = 1_000) {
+    return safeAsync(async () => {
       let totalDeleted = 0;
       let deletedInBatch: number;
 
@@ -639,20 +502,11 @@ export class RateLimitService {
       }
 
       return totalDeleted;
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error) },
-        'Failed to cleanup expired rate limit records'
-      );
-      return 0;
-    }
+    }, { service: 'RateLimitService', operation: 'cleanupExpiredRecords' });
   }
 
-  // ── Admin: manual unblock ────────────────────────────────────────────────
-
-  /** Administratively clear a block from a rate-limit record. */
-  async unblockRateLimit(rateLimitId: string, reason: string): Promise<boolean> {
-    try {
+  async unblockRateLimit(rateLimitId: string, reason: string) {
+    return safeAsync(async () => {
       if (!rateLimitId || !reason) {
         throw new Error('Rate limit ID and reason are required');
       }
@@ -677,15 +531,8 @@ export class RateLimitService {
 
       logger.info({ rateLimitId, reason }, 'Rate limit manually unblocked');
       return true;
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), rateLimitId },
-        'Failed to unblock rate limit'
-      );
-      return false;
-    }
+    }, { service: 'RateLimitService', operation: 'unblockRateLimit' });
   }
 }
 
-// Export singleton instance
 export const rateLimitService = RateLimitService.getInstance();

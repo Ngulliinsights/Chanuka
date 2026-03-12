@@ -6,6 +6,7 @@ import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
 import { schemaValidationService } from '@server/infrastructure/validation/schema-validation-service';
 import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
+import { users } from '@server/infrastructure/schema';
 import { HealthCheckResponse } from '@server/types/common';
 
 // Define interfaces for type safety

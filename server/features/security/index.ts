@@ -85,3 +85,5 @@ export {
 
 
 
+
+export * from './application/services/privacy-service';

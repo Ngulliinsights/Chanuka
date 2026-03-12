@@ -1,3 +1,4 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { securityAuditService } from './security-audit.service';
 import { logger } from '@server/infrastructure/observability';
 

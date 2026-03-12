@@ -1,4 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
+import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import { type DatabaseTransaction, withTransaction, readDatabase } from '@server/infrastructure/database/connection';
 import {
   moderationAppeals,
@@ -53,7 +54,6 @@ export interface ModeratorPerformanceMetrics {
 
 // ==================== Helper Functions ====================
 
-/** Safely extract error message from unknown error type */
 function getErrorMessage(error: unknown): string {
   if (typeof error === 'object' && error !== null && 'message' in error) {
     return String((error as { message: unknown }).message);
@@ -61,21 +61,18 @@ function getErrorMessage(error: unknown): string {
   return String(error);
 }
 
-/** Validate moderation context using standardized type guard */
 function validateModerationContext(context: unknown): asserts context is ModerationContext {
   if (!isModerationContext(context)) {
     throw new Error('Invalid moderation context');
   }
 }
 
-/** Validate moderation decision using standardized type guard */
 function validateModerationDecision(decision: unknown): asserts decision is ModerationDecision {
   if (!isModerationDecision(decision)) {
     throw new Error('Invalid moderation decision');
   }
 }
 
-/** Validate moderation appeal using standardized type guard */
 function validateModerationAppeal(appeal: unknown): asserts appeal is ModerationAppeal {
   if (!isModerationAppeal(appeal)) {
     throw new Error('Invalid moderation appeal');
@@ -84,17 +81,6 @@ function validateModerationAppeal(appeal: unknown): asserts appeal is Moderation
 
 // ==================== Service Class ====================
 
-/**
- * Service for managing content moderation workflows.
- * Handles moderation queue, decisions, appeals, and moderator performance tracking.
- *
- * SECURITY & CONCURRENCY:
- * - Uses transactions with row-level locking (FOR UPDATE) to prevent race conditions
- * - Validates all inputs before processing
- * - Prevents duplicate queue entries atomically
- * - Ensures moderator assignment is atomic and doesn't allow double-assignment
- * - Tracks all state transitions with timestamps for auditing
- */
 export class ModerationService {
   private static instance: ModerationService;
 
@@ -107,12 +93,8 @@ export class ModerationService {
 
   // ==================== Queue Management ====================
 
-  /**
-   * Add content to moderation queue with race condition prevention.
-   * Uses transaction with explicit locking to prevent duplicate entries.
-   */
-  async queueForModeration(context: ModerationContext): Promise<ModerationQueueResult> {
-    try {
+  async queueForModeration(context: ModerationContext) {
+    return safeAsync(async () => {
       validateModerationContext(context);
 
       return await withTransaction(async (tx: DatabaseTransaction) => {
@@ -127,7 +109,7 @@ export class ModerationService {
         const existing = await tx.query(existingQuery, [context.contentType, context.contentId]);
 
         if (existing && Array.isArray(existing) && existing.length > 0) {
-          return { success: false, error: 'Content already in moderation queue' };
+          throw new Error('Content already in moderation queue');
         }
 
         const priority = this.calculatePriority(context);
@@ -164,21 +146,11 @@ export class ModerationService {
 
         return { success: true, queueItemId };
       });
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), context },
-        'Failed to queue content for moderation'
-      );
-      return { success: false, error: getErrorMessage(error) };
-    }
+    }, { service: 'ModerationService', operation: 'queueForModeration', context });
   }
 
-  /**
-   * Assign moderator to queue item with race condition prevention.
-   * Prevents double-assignment using row-level locking.
-   */
-  async assignModerator(queueItemId: string, moderatorId: string): Promise<boolean> {
-    try {
+  async assignModerator(queueItemId: string, moderatorId: string) {
+    return safeAsync(async () => {
       if (!queueItemId || !moderatorId) {
         throw new Error('Queue item ID and moderator ID are required');
       }
@@ -212,21 +184,11 @@ export class ModerationService {
         logger.info({ queueItemId, moderatorId }, 'Moderator assigned to queue item');
         return true;
       });
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), queueItemId, moderatorId },
-        'Failed to assign moderator'
-      );
-      return false;
-    }
+    }, { service: 'ModerationService', operation: 'assignModerator', queueItemId, moderatorId });
   }
 
-  /**
-   * Get pending queue items for moderator assignment.
-   * Prioritizes by urgency and creation time.
-   */
-  async getPendingQueueItems(limit = 50): Promise<ModerationQueueItem[]> {
-    try {
+  async getPendingQueueItems(limit = 50) {
+    return safeAsync(async () => {
       if (limit < 1 || limit > 500) {
         throw new Error('Limit must be between 1 and 500');
       }
@@ -247,17 +209,11 @@ export class ModerationService {
         .limit(limit)) as ModerationQueueItem[];
 
       return items;
-    } catch (error) {
-      logger.error({ error: getErrorMessage(error) }, 'Failed to get pending queue items');
-      return [];
-    }
+    }, { service: 'ModerationService', operation: 'getPendingQueueItems', limit });
   }
 
-  /**
-   * Get assigned items for a specific moderator.
-   */
-  async getAssignedItems(moderatorId: string): Promise<ModerationQueueItem[]> {
-    try {
+  async getAssignedItems(moderatorId: string) {
+    return safeAsync(async () => {
       if (!moderatorId) {
         throw new Error('Moderator ID is required');
       }
@@ -274,23 +230,13 @@ export class ModerationService {
         .orderBy(desc(moderationQueue.priority), asc(moderationQueue.assigned_at))) as ModerationQueueItem[];
 
       return items;
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), moderatorId },
-        'Failed to get assigned items'
-      );
-      return [];
-    }
+    }, { service: 'ModerationService', operation: 'getAssignedItems', moderatorId });
   }
 
   // ==================== Decision Management ====================
 
-  /**
-   * Record moderation decision with transactional consistency.
-   * Ensures queue item status is updated atomically with decision creation.
-   */
-  async recordDecision(decision: ModerationDecision): Promise<ModerationDecisionResult> {
-    try {
+  async recordDecision(decision: ModerationDecision) {
+    return safeAsync(async () => {
       validateModerationDecision(decision);
 
       return await withTransaction(async (tx: DatabaseTransaction) => {
@@ -358,26 +304,11 @@ export class ModerationService {
 
         return { success: true, decisionId };
       });
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), decision },
-        'Failed to record moderation decision'
-      );
-      return { success: false, error: getErrorMessage(error) };
-    }
+    }, { service: 'ModerationService', operation: 'recordDecision', decision });
   }
 
-  /**
-   * Get decision by ID.
-   *
-   * NOTE: The Drizzle schema uses snake_case columns that do not directly map
-   * to the camelCase `ModerationDecision` domain type.  We route through
-   * `unknown` to make the mismatch explicit and intentional; a proper mapper
-   * function should replace this cast once the schema and domain types are
-   * aligned.
-   */
-  async getDecision(decisionId: string): Promise<ModerationDecision | null> {
-    try {
+  async getDecision(decisionId: string) {
+    return safeAsync(async () => {
       if (!decisionId) {
         throw new Error('Decision ID is required');
       }
@@ -389,23 +320,13 @@ export class ModerationService {
         .limit(1)) as unknown as ModerationDecision[];
 
       return result[0] ?? null;
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), decisionId },
-        'Failed to get decision'
-      );
-      return null;
-    }
+    }, { service: 'ModerationService', operation: 'getDecision', decisionId });
   }
 
   // ==================== Appeal Management ====================
 
-  /**
-   * File appeal against moderation decision with validation.
-   * Prevents duplicate appeals for the same decision.
-   */
-  async fileAppeal(appeal: ModerationAppeal): Promise<ModerationAppealResult> {
-    try {
+  async fileAppeal(appeal: ModerationAppeal) {
+    return safeAsync(async () => {
       validateModerationAppeal(appeal);
 
       return await withTransaction(async (tx: DatabaseTransaction) => {
@@ -469,23 +390,11 @@ export class ModerationService {
 
         return { success: true, appealId };
       });
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), appeal },
-        'Failed to file moderation appeal'
-      );
-      return { success: false, error: getErrorMessage(error) };
-    }
+    }, { service: 'ModerationService', operation: 'fileAppeal', appeal });
   }
 
-  /**
-   * Get pending appeals for review.
-   *
-   * NOTE: Same schema/domain-type mismatch as `getDecision` — routed through
-   * `unknown` intentionally until a mapper layer is introduced.
-   */
-  async getPendingAppeals(limit = 50): Promise<ModerationAppeal[]> {
-    try {
+  async getPendingAppeals(limit = 50) {
+    return safeAsync(async () => {
       if (limit < 1 || limit > 500) {
         throw new Error('Limit must be between 1 and 500');
       }
@@ -498,27 +407,16 @@ export class ModerationService {
         .limit(limit)) as unknown as ModerationAppeal[];
 
       return appeals;
-    } catch (error) {
-      logger.error({ error: getErrorMessage(error) }, 'Failed to get pending appeals');
-      return [];
-    }
+    }, { service: 'ModerationService', operation: 'getPendingAppeals', limit });
   }
 
   // ==================== Performance Tracking ====================
 
-  /**
-   * Calculate moderator performance metrics for a given period.
-   */
-  async calculateModeratorPerformance(
-    moderatorId: string,
-    periodStart: Date,
-    periodEnd: Date
-  ): Promise<ModeratorPerformanceMetrics | null> {
-    try {
+  async calculateModeratorPerformance(moderatorId: string, periodStart: Date, periodEnd: Date) {
+    return safeAsync(async () => {
       if (!moderatorId) throw new Error('Moderator ID is required');
       if (periodStart >= periodEnd) throw new Error('Period start must be before period end');
 
-      // See getDecision / getPendingAppeals for the schema↔domain-type note.
       const decisions = (await readDatabase
         .select()
         .from(moderationDecisions)
@@ -557,12 +455,10 @@ export class ModerationService {
 
       const decisionsMade = decisions.length;
       const appealsOverturned = appeals.filter(
-        // `originalPenaltyReversed` is the camelCase field on ModerationAppeal.
         (a: ModerationAppeal) => a.originalPenaltyReversed === true
       ).length;
       const overturnRate = decisionsMade > 0 ? (appealsOverturned / decisionsMade) * 100 : 0;
 
-      // `queueItemId` is the camelCase field on ModerationDecision.
       const queueItemIds = decisions.map((d: ModerationDecision) => d.queueItemId);
       const queueItems = (await readDatabase
         .select()
@@ -604,22 +500,13 @@ export class ModerationService {
       );
 
       return metrics;
-    } catch (error) {
-      logger.error(
-        { error: getErrorMessage(error), moderatorId },
-        'Failed to calculate moderator performance'
-      );
-      return null;
-    }
+    }, { service: 'ModerationService', operation: 'calculateModeratorPerformance', moderatorId });
   }
 
   // ==================== SLA Management ====================
 
-  /**
-   * Mark SLA violations for overdue items.
-   */
-  async markSlaViolations(): Promise<number> {
-    try {
+  async markSlaViolations() {
+    return safeAsync(async () => {
       const result = await withTransaction(async (tx: DatabaseTransaction) => {
         const updateSlaQuery = `
           UPDATE moderation_queue
@@ -636,15 +523,11 @@ export class ModerationService {
 
       logger.info({ count: result }, 'Marked SLA violations');
       return result;
-    } catch (error) {
-      logger.error({ error: getErrorMessage(error) }, 'Failed to mark SLA violations');
-      return 0;
-    }
+    }, { service: 'ModerationService', operation: 'markSlaViolations' });
   }
 
   // ==================== Private Helpers ====================
 
-  /** Calculate priority based on context signals (1–5, where 5 is highest) */
   private calculatePriority(context: ModerationContext): number {
     if (context.priority && context.priority >= 1 && context.priority <= 5) {
       return context.priority;
@@ -656,14 +539,12 @@ export class ModerationService {
     return 1;
   }
 
-  /** Calculate SLA deadline based on priority level */
   private calculateSLADeadline(priority: number): Date {
     const hoursMap: Record<number, number> = { 5: 0.25, 4: 1, 3: 6, 2: 12, 1: 24 };
     const hours = hoursMap[priority] ?? 24;
     return new Date(Date.now() + hours * 60 * 60 * 1000);
   }
 
-  /** Calculate overall rating based on performance metrics */
   private calculateOverallRating(overturnRate: number, decisionsMade: number): string {
     if (decisionsMade < 10) return 'insufficient_data';
     if (overturnRate < 5) return 'excellent';

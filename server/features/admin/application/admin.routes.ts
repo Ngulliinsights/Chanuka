@@ -1,9 +1,12 @@
+import { User } from '@server/features/users/domain/entities/user';
 import { alertingService, notificationSchedulerService } from '@server/features/notifications';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
 import { and, count, desc, eq, gte,sql } from 'drizzle-orm';
 
 import { analysis, bill, comments, notification,users  } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills } from '@server/infrastructure/schema';
 
 export interface AdminStats {
   users: {

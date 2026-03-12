@@ -1,3 +1,4 @@
+import { users } from '@server/infrastructure/schema';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { sql } from 'drizzle-orm';
 import { SecureQueryBuilderService, createSecureQueryBuilderService } from '../secure-query-builder.service.v2';
