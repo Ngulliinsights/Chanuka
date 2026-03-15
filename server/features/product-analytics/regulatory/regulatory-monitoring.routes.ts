@@ -1,5 +1,5 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
-import { regulatoryChangeMonitoringService } from '@server/features/analytics/domain/regulatory-change-monitoring.service';
+import { regulatoryChangeTrackerService } from '@server/features/analytics/domain/regulatory-change-tracker.service';
 import { ApiResponseWrapper } from '@server/utils/api-utils';
 import { logger } from '@server/infrastructure/observability';
 import { NextFunction,Request, Response, Router } from 'express';
@@ -80,7 +80,7 @@ const validateRequest = (schema: z.ZodSchema, source: 'body' | 'params' | 'query
 router.post('/monitoring/start', asyncHandler(async (req: Request, res: Response) => {
   // Start the monitoring service
   // Note: The service handles preventing duplicate monitoring instances internally
-  regulatoryChangeMonitoringService.startAutomatedMonitoring();
+  regulatoryChangeTrackerService.startAutomatedMonitoring();
   
   res.json({
     success: true,
@@ -101,7 +101,7 @@ router.post('/monitoring/start', asyncHandler(async (req: Request, res: Response
  * @returns Success confirmation with timestamp
  */
 router.post('/monitoring/stop', asyncHandler(async (req: Request, res: Response) => {
-  regulatoryChangeMonitoringService.stopAutomatedMonitoring();
+  regulatoryChangeTrackerService.stopAutomatedMonitoring();
   
   res.json({
     success: true,
@@ -134,7 +134,7 @@ router.get(
     const { regulationId } = req.params;
     
     // Call the service to perform stakeholder impact analysis
-    const impacts = await regulatoryChangeMonitoringService.analyzeStakeholderImpact(
+    const impacts = await regulatoryChangeTrackerService.analyzeStakeholderImpact(
       regulationId
     );
     
@@ -197,7 +197,7 @@ router.get('/impact/batch', asyncHandler(async (req: Request, res: Response) => 
   // Promise.all runs all the analyses simultaneously rather than one after another
   const impactPromises = regulationIds.map(async (id) => {
     try {
-      const impacts = await regulatoryChangeMonitoringService.analyzeStakeholderImpact(id);
+      const impacts = await regulatoryChangeTrackerService.analyzeStakeholderImpact(id);
       return { regulationId: id, impacts, error: null };
     } catch (error) {
       // If one regulation fails, we still want to return results for the others
@@ -239,7 +239,7 @@ router.get(
     const { regulationId } = req.params;
     
     // Use the bulk method even for single IDs because it's optimized for performance
-    const bulkOpportunities = await regulatoryChangeMonitoringService.getBulkStrategicOpportunities(
+    const bulkOpportunities = await regulatoryChangeTrackerService.getBulkStrategicOpportunities(
       [regulationId]
     );
     
@@ -298,7 +298,7 @@ router.get('/opportunities/batch', asyncHandler(async (req: Request, res: Respon
   }
   
   // This method is specifically designed for bulk operations and handles caching internally
-  const bulkOpportunities = await regulatoryChangeMonitoringService.getBulkStrategicOpportunities(
+  const bulkOpportunities = await regulatoryChangeTrackerService.getBulkStrategicOpportunities(
     regulationIds
   );
   
@@ -345,7 +345,7 @@ router.post(
     const { type, title, description, severity, metadata } = req.body;
     
     // The service handles persisting the alert and potentially triggering notifications
-    const alert = await regulatoryChangeMonitoringService.createRegulatoryAlert(
+    const alert = await regulatoryChangeTrackerService.createRegulatoryAlert(
       type,
       title,
       description,
