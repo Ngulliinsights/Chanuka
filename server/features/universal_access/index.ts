@@ -5,13 +5,13 @@
  * Ensures universal access regardless of device or connectivity
  */
 
-export { ussdService } from './ussd.service';
+export { ussdService } from './application/ussd.service';
 export { ussdController } from './presentation/http/controller';
-export { ussdValidator } from './ussd.validator';
-export { ussdAnalytics } from './ussd.analytics';
-export { USSD_CONFIG, USSD_MENUS } from './ussd.config';
+export { ussdValidator } from './application/ussd.validator';
+export { ussdAnalytics } from './application/ussd.analytics';
+export { USSD_CONFIG, USSD_MENUS } from './application/ussd.config';
 
-export * from './ussd.types';
+export * from './domain/ussd.types';
 export { default as ussdRoutes } from './presentation/http/routes';
 
 // Re-export middleware
@@ -20,4 +20,4 @@ export {
   validateUSSDRequest,
   logUSSDRequest,
   ussdErrorHandler
-} from './ussd.middleware';
+} from './infrastructure/ussd.middleware';

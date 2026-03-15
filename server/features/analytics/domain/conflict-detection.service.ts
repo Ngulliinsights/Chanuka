@@ -11,17 +11,16 @@
 import {
   ConflictAnalysis,
   conflictDetectionOrchestratorService,
-  Stakeholder,
-  ConflictDetectionError
-} from '../conflict-detection/index';
+  Stakeholder
+} from './conflict-detection/index';
 
 // Re-export types for backward compatibility
 export type {
   ConflictAnalysis,
   Stakeholder
-} from '../conflict-detection/index';
+} from './conflict-detection/index';
 
-export { ConflictDetectionError } from '../conflict-detection/index';
+export { ConflictDetectionError } from './conflict-detection/index';
 
 /**
  * Legacy EnhancedConflictDetectionService wrapper
@@ -81,7 +80,9 @@ export class EnhancedConflictDetectionService {
     timeline: string;
     priority: 'low' | 'medium' | 'high' | 'critical';
     stakeholders: string[];
-  }>> { return conflictDetectionOrchestratorService.generateMitigationStrategies(sponsor_id, bill_id);
+  }>> { 
+    const result = await conflictDetectionOrchestratorService.generateMitigationStrategies(sponsor_id, bill_id);
+    return result.strategies;
    }
 }
 

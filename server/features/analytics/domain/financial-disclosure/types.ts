@@ -1,0 +1,239 @@
+// src/types/financial-disclosure-types.ts
+// Shared type definitions for the financial disclosure system
+// This prevents type duplication and ensures consistency across all modules
+
+import { RequiredDisclosureType } from './config';
+
+// ---------------------------------------------------------------------------
+// Primitive Unions
+// ---------------------------------------------------------------------------
+
+/** Four-tier risk classification used across all analytical services. */
+export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
+
+// ---------------------------------------------------------------------------
+// Core Domain Types
+// ---------------------------------------------------------------------------
+
+/**
+ * Core financial disclosure record with enriched metadata.
+ * This represents a single disclosure entry with all calculated fields.
+ */
+export interface FinancialDisclosure {
+  // Core fields from database
+  id: number;
+  sponsor_id: number;
+  disclosureType: RequiredDisclosureType;
+  description: string;
+  amount?: number;
+  source?: string;
+  dateReported: Date;
+  is_verified: boolean;
+
+  // Calculated enrichment fields
+  completenessScore: number; // Individual disclosure quality score (0-100)
+  riskLevel: RiskLevel;
+  lastUpdated: Date;
+}
+
+/**
+ * Financial relationship between a sponsor and an external entity.
+ * Used for network analysis and conflict detection.
+ */
+export interface FinancialRelationship {
+  sponsor_id: number;
+  relatedEntity: string;
+  relationshipType: 'ownership' | 'employment' | 'investment' | 'family' | 'business_partner';
+  strength: number; // 0-100 scale indicating connection strength
+  financialValue?: number;
+  start_date?: Date;
+  end_date?: Date;
+  is_active: boolean;
+  conflictPotential: RiskLevel;
+}
+
+/**
+ * Detected conflict of interest with supporting evidence.
+ * Generated when relationship patterns suggest competing interests.
+ */
+export interface ConflictOfInterest {
+  entity: string;
+  severity: RiskLevel;
+  description: string;
+  relatedRelationships: FinancialRelationship[];
+  potentialImpact: string;
+}
+
+/**
+ * Comprehensive relationship mapping for a sponsor.
+ * Provides a network view of all financial connections and risks.
+ */
+export interface RelationshipMapping {
+  sponsor_id: number;
+  sponsorName: string;
+  relationships: FinancialRelationship[];
+  totalFinancialExposure: number;
+  riskAssessment: RiskLevel;
+  detectedConflicts: ConflictOfInterest[];
+  networkMetrics: {
+    centralityScore: number;       // How connected is this sponsor
+    clusteringCoefficient: number; // How interconnected are relationships
+    riskPropagation: number;       // Potential for risk to spread
+    riskConcentration: number;     // Concentration of financial exposure
+  };
+  lastMappingUpdate: Date;
+}
+
+/**
+ * Detailed completeness analysis for a sponsor.
+ * Multi-dimensional assessment of disclosure quality and compliance.
+ */
+export interface CompletenessReport {
+  sponsor_id: number;
+  sponsorName: string;
+  overallScore: number; // 0-100 composite score
+  requiredDisclosures: number;
+  completedDisclosures: number;
+  missingDisclosures: string[];
+  lastUpdateDate: Date;
+  riskAssessment: RiskLevel;
+  temporalTrend: 'stable' | 'improving' | 'declining';
+  recommendations: string[];
+  detailedMetrics: {
+    requiredDisclosureScore: number; // 0-1 scale
+    verificationScore: number;       // 0-1 scale
+    recencyScore: number;            // 0-1 scale
+    detailScore: number;             // 0-1 scale
+  };
+}
+
+/**
+ * System-wide transparency dashboard data.
+ * Aggregated metrics for executive oversight and compliance reporting.
+ */
+export interface TransparencyDashboard {
+  generatedAt: Date;
+  totalSponsors: number;
+  averageCompletenessScore: number;
+  disclosureStatistics: {
+    total: number;
+    verified: number;
+    pending: number;
+    byType: Record<string, number>;
+  };
+  riskDistribution: Record<RiskLevel, number>;
+  topPerformers: Array<{
+    sponsor_id: number;
+    sponsorName: string;
+    score: number;
+  }>;
+  needsAttention: Array<{
+    sponsor_id: number;
+    sponsorName: string;
+    score: number;
+    riskLevel: RiskLevel;
+  }>;
+  /**
+   * Anomaly statistics — only present when the orchestrator service generates
+   * the dashboard (which includes anomaly detection). The leaner analytics
+   * service omits this field.
+   */
+  anomalyStatistics?: {
+    sponsorsWithAnomalies: number;
+    anomaliesBySeverity: Record<string, number>;
+    anomaliesByType: Record<string, number>;
+    averageRiskScore: number;
+  };
+}
+
+/**
+ * Financial disclosure alert/notification.
+ * Represents an automated or manual alert about disclosure issues.
+ */
+export interface FinancialAlert {
+  id: string;
+  type:
+    | 'new_disclosure'
+    | 'updated_disclosure'
+    | 'missing_disclosure'
+    | 'threshold_exceeded'
+    | 'conflict_detected'
+    | 'stale_disclosure';
+  sponsor_id: number;
+  sponsorName: string;
+  description: string;
+  severity: 'info' | 'warning' | 'critical';
+  created_at: Date;
+  isResolved: boolean;
+  metadata: Record<string, unknown>;
+}
+
+/**
+ * Monitoring service operational status.
+ * Used for observability and health monitoring.
+ */
+export interface MonitoringStatus {
+  isRunning: boolean;
+  lastCheckTime: Date | null;
+  next_checkTime: Date | null;
+  checksPerformed: number;
+  alertsGenerated: number;
+  errorsEncountered: number;
+  currentBatch?: number;
+  totalBatches?: number;
+}
+
+/**
+ * Basic completeness score (lightweight version for monitoring).
+ * Used for quick operational checks without full analytics.
+ */
+export interface CompletenessScore {
+  sponsor_id: number;
+  score: number;
+  missingDisclosures: string[];
+  totalRequired: number;
+  totalPresent: number;
+}
+
+/**
+ * Health check result for a single service component.
+ */
+export interface HealthCheckResult {
+  name: string;
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  message?: string;
+  error?: string;
+  stats?: unknown;
+}
+
+/**
+ * Overall system health status.
+ */
+export interface SystemHealthStatus {
+  status: 'healthy' | 'degraded' | 'unhealthy';
+  checks: HealthCheckResult[];
+  timestamp: Date;
+}
+
+/**
+ * Sponsor basic information (lightweight).
+ */
+export interface SponsorInfo {
+  id: number;
+  name: string;
+  is_active: boolean;
+}
+
+/**
+ * Database affiliation record for relationship mapping.
+ */
+export interface SponsorAffiliation {
+  id: number;
+  sponsor_id: number;
+  organization: string;
+  type: 'economic' | 'professional' | 'ownership' | 'family';
+  conflictType?: 'ownership' | 'financial' | null;
+  is_active: boolean;
+  start_date?: Date;
+  end_date?: Date;
+}

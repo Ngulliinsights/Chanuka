@@ -6,8 +6,8 @@
 
 import { Request, Response } from 'express';
 import { logger } from '@server/infrastructure/observability';
-import { ussdService } from '../../ussd.service';
-import type { USSDRequest } from '../../ussd.types';
+import { ussdService } from '../../application/ussd.service';
+import type { USSDRequest } from '../../domain/ussd.types';
 
 export class USSDController {
   /**

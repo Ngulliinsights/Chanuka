@@ -91,12 +91,12 @@ export class AnalyticsService {
           value: data.value
         };
 
-        return Ok(engagement);
+        return new Ok(engagement);
       });
 
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Failed to track engagement');
-      return Err(new Error('Failed to track engagement'));
+      return new Err(new Error('Failed to track engagement'));
     }
   }
 
@@ -111,7 +111,7 @@ export class AnalyticsService {
       const cacheKey = `${this.cachePrefix}:summary:${entityType}:${entityId}:${period}:${dateFrom}:${dateTo}`;
       const cached = await cacheService.get<EngagementSummary>(cacheKey);
       if (cached) {
-        return Ok(cached);
+        return new Ok(cached);
       }
 
       // Calculate date range based on period
@@ -199,11 +199,11 @@ export class AnalyticsService {
       };
 
       await cacheService.set(cacheKey, summary, this.cacheTTL);
-      return Ok(summary);
+      return new Ok(summary);
 
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : 'Unknown error', entityId }, 'Failed to get engagement summary');
-      return Err(new Error('Failed to retrieve engagement summary'));
+      return new Err(new Error('Failed to retrieve engagement summary'));
     }
   }
 
@@ -217,7 +217,7 @@ export class AnalyticsService {
       const cacheKey = `${this.cachePrefix}:user:${userId}:${period}:${dateFrom}:${dateTo}`;
       const cached = await cacheService.get<UserEngagementProfile>(cacheKey);
       if (cached) {
-        return Ok(cached);
+        return new Ok(cached);
       }
 
       const endDate = dateTo ? new Date(dateTo) : new Date();
@@ -270,11 +270,11 @@ export class AnalyticsService {
       };
 
       await cacheService.set(cacheKey, profile, this.cacheTTL);
-      return Ok(profile);
+      return new Ok(profile);
 
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : 'Unknown error', userId }, 'Failed to get user engagement profile');
-      return Err(new Error('Failed to retrieve user engagement profile'));
+      return new Err(new Error('Failed to retrieve user engagement profile'));
     }
   }
 
@@ -301,7 +301,7 @@ export class AnalyticsService {
       const cacheKey = `${this.cachePrefix}:top-content:${JSON.stringify(params)}`;
       const cached = await cacheService.get<any[]>(cacheKey);
       if (cached) {
-        return Ok(cached);
+        return new Ok(cached);
       }
 
       const endDate = params.dateTo ? new Date(params.dateTo) : new Date();
@@ -347,11 +347,11 @@ export class AnalyticsService {
       }));
 
       await cacheService.set(cacheKey, topContent, this.cacheTTL);
-      return Ok(topContent);
+      return new Ok(topContent);
 
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Failed to get top content');
-      return Err(new Error('Failed to retrieve top content'));
+      return new Err(new Error('Failed to retrieve top content'));
     }
   }
 
@@ -377,7 +377,7 @@ export class AnalyticsService {
       const cacheKey = `${this.cachePrefix}:realtime`;
       const cached = await cacheService.get<any>(cacheKey);
       if (cached) {
-        return Ok(cached);
+        return new Ok(cached);
       }
 
       // Get recent activity (last 5 minutes)
@@ -422,11 +422,11 @@ export class AnalyticsService {
       };
 
       await cacheService.set(cacheKey, metrics, 30); // 30 second cache
-      return Ok(metrics);
+      return new Ok(metrics);
 
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : 'Unknown error' }, 'Failed to get real-time metrics');
-      return Err(new Error('Failed to retrieve real-time metrics'));
+      return new Err(new Error('Failed to retrieve real-time metrics'));
     }
   }
 
@@ -468,7 +468,7 @@ export class AnalyticsService {
       `${this.cachePrefix}:realtime`
     ];
 
-    await Promise.all(patterns.map(pattern => cacheService.deletePattern(pattern)));
+    await Promise.all(patterns.map(pattern => cacheService.invalidatePattern(pattern)));
   }
 }
 
