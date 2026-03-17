@@ -6,6 +6,7 @@
 export * from './metrics';
 export * from './performance';
 export * from './errors';
+export * from './analytics-types';
 
 // Explicitly re-export conflicting types to resolve ambiguity
 export type { PerformanceTraceId } from './performance';

@@ -17,67 +17,12 @@ import { users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, sql } from 'drizzle-orm';
 import { z } from 'zod';
 
-// ---------------------------------------------------------------------------
-// Validation schemas
-// ---------------------------------------------------------------------------
-
-const user_profilesDataSchema = z.object({
-  bio: z.string().max(1000).optional(),
-  expertise: z.array(z.string().max(50)).max(10).optional(),
-  location: z.string().max(100).optional(),
-  organization: z.string().max(200).optional(),
-  is_public: z.boolean().optional(),
-});
-
-const userBasicInfoSchema = z.object({
-  first_name: z.string().max(50).optional(),
-  last_name: z.string().max(50).optional(),
-  name: z.string().max(100).optional(),
-});
-
-const user_interestsSchema = z.array(z.string().max(50)).max(20);
-
-const userPreferencesSchema = z.object({
-  emailNotifications: z.boolean().optional(),
-  pushNotifications: z.boolean().optional(),
-  smsNotifications: z.boolean().optional(),
-  notificationFrequency: z.enum(['immediate', 'daily', 'weekly']).optional(),
-  billCategories: z.array(z.string().max(50)).max(20).optional(),
-  language: z.string().max(10).optional(),
-  theme: z.enum(['light', 'dark', 'auto']).optional(),
-});
-
-const userVerificationDataSchema = z.object({
-  verification_status: z.enum(['pending', 'verified', 'rejected']),
-  verificationDocuments: z.any().optional(),
-  verificationNotes: z.string().max(500).optional(),
-});
-
-// ---------------------------------------------------------------------------
-// Public interfaces
-// ---------------------------------------------------------------------------
-
-export interface UserProfileData {
-  bio?: string;
-  expertise?: string[];
-  location?: string;
-  organization?: string;
-  is_public?: boolean;
-}
-
-export interface UserInterestData {
-  interests: string[];
-}
-
-export interface UserPreferences {
-  emailNotifications?: boolean;
-  pushNotifications?: boolean;
-  smsNotifications?: boolean;
-  notificationFrequency?: 'immediate' | 'daily' | 'weekly';
-  billCategories?: string[];
-  language?: string;
-  theme?: 'light' | 'dark' | 'auto';
-}
+// Import types from shared layer
+import type {
+  UserProfileData,
+  UserInterestData,
+  UserPreferences
+} from '@shared/types';
 
 export interface UserVerificationData {
   verification_status: 'pending' | 'verified' | 'rejected';

@@ -6,71 +6,15 @@ import { db } from '@server/infrastructure/database';
 import bcrypt from 'bcrypt';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
-// Type definitions for better code clarity and type safety
-interface UserProfile {
-  expertise?: string[];
-  organization?: string;
-  bio?: string;
-}
-
-export interface UserManagementFilters {
-  role?: 'citizen' | 'expert' | 'admin' | 'moderator' | 'ambassador' | 'organizer';
-  status?: 'active' | 'inactive';
-  search?: string;
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-}
-
-export interface UserDetails {
-  id: string;
-  email: string;
-  role: string;
-  is_active: boolean;
-  last_login_at: Date | null;
-  created_at: Date;
-  updated_at: Date;
-  profile?: UserProfile;
-  stats: {
-    commentsCount: number;
-    billsTracked: number;
-    notificationsReceived: number;
-    lastActivity: Date | null;
-  };
-  sessions: {
-    active: number;
-    lastSession: Date | null;
-  };
-}
-
-export interface UserActivityLog {
-  id: string;
-  user_id: string;
-  action: string;
-  details: Record<string, unknown>;
-  timestamp: Date;
-  ip_address?: string;
-  user_agent?: string;
-}
-
-export interface BulkUserOperation {
-  user_ids: string[];
-  operation: 'activate' | 'deactivate' | 'delete' | 'changeRole';
-  parameters?: {
-    role?: 'citizen' | 'expert' | 'admin' | 'moderator' | 'ambassador' | 'organizer';
-    reason?: string;
-  };
-}
-
-export interface UserExportData {
-  users: UserDetails[];
-  summary: {
-    totalUsers: number;
-    activeUsers: number;
-    exportDate: Date;
-  };
-}
+// Import types from shared layer
+import type {
+  UserManagementFilters,
+  UserDetails,
+  UserActivityLog,
+  BulkUserOperation,
+  UserExportData,
+  UserProfileData
+} from '@shared/types';
 
 // Constants for better maintainability and configuration
 const ACTIVITY_LOG_MAX_SIZE = 1000;

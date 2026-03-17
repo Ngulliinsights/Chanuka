@@ -415,3 +415,56 @@ export function createRateLimitEvent(event: Omit<RateLimitEvent, 'id' | 'created
     ...event
   };
 }
+
+// ============================================================================
+// Moderation Queue Types (Operational/Service Layer)
+// ============================================================================
+
+/**
+ * Filters for querying the moderation queue
+ * Used for filtering and searching moderation items
+ */
+export interface ContentModerationFilters {
+  content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
+  status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
+  severity?: 'info' | 'low' | 'medium' | 'high' | 'critical';
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+  moderator?: string;
+  reportType?: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
+  autoDetected?: boolean;
+}
+
+/**
+ * Represents a single item in the moderation queue
+ * Enriched with content preview and reporter information
+ */
+export interface ModerationItem {
+  id: number;
+  content_type: 'comment' | 'bill' | 'user_profile' | 'sponsor_transparency';
+  content_id: number;
+  content: {
+    title?: string;
+    text: string;
+    author: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    created_at: Date;
+  };
+  reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
+  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
+  reason: string;
+  description?: string;
+  reportedBy: string;
+  autoDetected: boolean;
+  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
+  reviewedBy?: string | null;
+  reviewedAt?: Date | null;
+  resolutionNotes?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}

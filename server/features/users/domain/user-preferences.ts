@@ -8,46 +8,11 @@ import { users } from '@server/infrastructure/schema';
 import { sponsors } from '@server/infrastructure/schema';
 import { eq } from 'drizzle-orm';
 
-// --- Interface Definitions ---
-// Defines the structure of GLOBAL bill tracking preferences stored within users.preferences.
-// These serve as defaults unless overridden by per-bill settings in userBillTrackingPreference table.
-export interface BillTrackingPreferences {
-  // Global defaults for which event types trigger notifications
-  statusChanges: boolean;
-  newComments: boolean;
-  votingSchedule: boolean;
-  amendments: boolean;
-  // Global default notification frequency
-  updateFrequency: 'immediate' | 'hourly' | 'daily' | 'weekly';
-  // Global default enabled notification channels
-  notificationChannels: {
-    inApp: boolean;
-    email: boolean;
-    push: boolean;
-    sms: boolean;
-  };
-  // Global quiet hours settings
-  quietHours?: {
-    enabled: boolean;
-    startTime: string; // HH:MM format
-    endTime: string;   // HH:MM format
-    timezone?: string; // IANA timezone string (e.g., "Africa/Nairobi")
-  };
-  // Global smart filtering settings
-  smartFiltering: {
-    enabled: boolean;
-    interestBasedFiltering: boolean; // Filter based on user_interest table?
-    priorityThreshold: 'low' | 'medium' | 'high'; // Minimum priority to receive
-    categoryFilters: string[]; // Global list of allowed categories
-    keywordFilters: string[]; // Global list of keywords
-    sponsorFilters: string[]; // Global list of followed sponsors
-  };
-  // Global advanced settings
-  advancedSettings?: { // Make optional for backward compatibility
-    digestSchedule?: {
-      enabled: boolean;
-      frequency: 'daily' | 'weekly' | 'monthly';
-      dayOfWeek?: number; // 0=Sun, 6=Sat for weekly
+// Import types from shared layer
+import type {
+  BillTrackingPreferences,
+  UserNotificationPreferences
+} from '@shared/types';
       dayOfMonth?: number; // 1-31 for monthly
       timeOfDay: string; // HH:MM format
     };

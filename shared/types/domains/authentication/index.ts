@@ -4,6 +4,7 @@
  */
 
 export * from './user';
+export * from './user-management-types';
 // export * from './auth-state'; // Commented out to avoid duplicate isAuthenticated export
 
 /**

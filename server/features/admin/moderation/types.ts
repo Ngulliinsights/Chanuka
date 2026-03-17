@@ -1,53 +1,14 @@
 /**
- * Shared types for the moderation system
+ * Moderation Types - Re-export from Shared Layer
+ * 
+ * These types have been migrated to @shared/types/domains/safeguards/moderation.ts
+ * This file now simply re-exports them for backward compatibility.
  */
 
-/**
- * Filters for querying the moderation queue
- */
-export interface ContentModerationFilters {
-  content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
-  status?: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
-  severity?: 'info' | 'low' | 'medium' | 'high' | 'critical';
-  dateRange?: {
-    start: Date;
-    end: Date;
-  };
-  moderator?: string;
-  reportType?: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
-  autoDetected?: boolean;
-}
-
-/**
- * Represents a single item in the moderation queue
- */
-export interface ModerationItem {
-  id: number;
-  content_type: 'comment' | 'bill' | 'user_profile' | 'sponsor_transparency';
-  content_id: number;
-  content: {
-    title?: string;
-    text: string;
-    author: {
-      id: string;
-      name: string;
-      email: string;
-    };
-    created_at: Date;
-  };
-  reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
-  severity: 'info' | 'low' | 'medium' | 'high' | 'critical';
-  reason: string;
-  description?: string;
-  reportedBy: string;
-  autoDetected: boolean;
-  status: 'pending' | 'reviewed' | 'resolved' | 'dismissed' | 'escalated';
-  reviewedBy?: string | null;
-  reviewedAt?: Date | null;
-  resolutionNotes?: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
+export type {
+  ContentModerationFilters,
+  ModerationItem
+} from '@shared/types';
 
 /**
  * Record of a moderation action

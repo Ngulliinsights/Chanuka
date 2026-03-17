@@ -98,6 +98,12 @@ export * from './domains/monitoring';
 // Safeguards domain - Moderation and safety types
 export * from './domains/safeguards';
 
+// Feature Flags domain - Feature flag and A/B testing types
+export * from './domains/feature-flags';
+
+// Community domain - Advocacy, search, and notification types
+export * from './domains/community';
+
 // ============================================================================
 // API Types - Contract Layer
 // ============================================================================
