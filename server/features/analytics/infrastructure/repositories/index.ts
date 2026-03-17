@@ -21,3 +21,10 @@ export {
   mlAnalysisRepository, 
   MLAnalysisRepository 
 } from './ml-analysis.repository';
+
+export {
+  conflictDetectionRepository,
+  ConflictDetectionRepository,
+  type SponsorAffiliation,
+  type SponsorTransparency,
+} from './conflict-detection.repository';

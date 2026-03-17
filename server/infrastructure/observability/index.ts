@@ -53,11 +53,11 @@ export {
   isSensitiveEndpoint,
   classifyRisk,
   classifySecurityEventType,
-} from '../../features/security/security-policy';
+} from '../../features/security/infrastructure/policies/security-policy';
 export {
   emitSecurityEvent,
   emitSensitiveOperationAudit,
-} from '../../features/security/security-event-logger';
+} from '../../features/security/infrastructure/observability/security-event-logger';
 
 // ─── Database ─────────────────────────────────────────────────────────────────
 export {

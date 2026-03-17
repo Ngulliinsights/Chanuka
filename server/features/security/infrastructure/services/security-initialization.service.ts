@@ -8,7 +8,7 @@ import { securityAuditService } from './security-audit.service';
 import { tlsConfigService } from '../../domain/services/tls-config.service';
 import { inputValidationService } from '@server/infrastructure/validation/input-validation-service';
 import { secureSessionService } from '@server/infrastructure/auth/secure-session-service';
-import { securityMiddleware } from '../../security-middleware';
+import { securityMiddleware } from '../http/security-middleware';
 
 /**
  * Security initialization service that sets up all security components

@@ -2,7 +2,7 @@
 // Centralized exports for security-related functionality
 
 // Routes
-export { default as securityMonitoringRouter } from './security-monitoring';
+// Note: security-monitoring router was removed during DDD refactoring
 
 // Domain Services (Pure business logic)
 export {
@@ -28,8 +28,8 @@ export {
   securityAuditService,
   IntrusionDetectionService,
   intrusionDetectionService,
-  SecurityMonitoringService,
-  getSecurityMonitoringService,
+  SecurityEventTrackerService,
+  getSecurityEventTrackerService,
   PrivacyService,
   SecurityInitializationService,
   createSecurityInitializationService,

@@ -6,26 +6,19 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { getDefaultCache } from '@server/infrastructure/cache/index';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
-
 import {
-  type Bill,
-  bill_sponsorships,
-  bills,
   type Sponsor,
-  type SponsorAffiliation,
-  sponsorAffiliations,
   sponsors,
-  type SponsorTransparency,
-  sponsorTransparency
 } from '@server/infrastructure/schema';
-import { db } from '@server/infrastructure/database';
+import {
+  conflictDetectionRepository,
+  type SponsorAffiliation,
+  type SponsorTransparency,
+} from '@server/features/analytics/infrastructure/repositories/conflict-detection.repository';
+
 
 import {
   ConflictDetectionConfig,
-  ConflictDetectionError,
   FinancialConflict,
   isValidVote,
   ProfessionalConflict,
@@ -35,7 +28,6 @@ import {
 export class ConflictDetectionEngineService {
   private static instance: ConflictDetectionEngineService;
   private readonly config: ConflictDetectionConfig;
-  private readonly memoCache = new Map<string, any>();
 
   public static getInstance(): ConflictDetectionEngineService {
     if (!ConflictDetectionEngineService.instance) {
@@ -52,15 +44,15 @@ export class ConflictDetectionEngineService {
    * Analyzes financial conflicts for a sponsor
    */
   async analyzeFinancialConflicts(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     disclosures: SponsorTransparency[],
     affiliations: SponsorAffiliation[],
     bill_id?: number
   ): Promise<FinancialConflict[]> { try {
       const [directConflicts, indirectConflicts, familyConflicts] = await Promise.all([
-        this.analyzeDirectFinancialConflicts(sponsor, disclosures, bill_id),
-        this.analyzeIndirectFinancialConflicts(sponsor, affiliations, bill_id),
-        this.analyzeFamilyFinancialConflicts(sponsor, disclosures, bill_id),
+        this.analyzeDirectFinancialConflicts(_sponsor, disclosures, bill_id),
+        this.analyzeIndirectFinancialConflicts(_sponsor, affiliations, bill_id),
+        this.analyzeFamilyFinancialConflicts(_sponsor, disclosures, bill_id),
       ]);
 
       return [...directConflicts, ...indirectConflicts, ...familyConflicts];
@@ -78,7 +70,7 @@ export class ConflictDetectionEngineService {
    * Analyzes professional conflicts for a sponsor
    */
   async analyzeProfessionalConflicts(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     affiliations: SponsorAffiliation[],
     bill_id?: number
   ): Promise<ProfessionalConflict[]> { try {
@@ -130,7 +122,7 @@ export class ConflictDetectionEngineService {
    * Analyzes voting pattern inconsistencies
    */
   async analyzeVotingPatternInconsistencies(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     votingHistory: unknown[]
   ): Promise<VotingAnomaly[]> {
     try {
@@ -143,11 +135,11 @@ export class ConflictDetectionEngineService {
       }
 
       // Analyze party deviation patterns
-      const partyAnomalies = await this.detectPartyDeviationAnomalies(sponsor, validVotes);
+      const partyAnomalies = await this.detectPartyDeviationAnomalies(_sponsor, validVotes);
       anomalies.push(...partyAnomalies);
 
       // Analyze pattern inconsistencies
-      const patternAnomalies = await this.detectPatternInconsistencies(sponsor, validVotes);
+      const patternAnomalies = await this.detectPatternInconsistencies(_sponsor, validVotes);
       anomalies.push(...patternAnomalies);
 
       return anomalies;
@@ -164,7 +156,7 @@ export class ConflictDetectionEngineService {
   // Private helper methods
 
   private async analyzeDirectFinancialConflicts(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     disclosures: SponsorTransparency[],
     bill_id?: number
   ): Promise<FinancialConflict[]> { const conflicts: FinancialConflict[] = [];
@@ -198,7 +190,7 @@ export class ConflictDetectionEngineService {
   }
 
   private async analyzeIndirectFinancialConflicts(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     affiliations: SponsorAffiliation[],
     bill_id?: number
   ): Promise<FinancialConflict[]> { const conflicts: FinancialConflict[] = [];
@@ -237,7 +229,7 @@ export class ConflictDetectionEngineService {
   }
 
   private async analyzeFamilyFinancialConflicts(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     disclosures: SponsorTransparency[],
     bill_id?: number
   ): Promise<FinancialConflict[]> { const conflicts: FinancialConflict[] = [];
@@ -271,7 +263,7 @@ export class ConflictDetectionEngineService {
   }
 
   private async detectPartyDeviationAnomalies(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     votes: ValidatedVote[]
   ): Promise<VotingAnomaly[]> {
     const anomalies: VotingAnomaly[] = [];
@@ -300,7 +292,7 @@ export class ConflictDetectionEngineService {
   }
 
   private async detectPatternInconsistencies(
-    sponsor: Sponsor,
+    _sponsor: Sponsor,
     votes: ValidatedVote[]
   ): Promise<VotingAnomaly[]> {
     const anomalies: VotingAnomaly[] = [];
@@ -310,7 +302,7 @@ export class ConflictDetectionEngineService {
       if (!acc[vote.billCategory]) {
         acc[vote.billCategory] = [];
       }
-      acc[vote.billCategory].push(vote);
+      acc[vote.billCategory]!.push(vote);
       return acc;
     }, {} as Record<string, ValidatedVote[]>);
 
@@ -328,6 +320,7 @@ export class ConflictDetectionEngineService {
       if (yesRatio > 0.3 && yesRatio < 0.7 && noRatio > 0.3 && noRatio < 0.7) {
         // This indicates inconsistent voting in this category
         const mostRecentVote = categoryVotes.sort((a, b) => b.bill_id - a.bill_id)[0];
+        if (!mostRecentVote) continue;
 
         anomalies.push({
           id: `pattern_inconsistency_${sponsors.id}_${category}`,
@@ -352,33 +345,19 @@ export class ConflictDetectionEngineService {
     bill_id?: number
   ): Promise<number[]> {
     try {
-      const cacheKey = `affected_bills:${organization}:${ bill_id || 'all' }`;
-      const cache = getDefaultCache();
-      const cached = await cache.get(cacheKey);
-      if (cached) return cached;
-
-      // Simple implementation - in reality this would be more sophisticated
-      const bills = await db
-        .select({ id: bills.id })
-        .from(bills)
-        .where(
-          and(
-            like(bills.summary, `%${organization}%`),
-            bill_id ? eq(bills.id, bill_id) : sql`1=1`
-          )
-        )
-        .limit(10);
-
-      const result = bills.map(b => b.id);
-      await cache.set(cacheKey, result, 1800);
-      return result;
+      const result = await conflictDetectionRepository.findAffectedBillsForOrganization(organization, bill_id);
+      if (result.isErr) {
+        logger.error({ organization, error: result.error }, 'Repository error finding affected bills');
+        return [];
+      }
+      return result.value;
     } catch (error) {
       logger.error({ organization, error }, 'Error finding affected bills:');
       return [];
     }
   }
 
-  private async getOrganizationFinancialInterests(organization: string): Promise<unknown[]> {
+  private async getOrganizationFinancialInterests(_organization: string): Promise<unknown[]> {
     // Simplified implementation - would be more complex in reality
     return [];
   }
@@ -392,7 +371,7 @@ export class ConflictDetectionEngineService {
 
   private calculateProfessionalSeverity(
     role: string,
-    organization: string
+    _organization: string
   ): 'low' | 'medium' | 'high' | 'critical' {
     const roleUpper = role.toUpperCase();
     

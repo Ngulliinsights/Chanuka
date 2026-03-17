@@ -1,11 +1,10 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
-import { regulatoryChangeTrackerService } from '@server/features/analytics/domain/regulatory-change-tracker.service';
-import { ApiResponseWrapper } from '@server/utils/api-utils';
+import { regulatoryChangeMonitoringService as regulatoryChangeTrackerService } from './regulatory-change-tracker.service';
 import { logger } from '@server/infrastructure/observability';
-import { NextFunction,Request, Response, Router } from 'express';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import { z } from 'zod'; // For runtime validation
 
-const router = Router();
+const router: Router = Router();
 
 // ============================================================================
 // VALIDATION SCHEMAS
@@ -20,8 +19,6 @@ const createAlertSchema = z.object({
   metadata: z.record(z.unknown()).optional()
 });
 
-// Schema for regulation ID parameter validation
-const regulationIdSchema = z.string().uuid('Invalid regulation ID format');
 
 // ============================================================================
 // MIDDLEWARE
@@ -43,11 +40,11 @@ const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => P
  * Think of it as a bouncer that checks if data has the right "ID" before letting it in
  */
 const validateRequest = (schema: z.ZodSchema, source: 'body' | 'params' | 'query' = 'body') => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req[source]);
     
     if (!result.success) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         error: 'Validation failed',
         details: result.error.errors.map(err => ({
@@ -55,11 +52,12 @@ const validateRequest = (schema: z.ZodSchema, source: 'body' | 'params' | 'query
           message: err.message
         }))
       });
+      return;
     }
     
     // Replace the request data with the validated version
     // This ensures type safety throughout the rest of the request handling
-    req[source] = result.data;
+    (req as any)[source] = result.data;
     next();
   };
 };
@@ -77,9 +75,7 @@ const validateRequest = (schema: z.ZodSchema, source: 'body' | 'params' | 'query
  * 
  * @returns Success confirmation with timestamp
  */
-router.post('/monitoring/start', asyncHandler(async (req: Request, res: Response) => {
-  // Start the monitoring service
-  // Note: The service handles preventing duplicate monitoring instances internally
+router.post('/monitoring/start', asyncHandler(async (_req: Request, res: Response) => {
   regulatoryChangeTrackerService.startAutomatedMonitoring();
   
   res.json({
@@ -100,7 +96,7 @@ router.post('/monitoring/start', asyncHandler(async (req: Request, res: Response
  * 
  * @returns Success confirmation with timestamp
  */
-router.post('/monitoring/stop', asyncHandler(async (req: Request, res: Response) => {
+router.post('/monitoring/stop', asyncHandler(async (_req: Request, res: Response) => {
   regulatoryChangeTrackerService.stopAutomatedMonitoring();
   
   res.json({
@@ -129,23 +125,24 @@ router.post('/monitoring/stop', asyncHandler(async (req: Request, res: Response)
  */
 router.get(
   '/impact/:regulationId',
-  validateRequest(regulationIdSchema, 'params'),
   asyncHandler(async (req: Request, res: Response) => {
-    const { regulationId } = req.params;
+    const regulationId = req.params.regulationId;
+    if (!regulationId) {
+      res.status(400).json({ success: false, error: 'Regulation ID is required' });
+      return;
+    }
     
-    // Call the service to perform stakeholder impact analysis
     const impacts = await regulatoryChangeTrackerService.analyzeStakeholderImpact(
       regulationId
     );
     
-    // Handle the case where no analysis is available
-    // This could happen if the regulation doesn't exist or hasn't been analyzed yet
     if (!impacts || impacts.length === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'No impact analysis found for this regulation',
         data: { regulationId }
       });
+      return;
     }
     
     res.json({
@@ -171,36 +168,32 @@ router.get(
  * @returns Batch impact analysis results with per-regulation breakdown
  */
 router.get('/impact/batch', asyncHandler(async (req: Request, res: Response) => {
-  // Parse the comma-separated list of IDs from the query string
   const regulationIds = (req.query.regulationIds as string)?.split(',').filter(Boolean);
   
   if (!regulationIds || regulationIds.length === 0) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'At least one regulation ID is required',
       hint: 'Provide comma-separated UUIDs via ?regulationIds=id1,id2,id3'
     });
+    return;
   }
   
-  // Limit batch size to prevent overwhelming the system
-  // 50 is a reasonable limit that balances efficiency with resource usage
   if (regulationIds.length > 50) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'Too many regulations requested',
       limit: 50,
       requested: regulationIds.length
     });
+    return;
   }
   
-  // Process all impacts in parallel for better performance
-  // Promise.all runs all the analyses simultaneously rather than one after another
   const impactPromises = regulationIds.map(async (id) => {
     try {
       const impacts = await regulatoryChangeTrackerService.analyzeStakeholderImpact(id);
       return { regulationId: id, impacts, error: null };
-    } catch (error) {
-      // If one regulation fails, we still want to return results for the others
+    } catch (_error) {
       return { regulationId: id, impacts: [], error: 'Analysis failed' };
     }
   });
@@ -234,25 +227,24 @@ router.get('/impact/batch', asyncHandler(async (req: Request, res: Response) => 
  */
 router.get(
   '/opportunities/:regulationId',
-  validateRequest(regulationIdSchema, 'params'),
   asyncHandler(async (req: Request, res: Response) => {
-    const { regulationId } = req.params;
+    const regulationId = req.params.regulationId;
+    if (!regulationId) {
+      res.status(400).json({ success: false, error: 'Regulation ID is required' });
+      return;
+    }
     
-    // Use the bulk method even for single IDs because it's optimized for performance
-    const bulkOpportunities = await regulatoryChangeTrackerService.getBulkStrategicOpportunities(
-      [regulationId]
+    const opportunities = await regulatoryChangeTrackerService.identifyStrategicOpportunities(
+      regulationId
     );
     
-    const opportunities = bulkOpportunities[regulationId] || [];
-    
-    // If no opportunities are found, it might mean the regulation hasn't been analyzed
-    // or genuinely presents no strategic opportunities
     if (opportunities.length === 0) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         error: 'No strategic opportunities found for this regulation',
         data: { regulationId }
       });
+      return;
     }
     
     res.json({
@@ -267,44 +259,37 @@ router.get(
   })
 );
 
-/**
- * GET /opportunities/batch
- * Retrieves strategic opportunities for multiple regulations efficiently
- * 
- * The service method is already designed for bulk operations, making this the most
- * efficient way to get opportunities for multiple regulations at once.
- * 
- * @query regulationIds - Comma-separated list of regulation UUIDs (max 50)
- * @returns Batch opportunities analysis organized by regulation
- */
 router.get('/opportunities/batch', asyncHandler(async (req: Request, res: Response) => {
   const regulationIds = (req.query.regulationIds as string)?.split(',').filter(Boolean);
   
   if (!regulationIds || regulationIds.length === 0) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'At least one regulation ID is required',
       hint: 'Provide comma-separated UUIDs via ?regulationIds=id1,id2,id3'
     });
+    return;
   }
   
   if (regulationIds.length > 50) {
-    return res.status(400).json({
+    res.status(400).json({
       success: false,
       error: 'Batch size limit exceeded',
       limit: 50,
       requested: regulationIds.length
     });
+    return;
   }
   
-  // This method is specifically designed for bulk operations and handles caching internally
-  const bulkOpportunities = await regulatoryChangeTrackerService.getBulkStrategicOpportunities(
-    regulationIds
+  const results: Record<string, Awaited<ReturnType<typeof regulatoryChangeTrackerService.identifyStrategicOpportunities>>> = {};
+  await Promise.all(
+    regulationIds.map(async (id) => {
+      results[id] = await regulatoryChangeTrackerService.identifyStrategicOpportunities(id);
+    })
   );
   
-  // Calculate total opportunities across all regulations for the summary
-  const totalOpportunities = Object.values(bulkOpportunities).reduce(
-    (sum, opportunities) => sum + opportunities.length,
+  const totalOpportunities = Object.values(results).reduce(
+    (sum, opps) => sum + opps.length,
     0
   );
   
@@ -313,7 +298,7 @@ router.get('/opportunities/batch', asyncHandler(async (req: Request, res: Respon
     data: {
       total: totalOpportunities,
       regulationCount: regulationIds.length,
-      opportunities: bulkOpportunities,
+      opportunities: results,
       analyzed_at: new Date().toISOString()
     }
   });
@@ -373,7 +358,7 @@ router.post(
  * It provides consistent error responses and logs details for debugging.
  * In production, we hide internal error details from clients for security.
  */
-router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+router.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   // Track error with comprehensive context using errorTracker
   errorTracker.trackRequestError(
     err,
@@ -382,17 +367,19 @@ router.use((err: Error, req: Request, res: Response, next: NextFunction) => {
     'business_logic'
   );
 
-  // Send consistent error response using ApiResponseWrapper
-  ApiResponseWrapper.error(
-    res,
-    err,
-    500,
-    {
-      source: 'database',
-      requestId: (req as Record<string, unknown>).traceId as string | undefined,
-      executionTime: Date.now() - ((req as Record<string, unknown>).startTime as number || Date.now())
-    }
-  );
+  // Send consistent error response
+  const statusCode = 500;
+  const requestId = (req as unknown as Record<string, unknown>).traceId as string | undefined;
+  const startTime = (req as unknown as Record<string, unknown>).startTime as number | undefined;
+  
+  logger.error({ err, requestId, statusCode }, 'Regulatory monitoring route error');
+
+  res.status(statusCode).json({
+    success: false,
+    error: 'Internal server error',
+    requestId,
+    executionTime: startTime ? Date.now() - startTime : undefined
+  });
 });
 
 export default router;

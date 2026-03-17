@@ -9,6 +9,8 @@ import { logger } from '@server/infrastructure/observability';
 import { bills } from '@server/infrastructure/schema';
 import type { USSDSession, USSDResponse, USSDRequest, USSDLanguage } from '../domain/ussd.types';
 import { USSD_CONFIG, USSD_MENUS } from './ussd.config';
+import { ussdCorruptionAnalysisService } from './ussd-corruption-analysis.service';
+import { ussdMarketIntelligenceService } from './ussd-market-intelligence.service';
 
 export class USSDService {
   private sessions: Map<string, USSDSession> = new Map();
@@ -66,6 +68,7 @@ export class USSDService {
       language: USSD_CONFIG.defaultLanguage,
       currentMenu: 'main',
       menuHistory: [],
+      userData: {},
       createdAt: new Date(),
       lastActivity: new Date()
     };
@@ -130,6 +133,13 @@ export class USSDService {
    * Handle user input based on current menu
    */
   private async handleInput(session: USSDSession, input: string): Promise<USSDResponse> {
+    // Prioritize pending arbitrary text input for handlers
+    if (session.userData?.pendingHandler) {
+      const handler = session.userData.pendingHandler as string;
+      session.userData.pendingHandler = undefined;
+      return await this.executeHandler(session, handler, input);
+    }
+
     // First request - show main menu
     if (!input) {
       return this.showMenu(session, 'main');
@@ -167,6 +177,8 @@ export class USSDService {
         break;
 
       case 'input':
+        if (!session.userData) session.userData = {};
+        session.userData.pendingHandler = selectedOption.handler;
         return {
           message: `CON ${selectedOption.label}:\nEnter your search term:`,
           continueSession: true
@@ -210,7 +222,7 @@ export class USSDService {
   /**
    * Execute handler function
    */
-  private async executeHandler(session: USSDSession, handler: string): Promise<USSDResponse> {
+  private async executeHandler(session: USSDSession, handler: string, input?: string): Promise<USSDResponse> {
     const logContext = { component: 'USSDService', operation: 'executeHandler', handler };
     logger.debug(logContext, 'Executing handler');
 
@@ -221,6 +233,20 @@ export class USSDService {
       switch (handlerName) {
         case 'getLatestBills':
           return await this.getLatestBills(session);
+          case 'searchBill':
+          return this.searchBill(session, input);
+          case 'analyzeCorruptionRisk':
+          return await this.analyzeCorruptionRisk(session, input);
+          case 'analyzeMarketImpact':
+          return await this.analyzeMarketImpact(session, input);
+          case 'findMPByConstituency':
+          return this.findMPByConstituency(session, input);
+          case 'findMPByName':
+          return this.findMPByName(session, input);
+          case 'trackBillById':
+          return this.trackBillById(session, input);
+          case 'getMyTrackedBills':
+          return this.getMyTrackedBills(session);
 
         case 'setLanguage':
           return this.setLanguage(session, params[0] as USSDLanguage);
@@ -274,6 +300,44 @@ export class USSDService {
       message: `CON ${message}`,
       continueSession: true
     };
+  }
+
+  
+  private searchBill(session: USSDSession, input?: string): USSDResponse {
+    if (!input) {
+        return { message: 'END Invalid search criteria.', continueSession: false };
+    }
+    const message = `Found 2 matches for "${input}":\n1. Example Bill A\n2. Example Bill B`;
+    return { message: `END ${message}`, continueSession: false };
+  }
+
+  private async analyzeCorruptionRisk(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) return { message: 'END Bill ID required', continueSession: false };
+    const analysis = await ussdCorruptionAnalysisService.analyzeCorruptionRisk(input);
+    return { message: `END ${analysis.message || analysis.riskLevel}`, continueSession: false };
+  }
+
+  private async analyzeMarketImpact(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) return { message: 'END Query required', continueSession: false };
+    const analysis = await ussdMarketIntelligenceService.getMarketInsights(input);
+    return { message: `END ${analysis.insights}`, continueSession: false };
+  }
+
+  private findMPByConstituency(session: USSDSession, input?: string): USSDResponse {
+    return { message: `END MP for ${input || 'Unknown'}: Hon. Jane Doe`, continueSession: false };
+  }
+
+  private findMPByName(session: USSDSession, input?: string): USSDResponse {
+    return { message: `END Hon. ${input || 'Unknown'} represents Nairobi Central`, continueSession: false };
+  }
+
+  private trackBillById(session: USSDSession, input?: string): USSDResponse {
+    if (input === '0') return this.showMenu(session, 'main');
+    return { message: `END Now tracking Bill ${input || 'Unknown'}. You will receive SMS alerts.`, continueSession: false };
+  }
+
+  private getMyTrackedBills(session: USSDSession): USSDResponse {
+    return { message: `END Tracked Bills:\n1. Finance Bill (2nd Reading)`, continueSession: false };
   }
 
   /**

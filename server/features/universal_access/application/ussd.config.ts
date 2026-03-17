@@ -40,6 +40,8 @@ export const USSD_MENUS: Record<string, USSDMenu> = {
       { key: '1', label: 'Latest Bills', action: 'execute', handler: 'getLatestBills' },
       { key: '2', label: 'By Category', action: 'navigate', target: 'bill_categories' },
       { key: '3', label: 'Search Bill', action: 'input', handler: 'searchBill' },
+      { key: '4', label: 'Corruption Risk', action: 'input', handler: 'analyzeCorruptionRisk' },
+      { key: '5', label: 'Market Impact', action: 'input', handler: 'analyzeMarketImpact' },
       { key: '0', label: 'Back', action: 'navigate', target: 'main' }
     ]
   },

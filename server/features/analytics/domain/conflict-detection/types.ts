@@ -1,6 +1,14 @@
 /**
  * Shared types for the conflict detection system
  */
+import { z } from 'zod';
+
+export const AnalyzeSponsorConflictsSchema = z.object({
+  sponsor_id: z.number().int().positive(),
+  bill_id: z.number().int().positive().optional()
+});
+
+export type AnalyzeSponsorConflictsInput = z.infer<typeof AnalyzeSponsorConflictsSchema>;
 
 /**
  * Represents a comprehensive conflict of interest analysis for a sponsor
@@ -159,12 +167,12 @@ export class ConflictDetectionError extends Error { constructor(
  * Type guard for vote validation
  */
 export function isValidVote(vote: unknown): vote is ValidatedVote {
-  return vote &&
-    typeof vote === 'object' &&
-    typeof vote.vote === 'string' &&
-    (vote.vote === 'yes' || vote.vote === 'no') &&
-    typeof vote.bill_id === 'number' &&
-    typeof vote.billTitle === 'string';
+  if (!vote || typeof vote !== 'object') return false;
+  const v = vote as Record<string, unknown>;
+  return typeof v.vote === 'string' &&
+    (v.vote === 'yes' || v.vote === 'no') &&
+    typeof v.bill_id === 'number' &&
+    typeof v.billTitle === 'string';
 }
 
 

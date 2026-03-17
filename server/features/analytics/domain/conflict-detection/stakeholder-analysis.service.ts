@@ -1,6 +1,6 @@
 /**
  * Stakeholder Analysis Service
- * 
+ *
  * Responsible for identifying stakeholders and analyzing their interests
  * in relation to bills and legislative processes.
  */
@@ -8,18 +8,13 @@
 import { Stakeholder, StakeholderInterest } from '@server/features/analytics/domain/conflict-detection/types';
 import { logger } from '@server/infrastructure/observability';
 import { getDefaultCache } from '@server/infrastructure/cache/index';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { db } from '@server/infrastructure/database';
 import {
   type Bill,
   bill_sponsorships,
-  bills,
-  type Sponsor,
-  type SponsorAffiliation,
-  sponsorAffiliations,
-  sponsors
+  sponsors,
 } from '@server/infrastructure/schema';
-import { db } from '@server/infrastructure/database';
-import { and, count, desc, eq, gte, inArray, like, lte, or,sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 export class StakeholderAnalysisService {
   private static instance: StakeholderAnalysisService;
@@ -36,32 +31,36 @@ export class StakeholderAnalysisService {
    */
   async identifyStakeholders(bill: Bill): Promise<Stakeholder[]> {
     try {
-      const cacheKey = `stakeholders:bill:${bills.id}`;
+      const cacheKey = `stakeholders:bill:${bill.id}`;
       const cache = getDefaultCache();
       const cached = await cache.get(cacheKey);
       if (cached) return cached;
 
-      const [sponsors, organizations, industries] = await Promise.all([
+      const [individualStakeholders, organizations, industries] = await Promise.all([
         this.identifyIndividualStakeholders(bill),
         this.identifyOrganizationalStakeholders(bill),
-        this.identifyIndustryStakeholders(bill)
+        this.identifyIndustryStakeholders(bill),
       ]);
 
-      const stakeholders = [...sponsors, ...organizations, ...industries];
+      const stakeholders = [...individualStakeholders, ...organizations, ...industries];
       await cache.set(cacheKey, stakeholders, 3600);
-      
+
       return stakeholders;
-    } catch (error) { logger.error({
-        component: 'StakeholderAnalysis',
-        bill_id: bills.id,
-        error: error instanceof Error ? error.message : String(error)
-       }, 'Error identifying stakeholders:');
+    } catch (error) {
+      logger.error(
+        {
+          component: 'StakeholderAnalysis',
+          bill_id: bill.id,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        'Error identifying stakeholders',
+      );
       return [];
     }
   }
 
   /**
-   * Analyzes stakeholder interests for a specific bill
+   * Analyzes stakeholder interests for a given list of stakeholders
    */
   async analyzeStakeholderInterests(stakeholders: Stakeholder[]): Promise<StakeholderInterest[]> {
     try {
@@ -74,10 +73,13 @@ export class StakeholderAnalysisService {
 
       return interests;
     } catch (error) {
-      logger.error({
-        component: 'StakeholderAnalysis',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error analyzing stakeholder interests:');
+      logger.error(
+        {
+          component: 'StakeholderAnalysis',
+          error: error instanceof Error ? error.message : String(error),
+        },
+        'Error analyzing stakeholder interests',
+      );
       return [];
     }
   }
@@ -91,7 +93,6 @@ export class StakeholderAnalysisService {
     for (const stakeholder of stakeholders) {
       let influence = 0.5; // Base influence
 
-      // Adjust based on stakeholder type
       switch (stakeholder.type) {
         case 'government':
           influence += 0.3;
@@ -107,10 +108,7 @@ export class StakeholderAnalysisService {
           break;
       }
 
-      // Adjust based on transparency
       influence += stakeholder.transparency * 0.2;
-
-      // Adjust based on number of interests
       influence += Math.min(stakeholder.interests.length * 0.05, 0.2);
 
       influenceMap.set(stakeholder.id, Math.min(influence, 1.0));
@@ -122,15 +120,15 @@ export class StakeholderAnalysisService {
   /**
    * Identifies potential conflicts between stakeholders
    */
-  async identifyStakeholderConflicts(
-    stakeholders: Stakeholder[]
-  ): Promise<Array<{
-    stakeholder1: Stakeholder;
-    stakeholder2: Stakeholder;
-    conflictType: string;
-    severity: 'low' | 'medium' | 'high';
-    description: string;
-  }>> {
+  async identifyStakeholderConflicts(stakeholders: Stakeholder[]): Promise<
+    Array<{
+      stakeholder1: Stakeholder;
+      stakeholder2: Stakeholder;
+      conflictType: string;
+      severity: 'low' | 'medium' | 'high';
+      description: string;
+    }>
+  > {
     const conflicts: Array<{
       stakeholder1: Stakeholder;
       stakeholder2: Stakeholder;
@@ -144,13 +142,11 @@ export class StakeholderAnalysisService {
         const stakeholder1 = stakeholders[i];
         const stakeholder2 = stakeholders[j];
 
+        if (!stakeholder1 || !stakeholder2) continue;
+
         const conflict = this.analyzeStakeholderConflict(stakeholder1, stakeholder2);
         if (conflict) {
-          conflicts.push({
-            stakeholder1,
-            stakeholder2,
-            ...conflict
-          });
+          conflicts.push({ stakeholder1, stakeholder2, ...conflict });
         }
       }
     }
@@ -158,64 +154,60 @@ export class StakeholderAnalysisService {
     return conflicts;
   }
 
-  // Private helper methods
+  // ─── Private helpers ────────────────────────────────────────────────────────
 
   private async identifyIndividualStakeholders(bill: Bill): Promise<Stakeholder[]> {
     try {
-      // Get bill sponsors
       const billSponsors = await db
-        .select({
-          sponsor: sponsors
-        })
+        .select({ sponsor: sponsors })
         .from(bill_sponsorships)
         .innerJoin(sponsors, eq(bill_sponsorships.sponsor_id, sponsors.id))
-        .where(eq(bill_sponsorships.bill_id, bills.id));
+        .where(eq(bill_sponsorships.bill_id, bill.id));
 
       return billSponsors.map(({ sponsor }) => ({
-        id: `individual_${sponsors.id}`,
-        name: sponsors.name,
+        id: `individual_${sponsor.id}`,
+        name: sponsor.name,
         type: 'individual' as const,
-        interests: [{ bill_id: bills.id,
-          issueArea: bills.category || 'General',
-          position: 'support' as const,
-          strength: 0.9,
-          description: `Primary sponsor of ${bills.title }`
-        }],
+        interests: [
+          {
+            bill_id: bill.id,
+            issueArea: bill.category ?? 'General',
+            position: 'support' as const,
+            strength: 0.9,
+            description: `Primary sponsor of ${bill.title}`,
+          },
+        ],
         influence: 0.8,
-        transparency: 0.7
+        transparency: 0.7,
       }));
     } catch (error) {
-      logger.error({ error }, 'Error identifying individual stakeholders:');
+      logger.error({ error }, 'Error identifying individual stakeholders');
       return [];
     }
   }
 
   private async identifyOrganizationalStakeholders(bill: Bill): Promise<Stakeholder[]> {
     try {
-      const stakeholders: Stakeholder[] = [];
+      const organizations = this.extractOrganizationsFromText(bill.summary ?? '');
 
-      // Extract organizations mentioned in bill summary
-      const organizations = this.extractOrganizationsFromText(bills.summary || '');
-
-      for (const org of organizations) {
-        stakeholders.push({
-          id: `organization_${org.toLowerCase().replace(/\s+/g, '_')}`,
-          name: org,
-          type: 'organization',
-          interests: [{ bill_id: bills.id,
-            issueArea: bills.category || 'General',
-            position: 'neutral',
+      return organizations.map((org) => ({
+        id: `organization_${org.toLowerCase().replace(/\s+/g, '_')}`,
+        name: org,
+        type: 'organization' as const,
+        interests: [
+          {
+            bill_id: bill.id,
+            issueArea: bill.category ?? 'General',
+            position: 'neutral' as const,
             strength: 0.6,
-            description: `Mentioned in bill ${bills.title }`
-          }],
-          influence: 0.6,
-          transparency: 0.5
-        });
-      }
-
-      return stakeholders;
+            description: `Mentioned in bill ${bill.title}`,
+          },
+        ],
+        influence: 0.6,
+        transparency: 0.5,
+      }));
     } catch (error) {
-      logger.error({ error }, 'Error identifying organizational stakeholders:');
+      logger.error({ error }, 'Error identifying organizational stakeholders');
       return [];
     }
   }
@@ -224,61 +216,63 @@ export class StakeholderAnalysisService {
     try {
       const industries = this.identifyAffectedIndustries(bill);
 
-      return industries.map(industry => ({
+      return industries.map((industry) => ({
         id: `industry_${industry.toLowerCase().replace(/\s+/g, '_')}`,
         name: industry,
         type: 'industry' as const,
-        interests: [{ bill_id: bills.id,
-          issueArea: bills.category || 'General',
-          position: 'neutral' as const,
-          strength: 0.5,
-          description: `Industry potentially affected by ${bills.title }`
-        }],
+        interests: [
+          {
+            bill_id: bill.id,
+            issueArea: bill.category ?? 'General',
+            position: 'neutral' as const,
+            strength: 0.5,
+            description: `Industry potentially affected by ${bill.title}`,
+          },
+        ],
         influence: 0.5,
-        transparency: 0.4
+        transparency: 0.4,
       }));
     } catch (error) {
-      logger.error({ error }, 'Error identifying industry stakeholders:');
+      logger.error({ error }, 'Error identifying industry stakeholders');
       return [];
     }
   }
 
   private async analyzeIndividualStakeholderInterests(
-    stakeholder: Stakeholder
+    stakeholder: Stakeholder,
   ): Promise<StakeholderInterest[]> {
-    // For now, return the existing interests
-    // In a full implementation, this would analyze deeper patterns
+    // Returns existing interests; a full implementation would analyse deeper patterns.
     return stakeholder.interests;
   }
 
   private analyzeStakeholderConflict(
     stakeholder1: Stakeholder,
-    stakeholder2: Stakeholder
+    stakeholder2: Stakeholder,
   ): {
     conflictType: string;
     severity: 'low' | 'medium' | 'high';
     description: string;
   } | null {
-    // Find opposing interests
     for (const interest1 of stakeholder1.interests) {
       for (const interest2 of stakeholder2.interests) {
-        if (interest1.bill_id === interest2.bill_id && 
-            interest1.issueArea === interest2.issueArea) {
-          
-          if ((interest1.position === 'support' && interest2.position === 'oppose') ||
-              (interest1.position === 'oppose' && interest2.position === 'support')) {
-            
-            const severity = this.calculateConflictSeverity(
-              interest1.strength,
-              interest2.strength,
-              stakeholder1.influence,
-              stakeholder2.influence
-            );
+        if (
+          interest1.bill_id === interest2.bill_id &&
+          interest1.issueArea === interest2.issueArea
+        ) {
+          const isOpposing =
+            (interest1.position === 'support' && interest2.position === 'oppose') ||
+            (interest1.position === 'oppose' && interest2.position === 'support');
 
+          if (isOpposing) {
             return {
               conflictType: 'opposing_positions',
-              severity,
-              description: `${stakeholder1.name} ${interest1.position}s while ${stakeholder2.name} ${interest2.position}s the same bill`
+              severity: this.calculateConflictSeverity(
+                interest1.strength,
+                interest2.strength,
+                stakeholder1.influence,
+                stakeholder2.influence,
+              ),
+              description: `${stakeholder1.name} ${interest1.position}s while ${stakeholder2.name} ${interest2.position}s the same bill`,
             };
           }
         }
@@ -292,11 +286,9 @@ export class StakeholderAnalysisService {
     strength1: number,
     strength2: number,
     influence1: number,
-    influence2: number
+    influence2: number,
   ): 'low' | 'medium' | 'high' {
-    const avgStrength = (strength1 + strength2) / 2;
-    const avgInfluence = (influence1 + influence2) / 2;
-    const conflictScore = avgStrength * avgInfluence;
+    const conflictScore = ((strength1 + strength2) / 2) * ((influence1 + influence2) / 2);
 
     if (conflictScore >= 0.7) return 'high';
     if (conflictScore >= 0.5) return 'medium';
@@ -304,55 +296,45 @@ export class StakeholderAnalysisService {
   }
 
   private extractOrganizationsFromText(text: string): string[] {
-    // Simple regex-based extraction - in reality this would be more sophisticated
     const orgPatterns = [
       /\b([A-Z][a-z]+ (?:Corporation|Corp|Company|Co|Ltd|Limited|Inc|Incorporated|Organization|Org|Foundation|Institute|Association|Agency|Authority|Board|Commission|Committee|Council|Department|Ministry|Office|Bureau|Service|Bank|Group|Holdings|Partners|Solutions|Systems|Technologies|Tech|Enterprises|Industries|International|National|Kenya|African))\b/g,
-      /\b([A-Z]{2,}(?:\s+[A-Z]{2,})*)\b/g // Acronyms
+      /\b([A-Z]{2,}(?:\s+[A-Z]{2,})*)\b/g, // Acronyms
     ];
 
     const organizations = new Set<string>();
 
     for (const pattern of orgPatterns) {
-      const matches = text.match(pattern);
-      if (matches) {
-        matches.forEach(match => {
-          if (match.length > 3 && match.length < 100) {
-            organizations.add(match.trim());
-          }
-        });
+      for (const match of text.matchAll(pattern)) {
+        const org = match[0].trim();
+        if (org.length > 3 && org.length < 100) {
+          organizations.add(org);
+        }
       }
     }
 
-    return Array.from(organizations).slice(0, 10); // Limit to 10 organizations
+    return Array.from(organizations).slice(0, 10);
   }
 
   private identifyAffectedIndustries(bill: Bill): string[] {
-    const text = (bills.title + ' ' + (bills.summary || '')).toLowerCase();
-    const industries: string[] = [];
+    const text = `${bill.title} ${bill.summary ?? ''}`.toLowerCase();
 
-    const industryKeywords = {
-      'Technology': ['technology', 'tech', 'digital', 'software', 'internet', 'cyber', 'data'],
-      'Healthcare': ['health', 'medical', 'hospital', 'pharmaceutical', 'medicine', 'healthcare'],
-      'Finance': ['bank', 'financial', 'finance', 'investment', 'insurance', 'credit', 'loan'],
-      'Agriculture': ['agriculture', 'farming', 'crop', 'livestock', 'agricultural', 'food'],
-      'Energy': ['energy', 'power', 'electricity', 'renewable', 'solar', 'wind', 'oil', 'gas'],
-      'Education': ['education', 'school', 'university', 'learning', 'academic', 'student'],
-      'Transportation': ['transport', 'road', 'railway', 'aviation', 'shipping', 'logistics'],
-      'Manufacturing': ['manufacturing', 'factory', 'production', 'industrial', 'assembly'],
-      'Tourism': ['tourism', 'hotel', 'travel', 'hospitality', 'recreation'],
-      'Mining': ['mining', 'mineral', 'extraction', 'quarry', 'geological']
+    const industryKeywords: Record<string, string[]> = {
+      Technology: ['technology', 'tech', 'digital', 'software', 'internet', 'cyber', 'data'],
+      Healthcare: ['health', 'medical', 'hospital', 'pharmaceutical', 'medicine', 'healthcare'],
+      Finance: ['bank', 'financial', 'finance', 'investment', 'insurance', 'credit', 'loan'],
+      Agriculture: ['agriculture', 'farming', 'crop', 'livestock', 'agricultural', 'food'],
+      Energy: ['energy', 'power', 'electricity', 'renewable', 'solar', 'wind', 'oil', 'gas'],
+      Education: ['education', 'school', 'university', 'learning', 'academic', 'student'],
+      Transportation: ['transport', 'road', 'railway', 'aviation', 'shipping', 'logistics'],
+      Manufacturing: ['manufacturing', 'factory', 'production', 'industrial', 'assembly'],
+      Tourism: ['tourism', 'hotel', 'travel', 'hospitality', 'recreation'],
+      Mining: ['mining', 'mineral', 'extraction', 'quarry', 'geological'],
     };
 
-    for (const [industry, keywords] of Object.entries(industryKeywords)) {
-      if (keywords.some(keyword => text.includes(keyword))) {
-        industries.push(industry);
-      }
-    }
-
-    return industries;
+    return Object.entries(industryKeywords)
+      .filter(([, keywords]) => keywords.some((kw) => text.includes(kw)))
+      .map(([industry]) => industry);
   }
 }
 
 export const stakeholderAnalysisService = StakeholderAnalysisService.getInstance();
-
-

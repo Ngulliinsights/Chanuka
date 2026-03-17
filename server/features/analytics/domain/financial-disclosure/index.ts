@@ -128,7 +128,7 @@ const validateRequest = (schema: z.ZodObject<any>) => {
  * Creates and configures the financial disclosure router with all endpoints.
  */
 export function createFinancialDisclosureRouter(
-  monitoringService: ComplianceAuditingService,
+  auditingService: ComplianceAuditingService,
   analyticsService: FinancialDisclosureAnalyticsService = financialDisclosureAnalyticsService,
 ): Router {
   const router = Router();
@@ -141,7 +141,7 @@ export function createFinancialDisclosureRouter(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const sponsor_id = req.query.sponsor_id ? Number(req.query.sponsor_id) : undefined;
-        const data = await monitoringService.collectFinancialDisclosures(sponsor_id);
+        const data = await auditingService.collectFinancialDisclosures(sponsor_id);
 
         const etag = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
         res.setHeader('ETag', etag);
@@ -165,7 +165,7 @@ export function createFinancialDisclosureRouter(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const sponsor_id = Number(req.params.sponsor_id);
-        const completeness = await monitoringService.calculateBasicCompleteness(sponsor_id);
+        const completeness = await auditingService.calculateBasicCompleteness(sponsor_id);
         ApiSuccess(res, completeness);
       } catch (error) {
         next(error);
@@ -187,7 +187,7 @@ export function createFinancialDisclosureRouter(
           includeResolved: req.query.includeResolved === 'true',
           limit: req.query.limit ? Number(req.query.limit) : undefined,
         };
-        const alerts = await monitoringService.getRecentAlerts(options);
+        const alerts = await auditingService.getRecentAlerts(options);
         ApiSuccess(res, alerts);
       } catch (error) {
         next(error);
@@ -201,7 +201,7 @@ export function createFinancialDisclosureRouter(
     async (req: Request, res: Response, next: NextFunction) => {
       try {
         const { type, sponsor_id, description, severity, metadata } = req.body;
-        const alert = await monitoringService.createManualAlert(
+        const alert = await auditingService.createManualAlert(
           type,
           sponsor_id,
           description,
@@ -225,7 +225,7 @@ export function createFinancialDisclosureRouter(
         // Basic sanitization for resolution notes
         const resolution = resolutionRaw.replace(/</g, '&lt;').replace(/>/g, '&gt;');
         
-        await monitoringService.resolveAlert(alertId, resolution);
+        await auditingService.resolveAlert(alertId, resolution);
         ApiSuccess(res, {
           message: 'Alert resolved successfully',
           alertId,
@@ -241,7 +241,7 @@ export function createFinancialDisclosureRouter(
 
   router.post('/monitoring/start', (_req: Request, res: Response, next: NextFunction) => {
     try {
-      monitoringService.startAutomatedMonitoring();
+      auditingService.startAutomatedMonitoring();
       ApiSuccess(res, {
         message: 'Automated monitoring started successfully',
         timestamp: new Date().toISOString(),
@@ -255,8 +255,8 @@ export function createFinancialDisclosureRouter(
     '/monitoring/stop',
     async (_req: Request, res: Response, next: NextFunction) => {
       try {
-        await monitoringService.stopAutomatedMonitoring();
-        const status = monitoringService.getStatus();
+        await auditingService.stopAutomatedMonitoring();
+        const status = auditingService.getStatus();
         ApiSuccess(res, {
           message: 'Monitoring stopped successfully',
           finalStatus: status,
@@ -272,7 +272,7 @@ export function createFinancialDisclosureRouter(
     '/monitoring/trigger',
     async (_req: Request, res: Response, next: NextFunction) => {
       try {
-        const alerts = await monitoringService.triggerManualCheck();
+        const alerts = await auditingService.triggerManualCheck();
         ApiSuccess(res, {
           message: 'Monitoring check completed',
           alertsGenerated: alerts.length,
@@ -287,7 +287,7 @@ export function createFinancialDisclosureRouter(
 
   router.get('/monitoring/status', (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const status = monitoringService.getStatus();
+      const status = auditingService.getStatus();
       ApiSuccess(res, status);
     } catch (error) {
       next(error);
@@ -298,7 +298,7 @@ export function createFinancialDisclosureRouter(
 
   router.get('/health', async (_req: Request, res: Response, next: NextFunction) => {
     try {
-      const healthStatus = await monitoringService.getHealthStatus();
+      const healthStatus = await auditingService.getHealthStatus();
       if (healthStatus.status === 'unhealthy') {
         res.status(503).json(healthStatus);
         return;
@@ -365,7 +365,7 @@ export function createFinancialDisclosureRouter(
         const sponsor_id = Number(req.params.sponsor_id);
         const format = (req.query.format as 'json' | 'csv') ?? 'json';
 
-        const data = await monitoringService.exportSponsorDisclosures(sponsor_id, format);
+        const data = await auditingService.exportSponsorDisclosures(sponsor_id, format);
 
         if (format === 'csv') {
           res.setHeader('Content-Type', 'text/csv; charset=utf-8');

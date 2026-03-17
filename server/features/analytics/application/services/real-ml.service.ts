@@ -1,14 +1,8 @@
 // Real ML implementation using NLP libraries (TensorFlow.js optional due to native binding issues)
 import { logger } from '@server/infrastructure/observability';
-import type {
-    AnalysisResult,
-    ComprehensiveAnalysisResult,
-    ImplementationWorkaroundDetection,
-    SimilarityAnalysis} from '@shared/types/ml';
-import * as compromise from 'compromise';
+import type { AnalysisResult } from '@shared/types/ml';
+import compromise from 'compromise';
 import * as natural from 'natural';
-
-import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 /**
  * Real ML Analysis Service using simple NLP techniques
@@ -52,7 +46,7 @@ export class RealMLAnalysisService {
             }, 'ML service initialized without TensorFlow.js (using NLP libraries)');
 
             // Initialize Natural language processing tools
-            natural.PorterStemmer.attach();
+            // natural.PorterStemmer.attach(); // Not available in some type definitions
             
             // Initialize vocabulary and sentiment lexicons
             this.vocabulary = this.getVocabulary();
@@ -67,10 +61,11 @@ export class RealMLAnalysisService {
                 sentimentWordsCount: this.sentimentWords.positive.length + this.sentimentWords.negative.length
             }, 'Real ML Analysis Service initialized successfully');
         } catch (error) {
-            logger.error('Failed to initialize Real ML Analysis Service:', {
+            logger.error({
                 component: 'analytics',
-                operation: 'initialize'
-            }, error instanceof Error ? error : { message: String(error) });
+                operation: 'initialize',
+                err: error instanceof Error ? error : { message: String(error) }
+            }, 'Failed to initialize Real ML Analysis Service:');
             throw error;
         }
     }
@@ -98,13 +93,14 @@ export class RealMLAnalysisService {
      */
     private preprocessText(text: string): number[] {
         // Use Natural for advanced tokenization
-        const tokens = natural.WordTokenizer.tokenize(text.toLowerCase()) || [];
+        const tokenizer = new natural.WordTokenizer();
+        const tokens = tokenizer.tokenize(text.toLowerCase()) || [];
         
         // Use Natural's stemmer for better word matching
-        const stemmedTokens = tokens.map(token => natural.PorterStemmer.stem(token));
+        const stemmedTokens = tokens.map((token: string) => natural.PorterStemmer.stem(token));
 
         // Remove stop words using Natural's list
-        const filteredTokens = stemmedTokens.filter(token => 
+        const filteredTokens = stemmedTokens.filter((token: string) => 
             !natural.stopwords.includes(token) && token.length > 2
         );
 
@@ -113,16 +109,16 @@ export class RealMLAnalysisService {
         const termFreq = new Map<string, number>();
 
         // Calculate term frequencies
-        filteredTokens.forEach(token => {
+        filteredTokens.forEach((token: string) => {
             termFreq.set(token, (termFreq.get(token) || 0) + 1);
         });
 
         // Create vector representation with TF-IDF weighting
-        filteredTokens.forEach(token => {
+        filteredTokens.forEach((token: string) => {
             const index = this.vocabulary.indexOf(token);
             if (index !== -1 && index < 100) {
                 const tf = (termFreq.get(token) || 0) / filteredTokens.length;
-                const idf = Math.log(1000 / (this.vocabulary.filter(v => v === token).length + 1));
+                const idf = Math.log(1000 / (this.vocabulary.filter((v: string) => v === token).length + 1));
                 vector[index] += tf * idf;
             }
         });
@@ -153,7 +149,8 @@ export class RealMLAnalysisService {
 
         // Fallback to Natural tokenization if Compromise doesn't find much
         if (meaningfulTokens.length < 5) {
-            return natural.WordTokenizer.tokenize(text.toLowerCase()) || [];
+            const tokenizer = new natural.WordTokenizer();
+            return tokenizer.tokenize(text.toLowerCase()) || [];
         }
 
         return meaningfulTokens;
@@ -252,10 +249,11 @@ export class RealMLAnalysisService {
                 }
             };
         } catch (error) {
-            logger.error('Error in real stakeholder influence analysis:', {
+            logger.error({
                 component: 'analytics',
-                operation: 'analyzeStakeholderInfluence'
-            }, error instanceof Error ? error : { message: String(error) });
+                operation: 'analyzeStakeholderInfluence',
+                err: error instanceof Error ? error : { message: String(error) }
+            }, 'Error in real stakeholder influence analysis:');
 
             return {
                 confidence: 0.0,
@@ -308,11 +306,12 @@ export class RealMLAnalysisService {
         });
 
         // Use Natural's named entity recognition patterns
-        const sentences = natural.SentenceTokenizer.tokenize(text);
-        sentences.forEach(sentence => {
+        const sentenceTokenizer = new natural.SentenceTokenizer([]);
+        const sentences = sentenceTokenizer.tokenize(text);
+        sentences.forEach((sentence: string) => {
             // Look for capitalized sequences that might be organization names
             const capitalizedSequences = sentence.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
-            capitalizedSequences.forEach(seq => {
+            capitalizedSequences.forEach((seq: string) => {
                 if (seq.split(' ').length >= 2 && seq.length > 10) {
                     entities.add(seq);
                 }
@@ -385,8 +384,10 @@ export class RealMLAnalysisService {
      */
     private calculateSentimentScore(text: string): number {
         // Use Natural's built-in sentiment analyzer
-        const naturalSentiment = natural.SentimentAnalyzer.getSentiment(
-            natural.WordTokenizer.tokenize(text.toLowerCase()) || []
+        const tokenizer = new natural.WordTokenizer();
+        const analyzer = new natural.SentimentAnalyzer('English', natural.PorterStemmer, 'afinn');
+        const naturalSentiment = analyzer.getSentiment(
+            tokenizer.tokenize(text.toLowerCase()) || []
         );
 
         // Use custom lexicon-based approach
@@ -484,7 +485,7 @@ export class RealMLAnalysisService {
     /**
      * Calculate confidence based on analysis quality
      */
-    private calculateConfidence(stakeholders: unknown[], influenceScores: number[]): number {
+    private calculateConfidence(stakeholders: any[], influenceScores: number[]): number {
         const hasStakeholders = stakeholders.length > 0;
         const hasScores = influenceScores.length > 0;
         const avgScore = influenceScores.reduce((sum, score) => sum + score, 0) / influenceScores.length;
@@ -510,7 +511,7 @@ export class RealMLAnalysisService {
     /**
      * Generate activity description
      */
-    private generateActivityDescription(stakeholder: unknown, score: number): string {
+    private generateActivityDescription(_stakeholder: unknown, score: number): string {
         const activities = [
             'Active lobbying detected',
             'Increased engagement observed',
@@ -525,17 +526,17 @@ export class RealMLAnalysisService {
     /**
      * Analyze trends in stakeholder data
      */
-    private analyzeTrends(stakeholders: unknown[], sentiments: Record<string, string>): any {
-        const positive = stakeholders.filter(s => sentiments[s.name] === 'positive');
-        const negative = stakeholders.filter(s => sentiments[s.name] === 'negative');
+    private analyzeTrends(stakeholders: any[], sentiments: Record<string, string>): any {
+        const positive = stakeholders.filter((s: any) => sentiments[s.name] === 'positive');
+        const negative = stakeholders.filter((s: any) => sentiments[s.name] === 'negative');
 
         return {
-            increasingSupport: positive.slice(0, 3).map(s => s.name),
-            decreasingSupport: negative.slice(0, 2).map(s => s.name),
+            increasingSupport: positive.slice(0, 3).map((s: any) => s.name),
+            decreasingSupport: negative.slice(0, 2).map((s: any) => s.name),
             emergingConcerns: stakeholders
-                .filter(s => s.mentions > 1 && sentiments[s.name] === 'neutral')
+                .filter((s: any) => s.mentions > 1 && sentiments[s.name] === 'neutral')
                 .slice(0, 2)
-                .map(s => s.name)
+                .map((s: any) => s.name)
         };
     }
 
@@ -603,10 +604,11 @@ export class RealMLAnalysisService {
                 }
             };
         } catch (error) {
-            logger.error('Error in real conflict detection:', {
+            logger.error({
                 component: 'analytics',
-                operation: 'detectConflictsOfInterest'
-            }, error instanceof Error ? error : { message: String(error) });
+                operation: 'detectConflictsOfInterest',
+                err: error instanceof Error ? error : { message: String(error) }
+            }, 'Error in real conflict detection:');
 
             return {
                 confidence: 0.0,
@@ -692,23 +694,23 @@ export class RealMLAnalysisService {
     /**
      * Calculate overall risk level
      */
-    private calculateOverallRisk(relationships: unknown[]): 'low' | 'medium' | 'high' {
-        if (relationships.some(r => r.severity === 'high')) return 'high';
-        if (relationships.some(r => r.severity === 'medium')) return 'medium';
+    private calculateOverallRisk(relationships: any[]): 'low' | 'medium' | 'high' {
+        if (relationships.some((r: any) => r.severity === 'high')) return 'high';
+        if (relationships.some((r: any) => r.severity === 'medium')) return 'medium';
         return 'low';
     }
 
     /**
      * Generate recommendations based on analysis
      */
-    private generateRecommendations(relationships: unknown[]): string[] {
+    private generateRecommendations(relationships: any[]): string[] {
         const recommendations = ['Maintain transparency in all proceedings'];
 
         if (relationships.length > 0) {
             recommendations.push('Consider additional disclosure requirements');
         }
 
-        if (relationships.some(r => r.severity === 'high')) {
+        if (relationships.some((r: any) => r.severity === 'high')) {
             recommendations.push('Immediate ethics review recommended');
         }
 
@@ -781,10 +783,11 @@ export class RealMLAnalysisService {
                 }
             };
         } catch (error) {
-            logger.error('Error in real beneficiary analysis:', {
+            logger.error({
                 component: 'analytics',
-                operation: 'analyzeBeneficiaries'
-            }, error instanceof Error ? error : { message: String(error) });
+                operation: 'analyzeBeneficiaries',
+                err: error instanceof Error ? error : { message: String(error) }
+            }, 'Error in real beneficiary analysis:');
 
             return {
                 confidence: 0.0,
@@ -853,7 +856,7 @@ export class RealMLAnalysisService {
     private analyzeEconomicImpact(text: string): any {
         const lowerText = text.toLowerCase();
         const hasFinancialTerms = /\b(million|billion|dollar|cost|revenue|profit|funding|investment)\b/.test(lowerText);
-        const hasJobTerms = /\b(job|employment|worker|employee|hiring|workforce)\b/.test(lowerText);
+        const _hasJobTerms = /\b(job|employment|worker|employee|hiring|workforce)\b/.test(lowerText);
 
         return {
             positiveImpact: hasFinancialTerms ? '$1.5B estimated benefit' : '$500M estimated benefit',

@@ -7,7 +7,7 @@ import type { Request } from 'express';
 import type { ThreatDetectionResult } from './intrusion-detection.service';
 
 /**
- * SecurityMonitoringService - The Active Intelligence Layer
+ * SecurityEventTrackerService - The Active Intelligence Layer
  * Analyzes security data in real-time to trigger alerts and coordinate defenses.
  * It reads from the audit log (Flight Recorder) and decides if a pilot (Admin)
  * needs to be woken up.
@@ -124,8 +124,8 @@ type DatabaseInstance = any;
 // 4. The Service Implementation with Explicit Dependencies
 // ----------------------------------------------------------------------
 
-export class SecurityMonitoringService {
-  private static instance: SecurityMonitoringService | null = null;
+export class SecurityEventTrackerService {
+  private static instance: SecurityEventTrackerService | null = null;
 
   /**
    * Explicit dependencies injected via constructor
@@ -145,22 +145,22 @@ export class SecurityMonitoringService {
     intrusionDetection?: IIntrusionDetectionService,
     auditService?: ISecurityAuditService,
     database?: DatabaseInstance
-  ): SecurityMonitoringService {
-    if (!SecurityMonitoringService.instance) {
+  ): SecurityEventTrackerService {
+    if (!SecurityEventTrackerService.instance) {
       // Lazy import to avoid circular dependencies
       if (!intrusionDetection || !auditService) {
         throw new Error(
-          'SecurityMonitoringService requires dependencies on first initialization. ' +
+          'SecurityEventTrackerService requires dependencies on first initialization. ' +
           'Use createInstance() or provide dependencies.'
         );
       }
-      SecurityMonitoringService.instance = new SecurityMonitoringService(
+      SecurityEventTrackerService.instance = new SecurityEventTrackerService(
         intrusionDetection,
         auditService,
         database
       );
     }
-    return SecurityMonitoringService.instance;
+    return SecurityEventTrackerService.instance;
   }
 
   /**
@@ -171,15 +171,15 @@ export class SecurityMonitoringService {
     intrusionDetection: IIntrusionDetectionService,
     auditService: ISecurityAuditService,
     database: DatabaseInstance = db
-  ): SecurityMonitoringService {
-    return new SecurityMonitoringService(intrusionDetection, auditService, database);
+  ): SecurityEventTrackerService {
+    return new SecurityEventTrackerService(intrusionDetection, auditService, database);
   }
 
   /**
    * Reset singleton (useful for testing)
    */
   public static resetInstance(): void {
-    SecurityMonitoringService.instance = null;
+    SecurityEventTrackerService.instance = null;
   }
 
   /**
@@ -488,9 +488,9 @@ export class SecurityMonitoringService {
  * Initialize the singleton with real dependencies
  * This lazy loads the dependencies to avoid circular imports
  */
-let productionInstance: SecurityMonitoringService | null = null;
+let productionInstance: SecurityEventTrackerService | null = null;
 
-export async function getSecurityMonitoringService(): Promise<SecurityMonitoringService> {
+export async function getSecurityEventTrackerService(): Promise<SecurityEventTrackerService> {
   if (!productionInstance) {
     // Dynamic import to avoid circular dependencies
     const [{ intrusionDetectionService }, { securityAuditService }] = await Promise.all([
@@ -498,7 +498,7 @@ export async function getSecurityMonitoringService(): Promise<SecurityMonitoring
       import('./security-audit.service')
     ]);
 
-    productionInstance = SecurityMonitoringService.getInstance(
+    productionInstance = SecurityEventTrackerService.getInstance(
       intrusionDetectionService,
       securityAuditService,
       db
@@ -509,7 +509,7 @@ export async function getSecurityMonitoringService(): Promise<SecurityMonitoring
 
 /**
  * Default export for backward compatibility
- * Use getSecurityMonitoringService() in production code
+ * Use getSecurityEventTrackerService() in production code
  */
-export const securityMonitoringServicePromise = getSecurityMonitoringService();
+export const securityEventTrackerServicePromise = getSecurityEventTrackerService();
 

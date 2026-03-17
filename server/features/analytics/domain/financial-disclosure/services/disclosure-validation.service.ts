@@ -8,20 +8,9 @@ import { cacheService } from '@server/infrastructure/cache';
 import { logger } from '@server/infrastructure/observability';
 import { disclosureProcessingService } from './disclosure-processing.service';
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
 const MS_PER_DAY = 1_000 * 60 * 60 * 24;
-
-/** Minimum number of disclosures required to compute a meaningful trend. */
 const MIN_DISCLOSURES_FOR_TREND = 5;
-
-/**
- * Fractional change in period verification rate needed to classify a trend
- * as improving or declining (10% in either direction).
- */
 const TREND_THRESHOLD = 0.1;
-
-// ─── Internal Types ───────────────────────────────────────────────────────────
 
 interface DetailedMetrics {
   requiredDisclosureScore: number;
@@ -30,32 +19,17 @@ interface DetailedMetrics {
   detailScore: number;
   totalDisclosures: number;
   completedRequired: number;
-  /** Number of disclosures whose `dateReported` exceeds the configured stale threshold. */
   staleCount: number;
-  /** Number of disclosures that are unverified. */
   unverifiedCount: number;
 }
 
-// ─── Service ──────────────────────────────────────────────────────────────────
-
-/**
- * Disclosure Validation Service
- *
- * Responsible for:
- * - Completeness scoring and assessment
- * - Validation logic for disclosure quality
- * - Compliance risk assessment
- * - Recommendation generation
- */
 export class DisclosureValidationService {
   private readonly config = FinancialDisclosureConfig;
 
-  /**
-   * Calculates a comprehensive completeness score using multiple dimensions.
-   */
   async calculateCompletenessScore(sponsor_id: number): Promise<CompletenessReport> {
     const cacheKey = this.config.cache.keyPrefixes.completeness(sponsor_id);
 
+    try {
       const cached = await cacheService.get<CompletenessReport>(cacheKey);
       if (cached) return cached;
 
@@ -68,12 +42,10 @@ export class DisclosureValidationService {
         if (!sponsorInfo) {
           throw createNotFoundError(
             'Sponsor', String(sponsor_id),
-            { service: 'disclosure-validation', operation: 'calculateCompletenessScore' },
+            { service: 'disclosure-validation', operation: 'calculateCompletenessScore' }
           );
         }
 
-        // Build the present-types set once; reuse it in both metric calculation
-        // and the missing-types derivation below.
         const presentTypes = new Set(disclosures.map((d) => d.disclosureType));
         const missingDisclosures = this.config.requiredTypes.filter((t) => !presentTypes.has(t));
 
@@ -108,32 +80,23 @@ export class DisclosureValidationService {
       throw createDatabaseError(
         'calculateCompletenessScore',
         error instanceof Error ? error : new Error(String(error)),
-        { service: 'disclosure-validation', operation: 'calculateCompletenessScore' },
+        { service: 'disclosure-validation', operation: 'calculateCompletenessScore' }
       );
     }
   }
 
-  // ─── Metric Calculation ─────────────────────────────────────────────────────
-
-  /**
-   * Calculates detailed metrics across four dimensions of disclosure quality.
-   *
-   * @param disclosures - The sponsor's full disclosure history.
-   * @param presentTypes - Pre-built set of disclosure types; avoids a redundant map pass.
-   */
   private calculateDetailedMetrics(
     disclosures: FinancialDisclosure[],
-    presentTypes: Set<string>,
+    presentTypes: Set<string>
   ): DetailedMetrics {
     const total = disclosures.length;
     const now = Date.now();
     const staleThreshold = this.config.riskThresholds.disclosureAge.stale;
 
     const completedRequired = this.config.requiredTypes.filter((t) =>
-      presentTypes.has(t),
+      presentTypes.has(t)
     ).length;
 
-    // Single pass: collect verification, detail, staleness, and recency together.
     let verifiedCount = 0;
     let detailedCount = 0;
     let staleCount = 0;
@@ -164,12 +127,6 @@ export class DisclosureValidationService {
     };
   }
 
-  // ─── Scoring & Assessment ───────────────────────────────────────────────────
-
-  /**
-   * Combines the four metric dimensions into a single 0–100 completeness score
-   * using configured weights.
-   */
   private applyWeightedScoring(metrics: DetailedMetrics): number {
     const w = this.config.completenessWeights;
 
@@ -182,13 +139,9 @@ export class DisclosureValidationService {
     return Math.round(Math.min(score, 100));
   }
 
-  /**
-   * Assesses overall completeness risk based on both the aggregate score
-   * and the age of the most recent disclosure.
-   */
   private assessCompletenessRisk(
     score: number,
-    lastUpdate: Date,
+    lastUpdate: Date
   ): CompletenessReport['riskAssessment'] {
     const daysSinceUpdate = Math.floor((Date.now() - lastUpdate.getTime()) / MS_PER_DAY);
     const { stale, recent, current } = this.config.riskThresholds.disclosureAge;
@@ -199,24 +152,13 @@ export class DisclosureValidationService {
     return 'low';
   }
 
-  // ─── Trend Analysis ─────────────────────────────────────────────────────────
-
-  /**
-   * Determines whether disclosure quality is improving, declining, or stable by
-   * comparing the verification rate of the first half of the history against the
-   * second half. Requires at least {@link MIN_DISCLOSURES_FOR_TREND} records.
-   *
-   * Note: verification rate is used rather than recency score because recency is
-   * a function of age-from-now — older records will always decay more, making a
-   * recency-based split comparison a tautology rather than a genuine quality signal.
-   */
   private analyzeTemporalTrend(
-    disclosures: FinancialDisclosure[],
+    disclosures: FinancialDisclosure[]
   ): CompletenessReport['temporalTrend'] {
     if (disclosures.length < MIN_DISCLOSURES_FOR_TREND) return 'stable';
 
     const sorted = [...disclosures].sort(
-      (a, b) => a.dateReported.getTime() - b.dateReported.getTime(),
+      (a, b) => a.dateReported.getTime() - b.dateReported.getTime()
     );
     const mid = Math.floor(sorted.length / 2);
 
@@ -231,52 +173,46 @@ export class DisclosureValidationService {
     return 'stable';
   }
 
-  // ─── Recommendations ────────────────────────────────────────────────────────
-
-  /**
-   * Generates specific, actionable recommendations ordered by severity.
-   * Falls back to a positive confirmation message when no issues are found.
-   */
   private generateRecommendations(
     metrics: DetailedMetrics,
     disclosures: FinancialDisclosure[],
-    missingTypes: readonly string[],
+    missingTypes: readonly string[]
   ): string[] {
     const recommendations: string[] = [];
 
     if (metrics.requiredDisclosureScore < 0.75) {
       recommendations.push(
-        `Priority action required: complete missing disclosure type(s) — ${missingTypes.join(', ')}.`,
+        `Priority action required: complete missing disclosure type(s) — ${missingTypes.join(', ')}.`
       );
     }
 
     if (metrics.verificationScore < 0.6) {
       const highRiskUnverified = disclosures.filter(
-        (d) => !d.is_verified && (d.riskLevel === 'high' || d.riskLevel === 'critical'),
+        (d) => !d.is_verified && (d.riskLevel === 'high' || d.riskLevel === 'critical')
       ).length;
 
       recommendations.push(
         highRiskUnverified > 0
           ? `Urgent: verify ${highRiskUnverified} high-risk disclosure(s) immediately to reduce compliance exposure.`
-          : `Verify ${metrics.unverifiedCount} pending disclosure(s) to improve transparency rating.`,
+          : `Verify ${metrics.unverifiedCount} pending disclosure(s) to improve transparency rating.`
       );
     }
 
     if (metrics.recencyScore < 0.5 && metrics.staleCount > 0) {
       recommendations.push(
-        `Update ${metrics.staleCount} disclosure(s) older than one year to reflect current financial status.`,
+        `Update ${metrics.staleCount} disclosure(s) older than one year to reflect current financial status.`
       );
     }
 
     if (metrics.detailScore < 0.4) {
       recommendations.push(
-        'Enhance disclosure quality by adding amounts, sources, and detailed descriptions to existing entries.',
+        'Enhance disclosure quality by adding amounts, sources, and detailed descriptions to existing entries.'
       );
     }
 
     if (recommendations.length === 0) {
       recommendations.push(
-        'Excellent compliance — disclosure practices meet all benchmarks. Continue maintaining timely, verified reporting.',
+        'Excellent compliance — disclosure practices meet all benchmarks. Continue maintaining timely, verified reporting.'
       );
     }
 
