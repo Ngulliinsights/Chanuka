@@ -3,13 +3,13 @@
  * Displays conflict analysis results with network visualization
  */
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/interactive';
-import { Badge } from '@client/lib/design-system/feedback';
-import { Button } from '@client/lib/design-system/interactive';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive';
-import { Alert, AlertDescription } from '@client/lib/design-system/feedback';
-import { LoadingSpinner } from '@client/lib/design-system/feedback';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
 import { 
   AlertTriangle, 
   TrendingUp, 
@@ -301,10 +301,15 @@ export function ConflictVisualization({
   }
 
   const conflictCount = conflicts?.length || 0;
-  const severityCounts = conflicts?.reduce((acc, conflict) => {
+  const severityCounts: Record<ConflictSeverity, number> = conflicts?.reduce((acc, conflict) => {
     acc[conflict.severity] = (acc[conflict.severity] || 0) + 1;
     return acc;
-  }, {} as Record<ConflictSeverity, number>) || {};
+  }, {} as Record<ConflictSeverity, number>) || {
+    critical: 0,
+    high: 0,
+    medium: 0,
+    low: 0
+  };
 
   return (
     <div className="space-y-6">

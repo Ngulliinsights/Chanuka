@@ -3,14 +3,13 @@
  * Detailed view of a single sponsor with all related information
  */
 
-import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/interactive';
-import { Badge } from '@client/lib/design-system/feedback';
-import { Button } from '@client/lib/design-system/interactive';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive';
-import { Alert, AlertDescription } from '@client/lib/design-system/feedback';
-import { LoadingSpinner } from '@client/lib/design-system/feedback';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
 import { 
   ArrowLeft, 
   User, 
@@ -19,10 +18,8 @@ import {
   Shield, 
   AlertTriangle,
   Phone,
-  Mail,
   MapPin,
-  Calendar,
-  TrendingUp
+  Calendar
 } from 'lucide-react';
 
 import { 
@@ -34,7 +31,7 @@ import {
 } from '../hooks';
 import { ConflictVisualization } from '../ui/ConflictVisualization';
 import { RiskProfile } from '../ui/RiskProfile';
-import type { Sponsor, SponsorAffiliation, SponsorTransparency } from '../types';
+import type { Sponsor } from '../types';
 
 // ============================================================================
 // Helper Functions

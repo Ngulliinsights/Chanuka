@@ -3,7 +3,7 @@
  * Centralized security event monitoring and alerting system
  */
 
-import { SecurityMetrics, ThreatLevel } from '@client/lib/types';
+import { SecurityMetrics } from '@client/lib/types';
 import { logger } from '@client/lib/utils/logger';
 
 // Type definitions for missing types

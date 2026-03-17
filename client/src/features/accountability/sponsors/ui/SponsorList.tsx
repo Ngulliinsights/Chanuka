@@ -3,12 +3,12 @@
  * Displays a list of sponsors with filtering and search capabilities
  */
 
-import React, { useState, useMemo } from 'react';
-import { Input } from '@client/lib/design-system/interactive';
-import { Button } from '@client/lib/design-system/interactive';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/lib/design-system/interactive';
-import { LoadingSpinner } from '@client/lib/design-system/feedback';
-import { Alert, AlertDescription } from '@client/lib/design-system/feedback';
+import { useState, useMemo, useEffect } from 'react';
+import { Input } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Search, Filter, RefreshCw, Plus } from 'lucide-react';
 
 import { useSponsors, useParties, useConstituencies } from '../hooks';
@@ -65,7 +65,7 @@ export function SponsorList({
   const { data: constituencies } = useConstituencies();
 
   // Reset page when filters change
-  React.useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery, selectedParty, selectedConstituency, activeOnly, sortBy, sortOrder]);
 

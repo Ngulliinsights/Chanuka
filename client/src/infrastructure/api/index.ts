@@ -133,6 +133,26 @@ export {
 
 // Global clients
 export { contractApiClient } from './contract-client';
+
+// Export a simple api client for backward compatibility
+export const api = {
+  get: async (url: string) => {
+    const response = await globalApiClient.get(url);
+    return { data: response };
+  },
+  post: async (url: string, data?: any) => {
+    const response = await globalApiClient.post(url, data);
+    return { data: response };
+  },
+  put: async (url: string, data?: any) => {
+    const response = await globalApiClient.put(url, data);
+    return { data: response };
+  },
+  delete: async (url: string) => {
+    const response = await globalApiClient.delete(url);
+    return { data: response };
+  }
+};
 export const analyticsApiService = {
   trackEvent: async (_event: unknown) => ({ data: {} }),
   getEvents: async () => ({ data: [] }),

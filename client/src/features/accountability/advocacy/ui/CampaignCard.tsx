@@ -4,7 +4,6 @@
  * Displays campaign summary in a card format
  */
 
-import React from 'react';
 import { Users, Target, TrendingUp, Calendar } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';

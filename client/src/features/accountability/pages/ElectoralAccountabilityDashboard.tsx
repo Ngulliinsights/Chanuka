@@ -4,7 +4,7 @@
  * Main dashboard for Electoral Accountability Engine
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MPScorecard } from '../ui/mp-scorecard/MPScorecard';
 import { VotingRecordTimeline } from '../ui/mp-scorecard/VotingRecordTimeline';
@@ -19,7 +19,7 @@ export function ElectoralAccountabilityDashboard() {
   // Get sponsorId from route params or use demo data
   const [sponsorId] = useState(routeSponsorId || 'demo-sponsor-id');
   // Get constituency from user profile or use default
-  const [constituency] = useState(user?.constituency || 'Westlands');
+  const [constituency] = useState((user as any)?.constituency || 'Westlands');
 
   const handleViewDetails = () => {
     // Navigate to detailed MP accountability page

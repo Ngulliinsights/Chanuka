@@ -54,10 +54,6 @@ const BillsPortal = createLazyComponent(
   () => import('@client/features/bills/pages/BillsPortalPage'),
   'Bills Portal'
 );
-const BillsDashboard = createLazyComponent(
-  () => import('@client/features/bills/pages/bills-dashboard-page'),
-  'Bills Dashboard'
-);
 const BillDetail = createLazyComponent(
   () => import('@client/features/bills/pages/bill-detail'),
   'Bill Detail'

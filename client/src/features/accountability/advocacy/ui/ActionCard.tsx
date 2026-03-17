@@ -4,8 +4,7 @@
  * Displays action item in a card format
  */
 
-import React from 'react';
-import { Clock, Flag, CheckCircle, Play } from 'lucide-react';
+import { Clock, Flag, CheckCircle, ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -113,7 +112,7 @@ export function ActionCard({ action, onStart, onComplete, onView }: ActionCardPr
               className="flex-1"
               onClick={() => onStart(action.id)}
             >
-              <Play className="h-4 w-4 mr-2" />
+              <ArrowRight className="h-4 w-4 mr-2" />
               Start Action
             </Button>
           )}

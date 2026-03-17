@@ -3,10 +3,9 @@
  * Displays sponsor information in a card format with conflict indicators
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/interactive';
-import { Badge } from '@client/lib/design-system/feedback';
-import { Button } from '@client/lib/design-system/interactive';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import { AlertTriangle, Eye, Shield, TrendingUp, Users } from 'lucide-react';
 
 import type { Sponsor, ConflictSeverity } from '../types';

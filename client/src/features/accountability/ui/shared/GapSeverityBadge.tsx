@@ -4,7 +4,6 @@
  * Visual indicator for gap severity levels
  */
 
-import React from 'react';
 import { AlertCircle, AlertTriangle, Info, XCircle } from 'lucide-react';
 
 interface GapSeverityBadgeProps {

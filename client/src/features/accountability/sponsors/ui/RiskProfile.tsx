@@ -3,12 +3,11 @@
  * Displays detailed risk assessment for a sponsor
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/interactive';
-import { Badge } from '@client/lib/design-system/feedback';
-import { Progress } from '@client/lib/design-system/feedback';
-import { Alert, AlertDescription } from '@client/lib/design-system/feedback';
-import { LoadingSpinner } from '@client/lib/design-system/feedback';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { Alert, AlertDescription } from '@client/lib/design-system';
+import { LoadingSpinner } from '@client/lib/design-system';
 import { 
   Shield, 
   TrendingUp, 
@@ -52,13 +51,6 @@ const getRiskColor = (score: number): string => {
   if (score >= 55) return 'text-orange-600';
   if (score >= 35) return 'text-yellow-600';
   return 'text-green-600';
-};
-
-const getRiskBarColor = (score: number): string => {
-  if (score >= 75) return 'bg-red-500';
-  if (score >= 55) return 'bg-orange-500';
-  if (score >= 35) return 'bg-yellow-500';
-  return 'bg-green-500';
 };
 
 const getRiskIcon = (score: number) => {

@@ -4,7 +4,6 @@
  * Comprehensive MP accountability metrics display
  */
 
-import React from 'react';
 import { useMPScorecard } from '../../hooks/useElectoralAccountability';
 import { AccountabilityMetricCard } from '../shared/AccountabilityMetricCard';
 import { GapSeverityBadge } from '../shared/GapSeverityBadge';

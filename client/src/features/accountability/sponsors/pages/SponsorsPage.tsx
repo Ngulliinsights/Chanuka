@@ -3,7 +3,6 @@
  * Main page for sponsors listing and management
  */
 
-import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { SponsorList } from '../ui/SponsorList';

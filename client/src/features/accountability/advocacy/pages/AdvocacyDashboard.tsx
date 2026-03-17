@@ -4,8 +4,8 @@
  * Main dashboard for advocacy coordination features
  */
 
-import React, { useState } from 'react';
-import { Plus, TrendingUp, Users, Target } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, TrendingUp, Target } from 'lucide-react';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { useCampaigns, useTrendingCampaigns, useUserActions, useUserDashboard, useJoinCampaign } from '../hooks/use-advocacy';

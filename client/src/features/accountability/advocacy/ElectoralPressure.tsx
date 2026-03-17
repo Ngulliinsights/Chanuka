@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '@client/infrastructure/api';
 
@@ -67,7 +66,7 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
         })
       );
 
-      const overallGap = bills.reduce((sum, b) => sum + b.gap_score, 0) / bills.length;
+      const overallGap = bills.reduce((sum: number, b: any) => sum + b.gap_score, 0) / bills.length;
       const representationScore = Math.max(0, 100 - overallGap);
 
       return {

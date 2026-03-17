@@ -303,7 +303,7 @@ export class SponsorsApiService {
    */
   async getConflictMapping(billId?: string | number): Promise<ConflictMapping> {
     try {
-      const params = billId ? { bill_id: billId.toString() } : {};
+      const params: Record<string, string> = billId ? { bill_id: billId.toString() } : {};
       const response = await globalApiClient.get<{ data: ConflictMapping }>(
         `${this.endpoint}/conflicts/mapping`,
         { params }
