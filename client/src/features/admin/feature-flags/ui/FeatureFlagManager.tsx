@@ -4,7 +4,7 @@
  * Main admin UI for managing feature flags
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, TrendingUp } from 'lucide-react';
 import { useFeatureFlags, useDeleteFlag, useToggleFlag } from '../hooks/useFeatureFlags';
 import { FlagEditor } from './FlagEditor';

@@ -2,10 +2,10 @@
 // FEATURE FLAGS PAGE - Main admin page for feature flag management
 // ============================================================================
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FlagList } from '../ui/FlagList';
 import { FlagEditor } from '../ui/FlagEditor';
-import { FlagAnalyticsDashboard } from '../ui/FlagAnalyticsDashboard';
+import { AnalyticsDashboard as FlagAnalyticsDashboard } from '../ui/FlagAnalyticsDashboard';
 import type { FeatureFlag } from '../types';
 
 export function FeatureFlagsPage() {
