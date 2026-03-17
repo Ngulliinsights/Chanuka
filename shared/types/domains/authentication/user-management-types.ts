@@ -14,7 +14,7 @@
  * @module shared/types/domains/authentication/user-management-types
  */
 
-import { UserRole, UserStatus } from '../../core/enums';
+import { UserRole } from '../../core/enums';
 
 // ============================================================================
 // User Profile and Preferences

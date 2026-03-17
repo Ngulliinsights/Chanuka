@@ -3,6 +3,7 @@
 // ============================================================================
 
 import { useFlagAnalytics } from '../hooks/useFeatureFlags';
+import styles from './FlagAnalyticsDashboard.module.css';
 
 interface AnalyticsDashboardProps {
   flagName: string;
@@ -49,6 +50,8 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
+              title="Close analytics"
+              aria-label="Close analytics"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -109,14 +112,14 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
             <div className="text-sm font-medium text-gray-700 mb-2">Evaluation Distribution</div>
             <div className="h-8 bg-gray-200 rounded-lg overflow-hidden flex">
               <div
-                className="bg-green-500 flex items-center justify-center text-white text-xs font-medium"
-                style={{ width: `${analytics.enabledPercentage}%` }}
+                className={styles.enabledBar}
+                style={{ '--enabled-percentage': `${analytics.enabledPercentage}%` } as React.CSSProperties}
               >
                 {analytics.enabledPercentage > 10 && `${analytics.enabledPercentage.toFixed(1)}%`}
               </div>
               <div
-                className="bg-gray-400 flex items-center justify-center text-white text-xs font-medium"
-                style={{ width: `${100 - analytics.enabledPercentage}%` }}
+                className={styles.disabledBar}
+                style={{ '--disabled-percentage': `${100 - analytics.enabledPercentage}%` } as React.CSSProperties}
               >
                 {100 - analytics.enabledPercentage > 10 && `${(100 - analytics.enabledPercentage).toFixed(1)}%`}
               </div>
