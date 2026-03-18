@@ -8,115 +8,48 @@ import type {
   UpdateFlagRequest,
   FlagAnalytics,
 } from '../types';
+import { apiFetchClient } from '@client/infrastructure/api/response-handler';
 
 const API_BASE = '/api/feature-flags';
 
 export const featureFlagsApi = {
   // Get all flags
   async getAllFlags(): Promise<FeatureFlag[]> {
-    const response = await fetch(`${API_BASE}/flags`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error('Failed to fetch feature flags');
-    }
-    return response.json();
+    return apiFetchClient.get<FeatureFlag[]>(`${API_BASE}/flags`);
   },
 
   // Get single flag
   async getFlag(name: string): Promise<FeatureFlag> {
-    const response = await fetch(`${API_BASE}/flags/${name}`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch flag: ${name}`);
-    }
-    return response.json();
+    return apiFetchClient.get<FeatureFlag>(`${API_BASE}/flags/${name}`);
   },
 
   // Create flag
   async createFlag(data: CreateFlagRequest): Promise<FeatureFlag> {
-    const response = await fetch(`${API_BASE}/flags`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to create feature flag');
-    }
-    return response.json();
+    return apiFetchClient.post<FeatureFlag>(`${API_BASE}/flags`, data);
   },
 
   // Update flag
   async updateFlag(name: string, data: UpdateFlagRequest): Promise<FeatureFlag> {
-    const response = await fetch(`${API_BASE}/flags/${name}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to update flag: ${name}`);
-    }
-    return response.json();
+    return apiFetchClient.put<FeatureFlag>(`${API_BASE}/flags/${name}`, data);
   },
 
   // Delete flag
   async deleteFlag(name: string): Promise<void> {
-    const response = await fetch(`${API_BASE}/flags/${name}`, {
-      method: 'DELETE',
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to delete flag: ${name}`);
-    }
+    await apiFetchClient.delete(`${API_BASE}/flags/${name}`);
   },
 
   // Toggle flag
   async toggleFlag(name: string, enabled: boolean): Promise<FeatureFlag> {
-    const response = await fetch(`${API_BASE}/flags/${name}/toggle`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ enabled }),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to toggle flag: ${name}`);
-    }
-    return response.json();
+    return apiFetchClient.post<FeatureFlag>(`${API_BASE}/flags/${name}/toggle`, { enabled });
   },
 
   // Update rollout percentage
   async updateRollout(name: string, percentage: number): Promise<FeatureFlag> {
-    const response = await fetch(`${API_BASE}/flags/${name}/rollout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ percentage }),
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to update rollout: ${name}`);
-    }
-    return response.json();
+    return apiFetchClient.post<FeatureFlag>(`${API_BASE}/flags/${name}/rollout`, { percentage });
   },
 
   // Get analytics
   async getAnalytics(name: string): Promise<FlagAnalytics> {
-    const response = await fetch(`${API_BASE}/flags/${name}/analytics`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch analytics: ${name}`);
-    }
-    return response.json();
+    return apiFetchClient.get<FlagAnalytics>(`${API_BASE}/flags/${name}/analytics`);
   },
 };

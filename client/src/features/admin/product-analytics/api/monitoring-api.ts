@@ -10,6 +10,7 @@ import type {
   FeatureMetric,
   IntegrationLog,
 } from '../types';
+import { apiFetchClient } from '@client/infrastructure/api/response-handler';
 
 const API_BASE = '/api/monitoring';
 
@@ -18,21 +19,15 @@ const API_BASE = '/api/monitoring';
 // ============================================================================
 
 export async function getDashboardData(): Promise<MonitoringDashboardData> {
-  const response = await fetch(`${API_BASE}/dashboard`);
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch dashboard data');
-  }
-  
-  const data = await response.json();
+  const data = await apiFetchClient.get<MonitoringDashboardData>(`${API_BASE}/dashboard`);
   
   // Parse dates
-  data.features = data.features.map((feature: unknown) => ({
+  (data as any).features = (data as any).features.map((feature: unknown) => ({
     ...feature,
-    lastHealthCheck: feature.lastHealthCheck ? new Date(feature.lastHealthCheck) : undefined,
-    recentMetrics: feature.recentMetrics ? {
-      ...feature.recentMetrics,
-      timestamp: new Date(feature.recentMetrics.timestamp),
+    lastHealthCheck: (feature as any).lastHealthCheck ? new Date((feature as any).lastHealthCheck) : undefined,
+    recentMetrics: (feature as any).recentMetrics ? {
+      ...(feature as any).recentMetrics,
+      timestamp: new Date((feature as any).recentMetrics.timestamp),
     } : undefined,
   }));
   
@@ -57,20 +52,14 @@ export async function getFeatureMetrics(
     params.append('endTime', endTime.toISOString());
   }
   
-  const response = await fetch(
+  const data = await apiFetchClient.get<FeatureMetric[]>(
     `${API_BASE}/features/${featureId}/metrics?${params.toString()}`
   );
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch feature metrics');
-  }
-  
-  const data = await response.json();
   
   // Parse dates
   return data.map((metric: unknown) => ({
     ...metric,
-    timestamp: new Date(metric.timestamp),
+    timestamp: new Date((metric as any).timestamp),
   }));
 }
 
@@ -88,15 +77,9 @@ export async function getFeatureAlerts(
     params.append('resolved', resolved.toString());
   }
   
-  const response = await fetch(
+  const data = await apiFetchClient.get<IntegrationAlert[]>(
     `${API_BASE}/features/${featureId}/alerts?${params.toString()}`
   );
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch feature alerts');
-  }
-  
-  const data = await response.json();
   
   // Parse dates
   return data.map((alert: unknown) => ({
@@ -104,34 +87,18 @@ export async function getFeatureAlerts(
     created_at: new Date(alert.created_at),
     updated_at: new Date(alert.updated_at),
     acknowledgedAt: alert.acknowledgedAt ? new Date(alert.acknowledgedAt) : undefined,
-    resolvedAt: alert.resolvedAt ? new Date(alert.resolvedAt) : undefined,
+    resolvedAt: (alert as any).resolvedAt ? new Date((alert as any).resolvedAt) : undefined,
   }));
+  
+  return data;
 }
 
 export async function acknowledgeAlert(alertId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/alerts/${alertId}/acknowledge`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to acknowledge alert');
-  }
+  await apiFetchClient.put(`${API_BASE}/alerts/${alertId}/acknowledge`, {});
 }
 
 export async function resolveAlert(alertId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/alerts/${alertId}/resolve`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error('Failed to resolve alert');
-  }
+  await apiFetchClient.put(`${API_BASE}/alerts/${alertId}/resolve`, {});
 }
 
 // ============================================================================
@@ -152,20 +119,14 @@ export async function getFeatureLogs(
     params.append('limit', limit.toString());
   }
   
-  const response = await fetch(
+  const data = await apiFetchClient.get<IntegrationLog[]>(
     `${API_BASE}/features/${featureId}/logs?${params.toString()}`
   );
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch feature logs');
-  }
-  
-  const data = await response.json();
   
   // Parse dates
   return data.map((log: unknown) => ({
     ...log,
-    timestamp: new Date(log.timestamp),
+    timestamp: new Date((log as any).timestamp),
   }));
 }
 
@@ -183,13 +144,7 @@ export async function getSystemHealth(): Promise<{
   criticalAlerts: number;
   timestamp: Date;
 }> {
-  const response = await fetch(`${API_BASE}/health`);
-  
-  if (!response.ok) {
-    throw new Error('Failed to fetch system health');
-  }
-  
-  const data = await response.json();
+  const data = await apiFetchClient.get<any>(`${API_BASE}/health`);
   
   return {
     ...data,

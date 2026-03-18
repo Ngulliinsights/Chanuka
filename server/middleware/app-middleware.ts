@@ -4,6 +4,7 @@ import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
 import { performanceMonitor } from '@server/utils/missing-modules-fallback';
 import { logger } from '@server/infrastructure/observability';
+import { responseStandardizer } from '@server/middleware/response-standardizer.middleware';
 import cors from 'cors';
 import express, { Express,NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
@@ -152,6 +153,10 @@ export function configureAppMiddleware(app: Express): void {
 
   // Correlation ID middleware (must be early in the chain)
   app.use(correlationIdMiddleware);
+
+  // Response Standardizer - wraps all responses in standard format
+  // Must be early in the chain, after body parsing
+  app.use(responseStandardizer());
 
   // Request monitoring and logging pipeline
   app.use(requestLogger);

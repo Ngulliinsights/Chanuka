@@ -12,6 +12,7 @@ import type {
   ArgumentFilters,
   ArgumentSearchResult,
 } from '../types';
+import { apiFetchClient } from '@client/infrastructure/api/response-handler';
 
 const BASE_URL = '/api/argument-intelligence';
 
@@ -31,36 +32,14 @@ export async function getArguments(
   
   const url = `${BASE_URL}/arguments/${billId}${params.toString() ? `?${params.toString()}` : ''}`;
   
-  const response = await fetch(url, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch arguments: ${response.statusText}`);
-  }
-  
-  const result = await response.json();
-  return result.data;
+  return apiFetchClient.get<{ arguments: Argument[]; count: number; pagination: Record<string, unknown> }>(url);
 }
 
 /**
  * Get argument statistics for a bill
  */
 export async function getArgumentStatistics(billId: string): Promise<ArgumentStatistics> {
-  const response = await fetch(`${BASE_URL}/statistics/${billId}`, {
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    },
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch statistics: ${response.statusText}`);
-  }
-  
-  const result = await response.json();
-  return result.data;
+  return apiFetchClient.get<ArgumentStatistics>(`${BASE_URL}/statistics/${billId}`);
 }
 
 /**
@@ -74,28 +53,17 @@ export async function clusterArguments(
     maxClusters?: number;
   }
 ): Promise<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: Record<string, unknown> }> {
-  const response = await fetch(`${BASE_URL}/cluster-arguments`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
-    },
-    body: JSON.stringify({
+  return apiFetchClient.post<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: Record<string, unknown> }>(
+    `${BASE_URL}/cluster-arguments`,
+    {
       arguments: argumentList.map(arg => ({
         id: arg.id,
         text: arg.argument_text,
         position: arg.position,
       })),
       config: config || {},
-    }),
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to cluster arguments: ${response.statusText}`);
-  }
-  
-  const result = await response.json();
-  return result.data;
+    }
+  );
 }
 
 /**

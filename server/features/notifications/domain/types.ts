@@ -1,11 +1,12 @@
-import { BillTrackingPreferences as GlobalBillTrackingPreferences } from '@server/features/users/domain/user-preferences';
-
 /**
- * Combined preference type that merges global and per-bill settings.
- * Per-bill settings take precedence when available and active.
+ * Notification Types - Re-export from Shared Layer
+ * 
+ * These types have been migrated to @shared/types/domains/community/notification-types.ts
+ * This file now simply re-exports them for backward compatibility.
  */
-export interface CombinedBillTrackingPreferences extends GlobalBillTrackingPreferences {
-  _perBillSettingsApplied?: boolean; // Internal flag indicating per-bill override was used
-  alert_frequency?: GlobalBillTrackingPreferences['updateFrequency']; // Alias for compatibility
-  alert_channels?: Array<'in_app' | 'email' | 'push' | 'sms'>; // Per-bill channel format
-}
+
+export type {
+  CombinedBillTrackingPreferences,
+  NotificationTemplate,
+  UserNotification
+} from '@shared/types';

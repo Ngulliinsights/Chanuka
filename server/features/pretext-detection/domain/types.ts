@@ -1,29 +1,16 @@
 /**
- * Pretext Detection Domain Types
+ * Pretext Detection Types - Re-export from Shared Layer
  * 
- * Core types for the pretext detection feature following DDD patterns
+ * Core types for the pretext detection feature have been migrated to
+ * @shared/types/features/analysis/pretext-types.ts
+ * This file now simply re-exports them for backward compatibility.
  */
 
-export interface PretextAnalysisInput {
-  billId: string;
-  force?: boolean;
-}
-
-export interface PretextDetection {
-  type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  description: string;
-  evidence: string[];
-  confidence: number;
-}
-
-export interface PretextAnalysisResult {
-  billId: string;
-  detections: PretextDetection[];
-  score: number;
-  confidence: number;
-  analyzedAt: Date;
-}
+export type {
+  PretextAnalysisInput,
+  PretextDetection,
+  PretextAnalysisResult
+} from '@shared/types';
 
 export interface PretextAlert {
   id: string;

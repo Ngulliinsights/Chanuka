@@ -104,6 +104,9 @@ export * from './domains/feature-flags';
 // Community domain - Advocacy, search, and notification types
 export * from './domains/community';
 
+// Accessibility domain - USSD and low-bandwidth access types
+export * from './domains/accessibility';
+
 // ============================================================================
 // API Types - Contract Layer
 // ============================================================================
