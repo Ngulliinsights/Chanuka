@@ -12,27 +12,31 @@ import {
   Report,
   CreateCommentRequest,
   UpdateCommentRequest,
-  CreateVoteRequest,
   CreateReportRequest,
   CommentQueryParams,
   VoteQueryParams,
   ReportQueryParams,
-  VoteType
+  VoteType,
 } from '@shared/types/api/contracts/community.contracts';
-import { useToast } from '@client/components/ui/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 // Query Keys
 export const communityKeys = {
   all: ['community'] as const,
   comments: () => [...communityKeys.all, 'comments'] as const,
-  commentsList: (params: Partial<CommentQueryParams>) => [...communityKeys.comments(), 'list', params] as const,
+  commentsList: (params: Partial<CommentQueryParams>) =>
+    [...communityKeys.comments(), 'list', params] as const,
   comment: (id: string) => [...communityKeys.comments(), 'detail', id] as const,
-  commentTree: (billId: string, params?: any) => [...communityKeys.comments(), 'tree', billId, params] as const,
+  commentTree: (billId: string, params?: any) =>
+    [...communityKeys.comments(), 'tree', billId, params] as const,
   votes: () => [...communityKeys.all, 'votes'] as const,
-  votesList: (params: Partial<VoteQueryParams>) => [...communityKeys.votes(), 'list', params] as const,
-  userVote: (targetId: string, targetType: string) => [...communityKeys.votes(), 'user', targetType, targetId] as const,
+  votesList: (params: Partial<VoteQueryParams>) =>
+    [...communityKeys.votes(), 'list', params] as const,
+  userVote: (targetId: string, targetType: string) =>
+    [...communityKeys.votes(), 'user', targetType, targetId] as const,
   reports: () => [...communityKeys.all, 'reports'] as const,
-  reportsList: (params: Partial<ReportQueryParams>) => [...communityKeys.reports(), 'list', params] as const,
+  reportsList: (params: Partial<ReportQueryParams>) =>
+    [...communityKeys.reports(), 'list', params] as const,
   stats: () => [...communityKeys.all, 'stats'] as const,
   trends: (params: any) => [...communityKeys.all, 'trends', params] as const,
   contributors: (params: any) => [...communityKeys.all, 'contributors', params] as const,
@@ -57,11 +61,14 @@ export function useComment(id: string) {
   });
 }
 
-export function useCommentTree(billId: string, params?: { 
-  maxDepth?: number; 
-  sortBy?: 'newest' | 'oldest' | 'popular'; 
-  limit?: number 
-}) {
+export function useCommentTree(
+  billId: string,
+  params?: {
+    maxDepth?: number;
+    sortBy?: 'newest' | 'oldest' | 'popular';
+    limit?: number;
+  }
+) {
   return useQuery({
     queryKey: communityKeys.commentTree(billId, params),
     queryFn: () => communityApiService.getCommentTree(billId, params),
@@ -85,17 +92,16 @@ export function useCreateComment() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (data: CreateCommentRequest) => 
-      communityApiService.createComment(data),
+    mutationFn: (data: CreateCommentRequest) => communityApiService.createComment(data),
     onSuccess: (response, variables) => {
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
       queryClient.invalidateQueries({ queryKey: communityKeys.commentTree(variables.billId) });
       queryClient.invalidateQueries({ queryKey: communityKeys.stats() });
-      
+
       if (variables.parentId) {
-        queryClient.invalidateQueries({ 
-          queryKey: [...communityKeys.comment(variables.parentId), 'replies'] 
+        queryClient.invalidateQueries({
+          queryKey: [...communityKeys.comment(variables.parentId), 'replies'],
         });
       }
 
@@ -124,7 +130,7 @@ export function useUpdateComment() {
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
-      
+
       toast({
         title: 'Comment Updated',
         description: 'Your comment has been updated successfully',
@@ -150,7 +156,7 @@ export function useDeleteComment() {
       queryClient.removeQueries({ queryKey: communityKeys.comment(id) });
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
       queryClient.invalidateQueries({ queryKey: communityKeys.stats() });
-      
+
       toast({
         title: 'Comment Deleted',
         description: 'Your comment has been deleted',
@@ -185,15 +191,12 @@ export function useVoteOnComment() {
       communityApiService.voteOnComment(commentId, type),
     onSuccess: (response, { commentId, type }) => {
       // Update user vote cache
-      queryClient.setQueryData(
-        communityKeys.userVote(commentId, 'comment'),
-        response
-      );
-      
+      queryClient.setQueryData(communityKeys.userVote(commentId, 'comment'), response);
+
       // Invalidate comment to refresh vote counts
       queryClient.invalidateQueries({ queryKey: communityKeys.comment(commentId) });
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
-      
+
       toast({
         title: type === 'upvote' ? 'Upvoted' : 'Downvoted',
         description: `You ${type === 'upvote' ? 'upvoted' : 'downvoted'} this comment`,
@@ -217,11 +220,8 @@ export function useVoteOnBill() {
     mutationFn: ({ billId, type }: { billId: string; type: VoteType }) =>
       communityApiService.voteOnBill(billId, type),
     onSuccess: (response, { billId, type }) => {
-      queryClient.setQueryData(
-        communityKeys.userVote(billId, 'bill'),
-        response
-      );
-      
+      queryClient.setQueryData(communityKeys.userVote(billId, 'bill'), response);
+
       toast({
         title: type === 'upvote' ? 'Supported' : 'Opposed',
         description: `You ${type === 'upvote' ? 'support' : 'oppose'} this bill`,
@@ -243,11 +243,10 @@ export function useCreateReport() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (data: CreateReportRequest) =>
-      communityApiService.createReport(data),
+    mutationFn: (data: CreateReportRequest) => communityApiService.createReport(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: communityKeys.reports() });
-      
+
       toast({
         title: 'Report Submitted',
         description: 'Thank you for reporting. We will review this content.',
@@ -352,22 +351,19 @@ export function useRealTimeComments(billId: string) {
   useEffect(() => {
     if (!billId) return;
 
-    const unsubscribe = communityApiService.subscribeToComments(billId, (comment) => {
+    const unsubscribe = communityApiService.subscribeToComments(billId, comment => {
       // Add new comment to cache
-      queryClient.setQueryData(
-        communityKeys.commentTree(billId),
-        (oldData: any) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            data: {
-              ...oldData.data,
-              // Add new comment to the tree
-              // This would need more sophisticated logic for proper tree insertion
-            }
-          };
-        }
-      );
+      queryClient.setQueryData(communityKeys.commentTree(billId), (oldData: any) => {
+        if (!oldData) return oldData;
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            // Add new comment to the tree
+            // This would need more sophisticated logic for proper tree insertion
+          },
+        };
+      });
 
       // Invalidate queries to refresh
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
@@ -392,7 +388,7 @@ export function useRealTimeVotes(targetId: string, targetType: string) {
   useEffect(() => {
     if (!targetId || !targetType) return;
 
-    const unsubscribe = communityApiService.subscribeToVotes(targetId, targetType, (vote) => {
+    const unsubscribe = communityApiService.subscribeToVotes(targetId, targetType, vote => {
       // Update vote counts in cache
       if (targetType === 'comment') {
         queryClient.invalidateQueries({ queryKey: communityKeys.comment(targetId) });
@@ -422,10 +418,12 @@ export function useHighlightComment() {
     onSuccess: (response, { id, highlight }) => {
       queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
-      
+
       toast({
         title: highlight ? 'Comment Highlighted' : 'Highlight Removed',
-        description: highlight ? 'Comment has been highlighted' : 'Comment highlight has been removed',
+        description: highlight
+          ? 'Comment has been highlighted'
+          : 'Comment highlight has been removed',
       });
     },
     onError: (error: Error) => {
@@ -448,7 +446,7 @@ export function usePinComment() {
     onSuccess: (response, { id, pin }) => {
       queryClient.invalidateQueries({ queryKey: communityKeys.comment(id) });
       queryClient.invalidateQueries({ queryKey: communityKeys.comments() });
-      
+
       toast({
         title: pin ? 'Comment Pinned' : 'Comment Unpinned',
         description: pin ? 'Comment has been pinned' : 'Comment has been unpinned',

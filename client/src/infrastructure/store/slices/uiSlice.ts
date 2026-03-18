@@ -178,19 +178,6 @@ export const {
 } = uiSlice.actions;
 
 // Export selectors
-export const selectTheme = (state: { ui: UIState }) => state.ui.theme;
-export const selectSidebarCollapsed = (state: { ui: UIState }) => state.ui.sidebarCollapsed;
-export const selectCurrentPage = (state: { ui: UIState }) => state.ui.currentPage;
-export const selectBreadcrumbs = (state: { ui: UIState }) => state.ui.breadcrumbs;
-export const selectActiveModal = (state: { ui: UIState }) => state.ui.activeModal;
-export const selectModalData = (state: { ui: UIState }) => state.ui.modalData;
-export const selectGlobalLoading = (state: { ui: UIState }) => state.ui.globalLoading;
-export const selectLoadingMessage = (state: { ui: UIState }) => state.ui.loadingMessage;
-export const selectToast = (state: { ui: UIState }) => state.ui.toast;
-export const selectIsOnline = (state: { ui: UIState }) => state.ui.isOnline;
-export const selectIsMobile = (state: { ui: UIState }) => state.ui.isMobile;
-export const selectScreenSize = (state: { ui: UIState }) => state.ui.screenSize;
-export const selectFeatures = (state: { ui: UIState }) => state.ui.features;
-
+export export export export export export export export export export export export export 
 // Export reducer
 export default uiSlice.reducer;

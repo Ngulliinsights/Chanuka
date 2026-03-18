@@ -1,6 +1,6 @@
 /**
  * useBillComparison Hook
- * 
+ *
  * Hook for comparing multiple bills side-by-side.
  * Handles fetching bills, computing differences, and managing comparison state.
  */
@@ -38,10 +38,10 @@ interface MetadataDiff {
 
 /**
  * Hook to compare multiple bills
- * 
+ *
  * @param options - Configuration including bill IDs to compare
  * @returns Comparison result with bills, loading state, and computed differences
- * 
+ *
  * @example
  * ```tsx
  * const { bills, differences, isLoading } = useBillComparison({
@@ -65,9 +65,7 @@ export function useBillComparison(options: BillComparisonOptions): ComparisonRes
   // Aggregate loading and error states
   const isLoading = billQueries.some(q => q.isLoading);
   const error = billQueries.find(q => q.error)?.error as Error | null;
-  const bills = billQueries
-    .filter(q => q.data)
-    .map(q => q.data as Bill);
+  const bills = billQueries.filter(q => q.data).map(q => q.data as Bill);
 
   // Compute differences between bills
   const differences = useMemo(() => {
@@ -128,13 +126,11 @@ function computeDifferences(bills: Bill[]): ComparisonDifferences {
   const allKeywords = bills.map(bill => extractKeywords(bill));
   const commonKeywords = findCommonKeywords(allKeywords);
   const uniqueKeywords: Record<string, string[]> = {};
-  
+
   bills.forEach((_, index) => {
     const keywords = allKeywords[index];
     if (keywords) {
-      uniqueKeywords[`bill${index + 1}`] = keywords.filter(
-        kw => !commonKeywords.includes(kw)
-      );
+      uniqueKeywords[`bill${index + 1}`] = keywords.filter(kw => !commonKeywords.includes(kw));
     }
   });
 
@@ -160,9 +156,7 @@ function computeTextSimilarity(bills: Bill[]): number {
   });
 
   // Simple word-based similarity
-  const wordSets = texts.map(text => 
-    new Set(text.split(/\s+/).filter(word => word.length > 3))
-  );
+  const wordSets = texts.map(text => new Set(text.split(/\s+/).filter(word => word.length > 3)));
 
   let totalSimilarity = 0;
   let comparisons = 0;
@@ -171,14 +165,12 @@ function computeTextSimilarity(bills: Bill[]): number {
     for (let j = i + 1; j < wordSets.length; j++) {
       const setI = wordSets[i];
       const setJ = wordSets[j];
-      
+
       if (!setI || !setJ) continue;
-      
-      const intersection = new Set(
-        [...setI].filter(word => setJ.has(word))
-      );
+
+      const intersection = new Set([...setI].filter(word => setJ.has(word)));
       const union = new Set([...setI, ...setJ]);
-      
+
       const similarity = (intersection.size / union.size) * 100;
       totalSimilarity += similarity;
       comparisons++;
@@ -196,7 +188,7 @@ function extractKeywords(bill: Bill): string[] {
   const summary = bill.summary || '';
   const text = `${title} ${summary}`.toLowerCase();
   const words = text.split(/\s+/).filter(word => word.length > 4);
-  
+
   // Count word frequency
   const frequency: Record<string, number> = {};
   words.forEach(word => {
@@ -218,7 +210,7 @@ function findCommonKeywords(allKeywords: string[][]): string[] {
 
   const firstSet = new Set(allKeywords[0] || []);
   if (firstSet.size === 0) return [];
-  
+
   const common = [...firstSet].filter(keyword =>
     allKeywords.every(keywords => keywords && keywords.includes(keyword))
   );

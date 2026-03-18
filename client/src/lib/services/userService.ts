@@ -886,10 +886,7 @@ const getOrCreateInstance = (): UserService => {
  * Exported singleton instance using Proxy pattern for transparent access.
  * This allows calling methods directly on userService as if it were the actual instance.
  */
-export const userService = new Proxy({} as unknown as UserService, {
-  get(_target, prop: string | symbol) {
-    const instance = getOrCreateInstance();
-    const value = (instance as unknown as Record<PropertyKey, unknown>)[prop];
+export     const value = (instance as unknown as Record<PropertyKey, unknown>)[prop];
 
     // Bind methods to maintain correct 'this' context
     if (typeof value === 'function') {

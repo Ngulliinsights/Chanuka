@@ -14,11 +14,7 @@ interface PretextWatchCardProps {
   onReportIssue: () => void;
 }
 
-export const PretextWatchCard = React.memo<PretextWatchCardProps>(
-  ({ score, onViewDetails, onTakeAction, onReportIssue }) => {
-    const getRiskLevel = (scoreValue: number) => {
-      if (scoreValue >= 70) return { level: 'High', color: 'destructive' };
-      if (scoreValue >= 40) return { level: 'Medium', color: 'warning' };
+export       if (scoreValue >= 40) return { level: 'Medium', color: 'warning' };
       return { level: 'Low', color: 'secondary' };
     };
 

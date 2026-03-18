@@ -112,10 +112,7 @@ export function useUnifiedDiscussion({
     enableTypingIndicators,
   });
 
-  const stateSyncService = useMemo(
-    () => new StateSyncService(queryClient),
-    [queryClient]
-  );
+  const stateSyncService = useMemo(() => new StateSyncService(queryClient), [queryClient]);
 
   const commentsQueryKey = useMemo(
     () => ['comments', billId, discussionState.sortBy, discussionState.filterBy] as const,
@@ -172,20 +169,18 @@ export function useUnifiedDiscussion({
 
   const prependComment = useCallback(
     (newComment: EnrichedComment) => {
-      queryClient.setQueryData(
-        commentsQueryKey,
-        (old: EnrichedComment[] = []) => [newComment, ...old]
-      );
+      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) => [
+        newComment,
+        ...old,
+      ]);
     },
     [queryClient, commentsQueryKey]
   );
 
   const replaceComment = useCallback(
     (updated: EnrichedComment) => {
-      queryClient.setQueryData(
-        commentsQueryKey,
-        (old: EnrichedComment[] = []) =>
-          old.map(c => (c.id === updated.id ? updated : c))
+      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) =>
+        old.map(c => (c.id === updated.id ? updated : c))
       );
     },
     [queryClient, commentsQueryKey]
@@ -193,10 +188,8 @@ export function useUnifiedDiscussion({
 
   const removeComment = useCallback(
     (commentId: string) => {
-      queryClient.setQueryData(
-        commentsQueryKey,
-        (old: EnrichedComment[] = []) =>
-          old.filter(c => String(c.id) !== String(commentId))
+      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) =>
+        old.filter(c => String(c.id) !== String(commentId))
       );
     },
     [queryClient, commentsQueryKey]
@@ -285,10 +278,10 @@ export function useUnifiedDiscussion({
       return response.data as UnifiedThread;
     },
     onSuccess: newThread => {
-      queryClient.setQueryData(
-        ['threads', billId],
-        (old: UnifiedThread[] = []) => [newThread, ...old]
-      );
+      queryClient.setQueryData(['threads', billId], (old: UnifiedThread[] = []) => [
+        newThread,
+        ...old,
+      ]);
       setDiscussionState(prev => ({ ...prev, currentThreadId: newThread.id }));
       stateSyncService.syncThreadCreated(newThread);
     },
@@ -378,8 +371,8 @@ export function useUnifiedDiscussion({
           }
         }
       }),
-      
-      realTimeService.subscribe(`bill:${billId}`, () => {})
+
+      realTimeService.subscribe(`bill:${billId}`, () => {}),
     ];
 
     if (discussionState.currentThreadId) {
@@ -430,8 +423,7 @@ export function useUnifiedDiscussion({
   );
 
   const createThread = useCallback(
-    (data: CreateThreadRequest): Promise<UnifiedThread> =>
-      createThreadMutation.mutateAsync(data),
+    (data: CreateThreadRequest): Promise<UnifiedThread> => createThreadMutation.mutateAsync(data),
     [createThreadMutation]
   );
 

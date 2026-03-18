@@ -130,12 +130,12 @@ function MPAccountabilityPage() {
         onViewDetails={() => console.log('View details')}
         onCreateCampaign={() => console.log('Create campaign')}
       />
-      
+
       <VotingRecordTimeline
         sponsorId="sponsor-uuid"
         constituency="Westlands"
         includeGapAnalysis={true}
-        onVoteClick={(record) => console.log('Vote clicked:', record)}
+        onVoteClick={record => console.log('Vote clicked:', record)}
       />
     </div>
   );
@@ -170,7 +170,7 @@ import { useCreatePressureCampaign } from '@/features/electoral-accountability';
 function CampaignForm() {
   const createCampaign = useCreatePressureCampaign();
 
-  const handleSubmit = async (data) => {
+  const handleSubmit = async data => {
     try {
       const campaign = await createCampaign.mutateAsync({
         campaignName: 'Hold MP Accountable',
@@ -196,12 +196,14 @@ function CampaignForm() {
 ### Colors
 
 **Severity Levels:**
+
 - Low: Green (`bg-green-50`, `text-green-800`, `border-green-200`)
 - Medium: Yellow (`bg-yellow-50`, `text-yellow-800`, `border-yellow-200`)
 - High: Orange (`bg-orange-50`, `text-orange-800`, `border-orange-200`)
 - Critical: Red (`bg-red-50`, `text-red-800`, `border-red-200`)
 
 **Vote Types:**
+
 - Yes: Green (`text-green-600`, `bg-green-50`)
 - No: Red (`text-red-600`, `bg-red-50`)
 - Abstain: Yellow (`text-yellow-600`, `bg-yellow-50`)
@@ -357,19 +359,14 @@ describe('ElectoralAccountabilityDashboard', () => {
 
 ```tsx
 // Link from bill detail page to accountability
-<Link to={`/accountability/mp/${bill.sponsorId}?bill=${bill.id}`}>
-  View MP Accountability
-</Link>
+<Link to={`/accountability/mp/${bill.sponsorId}?bill=${bill.id}`}>View MP Accountability</Link>
 ```
 
 ### Community Feature
 
 ```tsx
 // Show constituency sentiment in community discussions
-<ConstituencySentimentDisplay
-  billId={bill.id}
-  constituency={user.constituency}
-/>
+<ConstituencySentimentDisplay billId={bill.id} constituency={user.constituency} />
 ```
 
 ### Notifications Feature
@@ -415,15 +412,19 @@ VITE_ENABLE_CAMPAIGN_CREATION=true
 ### Common Issues
 
 **Issue:** "Failed to fetch voting record"
+
 - **Solution:** Check API endpoint is accessible and sponsor ID is valid
 
 **Issue:** "No voting records found"
+
 - **Solution:** Verify data exists in database for the MP and constituency
 
 **Issue:** Components not rendering
+
 - **Solution:** Ensure React Query provider is configured in app root
 
 **Issue:** TypeScript errors
+
 - **Solution:** Run `npm install` to ensure all types are available
 
 ---

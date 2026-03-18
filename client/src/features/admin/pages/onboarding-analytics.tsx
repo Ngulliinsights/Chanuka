@@ -16,14 +16,14 @@ interface OnboardingMetrics {
 
 /**
  * Onboarding Analytics Dashboard
- * 
+ *
  * Displays comprehensive metrics about the onboarding experience:
  * - Completion rates
  * - Time to complete
  * - Step-by-step dropoff
  * - Persona distribution
  * - Daily trends
- * 
+ *
  * Helps identify friction points and optimize the onboarding flow.
  */
 export function OnboardingAnalytics() {
@@ -58,8 +58,8 @@ export function OnboardingAnalytics() {
           personaDistribution: {
             'Concerned Citizen': 45,
             'Policy Analyst': 25,
-            'Activist': 20,
-            'Journalist': 10,
+            Activist: 20,
+            Journalist: 10,
           },
           stepDropoff: [
             { step: 1, retention: 100, stepName: 'Welcome' },
@@ -93,7 +93,7 @@ export function OnboardingAnalytics() {
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-3xl font-bold">Onboarding Analytics</h1>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
@@ -134,7 +134,9 @@ export function OnboardingAnalytics() {
             <CardTitle className="text-sm">Avg. Time</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{Math.floor(metrics.averageCompletionTime / 60)}m</div>
+            <div className="text-2xl font-bold">
+              {Math.floor(metrics.averageCompletionTime / 60)}m
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -161,9 +163,11 @@ export function OnboardingAnalytics() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            {metrics.stepDropoff.map((step) => (
+            {metrics.stepDropoff.map(step => (
               <div key={step.step} className="flex items-center justify-between">
-                <span>Step {step.step}: {step.stepName}</span>
+                <span>
+                  Step {step.step}: {step.stepName}
+                </span>
                 <div className="flex items-center gap-2">
                   <div className="w-32 bg-gray-200 rounded-full h-2">
                     <div

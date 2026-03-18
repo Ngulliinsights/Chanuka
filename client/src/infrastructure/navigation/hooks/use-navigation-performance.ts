@@ -33,7 +33,10 @@ export function useNavigationPerformance() {
           let totalShift = 0;
 
           entries.forEach(entry => {
-            if (entry.entryType === 'layout-shift' && !(entry as unknown as Record<string, unknown>).hadRecentInput) {
+            if (
+              entry.entryType === 'layout-shift' &&
+              !(entry as unknown as Record<string, unknown>).hadRecentInput
+            ) {
               totalShift += (entry as unknown as Record<string, unknown>).value;
             }
           });

@@ -1,8 +1,8 @@
 /**
  * Telemetry Sub-module
- * 
+ *
  * Provides system telemetry data collection and aggregation.
- * 
+ *
  * Requirements: 3.1, 11.5
  */
 
@@ -20,10 +20,9 @@ export const telemetryService = {
   sendMetrics: async (data: any) => {
     console.debug('[TelemetryService] Sending metrics:', data);
     return Promise.resolve();
-  }
+  },
 };
 
-export const TelemetryServiceImpl = {};
 export type TelemetryService = any;
 
 /**
@@ -36,7 +35,7 @@ export async function sendTelemetry(data: {
   timestamp?: Date;
 }): Promise<void> {
   const service = telemetryService;
-  
+
   // Convert to the format expected by the telemetry service
   const metricsData = {
     timestamp: data.timestamp || new Date(),

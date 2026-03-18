@@ -12,7 +12,7 @@ import { AuthApiService, setAuthApiService } from '../services/auth-api-service'
 import { sessionManager } from '../services/session-manager';
 import { tokenManager } from '../services/token-manager';
 
-import { createAuthConfig, validateAuthConfig, type AuthSettings } from './auth-config';
+import { createAuthConfig, validateAuthConfig } from './auth-config';
 /**
  * Authentication initialization options
  */

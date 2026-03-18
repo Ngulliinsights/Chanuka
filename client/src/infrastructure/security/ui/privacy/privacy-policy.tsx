@@ -1,5 +1,4 @@
 import { Shield, Eye, Clock, Users, Network } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import {
@@ -9,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/lib/design-system';
-import { logger } from '@client/lib/utils/logger';
 
 export function PrivacyPolicy() {
   return (

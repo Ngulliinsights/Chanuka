@@ -29,12 +29,10 @@ describe('AlertManagement', () => {
   });
 
   it('renders loading state', () => {
-    vi.mocked(monitoringApi.getFeatureAlerts).mockImplementation(
-      () => new Promise(() => {})
-    );
+    vi.mocked(monitoringApi.getFeatureAlerts).mockImplementation(() => new Promise(() => {}));
 
     render(<AlertManagement featureId="test-feature" />, { wrapper: createWrapper() });
-    
+
     expect(screen.getByRole('status', { hidden: true })).toBeInTheDocument();
   });
 

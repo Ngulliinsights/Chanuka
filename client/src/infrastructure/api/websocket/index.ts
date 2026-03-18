@@ -1,6 +1,6 @@
 /**
  * WebSocket Client Sub-Module
- * 
+ *
  * Consolidated WebSocket functionality including:
  * - WebSocket client with reconnection
  * - Connection state management
@@ -10,11 +10,7 @@
  */
 
 // Unified WebSocket client
-export {
-  UnifiedWebSocketClient,
-  createWebSocketClient,
-} from './client';
-
+export { UnifiedWebSocketClient, createWebSocketClient } from './client';
 
 // WebSocket types
 export type {

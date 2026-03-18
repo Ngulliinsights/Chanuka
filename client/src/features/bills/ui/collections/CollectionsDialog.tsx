@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, FolderPlus, X } from 'lucide-react';
+import { Plus, FolderPlus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,10 @@ import { Input } from '@client/lib/design-system';
 import { Label } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 import { Switch } from '@client/lib/design-system';
-import { collectionsService, BillCollection } from '@client/features/bills/services/collections-service';
+import {
+  collectionsService,
+  BillCollection,
+} from '@client/features/bills/services/collections-service';
 import { useToast } from '@client/lib/hooks/use-toast';
 
 interface CollectionsDialogProps {
@@ -43,7 +46,10 @@ export function CollectionsDialog({ billId, onCollectionCreated }: CollectionsDi
       description: description.trim() || undefined,
       billIds: billId ? [billId] : [],
       isPublic,
-      tags: tags.split(',').map(t => t.trim()).filter(Boolean),
+      tags: tags
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean),
     });
 
     toast({
@@ -77,7 +83,7 @@ export function CollectionsDialog({ billId, onCollectionCreated }: CollectionsDi
             <Input
               id="name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder="My Bills Collection"
             />
           </div>
@@ -86,7 +92,7 @@ export function CollectionsDialog({ billId, onCollectionCreated }: CollectionsDi
             <Textarea
               id="description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={e => setDescription(e.target.value)}
               placeholder="What is this collection about?"
               rows={3}
             />
@@ -96,17 +102,13 @@ export function CollectionsDialog({ billId, onCollectionCreated }: CollectionsDi
             <Input
               id="tags"
               value={tags}
-              onChange={(e) => setTags(e.target.value)}
+              onChange={e => setTags(e.target.value)}
               placeholder="education, health, finance"
             />
           </div>
           <div className="flex items-center justify-between">
             <Label htmlFor="public">Make public</Label>
-            <Switch
-              id="public"
-              checked={isPublic}
-              onCheckedChange={setIsPublic}
-            />
+            <Switch id="public" checked={isPublic} onCheckedChange={setIsPublic} />
           </div>
         </div>
         <div className="flex justify-end gap-2">

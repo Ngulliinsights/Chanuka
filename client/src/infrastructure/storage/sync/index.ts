@@ -18,8 +18,7 @@
  * });
  *
  * // Check sync status
- * const status = backgroundSyncManager.getStatus();
- * ```
+ *  * ```
  */
 
 export * from './background-sync-manager';
@@ -39,7 +38,6 @@ export * from './background-sync-manager';
  * });
  *
  * // Get pending sync tasks
- * const pending = backgroundSyncManager.getPendingTasks();
- * ```
+ *  * ```
  */
 export { backgroundSyncManager } from './background-sync-manager';

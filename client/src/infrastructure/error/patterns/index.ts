@@ -1,6 +1,6 @@
 /**
  * Error Handling Patterns (Strategic - Future Use)
- * 
+ *
  * Optional patterns for advanced error handling.
  * Not required for basic usage, but available when needed.
  */

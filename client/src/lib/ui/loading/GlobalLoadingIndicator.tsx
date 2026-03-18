@@ -203,10 +203,7 @@ export const GlobalLoadingIndicator = React.memo<GlobalLoadingIndicatorProps>(
 
           {/* Offline indicator */}
           {!state.isOnline && (
-            <Network
-              className="h-4 w-4 text-red-500 flex-shrink-0"
-              aria-label="Offline"
-            />
+            <Network className="h-4 w-4 text-red-500 flex-shrink-0" aria-label="Offline" />
           )}
         </div>
 

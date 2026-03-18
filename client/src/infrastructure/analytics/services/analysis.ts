@@ -9,12 +9,20 @@
 import { globalApiClient } from '@client/infrastructure/api';
 import { logger } from '@client/lib/utils/logger';
 import { billAnalysisSchema } from '@shared/validation/schemas/analytics.schema';
-import type { BillAnalysis, StakeholderImpact, CorporateConnection } from '@shared/validation/schemas/analytics.schema';
+import type {
+  BillAnalysis,
+  StakeholderImpact,
+  CorporateConnection,
+} from '@shared/validation/schemas/analytics.schema';
 
 /**
  * Core interfaces for bill analysis system
  */
-export type { BillAnalysis, StakeholderImpact, CorporateConnection } from '@shared/validation/schemas/analytics.schema';
+export type {
+  BillAnalysis,
+  StakeholderImpact,
+  CorporateConnection,
+} from '@shared/validation/schemas/analytics.schema';
 
 /**
  * Result type for conflict analysis operations

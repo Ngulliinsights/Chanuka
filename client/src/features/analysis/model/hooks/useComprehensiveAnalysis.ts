@@ -1,11 +1,11 @@
 /**
  * useComprehensiveAnalysis Hook
- * 
+ *
  * React hook for fetching and managing comprehensive bill analysis data.
  * Integrates with React Query for caching and automatic refetching.
  */
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { analysisApiService } from '../services/analysis-api.service';
 import type { ComprehensiveBillAnalysis } from '@shared/types/features/analysis';
 
@@ -17,10 +17,10 @@ interface UseComprehensiveAnalysisOptions {
 
 /**
  * Hook to fetch comprehensive analysis for a bill
- * 
+ *
  * @param options - Configuration options including bill ID and force flag
  * @returns React Query result with analysis data
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading, error } = useComprehensiveAnalysis({

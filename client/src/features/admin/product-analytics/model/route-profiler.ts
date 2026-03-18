@@ -55,6 +55,4 @@ class RouteProfiler {
   }
 }
 
-export const routeProfiler = RouteProfiler.getInstance();
-
 export type { RouteMetrics };

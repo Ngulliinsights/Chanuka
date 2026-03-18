@@ -28,13 +28,19 @@ describe('HealthStatusDisplay', () => {
   });
 
   it('applies correct size classes', () => {
-    const { container: smallContainer } = render(<HealthStatusDisplay status="healthy" size="sm" />);
+    const { container: smallContainer } = render(
+      <HealthStatusDisplay status="healthy" size="sm" />
+    );
     expect(smallContainer.querySelector('.w-2')).toBeInTheDocument();
 
-    const { container: mediumContainer } = render(<HealthStatusDisplay status="healthy" size="md" />);
+    const { container: mediumContainer } = render(
+      <HealthStatusDisplay status="healthy" size="md" />
+    );
     expect(mediumContainer.querySelector('.w-3')).toBeInTheDocument();
 
-    const { container: largeContainer } = render(<HealthStatusDisplay status="healthy" size="lg" />);
+    const { container: largeContainer } = render(
+      <HealthStatusDisplay status="healthy" size="lg" />
+    );
     expect(largeContainer.querySelector('.w-4')).toBeInTheDocument();
   });
 });

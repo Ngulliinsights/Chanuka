@@ -1,6 +1,6 @@
 /**
  * Circuit Breaker Shared Types
- * 
+ *
  * Extracted to prevent circular dependencies between
  * circuit-breaker-monitor and interceptors modules.
  */

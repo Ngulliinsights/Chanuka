@@ -369,8 +369,8 @@ export class PerformanceApiService {
    * @example
    * ```typescript
    * const benchmarks = await service.getBenchmarks();
-   * const lcpGood = benchmarks.webVitals.LCP.good; // 2500ms
-   * const lcpPoor = benchmarks.webVitals.LCP.poor; // 4000ms
+   *  // 2500ms
+   *  // 4000ms
    * ```
    */
   async getBenchmarks(): Promise<PerformanceBenchmarks> {
@@ -545,4 +545,4 @@ export class PerformanceApiService {
  * await performanceApiService.reportMetrics(metricsPayload);
  * ```
  */
-export const performanceApiService = new PerformanceApiService();
+export 

@@ -15,10 +15,7 @@ export interface UserNotifications {
   preferences: NotificationPreference[];
 }
 
-export const notificationsService = {
-  async fetchPreferences(): Promise<NotificationPreference[]> {
-    const response = await globalApiClient.get('/api/notifications/preferences');
-    return response.data;
+export     return response.data;
   },
 
   async updatePreference(type: string, channels: string[], enabled: boolean): Promise<void> {

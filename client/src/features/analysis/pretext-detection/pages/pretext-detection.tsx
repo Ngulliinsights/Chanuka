@@ -1,15 +1,20 @@
 /**
  * Pretext Detection Page
- * 
+ *
  * Main page for the pretext detection feature
  */
 
 import React, { useState, useEffect } from 'react';
 
 import { AlertTriangle, Shield, TrendingUp, Clock } from 'lucide-react';
-import { PretextDetectionPanel } from '../ui/PretextDetectionPanel';
 import { usePretextAlerts, usePretextAnalytics } from '../hooks/usePretextDetectionApi';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
@@ -20,7 +25,7 @@ import { analyticsService } from '@client/infrastructure/observability/analytics
  */
 export function PretextDetectionPage() {
   const [selectedTab, setSelectedTab] = useState('overview');
-  
+
   // Fetch alerts and analytics
   const { data: alerts, isLoading: alertsLoading, error: alertsError } = usePretextAlerts();
   const { data: analytics, isLoading: analyticsLoading } = usePretextAnalytics();
@@ -49,7 +54,6 @@ export function PretextDetectionPage() {
 
   return (
     <>
-
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Header */}
@@ -59,7 +63,8 @@ export function PretextDetectionPage() {
               <h1 className="text-3xl font-bold text-gray-900">Pretext Detection</h1>
             </div>
             <p className="text-gray-600">
-              Identify potential pretext bills using advanced pattern recognition, timing analysis, and network mapping.
+              Identify potential pretext bills using advanced pattern recognition, timing analysis,
+              and network mapping.
             </p>
           </div>
 
@@ -138,7 +143,8 @@ export function PretextDetectionPage() {
                 <CardHeader>
                   <CardTitle>How Pretext Detection Works</CardTitle>
                   <CardDescription>
-                    Our system analyzes bills using multiple indicators to identify potential pretext legislation
+                    Our system analyzes bills using multiple indicators to identify potential
+                    pretext legislation
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -152,7 +158,8 @@ export function PretextDetectionPage() {
                       <div>
                         <h3 className="font-semibold mb-1">Timing Analysis</h3>
                         <p className="text-sm text-gray-600">
-                          Detects bills introduced shortly after crisis events or coordinated with media coverage
+                          Detects bills introduced shortly after crisis events or coordinated with
+                          media coverage
                         </p>
                       </div>
                     </div>
@@ -194,7 +201,8 @@ export function PretextDetectionPage() {
                       <div>
                         <h3 className="font-semibold mb-1">Scope Creep Detection</h3>
                         <p className="text-sm text-gray-600">
-                          Analyzes bill text for broad powers or vague language beyond stated purpose
+                          Analyzes bill text for broad powers or vague language beyond stated
+                          purpose
                         </p>
                       </div>
                     </div>
@@ -217,7 +225,7 @@ export function PretextDetectionPage() {
                 </Card>
               ) : alerts && alerts.length > 0 ? (
                 <div className="space-y-4">
-                  {alerts.map((alert) => (
+                  {alerts.map(alert => (
                     <Card key={alert.id}>
                       <CardHeader>
                         <div className="flex items-center justify-between">
@@ -227,15 +235,16 @@ export function PretextDetectionPage() {
                               alert.status === 'pending'
                                 ? 'default'
                                 : alert.status === 'approved'
-                                ? 'destructive'
-                                : 'secondary'
+                                  ? 'destructive'
+                                  : 'secondary'
                             }
                           >
                             {alert.status}
                           </Badge>
                         </div>
                         <CardDescription>
-                          Risk Score: {alert.score}/100 • Created {new Date(alert.createdAt).toLocaleDateString()}
+                          Risk Score: {alert.score}/100 • Created{' '}
+                          {new Date(alert.createdAt).toLocaleDateString()}
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -276,7 +285,11 @@ export function PretextDetectionPage() {
                   </CardHeader>
                   <CardContent>
                     {analyticsLoading ? (
-                      <LoadingStateManager type="content" state="loading" message="Loading analytics..." />
+                      <LoadingStateManager
+                        type="content"
+                        state="loading"
+                        message="Loading analytics..."
+                      />
                     ) : analytics?.detectionsByType ? (
                       <div className="space-y-2">
                         {Object.entries(analytics.detectionsByType).map(([type, count]) => (
@@ -298,7 +311,11 @@ export function PretextDetectionPage() {
                   </CardHeader>
                   <CardContent>
                     {analyticsLoading ? (
-                      <LoadingStateManager type="content" state="loading" message="Loading analytics..." />
+                      <LoadingStateManager
+                        type="content"
+                        state="loading"
+                        message="Loading analytics..."
+                      />
                     ) : analytics?.alertsByStatus ? (
                       <div className="space-y-2">
                         {Object.entries(analytics.alertsByStatus).map(([status, count]) => (

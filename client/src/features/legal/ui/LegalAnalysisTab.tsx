@@ -1,6 +1,6 @@
 /**
  * LegalAnalysisTab Component
- * 
+ *
  * Displays constitutional analysis of a bill including:
  * - Alignment score with constitution (0-100%)
  * - Identified constitutional conflicts
@@ -30,7 +30,9 @@ interface LegalAnalysisTabProps {
 }
 
 export function LegalAnalysisTab({ billId, analysis, isLoading, error }: LegalAnalysisTabProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'conflicts' | 'risks' | 'precedents'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'conflicts' | 'risks' | 'precedents'>(
+    'overview'
+  );
 
   if (isLoading) {
     return (
@@ -61,26 +63,32 @@ export function LegalAnalysisTab({ billId, analysis, isLoading, error }: LegalAn
     critical: 'bg-red-50 border-red-200 text-red-800',
     high: 'bg-orange-50 border-orange-200 text-orange-800',
     moderate: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    low: 'bg-green-50 border-green-200 text-green-800'
+    low: 'bg-green-50 border-green-200 text-green-800',
   };
 
   const riskBadgeColors = {
     critical: 'bg-red-100 text-red-800',
     high: 'bg-orange-100 text-orange-800',
     moderate: 'bg-yellow-100 text-yellow-800',
-    low: 'bg-green-100 text-green-800'
+    low: 'bg-green-100 text-green-800',
   };
 
   return (
     <div className="space-y-6">
       {/* Alignment Score Card */}
-      <div className={`border rounded-lg p-6 ${riskColors[analysis.legal_risk_level as keyof typeof riskColors] || riskColors.moderate}`}>
+      <div
+        className={`border rounded-lg p-6 ${riskColors[analysis.legal_risk_level as keyof typeof riskColors] || riskColors.moderate}`}
+      >
         <div className="flex items-start justify-between mb-4">
           <div>
             <h3 className="text-lg font-bold">Constitutional Alignment Score</h3>
-            <p className="text-sm opacity-75 mt-1">Based on analysis of constitutional provisions</p>
+            <p className="text-sm opacity-75 mt-1">
+              Based on analysis of constitutional provisions
+            </p>
           </div>
-          <span className={`px-3 py-1 rounded-full text-sm font-semibold ${riskBadgeColors[analysis.legal_risk_level as keyof typeof riskBadgeColors] || riskBadgeColors.moderate}`}>
+          <span
+            className={`px-3 py-1 rounded-full text-sm font-semibold ${riskBadgeColors[analysis.legal_risk_level as keyof typeof riskBadgeColors] || riskBadgeColors.moderate}`}
+          >
             {analysis.legal_risk_level.toUpperCase()}
           </span>
         </div>
@@ -93,10 +101,13 @@ export function LegalAnalysisTab({ billId, analysis, isLoading, error }: LegalAn
           <div className="w-full bg-gray-300 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
-                analysis.alignment_score >= 75 ? 'bg-green-500' :
-                analysis.alignment_score >= 50 ? 'bg-yellow-500' :
-                analysis.alignment_score >= 25 ? 'bg-orange-500' :
-                'bg-red-500'
+                analysis.alignment_score >= 75
+                  ? 'bg-green-500'
+                  : analysis.alignment_score >= 50
+                    ? 'bg-yellow-500'
+                    : analysis.alignment_score >= 25
+                      ? 'bg-orange-500'
+                      : 'bg-red-500'
               }`}
               style={{ width: `${Math.min(100, analysis.alignment_score)}%` }}
             />
@@ -104,7 +115,8 @@ export function LegalAnalysisTab({ billId, analysis, isLoading, error }: LegalAn
         </div>
 
         <p className="text-sm leading-relaxed">
-          {analysis.executive_summary || 'This bill has been analyzed for constitutional compliance. Review conflicts and risks below.'}
+          {analysis.executive_summary ||
+            'This bill has been analyzed for constitutional compliance. Review conflicts and risks below.'}
         </p>
       </div>
 
@@ -145,18 +157,10 @@ export function LegalAnalysisTab({ billId, analysis, isLoading, error }: LegalAn
 
       {/* Tab Content */}
       <div className="min-h-96">
-        {activeTab === 'overview' && (
-          <ConstitutionalOverview analysis={analysis} />
-        )}
-        {activeTab === 'conflicts' && (
-          <ConflictsList billId={billId} analysisId={analysis.id} />
-        )}
-        {activeTab === 'risks' && (
-          <LegalRisksList billId={billId} analysisId={analysis.id} />
-        )}
-        {activeTab === 'precedents' && (
-          <PrecedentsList billId={billId} />
-        )}
+        {activeTab === 'overview' && <ConstitutionalOverview analysis={analysis} />}
+        {activeTab === 'conflicts' && <ConflictsList billId={billId} analysisId={analysis.id} />}
+        {activeTab === 'risks' && <LegalRisksList billId={billId} analysisId={analysis.id} />}
+        {activeTab === 'precedents' && <PrecedentsList billId={billId} />}
       </div>
     </div>
   );
@@ -170,9 +174,7 @@ function ConstitutionalOverview({ analysis }: { analysis: ConstitutionalAnalysis
     <div className="space-y-4">
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-semibold text-blue-900 mb-2">How is this score calculated?</h4>
-        <p className="text-sm text-blue-800">
-          The alignment score is based on:
-        </p>
+        <p className="text-sm text-blue-800">The alignment score is based on:</p>
         <ul className="text-sm text-blue-800 list-disc list-inside mt-2 space-y-1">
           <li>Number and severity of constitutional conflicts identified</li>
           <li>Matching with constitutional provisions</li>
@@ -184,9 +186,15 @@ function ConstitutionalOverview({ analysis }: { analysis: ConstitutionalAnalysis
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h4 className="font-semibold text-gray-800 mb-3">Analysis Insights</h4>
         <div className="space-y-2 text-sm text-gray-700">
-          <p>• <strong>High-risk areas:</strong> Review the Conflicts tab for detailed analysis</p>
-          <p>• <strong>Precedent comparison:</strong> See related court cases in the Precedents tab</p>
-          <p>• <strong>Mitigation options:</strong> View suggested amendments in the Risks tab</p>
+          <p>
+            • <strong>High-risk areas:</strong> Review the Conflicts tab for detailed analysis
+          </p>
+          <p>
+            • <strong>Precedent comparison:</strong> See related court cases in the Precedents tab
+          </p>
+          <p>
+            • <strong>Mitigation options:</strong> View suggested amendments in the Risks tab
+          </p>
         </div>
       </div>
     </div>
@@ -204,8 +212,8 @@ function ConflictsList({ billId, analysisId }: { billId: string; analysisId: str
       severity: 'critical',
       description: 'Bill language could restrict free speech beyond constitutional limits',
       billLanguage: 'Section 2.3.1 restricts speech...',
-      resolution: 'Amend to include explicit carve-out for protected speech'
-    }
+      resolution: 'Amend to include explicit carve-out for protected speech',
+    },
   ]);
 
   return (
@@ -214,14 +222,23 @@ function ConflictsList({ billId, analysisId }: { billId: string; analysisId: str
         <p className="text-gray-600 py-8 text-center">No conflicts identified</p>
       ) : (
         conflicts.map(conflict => (
-          <div key={conflict.id} className={`border rounded-lg p-4 ${
-            conflict.severity === 'critical' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'
-          }`}>
+          <div
+            key={conflict.id}
+            className={`border rounded-lg p-4 ${
+              conflict.severity === 'critical'
+                ? 'bg-red-50 border-red-200'
+                : 'bg-yellow-50 border-yellow-200'
+            }`}
+          >
             <div className="flex items-start justify-between mb-2">
               <h4 className="font-semibold text-gray-800">{conflict.provision}</h4>
-              <span className={`px-2 py-1 rounded text-xs font-medium ${
-                conflict.severity === 'critical' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'
-              }`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium ${
+                  conflict.severity === 'critical'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-yellow-100 text-yellow-800'
+                }`}
+              >
                 {conflict.severity.toUpperCase()}
               </span>
             </div>
@@ -229,7 +246,9 @@ function ConflictsList({ billId, analysisId }: { billId: string; analysisId: str
             <div className="bg-white rounded p-2 text-xs mb-2 border border-gray-200">
               <p className="font-mono text-gray-600">{conflict.billLanguage}</p>
             </div>
-            <p className="text-sm text-gray-700"><strong>Suggested Resolution:</strong> {conflict.resolution}</p>
+            <p className="text-sm text-gray-700">
+              <strong>Suggested Resolution:</strong> {conflict.resolution}
+            </p>
           </div>
         ))
       )}
@@ -248,8 +267,8 @@ function LegalRisksList({ billId, analysisId }: { billId: string; analysisId: st
       title: 'Lack of enforcement mechanism',
       probability: 85,
       impact: 70,
-      mitigation: 'Add specific enforcement authority and penalties'
-    }
+      mitigation: 'Add specific enforcement authority and penalties',
+    },
   ]);
 
   return (
@@ -258,7 +277,10 @@ function LegalRisksList({ billId, analysisId }: { billId: string; analysisId: st
         <p className="text-gray-600 py-8 text-center">No significant legal risks identified</p>
       ) : (
         risks.map(risk => (
-          <div key={risk.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+          <div
+            key={risk.id}
+            className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition"
+          >
             <div className="flex items-start justify-between mb-2">
               <div>
                 <h4 className="font-semibold text-gray-800">{risk.title}</h4>
@@ -281,7 +303,9 @@ function LegalRisksList({ billId, analysisId }: { billId: string; analysisId: st
                 <div className="font-semibold text-gray-800">{risk.impact}%</div>
               </div>
             </div>
-            <p className="text-sm text-gray-700"><strong>Mitigation:</strong> {risk.mitigation}</p>
+            <p className="text-sm text-gray-700">
+              <strong>Mitigation:</strong> {risk.mitigation}
+            </p>
           </div>
         ))
       )}
@@ -300,8 +324,8 @@ function PrecedentsList({ billId }: { billId: string }) {
       citation: '2020 eKLR 123',
       year: 2020,
       relevance: 'Highly Relevant',
-      holding: 'Established that restrictions must meet strict scrutiny test'
-    }
+      holding: 'Established that restrictions must meet strict scrutiny test',
+    },
   ]);
 
   return (
@@ -314,7 +338,9 @@ function PrecedentsList({ billId }: { billId: string }) {
             <div className="flex items-start justify-between mb-2">
               <div>
                 <h4 className="font-semibold text-gray-800">{precedent.caseName}</h4>
-                <p className="text-xs text-gray-600 mt-1">{precedent.citation} ({precedent.year})</p>
+                <p className="text-xs text-gray-600 mt-1">
+                  {precedent.citation} ({precedent.year})
+                </p>
               </div>
               <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
                 {precedent.relevance}

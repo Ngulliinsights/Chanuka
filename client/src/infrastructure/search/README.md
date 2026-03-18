@@ -15,12 +15,15 @@ The Search module provides unified search interface and strategy selection for t
 ## Public Exports
 
 ### Components
+
 - `UnifiedSearchInterface` - Main search interface component
 
 ### Classes
+
 - `SearchStrategySelector` - Selects optimal search strategy
 
 ### Types
+
 - `SearchStrategy` - Available search strategies
 - `UnifiedSearchQuery` - Search query structure
 - `UnifiedSearchResult` - Search result format

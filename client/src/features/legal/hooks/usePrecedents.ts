@@ -1,6 +1,6 @@
 /**
  * usePrecedents Hook
- * 
+ *
  * Fetches legal precedents related to a bill
  * Uses React Query for caching (20 minute TTL - precedents change rarely)
  */

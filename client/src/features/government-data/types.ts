@@ -266,7 +266,7 @@ export interface GovernmentDataError {
   timestamp: Date;
 }
 
-export type GovernmentDataErrorCode = 
+export type GovernmentDataErrorCode =
   | 'FETCH_FAILED'
   | 'CREATE_FAILED'
   | 'UPDATE_FAILED'
@@ -283,7 +283,12 @@ export type GovernmentDataErrorCode =
 // Utility Types
 // ==========================================================================
 
-export type GovernmentDataSortField = 'created_at' | 'updated_at' | 'data_type' | 'source' | 'title';
+export type GovernmentDataSortField =
+  | 'created_at'
+  | 'updated_at'
+  | 'data_type'
+  | 'source'
+  | 'title';
 export type SortOrder = 'asc' | 'desc';
 
 export interface SortConfig {
@@ -335,7 +340,8 @@ export const SOURCES = {
   TREASURY: 'treasury',
 } as const;
 
-export type GovernmentDataStatus = typeof GOVERNMENT_DATA_STATUS[keyof typeof GOVERNMENT_DATA_STATUS];
-export type SyncLogStatus = typeof SYNC_STATUS[keyof typeof SYNC_STATUS];
-export type DataType = typeof DATA_TYPES[keyof typeof DATA_TYPES];
-export type Source = typeof SOURCES[keyof typeof SOURCES];
+export type GovernmentDataStatus =
+  (typeof GOVERNMENT_DATA_STATUS)[keyof typeof GOVERNMENT_DATA_STATUS];
+export type SyncLogStatus = (typeof SYNC_STATUS)[keyof typeof SYNC_STATUS];
+export type DataType = (typeof DATA_TYPES)[keyof typeof DATA_TYPES];
+export type Source = (typeof SOURCES)[keyof typeof SOURCES];

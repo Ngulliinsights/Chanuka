@@ -7,6 +7,7 @@
 ## Why Migrate?
 
 The `AuthenticatedApiClient` lacks critical features:
+
 - ❌ No retry logic
 - ❌ No caching
 - ❌ No circuit breaker
@@ -16,6 +17,7 @@ The `AuthenticatedApiClient` lacks critical features:
 - ❌ No request/response interceptors
 
 The `globalApiClient` provides:
+
 - ✅ Automatic retry with exponential backoff
 - ✅ Response caching
 - ✅ Circuit breaker for fault tolerance
@@ -30,6 +32,7 @@ The `globalApiClient` provides:
 ### Step 1: Replace Imports
 
 **Before:**
+
 ```typescript
 import { AuthenticatedApiClient } from '@client/infrastructure/auth';
 
@@ -37,19 +40,19 @@ const client = new AuthenticatedApiClient();
 ```
 
 **After:**
+
 ```typescript
 import { globalApiClient, createAuthRequestInterceptor } from '@client/infrastructure/api';
 import { getAuthToken } from '@client/infrastructure/auth';
 
 // Set up auth interceptor once (typically in app initialization)
-globalApiClient.addRequestInterceptor(
-  createAuthRequestInterceptor(() => getAuthToken())
-);
+globalApiClient.addRequestInterceptor(createAuthRequestInterceptor(() => getAuthToken()));
 ```
 
 ### Step 2: Update API Calls
 
 **Before:**
+
 ```typescript
 // GET request
 const users = await client.get<User[]>('/api/users');
@@ -65,6 +68,7 @@ await client.delete('/api/users/123');
 ```
 
 **After:**
+
 ```typescript
 // GET request
 const users = await globalApiClient.get<User[]>('/api/users');
@@ -82,6 +86,7 @@ await globalApiClient.delete('/api/users/123');
 ### Step 3: Handle Errors Properly
 
 **Before:**
+
 ```typescript
 try {
   const data = await client.get('/api/data');
@@ -92,6 +97,7 @@ try {
 ```
 
 **After:**
+
 ```typescript
 import { isApiError } from '@client/infrastructure/error';
 
@@ -115,6 +121,7 @@ try {
 ### Step 4: Use Advanced Features
 
 #### Caching
+
 ```typescript
 // Cache GET requests automatically
 const response = await globalApiClient.get('/api/data', {
@@ -124,6 +131,7 @@ const response = await globalApiClient.get('/api/data', {
 ```
 
 #### Retry Logic
+
 ```typescript
 // Automatic retry with exponential backoff
 const response = await globalApiClient.post('/api/data', payload, {
@@ -135,6 +143,7 @@ const response = await globalApiClient.post('/api/data', payload, {
 ```
 
 #### Fallback Data
+
 ```typescript
 // Provide fallback data if request fails
 const response = await globalApiClient.get('/api/data', {
@@ -143,6 +152,7 @@ const response = await globalApiClient.get('/api/data', {
 ```
 
 #### Request Cancellation
+
 ```typescript
 const controller = new AbortController();
 
@@ -190,9 +200,7 @@ import { getAuthToken } from '@client/infrastructure/auth';
 import { isApiError } from '@client/infrastructure/error';
 
 // Initialize auth interceptor once (in app setup)
-globalApiClient.addRequestInterceptor(
-  createAuthRequestInterceptor(() => getAuthToken())
-);
+globalApiClient.addRequestInterceptor(createAuthRequestInterceptor(() => getAuthToken()));
 
 export class UserService {
   async getUsers(): Promise<User[]> {
@@ -235,10 +243,10 @@ import { contractApiClient } from '@client/infrastructure/api';
 import { userEndpoints } from '@shared/types/api/contracts';
 
 // Fully type-safe with request/response validation
-const result = await contractApiClient.call(
-  userEndpoints.createUser,
-  { name: 'John', email: 'john@example.com' }
-);
+const result = await contractApiClient.call(userEndpoints.createUser, {
+  name: 'John',
+  email: 'john@example.com',
+});
 
 if (result.success) {
   console.log('User created:', result.data);
@@ -256,12 +264,10 @@ import { globalApiClient, createAuthRequestInterceptor } from '@client/infrastru
 import { getAuthToken } from '@client/infrastructure/auth';
 
 // Set up authentication interceptor
-globalApiClient.addRequestInterceptor(
-  createAuthRequestInterceptor(() => getAuthToken())
-);
+globalApiClient.addRequestInterceptor(createAuthRequestInterceptor(() => getAuthToken()));
 
 // Optional: Add logging interceptor
-globalApiClient.addResponseInterceptor(async (response) => {
+globalApiClient.addResponseInterceptor(async response => {
   console.log('API Response:', {
     status: response.status,
     url: response.url,
@@ -282,17 +288,19 @@ globalApiClient.configure({
 ## Testing
 
 ### Before
+
 ```typescript
 // Hard to mock
 const client = new AuthenticatedApiClient();
 ```
 
 ### After
+
 ```typescript
 import { globalApiClient } from '@client/infrastructure/api';
 
 // Easy to mock with interceptors
-globalApiClient.addRequestInterceptor(async (request) => {
+globalApiClient.addRequestInterceptor(async request => {
   // Mock logic
   return request;
 });

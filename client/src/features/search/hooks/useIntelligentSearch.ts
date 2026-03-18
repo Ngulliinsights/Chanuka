@@ -12,11 +12,8 @@ import { useToast } from '@client/lib/hooks/use-toast';
 import { useDebounce } from '@client/lib/hooks/use-debounce';
 import { logger } from '@client/lib/utils/logger';
 
-
 import { intelligentSearch } from '../services/intelligent-search';
-import type {
-  DualSearchRequest,
-} from '../services/intelligent-search';
+import type { DualSearchRequest } from '../services/intelligent-search';
 import type {
   AutocompleteResult,
   SearchSuggestion,

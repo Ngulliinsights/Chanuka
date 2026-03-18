@@ -19,7 +19,6 @@ import {
   Clock,
   Activity,
 } from 'lucide-react';
-import React from 'react';
 import { useEffect, useMemo, memo } from 'react';
 
 import { Badge } from '@client/lib/design-system';

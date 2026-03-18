@@ -1,6 +1,6 @@
 /**
  * Comparison Floating Bar
- * 
+ *
  * Floating action bar that appears when bills are selected for comparison.
  * Provides quick access to compare and clear actions.
  */

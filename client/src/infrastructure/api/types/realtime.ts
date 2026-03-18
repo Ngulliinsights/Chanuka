@@ -1,10 +1,9 @@
 /**
  * Realtime Client Type Definitions
- * 
+ *
  * Defines interfaces for realtime event subscriptions and pub/sub functionality
  * within the unified API module.
  */
-
 
 /**
  * Realtime subscription handle
@@ -12,10 +11,10 @@
 export interface Subscription {
   /** Unique subscription ID */
   id: string;
-  
+
   /** Topic being subscribed to */
   topic: string;
-  
+
   /** Unsubscribe from this subscription */
   unsubscribe(): void;
 }
@@ -27,7 +26,7 @@ export type EventHandler<T = any> = (data: T) => void;
 
 /**
  * Realtime client interface
- * 
+ *
  * Provides methods for subscribing to realtime events, publishing events,
  * and managing subscriptions.
  */
@@ -39,7 +38,7 @@ export interface IRealtimeClient {
    * @returns Subscription handle
    */
   subscribe<T = any>(topic: string, handler: EventHandler<T>): Subscription;
-  
+
   /**
    * Register an event listener (legacy style)
    * @param event - Event name
@@ -52,26 +51,26 @@ export interface IRealtimeClient {
    * @param subscription - Subscription to cancel
    */
   unsubscribe(subscription: Subscription): void;
-  
+
   /**
    * Publish an event to a topic
    * @param topic - Topic to publish to
    * @param data - Event data
    */
   publish(topic: string, data: unknown): void;
-  
+
   /**
    * Check if connected to realtime server
    * @returns true if connected
    */
   isConnected(): boolean;
-  
+
   /**
    * Get all active subscriptions
    * @returns Array of active subscriptions
    */
   getSubscriptions(): Subscription[];
-  
+
   /**
    * Clear all subscriptions
    */
@@ -89,16 +88,16 @@ export interface IRealtimeClient {
 export interface RealtimeEvent<T = unknown> {
   /** Event type/topic */
   type: string;
-  
+
   /** Event data */
   data: T;
-  
+
   /** Event timestamp */
   timestamp: number;
-  
+
   /** Optional event ID */
   id?: string;
-  
+
   /** Optional metadata */
   metadata?: Record<string, unknown>;
 }
@@ -109,19 +108,19 @@ export interface RealtimeEvent<T = unknown> {
 export interface RealtimeOptions {
   /** WebSocket URL for realtime connection */
   url: string;
-  
+
   /** Auto-reconnect on disconnect */
   autoReconnect?: boolean;
-  
+
   /** Maximum reconnection attempts */
   maxReconnectAttempts?: number;
-  
+
   /** Reconnection delay in milliseconds */
   reconnectDelay?: number;
-  
+
   /** Enable heartbeat */
   enableHeartbeat?: boolean;
-  
+
   /** Heartbeat interval in milliseconds */
   heartbeatInterval?: number;
 }
@@ -132,16 +131,16 @@ export interface RealtimeOptions {
 export interface RealtimeHubState {
   /** Connection status */
   connected: boolean;
-  
+
   /** Number of active subscriptions */
   subscriptionCount: number;
-  
+
   /** Last connection timestamp */
   lastConnected?: string;
-  
+
   /** Last disconnection timestamp */
   lastDisconnected?: string;
-  
+
   /** Reconnection attempts */
   reconnectAttempts: number;
 }

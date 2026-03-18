@@ -1,7 +1,7 @@
-import { privacyFacade } from '@server/infrastructure/privacy';
 import { logger } from '@server/infrastructure/observability';
+import { privacyFacade } from '@server/infrastructure/privacy';
 import { AuthenticatedRequest, PrivacyRequest } from '@server/middleware/auth-types';
-import { NextFunction,Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 export interface PrivacyConsent {
   analytics: boolean;
@@ -163,14 +163,15 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
             code: 'COOKIE_CONSENT_REQUIRED'
           });
         }
-      } else if (req.user) { // Check user's privacy preferences for authenticated users
+      } else if (req.user) {
+        // Check user's privacy preferences for authenticated users
         const user_id = req.user.id;
         const preferences = await privacyFacade.getPrivacyPreferences(user_id);
 
         if (!preferences.cookies[cookieType]) {
           return res.status(403).json({
             error: 'Cookie consent required',
-            message: `This operation requires consent for ${cookieType } cookies`,
+            message: `This operation requires consent for ${cookieType} cookies`,
             cookieType,
             currentConsent: preferences.cookies[cookieType],
             code: 'COOKIE_CONSENT_REQUIRED'
@@ -178,7 +179,7 @@ export const enforceCookieConsent = (cookieType: 'analytics' | 'marketing' | 'pr
         }
       }
 
-      next();
+      return next();
     } catch (error) {
       logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error enforcing cookie consent');
       // Allow request to continue on error

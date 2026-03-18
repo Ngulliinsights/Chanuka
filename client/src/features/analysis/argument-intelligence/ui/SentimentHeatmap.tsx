@@ -1,6 +1,6 @@
 /**
  * Sentiment Heatmap Component
- * 
+ *
  * Visualizes sentiment distribution across arguments.
  */
 
@@ -39,9 +39,7 @@ export function SentimentHeatmap({ sentimentData, className = '' }: SentimentHea
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
           <span className="text-sm font-medium text-gray-700">Overall Sentiment</span>
-          <span className="text-sm font-semibold">
-            {getSentimentLabel(sentimentData.overall)}
-          </span>
+          <span className="text-sm font-semibold">{getSentimentLabel(sentimentData.overall)}</span>
         </div>
         <div className="w-full h-8 bg-gray-200 rounded-lg overflow-hidden relative">
           <div
@@ -59,10 +57,10 @@ export function SentimentHeatmap({ sentimentData, className = '' }: SentimentHea
       {/* Position-based Sentiment */}
       <div className="space-y-4">
         <h4 className="text-sm font-semibold text-gray-700">By Position</h4>
-        
-        {sentimentData.distribution.map((item) => {
+
+        {sentimentData.distribution.map(item => {
           const percentage = totalCount > 0 ? (item.count / totalCount) * 100 : 0;
-          
+
           return (
             <div key={item.position} className="space-y-1">
               <div className="flex items-center justify-between text-sm">
@@ -71,7 +69,7 @@ export function SentimentHeatmap({ sentimentData, className = '' }: SentimentHea
                   {item.count} ({percentage.toFixed(1)}%)
                 </span>
               </div>
-              
+
               <div className="flex gap-2">
                 {/* Count bar */}
                 <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
@@ -80,13 +78,13 @@ export function SentimentHeatmap({ sentimentData, className = '' }: SentimentHea
                       item.position === 'support'
                         ? 'bg-green-200'
                         : item.position === 'oppose'
-                        ? 'bg-red-200'
-                        : 'bg-gray-300'
+                          ? 'bg-red-200'
+                          : 'bg-gray-300'
                     }`}
                     style={{ width: `${percentage}%` }}
                   />
                 </div>
-                
+
                 {/* Sentiment indicator */}
                 <div className="w-20 h-6 bg-gray-100 rounded overflow-hidden relative">
                   <div
@@ -94,9 +92,7 @@ export function SentimentHeatmap({ sentimentData, className = '' }: SentimentHea
                     style={{ width: `${((item.averageSentiment + 1) / 2) * 100}%` }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-medium">
-                      {item.averageSentiment.toFixed(1)}
-                    </span>
+                    <span className="text-xs font-medium">{item.averageSentiment.toFixed(1)}</span>
                   </div>
                 </div>
               </div>

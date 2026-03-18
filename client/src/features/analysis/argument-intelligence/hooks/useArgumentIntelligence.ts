@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence Hook
- * 
+ *
  * React hook for fetching and managing argument intelligence data
  */
 
@@ -57,10 +57,10 @@ export function useArgumentIntelligence(billId: string): UseArgumentIntelligence
 
       // Fetch bill analysis
       const analysisResponse = await fetch(`/api/argument-intelligence/bill/${billId}/analysis`);
-      
+
       if (analysisResponse.ok) {
         const analysisData = await analysisResponse.json();
-        
+
         if (analysisData.success && analysisData.analysis) {
           // Set sentiment data
           setSentimentData({
@@ -95,7 +95,9 @@ export function useArgumentIntelligence(billId: string): UseArgumentIntelligence
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch argument intelligence data'));
+      setError(
+        err instanceof Error ? err : new Error('Failed to fetch argument intelligence data')
+      );
     } finally {
       setIsLoading(false);
     }

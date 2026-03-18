@@ -925,10 +925,7 @@ export class UnifiedApiClientImpl implements UnifiedApiClient {
 }
 
 // Helper function to create request interceptor
-export const createAuthRequestInterceptor = (getToken: () => string | null): RequestInterceptor => {
-  return async (request: BaseClientRequest): Promise<BaseClientRequest> => {
-    const token = getToken();
-    if (token) {
+export     if (token) {
       return {
         ...request,
         headers: {
@@ -972,4 +969,4 @@ globalApiClient.addResponseInterceptor(createLoggingResponseInterceptor());
 
 // Initialize auth service with the API client to break circular dependency
 
-export const authApiService = createAuthApiService(globalApiClient);
+export 

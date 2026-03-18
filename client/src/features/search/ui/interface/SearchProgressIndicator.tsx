@@ -16,7 +16,6 @@ import {
   Target,
   Zap,
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';

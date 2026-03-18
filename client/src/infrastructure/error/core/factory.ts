@@ -40,10 +40,13 @@ export class ErrorFactory {
       },
       statusCode: 400,
       details: {
-        fields: fields.reduce((acc, { field, message }) => {
-          acc[field] = message;
-          return acc;
-        }, {} as Record<string, string>),
+        fields: fields.reduce(
+          (acc, { field, message }) => {
+            acc[field] = message;
+            return acc;
+          },
+          {} as Record<string, string>
+        ),
       },
       recoverable: true,
       retryable: false,
@@ -81,10 +84,7 @@ export class ErrorFactory {
   /**
    * Create authentication error
    */
-  static createAuthenticationError(
-    message: string,
-    context?: Partial<ErrorContext>
-  ): ClientError {
+  static createAuthenticationError(message: string, context?: Partial<ErrorContext>): ClientError {
     return {
       id: crypto.randomUUID(),
       code: ERROR_CODES.NOT_AUTHENTICATED,
@@ -136,10 +136,7 @@ export class ErrorFactory {
   /**
    * Create not found error
    */
-  static createNotFoundError(
-    resource: string,
-    context?: Partial<ErrorContext>
-  ): ClientError {
+  static createNotFoundError(resource: string, context?: Partial<ErrorContext>): ClientError {
     return {
       id: crypto.randomUUID(),
       code: ERROR_CODES.RESOURCE_NOT_FOUND,
@@ -266,10 +263,7 @@ export class ErrorFactory {
   /**
    * Create error from unknown error
    */
-  static createFromError(
-    error: unknown,
-    context?: Partial<ErrorContext>
-  ): ClientError {
+  static createFromError(error: unknown, context?: Partial<ErrorContext>): ClientError {
     if (isClientError(error)) {
       return error;
     }

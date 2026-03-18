@@ -1,10 +1,9 @@
 /**
  * Recommendations Section Component
- * 
+ *
  * Displays personalized bill recommendations on the user dashboard
  */
 
-import React from 'react';
 import { Sparkles, TrendingUp, Users } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';

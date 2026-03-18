@@ -32,15 +32,11 @@ describe('Dashboard Config Validator', () => {
 
     it('should accept valid configuration without optional fields', () => {
       const validConfig = {
-        widgets: [
-          { id: 'widget1', type: 'metric', config: { value: 42 } },
-        ],
+        widgets: [{ id: 'widget1', type: 'metric', config: { value: 42 } }],
         layout: {
           columns: 1,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
         },
       };
 
@@ -65,9 +61,7 @@ describe('Dashboard Config Validator', () => {
 
     it('should reject configuration missing layout field', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
       };
 
       expect(() => validateDashboardConfig(invalidConfig)).toThrow(
@@ -93,15 +87,11 @@ describe('Dashboard Config Validator', () => {
     // Requirement 15.2: Reject configs with invalid widget types
     it('should reject configuration with invalid widget type', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'invalid-type', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'invalid-type', config: {} }],
         layout: {
           columns: 1,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
         },
       };
 
@@ -113,15 +103,11 @@ describe('Dashboard Config Validator', () => {
     // Requirement 15.3: Reject configs with invalid layout
     it('should reject configuration with invalid layout columns', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 0,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
         },
       };
 
@@ -132,15 +118,11 @@ describe('Dashboard Config Validator', () => {
 
     it('should reject configuration with invalid layout rows', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 1,
           rows: -1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
         },
       };
 
@@ -151,15 +133,11 @@ describe('Dashboard Config Validator', () => {
 
     it('should reject configuration with negative position coordinates', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 1,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: -1, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: -1, y: 0, width: 1, height: 1 }],
         },
       };
 
@@ -170,15 +148,11 @@ describe('Dashboard Config Validator', () => {
 
     it('should reject configuration with invalid position dimensions', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 1,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 0, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 0, height: 1 }],
         },
       };
 
@@ -190,9 +164,7 @@ describe('Dashboard Config Validator', () => {
     // Requirement 15.5: Ensure widget positions reference existing widgets
     it('should reject configuration where position references non-existent widget', () => {
       const invalidConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 2,
           rows: 1,
@@ -210,9 +182,7 @@ describe('Dashboard Config Validator', () => {
 
     it('should provide field-level error messages', () => {
       const invalidConfig = {
-        widgets: [
-          { id: '', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: '', type: 'chart', config: {} }],
         layout: {
           columns: 1,
           rows: 1,
@@ -220,24 +190,18 @@ describe('Dashboard Config Validator', () => {
         },
       };
 
-      expect(() => validateDashboardConfig(invalidConfig)).toThrow(
-        /Widget ID cannot be empty/
-      );
+      expect(() => validateDashboardConfig(invalidConfig)).toThrow(/Widget ID cannot be empty/);
     });
   });
 
   describe('safeValidateDashboardConfig', () => {
     it('should return success for valid configuration', () => {
       const validConfig = {
-        widgets: [
-          { id: 'widget1', type: 'chart', config: {} },
-        ],
+        widgets: [{ id: 'widget1', type: 'chart', config: {} }],
         layout: {
           columns: 1,
           rows: 1,
-          positions: [
-            { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
-          ],
+          positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
         },
       };
 

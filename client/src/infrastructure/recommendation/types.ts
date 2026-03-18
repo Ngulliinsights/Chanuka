@@ -1,6 +1,6 @@
 /**
  * Recommendation Engine Types
- * 
+ *
  * Type definitions for the recommendation engine feature
  */
 

@@ -1,6 +1,6 @@
 /**
  * Unified WebSocket Client
- * 
+ *
  * Implements IWebSocketClient interface with:
  * - Connection management with reconnection
  * - Message sending and receiving
@@ -11,10 +11,7 @@
 
 import { logger } from '@client/lib/utils/logger';
 import { observability } from '@client/infrastructure/observability';
-import {
-  ConnectionState,
-  WebSocketMessage,
-} from '@shared/types/api/websocket';
+import { ConnectionState, WebSocketMessage } from '@shared/types/api/websocket';
 import type {
   IWebSocketClient,
   WebSocketOptions,
@@ -404,9 +401,9 @@ export class UnifiedWebSocketClient implements IWebSocketClient {
 
   private handleConnectionError(error: unknown): void {
     this.connectionState = ConnectionState.FAILED;
-    
+
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    
+
     // Track error with observability
     observability.trackError(errorObj, {
       component: 'WebSocketClient',
@@ -416,7 +413,7 @@ export class UnifiedWebSocketClient implements IWebSocketClient {
         reconnectAttempts: this.reconnectAttempts,
       },
     });
-    
+
     logger.error('WebSocket connection failed', {
       component: 'WebSocketClient',
       error: errorObj.message,

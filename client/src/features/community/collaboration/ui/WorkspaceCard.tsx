@@ -1,4 +1,3 @@
-import React from 'react';
 import { Users, Settings, MoreVertical, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -44,10 +43,7 @@ export function WorkspaceCard({ workspace, onDelete }: WorkspaceCardProps) {
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => onDelete(workspace.id)}
-                className="text-red-600"
-              >
+              <DropdownMenuItem onClick={() => onDelete(workspace.id)} className="text-red-600">
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </DropdownMenuItem>

@@ -15,46 +15,60 @@ A comprehensive monitoring dashboard for tracking all integrated features in rea
 ## Components
 
 ### IntegrationMonitoringDashboard
+
 Main dashboard component that displays:
+
 - System health overview
 - Feature list with health status
 - Feature detail modal with tabs for overview, metrics, alerts, and logs
 
 ### HealthStatusDisplay
+
 Displays health status with appropriate color coding:
+
 - Green: Healthy
 - Yellow: Degraded
 - Red: Down
 - Gray: Unknown
 
 ### MetricsVisualization
+
 Shows aggregated metrics for a feature over the last 24 hours:
+
 - Total requests
 - Success rate
 - Average response time
 - Error rate
 
 ### AlertManagement
+
 Manages alerts for a feature:
+
 - View active and resolved alerts
 - Acknowledge alerts
 - Resolve alerts
 - Filter by resolution status
 
 ### FeatureUsageCharts
+
 Displays usage trends:
+
 - Total requests over time
 - Active users over time
 - Success rate over time
 
 ### PerformanceMetrics
+
 Shows performance metrics:
+
 - Average response time
 - P95 response time
 - P99 response time
 
 ### ErrorTrackingDisplay
+
 Displays error tracking information:
+
 - Error statistics
 - Error trend chart
 - Recent error logs with filtering
@@ -89,6 +103,7 @@ The monitoring feature includes comprehensive tests:
 - E2E tests for dashboard workflows
 
 Run tests:
+
 ```bash
 npm test -- monitoring
 ```

@@ -105,9 +105,12 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'improving': return '📈';
-      case 'worsening': return '📉';
-      default: return '➡️';
+      case 'improving':
+        return '📈';
+      case 'worsening':
+        return '📉';
+      default:
+        return '➡️';
     }
   };
 
@@ -160,11 +163,9 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
 
       {/* Voting Record */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Voting Record vs Constituency
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Voting Record vs Constituency</h3>
         <div className="space-y-4">
-          {data.bills.map((bill) => (
+          {data.bills.map(bill => (
             <div
               key={bill.bill_id}
               className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -191,12 +192,8 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
                 <div className="bg-gray-50 rounded p-3">
                   <p className="text-xs text-gray-600 mb-1">Constituency Sentiment</p>
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-green-600">
-                      ✓ {bill.constituency_vote.support}
-                    </span>
-                    <span className="text-red-600">
-                      ✗ {bill.constituency_vote.oppose}
-                    </span>
+                    <span className="text-green-600">✓ {bill.constituency_vote.support}</span>
+                    <span className="text-red-600">✗ {bill.constituency_vote.oppose}</span>
                   </div>
                 </div>
               </div>
@@ -206,7 +203,9 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Representation Gap</span>
-                    <span className={`font-semibold ${bill.gap_score > 30 ? 'text-red-600' : 'text-yellow-600'}`}>
+                    <span
+                      className={`font-semibold ${bill.gap_score > 30 ? 'text-red-600' : 'text-yellow-600'}`}
+                    >
                       {bill.gap_score}%
                     </span>
                   </div>
@@ -229,9 +228,7 @@ export function ElectoralPressure({ sponsorId }: ElectoralPressureProps) {
         <div className="space-y-3">
           <button className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-left">
             <div className="font-medium">Contact Your MP</div>
-            <div className="text-sm opacity-90">
-              Let them know your position on these bills
-            </div>
+            <div className="text-sm opacity-90">Let them know your position on these bills</div>
           </button>
           <button className="w-full px-4 py-3 bg-white border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-left">
             <div className="font-medium">Share This Report</div>

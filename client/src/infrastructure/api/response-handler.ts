@@ -35,10 +35,8 @@ export async function extractResponseData<T>(
     const standardized = json as StandardApiResponse<T>;
     
     if (!standardized.success) {
-      const error = standardized.error || {};
-      throw new Error(
-        error.message || 'API request failed'
-      );
+      const error = standardized.error || { message: 'API request failed' };
+      throw new Error(error.message);
     }
 
     return standardized.data as T;

@@ -79,9 +79,7 @@ export const useWebVitals = (options: WebVitalsHookOptions = {}) => {
 };
 
 // Utility function to get performance rating based on metric values
-export const getPerformanceRating = (metric: Metric): 'good' | 'needs-improvement' | 'poor' => {
-  const { name, value } = metric;
-
+export 
   switch (name) {
     case 'CLS':
       return value <= 0.1 ? 'good' : value <= 0.25 ? 'needs-improvement' : 'poor';
@@ -99,9 +97,7 @@ export const getPerformanceRating = (metric: Metric): 'good' | 'needs-improvemen
 };
 
 // Hook for monitoring performance budgets
-export const usePerformanceBudget = (budgets?: {
-  lcp?: number;
-  cls?: number;
+export   cls?: number;
   fcp?: number;
   ttfb?: number;
 }) => {

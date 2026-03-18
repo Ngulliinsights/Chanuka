@@ -8,7 +8,7 @@
 import { RecoveryStrategy } from '@client/lib/hooks/use-error-recovery';
 
 import { ErrorDomain, ErrorSeverity } from '../constants';
-import { AppError, ErrorContext, ErrorRecoveryStrategy } from '../types';
+import { AppError } from '../types';
 
 // ============================================================================
 // Recovery Suggestion Types
@@ -44,7 +44,7 @@ export let RECOVERY_SUGGESTIONS: RecoverySuggestion[] = [
     priority: 1,
     applicableDomains: [ErrorDomain.NETWORK, ErrorDomain.EXTERNAL_SERVICE],
     applicableSeverities: [ErrorSeverity.LOW, ErrorSeverity.MEDIUM],
-    condition: (error) => error.retryable,
+    condition: error => error.retryable,
     automatic: true,
     estimatedSuccessRate: 0.7,
   },
@@ -97,7 +97,7 @@ export let RECOVERY_SUGGESTIONS: RecoverySuggestion[] = [
     priority: 2,
     applicableDomains: [ErrorDomain.AUTHENTICATION],
     applicableSeverities: [ErrorSeverity.MEDIUM],
-    condition: (error) => error.message.includes('credentials'),
+    condition: error => error.message.includes('credentials'),
     estimatedSuccessRate: 0.8,
   },
 
@@ -217,10 +217,9 @@ export function getRecoverySuggestions(
   context: any = {},
   maxSuggestions: number = 3
 ): RecoverySuggestion[] {
-  return RECOVERY_SUGGESTIONS
-    .filter(suggestion =>
-      isSuggestionApplicable(suggestion, error, context)
-    )
+  return RECOVERY_SUGGESTIONS.filter(suggestion =>
+    isSuggestionApplicable(suggestion, error, context)
+  )
     .sort((a, b) => {
       // Sort by priority, then by estimated success rate
       if (a.priority !== b.priority) {
@@ -289,13 +288,19 @@ export function enhanceSuggestionsWithContext(
     const enhancedSuggestion = { ...suggestion };
 
     // Enhance based on network status
-    if (!systemContext.isOnline && enhancedSuggestion.applicableDomains.includes(ErrorDomain.NETWORK)) {
+    if (
+      !systemContext.isOnline &&
+      enhancedSuggestion.applicableDomains.includes(ErrorDomain.NETWORK)
+    ) {
       enhancedSuggestion.priority = Math.max(1, enhancedSuggestion.priority - 1);
       enhancedSuggestion.description += ' (You appear to be offline)';
     }
 
     // Enhance based on connection type
-    if (systemContext.connectionType === 'slow' && enhancedSuggestion.applicableDomains.includes(ErrorDomain.NETWORK)) {
+    if (
+      systemContext.connectionType === 'slow' &&
+      enhancedSuggestion.applicableDomains.includes(ErrorDomain.NETWORK)
+    ) {
       enhancedSuggestion.description += ' (Your connection appears slow)';
     }
 

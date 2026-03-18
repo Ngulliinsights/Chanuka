@@ -13,7 +13,6 @@ import {
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { useBillSponsorshipAnalysis as useSponsorshipAnalysis } from '@client/features/bills';
 import { ImplementationWorkarounds } from '@client/features/bills/ui/components/ImplementationWorkarounds';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';

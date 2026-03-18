@@ -1,12 +1,17 @@
 /**
  * Constitutional Analysis Display Component
- * 
+ *
  * Displays constitutional analysis results with visualizations
  */
 
-import React from 'react';
 import { AlertTriangle, CheckCircle, FileText, Scale, TrendingUp } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
@@ -51,9 +56,7 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
             <Scale className="h-5 w-5" />
             Constitutional Alignment
           </CardTitle>
-          <CardDescription>
-            Overall assessment of constitutional compliance
-          </CardDescription>
+          <CardDescription>Overall assessment of constitutional compliance</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -69,8 +72,8 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
           </div>
           <Progress value={analysis.alignmentScore * 100} className="h-3" />
           <p className="text-sm text-gray-600">
-            Analyzed {new Date(analysis.analyzedAt).toLocaleDateString()} • 
-            Processing time: {(analysis.processingTime / 1000).toFixed(2)}s
+            Analyzed {new Date(analysis.analyzedAt).toLocaleDateString()} • Processing time:{' '}
+            {(analysis.processingTime / 1000).toFixed(2)}s
           </p>
         </CardContent>
       </Card>
@@ -83,9 +86,7 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
               <AlertTriangle className="h-5 w-5 text-orange-600" />
               Constitutional Concerns ({analysis.violations.length})
             </CardTitle>
-            <CardDescription>
-              Potential issues identified in the analysis
-            </CardDescription>
+            <CardDescription>Potential issues identified in the analysis</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {analysis.violations.map((violation, index) => (
@@ -104,14 +105,14 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
                       </AlertDescription>
                     </div>
                   </div>
-                  
+
                   {violation.affectedArticles.length > 0 && (
                     <div className="text-xs text-gray-600">
                       <span className="font-medium">Affected Articles:</span>{' '}
                       {violation.affectedArticles.join(', ')}
                     </div>
                   )}
-                  
+
                   {violation.recommendation && (
                     <div className="text-xs bg-white/50 p-2 rounded">
                       <span className="font-medium">Recommendation:</span>{' '}
@@ -133,9 +134,7 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
               <FileText className="h-5 w-5 text-blue-600" />
               Recommendations
             </CardTitle>
-            <CardDescription>
-              Suggested improvements and considerations
-            </CardDescription>
+            <CardDescription>Suggested improvements and considerations</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -158,9 +157,7 @@ export function ConstitutionalAnalysisDisplay({ analysis }: ConstitutionalAnalys
               <Scale className="h-5 w-5 text-purple-600" />
               Relevant Precedents
             </CardTitle>
-            <CardDescription>
-              Legal precedents related to this bill
-            </CardDescription>
+            <CardDescription>Legal precedents related to this bill</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {analysis.precedents.map((precedent, index) => (

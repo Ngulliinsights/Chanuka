@@ -2,7 +2,7 @@ import { CivicEducationHub } from '@client/lib/ui/civic';
 
 /**
  * Civic Education Landing Page
- * 
+ *
  * Main entry point for civic education content
  * Uses the CivicEducationHub component
  */

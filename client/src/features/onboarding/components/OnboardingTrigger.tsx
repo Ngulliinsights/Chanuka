@@ -7,12 +7,12 @@ import { logger } from '@client/lib/utils/logger';
 
 /**
  * Onboarding Trigger Component
- * 
+ *
  * Automatically triggers the welcome tour for:
  * - First-time users
  * - Users after major updates
  * - Users who haven't completed onboarding
- * 
+ *
  * Features:
  * - Smart detection of onboarding status
  * - Version-based update tours
@@ -59,7 +59,7 @@ export function OnboardingTrigger() {
     // Existing users - check for version updates
     if (onboardingVersion !== currentVersion) {
       const updateTourShown = localStorage.getItem(`chanuka_update_tour_${currentVersion}`);
-      
+
       if (!updateTourShown) {
         logger.info('Showing update tour notification', {
           component: 'OnboardingTrigger',
@@ -70,7 +70,7 @@ export function OnboardingTrigger() {
         // Show non-intrusive notification about new features
         toast({
           title: '🎉 New Features Available!',
-          description: 'Discover what\'s new in Chanuka 2.0',
+          description: "Discover what's new in Chanuka 2.0",
           duration: 10000,
           action: (
             <Button
@@ -124,13 +124,7 @@ export function OnboardingTrigger() {
  * Determine if we should show a tip for this page
  */
 function shouldShowTipForPage(pathname: string): boolean {
-  const tippablePages = [
-    '/bills',
-    '/search',
-    '/community',
-    '/dashboard',
-    '/account',
-  ];
+  const tippablePages = ['/bills', '/search', '/community', '/dashboard', '/account'];
 
   return tippablePages.some(page => pathname.startsWith(page));
 }
@@ -142,23 +136,28 @@ function getTipForPage(pathname: string): { title: string; description: string }
   const tips: Record<string, { title: string; description: string }> = {
     '/bills': {
       title: '💡 Pro Tip: Collections',
-      description: 'Create collections to organize bills by topic or campaign. Click the bookmark icon on any bill.',
+      description:
+        'Create collections to organize bills by topic or campaign. Click the bookmark icon on any bill.',
     },
     '/search': {
       title: '💡 Pro Tip: Advanced Search',
-      description: 'Use filters to narrow your search by date, status, or sponsor. Try the command palette (⌘K) for quick access.',
+      description:
+        'Use filters to narrow your search by date, status, or sponsor. Try the command palette (⌘K) for quick access.',
     },
     '/community': {
       title: '💡 Pro Tip: Expert Insights',
-      description: 'Follow experts in your areas of interest to get notified when they share insights on bills.',
+      description:
+        'Follow experts in your areas of interest to get notified when they share insights on bills.',
     },
     '/dashboard': {
       title: '💡 Pro Tip: Customize Your Dashboard',
-      description: 'Drag and drop widgets to customize your dashboard layout. Click the settings icon to add more widgets.',
+      description:
+        'Drag and drop widgets to customize your dashboard layout. Click the settings icon to add more widgets.',
     },
     '/account': {
       title: '💡 Pro Tip: Notification Preferences',
-      description: 'Fine-tune your notification settings to get alerts only for bills and topics you care about.',
+      description:
+        'Fine-tune your notification settings to get alerts only for bills and topics you care about.',
     },
   };
 

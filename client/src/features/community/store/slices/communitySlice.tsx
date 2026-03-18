@@ -1,4 +1,3 @@
- 
 /**
  * Community State Management - React Query Implementation (Optimized)
  *
@@ -26,7 +25,6 @@
  */
 
 import { useQuery, useQueryClient, QueryClient, UseQueryResult } from '@tanstack/react-query';
-import React from 'react';
 import {
   createContext,
   useContext,
@@ -678,14 +676,14 @@ export function useCommunityStats(): UseQueryResult<CommunityStats, ApiError> {
   return useQuery({
     queryKey: communityKeys.stats(),
     queryFn: () =>
-      Promise.resolve({ 
-        totalUsers: 0, 
-        activeUsers: 0, 
-        totalComments: 0, 
+      Promise.resolve({
+        totalUsers: 0,
+        activeUsers: 0,
+        totalComments: 0,
         totalThreads: 0,
         totalExperts: 0,
         averageCommentLength: 0,
-        engagementRate: 0
+        engagementRate: 0,
       }) as Promise<CommunityStats>, // Method not implemented yet
 
     refetchInterval: query =>

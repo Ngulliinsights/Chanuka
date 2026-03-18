@@ -130,10 +130,18 @@ export function NavigationSliceDemo() {
             >
               Set Admin Section
             </Button>
-            <Button onClick={() => navigation.setUserRole(UserRole.Admin)} variant="outline" size="sm">
+            <Button
+              onClick={() => navigation.setUserRole(UserRole.Admin)}
+              variant="outline"
+              size="sm"
+            >
               Set Admin Role
             </Button>
-            <Button onClick={() => navigation.setUserRole(UserRole.Public)} variant="outline" size="sm">
+            <Button
+              onClick={() => navigation.setUserRole(UserRole.Public)}
+              variant="outline"
+              size="sm"
+            >
               Set Public Role
             </Button>
           </div>

@@ -666,4 +666,4 @@ export class CacheKeyGenerator {
 /**
  * Global cache instance
  */
-export const globalCache = new ApiCacheManager();
+export 

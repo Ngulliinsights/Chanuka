@@ -3,10 +3,8 @@
  * React hook for using security services in components
  */
 
-
 import { clientRateLimiter, RateLimitConfigs } from '@client/infrastructure/security/rate-limiter';
-import { securityService, type SecurityStatus } from '@client/infrastructure/security/security-service';
-import { type SecurityThreat } from '@client/infrastructure/security/vulnerability-scanner';
+import { securityService } from '@client/infrastructure/security/security-service';
 
 export type { SecurityStatus };
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
@@ -88,7 +86,10 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
 
   const validateInput = useCallback(async <T>(schema: unknown, input: unknown) => {
     try {
-      const result = await securityService.validateInput<T>(schema as Record<string, unknown>, input);
+      const result = await securityService.validateInput<T>(
+        schema as Record<string, unknown>,
+        input
+      );
       return result;
     } catch (error) {
       console.error('Input validation failed:', error);
@@ -173,11 +174,13 @@ export function useSecurity(_options: UseSecurityOptions = {}): SecurityHookResu
       if (!config) {
         throw new Error(`Rate limit config not found: ${configName}`);
       }
-      
+
       const limitCheck = clientRateLimiter.checkLimit(key, config);
 
       if (!limitCheck.allowed) {
-        const retryAfterMs = limitCheck.retryAfter ? limitCheck.retryAfter * 1000 : limitCheck.resetTime;
+        const retryAfterMs = limitCheck.retryAfter
+          ? limitCheck.retryAfter * 1000
+          : limitCheck.resetTime;
         throw new Error(`Rate limit exceeded. Retry after ${retryAfterMs}ms`);
       }
 

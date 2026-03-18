@@ -1,6 +1,3 @@
- 
- 
-
 /**
  * Feature Fallbacks Components - Refactored for Simplified API
  *
@@ -103,9 +100,7 @@ export function useResizeObserver(
  * Legacy export name for backwards compatibility
  * @deprecated Use useResizeObserver instead
  */
-export const useResizeObserverFallback = useResizeObserver;
-
-// ============================================================================
+export // ============================================================================
 // LAZY IMAGE COMPONENT
 // ============================================================================
 

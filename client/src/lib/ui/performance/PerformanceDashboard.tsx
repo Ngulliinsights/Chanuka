@@ -9,7 +9,6 @@
  */
 
 // Remove unused React import
-import React from 'react';
 
 import { NavigationPerformanceDashboard } from '@client/lib/ui/navigation/performance/NavigationPerformanceDashboard';
 

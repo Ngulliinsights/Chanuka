@@ -6,7 +6,6 @@
 
 import { formatDistanceToNow } from 'date-fns';
 import { BookOpen, MessageSquare, TrendingUp, Calendar, Award, Target } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Card, CardContent } from '@client/lib/design-system/typography/Card';

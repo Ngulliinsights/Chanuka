@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence Dashboard Component
- * 
+ *
  * Main dashboard that integrates all argument intelligence features.
  */
 
@@ -34,41 +34,48 @@ export function ArgumentIntelligenceDashboard({
   } = useArgumentIntelligence(billId);
 
   const [selectedCluster, setSelectedCluster] = useState<ArgumentCluster | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'clusters' | 'sentiment' | 'quality'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'clusters' | 'sentiment' | 'quality'>(
+    'overview'
+  );
 
   // Calculate sentiment data from statistics
-  const sentimentData: SentimentData | null = statistics ? {
-    overall: 0.5, // Placeholder - would be calculated from actual sentiment scores
-    support: 0.7,
-    oppose: -0.3,
-    neutral: 0.1,
-    distribution: [
-      {
-        position: 'support',
-        count: statistics.positionBreakdown.support,
-        averageSentiment: 0.7,
-      },
-      {
-        position: 'oppose',
-        count: statistics.positionBreakdown.oppose,
-        averageSentiment: -0.3,
-      },
-      {
-        position: 'neutral',
-        count: statistics.positionBreakdown.neutral,
-        averageSentiment: 0.1,
-      },
-    ],
-  } : null;
+  const sentimentData: SentimentData | null = statistics
+    ? {
+        overall: 0.5, // Placeholder - would be calculated from actual sentiment scores
+        support: 0.7,
+        oppose: -0.3,
+        neutral: 0.1,
+        distribution: [
+          {
+            position: 'support',
+            count: statistics.positionBreakdown.support,
+            averageSentiment: 0.7,
+          },
+          {
+            position: 'oppose',
+            count: statistics.positionBreakdown.oppose,
+            averageSentiment: -0.3,
+          },
+          {
+            position: 'neutral',
+            count: statistics.positionBreakdown.neutral,
+            averageSentiment: 0.1,
+          },
+        ],
+      }
+    : null;
 
   // Calculate average quality metrics from arguments
-  const qualityMetrics: QualityMetrics | null = args.length > 0 ? {
-    clarity: 0.75,
-    evidence: statistics ? statistics.evidenceFound / statistics.totalArguments : 0.6,
-    reasoning: statistics ? statistics.averageStrength : 0.7,
-    relevance: 0.8,
-    constructiveness: 0.65,
-  } : null;
+  const qualityMetrics: QualityMetrics | null =
+    args.length > 0
+      ? {
+          clarity: 0.75,
+          evidence: statistics ? statistics.evidenceFound / statistics.totalArguments : 0.6,
+          reasoning: statistics ? statistics.averageStrength : 0.7,
+          relevance: 0.8,
+          constructiveness: 0.65,
+        }
+      : null;
 
   const handleSearch = async (query: string) => {
     updateFilters({ searchQuery: query });
@@ -129,15 +136,16 @@ export function ArgumentIntelligenceDashboard({
             { id: 'clusters', label: 'Clusters', icon: '🔗' },
             { id: 'sentiment', label: 'Sentiment', icon: '💭' },
             { id: 'quality', label: 'Quality', icon: '⭐' },
-          ].map((tab) => (
+          ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
               className={`
                 flex-1 px-4 py-3 text-sm font-medium transition-colors
-                ${activeTab === tab.id
-                  ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                ${
+                  activeTab === tab.id
+                    ? 'border-b-2 border-blue-500 text-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
                 }
               `}
             >
@@ -166,7 +174,9 @@ export function ArgumentIntelligenceDashboard({
                   </div>
                   <div className="bg-purple-50 rounded-lg p-4">
                     <p className="text-sm text-purple-600 font-medium">Claims</p>
-                    <p className="text-3xl font-bold text-purple-900">{statistics.claimsExtracted}</p>
+                    <p className="text-3xl font-bold text-purple-900">
+                      {statistics.claimsExtracted}
+                    </p>
                   </div>
                   <div className="bg-orange-50 rounded-lg p-4">
                     <p className="text-sm text-orange-600 font-medium">Evidence</p>
@@ -184,13 +194,18 @@ export function ArgumentIntelligenceDashboard({
                         <div key={position} className="space-y-1">
                           <div className="flex justify-between text-sm">
                             <span className="capitalize">{position}</span>
-                            <span className="font-medium">{count} ({percentage.toFixed(1)}%)</span>
+                            <span className="font-medium">
+                              {count} ({percentage.toFixed(1)}%)
+                            </span>
                           </div>
                           <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                             <div
                               className={`h-full ${
-                                position === 'support' ? 'bg-green-500' :
-                                position === 'oppose' ? 'bg-red-500' : 'bg-gray-400'
+                                position === 'support'
+                                  ? 'bg-green-500'
+                                  : position === 'oppose'
+                                    ? 'bg-red-500'
+                                    : 'bg-gray-400'
                               }`}
                               style={{ width: `${percentage}%` }}
                             />

@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence API Client
- * 
+ *
  * API client for interacting with the argument intelligence backend.
  */
 
@@ -24,15 +24,21 @@ export async function getArguments(
   filters?: ArgumentFilters
 ): Promise<{ arguments: Argument[]; count: number; pagination: Record<string, unknown> }> {
   const params = new URLSearchParams();
-  
+
   if (filters?.argumentType) params.append('argumentType', filters.argumentType);
   if (filters?.position) params.append('position', filters.position);
-  if (filters?.minConfidence !== undefined) params.append('minConfidence', filters.minConfidence.toString());
-  if (filters?.minStrength !== undefined) params.append('minStrength', filters.minStrength.toString());
-  
+  if (filters?.minConfidence !== undefined)
+    params.append('minConfidence', filters.minConfidence.toString());
+  if (filters?.minStrength !== undefined)
+    params.append('minStrength', filters.minStrength.toString());
+
   const url = `${BASE_URL}/arguments/${billId}${params.toString() ? `?${params.toString()}` : ''}`;
-  
-  return apiFetchClient.get<{ arguments: Argument[]; count: number; pagination: Record<string, unknown> }>(url);
+
+  return apiFetchClient.get<{
+    arguments: Argument[];
+    count: number;
+    pagination: Record<string, unknown>;
+  }>(url);
 }
 
 /**
@@ -53,17 +59,18 @@ export async function clusterArguments(
     maxClusters?: number;
   }
 ): Promise<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: Record<string, unknown> }> {
-  return apiFetchClient.post<{ clusters: ArgumentCluster[]; outliers: string[]; metrics: Record<string, unknown> }>(
-    `${BASE_URL}/cluster-arguments`,
-    {
-      arguments: argumentList.map(arg => ({
-        id: arg.id,
-        text: arg.argument_text,
-        position: arg.position,
-      })),
-      config: config || {},
-    }
-  );
+  return apiFetchClient.post<{
+    clusters: ArgumentCluster[];
+    outliers: string[];
+    metrics: Record<string, unknown>;
+  }>(`${BASE_URL}/cluster-arguments`, {
+    arguments: argumentList.map(arg => ({
+      id: arg.id,
+      text: arg.argument_text,
+      position: arg.position,
+    })),
+    config: config || {},
+  });
 }
 
 /**
@@ -72,14 +79,14 @@ export async function clusterArguments(
 export async function getArgumentMap(billId: string): Promise<ArgumentMap> {
   const response = await fetch(`${BASE_URL}/argument-map/${billId}`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch argument map: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }
@@ -95,17 +102,17 @@ export async function searchArguments(
     q: query,
     limit: limit.toString(),
   });
-  
+
   const response = await fetch(`${BASE_URL}/search?${params.toString()}`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to search arguments: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }
@@ -117,14 +124,14 @@ export async function synthesizeBill(billId: string): Promise<any> {
   const response = await fetch(`${BASE_URL}/synthesize-bill/${billId}`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to synthesize bill: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }
@@ -135,14 +142,14 @@ export async function synthesizeBill(billId: string): Promise<any> {
 export async function getCoalitionOpportunities(billId: string): Promise<any> {
   const response = await fetch(`${BASE_URL}/coalition-opportunities/${billId}`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch coalition opportunities: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }
@@ -153,14 +160,14 @@ export async function getCoalitionOpportunities(billId: string): Promise<any> {
 export async function getEvidenceAssessment(billId: string): Promise<any> {
   const response = await fetch(`${BASE_URL}/evidence-assessment/${billId}`, {
     headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
     },
   });
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch evidence assessment: ${response.statusText}`);
   }
-  
+
   const result = await response.json();
   return result.data;
 }

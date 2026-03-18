@@ -322,10 +322,4 @@ export const navigationPersistenceMiddleware: Middleware = store => next => (act
  * Utility functions for external use
  * Export these for testing or manual state management
  */
-export const navigationPersistenceUtils = {
-  loadNavigationState,
-  saveNavigationState,
-  clearNavigationState,
-  sanitizePreferences,
-  sanitizeRecentPage,
-};
+export 

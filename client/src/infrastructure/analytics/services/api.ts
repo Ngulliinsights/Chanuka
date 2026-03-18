@@ -20,7 +20,7 @@ import type {
 import { logger } from '@client/lib/utils/logger';
 
 import { globalErrorHandler } from '@client/infrastructure/api/errors';
-import type { ApiClient, UnifiedApiClient, UnknownError, AxiosErrorResponse } from '@client/infrastructure/api/types';
+import type { ApiClient, UnknownError, AxiosErrorResponse } from '@client/infrastructure/api/types';
 
 /**
  * Centralized service for all analytics-related API operations.
@@ -363,9 +363,9 @@ export class AnalyticsApiService {
 /**
  * Factory function to create AnalyticsApiService with API client dependency.
  */
-export const createAnalyticsApiService = (apiClient: UnifiedApiClient): AnalyticsApiService => {
+export function createAnalyticsApiService(apiClient: ApiClient): AnalyticsApiService {
   return new AnalyticsApiService(apiClient);
-};
+}
 
 /**
  * Global instance of the analytics API service.

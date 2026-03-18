@@ -5,11 +5,7 @@
  * These are distinct from @client/lib/types/community which are shared across the app
  */
 
-import type {
-  Comment,
-  DiscussionThread,
-  ActivityItem,
-} from '@client/lib/types/community';
+import type { Comment, DiscussionThread, ActivityItem } from '@client/lib/types/community';
 
 /**
  * Unified comment representation for internal use
@@ -54,13 +50,7 @@ export interface ModerationActionRequest {
 /**
  * Moderator actions available on a piece of content.
  */
-export type ModerationAction =
-  | 'approve'
-  | 'reject'
-  | 'hide'
-  | 'flag'
-  | 'remove'
-  | 'restore';
+export type ModerationAction = 'approve' | 'reject' | 'hide' | 'flag' | 'remove' | 'restore';
 
 export type ViolationType =
   | 'spam'

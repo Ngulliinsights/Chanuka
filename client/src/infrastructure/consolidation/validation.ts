@@ -2,15 +2,11 @@
  * Validation functions for consolidation mappings
  */
 
-import type {
-  ConsolidationMapping,
-  ConsolidationPlan,
-  ValidationResult,
-} from './types';
+import type { ConsolidationMapping, ConsolidationPlan, ValidationResult } from './types';
 
 /**
  * Validates a single consolidation mapping
- * 
+ *
  * @param mapping - The consolidation mapping to validate
  * @param existingModules - List of existing module names
  * @returns Validation result with errors and warnings
@@ -42,9 +38,7 @@ export function validateMapping(
   // Validate target module name format (kebab-case)
   const kebabCaseRegex = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
   if (mapping.targetModule && !kebabCaseRegex.test(mapping.targetModule)) {
-    errors.push(
-      `Target module name "${mapping.targetModule}" must be in kebab-case format`
-    );
+    errors.push(`Target module name "${mapping.targetModule}" must be in kebab-case format`);
   }
 
   // Validate migrations
@@ -56,9 +50,7 @@ export function validateMapping(
       errors.push('Migration "to" path cannot be empty');
     }
     if (migration.from === migration.to) {
-      warnings.push(
-        `Migration from "${migration.from}" to "${migration.to}" has identical paths`
-      );
+      warnings.push(`Migration from "${migration.from}" to "${migration.to}" has identical paths`);
     }
   }
 
@@ -71,9 +63,7 @@ export function validateMapping(
       warnings.push('Breaking change should include mitigation strategy');
     }
     if (breakingChange.affectedFiles.length === 0) {
-      warnings.push(
-        `Breaking change "${breakingChange.description}" has no affected files listed`
-      );
+      warnings.push(`Breaking change "${breakingChange.description}" has no affected files listed`);
     }
   }
 
@@ -86,7 +76,7 @@ export function validateMapping(
 
 /**
  * Validates that mappings don't have conflicts
- * 
+ *
  * @param mapping - The mapping to check
  * @param allMappings - All mappings in the plan
  * @returns Validation result
@@ -100,21 +90,19 @@ export function validateNoConflicts(
 
   // Check for duplicate source modules across mappings
   const sourceModulesInOtherMappings = allMappings
-    .filter((m) => m !== mapping)
-    .flatMap((m) => m.sourceModules);
+    .filter(m => m !== mapping)
+    .flatMap(m => m.sourceModules);
 
   for (const sourceModule of mapping.sourceModules) {
     if (sourceModulesInOtherMappings.includes(sourceModule)) {
-      errors.push(
-        `Source module "${sourceModule}" appears in multiple consolidation mappings`
-      );
+      errors.push(`Source module "${sourceModule}" appears in multiple consolidation mappings`);
     }
   }
 
   // Check for duplicate target modules
   const targetModulesInOtherMappings = allMappings
-    .filter((m) => m !== mapping)
-    .map((m) => m.targetModule);
+    .filter(m => m !== mapping)
+    .map(m => m.targetModule);
 
   if (targetModulesInOtherMappings.includes(mapping.targetModule)) {
     errors.push(
@@ -131,15 +119,12 @@ export function validateNoConflicts(
 
 /**
  * Validates an entire consolidation plan
- * 
+ *
  * @param plan - The consolidation plan to validate
  * @param existingModules - List of existing module names
  * @returns Validation result
  */
-export function validatePlan(
-  plan: ConsolidationPlan,
-  existingModules: string[]
-): ValidationResult {
+export function validatePlan(plan: ConsolidationPlan, existingModules: string[]): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -164,9 +149,7 @@ export function validatePlan(
   }
 
   if (plan.moduleCountAfter >= plan.moduleCountBefore) {
-    warnings.push(
-      'Module count after consolidation should be less than before'
-    );
+    warnings.push('Module count after consolidation should be less than before');
   }
 
   // Validate timeline
@@ -175,10 +158,7 @@ export function validatePlan(
   }
 
   // Check if target module count is achievable
-  const totalSourceModules = plan.mappings.reduce(
-    (sum, m) => sum + m.sourceModules.length,
-    0
-  );
+  const totalSourceModules = plan.mappings.reduce((sum, m) => sum + m.sourceModules.length, 0);
   const targetModules = plan.mappings.length;
   const unmappedModules = plan.moduleCountBefore - totalSourceModules;
   const projectedTotal = targetModules + unmappedModules;

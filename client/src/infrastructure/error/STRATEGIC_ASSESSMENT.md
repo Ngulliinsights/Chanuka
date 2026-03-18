@@ -13,6 +13,7 @@ Let me reassess each component for strategic value, not just current usage.
 **Current Status:** 0% adoption in features
 
 **Strategic Value:** HIGH
+
 - **Server uses Result<T>** extensively (907+ uses of AsyncServiceResult)
 - **Type-safe error handling** without exceptions
 - **Functional programming pattern** gaining adoption
@@ -22,6 +23,7 @@ Let me reassess each component for strategic value, not just current usage.
 **Recommendation:** KEEP - Provide as optional pattern for features that want type-safe error handling
 
 **Usage Example:**
+
 ```typescript
 // Future use case: Type-safe API calls
 async function fetchBillSafely(id: string): Promise<ClientResult<Bill>> {
@@ -45,6 +47,7 @@ if (result.success) {
 **Current Status:** 0% adoption
 
 **Strategic Value:** MEDIUM-HIGH
+
 - **Anomaly detection** - Catch unusual error patterns in production
 - **Pattern recognition** - Identify systemic issues
 - **Alert rules** - Proactive monitoring
@@ -52,11 +55,13 @@ if (result.success) {
 - **Production monitoring** - Essential for mature applications
 
 **Recommendation:** KEEP but simplify
+
 - Remove: Complex ML algorithms (z-score, isolation forest)
 - Keep: Basic pattern matching, alert rules, error correlation
 - Reduce from 890 lines to ~300 lines
 
 **Why Keep:**
+
 - Production apps need error analytics
 - Observability alone isn't enough
 - Helps identify issues before users report them
@@ -68,6 +73,7 @@ if (result.success) {
 **Strategic Value:** MIXED
 
 #### KEEP (Strategic):
+
 - ✅ `authRefreshStrategy` - React Query doesn't handle token refresh
 - ✅ `authRetryStrategy` - Custom auth retry logic
 - ✅ `authLogoutStrategy` - User session management
@@ -75,6 +81,7 @@ if (result.success) {
 - ✅ `cacheClearStrategy` - Manual cache clearing
 
 #### DELETE (Duplicates React Query):
+
 - ❌ `networkRetryStrategy` - React Query retry
 - ❌ `cacheFallbackStrategy` - React Query staleTime
 - ❌ `offlineModeStrategy` - React Query networkMode
@@ -90,6 +97,7 @@ if (result.success) {
 **Current Status:** 3 reporters (Console, Sentry, API)
 
 **Strategic Value:** HIGH
+
 - **External monitoring** - Sentry, DataDog, etc.
 - **API logging** - Send errors to backend
 - **Console debugging** - Development
@@ -102,11 +110,13 @@ if (result.success) {
 **Current Status:** Multiple variants, 3 actually used
 
 **Strategic Value:** HIGH
+
 - **React error handling** - Catch component errors
 - **User experience** - Show fallback UI
 - **Error recovery** - Allow users to retry
 
 **Recommendation:** KEEP but consolidate
+
 - Keep: ErrorBoundary, ErrorFallback, RecoveryUI (~500 lines)
 - Delete: Multiple variants, unused components (~1,286 lines)
 
@@ -115,6 +125,7 @@ if (result.success) {
 **Current Status:** User-friendly error messages
 
 **Strategic Value:** HIGH
+
 - **User experience** - Translate technical errors to user language
 - **Internationalization** - Support multiple languages
 - **Contextual help** - Provide recovery suggestions
@@ -127,6 +138,7 @@ if (result.success) {
 **Current Status:** HTTP boundary serialization
 
 **Strategic Value:** HIGH
+
 - **Server alignment** - Convert between client/server formats
 - **API integration** - Serialize errors for HTTP
 - **Type safety** - Ensure consistent error format
@@ -140,10 +152,12 @@ if (result.success) {
 ### 1. Duplicate Type Systems
 
 **Files:**
+
 - Old `types.ts` (overlaps with `core/types.ts`)
 - Old `unified-types.ts` (overlaps with `core/types.ts`)
 
 **Strategic Value:** NONE
+
 - Duplication causes confusion
 - Consolidated in `core/types.ts`
 
@@ -152,10 +166,12 @@ if (result.success) {
 ### 2. Duplicate Handlers
 
 **Files:**
+
 - Old `handler.ts` (replaced by `core/handler.ts`)
 - Old `unified-handler.ts` (merged into `core/handler.ts`)
 
 **Strategic Value:** NONE
+
 - Functionality merged into consolidated handler
 - No unique features
 
@@ -164,10 +180,12 @@ if (result.success) {
 ### 3. Duplicate Factories
 
 **Files:**
+
 - Old `factory.ts` (replaced by `core/factory.ts`)
 - Old `unified-factory.ts` (merged into `core/factory.ts`)
 
 **Strategic Value:** NONE
+
 - Functionality merged into consolidated factory
 - No unique features
 
@@ -178,6 +196,7 @@ if (result.success) {
 ## 📊 Revised Deletion Plan
 
 ### Phase 2A: Delete True Duplicates (After Migration)
+
 - ❌ Old `handler.ts` (850 lines) - replaced by `core/handler.ts`
 - ❌ Old `factory.ts` (420 lines) - replaced by `core/factory.ts`
 - ❌ Old `unified-handler.ts` (450 lines) - merged into `core/handler.ts`
@@ -188,6 +207,7 @@ if (result.success) {
 **Total Deletion:** ~2,100 lines (true duplicates)
 
 ### Phase 2B: Simplify Strategic Components
+
 - ⚠️ `analytics.ts` - Reduce from 890 to ~300 lines (remove ML algorithms)
 - ⚠️ `recovery.ts` - Reduce from 680 to ~200 lines (remove React Query duplicates)
 - ⚠️ `components/` - Reduce from 1,786 to ~500 lines (consolidate variants)
@@ -195,6 +215,7 @@ if (result.success) {
 **Total Reduction:** ~1,856 lines (simplification)
 
 ### Phase 2C: Keep Strategic Infrastructure
+
 - ✅ `result.ts` (520 lines) - Future type-safe error handling
 - ✅ `reporters/` (380 lines) - External monitoring
 - ✅ `messages/` (1,200 lines) - User experience
@@ -247,6 +268,7 @@ client/src/infrastructure/error/
 ## 📈 Revised Metrics
 
 ### Code Changes
+
 - **Delete:** 2,100 lines (true duplicates)
 - **Simplify:** 1,856 lines reduction (remove bloat)
 - **Keep:** 3,440 lines (strategic infrastructure)
@@ -255,6 +277,7 @@ client/src/infrastructure/error/
 **Net Result:** 5,910 lines (down from 5,780 lines, but with better organization)
 
 ### Strategic Value
+
 - ✅ Result monad for future type-safe APIs
 - ✅ Analytics for production monitoring
 - ✅ Recovery strategies for auth/user actions
@@ -271,6 +294,7 @@ client/src/infrastructure/error/
 **Revised Plan:** Delete 2,100 lines of true duplicates, simplify 1,856 lines, keep 3,440 lines of strategic infrastructure
 
 **Why Keep More:**
+
 1. **Result monad** - Server uses it, future client adoption
 2. **Analytics** - Production monitoring needs
 3. **Recovery strategies** - Auth/user actions not handled by React Query

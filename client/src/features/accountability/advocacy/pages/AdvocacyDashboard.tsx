@@ -1,14 +1,26 @@
 /**
  * Advocacy Dashboard Page
- * 
+ *
  * Main dashboard for advocacy coordination features
  */
 
 import { useState } from 'react';
 import { Plus, TrendingUp, Target } from 'lucide-react';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
-import { useCampaigns, useTrendingCampaigns, useUserActions, useUserDashboard, useJoinCampaign } from '../hooks/use-advocacy';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
+import {
+  useCampaigns,
+  useTrendingCampaigns,
+  useUserActions,
+  useUserDashboard,
+  useJoinCampaign,
+} from '../hooks/use-advocacy';
 import { CampaignCard } from '../ui/CampaignCard';
 import { ActionCard } from '../ui/ActionCard';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +28,7 @@ import { useNavigate } from 'react-router-dom';
 export function AdvocacyDashboard() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
-  
+
   // Mock user ID - in real app, get from auth context
   const userId = 'current-user-id';
 
@@ -55,9 +67,7 @@ export function AdvocacyDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Active Campaigns
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Active Campaigns</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboard.activeCampaigns || 0}</div>
@@ -65,9 +75,7 @@ export function AdvocacyDashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Pending Actions
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Pending Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboard.pendingActions || 0}</div>
@@ -75,9 +83,7 @@ export function AdvocacyDashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Completed Actions
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Completed Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboard.completedActions || 0}</div>
@@ -85,9 +91,7 @@ export function AdvocacyDashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-3">
-              <CardTitle className="text-sm font-medium text-gray-600">
-                Total Impact
-              </CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">Total Impact</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{dashboard.totalImpact || 0}</div>
@@ -114,7 +118,7 @@ export function AdvocacyDashboard() {
             </div>
             {trendingCampaigns && trendingCampaigns.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {trendingCampaigns.map((campaign) => (
+                {trendingCampaigns.map(campaign => (
                   <CampaignCard
                     key={campaign.id}
                     campaign={campaign}
@@ -140,11 +144,11 @@ export function AdvocacyDashboard() {
             </div>
             {userActions && userActions.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {userActions.slice(0, 4).map((action) => (
+                {userActions.slice(0, 4).map(action => (
                   <ActionCard
                     key={action.id}
                     action={action}
-                    onView={(id) => navigate(`/advocacy/actions/${id}`)}
+                    onView={id => navigate(`/advocacy/actions/${id}`)}
                   />
                 ))}
               </div>
@@ -173,7 +177,7 @@ export function AdvocacyDashboard() {
             </Card>
           ) : campaigns && campaigns.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {campaigns.map((campaign) => (
+              {campaigns.map(campaign => (
                 <CampaignCard
                   key={campaign.id}
                   campaign={campaign}
@@ -195,11 +199,11 @@ export function AdvocacyDashboard() {
           <h2 className="text-xl font-semibold mb-4">My Actions</h2>
           {userActions && userActions.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {userActions.map((action) => (
+              {userActions.map(action => (
                 <ActionCard
                   key={action.id}
                   action={action}
-                  onView={(id) => navigate(`/advocacy/actions/${id}`)}
+                  onView={id => navigate(`/advocacy/actions/${id}`)}
                 />
               ))}
             </div>

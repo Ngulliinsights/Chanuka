@@ -171,4 +171,4 @@ class OfflineAnalyticsManager {
   }
 }
 
-export const offlineAnalyticsManager = new OfflineAnalyticsManager();
+export 

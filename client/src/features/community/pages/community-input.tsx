@@ -10,7 +10,6 @@ import {
   Star,
   ThumbsUp,
 } from 'lucide-react';
-import React from 'react';
 import { useState } from 'react';
 
 import ActivityFeed from '@client/features/community/ui/activity/ActivityFeed';

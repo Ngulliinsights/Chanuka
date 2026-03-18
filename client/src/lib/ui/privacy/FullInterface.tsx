@@ -11,8 +11,18 @@ import { PrivacySettings, ConsentRecord } from '@client/infrastructure/auth';
 
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive/Tabs';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/lib/design-system/interactive/Tabs';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system/typography/Card';
 import { logger } from '@client/lib/utils/logger';
 const VisibilityControls = React.lazy(() =>
   import('./controls/VisibilityControls').then(module => ({ default: module.VisibilityControls }))

@@ -5,7 +5,10 @@
  * and provides contextual guidance for their civic engagement journey.
  */
 
-import type { PersonaType, PersonaClassification } from '@client/infrastructure/observability/personalization';
+import type {
+  PersonaType,
+  PersonaClassification,
+} from '@client/infrastructure/observability/personalization';
 import {
   TrendingUp,
   Target,

@@ -1,6 +1,6 @@
 /**
  * Text Diff Component
- * 
+ *
  * Displays text differences between two strings with highlighting.
  * Uses a simple word-based diff algorithm.
  */
@@ -21,7 +21,12 @@ interface DiffPart {
   value: string;
 }
 
-export function TextDiff({ text1, text2, label1 = 'Version 1', label2 = 'Version 2' }: TextDiffProps) {
+export function TextDiff({
+  text1,
+  text2,
+  label1 = 'Version 1',
+  label2 = 'Version 2',
+}: TextDiffProps) {
   const diff = useMemo(() => computeDiff(text1 || '', text2 || ''), [text1, text2]);
 
   return (
@@ -38,8 +43,8 @@ export function TextDiff({ text1, text2, label1 = 'Version 1', label2 = 'Version
                   part.type === 'removed'
                     ? 'bg-red-100 dark:bg-red-900/30 text-red-900 dark:text-red-200 line-through'
                     : part.type === 'equal'
-                    ? ''
-                    : 'opacity-30'
+                      ? ''
+                      : 'opacity-30'
                 }
               >
                 {part.value}
@@ -61,8 +66,8 @@ export function TextDiff({ text1, text2, label1 = 'Version 1', label2 = 'Version
                   part.type === 'added'
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-200'
                     : part.type === 'equal'
-                    ? ''
-                    : 'opacity-30'
+                      ? ''
+                      : 'opacity-30'
                 }
               >
                 {part.value}
@@ -91,7 +96,7 @@ function computeDiff(text1: string, text2: string): { left: DiffPart[]; right: D
   while (i < words1.length || j < words2.length) {
     const word1 = words1[i] || '';
     const word2 = words2[j] || '';
-    
+
     if (i >= words1.length) {
       // Remaining words in text2 are additions
       right.push({ type: 'added', value: word2 });

@@ -13,10 +13,9 @@ import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute'
  * This wrapper ensures that transient network errors don't permanently
  * break the application by providing a fallback UI with retry capability.
  */
- 
+
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
   return lazy(() =>
-     
     importFn().catch((error: unknown) => {
       logger.error(`Failed to load ${componentName}:`, { component: 'AppRouter' }, error);
 
@@ -46,10 +45,7 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 };
 
 // Lazy-loaded page components with enhanced error handling
-const HomePage = createLazyComponent(
-  () => import('@client/features/home/pages/home'),
-  'Home Page'
-);
+const HomePage = createLazyComponent(() => import('@client/features/home/pages/home'), 'Home Page');
 const BillsPortal = createLazyComponent(
   () => import('@client/features/bills/pages/BillsPortalPage'),
   'Bills Portal'
@@ -79,26 +75,71 @@ const AuthPage = createLazyComponent(
   () => import('@client/features/auth/pages/auth-page'),
   'Authentication'
 );
-const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
-const WelcomeTour = createLazyComponent(() => import('@client/features/onboarding/pages/welcome-tour'), 'Welcome Tour');
+const Onboarding = createLazyComponent(
+  () => import('@client/features/onboarding/pages/onboarding'),
+  'Onboarding'
+);
+const WelcomeTour = createLazyComponent(
+  () => import('@client/features/onboarding/pages/welcome-tour'),
+  'Welcome Tour'
+);
 const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
-const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
-const SupportPage = createLazyComponent(() => import('@client/features/home/pages/support'), 'Support');
-const DocumentationPage = createLazyComponent(() => import('@client/features/legal/pages/documentation'), 'Documentation');
-const ContactPage = createLazyComponent(() => import('@client/features/home/pages/contact'), 'Contact');
+const PrivacyPage = createLazyComponent(
+  () => import('@client/features/legal/pages/privacy'),
+  'Privacy'
+);
+const SupportPage = createLazyComponent(
+  () => import('@client/features/home/pages/support'),
+  'Support'
+);
+const DocumentationPage = createLazyComponent(
+  () => import('@client/features/legal/pages/documentation'),
+  'Documentation'
+);
+const ContactPage = createLazyComponent(
+  () => import('@client/features/home/pages/contact'),
+  'Contact'
+);
 const AboutPage = createLazyComponent(() => import('@client/features/home/pages/about'), 'About');
-const CareersPage = createLazyComponent(() => import('@client/features/home/pages/careers'), 'Careers');
+const CareersPage = createLazyComponent(
+  () => import('@client/features/home/pages/careers'),
+  'Careers'
+);
 const PressPage = createLazyComponent(() => import('@client/features/home/pages/press'), 'Press');
 const BlogPage = createLazyComponent(() => import('@client/features/home/pages/blog'), 'Blog');
-const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
-const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility-statement'), 'Accessibility Statement');
-const CivicEducationPage = createLazyComponent(() => import('@client/features/onboarding/pages/civic-education'), 'Civic Education');
-const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
-const ExpertInsightsPage = createLazyComponent(() => import('@client/features/community/expert/pages/expert-insights'), 'Expert Insights');
+const CookiePolicyPage = createLazyComponent(
+  () => import('@client/features/legal/pages/cookie-policy'),
+  'Cookie Policy'
+);
+const AccessibilityPage = createLazyComponent(
+  () => import('@client/features/legal/pages/accessibility-statement'),
+  'Accessibility Statement'
+);
+const CivicEducationPage = createLazyComponent(
+  () => import('@client/features/onboarding/pages/civic-education'),
+  'Civic Education'
+);
+const AnalysisToolsPage = createLazyComponent(
+  () => import('@client/features/analysis/pages/analysis-tools'),
+  'Analysis Tools'
+);
+const ExpertInsightsPage = createLazyComponent(
+  () => import('@client/features/community/expert/pages/expert-insights'),
+  'Expert Insights'
+);
 const ApiAccessPage = createLazyComponent(() => import('@client/lib/api/api-access'), 'API Access');
-const SystemStatusPage = createLazyComponent(() => import('@client/features/admin/pages/system-status'), 'System Status');
-const SitemapPage = createLazyComponent(() => import('@client/features/legal/pages/sitemap'), 'Sitemap');
-const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
+const SystemStatusPage = createLazyComponent(
+  () => import('@client/features/admin/pages/system-status'),
+  'System Status'
+);
+const SitemapPage = createLazyComponent(
+  () => import('@client/features/legal/pages/sitemap'),
+  'Sitemap'
+);
+const SecurityPage = createLazyComponent(
+  () => import('@client/features/legal/pages/security'),
+  'Security'
+);
 const UserProfile = createLazyComponent(
   () => import('@client/features/users/pages/user-account'),
   'User Account'
@@ -170,7 +211,7 @@ interface RouteConfig {
 /**
  * Route loading fallback component with consistent styling
  */
- 
+
 const RouteLoadingFallback = React.memo<{ routeName?: string }>(({ routeName }) => {
   return (
     <LoadingStateManager
@@ -188,8 +229,7 @@ RouteLoadingFallback.displayName = 'RouteLoadingFallback';
 /**
  * Route error fallback component with recovery options
  */
- 
- 
+
 const RouteErrorFallback = React.memo<{
   error: Error;
   resetErrorBoundary: () => void;
@@ -238,8 +278,7 @@ RouteErrorFallback.displayName = 'RouteErrorFallback';
  * Wrapper component for individual routes with error boundaries.
  * Memoized to prevent unnecessary re-renders when parent updates.
  */
- 
- 
+
 const RouteWrapper = React.memo<{
   children: React.ReactNode;
   routeName: string;

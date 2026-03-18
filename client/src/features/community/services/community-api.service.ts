@@ -3,7 +3,6 @@
  * Modernized API service for community features (comments, voting, reports)
  */
 
-import { BaseApiService } from '@shared/core/api/base-api-service';
 import { globalApiClient } from '@client/infrastructure/api/client';
 import {
   Comment,
@@ -24,7 +23,7 @@ import {
   ReportResponse,
   ReportListResponse,
   CommunityStatsResponse,
-  CommentTreeResponse
+  CommentTreeResponse,
 } from '@shared/types/api/contracts/community.contracts';
 
 class CommunityApiService {
@@ -53,15 +52,21 @@ class CommunityApiService {
   }
 
   // Comment Tree Operations
-  async getCommentTree(billId: string, params?: { 
-    maxDepth?: number; 
-    sortBy?: 'newest' | 'oldest' | 'popular'; 
-    limit?: number 
-  }): Promise<CommentTreeResponse> {
+  async getCommentTree(
+    billId: string,
+    params?: {
+      maxDepth?: number;
+      sortBy?: 'newest' | 'oldest' | 'popular';
+      limit?: number;
+    }
+  ): Promise<CommentTreeResponse> {
     return this.client.get(`${this.baseUrl}/comments/tree/${billId}`, params);
   }
 
-  async getCommentReplies(commentId: string, params?: Partial<CommentQueryParams>): Promise<CommentListResponse> {
+  async getCommentReplies(
+    commentId: string,
+    params?: Partial<CommentQueryParams>
+  ): Promise<CommentListResponse> {
     return this.client.get(`${this.baseUrl}/comments/${commentId}/replies`, params);
   }
 
@@ -74,7 +79,11 @@ class CommunityApiService {
     return this.client.patch(`${this.baseUrl}/comments/${id}/pin`, { pin });
   }
 
-  async moderateComment(id: string, action: 'approve' | 'hide' | 'delete', reason?: string): Promise<CommentResponse> {
+  async moderateComment(
+    id: string,
+    action: 'approve' | 'hide' | 'delete',
+    reason?: string
+  ): Promise<CommentResponse> {
     return this.client.patch(`${this.baseUrl}/comments/${id}/moderate`, { action, reason });
   }
 
@@ -100,7 +109,7 @@ class CommunityApiService {
     return this.createVote({
       targetId: commentId,
       targetType: 'comment',
-      type
+      type,
     });
   }
 
@@ -108,11 +117,14 @@ class CommunityApiService {
     return this.createVote({
       targetId: billId,
       targetType: 'bill',
-      type
+      type,
     });
   }
 
-  async getUserVote(targetId: string, targetType: 'comment' | 'bill' | 'amendment'): Promise<VoteResponse | null> {
+  async getUserVote(
+    targetId: string,
+    targetType: 'comment' | 'bill' | 'amendment'
+  ): Promise<VoteResponse | null> {
     try {
       return await this.client.get(`${this.baseUrl}/votes/user/${targetType}/${targetId}`);
     } catch (error: any) {
@@ -192,45 +204,58 @@ class CommunityApiService {
   }
 
   // Bulk Operations
-  async bulkModerateComments(commentIds: string[], action: 'approve' | 'hide' | 'delete', reason?: string): Promise<{
+  async bulkModerateComments(
+    commentIds: string[],
+    action: 'approve' | 'hide' | 'delete',
+    reason?: string
+  ): Promise<{
     success: string[];
     failed: Array<{ id: string; error: string }>;
   }> {
     return this.client.patch(`${this.baseUrl}/comments/bulk/moderate`, {
       commentIds,
       action,
-      reason
+      reason,
     });
   }
 
-  async bulkResolveReports(reportIds: string[], resolution: string): Promise<{
+  async bulkResolveReports(
+    reportIds: string[],
+    resolution: string
+  ): Promise<{
     success: string[];
     failed: Array<{ id: string; error: string }>;
   }> {
     return this.client.patch(`${this.baseUrl}/reports/bulk/resolve`, {
       reportIds,
-      resolution
+      resolution,
     });
   }
 
   // Search Operations
-  async searchComments(query: string, params?: {
-    billId?: string;
-    userId?: string;
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-  }): Promise<CommentListResponse> {
+  async searchComments(
+    query: string,
+    params?: {
+      billId?: string;
+      userId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+      limit?: number;
+    }
+  ): Promise<CommentListResponse> {
     return this.client.get(`${this.baseUrl}/comments/search`, { q: query, ...params });
   }
 
   // Real-time Operations
-  async subscribeToComments(billId: string, callback: (comment: Comment) => void): Promise<() => void> {
+  async subscribeToComments(
+    billId: string,
+    callback: (comment: Comment) => void
+  ): Promise<() => void> {
     // WebSocket subscription implementation
     // This would connect to a WebSocket endpoint for real-time comment updates
     const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/community/comments/${billId}`);
-    
-    ws.onmessage = (event) => {
+
+    ws.onmessage = event => {
       const data = JSON.parse(event.data);
       if (data.type === 'new_comment') {
         callback(data.comment);
@@ -240,10 +265,16 @@ class CommunityApiService {
     return () => ws.close();
   }
 
-  async subscribeToVotes(targetId: string, targetType: string, callback: (vote: Vote) => void): Promise<() => void> {
-    const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/community/votes/${targetType}/${targetId}`);
-    
-    ws.onmessage = (event) => {
+  async subscribeToVotes(
+    targetId: string,
+    targetType: string,
+    callback: (vote: Vote) => void
+  ): Promise<() => void> {
+    const ws = new WebSocket(
+      `${process.env.REACT_APP_WS_URL}/community/votes/${targetType}/${targetId}`
+    );
+
+    ws.onmessage = event => {
       const data = JSON.parse(event.data);
       if (data.type === 'vote_update') {
         callback(data.vote);

@@ -30,7 +30,6 @@ import {
   selectTrendData,
   setActiveTab,
   updateFilters,
-  type DashboardFilters,
 } from '@client/infrastructure/store';
 import type { ErrorPattern } from '@client/lib/services';
 

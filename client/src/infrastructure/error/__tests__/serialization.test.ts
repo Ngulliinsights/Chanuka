@@ -15,7 +15,6 @@ import {
   createNetworkError,
   createAuthenticationError,
   createAuthorizationError,
-  createBusinessError,
   createSystemError,
   createNotFoundError,
   createTimeoutError,
@@ -54,11 +53,11 @@ describe('Error Serialization', () => {
     });
 
     it('should serialize network error correctly', () => {
-      const error = createNetworkError(
-        'Request failed',
-        500,
-        { component: 'APIClient', operation: 'fetchData', requestId: 'req123' }
-      );
+      const error = createNetworkError('Request failed', 500, {
+        component: 'APIClient',
+        operation: 'fetchData',
+        requestId: 'req123',
+      });
 
       const apiError = toApiError(error);
 
@@ -72,10 +71,10 @@ describe('Error Serialization', () => {
     });
 
     it('should serialize authentication error correctly', () => {
-      const error = createAuthenticationError(
-        'Invalid credentials',
-        { component: 'AuthService', operation: 'login' }
-      );
+      const error = createAuthenticationError('Invalid credentials', {
+        component: 'AuthService',
+        operation: 'login',
+      });
 
       const apiError = toApiError(error);
 
@@ -86,11 +85,10 @@ describe('Error Serialization', () => {
     });
 
     it('should serialize authorization error correctly', () => {
-      const error = createAuthorizationError(
-        'Insufficient permissions',
-        ['admin', 'moderator'],
-        { component: 'AdminPanel', operation: 'accessSettings' }
-      );
+      const error = createAuthorizationError('Insufficient permissions', ['admin', 'moderator'], {
+        component: 'AdminPanel',
+        operation: 'accessSettings',
+      });
 
       const apiError = toApiError(error);
 
@@ -101,18 +99,14 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve all error context', () => {
-      const error = createNetworkError(
-        'Request failed',
-        500,
-        {
-          component: 'APIClient',
-          operation: 'fetchData',
-          userId: 'user123',
-          sessionId: 'session456',
-          requestId: 'req789',
-          metadata: { endpoint: '/api/users', method: 'GET' },
-        }
-      );
+      const error = createNetworkError('Request failed', 500, {
+        component: 'APIClient',
+        operation: 'fetchData',
+        userId: 'user123',
+        sessionId: 'session456',
+        requestId: 'req789',
+        metadata: { endpoint: '/api/users', method: 'GET' },
+      });
 
       const apiError = toApiError(error);
       const context = apiError.error.details?.context as Record<string, unknown>;
@@ -128,10 +122,10 @@ describe('Error Serialization', () => {
 
   describe('fromApiError', () => {
     it('should deserialize validation error correctly', () => {
-      const originalError = createValidationError(
-        [{ field: 'email', message: 'Invalid email' }],
-        { component: 'Form', operation: 'validate' }
-      );
+      const originalError = createValidationError([{ field: 'email', message: 'Invalid email' }], {
+        component: 'Form',
+        operation: 'validate',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -161,16 +155,12 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve error context during deserialization', () => {
-      const originalError = createNetworkError(
-        'Request failed',
-        500,
-        {
-          component: 'APIClient',
-          operation: 'fetchData',
-          userId: 'user123',
-          metadata: { endpoint: '/api/users' },
-        }
-      );
+      const originalError = createNetworkError('Request failed', 500, {
+        component: 'APIClient',
+        operation: 'fetchData',
+        userId: 'user123',
+        metadata: { endpoint: '/api/users' },
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -211,11 +201,11 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve network error through round-trip', () => {
-      const originalError = createNetworkError(
-        'Request failed',
-        503,
-        { component: 'API', operation: 'fetch', requestId: 'req123' }
-      );
+      const originalError = createNetworkError('Request failed', 503, {
+        component: 'API',
+        operation: 'fetch',
+        requestId: 'req123',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -228,10 +218,10 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve authentication error through round-trip', () => {
-      const originalError = createAuthenticationError(
-        'Token expired',
-        { component: 'Auth', operation: 'verify' }
-      );
+      const originalError = createAuthenticationError('Token expired', {
+        component: 'Auth',
+        operation: 'verify',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -242,11 +232,10 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve authorization error through round-trip', () => {
-      const originalError = createAuthorizationError(
-        'Access denied',
-        ['admin'],
-        { component: 'AdminPanel', operation: 'access' }
-      );
+      const originalError = createAuthorizationError('Access denied', ['admin'], {
+        component: 'AdminPanel',
+        operation: 'access',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -258,11 +247,10 @@ describe('Error Serialization', () => {
 
     it('should preserve system error through round-trip', () => {
       const cause = new Error('Original error');
-      const originalError = createSystemError(
-        'System failure',
-        cause,
-        { component: 'System', operation: 'process' }
-      );
+      const originalError = createSystemError('System failure', cause, {
+        component: 'System',
+        operation: 'process',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -273,10 +261,11 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve not found error through round-trip', () => {
-      const originalError = createNotFoundError(
-        'User',
-        { component: 'UserService', operation: 'find', userId: '123' }
-      );
+      const originalError = createNotFoundError('User', {
+        component: 'UserService',
+        operation: 'find',
+        userId: '123',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -287,11 +276,10 @@ describe('Error Serialization', () => {
     });
 
     it('should preserve timeout error through round-trip', () => {
-      const originalError = createTimeoutError(
-        'fetchData',
-        5000,
-        { component: 'API', operation: 'fetch' }
-      );
+      const originalError = createTimeoutError('fetchData', 5000, {
+        component: 'API',
+        operation: 'fetch',
+      });
 
       const apiError = toApiError(originalError);
       const deserializedError = fromApiError(apiError);
@@ -304,10 +292,10 @@ describe('Error Serialization', () => {
 
   describe('JSON serialization', () => {
     it('should serialize and deserialize to/from JSON string', () => {
-      const originalError = createValidationError(
-        [{ field: 'email', message: 'Invalid' }],
-        { component: 'Form', operation: 'validate' }
-      );
+      const originalError = createValidationError([{ field: 'email', message: 'Invalid' }], {
+        component: 'Form',
+        operation: 'validate',
+      });
 
       const jsonString = serializeError(originalError);
       expect(typeof jsonString).toBe('string');
@@ -354,10 +342,10 @@ describe('Error Serialization', () => {
 
   describe('Type safety', () => {
     it('should maintain type safety through serialization', () => {
-      const error = createValidationError(
-        [{ field: 'email', message: 'Invalid' }],
-        { component: 'Form', operation: 'validate' }
-      );
+      const error = createValidationError([{ field: 'email', message: 'Invalid' }], {
+        component: 'Form',
+        operation: 'validate',
+      });
 
       const apiError = toApiError(error);
       const deserializedError = fromApiError(apiError);

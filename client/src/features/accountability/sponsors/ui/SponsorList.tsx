@@ -6,7 +6,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/lib/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/lib/design-system';
 import { LoadingSpinner } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { Search, Filter, RefreshCw, Plus } from 'lucide-react';
@@ -41,23 +47,28 @@ export function SponsorList({
   // State for filters and search
   const [searchQuery, setSearchQuery] = useState(initialFilters.query || '');
   const [selectedParty, setSelectedParty] = useState(initialFilters.party || '');
-  const [selectedConstituency, setSelectedConstituency] = useState(initialFilters.constituency || '');
+  const [selectedConstituency, setSelectedConstituency] = useState(
+    initialFilters.constituency || ''
+  );
   const [activeOnly, setActiveOnly] = useState(initialFilters.is_active ?? true);
   const [sortBy, setSortBy] = useState(initialFilters.sortBy || 'name');
   const [sortOrder, setSortOrder] = useState(initialFilters.sortOrder || 'asc');
   const [currentPage, setCurrentPage] = useState(initialFilters.page || 1);
 
   // Build query parameters
-  const queryParams = useMemo((): SponsorsQueryParams => ({
-    query: searchQuery || undefined,
-    party: selectedParty || undefined,
-    constituency: selectedConstituency || undefined,
-    is_active: activeOnly,
-    sortBy,
-    sortOrder,
-    page: currentPage,
-    limit: 20,
-  }), [searchQuery, selectedParty, selectedConstituency, activeOnly, sortBy, sortOrder, currentPage]);
+  const queryParams = useMemo(
+    (): SponsorsQueryParams => ({
+      query: searchQuery || undefined,
+      party: selectedParty || undefined,
+      constituency: selectedConstituency || undefined,
+      is_active: activeOnly,
+      sortBy,
+      sortOrder,
+      page: currentPage,
+      limit: 20,
+    }),
+    [searchQuery, selectedParty, selectedConstituency, activeOnly, sortBy, sortOrder, currentPage]
+  );
 
   // Data fetching
   const { data: sponsorsData, isLoading, error, refetch } = useSponsors(queryParams);
@@ -135,7 +146,7 @@ export function SponsorList({
             {sponsorsData?.count || 0} sponsor{(sponsorsData?.count || 0) !== 1 ? 's' : ''} found
           </p>
         </div>
-        
+
         {onCreateSponsor && (
           <Button onClick={onCreateSponsor}>
             <Plus className="h-4 w-4 mr-2" />
@@ -166,7 +177,7 @@ export function SponsorList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All parties</SelectItem>
-              {parties?.map((party) => (
+              {parties?.map(party => (
                 <SelectItem key={party} value={party}>
                   {party}
                 </SelectItem>
@@ -181,7 +192,7 @@ export function SponsorList({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All constituencies</SelectItem>
-              {constituencies?.map((constituency) => (
+              {constituencies?.map(constituency => (
                 <SelectItem key={constituency} value={constituency}>
                   {constituency}
                 </SelectItem>
@@ -221,7 +232,7 @@ export function SponsorList({
               <input
                 type="checkbox"
                 checked={activeOnly}
-                onChange={(e) => setActiveOnly(e.target.checked)}
+                onChange={e => setActiveOnly(e.target.checked)}
                 className="rounded border-gray-300"
               />
               Active sponsors only
@@ -249,7 +260,7 @@ export function SponsorList({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sponsors.map((sponsor) => (
+          {sponsors.map(sponsor => (
             <SponsorCard
               key={sponsor.id}
               sponsor={sponsor}
@@ -267,23 +278,13 @@ export function SponsorList({
       {/* Pagination */}
       {(hasNextPage || hasPrevPage) && (
         <div className="flex items-center justify-between">
-          <Button
-            variant="outline"
-            onClick={handlePrevPage}
-            disabled={!hasPrevPage || isLoading}
-          >
+          <Button variant="outline" onClick={handlePrevPage} disabled={!hasPrevPage || isLoading}>
             Previous
           </Button>
-          
-          <span className="text-sm text-gray-600">
-            Page {currentPage}
-          </span>
-          
-          <Button
-            variant="outline"
-            onClick={handleNextPage}
-            disabled={!hasNextPage || isLoading}
-          >
+
+          <span className="text-sm text-gray-600">Page {currentPage}</span>
+
+          <Button variant="outline" onClick={handleNextPage} disabled={!hasNextPage || isLoading}>
             Next
           </Button>
         </div>

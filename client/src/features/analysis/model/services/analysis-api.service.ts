@@ -171,4 +171,4 @@ export class AnalysisApiService {
 // Singleton Export
 // ============================================================================
 
-export const analysisApiService = new AnalysisApiService();
+export 

@@ -29,7 +29,7 @@ export default function WorkspaceDetailPage() {
         likes: 0,
         replies: 0,
         shares: 0,
-        userHasLiked: false
+        userHasLiked: false,
       }));
       setActivities(mappedActivities);
     }
@@ -48,9 +48,7 @@ export default function WorkspaceDetailPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold">{workspace.name}</h1>
-          {workspace.description && (
-            <p className="text-gray-600 mt-2">{workspace.description}</p>
-          )}
+          {workspace.description && <p className="text-gray-600 mt-2">{workspace.description}</p>}
         </div>
         <Button variant="outline">
           <Settings className="h-4 w-4 mr-2" />
@@ -77,7 +75,7 @@ export default function WorkspaceDetailPage() {
             {workspace.members.length === 0 ? (
               <p className="text-gray-600 text-center py-12">No members yet</p>
             ) : (
-              workspace.members.map((member) => (
+              workspace.members.map(member => (
                 <div
                   key={member.userId}
                   className="flex items-center justify-between p-4 border rounded-lg"

@@ -28,7 +28,7 @@ export function MobileNavigation() {
       aria-label="Mobile navigation"
     >
       <div className="flex items-center justify-around h-16">
-        {navItems.map((item) => {
+        {navItems.map(item => {
           const isActive = location.pathname === item.path;
           return (
             <button
@@ -36,9 +36,7 @@ export function MobileNavigation() {
               onClick={() => navigate(item.path)}
               className={cn(
                 'flex flex-col items-center justify-center flex-1 h-full transition-colors',
-                isActive
-                  ? 'text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                isActive ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'
               )}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}

@@ -5,7 +5,11 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { usePersonalizedRecommendations, useSimilarBills, useTrendingBills } from '../hooks/useRecommendations';
+import {
+  usePersonalizedRecommendations,
+  useSimilarBills,
+  useTrendingBills,
+} from '../hooks/useRecommendations';
 import { recommendationApi } from '../api/recommendation-api';
 
 // Mock the API
@@ -61,9 +65,7 @@ describe('useRecommendations hooks', () => {
     });
 
     it('handles errors', async () => {
-      (recommendationApi.getPersonalized as vitest.Mock).mockRejectedValue(
-        new Error('API Error')
-      );
+      (recommendationApi.getPersonalized as vitest.Mock).mockRejectedValue(new Error('API Error'));
 
       const { result } = renderHook(() => usePersonalizedRecommendations(10), {
         wrapper: createWrapper(),
@@ -85,7 +87,12 @@ describe('useRecommendations hooks', () => {
             type: 'bill',
             score: 0.75,
             reason: 'Similar content',
-            metadata: { billId: 124, billNumber: 'HB-002', title: 'Similar Bill', status: 'Active' },
+            metadata: {
+              billId: 124,
+              billNumber: 'HB-002',
+              title: 'Similar Bill',
+              status: 'Active',
+            },
           },
         ],
         count: 1,
@@ -124,7 +131,12 @@ describe('useRecommendations hooks', () => {
             type: 'bill',
             score: 0.9,
             reason: 'Trending now',
-            metadata: { billId: 125, billNumber: 'HB-003', title: 'Trending Bill', status: 'Active' },
+            metadata: {
+              billId: 125,
+              billNumber: 'HB-003',
+              title: 'Trending Bill',
+              status: 'Active',
+            },
           },
         ],
         count: 1,

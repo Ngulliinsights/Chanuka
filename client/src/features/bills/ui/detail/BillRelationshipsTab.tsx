@@ -25,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@client/lib/design-system';
-import { cn } from '@client/lib/design-system/utils/cn';
 
 interface BillRelationshipsTabProps {
   bill: Bill;

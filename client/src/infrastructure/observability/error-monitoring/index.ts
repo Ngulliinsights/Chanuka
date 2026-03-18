@@ -83,8 +83,7 @@ export const MonitoringIntegrationService = {
   }
 };
 
-export const monitoringIntegration = MonitoringIntegrationService;
-export type MonitoringConfig = any;
+export export type MonitoringConfig = any;
 export type UnifiedErrorMonitoring = any;
 export type ErrorMonitoringMiddleware = any;
 export type ClientSystem = any;
@@ -96,21 +95,14 @@ export type AppError = any;
 export type ErrorSeverity = any;
 export type ErrorDomain = any;
 
-export const CrossSystemErrorAnalytics = {
-  getInstance: () => ({
-    registerPerformanceMetrics: async (system: any, op: string, duration: number, success: boolean) => {
-      console.debug(`[CrossSystemErrorAnalytics] Performance recorded: ${system}/${op} - ${duration}ms (success: ${success})`);
-    },
+export     },
     getCrossSystemAnalytics: async () => {
       return { systems: [] };
     },
   })
 };
 
-export const ErrorAggregationService = {
-  getInstance: () => ErrorMonitor.getInstance()
-};
-
+export 
 /**
  * Track an error with context
  * Requirements: 11.2

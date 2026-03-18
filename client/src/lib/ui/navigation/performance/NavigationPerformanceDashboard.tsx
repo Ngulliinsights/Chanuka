@@ -7,7 +7,6 @@
 
 import { BarChart3, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
-import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';

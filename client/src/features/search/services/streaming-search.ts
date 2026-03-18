@@ -7,7 +7,11 @@
 
 import { streamSearch, cancelSearch } from '@client/features/search/services/api';
 import { logger } from '@client/lib/utils/logger';
-import type { SearchResult, SearchRequest as SearchQuery, SearchProgress } from '@client/lib/types/search';
+import type {
+  SearchResult,
+  SearchRequest as SearchQuery,
+  SearchProgress,
+} from '@client/lib/types/search';
 
 // Define types locally
 // Local types removed in favor of shared types

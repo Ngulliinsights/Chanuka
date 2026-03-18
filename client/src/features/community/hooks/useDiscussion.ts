@@ -168,8 +168,7 @@ export function useDiscussion({
 
     // Fallback: synthesise a thread-like object from comments alone
     const participantIds = new Set(comments.map(c => enriched(c).authorId).filter(Boolean));
-    const lastActivityFallback =
-      enriched(comments[0])?.updatedAt ?? new Date().toISOString();
+    const lastActivityFallback = enriched(comments[0])?.updatedAt ?? new Date().toISOString();
 
     return {
       id: 0,
@@ -279,8 +278,12 @@ export function useDiscussion({
     unified.invalidateComments();
   };
 
-  const subscribe = (): void => { /* handled by unified system */ };
-  const unsubscribe = (): void => { /* handled by unified system */ };
+  const subscribe = (): void => {
+    /* handled by unified system */
+  };
+  const unsubscribe = (): void => {
+    /* handled by unified system */
+  };
 
   // --------------------------------------------------------------------------
   // Return

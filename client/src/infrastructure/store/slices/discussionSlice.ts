@@ -335,8 +335,7 @@ export const reportCommentAsync = createAsyncThunk<
   async ({ commentId, violationType, reason, description }, { rejectWithValue }) => {
     try {
       // TODO: Replace with actual API call
-      // const response = await api.comments.report({ commentId, violationType, reason, description });
-
+      // 
       const report: CommentReport = {
         id: Date.now(),
         commentId,
@@ -649,16 +648,7 @@ const buildCommentTree = (
   };
 };
 
-export const selectThreadComments = createSelector(
-  [
-    selectDiscussionState,
-    (_: RootState, billId: number) => billId,
-    (_: RootState, __: number, sortBy?: CommentSortOption) => sortBy,
-    (_: RootState, __: number, ___?: CommentSortOption, filterBy?: CommentFilterOption) => filterBy,
-  ],
-  (discussion, billId, sortBy, filterBy) => {
-    const thread = discussion.threads[billId];
-    if (!thread) return [];
+export     if (!thread) return [];
 
     const sort = sortBy || discussion.sortPreference;
     const filter = filterBy || discussion.filterPreference;
@@ -715,11 +705,7 @@ export const selectThreadComments = createSelector(
   }
 );
 
-export const selectCommentReplies = createSelector(
-  [selectDiscussionState, (_: RootState, commentId: string) => commentId],
-  (discussion, commentId) => {
-    const comment = discussion.comments[commentId];
-    if (!comment) return [];
+export     if (!comment) return [];
 
     return comment.replies
       .map((replyId: string) => buildCommentTree(replyId, discussion.comments))
@@ -727,9 +713,7 @@ export const selectCommentReplies = createSelector(
   }
 );
 
-export const selectModerationStats = createSelector([selectDiscussionState], discussion => {
-  const reports = Object.values(discussion.reports);
-  return {
+export   return {
     totalReports: reports.length,
     pendingReports: discussion.pendingReports,
     resolvedReports: reports.filter((r: CommentReport) => r.status === 'resolved').length,
@@ -739,9 +723,7 @@ export const selectModerationStats = createSelector([selectDiscussionState], dis
   };
 });
 
-export const selectThreadStats = createSelector([selectThread], thread => {
-  if (!thread) return null;
-
+export 
   return {
     totalComments: thread.totalComments,
     participantCount: thread.participantCount,

@@ -1,6 +1,6 @@
 /**
  * Constitutional Intelligence Hook
- * 
+ *
  * React Query hook for fetching constitutional analysis data
  */
 
@@ -50,7 +50,7 @@ export function useConstitutionalAnalysis(billId: string | undefined) {
     queryKey: ['constitutional-analysis', billId],
     queryFn: async () => {
       if (!billId) throw new Error('Bill ID is required');
-      
+
       const response = await api.get(`/api/constitutional-intelligence/bill/${billId}`);
       return response.data.analysis as ConstitutionalAnalysis;
     },
@@ -76,17 +76,17 @@ export function useAnalyzeBill() {
       const response = await api.post('/api/constitutional-intelligence/analyze', request);
       return response.data.analysis as ConstitutionalAnalysis;
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       // Invalidate and refetch
       queryClient.invalidateQueries({ queryKey: ['constitutional-analysis', data.billId] });
-      
+
       logger.info('Constitutional analysis completed', {
         component: 'useAnalyzeBill',
         billId: data.billId,
         alignmentScore: data.alignmentScore,
       });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Constitutional analysis failed', {
         component: 'useAnalyzeBill',
         error: error instanceof Error ? error.message : String(error),

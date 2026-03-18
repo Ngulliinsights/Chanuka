@@ -1,6 +1,6 @@
 /**
  * Unit tests for module consolidation algorithm
- * 
+ *
  * Tests the core consolidation logic for MERGE, NEST, and REFACTOR strategies.
  */
 
@@ -25,7 +25,7 @@ describe('consolidation-algorithm', () => {
   describe('createStandardModuleStructure', () => {
     it('should create standard module structure with correct paths', () => {
       const structure = createStandardModuleStructure('test-module', '/base');
-      
+
       expect(structure.name).toBe('test-module');
       expect(structure.path).toContain('test-module');
       expect(structure.indexTs).toContain('index.ts');
@@ -43,9 +43,9 @@ describe('consolidation-algorithm', () => {
         { name: 'func1', type: 'function', signature: 'func1(): void', isDefault: false },
         { name: 'Class1', type: 'class', signature: 'class Class1', isDefault: false },
       ];
-      
+
       mergeExports(structure, exports, 'source');
-      
+
       expect(structure.subModules).toHaveLength(1);
       expect(structure.subModules[0].exports).toHaveLength(2);
       expect(structure.subModules[0].exports[0].name).toBe('func1');
@@ -53,19 +53,19 @@ describe('consolidation-algorithm', () => {
 
     it('should handle naming conflicts by prefixing', () => {
       const structure = createStandardModuleStructure('target');
-      
+
       // Add first set of exports
       const exports1: ModuleExport[] = [
         { name: 'func1', type: 'function', signature: 'func1(): void', isDefault: false },
       ];
       mergeExports(structure, exports1, 'source1');
-      
+
       // Add conflicting exports
       const exports2: ModuleExport[] = [
         { name: 'func1', type: 'function', signature: 'func1(): string', isDefault: false },
       ];
       mergeExports(structure, exports2, 'source2');
-      
+
       expect(structure.subModules[0].exports).toHaveLength(2);
       expect(structure.subModules[0].exports[0].name).toBe('func1');
       expect(structure.subModules[0].exports[1].name).toBe('source2_func1');
@@ -79,9 +79,9 @@ describe('consolidation-algorithm', () => {
         { name: 'Type1', kind: 'interface', definition: 'interface Type1 {}' },
         { name: 'Type2', kind: 'type', definition: 'type Type2 = string' },
       ];
-      
+
       mergeTypes(structure, types, 'source');
-      
+
       expect(structure.subModules).toHaveLength(1);
       expect(structure.subModules[0].types).toHaveLength(2);
       expect(structure.subModules[0].types[0].name).toBe('Type1');
@@ -89,17 +89,17 @@ describe('consolidation-algorithm', () => {
 
     it('should handle type naming conflicts by prefixing', () => {
       const structure = createStandardModuleStructure('target');
-      
+
       const types1: TypeDefinition[] = [
         { name: 'Config', kind: 'interface', definition: 'interface Config {}' },
       ];
       mergeTypes(structure, types1, 'source1');
-      
+
       const types2: TypeDefinition[] = [
         { name: 'Config', kind: 'interface', definition: 'interface Config { x: number }' },
       ];
       mergeTypes(structure, types2, 'source2');
-      
+
       expect(structure.subModules[0].types).toHaveLength(2);
       expect(structure.subModules[0].types[0].name).toBe('Config');
       expect(structure.subModules[0].types[1].name).toBe('source2_Config');
@@ -113,9 +113,9 @@ describe('consolidation-algorithm', () => {
         { name: 'func1', kind: 'function', code: 'function func1() {}' },
         { name: 'func2', kind: 'function', code: 'function func2() {}' },
       ];
-      
+
       mergeImplementations(structure, implementations);
-      
+
       expect(structure.subModules).toHaveLength(1);
       expect(structure.subModules[0].implementations).toHaveLength(2);
     });
@@ -124,7 +124,7 @@ describe('consolidation-algorithm', () => {
   describe('createSubModule', () => {
     it('should create sub-module structure', () => {
       const subModule = createSubModule('sub', '/target/path');
-      
+
       expect(subModule.name).toBe('sub');
       expect(subModule.path).toContain('sub');
       expect(subModule.exports).toEqual([]);
@@ -157,9 +157,9 @@ describe('consolidation-algorithm', () => {
           ],
         },
       ];
-      
+
       const commonCode = extractCommonCode(modules);
-      
+
       expect(commonCode).toHaveLength(1);
       expect(commonCode[0].name).toBe('common1');
     });
@@ -171,14 +171,12 @@ describe('consolidation-algorithm', () => {
           path: '/module1',
           exports: [],
           types: [],
-          implementations: [
-            { name: 'func1', kind: 'function', code: 'function func1() {}' },
-          ],
+          implementations: [{ name: 'func1', kind: 'function', code: 'function func1() {}' }],
         },
       ];
-      
+
       const commonCode = extractCommonCode(modules);
-      
+
       expect(commonCode).toEqual([]);
     });
   });
@@ -195,13 +193,13 @@ describe('consolidation-algorithm', () => {
           { name: 'specific1', kind: 'function', code: 'function specific1() {}' },
         ],
       };
-      
+
       const commonCode: Implementation[] = [
         { name: 'common1', kind: 'function', code: 'function common1() {}' },
       ];
-      
+
       const specificCode = extractSpecificCode(module, commonCode);
-      
+
       expect(specificCode).toHaveLength(1);
       expect(specificCode[0].name).toBe('specific1');
     });
@@ -210,7 +208,7 @@ describe('consolidation-algorithm', () => {
   describe('consolidateModules', () => {
     it('should fail with no source modules', () => {
       const result = consolidateModules([], 'target', ConsolidationStrategy.MERGE);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toContain('No source modules');
     });
@@ -225,9 +223,9 @@ describe('consolidation-algorithm', () => {
           implementations: [],
         },
       ];
-      
+
       const result = consolidateModules(modules, '', ConsolidationStrategy.MERGE);
-      
+
       expect(result.success).toBe(false);
       expect(result.error).toContain('Target module name is required');
     });
@@ -240,12 +238,8 @@ describe('consolidation-algorithm', () => {
           exports: [
             { name: 'func1', type: 'function', signature: 'func1(): void', isDefault: false },
           ],
-          types: [
-            { name: 'Type1', kind: 'interface', definition: 'interface Type1 {}' },
-          ],
-          implementations: [
-            { name: 'func1', kind: 'function', code: 'function func1() {}' },
-          ],
+          types: [{ name: 'Type1', kind: 'interface', definition: 'interface Type1 {}' }],
+          implementations: [{ name: 'func1', kind: 'function', code: 'function func1() {}' }],
         },
         {
           name: 'module2',
@@ -253,17 +247,13 @@ describe('consolidation-algorithm', () => {
           exports: [
             { name: 'func2', type: 'function', signature: 'func2(): void', isDefault: false },
           ],
-          types: [
-            { name: 'Type2', kind: 'interface', definition: 'interface Type2 {}' },
-          ],
-          implementations: [
-            { name: 'func2', kind: 'function', code: 'function func2() {}' },
-          ],
+          types: [{ name: 'Type2', kind: 'interface', definition: 'interface Type2 {}' }],
+          implementations: [{ name: 'func2', kind: 'function', code: 'function func2() {}' }],
         },
       ];
-      
+
       const result = consolidateModules(modules, 'merged', ConsolidationStrategy.MERGE);
-      
+
       expect(result.success).toBe(true);
       expect(result.module).toBeDefined();
       expect(result.module!.name).toBe('merged');
@@ -282,9 +272,7 @@ describe('consolidation-algorithm', () => {
             { name: 'func1', type: 'function', signature: 'func1(): void', isDefault: false },
           ],
           types: [],
-          implementations: [
-            { name: 'func1', kind: 'function', code: 'function func1() {}' },
-          ],
+          implementations: [{ name: 'func1', kind: 'function', code: 'function func1() {}' }],
         },
         {
           name: 'module2',
@@ -293,14 +281,12 @@ describe('consolidation-algorithm', () => {
             { name: 'func2', type: 'function', signature: 'func2(): void', isDefault: false },
           ],
           types: [],
-          implementations: [
-            { name: 'func2', kind: 'function', code: 'function func2() {}' },
-          ],
+          implementations: [{ name: 'func2', kind: 'function', code: 'function func2() {}' }],
         },
       ];
-      
+
       const result = consolidateModules(modules, 'nested', ConsolidationStrategy.NEST);
-      
+
       expect(result.success).toBe(true);
       expect(result.module).toBeDefined();
       expect(result.module!.name).toBe('nested');
@@ -332,17 +318,17 @@ describe('consolidation-algorithm', () => {
           ],
         },
       ];
-      
+
       const result = consolidateModules(modules, 'refactored', ConsolidationStrategy.REFACTOR);
-      
+
       expect(result.success).toBe(true);
       expect(result.module).toBeDefined();
       expect(result.module!.name).toBe('refactored');
       expect(result.module!.core).toBeDefined();
-      
+
       // Should have core sub-module + 2 specific sub-modules
       expect(result.module!.subModules.length).toBeGreaterThan(0);
-      
+
       // Find core sub-module
       const coreModule = result.module!.subModules.find(sm => sm.name === 'core');
       expect(coreModule).toBeDefined();

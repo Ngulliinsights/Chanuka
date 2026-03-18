@@ -13,15 +13,15 @@ import {
   UpdateGovernmentDataRequest,
   GovernmentDataType,
   GovernmentDataSource,
-  GovernmentDataStatus
 } from '@shared/types/api/contracts/government-data.contracts';
-import { useToast } from '@client/components/ui/use-toast';
+import { useToast } from '@client/lib/hooks/use-toast';
 
 // Query Keys
 export const governmentDataKeys = {
   all: ['government-data'] as const,
   lists: () => [...governmentDataKeys.all, 'list'] as const,
-  list: (params: Partial<GovernmentDataQueryParams>) => [...governmentDataKeys.lists(), params] as const,
+  list: (params: Partial<GovernmentDataQueryParams>) =>
+    [...governmentDataKeys.lists(), params] as const,
   details: () => [...governmentDataKeys.all, 'detail'] as const,
   detail: (id: string) => [...governmentDataKeys.details(), id] as const,
   stats: () => [...governmentDataKeys.all, 'stats'] as const,
@@ -85,9 +85,8 @@ export function useCreateGovernmentData() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (data: CreateGovernmentDataRequest) => 
-      governmentDataApiService.create(data),
-    onSuccess: (response) => {
+    mutationFn: (data: CreateGovernmentDataRequest) => governmentDataApiService.create(data),
+    onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.lists() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.stats() });
       toast({
@@ -163,10 +162,10 @@ export function useSyncGovernmentData() {
 
   return useMutation({
     mutationFn: ({ source, options }: { source?: string; options?: { force?: boolean } }) =>
-      source 
+      source
         ? governmentDataApiService.syncFromSource(source, options)
         : governmentDataApiService.syncAll(options),
-    onSuccess: (response) => {
+    onSuccess: response => {
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.all });
       toast({
         title: 'Sync Started',
@@ -184,7 +183,10 @@ export function useSyncGovernmentData() {
 }
 
 // Advanced hooks
-export function useGovernmentDataByType(dataType: GovernmentDataType, params?: Partial<GovernmentDataQueryParams>) {
+export function useGovernmentDataByType(
+  dataType: GovernmentDataType,
+  params?: Partial<GovernmentDataQueryParams>
+) {
   return useQuery({
     queryKey: [...governmentDataKeys.lists(), 'by-type', dataType, params],
     queryFn: () => governmentDataApiService.getByType(dataType, params),
@@ -192,7 +194,10 @@ export function useGovernmentDataByType(dataType: GovernmentDataType, params?: P
   });
 }
 
-export function useGovernmentDataBySource(source: GovernmentDataSource, params?: Partial<GovernmentDataQueryParams>) {
+export function useGovernmentDataBySource(
+  source: GovernmentDataSource,
+  params?: Partial<GovernmentDataQueryParams>
+) {
   return useQuery({
     queryKey: [...governmentDataKeys.lists(), 'by-source', source, params],
     queryFn: () => governmentDataApiService.getBySource(source, params),
@@ -279,7 +284,7 @@ export function useValidateGovernmentData() {
 
   return useMutation({
     mutationFn: (id: string) => governmentDataApiService.validateData(id),
-    onSuccess: (result) => {
+    onSuccess: result => {
       if (result.isValid) {
         toast({
           title: 'Validation Passed',
@@ -318,7 +323,7 @@ export function useBulkUpdateGovernmentData() {
       });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.lists() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.stats() });
-      
+
       toast({
         title: 'Bulk Update Successful',
         description: `Updated ${ids.length} items`,

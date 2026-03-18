@@ -1,6 +1,6 @@
 /**
  * Monitoring Hooks
- * 
+ *
  * Centralized exports for monitoring hooks
  */
 

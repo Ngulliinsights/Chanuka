@@ -28,7 +28,11 @@ import { useWebSocket } from './hooks/use-websocket';
 import { useRealTimeEngagement } from './hooks/use-realtime-engagement';
 
 // ✅ New way
-import { useWebSocket, useBillTracking, useCommunityRealTime } from '@client/infrastructure/api/realtime';
+import {
+  useWebSocket,
+  useBillTracking,
+  useCommunityRealTime,
+} from '@client/infrastructure/api/realtime';
 ```
 
 ### 3. Replace Hook Usage

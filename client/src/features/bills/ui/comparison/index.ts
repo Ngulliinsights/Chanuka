@@ -1,6 +1,6 @@
 /**
  * Comparison Components
- * 
+ *
  * Export all comparison-related components
  */
 

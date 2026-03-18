@@ -35,9 +35,7 @@ interface SyncableComment extends UnifiedComment {
 }
 
 export class StateSyncService {
-  constructor(
-    private queryClient: QueryClient
-  ) {}
+  constructor(private queryClient: QueryClient) {}
 
   /**
    * Sync comment creation across React Query cache and WebSocket
@@ -82,7 +80,6 @@ export class StateSyncService {
     this.updateCommentsCache(billId, comments =>
       comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
-
   }
 
   /**
@@ -111,7 +108,6 @@ export class StateSyncService {
       );
       this.updateThreadCommentCount(threadId, -1);
     }
-
   }
 
   /**
@@ -135,7 +131,6 @@ export class StateSyncService {
     this.updateCommentsCache(billId, comments =>
       comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
-
   }
 
   /**
@@ -146,7 +141,6 @@ export class StateSyncService {
       thread,
       ...old,
     ]);
-
   }
 
   /**
@@ -156,7 +150,6 @@ export class StateSyncService {
     this.queryClient.setQueryData(['threads', thread.billId], (old: UnifiedThread[] = []) =>
       old.map(t => (t.id === thread.id ? thread : t))
     );
-
   }
 
   /**
@@ -169,7 +162,7 @@ export class StateSyncService {
    */
   syncModerationAction(_moderation: UnifiedModeration, billId: number): void {
     // Note: StateSyncService no longer broadcasts moderation actions locally via websocket
-    // as it created redundant data flows. We rely on React Query cache invalidation here, 
+    // as it created redundant data flows. We rely on React Query cache invalidation here,
     // and the server will broadcast the action to other clients.
 
     // Invalidate the comment cache for this bill so any hidden/removed
@@ -246,8 +239,7 @@ export class StateSyncService {
         // When a peer broadcasts a moderation action, invalidate local comment
         // cache so the UI reflects the updated moderation status on next read.
         this.queryClient.invalidateQueries({
-          predicate: query =>
-            Array.isArray(query.queryKey) && query.queryKey[0] === 'comments',
+          predicate: query => Array.isArray(query.queryKey) && query.queryKey[0] === 'comments',
         });
         break;
       }

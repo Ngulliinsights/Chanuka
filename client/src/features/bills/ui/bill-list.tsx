@@ -1,6 +1,5 @@
 import { Loader2, AlertCircle, Filter } from 'lucide-react';
 import { useState, useMemo } from 'react';
-import React from 'react';
 import { Link } from 'wouter';
 
 import { Badge } from '@client/lib/design-system';
@@ -41,9 +40,7 @@ interface BillListProps {
   title?: string;
 }
 
-export const BillList = ({ bills, isLoading, error, title = 'Bills' }: BillListProps) => {
-  const [filter, setFilter] = useState<'active' | 'upcoming' | 'passed'>('active');
-  const [page, setPage] = useState(1);
+export   const [page, setPage] = useState(1);
   const BILLS_PER_PAGE = 5;
 
   // Memoize filtered bills to prevent unnecessary recalculations on every render

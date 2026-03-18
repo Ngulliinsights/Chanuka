@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 /**
  * Expert Insights Page
- * 
+ *
  * Hub for expert analysis and verified insights on Kenyan legislation
  */
 export default function ExpertInsightsPage() {
@@ -13,29 +13,29 @@ export default function ExpertInsightsPage() {
       experts: 12,
       insights: 45,
       icon: BookOpen,
-      color: 'blue'
+      color: 'blue',
     },
     {
       title: 'Public Finance',
       experts: 8,
       insights: 32,
       icon: TrendingUp,
-      color: 'green'
+      color: 'green',
     },
     {
       title: 'Devolution & Governance',
       experts: 15,
       insights: 58,
       icon: Users,
-      color: 'purple'
+      color: 'purple',
     },
     {
       title: 'Human Rights',
       experts: 10,
       insights: 38,
       icon: Award,
-      color: 'orange'
-    }
+      color: 'orange',
+    },
   ];
 
   const recentInsights = [
@@ -44,22 +44,25 @@ export default function ExpertInsightsPage() {
       expert: 'Prof. Githu Muigai',
       category: 'Constitutional Law',
       date: '2024-01-20',
-      excerpt: 'The Digital Health Bill presents significant opportunities for healthcare delivery while raising important data protection concerns...'
+      excerpt:
+        'The Digital Health Bill presents significant opportunities for healthcare delivery while raising important data protection concerns...',
     },
     {
       title: 'County Revenue Allocation: A Critical Review',
       expert: 'Wanjiru Gikonyo',
       category: 'Public Finance',
       date: '2024-01-18',
-      excerpt: 'The proposed changes to county revenue allocation formulas require careful consideration of equity principles...'
+      excerpt:
+        'The proposed changes to county revenue allocation formulas require careful consideration of equity principles...',
     },
     {
       title: 'Public Participation in Legislative Process',
       expert: 'Dr. PLO Lumumba',
       category: 'Devolution & Governance',
       date: '2024-01-15',
-      excerpt: 'Effective public participation remains a cornerstone of democratic governance, yet implementation challenges persist...'
-    }
+      excerpt:
+        'Effective public participation remains a cornerstone of democratic governance, yet implementation challenges persist...',
+    },
   ];
 
   return (
@@ -96,15 +99,17 @@ export default function ExpertInsightsPage() {
                 blue: 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400',
                 green: 'bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400',
                 purple: 'bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400',
-                orange: 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400'
+                orange: 'bg-orange-100 dark:bg-orange-900 text-orange-600 dark:text-orange-400',
               };
-              
+
               return (
                 <div
                   key={index}
                   className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700"
                 >
-                  <div className={`w-12 h-12 ${colorClasses[category.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}>
+                  <div
+                    className={`w-12 h-12 ${colorClasses[category.color as keyof typeof colorClasses]} rounded-lg flex items-center justify-center mb-4`}
+                  >
                     <Icon className="w-6 h-6" />
                   </div>
                   <h3 className="text-lg font-semibold mb-3">{category.title}</h3>
@@ -172,8 +177,8 @@ export default function ExpertInsightsPage() {
             <MessageSquare className="w-12 h-12 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-4">Share Your Expertise</h2>
             <p className="text-blue-100 mb-6">
-              Are you a legal professional, policy expert, or civic leader? Join our verified expert community
-              and help Kenyans understand complex legislation.
+              Are you a legal professional, policy expert, or civic leader? Join our verified expert
+              community and help Kenyans understand complex legislation.
             </p>
             <Link
               to="/community/expert-verification"

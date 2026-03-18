@@ -4,16 +4,7 @@
  * Allows users to customize their dashboard layout and preferences.
  */
 
-import {
-  Settings,
-  Clock,
-  RefreshCw,
-  LayoutGrid,
-  Grid3X3 as Grid,
-  List,
-  Maximize2,
-} from 'lucide-react';
-import React from 'react';
+import { Settings, Clock, RefreshCw, LayoutGrid, List, Maximize2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@client/lib/design-system/interactive/Button';
@@ -92,7 +83,9 @@ export function DashboardPreferencesModal({
     setLocalPreferences(prev => ({ ...prev, layout }));
   };
 
-  const handleTimeFilterChange = (defaultTimeFilter: UserDashboardPreferences['defaultTimeFilter']) => {
+  const handleTimeFilterChange = (
+    defaultTimeFilter: UserDashboardPreferences['defaultTimeFilter']
+  ) => {
     setLocalPreferences(prev => ({ ...prev, defaultTimeFilter }));
   };
 
@@ -113,7 +106,10 @@ export function DashboardPreferencesModal({
         // Add to pinned, remove from hidden
         return {
           ...prev,
-          pinnedSections: [...prev.pinnedSections.filter((id: string) => id !== sectionId), sectionId],
+          pinnedSections: [
+            ...prev.pinnedSections.filter((id: string) => id !== sectionId),
+            sectionId,
+          ],
           hiddenSections: prev.hiddenSections.filter((id: string) => id !== sectionId),
         };
       } else {
@@ -121,7 +117,10 @@ export function DashboardPreferencesModal({
         return {
           ...prev,
           pinnedSections: prev.pinnedSections.filter((id: string) => id !== sectionId),
-          hiddenSections: [...prev.hiddenSections.filter((id: string) => id !== sectionId), sectionId],
+          hiddenSections: [
+            ...prev.hiddenSections.filter((id: string) => id !== sectionId),
+            sectionId,
+          ],
         };
       }
     });

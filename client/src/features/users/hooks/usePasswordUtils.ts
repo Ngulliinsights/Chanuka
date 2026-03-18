@@ -153,7 +153,4 @@ export function usePasswordUtils() {
 }
 
 // Aliases for backward compatibility
-export const usePasswordVisibility = usePasswordUtils;
-export const usePasswordStrength = usePasswordUtils;
-
 export default usePasswordUtils;

@@ -121,8 +121,8 @@ export function useReportContent() {
       const apiReason = data.violationType === 'off_topic' ? 'other' : data.violationType;
       return communityApiService.reportComment({
         commentId: parseInt(data.commentId, 10),
-        reason: apiReason as 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'other', 
-        details: data.reason
+        reason: apiReason as 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'other',
+        details: data.reason,
       });
     },
     onSuccess: () => {

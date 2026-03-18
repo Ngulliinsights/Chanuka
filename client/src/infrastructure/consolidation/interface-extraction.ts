@@ -1,9 +1,9 @@
 /**
  * Interface Extraction Strategy
- * 
+ *
  * This module provides functionality to identify shared interfaces between
  * circular modules and extract them to separate files to break circular dependencies.
- * 
+ *
  * Requirements: 2.3
  */
 
@@ -53,7 +53,7 @@ export interface ImportUpdate {
 
 /**
  * Identifies shared interfaces between circular modules
- * 
+ *
  * @param project - ts-morph Project instance
  * @param circularModules - Array of module paths that form a circular dependency
  * @returns Array of shared interfaces found between the modules
@@ -100,18 +100,18 @@ export function identifySharedInterfaces(
     const imports = sourceFile.getImportDeclarations();
     for (const importDecl of imports) {
       const moduleSpecifier = importDecl.getModuleSpecifierValue();
-      
+
       // Check if this import is from another circular module
-      const importedModule = circularModules.find(m => 
-        moduleSpecifier.includes(m) || m.includes(moduleSpecifier)
+      const importedModule = circularModules.find(
+        m => moduleSpecifier.includes(m) || m.includes(moduleSpecifier)
       );
-      
+
       if (importedModule && importedModule !== modulePath) {
         // Get imported names
         const namedImports = importDecl.getNamedImports();
         for (const namedImport of namedImports) {
           const importedName = namedImport.getName();
-          
+
           // If this name is an interface/type, mark it as shared
           if (interfaceUsage.has(importedName)) {
             interfaceUsage.get(importedName)!.add(modulePath);
@@ -167,7 +167,7 @@ export function identifySharedInterfaces(
 
 /**
  * Generates TypeScript interface definitions for extracted interfaces
- * 
+ *
  * @param interfaces - Array of shared interfaces to extract
  * @returns TypeScript code containing all interface definitions
  */
@@ -194,7 +194,7 @@ export function generateInterfaceDefinitions(interfaces: SharedInterface[]): str
 
 /**
  * Creates a strategy to extract interfaces to separate files
- * 
+ *
  * @param project - ts-morph Project instance
  * @param circularModules - Array of module paths that form a circular dependency
  * @param targetFile - Path where extracted interfaces should be placed
@@ -217,12 +217,12 @@ export function createInterfaceExtractionStrategy(
     const imports = sourceFile.getImportDeclarations();
     for (const importDecl of imports) {
       const moduleSpecifier = importDecl.getModuleSpecifierValue();
-      
+
       // Check if this import is from another circular module
-      const importedModule = circularModules.find(m => 
-        moduleSpecifier.includes(m) || m.includes(moduleSpecifier)
+      const importedModule = circularModules.find(
+        m => moduleSpecifier.includes(m) || m.includes(moduleSpecifier)
       );
-      
+
       if (importedModule && importedModule !== modulePath) {
         const namedImports = importDecl.getNamedImports();
         const extractedNames: string[] = [];
@@ -230,7 +230,7 @@ export function createInterfaceExtractionStrategy(
 
         for (const namedImport of namedImports) {
           const importedName = namedImport.getName();
-          
+
           // Check if this is an extracted interface
           if (interfaces.some(iface => iface.name === importedName)) {
             extractedNames.push(importedName);
@@ -241,20 +241,16 @@ export function createInterfaceExtractionStrategy(
 
         if (extractedNames.length > 0) {
           const oldImport = importDecl.getText();
-          
+
           // Build new import statements
           const newImports: string[] = [];
-          
+
           // Import extracted interfaces from target file
-          newImports.push(
-            `import type { ${extractedNames.join(', ')} } from '${targetFile}';`
-          );
-          
+          newImports.push(`import type { ${extractedNames.join(', ')} } from '${targetFile}';`);
+
           // Keep remaining imports from original module
           if (remainingNames.length > 0) {
-            newImports.push(
-              `import { ${remainingNames.join(', ')} } from '${moduleSpecifier}';`
-            );
+            newImports.push(`import { ${remainingNames.join(', ')} } from '${moduleSpecifier}';`);
           }
 
           importUpdates.push({
@@ -277,7 +273,7 @@ export function createInterfaceExtractionStrategy(
 
 /**
  * Applies an interface extraction strategy to the project
- * 
+ *
  * @param project - ts-morph Project instance
  * @param strategy - Interface extraction strategy to apply
  */
@@ -287,9 +283,6 @@ export function applyInterfaceExtraction(
 ): void {
   // Create the target file with extracted interfaces
   const interfaceDefinitions = generateInterfaceDefinitions(strategy.interfaces);
-  const targetFile = project.createSourceFile(strategy.targetFile, interfaceDefinitions, {
-    overwrite: true,
-  });
 
   // Apply import updates
   for (const update of strategy.importUpdates) {

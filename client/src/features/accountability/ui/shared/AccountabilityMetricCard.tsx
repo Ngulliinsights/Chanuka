@@ -1,6 +1,6 @@
 /**
  * Accountability Metric Card
- * 
+ *
  * Reusable card component for displaying accountability metrics
  */
 
@@ -63,7 +63,7 @@ export function AccountabilityMetricCard({
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={(e) => {
+      onKeyDown={e => {
         if (onClick && (e.key === 'Enter' || e.key === ' ')) {
           e.preventDefault();
           onClick();
@@ -76,7 +76,7 @@ export function AccountabilityMetricCard({
             {icon && <div className="text-current opacity-70">{icon}</div>}
             <h3 className="text-sm font-medium opacity-80">{title}</h3>
           </div>
-          
+
           <div className="flex items-baseline gap-2">
             <p className="text-3xl font-bold">{value}</p>
             {trend && TrendIcon && (
@@ -87,9 +87,7 @@ export function AccountabilityMetricCard({
             )}
           </div>
 
-          {subtitle && (
-            <p className="mt-2 text-sm opacity-70">{subtitle}</p>
-          )}
+          {subtitle && <p className="mt-2 text-sm opacity-70">{subtitle}</p>}
         </div>
 
         {severity === 'critical' && (

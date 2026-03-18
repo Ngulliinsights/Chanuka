@@ -8,16 +8,16 @@ import { Badge } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { LoadingSpinner } from '@client/lib/design-system';
-import { 
-  Shield, 
-  TrendingUp, 
-  AlertTriangle, 
-  DollarSign, 
-  Building, 
-  Eye, 
+import {
+  Shield,
+  TrendingUp,
+  AlertTriangle,
+  DollarSign,
+  Building,
+  Eye,
   Users,
   CheckCircle,
-  XCircle
+  XCircle,
 } from 'lucide-react';
 
 import { useSponsorRiskProfile } from '../hooks';
@@ -38,11 +38,16 @@ interface RiskProfileProps {
 
 const getSeverityColor = (severity: ConflictSeverity): string => {
   switch (severity) {
-    case 'critical': return 'bg-red-100 text-red-800 border-red-200';
-    case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-    case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case 'low': return 'bg-green-100 text-green-800 border-green-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'critical':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'high':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'low':
+      return 'bg-green-100 text-green-800 border-green-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
@@ -69,11 +74,16 @@ const getRiskDescription = (score: number): string => {
 
 const getRiskCategoryIcon = (category: string) => {
   switch (category) {
-    case 'financialRisk': return <DollarSign className="h-4 w-4" />;
-    case 'affiliationRisk': return <Building className="h-4 w-4" />;
-    case 'transparencyRisk': return <Eye className="h-4 w-4" />;
-    case 'behavioralRisk': return <Users className="h-4 w-4" />;
-    default: return <Shield className="h-4 w-4" />;
+    case 'financialRisk':
+      return <DollarSign className="h-4 w-4" />;
+    case 'affiliationRisk':
+      return <Building className="h-4 w-4" />;
+    case 'transparencyRisk':
+      return <Eye className="h-4 w-4" />;
+    case 'behavioralRisk':
+      return <Users className="h-4 w-4" />;
+    default:
+      return <Shield className="h-4 w-4" />;
   }
 };
 
@@ -82,7 +92,7 @@ const getRiskCategoryLabel = (category: string): string => {
     financialRisk: 'Financial Risk',
     affiliationRisk: 'Affiliation Risk',
     transparencyRisk: 'Transparency Risk',
-    behavioralRisk: 'Behavioral Risk'
+    behavioralRisk: 'Behavioral Risk',
   };
   return labels[category] || category;
 };
@@ -92,7 +102,7 @@ const getRiskCategoryDescription = (category: string): string => {
     financialRisk: 'Risk from financial interests and monetary conflicts',
     affiliationRisk: 'Risk from organizational affiliations and relationships',
     transparencyRisk: 'Risk from incomplete or missing disclosure records',
-    behavioralRisk: 'Risk from voting patterns and behavioral indicators'
+    behavioralRisk: 'Risk from voting patterns and behavioral indicators',
   };
   return descriptions[category] || '';
 };
@@ -101,11 +111,7 @@ const getRiskCategoryDescription = (category: string): string => {
 // Sub-Components
 // ============================================================================
 
-function RiskScoreCard({ 
-  riskProfile 
-}: { 
-  riskProfile: RiskProfileType 
-}) {
+function RiskScoreCard({ riskProfile }: { riskProfile: RiskProfileType }) {
   return (
     <Card className="text-center">
       <CardHeader>
@@ -121,24 +127,18 @@ function RiskScoreCard({
             {riskProfile.overallScore}
           </div>
         </div>
-        
+
         <Badge className={getSeverityColor(riskProfile.level)}>
           {riskProfile.level.toUpperCase()} RISK
         </Badge>
-        
-        <p className="text-sm text-gray-600">
-          {getRiskDescription(riskProfile.overallScore)}
-        </p>
+
+        <p className="text-sm text-gray-600">{getRiskDescription(riskProfile.overallScore)}</p>
       </CardContent>
     </Card>
   );
 }
 
-function RiskBreakdownCard({ 
-  breakdown 
-}: { 
-  breakdown: RiskProfileType['breakdown'] 
-}) {
+function RiskBreakdownCard({ breakdown }: { breakdown: RiskProfileType['breakdown'] }) {
   return (
     <Card>
       <CardHeader>
@@ -152,20 +152,16 @@ function RiskBreakdownCard({
                 {getRiskCategoryIcon(category)}
                 <span className="font-medium">{getRiskCategoryLabel(category)}</span>
               </div>
-              <span className={`font-bold ${getRiskColor(score)}`}>
-                {score}%
-              </span>
+              <span className={`font-bold ${getRiskColor(score)}`}>{score}%</span>
             </div>
-            
-            <Progress 
-              value={score} 
+
+            <Progress
+              value={score}
               className="h-2"
               // Note: You may need to customize the Progress component to accept color props
             />
-            
-            <p className="text-xs text-gray-600">
-              {getRiskCategoryDescription(category)}
-            </p>
+
+            <p className="text-xs text-gray-600">{getRiskCategoryDescription(category)}</p>
           </div>
         ))}
       </CardContent>
@@ -173,11 +169,7 @@ function RiskBreakdownCard({
   );
 }
 
-function RecommendationsCard({ 
-  recommendations 
-}: { 
-  recommendations: string[] 
-}) {
+function RecommendationsCard({ recommendations }: { recommendations: string[] }) {
   if (recommendations.length === 0) {
     return (
       <Card>
@@ -220,10 +212,7 @@ function RecommendationsCard({
 // Main Component
 // ============================================================================
 
-export function RiskProfile({ 
-  sponsorId, 
-  sponsorName 
-}: RiskProfileProps) {
+export function RiskProfile({ sponsorId, sponsorName }: RiskProfileProps) {
   const { data: riskProfile, isLoading, error } = useSponsorRiskProfile(sponsorId);
 
   if (isLoading) {
@@ -239,9 +228,7 @@ export function RiskProfile({
     return (
       <Alert variant="destructive">
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Failed to load risk profile. Please try again later.
-        </AlertDescription>
+        <AlertDescription>Failed to load risk profile. Please try again later.</AlertDescription>
       </Alert>
     );
   }
@@ -250,9 +237,7 @@ export function RiskProfile({
     return (
       <Alert>
         <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Risk profile data is not available for this sponsor.
-        </AlertDescription>
+        <AlertDescription>Risk profile data is not available for this sponsor.</AlertDescription>
       </Alert>
     );
   }
@@ -288,21 +273,35 @@ export function RiskProfile({
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { level: 'low', range: '0-34', color: 'text-green-600', description: 'Minimal risk, routine monitoring' },
-              { level: 'medium', range: '35-54', color: 'text-yellow-600', description: 'Moderate risk, periodic review' },
-              { level: 'high', range: '55-74', color: 'text-orange-600', description: 'High risk, active monitoring' },
-              { level: 'critical', range: '75-100', color: 'text-red-600', description: 'Critical risk, immediate action' }
-            ].map((item) => (
+              {
+                level: 'low',
+                range: '0-34',
+                color: 'text-green-600',
+                description: 'Minimal risk, routine monitoring',
+              },
+              {
+                level: 'medium',
+                range: '35-54',
+                color: 'text-yellow-600',
+                description: 'Moderate risk, periodic review',
+              },
+              {
+                level: 'high',
+                range: '55-74',
+                color: 'text-orange-600',
+                description: 'High risk, active monitoring',
+              },
+              {
+                level: 'critical',
+                range: '75-100',
+                color: 'text-red-600',
+                description: 'Critical risk, immediate action',
+              },
+            ].map(item => (
               <div key={item.level} className="text-center p-3 border rounded-lg">
-                <div className={`text-lg font-bold ${item.color} capitalize`}>
-                  {item.level}
-                </div>
-                <div className="text-sm text-gray-600 mb-1">
-                  {item.range}
-                </div>
-                <div className="text-xs text-gray-500">
-                  {item.description}
-                </div>
+                <div className={`text-lg font-bold ${item.color} capitalize`}>{item.level}</div>
+                <div className="text-sm text-gray-600 mb-1">{item.range}</div>
+                <div className="text-xs text-gray-500">{item.description}</div>
               </div>
             ))}
           </div>

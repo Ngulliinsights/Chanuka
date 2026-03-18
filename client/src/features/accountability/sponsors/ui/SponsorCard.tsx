@@ -29,11 +29,16 @@ interface SponsorCardProps {
 
 const getSeverityColor = (severity: ConflictSeverity): string => {
   switch (severity) {
-    case 'critical': return 'bg-red-100 text-red-800 border-red-200';
-    case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-    case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case 'low': return 'bg-green-100 text-green-800 border-green-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'critical':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'high':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'low':
+      return 'bg-green-100 text-green-800 border-green-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
@@ -88,9 +93,7 @@ export function SponsorCard({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-lg font-semibold text-gray-900">
-              {sponsor.name}
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-gray-900">{sponsor.name}</CardTitle>
             <div className="flex items-center gap-2 mt-1">
               <Badge variant="outline" className="text-xs">
                 {sponsor.party}
@@ -107,11 +110,15 @@ export function SponsorCard({
               )}
             </div>
           </div>
-          
+
           {showConflictIndicator && conflictCount > 0 && (
-            <div className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getSeverityColor(conflictLevel)}`}>
+            <div
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium ${getSeverityColor(conflictLevel)}`}
+            >
               {getSeverityIcon(conflictLevel)}
-              <span>{conflictCount} conflict{conflictCount !== 1 ? 's' : ''}</span>
+              <span>
+                {conflictCount} conflict{conflictCount !== 1 ? 's' : ''}
+              </span>
             </div>
           )}
         </div>
@@ -155,19 +162,14 @@ export function SponsorCard({
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleViewDetails}
-              className="flex-1"
-            >
+            <Button variant="outline" size="sm" onClick={handleViewDetails} className="flex-1">
               <Eye className="h-4 w-4 mr-1" />
               View Details
             </Button>
-            
+
             {showConflictIndicator && (
               <Button
-                variant={conflictCount > 0 ? "destructive" : "outline"}
+                variant={conflictCount > 0 ? 'destructive' : 'outline'}
                 size="sm"
                 onClick={handleViewConflicts}
                 className="flex-1"

@@ -13,7 +13,6 @@ import { browserDetector } from '@client/infrastructure/browser/browser-detector
 import { ErrorDomain, ErrorSeverity, createError } from '@client/infrastructure/error';
 import { BaseError } from '@client/infrastructure/error/classes';
 
-
 /**
  * Represents a recovery option for error handling
  */
@@ -184,28 +183,23 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // });
 
     // Use unified error handler for comprehensive error processing
-    const appError = createError(
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.HIGH,
-      error.message,
-      {
-        details: {
-          name: error.name,
-          stack: error.stack,
-          componentStack: errorInfo.componentStack,
-          reactErrorInfo: errorInfo,
+    const appError = createError(ErrorDomain.SYSTEM, ErrorSeverity.HIGH, error.message, {
+      details: {
+        name: error.name,
+        stack: error.stack,
+        componentStack: errorInfo.componentStack,
+        reactErrorInfo: errorInfo,
+      },
+      context: {
+        component: this.props.context || 'ErrorBoundary',
+        metadata: {
+          url: window.location.href,
+          userAgent: navigator.userAgent,
         },
-        context: {
-          component: this.props.context || 'ErrorBoundary',
-          metadata: {
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-          },
-        },
-        recoverable: this.props.enableRecovery !== false,
-        retryable: false,
-      }
-    );
+      },
+      recoverable: this.props.enableRecovery !== false,
+      retryable: false,
+    });
 
     // Update state with unified error data using shared BaseError system
     this.setState({
@@ -291,14 +285,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.props.onMetricsCollected) {
       this.props.onMetricsCollected(metrics);
     }
-// Finish trace with outcome
-// try {
-//   const result = this.recoveryAttempts > 0 ? 'success' : 'error';
-//   finishTrace(trace, result);
-// } catch (e) {
-//   logger.debug('Trace finish failed in ErrorBoundary', { error: e });
-// }
-
+    // Finish trace with outcome
+    // try {
+    //   const result = this.recoveryAttempts > 0 ? 'success' : 'error';
+    //   finishTrace(trace, result);
+    // } catch (e) {
+    //   logger.debug('Trace finish failed in ErrorBoundary', { error: e });
+    // }
   }
 
   /**

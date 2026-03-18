@@ -14,7 +14,6 @@ import {
   UnifiedSecurityConfig,
   SecurityErrorType,
   ThreatType,
-  SanitizationOptions
 } from '../unified/security-interface';
 
 describe('Unified Security System', () => {
@@ -202,7 +201,9 @@ describe('Unified Security System', () => {
       expect(basicResult.sanitized).toBe('alert("test")');
 
       // Test comprehensive mode
-      const comprehensiveResult = await unifiedSecurity.sanitizer.sanitize(input, { mode: 'comprehensive' });
+      const comprehensiveResult = await unifiedSecurity.sanitizer.sanitize(input, {
+        mode: 'comprehensive',
+      });
       expect(comprehensiveResult.wasModified).toBe(true);
       expect(comprehensiveResult.threats.length).toBeGreaterThan(0);
     });
@@ -246,7 +247,10 @@ describe('Unified Security System', () => {
       const inputs = [
         { input: '<script>alert("xss")</script>', expectedType: 'script_injection' as ThreatType },
         { input: '<iframe src="evil.com"></iframe>', expectedType: 'html_injection' as ThreatType },
-        { input: '<div style="expression(alert(1))">', expectedType: 'attribute_injection' as ThreatType },
+        {
+          input: '<div style="expression(alert(1))">',
+          expectedType: 'attribute_injection' as ThreatType,
+        },
         { input: 'javascript:alert(1)', expectedType: 'url_injection' as ThreatType },
       ];
 
@@ -292,23 +296,25 @@ describe('Unified Security System', () => {
 
       // Test CSP error inference
       const cspError = new Error('CSP violation detected');
-      const cspSecurityError = (errorMiddleware as unknown as Record<string, unknown>).createSecurityError(
-        cspError, 'test-operation', 'TestComponent'
-      );
+      const cspSecurityError = (
+        errorMiddleware as unknown as Record<string, unknown>
+      ).createSecurityError(cspError, 'test-operation', 'TestComponent');
       expect(cspSecurityError.type).toBe(SecurityErrorType.CSP_VIOLATION);
 
       // Test validation error inference
       const validationError = new Error('Input validation failed');
-      const validationSecurityError = (errorMiddleware as unknown as Record<string, unknown>).createSecurityError(
-        validationError, 'test-operation', 'TestComponent'
-      );
+      const validationSecurityError = (
+        errorMiddleware as unknown as Record<string, unknown>
+      ).createSecurityError(validationError, 'test-operation', 'TestComponent');
       expect(validationSecurityError.type).toBe(SecurityErrorType.INPUT_VALIDATION_FAILED);
     });
 
     it('should handle batch operations with error handling', async () => {
       const operations = [
         async () => 'success',
-        async () => { throw new Error('failure'); },
+        async () => {
+          throw new Error('failure');
+        },
         async () => 'another success',
       ];
 

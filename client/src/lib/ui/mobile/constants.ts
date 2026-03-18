@@ -5,20 +5,9 @@
  */
 
 // Interaction constants
-export const INFINITE_SCROLL_DEFAULTS = {
-  isLoading: false,
-  hasMore: true,
-  threshold: 100,
-} as const;
-
-// Fallback constants
-export const MOBILE_FALLBACK_PROPS = {
-  columns: 1,
-  gap: 'sm',
-} as const;
-
-// Type definitions
-export type MobileTab = {
+export // Fallback constants
+type // Type definitions
+MobileTab = {
   id: string;
   label: string;
   icon?: React.ReactNode;

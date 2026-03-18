@@ -10,7 +10,6 @@ import {
   Activity,
   BarChart3,
 } from 'lucide-react';
-import React from 'react';
 /**
  * Integration Status Dashboard
  *

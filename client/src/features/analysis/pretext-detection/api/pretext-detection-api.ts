@@ -64,16 +64,7 @@ export interface AnalyticsResponse {
 /**
  * Pretext Detection API Client
  */
-export const pretextDetectionApi = {
-  /**
-   * Analyze a bill for pretext indicators
-   */
-  async analyze(request: AnalyzeRequest): Promise<AnalyzeResponse> {
-    const response = await globalApiClient.post<AnalyzeResponse>(
-      '/api/pretext-detection/analyze',
-      request
-    );
-    return response.data;
+export     return response.data;
   },
 
   /**

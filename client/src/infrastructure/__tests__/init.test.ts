@@ -1,9 +1,9 @@
 /**
  * Integration Tests for Infrastructure Initialization
- * 
+ *
  * These tests verify the complete initialization flow, service resolution order,
  * service interactions, and that no circular dependencies exist at runtime.
- * 
+ *
  * Requirements: 10.1, 10.2
  */
 
@@ -16,8 +16,6 @@ import {
   createServiceFactory,
   ServicePhase,
   initializeInThreePhases,
-  type IDIContainer,
-  type PhasedServiceFactory,
 } from '../consolidation/di-container';
 
 describe('Infrastructure Initialization Integration Tests', () => {
@@ -78,7 +76,7 @@ describe('Infrastructure Initialization Integration Tests', () => {
 
   beforeEach(() => {
     container = new DIContainer();
-    
+
     // Create service factories
     const factories = new Map<string, PhasedServiceFactory>();
 
@@ -199,10 +197,7 @@ describe('Infrastructure Initialization Integration Tests', () => {
           return mockStore;
         },
         {
-          dependencies: [
-            createServiceToken('APIClient'),
-            createServiceToken('ErrorHandler'),
-          ],
+          dependencies: [createServiceToken('APIClient'), createServiceToken('ErrorHandler')],
           singleton: true,
           phase: ServicePhase.BUSINESS,
         }
@@ -221,16 +216,16 @@ describe('Infrastructure Initialization Integration Tests', () => {
 
     it('should register all expected services', () => {
       const serviceNames = serviceRegistry.getServiceNames();
-      
+
       // Verify all core services are registered
       expect(serviceNames).toContain('EventBus');
       expect(serviceNames).toContain('Storage');
-      
+
       // Verify all foundation services are registered
       expect(serviceNames).toContain('Logger');
       expect(serviceNames).toContain('Cache');
       expect(serviceNames).toContain('Observability');
-      
+
       // Verify all business services are registered
       expect(serviceNames).toContain('ErrorHandler');
       expect(serviceNames).toContain('APIClient');

@@ -1,6 +1,6 @@
 /**
  * Client Notification Service Tests
- * 
+ *
  * Tests client-side notification management and delivery
  */
 
@@ -28,7 +28,7 @@ describe('Client Notification Service', () => {
         title: 'Test Notification',
         message: 'This is a test',
         priority: 'medium',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -43,7 +43,7 @@ describe('Client Notification Service', () => {
         title: 'First',
         message: 'First notification',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.addNotification({
@@ -51,7 +51,7 @@ describe('Client Notification Service', () => {
         title: 'Second',
         message: 'Second notification',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -65,7 +65,7 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -83,7 +83,7 @@ describe('Client Notification Service', () => {
         title: 'First',
         message: 'First message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.addNotification({
@@ -91,7 +91,7 @@ describe('Client Notification Service', () => {
         title: 'Second',
         message: 'Second message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.markAllAsRead();
@@ -106,7 +106,7 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -124,7 +124,7 @@ describe('Client Notification Service', () => {
         title: 'Unread',
         message: 'Unread message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.addNotification({
@@ -132,7 +132,7 @@ describe('Client Notification Service', () => {
         title: 'Read',
         message: 'Read message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -149,7 +149,7 @@ describe('Client Notification Service', () => {
         title: 'First',
         message: 'First message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.addNotification({
@@ -157,7 +157,7 @@ describe('Client Notification Service', () => {
         title: 'Second',
         message: 'Second message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       expect(notificationService.getUnreadCount()).toBe(2);
@@ -175,7 +175,7 @@ describe('Client Notification Service', () => {
           title: `Notification ${i}`,
           message: `Message ${i}`,
           priority: 'low',
-          category: 'test'
+          category: 'test',
         });
       }
 
@@ -189,7 +189,7 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       notificationService.clearAll();
@@ -212,7 +212,7 @@ describe('Client Notification Service', () => {
     it('should update preferences', () => {
       notificationService.updatePreferences({
         email: false,
-        billStatusChanges: false
+        billStatusChanges: false,
       });
 
       const preferences = notificationService.getPreferences();
@@ -223,7 +223,7 @@ describe('Client Notification Service', () => {
     it('should persist preferences to localStorage', () => {
       notificationService.updatePreferences({
         email: false,
-        push: true
+        push: true,
       });
 
       const stored = localStorage.getItem('notification-preferences');
@@ -238,7 +238,7 @@ describe('Client Notification Service', () => {
       const preferences: Partial<NotificationPreferences> = {
         email: false,
         sms: true,
-        frequency: 'daily'
+        frequency: 'daily',
       };
 
       localStorage.setItem('notification-preferences', JSON.stringify(preferences));
@@ -261,15 +261,15 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'notification_received',
           data: expect.objectContaining({
-            title: 'Test'
-          })
+            title: 'Test',
+          }),
         })
       );
 
@@ -285,7 +285,7 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       const notifications = notificationService.getNotifications();
@@ -295,7 +295,7 @@ describe('Client Notification Service', () => {
 
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: 'notification_read'
+          type: 'notification_read',
         })
       );
     });
@@ -305,15 +305,15 @@ describe('Client Notification Service', () => {
       notificationService.subscribe(listener);
 
       notificationService.updatePreferences({
-        email: false
+        email: false,
       });
 
       expect(listener).toHaveBeenCalledWith(
         expect.objectContaining({
           type: 'preferences_updated',
           data: expect.objectContaining({
-            email: false
-          })
+            email: false,
+          }),
         })
       );
     });
@@ -329,7 +329,7 @@ describe('Client Notification Service', () => {
         title: 'Test',
         message: 'Test message',
         priority: 'low',
-        category: 'test'
+        category: 'test',
       });
 
       expect(listener).not.toHaveBeenCalled();
@@ -339,7 +339,7 @@ describe('Client Notification Service', () => {
   describe('Notification Filtering', () => {
     it('should filter notifications based on preferences', () => {
       notificationService.updatePreferences({
-        billStatusChanges: false
+        billStatusChanges: false,
       });
 
       notificationService.addNotification({
@@ -347,7 +347,7 @@ describe('Client Notification Service', () => {
         title: 'Bill Status Changed',
         message: 'Status changed',
         priority: 'low',
-        category: 'bills'
+        category: 'bills',
       });
 
       const notifications = notificationService.getNotifications();
@@ -356,7 +356,7 @@ describe('Client Notification Service', () => {
 
     it('should allow system notifications regardless of preferences', () => {
       notificationService.updatePreferences({
-        inApp: false
+        inApp: false,
       });
 
       notificationService.addNotification({
@@ -364,7 +364,7 @@ describe('Client Notification Service', () => {
         title: 'System Alert',
         message: 'Important system message',
         priority: 'high',
-        category: 'system'
+        category: 'system',
       });
 
       const notifications = notificationService.getNotifications();
@@ -373,7 +373,7 @@ describe('Client Notification Service', () => {
 
     it('should filter comment notifications when disabled', () => {
       notificationService.updatePreferences({
-        newComments: false
+        newComments: false,
       });
 
       notificationService.addNotification({
@@ -381,7 +381,7 @@ describe('Client Notification Service', () => {
         title: 'New Comment',
         message: 'Someone commented',
         priority: 'low',
-        category: 'comments'
+        category: 'comments',
       });
 
       const notifications = notificationService.getNotifications();
@@ -400,7 +400,7 @@ describe('Client Notification Service', () => {
       expect(notifications[0].actionUrl).toBe('/bills/bill-123');
       expect(notifications[0].metadata).toEqual({
         billId: 'bill-123',
-        newStatus: 'passed'
+        newStatus: 'passed',
       });
     });
 
@@ -431,11 +431,11 @@ describe('Client Notification Service', () => {
       const mockRequestPermission = vi.fn().mockResolvedValue('granted');
       global.Notification = {
         permission: 'default',
-        requestPermission: mockRequestPermission
+        requestPermission: mockRequestPermission,
       } as unknown;
 
       notificationService.updatePreferences({
-        push: true
+        push: true,
       });
 
       expect(mockRequestPermission).toHaveBeenCalled();
@@ -447,7 +447,7 @@ describe('Client Notification Service', () => {
       (global.Notification as unknown as Record<string, unknown>).permission = 'granted';
 
       notificationService.updatePreferences({
-        push: true
+        push: true,
       });
 
       notificationService.addNotification({
@@ -455,13 +455,13 @@ describe('Client Notification Service', () => {
         title: 'Test Notification',
         message: 'Test message',
         priority: 'high',
-        category: 'test'
+        category: 'test',
       });
 
       expect(mockNotification).toHaveBeenCalledWith(
         'Test Notification',
         expect.objectContaining({
-          body: 'Test message'
+          body: 'Test message',
         })
       );
     });

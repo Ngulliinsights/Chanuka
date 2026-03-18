@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 17, 2026 at 01:41 PM
+**Generated:** March 19, 2026 at 12:13 AM
 **Max Depth:** 7 levels
-**Total Items:** 4,245
+**Total Items:** 4,281
 
 ```
 .
@@ -80,7 +80,7 @@
 │   │   ├── fix-button-variants.js
 │   │   ├── fix-component-props.js
 │   │   ├── fix-lucide-icons.js
-│   │   ├── fix-unused-imports.js
+│   │   ├── fix-unused-imports.cjs
 │   │   ├── README.md
 │   │   └── run-all-fixes.js
 │   ├── src/
@@ -154,6 +154,7 @@
 │   │   │   │   │   │   └── FeatureFlagManagerPage.tsx
 │   │   │   │   │   ├── ui/
 │   │   │   │   │   │   ├── FeatureFlagManager.tsx
+│   │   │   │   │   │   ├── FlagAnalyticsDashboard.module.css
 │   │   │   │   │   │   ├── FlagAnalyticsDashboard.tsx
 │   │   │   │   │   │   ├── FlagEditor.tsx
 │   │   │   │   │   │   ├── FlagList.tsx
@@ -701,6 +702,7 @@
 │   │   │   │   ├── privacy.ts
 │   │   │   │   ├── README.md
 │   │   │   │   ├── registry.ts
+│   │   │   │   ├── response-handler.ts
 │   │   │   │   ├── retry.ts
 │   │   │   │   ├── serialization-interceptors.ts
 │   │   │   │   ├── system.ts
@@ -2239,6 +2241,9 @@
 │   │   ├── schema-domain-relationships.md
 │   │   └── TYPE_SYSTEM_CLEANUP_COMPLETE.md
 │   ├── ADR_DCS_INTEGRATION_COMPLETE.md
+│   ├── API_CONTRACTS_GUIDE.md
+│   ├── API_CONTRACTS_QUICK_REF.md
+│   ├── API_CONTRACTS_SUMMARY.md
 │   ├── ARCHITECTURAL_LESSONS_LEARNED.md
 │   ├── DESIGN_DECISIONS_EXTRACTED.md
 │   ├── DESIGN_DECISIONS.md
@@ -3724,6 +3729,7 @@
 │   │   ├── privacy-middleware.ts
 │   │   ├── rate-limit-config.ts
 │   │   ├── rate-limiter.ts
+│   │   ├── response-standardizer.middleware.ts
 │   │   ├── safeguards.ts
 │   │   ├── security.middleware.ts
 │   │   ├── service-availability.ts
@@ -3918,20 +3924,24 @@
 │   │   │   │   ├── analytics.schemas.ts
 │   │   │   │   ├── bill.contract.ts
 │   │   │   │   ├── bill.schemas.ts
+│   │   │   │   ├── bills.contracts.ts
 │   │   │   │   ├── comment.contract.ts
 │   │   │   │   ├── comment.schemas.ts
 │   │   │   │   ├── community.contracts.ts
 │   │   │   │   ├── core.contracts.ts
 │   │   │   │   ├── endpoint-registry.ts
 │   │   │   │   ├── endpoint.ts
+│   │   │   │   ├── feature-flags.contracts.ts
 │   │   │   │   ├── government-data.contracts.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── monitoring-community.contracts.ts
 │   │   │   │   ├── notification.contract.ts
 │   │   │   │   ├── notification.schemas.ts
 │   │   │   │   ├── search.contract.ts
 │   │   │   │   ├── search.schemas.ts
 │   │   │   │   ├── user.contract.ts
-│   │   │   │   └── user.schemas.ts
+│   │   │   │   ├── user.schemas.ts
+│   │   │   │   └── validation.schemas.ts
 │   │   │   ├── websocket/
 │   │   │   │   ├── errors.ts
 │   │   │   │   ├── index.ts
@@ -3963,13 +3973,25 @@
 │   │   │   ├── tables.ts
 │   │   │   └── TYPE_GENERATION.md
 │   │   ├── domains/
+│   │   │   ├── accessibility/
+│   │   │   │   ├── index.ts
+│   │   │   │   └── ussd-types.ts
 │   │   │   ├── arguments/
 │   │   │   │   ├── argument.types.ts
 │   │   │   │   └── index.ts
 │   │   │   ├── authentication/
 │   │   │   │   ├── auth-state.ts
 │   │   │   │   ├── index.ts
+│   │   │   │   ├── user-management-types.ts
 │   │   │   │   └── user.ts
+│   │   │   ├── community/
+│   │   │   │   ├── advocacy-types.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── notification-types.ts
+│   │   │   │   └── search-types.ts
+│   │   │   ├── feature-flags/
+│   │   │   │   ├── flag-types.ts
+│   │   │   │   └── index.ts
 │   │   │   ├── legislative/
 │   │   │   │   ├── actions.ts
 │   │   │   │   ├── bill.ts
@@ -3980,6 +4002,7 @@
 │   │   │   │   ├── index.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── monitoring/
+│   │   │   │   ├── analytics-types.ts
 │   │   │   │   ├── errors.ts
 │   │   │   │   ├── index.ts
 │   │   │   │   ├── metrics.ts
@@ -4207,8 +4230,11 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
+├── API_CONTRACT_AUDIT.md
+├── API_CONTRACTS_IMPLEMENTATION_REPORT.md
 ├── ARCHITECTURE.md
 ├── BILLS_INTEGRATION_STATUS.md
+├── BUG_FIXES_SUMMARY.md
 ├── build_err.log
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
@@ -4224,6 +4250,9 @@
 ├── drizzle.config.ts
 ├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_ANALYSIS.md
 ├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_COMPLETE.md
+├── errors_full.txt
+├── errors_unique.txt
+├── errors.txt
 ├── feature_consolidation_analysis.md
 ├── FEATURE_INTEGRATION_STATUS.md
 ├── fix.cjs
@@ -4242,9 +4271,16 @@
 ├── QUICK_START.md
 ├── README.md
 ├── router_files.txt
+├── SERVER_MIGRATION_EXECUTION_SUMMARY.md
+├── SERVER_TYPE_MIGRATION_MAP.md
 ├── start-dev.js
 ├── start-error.log
 ├── tailwind.config.js
+├── TASK_4_COMPLETION_SUMMARY.md
+├── TASK_4_ENDPOINT_AUDIT.md
+├── TASK_4_STRATEGIC_RECOMMENDATIONS.md
+├── tsc_errors.txt
+├── tsc_errors2.txt
 ├── tsc_output.txt
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo

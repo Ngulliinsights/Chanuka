@@ -2,7 +2,6 @@
  * Integration Types
  */
 
-
 import type { PrivacyAnalyticsService } from '@client/lib/services/privacyAnalyticsService';
 
 import type { DeviceDetector } from '@client/infrastructure/mobile';

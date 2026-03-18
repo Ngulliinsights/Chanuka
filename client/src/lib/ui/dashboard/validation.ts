@@ -82,15 +82,6 @@ export const WidgetPositionSchema = z.object({
   z: z.number().int().optional(),
 });
 
-export const WidgetSizeSchema = z.object({
-  width: z.number().positive(),
-  height: z.number().positive(),
-  minWidth: z.number().positive().optional(),
-  minHeight: z.number().positive().optional(),
-  maxWidth: z.number().positive().optional(),
-  maxHeight: z.number().positive().optional(),
-});
-
 export const AppWidgetConfigSchema = z.object({
   id: z.string().min(1, 'Widget ID cannot be empty'),
   type: z.enum(['analytics', 'performance', 'engagement', 'metrics', 'chart', 'custom']),
@@ -239,7 +230,7 @@ export function validateCompleteDashboardConfig(config: unknown): CompleteDashbo
     const result = CompleteDashboardConfigSchema.parse(config);
 
     // Additional validation: ensure all widget positions reference existing widgets
-    const widgetIds = new Set(result.layout.widgets.map((w) => w.id));
+    const widgetIds = new Set(result.layout.widgets.map(w => w.id));
     for (const widget of result.layout.widgets) {
       if (!widgetIds.has(widget.id)) {
         throw new Error(`Widget position references non-existent widget: ${widget.id}`);

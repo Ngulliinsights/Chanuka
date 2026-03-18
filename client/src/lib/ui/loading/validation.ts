@@ -7,8 +7,6 @@ import { LoadingValidationError } from './errors';
  * Following navigation component patterns for validation
  */
 
-export const LoadingSizeSchema = z.enum(['sm', 'md', 'lg']);
-
 export const LoadingTypeSchema = z.enum([
   'page',
   'component',
@@ -17,8 +15,6 @@ export const LoadingTypeSchema = z.enum([
   'network-aware',
   'timeout-aware',
 ]);
-
-export const LoadingStateSchema = z.enum(['loading', 'success', 'error', 'timeout', 'offline']);
 
 export const LoadingPhaseSchema = z.enum(['preload', 'critical', 'lazy', 'complete']);
 
@@ -291,7 +287,13 @@ export function normalizeLoadingType(
     'timeout-aware',
   ];
   if (typeof type === 'string' && validTypes.includes(type)) {
-    return type as 'page' | 'component' | 'inline' | 'progressive' | 'network-aware' | 'timeout-aware';
+    return type as
+      | 'page'
+      | 'component'
+      | 'inline'
+      | 'progressive'
+      | 'network-aware'
+      | 'timeout-aware';
   }
   return 'component'; // Default fallback
 }

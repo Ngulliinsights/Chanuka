@@ -535,31 +535,4 @@ export const {
 export const selectErrors = (state: { errorHandling: ErrorHandlingState }) =>
   state.errorHandling.errors;
 
-export const selectActiveErrors = (state: { errorHandling: ErrorHandlingState }) =>
-  Object.values(state.errorHandling.activeErrors);
-
-export const selectGlobalError = (state: { errorHandling: ErrorHandlingState }) =>
-  state.errorHandling.globalError;
-
-export const selectErrorStats = (state: { errorHandling: ErrorHandlingState }) =>
-  state.errorHandling.errorStats;
-
-export const selectErrorPatterns = (state: { errorHandling: ErrorHandlingState }) =>
-  state.errorHandling.errorPatterns;
-
-export const selectIsRecoveryMode = (state: { errorHandling: ErrorHandlingState }) =>
-  state.errorHandling.isRecoveryMode;
-
-export const selectErrorsBySource =
-  (source: ErrorSource) => (state: { errorHandling: ErrorHandlingState }) =>
-    Object.values(state.errorHandling.activeErrors).filter(error => error.source === source);
-
-export const selectErrorsByDomain =
-  (domain: ErrorDomain) => (state: { errorHandling: ErrorHandlingState }) =>
-    Object.values(state.errorHandling.activeErrors).filter(error => error.type === domain);
-
-export const selectErrorsBySeverity =
-  (severity: ErrorSeverity) => (state: { errorHandling: ErrorHandlingState }) =>
-    Object.values(state.errorHandling.activeErrors).filter(error => error.severity === severity);
-
 export default errorHandlingSlice.reducer;

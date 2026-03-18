@@ -278,7 +278,7 @@ export function ProtectedRoute({
 /**
  * Higher-order component for creating protected routes with specific requirements
  */
- 
+
 export function createProtectedRoute(defaultProps: Partial<ProtectedRouteProps>) {
   return function ProtectedRouteWrapper(props: ProtectedRouteProps) {
     return <ProtectedRoute {...defaultProps} {...props} />;
@@ -288,26 +288,4 @@ export function createProtectedRoute(defaultProps: Partial<ProtectedRouteProps>)
 /**
  * Pre-configured protected route components for common use cases
  */
-export const AdminRoute = createProtectedRoute({
-  requireAuth: true,
-  requireRoles: ['admin', 'super_admin'],
-  requireVerification: true,
-});
-
-export const ModeratorRoute = createProtectedRoute({
-  requireAuth: true,
-  requireRoles: ['moderator', 'admin', 'super_admin'],
-  requireVerification: true,
-});
-
-export const VerifiedUserRoute = createProtectedRoute({
-  requireAuth: true,
-  requireVerification: true,
-});
-
-export const AuthenticatedRoute = createProtectedRoute({
-  requireAuth: true,
-  requireVerification: false,
-});
-
 export default ProtectedRoute;

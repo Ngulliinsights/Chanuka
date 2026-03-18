@@ -1,6 +1,6 @@
 /**
  * Error Boundary Module
- * 
+ *
  * Provides React error boundaries for catching and handling component errors
  */
 

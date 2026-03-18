@@ -472,4 +472,4 @@ export class AchievementService implements IAchievementService, ServiceLifecycle
 }
 
 // Export singleton instance
-export const achievementService = new AchievementService();
+export 

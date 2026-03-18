@@ -5,13 +5,17 @@
 
 // Remove unused React import
 import { Bell, Download, Trash, AlertTriangle } from 'lucide-react';
-import React from 'react';
 
 import { PrivacySettings } from '@client/infrastructure/auth';
 import { Alert, AlertDescription } from '@client/lib/design-system/feedback/Alert';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Switch } from '@client/lib/design-system/interactive/Switch';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system/typography/Card';
 import { Label } from '@client/lib/design-system/typography/Label';
 
 interface ConsentControlsProps {

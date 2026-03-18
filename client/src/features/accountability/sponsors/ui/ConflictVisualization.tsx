@@ -10,25 +10,25 @@ import { Button } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { LoadingSpinner } from '@client/lib/design-system';
-import { 
-  AlertTriangle, 
-  TrendingUp, 
-  Shield, 
-  Network, 
-  BarChart3, 
+import {
+  AlertTriangle,
+  TrendingUp,
+  Shield,
+  Network,
+  BarChart3,
   Clock,
   DollarSign,
   Building,
   Users,
-  Eye
+  Eye,
 } from 'lucide-react';
 
 import { useSponsorConflicts, useSponsorRiskProfile, useConflictMapping } from '../hooks';
-import type { 
-  ConflictDetectionResult, 
-  ConflictSeverity, 
-  ConflictType, 
-  RiskProfile 
+import type {
+  ConflictDetectionResult,
+  ConflictSeverity,
+  ConflictType,
+  RiskProfile,
 } from '../types';
 
 // ============================================================================
@@ -47,11 +47,16 @@ interface ConflictVisualizationProps {
 
 const getSeverityColor = (severity: ConflictSeverity): string => {
   switch (severity) {
-    case 'critical': return 'bg-red-100 text-red-800 border-red-200';
-    case 'high': return 'bg-orange-100 text-orange-800 border-orange-200';
-    case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    case 'low': return 'bg-green-100 text-green-800 border-green-200';
-    default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'critical':
+      return 'bg-red-100 text-red-800 border-red-200';
+    case 'high':
+      return 'bg-orange-100 text-orange-800 border-orange-200';
+    case 'medium':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    case 'low':
+      return 'bg-green-100 text-green-800 border-green-200';
+    default:
+      return 'bg-gray-100 text-gray-800 border-gray-200';
   }
 };
 
@@ -93,7 +98,7 @@ const getConflictTypeLabel = (type: ConflictType): string => {
     family_business: 'Family Business',
     voting_pattern: 'Voting Pattern',
     timing_suspicious: 'Suspicious Timing',
-    disclosure_incomplete: 'Incomplete Disclosure'
+    disclosure_incomplete: 'Incomplete Disclosure',
   };
   return labels[type] || type;
 };
@@ -121,18 +126,14 @@ function ConflictCard({ conflict }: { conflict: ConflictDetectionResult }) {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
             {getConflictTypeIcon(conflict.conflictType)}
-            <CardTitle className="text-lg">
-              {getConflictTypeLabel(conflict.conflictType)}
-            </CardTitle>
+            <CardTitle className="text-lg">{getConflictTypeLabel(conflict.conflictType)}</CardTitle>
           </div>
           <div className="flex items-center gap-2">
             <Badge className={getSeverityColor(conflict.severity)}>
               {getSeverityIcon(conflict.severity)}
               <span className="ml-1">{conflict.severity.toUpperCase()}</span>
             </Badge>
-            <Badge variant="outline">
-              {formatConfidence(conflict.confidence)} confidence
-            </Badge>
+            <Badge variant="outline">{formatConfidence(conflict.confidence)} confidence</Badge>
           </div>
         </div>
       </CardHeader>
@@ -161,11 +162,7 @@ function ConflictCard({ conflict }: { conflict: ConflictDetectionResult }) {
             <span className="text-xs text-gray-500">
               Detected: {new Date(conflict.detectedAt).toLocaleDateString()}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowDetails(!showDetails)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setShowDetails(!showDetails)}>
               <Eye className="h-4 w-4 mr-1" />
               {showDetails ? 'Hide' : 'Show'} Details
             </Button>
@@ -228,7 +225,7 @@ function RiskProfileCard({ riskProfile }: { riskProfile: RiskProfile }) {
         {/* Risk Breakdown */}
         <div className="space-y-3">
           <h4 className="font-medium">Risk Breakdown</h4>
-          
+
           {Object.entries(riskProfile.breakdown).map(([key, value]) => (
             <div key={key} className="space-y-1">
               <div className="flex justify-between text-sm">
@@ -268,13 +265,21 @@ function RiskProfileCard({ riskProfile }: { riskProfile: RiskProfile }) {
 // Main Component
 // ============================================================================
 
-export function ConflictVisualization({ 
-  sponsorId, 
+export function ConflictVisualization({
+  sponsorId,
   sponsorName,
-  billId 
+  billId,
 }: ConflictVisualizationProps) {
-  const { data: conflicts, isLoading: conflictsLoading, error: conflictsError } = useSponsorConflicts(sponsorId);
-  const { data: riskProfile, isLoading: riskLoading, error: riskError } = useSponsorRiskProfile(sponsorId);
+  const {
+    data: conflicts,
+    isLoading: conflictsLoading,
+    error: conflictsError,
+  } = useSponsorConflicts(sponsorId);
+  const {
+    data: riskProfile,
+    isLoading: riskLoading,
+    error: riskError,
+  } = useSponsorRiskProfile(sponsorId);
   const { data: conflictMapping, isLoading: mappingLoading } = useConflictMapping(billId);
 
   const isLoading = conflictsLoading || riskLoading || mappingLoading;
@@ -301,14 +306,17 @@ export function ConflictVisualization({
   }
 
   const conflictCount = conflicts?.length || 0;
-  const severityCounts: Record<ConflictSeverity, number> = conflicts?.reduce((acc, conflict) => {
-    acc[conflict.severity] = (acc[conflict.severity] || 0) + 1;
-    return acc;
-  }, {} as Record<ConflictSeverity, number>) || {
+  const severityCounts: Record<ConflictSeverity, number> = conflicts?.reduce(
+    (acc, conflict) => {
+      acc[conflict.severity] = (acc[conflict.severity] || 0) + 1;
+      return acc;
+    },
+    {} as Record<ConflictSeverity, number>
+  ) || {
     critical: 0,
     high: 0,
     medium: 0,
-    low: 0
+    low: 0,
   };
 
   return (
@@ -325,7 +333,7 @@ export function ConflictVisualization({
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {(['critical', 'high', 'medium', 'low'] as ConflictSeverity[]).map((severity) => (
+        {(['critical', 'high', 'medium', 'low'] as ConflictSeverity[]).map(severity => (
           <Card key={severity}>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -361,7 +369,7 @@ export function ConflictVisualization({
 
         <TabsContent value="conflicts" className="space-y-4">
           {conflicts && conflicts.length > 0 ? (
-            conflicts.map((conflict) => (
+            conflicts.map(conflict => (
               <ConflictCard key={conflict.conflictId} conflict={conflict} />
             ))
           ) : (
@@ -411,18 +419,21 @@ export function ConflictVisualization({
                     </div>
                     <div>
                       <span className="text-gray-600">Density:</span>
-                      <span className="ml-2 font-medium">{(conflictMapping.metrics.density * 100).toFixed(1)}%</span>
+                      <span className="ml-2 font-medium">
+                        {(conflictMapping.metrics.density * 100).toFixed(1)}%
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-600">Clusters:</span>
                       <span className="ml-2 font-medium">{conflictMapping.clusters.length}</span>
                     </div>
                   </div>
-                  
+
                   <div className="bg-gray-100 rounded-lg p-8 text-center">
                     <Network className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-600">
-                      Network visualization would be rendered here using a graph library like D3.js or vis.js
+                      Network visualization would be rendered here using a graph library like D3.js
+                      or vis.js
                     </p>
                   </div>
                 </div>

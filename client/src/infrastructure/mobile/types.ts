@@ -46,7 +46,7 @@ export interface TouchConfig {
   threshold?: number;
   velocity?: number;
   preventDefault?: boolean;
-  
+
   // Expanded properties for TouchHandler
   enableSwipe?: boolean;
   enableLongPress?: boolean;
@@ -57,7 +57,7 @@ export interface TouchConfig {
   longPressDelay?: number;
   swipeThreshold?: number;
   preventDefaultOnTouch?: boolean;
-  
+
   onSwipe?: (e: TouchEvent) => void;
   onLongPress?: (e: TouchEvent) => void;
   onTap?: (e: TouchEvent) => void;

@@ -14,12 +14,12 @@
 export { ConflictOfInterestAnalysis, AnalysisDashboard } from './ui';
 
 // Hooks
-export { 
-  useConflictAnalysis, 
+export {
+  useConflictAnalysis,
   useBillAnalysis,
   useComprehensiveAnalysis,
   useAnalysisHistory,
-  useTriggerAnalysis
+  useTriggerAnalysis,
 } from './model/hooks';
 
 // Services

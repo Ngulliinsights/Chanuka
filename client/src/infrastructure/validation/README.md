@@ -11,7 +11,12 @@ Consolidates validation logic from across the client application into a single, 
 ### Core Validator
 
 ```typescript
-import { validator, validateField, validateForm, validateSchema } from '@/infrastructure/validation';
+import {
+  validator,
+  validateField,
+  validateForm,
+  validateSchema,
+} from '@/infrastructure/validation';
 
 // Validate a single field
 const result = validateField('email', 'user@example.com', {
@@ -73,7 +78,7 @@ const result = await validateAsync(username, {
   custom: [
     {
       name: 'uniqueUsername',
-      test: async (value) => {
+      test: async value => {
         const exists = await checkUsernameExists(value);
         return !exists;
       },
@@ -149,7 +154,7 @@ if (!result.success) {
   // 1. Tracked in observability system
   // 2. Logged with appropriate severity
   // 3. Available for error recovery strategies
-  
+
   console.log(result.error); // ValidationError extends AppError
   console.log(result.errors); // Array of field-level errors
 }
@@ -196,12 +201,12 @@ const result = validateField('username', username, {
   custom: [
     {
       name: 'noSpaces',
-      test: (value) => !value.includes(' '),
+      test: value => !value.includes(' '),
       message: 'Username cannot contain spaces',
     },
     {
       name: 'noReservedWords',
-      test: (value) => !['admin', 'root', 'system'].includes(value.toLowerCase()),
+      test: value => !['admin', 'root', 'system'].includes(value.toLowerCase()),
       message: 'This username is reserved',
     },
   ],
@@ -251,10 +256,13 @@ if (password.length < 8) {
 ```typescript
 import { validateForm } from '@/infrastructure/validation';
 
-const result = validateForm({ email, password }, {
-  email: { required: true, email: true },
-  password: { required: true, minLength: 8 },
-});
+const result = validateForm(
+  { email, password },
+  {
+    email: { required: true, email: true },
+    password: { required: true, minLength: 8 },
+  }
+);
 
 if (!result.success) {
   setErrors(result.errors);

@@ -180,7 +180,7 @@ const navigationSlice = createSlice({
         state.preferences.favoritePages = [...updates.favoritePages];
         delete updates.favoritePages;
       }
-      
+
       // Spread the updates to avoid readonly issues
       Object.assign(state.preferences, updates);
       logger.debug('Navigation preferences updated', {
@@ -327,7 +327,7 @@ const navigationSlice = createSlice({
     clearPersistedState: state => {
       state.preferences = {
         ...initialState.preferences,
-        favoritePages: [...initialState.preferences.favoritePages]
+        favoritePages: [...initialState.preferences.favoritePages],
       };
       state.sidebarOpen = false;
       state.sidebarCollapsed = false;
@@ -374,18 +374,6 @@ export const {
 export const selectCurrentPath = (state: { navigation: NavigationState }) =>
   state.navigation.currentPath;
 
-export const selectPreviousPath = (state: { navigation: NavigationState }) =>
-  state.navigation.previousPath;
-
-export const selectBreadcrumbs = (state: { navigation: NavigationState }) =>
-  state.navigation.breadcrumbs;
-
-export const selectRelatedPages = (state: { navigation: NavigationState }) =>
-  state.navigation.relatedPages;
-
-export const selectCurrentSection = (state: { navigation: NavigationState }) =>
-  state.navigation.currentSection;
-
 export const selectSidebarOpen = (state: { navigation: NavigationState }) =>
   state.navigation.sidebarOpen;
 
@@ -397,11 +385,6 @@ export const selectIsMobile = (state: { navigation: NavigationState }) => state.
 export const selectSidebarCollapsed = (state: { navigation: NavigationState }) =>
   state.navigation.sidebarCollapsed;
 
-export const selectMounted = (state: { navigation: NavigationState }) => state.navigation.mounted;
-
-export const selectUserRole = (state: { navigation: NavigationState }) =>
-  state.navigation.userRole;
-
 export const selectNavigationPreferences = (state: { navigation: NavigationState }) =>
   state.navigation.preferences;
 
@@ -411,33 +394,8 @@ export const selectNavigationPreferences = (state: { navigation: NavigationState
  */
 
 // Checks if the current page is in favorites
-export const selectIsCurrentPageFavorited = createSelector(
-  [selectCurrentPath, selectNavigationPreferences],
-  (currentPath, preferences) => preferences.favoritePages.includes(currentPath)
-);
-
-// Gets recent pages sorted by visit count for "most visited" features
-export const selectMostVisitedPages = createSelector([selectNavigationPreferences], preferences =>
-  [...preferences.recentlyVisited].sort((a, b) => b.visitCount - a.visitCount).slice(0, 5)
-);
-
+export default // Gets recent pages sorted by visit count for "most visited" features
 // Checks if any menu is open (useful for overlay logic)
-export const selectIsAnyMenuOpen = createSelector(
-  [selectSidebarOpen, selectMobileMenuOpen],
-  (sidebarOpen, mobileMenuOpen) => sidebarOpen || mobileMenuOpen
-);
-
 // Combines mobile state with menu states for responsive behavior
-export const selectNavigationUIState = createSelector(
-  [selectIsMobile, selectSidebarOpen, selectSidebarCollapsed, selectMobileMenuOpen],
-  (isMobile, sidebarOpen, sidebarCollapsed, mobileMenuOpen) => ({
-    isMobile,
-    sidebarOpen,
-    sidebarCollapsed,
-    mobileMenuOpen,
-    showOverlay: isMobile && (sidebarOpen || mobileMenuOpen),
-  })
-);
-
 // Export the reducer as default for store configuration
-export default navigationSlice.reducer;
+navigationSlice.reducer;

@@ -45,8 +45,6 @@ export interface DualSearchRequest extends SearchQuery {
 
 // SearchEngineResult and CombinedSearchResult are now imported from shared types
 
-
-
 interface CacheEntry<T> {
   data: T;
   timestamp: number;
@@ -517,7 +515,7 @@ class IntelligentSearchService {
     query: string
   ): void {
     if (!Array.isArray(response)) return;
-    
+
     response.forEach((item: unknown) => {
       if (
         item &&
@@ -529,7 +527,7 @@ class IntelligentSearchService {
         suggestions.push({
           text: item.query,
           type: 'recent',
-          count: ('frequency' in item && typeof item.frequency === 'number') ? item.frequency : 1,
+          count: 'frequency' in item && typeof item.frequency === 'number' ? item.frequency : 1,
           // score: 0.8, // score not in shared type
         });
       }
@@ -545,7 +543,7 @@ class IntelligentSearchService {
     query: string
   ): void {
     if (!Array.isArray(response)) return;
-    
+
     response.forEach((item: unknown) => {
       if (
         item &&
@@ -557,7 +555,7 @@ class IntelligentSearchService {
         suggestions.push({
           text: item.query,
           type: 'popular',
-          count: ('count' in item && typeof item.count === 'number') ? item.count : 1,
+          count: 'count' in item && typeof item.count === 'number' ? item.count : 1,
           // score: 0.9,
         });
       }
@@ -823,7 +821,8 @@ class IntelligentSearchService {
 
     const queryTermsFound = results.some(
       r =>
-        r.title.toLowerCase().includes(queryLower) || (r.content || '').toLowerCase().includes(queryLower)
+        r.title.toLowerCase().includes(queryLower) ||
+        (r.content || '').toLowerCase().includes(queryLower)
     );
 
     // Weighted quality calculation
@@ -914,7 +913,10 @@ class IntelligentSearchService {
   /**
    * Generate intelligent search suggestions from results
    */
-  private async generateSuggestions(query: string, results: SearchResult[]): Promise<SearchSuggestion[]> {
+  private async generateSuggestions(
+    query: string,
+    results: SearchResult[]
+  ): Promise<SearchSuggestion[]> {
     const suggestions = new Set<string>();
     const queryLower = query.toLowerCase();
     const queryWords = new Set(queryLower.split(/\s+/));
@@ -934,11 +936,13 @@ class IntelligentSearchService {
       });
     });
 
-    return Array.from(suggestions).slice(0, SEARCH_CONFIG.SUGGESTION_LIMIT).map(text => ({
-      text,
-      type: 'related',
-      score: 0.8
-    }));
+    return Array.from(suggestions)
+      .slice(0, SEARCH_CONFIG.SUGGESTION_LIMIT)
+      .map(text => ({
+        text,
+        type: 'related',
+        score: 0.8,
+      }));
   }
 
   /**

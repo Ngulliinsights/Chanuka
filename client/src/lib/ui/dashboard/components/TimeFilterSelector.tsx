@@ -5,7 +5,6 @@
  */
 
 import { Clock } from 'lucide-react';
-import React from 'react';
 
 import {
   Select,

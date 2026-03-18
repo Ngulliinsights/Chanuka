@@ -10,7 +10,7 @@ declare const window: Window & typeof globalThis;
 import React, { useEffect, useState } from 'react';
 
 import { loadPolyfills } from '@client/infrastructure';
-import { getBrowserInfo, type BrowserInfo } from '@client/infrastructure';
+import { getBrowserInfo} from '@client/infrastructure';
 import { logger } from '@client/lib/utils/logger';
 
 interface BrowserCompatibilityCheckerProps {
@@ -44,11 +44,7 @@ const BrowserCompatibilityChecker: React.FC<BrowserCompatibilityCheckerProps> = 
     checkCompatibilityAndLoadPolyfills();
   }, []);
 
-  const checkCompatibilityAndLoadPolyfills = async () => {
-    try {
-      // Get browser information
-      const browserInfo = getBrowserInfo();
-
+  
       setState(prev => ({
         ...prev,
         browserInfo,

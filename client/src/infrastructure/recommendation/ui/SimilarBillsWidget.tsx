@@ -1,10 +1,9 @@
 /**
  * Similar Bills Widget
- * 
+ *
  * Widget for displaying similar bills on bill detail pages
  */
 
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GitCompare } from 'lucide-react';
 import { useSimilarBills } from '../hooks/useRecommendations';
@@ -17,10 +16,7 @@ interface SimilarBillsWidgetProps {
   limit?: number;
 }
 
-export function SimilarBillsWidget({ 
-  billId, 
-  limit = 5 
-}: SimilarBillsWidgetProps) {
+export function SimilarBillsWidget({ billId, limit = 5 }: SimilarBillsWidgetProps) {
   const navigate = useNavigate();
   const { data, isLoading, isError, error } = useSimilarBills(billId, limit);
 
@@ -31,17 +27,13 @@ export function SimilarBillsWidget({
     navigate(`/analysis/compare?bills=${billIds.join(',')}&from=bills`);
   };
 
-  const actions = recommendations.length >= 2 ? (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleCompareAll}
-      className="gap-2"
-    >
-      <GitCompare className="w-4 h-4" />
-      Compare All Similar
-    </Button>
-  ) : undefined;
+  const actions =
+    recommendations.length >= 2 ? (
+      <Button variant="outline" size="sm" onClick={handleCompareAll} className="gap-2">
+        <GitCompare className="w-4 h-4" />
+        Compare All Similar
+      </Button>
+    ) : undefined;
 
   return (
     <RecommendationWidget

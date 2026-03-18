@@ -6,7 +6,6 @@
  */
 
 import { Star, Info, TrendingUp, Users, Award } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';

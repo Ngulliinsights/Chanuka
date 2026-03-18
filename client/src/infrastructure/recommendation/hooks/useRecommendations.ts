@@ -1,6 +1,6 @@
 /**
  * useRecommendations Hook
- * 
+ *
  * React hook for fetching and managing bill recommendations
  */
 

@@ -1,9 +1,13 @@
 import { BookOpen, Scale, Clock, Zap, Users, HelpCircle, ExternalLink } from 'lucide-react';
-import React from 'react';
 import { useState } from 'react';
 
 import { Button } from '@client/lib/design-system/interactive/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive/Tabs';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/lib/design-system/interactive/Tabs';
 import {
   Card,
   CardContent,
@@ -43,7 +47,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
   const digitalHealthBill = REAL_BILLS[0];
   const financeBill = REAL_BILLS[1];
   const art43 = KENYA_CONSTITUTION.articles[43];
-  
+
   // Real cases
   const healthCase = KENYA_CASE_LAW.health[0];
   const ipCase = KENYA_CASE_LAW.health[2];
@@ -98,7 +102,8 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
       id: 'provision-1',
       sectionNumber: '4',
       title: 'Right to Health',
-      summary: 'Ensures digital health interventions align with the constitutional guarantee of highest attainable standard of health.',
+      summary:
+        'Ensures digital health interventions align with the constitutional guarantee of highest attainable standard of health.',
       constitutionalBasis: [
         {
           id: 'cb-1',
@@ -120,7 +125,7 @@ export function EducationalFramework({ bill, className = '' }: EducationalFramew
           relevance: 'contextual' as const,
           impact: 'unclear' as const,
           explanation:
-            "Digital health systems must balance accessibility with the strict privacy protections guaranteed by the Constitution.",
+            'Digital health systems must balance accessibility with the strict privacy protections guaranteed by the Constitution.',
         },
       ],
       concerns: [

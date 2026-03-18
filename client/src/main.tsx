@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { logger } from '@client/lib/utils/logger';
 
 import App from './App';
-import { initializeInfrastructure, type ServiceRegistry } from './infrastructure/init';
+import { initializeInfrastructure } from './infrastructure/init';
 
 import './index.css';
 

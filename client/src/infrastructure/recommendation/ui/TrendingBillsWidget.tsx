@@ -1,10 +1,9 @@
 /**
  * Trending Bills Widget
- * 
+ *
  * Widget for displaying trending bills on the dashboard
  */
 
-import React from 'react';
 import { useTrendingBills } from '../hooks/useRecommendations';
 import { RecommendationWidget } from './RecommendationWidget';
 import type { BillRecommendation } from '../types';
@@ -14,10 +13,7 @@ interface TrendingBillsWidgetProps {
   limit?: number;
 }
 
-export function TrendingBillsWidget({ 
-  days = 7, 
-  limit = 5 
-}: TrendingBillsWidgetProps) {
+export function TrendingBillsWidget({ days = 7, limit = 5 }: TrendingBillsWidgetProps) {
   const { data, isLoading, isError, error } = useTrendingBills(days, limit);
 
   const recommendations = (data?.data || []) as BillRecommendation[];

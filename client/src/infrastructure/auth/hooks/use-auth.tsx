@@ -51,10 +51,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Create wrapper selectors that work with the actual Redux state
   const user = useAppSelector((state: RootState) => (state as any).auth?.user || null);
   const loading = useAppSelector((state: RootState) => (state as any).auth?.isLoading || false);
-  const sessionExpiry = useAppSelector((state: RootState) => (state as any).auth?.sessionExpiry || null);
-  const isInitialized = useAppSelector((state: RootState) => (state as any).auth?.isInitialized || false);
-  const twoFactorRequired = useAppSelector((state: RootState) => (state as any).auth?.twoFactorRequired || false);
-  const isAuthenticated = useAppSelector((state: RootState) => (state as any).auth?.isAuthenticated || false);
+  const sessionExpiry = useAppSelector(
+    (state: RootState) => (state as any).auth?.sessionExpiry || null
+  );
+  const isInitialized = useAppSelector(
+    (state: RootState) => (state as any).auth?.isInitialized || false
+  );
+  const twoFactorRequired = useAppSelector(
+    (state: RootState) => (state as any).auth?.twoFactorRequired || false
+  );
+  const isAuthenticated = useAppSelector(
+    (state: RootState) => (state as any).auth?.isAuthenticated || false
+  );
 
   const mountedRef = useRef(true);
 
@@ -585,7 +593,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 /**
  * Custom hook to access authentication context.
  */
- 
+
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
 
@@ -602,7 +610,7 @@ export function useAuth(): AuthContextType {
 /**
  * Legacy compatibility hook for Redux auth store
  */
- 
+
 export function useAuthStore() {
   const user = useAppSelector((state: RootState) => (state as any).auth?.user || null);
   return { user } as const;

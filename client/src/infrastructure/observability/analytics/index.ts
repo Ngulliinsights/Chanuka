@@ -31,15 +31,11 @@ export class ComprehensiveAnalyticsTracker {
   getSummary() { return {}; }
 }
 
-export const AnalyticsProvider = ({ children }: any) => children;
-export const useAnalyticsContext = () => ({});
-export const withAnalytics = (Component: any) => Component;
-export enum AnalyticsStatus { Ready }
+export export export export enum AnalyticsStatus { Ready }
 export const initializeAnalytics = (config: any) => {
   console.log('[Analytics] Initialized with config:', config);
 };
-export const ANALYTICS_CONFIG = {};
-
+export 
 /**
  * Track an analytics event
  * Requirements: 11.4
@@ -64,9 +60,7 @@ export function trackEvent(event: {
 }
 
 // Comprehensive Tracker Hook Stub
-export const useComprehensiveAnalytics = () => {
-  const tracker = ComprehensiveAnalyticsTracker.getInstance();
-  return {
+export   return {
     trackEvent: tracker.trackEvent.bind(tracker),
     getMetrics: () => ({}),
     exportData: () => ({}),
@@ -77,10 +71,7 @@ export const useComprehensiveAnalytics = () => {
 };
 
 // Global Analytics Service Stub
-export const analyticsService = {
-  trackEvent: (name: string, props?: any) => {
-    ComprehensiveAnalyticsTracker.getInstance().trackEvent({ name, properties: props });
-  },
+export   },
   trackPage: (page: string) => {},
   identify: (userId: string, traits?: any) => {},
 };

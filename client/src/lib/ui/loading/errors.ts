@@ -1,6 +1,6 @@
 /**
  * Loading-specific Error Types
- * 
+ *
  * Uses shared base error classes from dashboard/errors.ts (canonical source)
  * to eliminate duplication across the error handling system.
  */
@@ -14,10 +14,7 @@ export {
   ValidationError,
 } from '@client/lib/ui/dashboard/errors';
 
-export type {
-  ErrorContext,
-  BaseErrorOptions,
-} from '@client/lib/ui/dashboard/errors';
+export type { ErrorContext, BaseErrorOptions } from '@client/lib/ui/dashboard/errors';
 
 import {
   BaseError,
@@ -35,7 +32,7 @@ import type { ErrorContext } from '@client/lib/ui/dashboard/errors';
 
 /**
  * Loading operation error - unified with core error system
- * 
+ *
  * @example
  * throw new LoadingError('Failed to load data', {
  *   statusCode: 400,
@@ -71,7 +68,7 @@ export class LoadingError extends BaseError {
 
 /**
  * Loading timeout error - for operations that exceed timeout
- * 
+ *
  * @example
  * throw new LoadingTimeoutError('fetchBills', 5000, {
  *   context: { component: 'BillsPage' }
@@ -90,14 +87,11 @@ export class LoadingTimeoutError extends NetworkError {
       cause?: Error | unknown;
     }
   ) {
-    super(
-      `Loading operation timed out after ${timeout}ms: ${operationId}`,
-      {
-        operation: operationId,
-        timeout,
-        ...options?.context,
-      }
-    );
+    super(`Loading operation timed out after ${timeout}ms: ${operationId}`, {
+      operation: operationId,
+      timeout,
+      ...options?.context,
+    });
     this.name = 'LoadingTimeoutError';
     this.operation = operationId;
     this.timeout = timeout;
@@ -106,7 +100,7 @@ export class LoadingTimeoutError extends NetworkError {
 
 /**
  * Loading network error - for network-related loading failures
- * 
+ *
  * @example
  * throw new LoadingNetworkError('Network connection failed', {
  *   context: { component: 'BillsList' }
@@ -132,7 +126,7 @@ export class LoadingNetworkError extends NetworkError {
 
 /**
  * Loading validation error - for validation failures during load
- * 
+ *
  * @example
  * throw new LoadingValidationError('Invalid response format', {
  *   context: { component: 'DataValidator' }
@@ -155,7 +149,7 @@ export class LoadingValidationError extends ValidationError {
 
 /**
  * Loading operation failed error - for general operation failures
- * 
+ *
  * @example
  * throw new LoadingOperationFailedError('fetchBills', 'Server returned error', 2);
  */
@@ -196,7 +190,7 @@ export class LoadingOperationFailedError extends BaseError {
 
 /**
  * Loading stage error - for errors at specific loading stages
- * 
+ *
  * @example
  * throw new LoadingStageError('data-fetch', 'Failed to fetch from API', {
  *   context: { stage: 'init' }
@@ -261,9 +255,7 @@ export function isLoadingNetworkError(error: unknown): error is LoadingNetworkEr
 /**
  * Type guard to check if error is a LoadingValidationError
  */
-export function isLoadingValidationError(
-  error: unknown
-): error is LoadingValidationError {
+export function isLoadingValidationError(error: unknown): error is LoadingValidationError {
   return error instanceof LoadingValidationError;
 }
 
@@ -384,7 +376,11 @@ export function formatErrorForLogging(error: LoadingError): Record<string, unkno
 /**
  * Check if error should trigger retry logic
  */
-export function shouldRetry(error: LoadingError, currentAttempt: number, maxAttempts: number): boolean {
+export function shouldRetry(
+  error: LoadingError,
+  currentAttempt: number,
+  maxAttempts: number
+): boolean {
   return error.retryable && currentAttempt < maxAttempts;
 }
 

@@ -1,6 +1,6 @@
 /**
  * Integration Monitoring Types
- * 
+ *
  * Type definitions for the monitoring dashboard
  */
 

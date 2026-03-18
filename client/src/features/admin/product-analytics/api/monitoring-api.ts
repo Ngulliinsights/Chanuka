@@ -1,6 +1,6 @@
 /**
  * Integration Monitoring API
- * 
+ *
  * API client for the monitoring service
  */
 
@@ -20,17 +20,21 @@ const API_BASE = '/api/monitoring';
 
 export async function getDashboardData(): Promise<MonitoringDashboardData> {
   const data = await apiFetchClient.get<MonitoringDashboardData>(`${API_BASE}/dashboard`);
-  
+
   // Parse dates
   (data as any).features = (data as any).features.map((feature: unknown) => ({
     ...feature,
-    lastHealthCheck: (feature as any).lastHealthCheck ? new Date((feature as any).lastHealthCheck) : undefined,
-    recentMetrics: (feature as any).recentMetrics ? {
-      ...(feature as any).recentMetrics,
-      timestamp: new Date((feature as any).recentMetrics.timestamp),
-    } : undefined,
+    lastHealthCheck: (feature as any).lastHealthCheck
+      ? new Date((feature as any).lastHealthCheck)
+      : undefined,
+    recentMetrics: (feature as any).recentMetrics
+      ? {
+          ...(feature as any).recentMetrics,
+          timestamp: new Date((feature as any).recentMetrics.timestamp),
+        }
+      : undefined,
   }));
-  
+
   return data;
 }
 
@@ -44,18 +48,18 @@ export async function getFeatureMetrics(
   endTime?: Date
 ): Promise<FeatureMetric[]> {
   const params = new URLSearchParams();
-  
+
   if (startTime) {
     params.append('startTime', startTime.toISOString());
   }
   if (endTime) {
     params.append('endTime', endTime.toISOString());
   }
-  
+
   const data = await apiFetchClient.get<FeatureMetric[]>(
     `${API_BASE}/features/${featureId}/metrics?${params.toString()}`
   );
-  
+
   // Parse dates
   return data.map((metric: unknown) => ({
     ...metric,
@@ -72,15 +76,15 @@ export async function getFeatureAlerts(
   resolved?: boolean
 ): Promise<IntegrationAlert[]> {
   const params = new URLSearchParams();
-  
+
   if (resolved !== undefined) {
     params.append('resolved', resolved.toString());
   }
-  
+
   const data = await apiFetchClient.get<IntegrationAlert[]>(
     `${API_BASE}/features/${featureId}/alerts?${params.toString()}`
   );
-  
+
   // Parse dates
   return data.map((alert: unknown) => ({
     ...alert,
@@ -89,7 +93,7 @@ export async function getFeatureAlerts(
     acknowledgedAt: alert.acknowledgedAt ? new Date(alert.acknowledgedAt) : undefined,
     resolvedAt: (alert as any).resolvedAt ? new Date((alert as any).resolvedAt) : undefined,
   }));
-  
+
   return data;
 }
 
@@ -111,18 +115,18 @@ export async function getFeatureLogs(
   limit?: number
 ): Promise<IntegrationLog[]> {
   const params = new URLSearchParams();
-  
+
   if (level) {
     params.append('level', level);
   }
   if (limit) {
     params.append('limit', limit.toString());
   }
-  
+
   const data = await apiFetchClient.get<IntegrationLog[]>(
     `${API_BASE}/features/${featureId}/logs?${params.toString()}`
   );
-  
+
   // Parse dates
   return data.map((log: unknown) => ({
     ...log,
@@ -145,7 +149,7 @@ export async function getSystemHealth(): Promise<{
   timestamp: Date;
 }> {
   const data = await apiFetchClient.get<any>(`${API_BASE}/health`);
-  
+
   return {
     ...data,
     timestamp: new Date(data.timestamp),

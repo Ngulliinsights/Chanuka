@@ -9,7 +9,6 @@ import {
   Gavel,
   PenTool,
 } from 'lucide-react';
-import React from 'react';
 
 import type { Bill } from '@client/features/bills/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
@@ -241,7 +240,6 @@ export default function BillTimelineTab({ bill }: BillTimelineTabProps) {
               {timelineEvents.map((event, index) => {
                 const StatusIcon = statusIcons[event.status];
                 const TypeIcon = typeIcons[event.type];
-                const isLast = index === timelineEvents.length - 1;
 
                 return (
                   <div key={event.id} className="relative flex gap-4">

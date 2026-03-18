@@ -5,7 +5,7 @@
  * with detailed breakdowns and trend analysis.
  */
 
-import { DollarSign, TrendingUp, AlertTriangle, Building, Calendar } from 'lucide-react';
+import { DollarSign, TrendingUp, AlertTriangle, Building } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
   BarChart,
@@ -22,7 +22,7 @@ import {
   Line,
 } from 'recharts';
 
-import { FinancialInterest, ConflictAnalysis } from '@client/features/analysis/types';
+import { ConflictAnalysis } from '@client/features/analysis/types';
 import { Badge } from '@client/lib/design-system';
 import {
   Card,

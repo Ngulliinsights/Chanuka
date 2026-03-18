@@ -6,7 +6,11 @@
  * React components to support Fast Refresh.
  */
 
-import { createError, errorHandler, handleError as coreHandleError } from '@client/infrastructure/error';
+import {
+  createError,
+  errorHandler,
+  handleError as coreHandleError,
+} from '@client/infrastructure/error';
 import type { ClientError, ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
 import { logger } from '@lib/utils/logger';
 

@@ -17,7 +17,6 @@ import { IntegrationContext } from './context/IntegrationContext';
 import { useIntegration } from './hooks/useIntegration';
 import type { IntegrationStatus, IntegrationServices, IntegrationContextValue } from './types';
 
-
 // ============================================================================
 // INTEGRATION PROVIDER
 // ============================================================================

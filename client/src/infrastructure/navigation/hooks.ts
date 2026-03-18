@@ -26,9 +26,7 @@ export function useNavigationSystem() {
 }
 
 // Alias for compatibility
-export const useUnifiedNavigation = useNavigationSystem;
-
-/**
+export /**
  * Hook for keyboard navigation support with shortcut handling
  *
  * Keyboard shortcuts:
@@ -38,7 +36,7 @@ export const useUnifiedNavigation = useNavigationSystem;
  *
  * @returns Navigation state plus handleKeyDown event handler
  */
-export function useKeyboardNavigation() {
+function useKeyboardNavigation() {
   const navigation = useNavigation();
 
   const handleKeyDown = (event: KeyboardEvent) => {

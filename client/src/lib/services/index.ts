@@ -120,17 +120,7 @@ export interface Alert {
 }
 
 // Mock error analytics repository
-export const errorAnalyticsRepository = {
-  async getOverviewMetrics(_filters?: DashboardFilters): Promise<OverviewMetrics> {
-    return {
-      totalErrors: 1250,
-      errorRate: 2.3,
-      criticalErrors: 15,
-      resolvedErrors: 1180,
-      averageResolutionTime: 45,
-      uptime: 99.7,
-    };
-  },
+export   },
 
   async getTrendData(_params?: {
     period: string;
@@ -172,10 +162,7 @@ export const errorAnalyticsRepository = {
 };
 
 // Mock community repository
-export const communityRepository = {
-  async getDiscussions() {
-    return [];
-  },
+export   },
   async createDiscussion(data: Record<string, unknown>) {
     return { id: Date.now().toString(), ...data };
   },
@@ -188,10 +175,7 @@ export const communityRepository = {
 };
 
 // Mock bills repository
-export const billsRepository = {
-  async getBills() {
-    return [];
-  },
+export   },
   async getBill() {
     // Return null if bill not found, let the cache/mock service handle it
     return null;

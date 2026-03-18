@@ -1,7 +1,6 @@
 import { format } from 'date-fns';
 import { Search, Star, ChevronRight, Trash, Bell } from 'lucide-react';
 import { useState } from 'react';
-import React from 'react';
 
 import { useSavedSearches } from '@client/features/search/hooks/useSearch';
 import { intelligentSearch } from '@client/features/search/services/intelligent-search';
@@ -188,7 +187,10 @@ export function SavedSearches({ onExecuteSearch, className = '' }: SavedSearches
                       </p>
 
                       <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                        <span>Created {format(new Date(search.created_at || search.createdAt), 'MMM d, yyyy')}</span>
+                        <span>
+                          Created{' '}
+                          {format(new Date(search.created_at || search.createdAt), 'MMM d, yyyy')}
+                        </span>
                         <span>Used {search.useCount} times</span>
                         {search.lastUsed && (
                           <span>Last used {format(new Date(search.lastUsed), 'MMM d')}</span>

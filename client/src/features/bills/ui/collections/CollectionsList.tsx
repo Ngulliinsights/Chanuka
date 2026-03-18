@@ -9,19 +9,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@client/lib/design-system';
-import { collectionsService, BillCollection } from '@client/features/bills/services/collections-service';
+import {
+  collectionsService,
+  BillCollection,
+} from '@client/features/bills/services/collections-service';
 import { useToast } from '@client/lib/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
 export function CollectionsList() {
-  const [collections, setCollections] = useState<BillCollection[]>(collectionsService.getCollections());
+  const [collections, setCollections] = useState<BillCollection[]>(
+    collectionsService.getCollections()
+  );
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleShare = (collection: BillCollection) => {
     const token = collectionsService.generateShareToken(collection.id);
     const url = `${window.location.origin}/collections/shared/${token}`;
-    
+
     navigator.clipboard.writeText(url);
     toast({
       title: 'Link copied',
@@ -74,7 +79,7 @@ export function CollectionsList() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      {collections.map((collection) => (
+      {collections.map(collection => (
         <Card key={collection.id} className="hover:shadow-lg transition-shadow cursor-pointer">
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -124,8 +129,10 @@ export function CollectionsList() {
               </span>
               <div className="flex gap-1">
                 {collection.isPublic && <Badge variant="secondary">Public</Badge>}
-                {collection.tags?.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="outline">{tag}</Badge>
+                {collection.tags?.slice(0, 2).map(tag => (
+                  <Badge key={tag} variant="outline">
+                    {tag}
+                  </Badge>
                 ))}
               </div>
             </div>

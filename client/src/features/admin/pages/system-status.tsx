@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 
 /**
  * System Status Page
- * 
+ *
  * Real-time system health and status monitoring
  */
 export default function SystemStatusPage() {
@@ -23,29 +23,29 @@ export default function SystemStatusPage() {
       status: 'operational',
       uptime: '99.98%',
       responseTime: '45ms',
-      icon: Zap
+      icon: Zap,
     },
     {
       name: 'Database',
       status: 'operational',
       uptime: '99.99%',
       responseTime: '12ms',
-      icon: Database
+      icon: Database,
     },
     {
       name: 'Web Application',
       status: 'operational',
       uptime: '99.95%',
       responseTime: '120ms',
-      icon: Globe
+      icon: Globe,
     },
     {
       name: 'WebSocket Service',
       status: 'operational',
       uptime: '99.92%',
       responseTime: '8ms',
-      icon: Activity
-    }
+      icon: Activity,
+    },
   ];
 
   const incidents = [
@@ -54,15 +54,15 @@ export default function SystemStatusPage() {
       description: 'Database optimization and index rebuilding',
       status: 'completed',
       date: '2024-01-15',
-      duration: '30 minutes'
+      duration: '30 minutes',
     },
     {
       title: 'API Rate Limit Adjustment',
       description: 'Increased rate limits for Pro tier users',
       status: 'completed',
       date: '2024-01-10',
-      duration: '5 minutes'
-    }
+      duration: '5 minutes',
+    },
   ];
 
   const getStatusColor = (status: string) => {
@@ -115,7 +115,9 @@ export default function SystemStatusPage() {
             <div className="flex items-center space-x-3">
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
               <div>
-                <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">All Systems Operational</h2>
+                <h2 className="text-2xl font-bold text-green-900 dark:text-green-100">
+                  All Systems Operational
+                </h2>
                 <p className="text-green-700 dark:text-green-300">
                   Last updated: {lastUpdated.toLocaleTimeString()}
                 </p>
@@ -129,7 +131,7 @@ export default function SystemStatusPage() {
             {services.map((service, index) => {
               const Icon = service.icon;
               const StatusIcon = getStatusIcon(service.status);
-              
+
               return (
                 <div
                   key={index}
@@ -144,7 +146,9 @@ export default function SystemStatusPage() {
                         <h4 className="font-semibold text-lg">{service.name}</h4>
                         <div className="flex items-center space-x-2 mt-1">
                           <StatusIcon className={`w-4 h-4 ${getStatusColor(service.status)}`} />
-                          <span className={`text-sm font-medium capitalize ${getStatusColor(service.status)}`}>
+                          <span
+                            className={`text-sm font-medium capitalize ${getStatusColor(service.status)}`}
+                          >
                             {service.status}
                           </span>
                         </div>

@@ -8,8 +8,12 @@
 
 import * as Sentry from '@sentry/browser';
 import { browserTracingIntegration } from '@sentry/browser';
-import { Replay } from '@sentry/replay';
+import { replayIntegration } from '@sentry/react';
 import * as React from 'react';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 interface ErrorContext {
   userId?: string;
@@ -30,6 +34,27 @@ interface CustomError extends Error {
   userImpact?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Internal dev-only logger
+// Replaces raw console.* calls — silenced in production automatically.
+// ---------------------------------------------------------------------------
+
+const devLog = {
+  warn: (...args: unknown[]) => {
+    if (process.env.NODE_ENV === 'development') console.warn(...args);  // eslint-disable-line no-console
+  },
+  log: (...args: unknown[]) => {
+    if (process.env.NODE_ENV === 'development') console.log(...args);   // eslint-disable-line no-console
+  },
+  error: (...args: unknown[]) => {
+    if (process.env.NODE_ENV === 'development') console.error(...args); // eslint-disable-line no-console
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Service
+// ---------------------------------------------------------------------------
+
 class ErrorMonitoringService {
   private initialized = false;
   private context: ErrorContext = {};
@@ -37,7 +62,7 @@ class ErrorMonitoringService {
   private errorHandler: ((event: ErrorEvent) => void) | null = null;
 
   /**
-   * Initialize error monitoring with Sentry configuration
+   * Initialize error monitoring with Sentry configuration.
    */
   initialize(config: {
     dsn: string;
@@ -49,7 +74,7 @@ class ErrorMonitoringService {
     replaysOnErrorSampleRate?: number;
   }) {
     if (this.initialized) {
-      console.warn('Error monitoring already initialized');
+      devLog.warn('Error monitoring already initialized');
       return;
     }
 
@@ -57,39 +82,36 @@ class ErrorMonitoringService {
       Sentry.init({
         dsn: config.dsn,
         environment: config.environment,
-        release: config.release || process.env.BUILD_VERSION || 'unknown',
+        release: config.release ?? process.env['BUILD_VERSION'] ?? 'unknown',
 
         // Performance monitoring
         integrations: [
-          // Use modern browser tracing integration
-          browserTracingIntegration({
-            // Remove tracePropagationTargets as it's not supported in this version
-          }),
+          browserTracingIntegration(),
 
           // Session replay for debugging
-          new Replay({
-            sessionSampleRate: config.replaysSessionSampleRate || 0.1,
-            errorSampleRate: config.replaysOnErrorSampleRate || 1.0,
+          replayIntegration({
             maskAllText: false,
             maskAllInputs: true,
             blockAllMedia: true,
           }),
         ],
 
-        tracesSampleRate: config.tracesSampleRate || 0.1,
+        tracesSampleRate: config.tracesSampleRate ?? 0.1,
 
-        beforeSend: (event, hint) => {
-          return this.filterAndEnhanceError(event, hint);
-        },
+        // Replay sample rates belong at the top-level init, not inside the integration
+        replaysSessionSampleRate: config.replaysSessionSampleRate ?? 0.1,
+        replaysOnErrorSampleRate: config.replaysOnErrorSampleRate ?? 1.0,
 
-        beforeBreadcrumb: breadcrumb => {
-          return this.filterBreadcrumb(breadcrumb);
-        },
+        // FIX TS2322: beforeSend must use Sentry.ErrorEvent, not Sentry.Event
+        beforeSend: (event: Sentry.ErrorEvent, hint: Sentry.EventHint) =>
+          this.filterAndEnhanceError(event, hint),
+
+        beforeBreadcrumb: breadcrumb => this.filterBreadcrumb(breadcrumb),
 
         initialScope: {
           tags: {
             component: 'chanuka-client',
-            version: config.release || 'unknown',
+            version: config.release ?? 'unknown',
           },
           level: 'info',
         },
@@ -102,14 +124,14 @@ class ErrorMonitoringService {
       window.addEventListener('beforeunload', () => this.cleanup());
 
       this.initialized = true;
-      console.log('✅ Error monitoring initialized successfully');
+      devLog.log('✅ Error monitoring initialized successfully');
     } catch (error) {
-      console.error('❌ Failed to initialize error monitoring:', error);
+      devLog.error('❌ Failed to initialize error monitoring:', error);
     }
   }
 
   /**
-   * Set user context for error tracking
+   * Set user context for error tracking.
    */
   setUserContext(user: { id?: string; email?: string; role?: string; sessionId?: string }) {
     this.context = { ...this.context, ...user };
@@ -121,12 +143,12 @@ class ErrorMonitoringService {
       segment: user.role,
     });
 
-    Sentry.setTag('userRole', user.role || 'anonymous');
-    Sentry.setTag('sessionId', user.sessionId || 'unknown');
+    Sentry.setTag('userRole', user.role ?? 'anonymous');
+    Sentry.setTag('sessionId', user.sessionId ?? 'unknown');
   }
 
   /**
-   * Set feature context for error tracking
+   * Set feature context for error tracking.
    */
   setFeatureContext(feature: string, action?: string, metadata?: Record<string, unknown>) {
     this.context.feature = feature;
@@ -134,19 +156,13 @@ class ErrorMonitoringService {
     this.context.metadata = metadata;
 
     Sentry.setTag('feature', feature);
-    if (action) {
-      Sentry.setTag('action', action);
-    }
+    if (action) Sentry.setTag('action', action);
 
-    Sentry.setContext('feature', {
-      name: feature,
-      action,
-      metadata,
-    });
+    Sentry.setContext('feature', { name: feature, action, metadata });
   }
 
   /**
-   * Capture a custom error with enhanced context
+   * Capture a custom error with enhanced context.
    */
   captureError(error: Error | CustomError, context?: Partial<ErrorContext>) {
     const enhancedError = this.enhanceError(error, context);
@@ -169,13 +185,11 @@ class ErrorMonitoringService {
       Sentry.captureException(enhancedError);
     });
 
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error captured:', enhancedError, context);
-    }
+    devLog.error('Error captured:', enhancedError, context);
   }
 
   /**
-   * Capture a custom message with context
+   * Capture a custom message with context.
    */
   captureMessage(
     message: string,
@@ -197,7 +211,7 @@ class ErrorMonitoringService {
   }
 
   /**
-   * Add breadcrumb for debugging context
+   * Add a breadcrumb for debugging context.
    */
   addBreadcrumb(
     message: string,
@@ -215,39 +229,35 @@ class ErrorMonitoringService {
   }
 
   /**
-   * Track user interactions for debugging
+   * Track user interactions for debugging.
    */
   trackUserInteraction(action: string, element?: string, metadata?: Record<string, unknown>) {
-    this.addBreadcrumb(`User ${action}${element ? ` on ${element}` : ''}`, 'user', 'info', {
-      action,
-      element,
-      ...metadata,
-    });
+    this.addBreadcrumb(
+      `User ${action}${element != null ? ` on ${element}` : ''}`,
+      'user',
+      'info',
+      { action, element, ...metadata }
+    );
 
-    // Use modern Sentry API for transactions
     Sentry.startSpan(
       {
         name: `User Interaction: ${action}`,
         op: 'user.interaction',
         attributes: {
           action,
-          element: element || 'unknown',
+          element: element ?? 'unknown',
         },
       },
       () => {
-        // Interaction tracking logic here
-        setTimeout(() => {
-          // Span automatically finishes when callback completes
-        }, 100);
+        // Span automatically finishes when callback completes
       }
     );
   }
 
   /**
-   * Track API calls and responses
+   * Track API calls and responses.
    */
   trackAPICall(method: string, url: string, status: number, duration: number, error?: Error) {
-    // Use modern Sentry API for spans
     Sentry.startSpan(
       {
         name: `${method} ${url}`,
@@ -278,39 +288,32 @@ class ErrorMonitoringService {
     );
   }
 
-  /**
-   * Set up unhandled promise rejection tracking (with cleanup support)
-   */
+  // ---------------------------------------------------------------------------
+  // Private helpers
+  // ---------------------------------------------------------------------------
+
   private setupUnhandledRejectionTracking() {
-    // Remove any existing handler first
     if (this.unhandledRejectionHandler) {
       window.removeEventListener('unhandledrejection', this.unhandledRejectionHandler);
     }
 
     this.unhandledRejectionHandler = (event: PromiseRejectionEvent) => {
-      this.captureError(new Error(`Unhandled Promise Rejection: ${event.reason}`), {
+      this.captureError(new Error(`Unhandled Promise Rejection: ${String(event.reason)}`), {
         feature: 'promise-rejection',
-        metadata: {
-          reason: event.reason,
-          promise: event.promise,
-        },
+        metadata: { reason: event.reason, promise: event.promise },
       });
     };
 
     window.addEventListener('unhandledrejection', this.unhandledRejectionHandler);
   }
 
-  /**
-   * Set up custom error boundaries (with cleanup support)
-   */
   private setupCustomErrorBoundaries() {
-    // Remove any existing handler first
     if (this.errorHandler) {
       window.removeEventListener('error', this.errorHandler);
     }
 
     this.errorHandler = (event: ErrorEvent) => {
-      this.captureError(event.error || new Error(event.message), {
+      this.captureError(event.error instanceof Error ? event.error : new Error(event.message), {
         feature: 'global-error',
         metadata: {
           filename: event.filename,
@@ -323,10 +326,6 @@ class ErrorMonitoringService {
     window.addEventListener('error', this.errorHandler);
   }
 
-  /**
-   * Cleanup error monitoring listeners to prevent memory leaks
-   * Called automatically on app unload
-   */
   cleanup() {
     if (this.unhandledRejectionHandler) {
       window.removeEventListener('unhandledrejection', this.unhandledRejectionHandler);
@@ -341,10 +340,11 @@ class ErrorMonitoringService {
     this.initialized = false;
   }
 
-  /**
-   * Filter and enhance errors before sending to Sentry
-   */
-  private filterAndEnhanceError(event: Sentry.Event, _hint: Sentry.EventHint): Sentry.Event | null {
+  // FIX TS2322: parameter and return type are Sentry.ErrorEvent (not Sentry.Event)
+  private filterAndEnhanceError(
+    event: Sentry.ErrorEvent,
+    _hint: Sentry.EventHint
+  ): Sentry.ErrorEvent | null {
     const ignoredErrors = [
       'ResizeObserver loop limit exceeded',
       'Non-Error promise rejection captured',
@@ -352,49 +352,41 @@ class ErrorMonitoringService {
       'Loading chunk',
     ];
 
-    if (event.exception?.values?.[0]?.value) {
-      const errorMessage = event.exception.values[0].value;
-      if (ignoredErrors.some(ignored => errorMessage.includes(ignored))) {
-        return null;
-      }
-    }
-
-    if (this.context.feature) {
-      event.tags = { ...event.tags, feature: this.context.feature };
-    }
-    if (this.context.action) {
-      event.tags = { ...event.tags, action: this.context.action };
+    const firstValue = event.exception?.values?.[0]?.value;
+    if (firstValue != null && ignoredErrors.some(msg => firstValue.includes(msg))) {
+      return null;
     }
 
     event.tags = {
       ...event.tags,
-      buildVersion: process.env.BUILD_VERSION || 'unknown',
-      buildTime: process.env.BUILD_TIME || 'unknown',
+      ...(this.context.feature != null && { feature: this.context.feature }),
+      ...(this.context.action != null && { action: this.context.action }),
+      buildVersion: process.env['BUILD_VERSION'] ?? 'unknown',
+      buildTime: process.env['BUILD_TIME'] ?? 'unknown',
     };
 
     return event;
   }
 
-  /**
-   * Filter breadcrumbs to reduce noise
-   */
   private filterBreadcrumb(breadcrumb: Sentry.Breadcrumb): Sentry.Breadcrumb | null {
+    // Drop noisy console.log breadcrumbs
     if (breadcrumb.category === 'console' && breadcrumb.level === 'log') {
       return null;
     }
 
-    if (breadcrumb.category === 'ui.click' && breadcrumb.message?.includes('button')) {
-      if (!breadcrumb.message.includes('submit') && !breadcrumb.message.includes('save')) {
-        return null;
-      }
+    // Drop generic button clicks; keep submit/save interactions
+    if (
+      breadcrumb.category === 'ui.click' &&
+      breadcrumb.message?.includes('button') &&
+      !breadcrumb.message.includes('submit') &&
+      !breadcrumb.message.includes('save')
+    ) {
+      return null;
     }
 
     return breadcrumb;
   }
 
-  /**
-   * Enhance error with additional context
-   */
   private enhanceError(error: Error | CustomError, context?: Partial<ErrorContext>): Error {
     const enhanced = error as Error & { context?: unknown };
 
@@ -409,45 +401,50 @@ class ErrorMonitoringService {
     return enhanced;
   }
 
-  /**
-   * Map custom severity to Sentry level
-   */
   private mapSeverityToSentryLevel(severity: string): Sentry.SeverityLevel {
     switch (severity) {
-      case 'low':
-        return 'info';
-      case 'medium':
-        return 'warning';
-      case 'high':
-        return 'error';
-      case 'critical':
-        return 'fatal';
-      default:
-        return 'error';
+      case 'low':      return 'info';
+      case 'medium':   return 'warning';
+      case 'high':     return 'error';
+      case 'critical': return 'fatal';
+      default:         return 'error';
     }
   }
 }
 
-// Create singleton instance
+// ---------------------------------------------------------------------------
+// Singleton export
+// ---------------------------------------------------------------------------
+
 export const errorMonitoring = new ErrorMonitoringService();
 
-// React Error Boundary component
-export class ErrorBoundary extends React.Component<
-  { children: React.ReactNode; fallback?: React.ComponentType<{ error: Error }> },
-  { hasError: boolean; error?: Error }
-> {
-  constructor(props: {
-    children: React.ReactNode;
-    fallback?: React.ComponentType<{ error: Error }>;
-  }) {
+// ---------------------------------------------------------------------------
+// React Error Boundary
+// ---------------------------------------------------------------------------
+
+type ErrorBoundaryProps = {
+  children: React.ReactNode;
+  fallback?: React.ComponentType<{ error: Error }>;
+};
+
+type ErrorBoundaryState = {
+  hasError: boolean;
+  error?: Error;
+};
+
+export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static override getDerivedStateFromError(error: Error) {
+  // FIX TS4113: getDerivedStateFromError is NOT typed as overridable in React's
+  // base Component types — remove the `override` modifier.
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
+  // FIX TS4114: componentDidCatch overrides the base class — must have `override`.
   override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     errorMonitoring.captureError(error, {
       feature: 'react-error-boundary',
@@ -458,21 +455,29 @@ export class ErrorBoundary extends React.Component<
     });
   }
 
-  render() {
+  // FIX TS4114: render() overrides the base class — must have `override`.
+  override render() {
     if (this.state.hasError) {
-      const FallbackComponent = this.props.fallback || DefaultErrorFallback;
-      return <FallbackComponent error={this.state.error!} />;
+      const FallbackComponent = this.props.fallback ?? DefaultErrorFallback;
+
+      // FIX no-non-null-assertion: use a null-safe fallback instead of `error!`
+      const error = this.state.error ?? new Error('An unknown error occurred.');
+      return <FallbackComponent error={error} />;
     }
 
     return this.props.children;
   }
 }
 
-// Default error fallback component
+// ---------------------------------------------------------------------------
+// Default fallback UI
+// ---------------------------------------------------------------------------
+
+// FIX react/no-unescaped-entities: replace raw `'` with &apos;
 const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => (
   <div className="error-boundary">
     <h2>Something went wrong</h2>
-    <p>We've been notified about this error and are working to fix it.</p>
+    <p>We&apos;ve been notified about this error and are working to fix it.</p>
     <details>
       <summary>Error details</summary>
       <pre>{error.message}</pre>
@@ -483,18 +488,12 @@ const DefaultErrorFallback: React.FC<{ error: Error }> = ({ error }) => (
   </div>
 );
 
-// Utility functions for common error scenarios
-export const errorUtils = {
-  wrapAsync: <T extends (...args: unknown[]) => Promise<unknown>>(
-    fn: T,
-    context?: Partial<ErrorContext>
-  ): T => {
-    return ((...args: unknown[]) => {
-      return fn(...args).catch((error: Error) => {
-        errorMonitoring.captureError(error, context);
-        throw error;
-      });
-    }) as T;
+// ---------------------------------------------------------------------------
+// Utility helpers
+// ---------------------------------------------------------------------------
+
+export         throw error;
+      })) as T;
   },
 
   createError: (

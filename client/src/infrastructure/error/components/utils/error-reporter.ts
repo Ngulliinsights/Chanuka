@@ -40,7 +40,6 @@ export function createErrorReporter(options: {
 }) {
   return {
     report: (error: Record<string, unknown>) => {
-       
       logger.error('User error reported', {
         component: 'ErrorReporter',
         error,
@@ -55,7 +54,7 @@ export function createErrorReporter(options: {
       let recoveryOptions: Array<{ label: string; action: string; description?: string }>;
 
       // Note: recoveryStrategies may not be present in all ErrorMetadata instances
-       
+
       const recoveryStrategies = (error.metadata as any)?.recoveryStrategies as
         | RecoveryStrategy[]
         | undefined;

@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
+import { Avatar, AvatarFallback } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {
@@ -200,7 +200,8 @@ export function ExpertConsensus({
               <Badge variant="secondary" className="text-xs">
                 {Math.round(
                   ((consensus.totalExperts -
-                    (consensus.minorityPositions?.reduce((sum, pos) => sum + pos.expertCount, 0) ?? 0)) /
+                    (consensus.minorityPositions?.reduce((sum, pos) => sum + pos.expertCount, 0) ??
+                      0)) /
                     consensus.totalExperts) *
                     100
                 )}

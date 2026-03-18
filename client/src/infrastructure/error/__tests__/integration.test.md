@@ -9,6 +9,7 @@ This document describes the integration tests for the unified error handling sys
 **Test File**: `serialization.test.ts`
 
 **Tests**:
+
 - ✅ Serialize validation error to API format
 - ✅ Serialize network error to API format
 - ✅ Serialize authentication error to API format
@@ -26,6 +27,7 @@ This document describes the integration tests for the unified error handling sys
 **Manual Test Steps**:
 
 1. Create an error using factory function:
+
 ```typescript
 import { createNetworkError, handleUnifiedError } from '@/infrastructure/error';
 
@@ -36,21 +38,25 @@ const error = createNetworkError('Request failed', 500, {
 ```
 
 2. Handle the error:
+
 ```typescript
 handleUnifiedError(error);
 ```
 
 3. Verify observability integration:
+
 - Check that `observability.trackError()` was called
 - Verify error context is preserved
 - Confirm error metadata is tracked
 
 4. Verify logging integration:
+
 - Check that `logger.error()` was called
 - Verify log context includes error details
 - Confirm appropriate log level used
 
 **Expected Results**:
+
 - Error is tracked in observability with full context
 - Error is logged with structured logger
 - Error context is preserved throughout
@@ -61,6 +67,7 @@ handleUnifiedError(error);
 **Manual Test Steps**:
 
 1. Register a recovery strategy:
+
 ```typescript
 import { errorHandler } from '@/infrastructure/error';
 
@@ -77,22 +84,26 @@ errorHandler.registerRecoveryStrategy({
 ```
 
 2. Create a recoverable error:
+
 ```typescript
 const error = createNetworkError('Request failed', 500);
 error.recoveryStrategies.push(/* recovery strategy */);
 ```
 
 3. Handle the error:
+
 ```typescript
 handleUnifiedError(error);
 ```
 
 4. Verify recovery:
+
 - Check that recovery strategy was executed
 - Verify recovery result is logged
 - Confirm error state is updated
 
 **Expected Results**:
+
 - Recovery strategy is executed automatically
 - Recovery result is logged
 - Error state reflects recovery attempt
@@ -133,6 +144,7 @@ npm test -- src/infrastructure/error/__tests__/serialization.test.ts --run
 **Status**: Created, pending build configuration fix
 
 **Coverage**:
+
 - Validation errors: ✅
 - Network errors: ✅
 - Authentication errors: ✅
@@ -149,6 +161,7 @@ npm test -- src/infrastructure/error/__tests__/serialization.test.ts --run
 **Status**: Manual verification required
 
 **Coverage**:
+
 - Observability integration: Pending
 - Logging integration: Pending
 - Recovery strategies: Pending

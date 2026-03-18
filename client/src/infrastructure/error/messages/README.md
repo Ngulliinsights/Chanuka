@@ -68,8 +68,8 @@ import { errorMessageService } from '@client/infrastructure/error/messages';
 const error = new AppError('Connection failed', 'NETWORK_ERROR', 'network');
 const formatted = errorMessageService.formatError(error);
 
-console.log(formatted.title);    // "Connection Problem"
-console.log(formatted.message);  // "We couldn't connect to the server..."
+console.log(formatted.title); // "Connection Problem"
+console.log(formatted.message); // "We couldn't connect to the server..."
 ```
 
 ### React Integration
@@ -79,14 +79,14 @@ import { useErrorMessages } from '@client/infrastructure/error/messages';
 
 function MyComponent() {
   const { formatError, getSuggestions } = useErrorMessages();
-  
+
   const handleApiError = (error: AppError) => {
     const formatted = formatError(error);
     const suggestions = getSuggestions(error);
-    
+
     // Display error to user
     showErrorMessage(formatted.title, formatted.message);
-    
+
     // Show recovery options
     showRecoveryOptions(suggestions);
   };
@@ -108,7 +108,7 @@ function App() {
 
 function ErrorBoundary() {
   const { formatError, getMessage } = useErrorMessageContext();
-  
+
   // Use context to format errors consistently
 }
 ```
@@ -117,10 +117,7 @@ function ErrorBoundary() {
 
 ```typescript
 // Get localized message
-const message = errorMessageService.getLocalizedMessage(
-  'network-connection-failed', 
-  'es-ES'
-);
+const message = errorMessageService.getLocalizedMessage('network-connection-failed', 'es-ES');
 
 // Add custom translations
 errorMessageService.addLocalizedMessages('de-DE', {
@@ -150,27 +147,33 @@ const enhanced = createEnhancedErrorMessage(error, {
 ### Core Functions
 
 #### `formatErrorMessage(error, options)`
+
 Formats an error with user-friendly message and context.
 
 **Parameters:**
+
 - `error`: AppError or standard Error
 - `options`: FormatOptions object
 
 **Returns:** FormattedErrorMessage
 
 #### `getRecoverySuggestions(error, maxSuggestions)`
+
 Gets recovery suggestions for an error.
 
 **Parameters:**
+
 - `error`: AppError
 - `maxSuggestions`: Maximum number of suggestions (default: 3)
 
 **Returns:** RecoverySuggestion[]
 
 #### `createEnhancedErrorMessage(error, options)`
+
 Creates a complete error message with formatting and suggestions.
 
 **Parameters:**
+
 - `error`: AppError or standard Error
 - `options`: Enhanced message options
 
@@ -179,9 +182,11 @@ Creates a complete error message with formatting and suggestions.
 ### React Hooks
 
 #### `useErrorMessages()`
+
 Main hook for accessing error message functionality.
 
 **Returns:**
+
 - `formatError`: Function to format errors
 - `getSuggestions`: Function to get recovery suggestions
 - `createEnhancedMessage`: Function to create enhanced messages
@@ -191,12 +196,15 @@ Main hook for accessing error message functionality.
 - `currentLocale`: Current locale
 
 #### `useErrorMessageComponent(error)`
+
 Hook for component-specific error message handling.
 
 **Parameters:**
+
 - `error`: AppError | Error | null
 
 **Returns:**
+
 - `formattedMessage`: Formatted error message
 - `recoverySuggestions`: Recovery suggestions
 - `displayText`: Text for display
@@ -204,12 +212,15 @@ Hook for component-specific error message handling.
 - `hasError`: Boolean indicating if error exists
 
 #### `useErrorRecovery(error)`
+
 Hook for error recovery functionality.
 
 **Parameters:**
+
 - `error`: AppError | null
 
 **Returns:**
+
 - `suggestions`: Recovery suggestions
 - `primarySuggestion`: Primary suggestion
 - `executePrimarySuggestion`: Function to execute primary suggestion
@@ -239,6 +250,7 @@ The system includes comprehensive tests covering:
 - ✅ Error handling edge cases
 
 Run tests with:
+
 ```bash
 npm test -- client/src/infrastructure/error/messages/__tests__
 ```

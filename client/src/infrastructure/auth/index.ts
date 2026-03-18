@@ -273,10 +273,7 @@ export {
 // ============================================================================
 // Note: These are exported for backward compatibility but should be imported
 // directly from their respective files to avoid circular dependencies:
-// - import { runAuthCleanup } from '@client/infrastructure/auth/scripts/cleanup-old-auth'
-// - import { initAuthSystem } from '@client/infrastructure/auth/scripts/init-auth-system'
-// - import { runMigrationHelper } from '@client/infrastructure/auth/scripts/migration-helper'
-
+// - // - // -
 // ============================================================================
 // Default Export (Main Auth Module)
 // ============================================================================

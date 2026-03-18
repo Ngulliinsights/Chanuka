@@ -285,18 +285,4 @@ export const globalErrorHandler = (error: unknown, context?: Record<string, unkn
 /**
  * Factory for creating typed API errors
  */
-export const ErrorFactory = {
-  network: (message: string, details?: Record<string, unknown>) =>
-    new NetworkError(message, details),
-  timeout: (message: string, details?: Record<string, unknown>) =>
-    new TimeoutError(message, details),
-  validation: (message: string, details?: Record<string, unknown>) =>
-    new ValidationError(message, details),
-  unauthorized: (message: string, details?: Record<string, unknown>) =>
-    new UnauthorizedError(message, details),
-  forbidden: (message: string, details?: Record<string, unknown>) =>
-    new ForbiddenError(message, details),
-  notFound: (message: string, details?: Record<string, unknown>) =>
-    new NotFoundError(message, details),
-  server: (message: string, details?: Record<string, unknown>) => new ServerError(message, details),
-};
+export 

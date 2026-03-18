@@ -1,25 +1,25 @@
 /**
  * Authenticated API Client
  * HTTP client with built-in authentication handling
- * 
+ *
  * @deprecated Use globalApiClient with createAuthRequestInterceptor instead.
  * This client lacks retry logic, caching, circuit breaker, and proper token management.
  * Will be removed in v2.0.0
- * 
+ *
  * @example
  * // ❌ Don't use this:
  * const client = new AuthenticatedApiClient();
  * await client.get('/api/users');
- * 
+ *
  * // ✅ Use this instead:
  * import { globalApiClient, createAuthRequestInterceptor } from '@client/infrastructure/api';
  * import { getAuthToken } from '@client/infrastructure/auth';
- * 
+ *
  * globalApiClient.addRequestInterceptor(
  *   createAuthRequestInterceptor(() => getAuthToken())
  * );
  * await globalApiClient.get('/api/users');
- * 
+ *
  * @see {@link globalApiClient} for the recommended API client
  * @see {@link createAuthRequestInterceptor} for authentication setup
  */

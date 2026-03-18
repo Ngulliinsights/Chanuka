@@ -13,7 +13,6 @@ import {
   Loader2,
   Info,
 } from 'lucide-react';
-import React from 'react';
 import { useState } from 'react';
 
 import { Button } from '@client/lib/design-system/interactive/Button';

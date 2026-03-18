@@ -1,6 +1,5 @@
 import { Loader2, AlertCircle, Filter, LayoutGrid, LayoutList } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '@client/lib/design-system';
@@ -82,24 +81,7 @@ const billMatchesFilter = (bill: Bill, filter: FilterStatus): boolean => {
   return false;
 };
 
-export const BillList = ({
-  bills,
-  isLoading,
-  error,
-  title = 'Bills',
-  onLoadMore,
-  hasMore = false,
-  filters = {},
-  onFiltersChange,
-  showPagination = false,
-  itemsPerPage = 10,
-  onSave,
-  onShare,
-  onComment,
-  savedBills = new Set(),
-}: BillListProps) => {
-  const [localFilter, setLocalFilter] = useState<FilterStatus>('all');
-  const [page, setPage] = useState(1);
+export   const [page, setPage] = useState(1);
   const [view, setView] = useState<ViewMode>('list');
 
   // Determine if we're using external or local filtering

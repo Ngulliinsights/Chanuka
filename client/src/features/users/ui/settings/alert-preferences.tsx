@@ -161,14 +161,7 @@ const defaultPreferences: AlertPreferences = {
   },
 };
 
-  const loadPreferences = async () => {
-    try {
-      const response = await fetch('/api/alert-preferences', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
+  
       if (response.ok) {
         const data = await response.json();
         // Merge API data with defaults to ensure all required fields exist
@@ -185,14 +178,7 @@ const defaultPreferences: AlertPreferences = {
     }
   };
 
-  const loadChannels = async () => {
-    try {
-      const response = await fetch('/api/alert-preferences/channels', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
+  
       if (response.ok) {
         const data = await response.json();
         setChannels(data.data);
@@ -202,14 +188,7 @@ const defaultPreferences: AlertPreferences = {
     }
   };
 
-  const loadCategories = async () => {
-    try {
-      const response = await fetch('/api/alert-preferences/categories', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
+  
       if (response.ok) {
         const data = await response.json();
         setCategories(data.data);
@@ -219,14 +198,7 @@ const defaultPreferences: AlertPreferences = {
     }
   };
 
-  const loadSponsors = async () => {
-    try {
-      const response = await fetch('/api/alert-preferences/sponsors', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
-
+  
       if (response.ok) {
         const data = await response.json();
         setSponsors(data.data);

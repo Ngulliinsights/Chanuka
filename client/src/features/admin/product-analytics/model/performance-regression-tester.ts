@@ -130,8 +130,6 @@ class PerformanceRegressionTester {
    * Test a specific route for performance regressions
    */
   private async testRoute(routePath: string): Promise<PerformanceTestResult> {
-    const startTime = performance.now();
-
     // Simulate navigation and measurement
     const metrics = await this.measureRoutePerformance(routePath);
     const baseline = this.baselines.get(routePath);
@@ -291,7 +289,9 @@ class PerformanceRegressionTester {
 }
 
 // Export singleton instance
-export const performanceRegressionTester = PerformanceRegressionTester.getInstance();
-
-// Export types
-export type { PerformanceBaseline, PerformanceTestResult, PerformanceRegression };
+export type {
+  // Export types
+  PerformanceBaseline,
+  PerformanceTestResult,
+  PerformanceRegression,
+};

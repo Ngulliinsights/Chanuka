@@ -1,7 +1,7 @@
-import { MessageCircle, Users, TrendingUp, Award, Plus, Filter, RefreshCw } from 'lucide-react';
+import { MessageCircle, TrendingUp, Award, Filter, RefreshCw } from 'lucide-react';
 import React, { useState } from 'react';
 
-import { DiscussionThread, CommentForm } from '@client/features/community/ui';
+import { DiscussionThread } from '@client/features/community/ui';
 import {
   Card,
   CardContent,

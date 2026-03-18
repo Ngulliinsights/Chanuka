@@ -16,11 +16,15 @@ import {
   ExternalLink,
   Star,
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system/typography/Card';
 import { EngagementHistoryItem } from '@client/lib/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';

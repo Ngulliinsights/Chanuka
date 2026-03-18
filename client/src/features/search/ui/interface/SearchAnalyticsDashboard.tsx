@@ -17,7 +17,6 @@ import {
   RefreshCw,
   Download,
   Filter,
-  Calendar,
 } from 'lucide-react';
 import React, { useState } from 'react';
 
@@ -33,7 +32,6 @@ import {
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { useToast } from '@client/lib/hooks/use-toast.ts';
-import { logger } from '@client/lib/utils/logger.ts';
 
 interface SearchAnalyticsData {
   overview: {

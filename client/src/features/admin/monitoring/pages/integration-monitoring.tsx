@@ -6,7 +6,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
-import { LoadingSpinner } from '@client/lib/design-system';
+
 import { Activity, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 interface IntegrationStatus {
@@ -23,22 +23,22 @@ const mockIntegrations: IntegrationStatus[] = [
     status: 'healthy',
     lastCheck: new Date().toISOString(),
     responseTime: 120,
-    uptime: 99.9
+    uptime: 99.9,
   },
   {
     name: 'Bills Database',
     status: 'healthy',
     lastCheck: new Date().toISOString(),
     responseTime: 85,
-    uptime: 99.8
+    uptime: 99.8,
   },
   {
     name: 'User Authentication',
     status: 'degraded',
     lastCheck: new Date().toISOString(),
     responseTime: 450,
-    uptime: 98.5
-  }
+    uptime: 98.5,
+  },
 ];
 
 function getStatusIcon(status: IntegrationStatus['status']) {
@@ -121,8 +121,11 @@ export default function IntegrationMonitoringDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {mockIntegrations.map((integration) => (
-              <div key={integration.name} className="flex items-center justify-between p-4 border rounded-lg">
+            {mockIntegrations.map(integration => (
+              <div
+                key={integration.name}
+                className="flex items-center justify-between p-4 border rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   {getStatusIcon(integration.status)}
                   <div>
@@ -148,7 +151,8 @@ export default function IntegrationMonitoringDashboard() {
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          This is a placeholder monitoring dashboard. In production, this would connect to real monitoring services.
+          This is a placeholder monitoring dashboard. In production, this would connect to real
+          monitoring services.
         </AlertDescription>
       </Alert>
     </div>

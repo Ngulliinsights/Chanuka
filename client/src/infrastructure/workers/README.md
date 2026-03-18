@@ -41,7 +41,7 @@ async function initializeApp() {
     try {
       const registration = await registerServiceWorker({
         scope: '/',
-        updateViaCache: 'none'
+        updateViaCache: 'none',
       });
 
       console.log('Service worker registered:', registration);
@@ -61,7 +61,7 @@ async function clearCache() {
   try {
     const response = await sendMessageToServiceWorker({
       type: 'CLEAR_CACHE',
-      cacheNames: ['api-cache', 'image-cache']
+      cacheNames: ['api-cache', 'image-cache'],
     });
 
     console.log('Cache cleared:', response);
@@ -82,7 +82,7 @@ function NetworkMonitor() {
   useEffect(() => {
     const unsubscribe = onNetworkStatusChange((newStatus) => {
       setStatus(newStatus);
-      
+
       if (newStatus.online) {
         console.log('Back online, syncing data...');
         syncOfflineData();
@@ -111,7 +111,7 @@ async function scheduleBackgroundSync(data) {
     await sendMessageToServiceWorker({
       type: 'BACKGROUND_SYNC',
       tag: 'sync-user-data',
-      data: data
+      data: data,
     });
 
     console.log('Background sync scheduled');

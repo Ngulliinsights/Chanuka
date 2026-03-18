@@ -271,21 +271,4 @@ export function validateInput(
 }
 
 // Predefined validation rules
-export const COMMON_VALIDATION_RULES = {
-  required: {
-    test: (value: string) => value.trim().length > 0,
-    message: 'This field is required',
-  },
-  noSpecialChars: {
-    test: (value: string) => VALIDATION_PATTERNS.noSpecialChars.test(value),
-    message: 'Special characters are not allowed',
-  },
-  alphanumeric: {
-    test: (value: string) => VALIDATION_PATTERNS.alphanumeric.test(value),
-    message: 'Only letters and numbers are allowed',
-  },
-  numeric: {
-    test: (value: string) => VALIDATION_PATTERNS.numeric.test(value),
-    message: 'Only numbers are allowed',
-  },
-};
+export 

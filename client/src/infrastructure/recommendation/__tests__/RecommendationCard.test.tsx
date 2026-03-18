@@ -76,7 +76,9 @@ describe('RecommendationCard', () => {
   });
 
   it('handles click tracking when enabled', () => {
-    renderWithProviders(<RecommendationCard recommendation={mockRecommendation} onClickTracking={true} />);
+    renderWithProviders(
+      <RecommendationCard recommendation={mockRecommendation} onClickTracking={true} />
+    );
 
     const link = screen.getByRole('link');
     fireEvent.click(link);
@@ -86,7 +88,9 @@ describe('RecommendationCard', () => {
   });
 
   it('does not track clicks when disabled', () => {
-    renderWithProviders(<RecommendationCard recommendation={mockRecommendation} onClickTracking={false} />);
+    renderWithProviders(
+      <RecommendationCard recommendation={mockRecommendation} onClickTracking={false} />
+    );
 
     const link = screen.getByRole('link');
     fireEvent.click(link);

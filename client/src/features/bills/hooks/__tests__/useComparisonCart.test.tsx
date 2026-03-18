@@ -1,6 +1,6 @@
 /**
  * useComparisonCart Hook Tests
- * 
+ *
  * Unit tests for the comparison cart hook with proper Redux integration.
  */
 
@@ -57,7 +57,7 @@ describe('useComparisonCart', () => {
         billIds: ['bill-1', 'bill-2'],
         maxBills: 3,
       });
-      
+
       const wrapper = createWrapper(store);
       const { result } = renderHook(() => useComparisonCart(), { wrapper });
 
@@ -217,7 +217,7 @@ describe('useComparisonCart', () => {
       store = createMockStore({
         billIds: ['bill-1', 'bill-2'],
       });
-      
+
       const wrapper = createWrapper(store);
       const { result } = renderHook(() => useComparisonCart(), { wrapper });
 

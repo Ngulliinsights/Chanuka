@@ -27,17 +27,21 @@ export const sponsorsKeys = {
   list: (params: SponsorsQueryParams) => [...sponsorsKeys.lists(), params] as const,
   details: () => [...sponsorsKeys.all, 'detail'] as const,
   detail: (id: string | number) => [...sponsorsKeys.details(), id] as const,
-  affiliations: (sponsorId: string | number) => [...sponsorsKeys.detail(sponsorId), 'affiliations'] as const,
-  transparency: (sponsorId: string | number) => [...sponsorsKeys.detail(sponsorId), 'transparency'] as const,
-  conflicts: (sponsorId: string | number) => [...sponsorsKeys.detail(sponsorId), 'conflicts'] as const,
-  riskProfile: (sponsorId: string | number) => [...sponsorsKeys.detail(sponsorId), 'risk-profile'] as const,
-  trends: (sponsorId: string | number, timeframe: number) => 
+  affiliations: (sponsorId: string | number) =>
+    [...sponsorsKeys.detail(sponsorId), 'affiliations'] as const,
+  transparency: (sponsorId: string | number) =>
+    [...sponsorsKeys.detail(sponsorId), 'transparency'] as const,
+  conflicts: (sponsorId: string | number) =>
+    [...sponsorsKeys.detail(sponsorId), 'conflicts'] as const,
+  riskProfile: (sponsorId: string | number) =>
+    [...sponsorsKeys.detail(sponsorId), 'risk-profile'] as const,
+  trends: (sponsorId: string | number, timeframe: number) =>
     [...sponsorsKeys.detail(sponsorId), 'trends', timeframe] as const,
   metadata: () => [...sponsorsKeys.all, 'metadata'] as const,
   parties: () => [...sponsorsKeys.metadata(), 'parties'] as const,
   constituencies: () => [...sponsorsKeys.metadata(), 'constituencies'] as const,
   statistics: () => [...sponsorsKeys.metadata(), 'statistics'] as const,
-  conflictMapping: (billId?: string | number) => 
+  conflictMapping: (billId?: string | number) =>
     [...sponsorsKeys.all, 'conflict-mapping', billId] as const,
 };
 
@@ -265,7 +269,7 @@ export function useCreateSponsor() {
   return useMutation({
     mutationFn: (sponsorData: Partial<Sponsor>) => sponsorsApiService.createSponsor(sponsorData),
 
-    onSuccess: (newSponsor) => {
+    onSuccess: newSponsor => {
       queryClient.invalidateQueries({ queryKey: sponsorsKeys.lists() });
       queryClient.invalidateQueries({ queryKey: sponsorsKeys.statistics() });
 
@@ -295,10 +299,10 @@ export function useUpdateSponsor(sponsorId: string | number) {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (updateData: Partial<Sponsor>) => 
+    mutationFn: (updateData: Partial<Sponsor>) =>
       sponsorsApiService.updateSponsor(sponsorId, updateData),
 
-    onSuccess: (updatedSponsor) => {
+    onSuccess: updatedSponsor => {
       queryClient.invalidateQueries({ queryKey: sponsorsKeys.detail(sponsorId) });
       queryClient.invalidateQueries({ queryKey: sponsorsKeys.lists() });
 

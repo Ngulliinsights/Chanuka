@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence Page
- * 
+ *
  * Main page for viewing argument intelligence analysis for a bill
  */
 
@@ -11,7 +11,13 @@ import { Brain, TrendingUp, Users, Target } from 'lucide-react';
 import { ArgumentClusterDisplay } from '../ui/ArgumentClusterDisplay';
 import { SentimentHeatmap } from '../ui/SentimentHeatmap';
 import { useArgumentIntelligence } from '../hooks/useArgumentIntelligence';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
 import { analyticsService } from '@client/infrastructure/observability/analytics';
@@ -22,14 +28,10 @@ import { analyticsService } from '@client/infrastructure/observability/analytics
 export function ArgumentIntelligencePage() {
   const { billId } = useParams<{ billId: string }>();
   const [selectedTab, setSelectedTab] = useState('clusters');
-  
-  const {
-    clusters,
-    sentimentData,
-    statistics,
-    isLoading,
-    error,
-  } = useArgumentIntelligence(billId || '');
+
+  const { clusters, sentimentData, statistics, isLoading, error } = useArgumentIntelligence(
+    billId || ''
+  );
 
   // Track page view on mount
   useEffect(() => {
@@ -77,7 +79,9 @@ export function ArgumentIntelligencePage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Total Arguments</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Total Arguments
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -89,7 +93,9 @@ export function ArgumentIntelligencePage() {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-600">Clusters Found</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-600">
+                    Clusters Found
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -106,7 +112,8 @@ export function ArgumentIntelligencePage() {
                 <CardContent>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold">
-                      {statistics.averageQuality ? (statistics.averageQuality * 100).toFixed(0) : 0}%
+                      {statistics.averageQuality ? (statistics.averageQuality * 100).toFixed(0) : 0}
+                      %
                     </span>
                     <TrendingUp className="h-5 w-5 text-green-600" />
                   </div>
@@ -151,7 +158,7 @@ export function ArgumentIntelligencePage() {
               ) : clusters && clusters.length > 0 ? (
                 <ArgumentClusterDisplay
                   clusters={clusters}
-                  onClusterClick={(cluster) => {
+                  onClusterClick={cluster => {
                     analyticsService.trackUserAction({
                       action: 'cluster_click',
                       category: 'argument_intelligence',
@@ -173,7 +180,11 @@ export function ArgumentIntelligencePage() {
 
             <TabsContent value="sentiment">
               {isLoading ? (
-                <LoadingStateManager type="content" state="loading" message="Loading sentiment data..." />
+                <LoadingStateManager
+                  type="content"
+                  state="loading"
+                  message="Loading sentiment data..."
+                />
               ) : error ? (
                 <Card>
                   <CardContent className="py-8">
@@ -206,7 +217,11 @@ export function ArgumentIntelligencePage() {
                 </CardHeader>
                 <CardContent>
                   {isLoading ? (
-                    <LoadingStateManager type="content" state="loading" message="Loading quality metrics..." />
+                    <LoadingStateManager
+                      type="content"
+                      state="loading"
+                      message="Loading quality metrics..."
+                    />
                   ) : statistics ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">

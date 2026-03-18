@@ -390,4 +390,4 @@ export class TouchHandler {
 }
 
 // Singleton instance
-export const touchHandler = TouchHandler.getInstance();
+export 

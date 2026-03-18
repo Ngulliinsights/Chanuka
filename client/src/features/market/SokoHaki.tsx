@@ -1,7 +1,6 @@
 import {
   AlertTriangle,
   CheckCircle,
-  TrendingUp,
   Search,
   ArrowLeft,
   ShieldAlert,
@@ -123,7 +122,6 @@ const SokoHaki = () => {
 
   const calculateVerdict = (commodity: Commodity, price: number): PriceVerdict => {
     const maxAcceptable = commodity.baselinePrice * (1 + commodity.acceptableRange / 100);
-    const overage = price - commodity.baselinePrice;
     const percentageOverage = ((price - commodity.baselinePrice) / commodity.baselinePrice) * 100;
 
     let status: 'NORMAL' | 'SUSPICIOUS' | 'CRITICAL';

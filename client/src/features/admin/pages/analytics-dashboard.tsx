@@ -17,8 +17,6 @@ import {
   RefreshCw,
   Settings,
   Eye,
-  Clock,
-  Zap,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
@@ -318,23 +316,25 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Popular User Paths</h3>
                     <div className="space-y-2">
-                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: unknown, index: number) => (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded"
-                        >
-                          <div className="flex-1">
-                            <div className="font-medium">{path.path.join(' → ')}</div>
-                            <div className="text-sm text-muted-foreground">
-                              {path.frequency} users • {(path.completionRate * 100).toFixed(1)}%
-                              completion
+                      {journeyAnalytics.popularPaths
+                        .slice(0, 5)
+                        .map((path: unknown, index: number) => (
+                          <div
+                            key={index}
+                            className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                          >
+                            <div className="flex-1">
+                              <div className="font-medium">{path.path.join(' → ')}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {path.frequency} users • {(path.completionRate * 100).toFixed(1)}%
+                                completion
+                              </div>
                             </div>
+                            <Badge variant="outline">
+                              {Math.round(path.averageCompletionTime / 1000 / 60)}m avg
+                            </Badge>
                           </div>
-                          <Badge variant="outline">
-                            {Math.round(path.averageCompletionTime / 1000 / 60)}m avg
-                          </Badge>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
 
@@ -470,7 +470,8 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <strong>Current Session:</strong> {currentMetrics.eventCount} events tracked
                   </p>
                   <p>
-                    <strong>Status:</strong> {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}
+                    <strong>Status:</strong>{' '}
+                    {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}
                   </p>
                 </div>
               </div>

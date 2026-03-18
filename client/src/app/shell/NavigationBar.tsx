@@ -43,7 +43,6 @@ interface NotificationItem {
   unread: boolean;
 }
 
-
 // Type Definitions
 interface NavigationBarProps {
   className?: string;
@@ -296,7 +295,7 @@ export const NavigationBar = memo<NavigationBarProps>(
       >
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
           <div className="flex justify-between items-center h-14">
-              {/* Left: Logo and mobile menu */}
+            {/* Left: Logo and mobile menu */}
             <div className="flex items-center">
               {isMobile && (
                 <Button
@@ -329,7 +328,10 @@ export const NavigationBar = memo<NavigationBarProps>(
 
               {/* Main Navigation Menu (desktop) */}
               {!isMobile && (
-                <nav className="hidden md:flex items-center ml-8 space-x-1" aria-label="Primary navigation">
+                <nav
+                  className="hidden md:flex items-center ml-8 space-x-1"
+                  aria-label="Primary navigation"
+                >
                   <Link to="/bills">
                     <Button variant="ghost" size="sm" className="text-sm font-medium">
                       Bills
@@ -434,7 +436,9 @@ export const NavigationBar = memo<NavigationBarProps>(
           onOpenChange={commandPalette.setIsOpen}
           {...(commandPalette.config && { config: commandPalette.config })}
           {...(commandPalette.customCommands && { customCommands: commandPalette.customCommands })}
-          {...(commandPalette.onCommandExecute && { onCommandExecute: commandPalette.onCommandExecute })}
+          {...(commandPalette.onCommandExecute && {
+            onCommandExecute: commandPalette.onCommandExecute,
+          })}
         />
 
         {/* Mobile Navigation Menu */}
@@ -487,9 +491,9 @@ export const NavigationBar = memo<NavigationBarProps>(
                 <LucideIcons.Info className="mr-3 h-5 w-5" />
                 About
               </Link>
-              
+
               <div className="border-t border-gray-200 my-4" />
-              
+
               <Link
                 to="/contact"
                 onClick={toggleMobileMenu}

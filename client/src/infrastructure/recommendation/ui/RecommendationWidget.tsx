@@ -1,6 +1,6 @@
 /**
  * Recommendation Widget Component
- * 
+ *
  * Main widget for displaying recommendations with loading and error states
  */
 
@@ -45,9 +45,7 @@ export function RecommendationWidget({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {title}
-          </h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
         </div>
         {actions && <div>{actions}</div>}
       </div>

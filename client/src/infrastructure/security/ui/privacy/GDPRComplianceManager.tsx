@@ -126,9 +126,7 @@ export default function GDPRComplianceManager() {
     }
   }, []);
 
-  const loadGDPRData = async () => {
-    if (!mockAuth.user) return;
-
+  
     setLoading(true);
     try {
       // Initialize GDPR rights with current status
@@ -326,9 +324,7 @@ export default function GDPRComplianceManager() {
     }
   };
 
-  const handleDataAccess = async () => {
-    if (!mockAuth.user) return;
-
+  
     const confirmed = window.confirm(
       "This will generate a comprehensive report of all your personal data. You will receive an email when it's ready. Continue?"
     );
@@ -354,9 +350,7 @@ export default function GDPRComplianceManager() {
     console.log('Data access request submitted for user:', mockAuth.user.id);
   };
 
-  const handleDataPortability = async () => {
-    if (!mockAuth.user) return;
-
+  
     const format = window.prompt('Choose export format (json, csv, xml):', 'json');
     if (!format || !['json', 'csv', 'xml'].includes(format)) return;
 
@@ -373,9 +367,7 @@ export default function GDPRComplianceManager() {
     console.log('Data portability request submitted with format:', format);
   };
 
-  const handleDataErasure = async () => {
-    if (!mockAuth.user) return;
-
+  
     const confirmed = window.confirm(
       'WARNING: This will permanently delete your account and all associated data. This action cannot be undone. Are you sure?'
     );
@@ -406,11 +398,7 @@ export default function GDPRComplianceManager() {
     console.log('Data erasure request submitted for user:', mockAuth.user.id);
   };
 
-  const handleProcessingRestriction = async () => {
-    const reason = window.prompt(
-      'Please specify the reason for restricting processing:\n1. Accuracy dispute\n2. Unlawful processing\n3. No longer needed\n4. Objection pending\n\nEnter number (1-4):'
-    );
-
+  
     if (!reason || !['1', '2', '3', '4'].includes(reason)) return;
 
     const reasons = {
@@ -435,11 +423,7 @@ export default function GDPRComplianceManager() {
     );
   };
 
-  const handleProcessingObjection = async () => {
-    const grounds = window.prompt(
-      'Please specify your grounds for objection (e.g., "I object to direct marketing" or "Processing not necessary for legitimate interests"):'
-    );
-
+  
     if (!grounds) return;
 
     // Mark the objection as pending review

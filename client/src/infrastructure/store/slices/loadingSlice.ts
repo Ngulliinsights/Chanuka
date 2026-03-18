@@ -582,27 +582,14 @@ export const {
 } = loadingSlice.actions;
 
 // Selectors
-export const selectLoadingOperation = (state: { loading: LoadingStateData }, id: string) =>
-  state.loading.operations[id];
-
-export const selectOperationsByType = (state: { loading: LoadingStateData }, type: LoadingType) =>
-  Object.values(state.loading.operations).filter(op => op.type === type);
-
-export const selectOperationsByPriority = (
-  state: { loading: LoadingStateData },
-  priority: LoadingPriority
-) => Object.values(state.loading.operations).filter(op => op.priority === priority);
-
+export 
+export 
+export 
 export const selectActiveOperationsCount = (state: { loading: LoadingStateData }) =>
   Object.keys(state.loading.operations).length;
 
-export const selectShouldShowGlobalLoader = (state: { loading: LoadingStateData }) =>
-  state.loading.highPriorityLoading ||
-  (state.loading.globalLoading && selectActiveOperationsCount(state) > 2);
-
-export const selectEstimatedTimeRemaining = (state: { loading: LoadingStateData }, id: string) => {
-  const operation = state.loading.operations[id];
-  if (!operation) return null;
+export 
+export   if (!operation) return null;
 
   const elapsed = Date.now() - operation.startTime;
   const timeout = operation.timeout || state.loading.adaptiveSettings.defaultTimeout;
@@ -611,17 +598,10 @@ export const selectEstimatedTimeRemaining = (state: { loading: LoadingStateData 
   return remaining > 0 ? remaining : null;
 };
 
-export const selectLoadingStats = (state: { loading: LoadingStateData }) => state.loading.stats;
-
-export const selectConnectionInfo = (state: { loading: LoadingStateData }) =>
-  state.loading.connectionInfo;
-
-export const selectAdaptiveSettings = (state: { loading: LoadingStateData }) =>
-  state.loading.adaptiveSettings;
-
-export const selectAssetLoadingProgress = (state: { loading: LoadingStateData }) =>
-  state.loading.assetLoadingProgress;
-
+export 
+export 
+export 
+export 
 // Type exports
 export type {
   LoadingStateData,

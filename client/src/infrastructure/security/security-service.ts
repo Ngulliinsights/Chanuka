@@ -415,24 +415,12 @@ export class SecurityService {
 }
 
 // Export validation schemas for easy access (if available)
-export const ValidationSchemas = {
-  User: {
-    registration: {
-      email: { type: 'string', format: 'email', required: true },
-      password: { type: 'string', minLength: 8, required: true },
-      firstName: { type: 'string', required: true },
-      lastName: { type: 'string', required: true },
-      acceptTerms: { type: 'boolean', required: true },
-    },
-    login: {
-      email: { type: 'string', format: 'email', required: true },
-      password: { type: 'string', required: true },
-    },
-  },
+export {
+  // Export singleton instance
+  // Export individual services for direct access if needed
+  cspNonceManager,
+  inputSanitizer,
+  csrfProtection,
+  clientRateLimiter,
+  vulnerabilityScanner,
 };
-
-// Export singleton instance
-export const securityService = SecurityService.getInstance();
-
-// Export individual services for direct access if needed
-export { cspNonceManager, inputSanitizer, csrfProtection, clientRateLimiter, vulnerabilityScanner };

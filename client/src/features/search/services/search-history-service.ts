@@ -121,4 +121,4 @@ class SearchHistoryService {
   }
 }
 
-export const searchHistoryService = new SearchHistoryService();
+export 

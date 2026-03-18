@@ -845,5 +845,4 @@ export class ServiceErrorFactory {
 }
 
 // Export default error logger and handler
-export const globalErrorHandler = GlobalErrorHandler.getInstance();
-export const errorRecoveryManager = ErrorRecoveryManager.getInstance();
+export export 

@@ -102,11 +102,10 @@ export default function BillCard({
   const [isHovered, setIsHovered] = useState(false);
   const [quickActionFocus, setQuickActionFocus] = useState<string | null>(null);
   const { toggleBill, hasBill } = useComparisonCart();
-  
+
   const isInComparisonCart = hasBill(String(bill.id));
 
-  const statusColor =
-    statusColors[bill.status] || statusColors.introduced;
+  const statusColor = statusColors[bill.status] || statusColors.introduced;
 
   // Check for conflicts of interest
   const hasConflicts = bill.sponsors?.some(
@@ -148,7 +147,7 @@ export default function BillCard({
         <div className="absolute top-2 left-2 z-10">
           <Checkbox
             checked={isSelected || isInComparisonCart}
-            onCheckedChange={(checked) => {
+            onCheckedChange={checked => {
               toggleBill(String(bill.id));
               onSelectionChange?.(String(bill.id), checked as boolean);
             }}
@@ -227,11 +226,13 @@ export default function BillCard({
       )}
 
       <CardHeader className="pb-3">
-        <div className={cn(
-          'flex items-start justify-between gap-2',
-          showQuickActions && 'pr-20',
-          showSelection && 'pl-8'
-        )}>
+        <div
+          className={cn(
+            'flex items-start justify-between gap-2',
+            showQuickActions && 'pr-20',
+            showSelection && 'pl-8'
+          )}
+        >
           <div className="space-y-2 flex-1">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span className="font-mono">{bill.billNumber}</span>
@@ -274,9 +275,7 @@ export default function BillCard({
 
         {/* Status Badge */}
         <div className="flex flex-wrap gap-2">
-          <Badge className={statusColor}>
-            {statusLabels[bill.status] || bill.status}
-          </Badge>
+          <Badge className={statusColor}>{statusLabels[bill.status] || bill.status}</Badge>
 
           {hasConflicts && (
             <Badge className="bg-red-100 text-red-800">

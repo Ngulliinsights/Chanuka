@@ -16,8 +16,16 @@
 import { privacyAnalyticsApiService } from '@client/infrastructure/api/privacy';
 import { logger } from '@client/lib/utils/logger';
 import { privacyUtils, privacyCompliance } from '@client/lib/utils/privacy-compliance';
-import type { AnalyticsEvent, AnalyticsConfig, UserConsent, AnalyticsSystemMetrics as AnalyticsMetrics } from '@client/lib/types/analytics';
-import type { DataExportRequest as DataExportResponse, DataDeletionRequest as DataDeletionResponse } from '@client/infrastructure/auth';
+import type {
+  AnalyticsEvent,
+  AnalyticsConfig,
+  UserConsent,
+  AnalyticsSystemMetrics as AnalyticsMetrics,
+} from '@client/lib/types/analytics';
+import type {
+  DataExportRequest as DataExportResponse,
+  DataDeletionRequest as DataDeletionResponse,
+} from '@client/infrastructure/auth';
 
 // ============================================================================
 // Types & Interfaces
@@ -250,7 +258,9 @@ class SafeApiService {
     this.api = this.createSafeApiWrapper(privacyAnalyticsApiService);
   }
 
-  private createSafeApiWrapper(apiService: typeof privacyAnalyticsApiService): IPrivacyAnalyticsApi {
+  private createSafeApiWrapper(
+    apiService: typeof privacyAnalyticsApiService
+  ): IPrivacyAnalyticsApi {
     // Create a wrapper that safely handles optional methods
     return {
       updateUserConsent: apiService.updateUserConsent?.bind(apiService),
@@ -317,7 +327,9 @@ class SafeApiService {
     } else {
       // If neither exists, we just log locally correctly or silently fail (stub behavior)
       // throw new Error('No sendEvents method available on API service');
-      logger.debug('No sendEvents method on API, events not sent to backend', { count: events.length });
+      logger.debug('No sendEvents method on API, events not sent to backend', {
+        count: events.length,
+      });
     }
   }
 
@@ -328,22 +340,22 @@ class SafeApiService {
         return response;
       }
       // Return a compatible empty response
-      return { 
-        success: false, 
-        data: {}, 
-        format: 'json', 
-        exportedAt: new Date().toISOString() 
+      return {
+        success: false,
+        data: {},
+        format: 'json',
+        exportedAt: new Date().toISOString(),
       };
     } catch (error) {
       logger.warn('API exportUserData failed', {
         component: 'SafeApiService',
         error: this.formatError(error),
       });
-      return { 
-        success: false, 
-        data: {}, 
-        format: 'json', 
-        exportedAt: new Date().toISOString() 
+      return {
+        success: false,
+        data: {},
+        format: 'json',
+        exportedAt: new Date().toISOString(),
       };
     }
   }
@@ -354,20 +366,20 @@ class SafeApiService {
         const response = await this.api.deleteUserData(userId);
         return response;
       }
-      return { 
-        success: false, 
-        message: 'Not implemented', 
-        deletedAt: new Date().toISOString() 
+      return {
+        success: false,
+        message: 'Not implemented',
+        deletedAt: new Date().toISOString(),
       };
     } catch (error) {
       logger.warn('API deleteUserData failed', {
         component: 'SafeApiService',
         error: this.formatError(error),
       });
-      return { 
-        success: false, 
-        message: 'Failed', 
-        deletedAt: new Date().toISOString() 
+      return {
+        success: false,
+        message: 'Failed',
+        deletedAt: new Date().toISOString(),
       };
     }
   }
@@ -654,14 +666,20 @@ export class PrivacyAnalyticsService {
     const metrics = data as Record<string, unknown>;
     return {
       totalEvents: typeof metrics.totalEvents === 'number' ? metrics.totalEvents : undefined,
-      anonymizedEvents: typeof metrics.anonymizedEvents === 'number' ? metrics.anonymizedEvents : undefined,
-      consentedEvents: typeof metrics.consentedEvents === 'number' ? metrics.consentedEvents : undefined,
-      categoriesTracked: Array.isArray(metrics.categoriesTracked) ? metrics.categoriesTracked : undefined,
-      retentionCompliance: typeof metrics.retentionCompliance === 'boolean' ? metrics.retentionCompliance : undefined,
+      anonymizedEvents:
+        typeof metrics.anonymizedEvents === 'number' ? metrics.anonymizedEvents : undefined,
+      consentedEvents:
+        typeof metrics.consentedEvents === 'number' ? metrics.consentedEvents : undefined,
+      categoriesTracked: Array.isArray(metrics.categoriesTracked)
+        ? metrics.categoriesTracked
+        : undefined,
+      retentionCompliance:
+        typeof metrics.retentionCompliance === 'boolean' ? metrics.retentionCompliance : undefined,
       lastFlush: typeof metrics.lastFlush === 'string' ? metrics.lastFlush : undefined,
       queueSize: typeof metrics.queueSize === 'number' ? metrics.queueSize : undefined,
       failedSends: typeof metrics.failedSends === 'number' ? metrics.failedSends : undefined,
-      circuitBreakerOpen: typeof metrics.circuitBreakerOpen === 'boolean' ? metrics.circuitBreakerOpen : undefined,
+      circuitBreakerOpen:
+        typeof metrics.circuitBreakerOpen === 'boolean' ? metrics.circuitBreakerOpen : undefined,
     };
   }
 
@@ -687,7 +705,7 @@ export class PrivacyAnalyticsService {
       const apiResponse = await this.apiService.deleteUserData(userId);
 
       // DataDeletionResponse doesn't return count, so we default to 0 or unknown
-      const eventsDeleted = 0; 
+      const eventsDeleted = 0;
       const success = apiResponse.success;
 
       logger.info('User data deleted via API', {
@@ -1026,10 +1044,8 @@ export class PrivacyAnalyticsService {
 }
 
 // Export singleton instance
-export const privacyAnalyticsService = new PrivacyAnalyticsService();
-
-// Export types
 export type {
+  // Export types
   AnalyticsEvent,
   AnalyticsConfig,
   UserConsent,

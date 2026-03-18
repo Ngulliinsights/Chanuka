@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence Types
- * 
+ *
  * Type definitions for argument intelligence features including
  * clustering, sentiment analysis, quality metrics, and position tracking.
  */

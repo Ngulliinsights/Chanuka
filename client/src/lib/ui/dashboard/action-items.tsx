@@ -10,7 +10,9 @@ import { validateActionItem } from './validation';
 
 export const ActionItems = React.memo<DashboardComponentProps>(
   ({ className = '', config, onError, onDataChange }) => {
-    const { data, loading, error, actions, recovery } = useDashboard(config as Partial<DashboardAppConfig>);
+    const { data, loading, error, actions, recovery } = useDashboard(
+      config as Partial<DashboardAppConfig>
+    );
     useDashboardActions(data.actionItems);
     const [showCompleted, setShowCompleted] = React.useState(
       (config as { showCompletedActions?: boolean })?.showCompletedActions ?? false

@@ -2,7 +2,6 @@
 // FLAG LIST - Display all feature flags
 // ============================================================================
 
-import React from 'react';
 import { useFeatureFlags, useToggleFlag, useDeleteFlag } from '../hooks/useFeatureFlags';
 import type { FeatureFlag } from '../types';
 
@@ -61,7 +60,7 @@ export function FlagList({ onEdit, onViewAnalytics }: FlagListProps) {
 
   return (
     <div className="space-y-4">
-      {flags.map((flag) => (
+      {flags.map(flag => (
         <div
           key={flag.id}
           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
@@ -72,9 +71,7 @@ export function FlagList({ onEdit, onViewAnalytics }: FlagListProps) {
                 <h3 className="text-lg font-semibold text-gray-900">{flag.name}</h3>
                 <span
                   className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    flag.enabled
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-gray-100 text-gray-800'
+                    flag.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                   }`}
                 >
                   {flag.enabled ? 'Enabled' : 'Disabled'}

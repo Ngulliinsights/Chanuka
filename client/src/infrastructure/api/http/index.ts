@@ -1,6 +1,6 @@
 /**
  * HTTP Client Sub-Module
- * 
+ *
  * Consolidated HTTP client functionality including:
  * - HTTP client with request methods (GET, POST, PUT, DELETE, PATCH)
  * - Request/response interceptors
@@ -11,7 +11,7 @@
  */
 
 // Main HTTP client (already in parent api directory)
-export { 
+export {
   UnifiedApiClientImpl,
   globalApiClient,
   createAuthRequestInterceptor,
@@ -70,10 +70,7 @@ export {
 } from '../circuit-breaker-monitor';
 
 // Request deduplication
-export {
-  RequestDeduplicator,
-  requestDeduplicator,
-} from './request-deduplicator';
+export { RequestDeduplicator, requestDeduplicator } from './request-deduplicator';
 
 // Interceptor types
 export type {
@@ -85,9 +82,4 @@ export type {
 } from '../types/interceptors';
 
 // HTTP types
-export type {
-  ApiRequest,
-  ApiResponse,
-  RequestOptions,
-  HttpMethod,
-} from '../types';
+export type { ApiRequest, ApiResponse, RequestOptions, HttpMethod } from '../types';

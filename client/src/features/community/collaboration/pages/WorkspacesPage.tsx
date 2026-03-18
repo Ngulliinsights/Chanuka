@@ -92,7 +92,7 @@ export default function WorkspacesPage() {
                 <Input
                   id="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={e => setName(e.target.value)}
                   placeholder="My Workspace"
                 />
               </div>
@@ -101,18 +101,14 @@ export default function WorkspacesPage() {
                 <Textarea
                   id="description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={e => setDescription(e.target.value)}
                   placeholder="What is this workspace for?"
                   rows={3}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="public">Make public</Label>
-                <Switch
-                  id="public"
-                  checked={isPublic}
-                  onCheckedChange={setIsPublic}
-                />
+                <Switch id="public" checked={isPublic} onCheckedChange={setIsPublic} />
               </div>
             </div>
             <div className="flex justify-end gap-2">
@@ -132,12 +128,8 @@ export default function WorkspacesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {workspaces.map((workspace) => (
-            <WorkspaceCard
-              key={workspace.id}
-              workspace={workspace}
-              onDelete={handleDelete}
-            />
+          {workspaces.map(workspace => (
+            <WorkspaceCard key={workspace.id} workspace={workspace} onDelete={handleDelete} />
           ))}
         </div>
       )}

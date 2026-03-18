@@ -27,26 +27,24 @@ export function RolloutControls({ flag }: RolloutControlsProps) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Rollout Controls</h3>
-      
+
       <div className="space-y-4">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700">
-              Rollout Percentage
-            </label>
+            <label className="text-sm font-medium text-gray-700">Rollout Percentage</label>
             <span className="text-2xl font-bold text-blue-600">{percentage}%</span>
           </div>
-          
+
           <input
             type="range"
             min="0"
             max="100"
             step="5"
             value={percentage}
-            onChange={(e) => setPercentage(parseInt(e.target.value, 10))}
+            onChange={e => setPercentage(parseInt(e.target.value, 10))}
             className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer"
           />
-          
+
           <div className="flex justify-between text-xs text-gray-500 mt-1">
             <span>0%</span>
             <span>25%</span>

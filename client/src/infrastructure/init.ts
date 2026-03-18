@@ -1,14 +1,14 @@
 /**
  * Infrastructure Initialization Module
- * 
+ *
  * This module provides centralized initialization for all infrastructure services
  * using the dependency injection container. Services are initialized in three phases
  * to ensure proper dependency order and eliminate circular dependencies.
- * 
+ *
  * Phase 1 (CORE): Services with no dependencies
  * Phase 2 (FOUNDATION): Services that depend on core services
  * Phase 3 (BUSINESS): Services that depend on foundation services
- * 
+ *
  * Requirements: 6.1, 6.2, 6.3, 6.4
  */
 
@@ -19,8 +19,6 @@ import {
   createServiceFactory,
   ServicePhase,
   initializeInThreePhases,
-  type IDIContainer,
-  type PhasedServiceFactory,
 } from './consolidation/di-container';
 
 // Import core services
@@ -68,26 +66,20 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
 
   factories.set(
     'EventBus',
-    createServiceFactory(
-      () => eventBus,
-      {
-        dependencies: [],
-        singleton: true,
-        phase: ServicePhase.CORE,
-      }
-    )
+    createServiceFactory(() => eventBus, {
+      dependencies: [],
+      singleton: true,
+      phase: ServicePhase.CORE,
+    })
   );
 
   factories.set(
     'Storage',
-    createServiceFactory(
-      () => secureStorage,
-      {
-        dependencies: [],
-        singleton: true,
-        phase: ServicePhase.CORE,
-      }
-    )
+    createServiceFactory(() => secureStorage, {
+      dependencies: [],
+      singleton: true,
+      phase: ServicePhase.CORE,
+    })
   );
 
   // ============================================================================
@@ -169,11 +161,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
         return errorHandler;
       },
       {
-        dependencies: [
-          ServiceTokens.Logger,
-          ServiceTokens.EventBus,
-          ServiceTokens.Observability,
-        ],
+        dependencies: [ServiceTokens.Logger, ServiceTokens.EventBus, ServiceTokens.Observability],
         singleton: true,
         phase: ServicePhase.BUSINESS,
       }
@@ -188,11 +176,7 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
         return globalApiClient;
       },
       {
-        dependencies: [
-          ServiceTokens.Cache,
-          ServiceTokens.ErrorHandler,
-          ServiceTokens.Logger,
-        ],
+        dependencies: [ServiceTokens.Cache, ServiceTokens.ErrorHandler, ServiceTokens.Logger],
         singleton: true,
         phase: ServicePhase.BUSINESS,
       }
@@ -219,14 +203,14 @@ function createServiceFactories(): Map<string, PhasedServiceFactory> {
 
 /**
  * Initialize all infrastructure services using the DI container
- * 
+ *
  * This function initializes services in three phases:
  * 1. Core: EventBus, Storage
  * 2. Foundation: Logger, Cache, Observability
  * 3. Business: ErrorHandler, APIClient, Store
- * 
+ *
  * Requirements: 6.1, 6.2, 6.3
- * 
+ *
  * @returns ServiceRegistry containing all initialized services
  */
 export function initializeInfrastructure(): ServiceRegistry {
@@ -247,7 +231,7 @@ export function initializeInfrastructure(): ServiceRegistry {
 
 /**
  * Get a service from the registry
- * 
+ *
  * @param registry - Service registry
  * @param serviceName - Name of the service to retrieve
  * @returns The service instance or undefined if not found
@@ -258,7 +242,7 @@ export function getService<T>(registry: ServiceRegistry, serviceName: string): T
 
 /**
  * Check if all services are initialized
- * 
+ *
  * @param registry - Service registry
  * @returns True if all services are initialized
  */

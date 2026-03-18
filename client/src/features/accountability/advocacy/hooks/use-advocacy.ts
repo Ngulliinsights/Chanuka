@@ -1,6 +1,6 @@
 /**
  * Advocacy Coordination Hooks
- * 
+ *
  * React Query hooks for advocacy features
  */
 
@@ -29,7 +29,13 @@ export interface ActionItem {
   id: string;
   campaign_id: string;
   user_id: string;
-  actionType: 'contact_representative' | 'attend_hearing' | 'submit_comment' | 'share_content' | 'organize_meeting' | 'petition_signature';
+  actionType:
+    | 'contact_representative'
+    | 'attend_hearing'
+    | 'submit_comment'
+    | 'share_content'
+    | 'organize_meeting'
+    | 'petition_signature';
   title: string;
   description: string;
   status: 'pending' | 'in_progress' | 'completed' | 'skipped';
@@ -42,7 +48,12 @@ export interface ActionItem {
 export interface ImpactMetric {
   id: string;
   campaign_id: string;
-  metricType: 'bill_amended' | 'committee_feedback' | 'media_attention' | 'legislative_response' | 'public_awareness';
+  metricType:
+    | 'bill_amended'
+    | 'committee_feedback'
+    | 'media_attention'
+    | 'legislative_response'
+    | 'public_awareness';
   value: number;
   description: string;
   attributionScore: number;
@@ -105,7 +116,7 @@ export function useCreateCampaign() {
       queryClient.invalidateQueries({ queryKey: ['campaigns'] });
       logger.info('Campaign created successfully', { component: 'useCreateCampaign' });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Failed to create campaign', {
         component: 'useCreateCampaign',
         error: error instanceof Error ? error.message : String(error),

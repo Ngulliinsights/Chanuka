@@ -20,7 +20,6 @@ import {
   RefreshCw,
   MessageSquare,
 } from 'lucide-react';
-import React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
 import { cn } from '@client/lib/design-system';

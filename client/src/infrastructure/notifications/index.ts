@@ -8,4 +8,3 @@ export * from './model';
 export { notificationsService } from './services/notifications';
 export type { NotificationPreference, UserNotifications } from './services/notifications';
 export * from './hooks';
-

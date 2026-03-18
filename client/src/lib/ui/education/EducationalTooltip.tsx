@@ -163,67 +163,7 @@ interface TooltipComponentProps {
   children: React.ReactNode;
 }
 
-export const LegalTermTooltip = ({ children }: TooltipComponentProps) => (
-  <EducationalTooltip
-    term="Legal Precedent"
-    definition="A legal decision or principle established in a previous case that is either binding or persuasive for future similar cases."
-    context="legal"
-    examples={[
-      'Supreme Court rulings that establish constitutional interpretations',
-      'High Court decisions that guide lower court judgments',
-    ]}
-    relatedTerms={['Case Law', 'Stare Decisis', 'Judicial Review']}
-    learnMoreUrl="https://example.com/legal-precedents"
-  >
-    {children}
-  </EducationalTooltip>
-);
-
-export const ConstitutionalTermTooltip = ({ children }: TooltipComponentProps) => (
-  <EducationalTooltip
-    term="Constitutional Review"
-    definition="The process of examining whether laws, policies, or government actions comply with the constitution."
-    context="constitutional"
-    examples={[
-      'Judicial review of new legislation',
-      'Constitutional court challenges to government policies',
-    ]}
-    relatedTerms={['Judicial Review', 'Constitutional Court', 'Bill of Rights']}
-    learnMoreUrl="https://example.com/constitutional-review"
-  >
-    {children}
-  </EducationalTooltip>
-);
-
-export const ProceduralTermTooltip = ({ children }: TooltipComponentProps) => (
-  <EducationalTooltip
-    term="Committee Stage"
-    definition="The phase where a parliamentary committee examines a bill in detail, hears evidence, and may propose amendments."
-    context="procedural"
-    examples={[
-      'Health Committee reviewing healthcare legislation',
-      'Finance Committee examining budget bills',
-    ]}
-    relatedTerms={['Parliamentary Procedure', 'Bill Reading', 'Amendment Process']}
-    learnMoreUrl="https://example.com/committee-stage"
-  >
-    {children}
-  </EducationalTooltip>
-);
-
-export const CivicTermTooltip = ({ children }: TooltipComponentProps) => (
-  <EducationalTooltip
-    term="Public Participation"
-    definition="The process by which citizens can engage with and influence government decision-making and policy development."
-    context="civic"
-    examples={[
-      'Public comment periods on proposed regulations',
-      'Town halls and community consultations',
-      'Citizen advisory committees',
-    ]}
-    relatedTerms={['Civic Engagement', 'Democratic Participation', 'Public Consultation']}
-    learnMoreUrl="https://example.com/public-participation"
-  >
-    {children}
-  </EducationalTooltip>
-);
+export 
+export 
+export 
+export 

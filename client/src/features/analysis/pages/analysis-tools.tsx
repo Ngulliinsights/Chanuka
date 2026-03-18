@@ -2,67 +2,68 @@ import { BarChart3, TrendingUp, Search, Users, Download, Filter } from 'lucide-r
 
 /**
  * Analysis Tools Page
- * 
+ *
  * Provides access to various legislative analysis tools
  */
 export default function AnalysisToolsPage() {
   const tools = [
     {
       title: 'Comprehensive Bill Analysis',
-      description: 'Constitutional analysis, stakeholder impact, transparency scores, and public interest assessment for any bill',
+      description:
+        'Constitutional analysis, stakeholder impact, transparency scores, and public interest assessment for any bill',
       icon: BarChart3,
       link: '/bills',
-      status: 'Available'
+      status: 'Available',
     },
     {
       title: 'Pretext Detection',
       description: 'Detect hidden agendas and pretexts in legislative language',
       icon: Search,
       link: '/analysis/pretext-detection',
-      status: 'Available'
+      status: 'Available',
     },
     {
       title: 'Advanced Filters',
       description: 'Use advanced filtering to find specific legislation',
       icon: Filter,
       link: '/bills?advanced=true',
-      status: 'Available'
+      status: 'Available',
     },
     {
       title: 'Bill Impact Analysis',
       description: 'Analyze the potential impact of bills on different sectors and communities',
       icon: TrendingUp,
       link: '/analysis/impact',
-      status: 'Coming Soon'
+      status: 'Coming Soon',
     },
     {
       title: 'Legislative Trends',
       description: 'Track trends in legislation across counties and the national assembly',
       icon: BarChart3,
       link: '/analysis/trends',
-      status: 'Coming Soon'
+      status: 'Coming Soon',
     },
     {
       title: 'Bill Comparison',
       description: 'Compare multiple bills side-by-side to understand differences',
       icon: Search,
       link: '/analysis/compare',
-      status: 'Available'
+      status: 'Available',
     },
     {
       title: 'Stakeholder Analysis',
       description: 'Identify and analyze stakeholders affected by legislation',
       icon: Users,
       link: '/analysis/stakeholders',
-      status: 'Coming Soon'
+      status: 'Coming Soon',
     },
     {
       title: 'Data Export',
       description: 'Export legislative data for custom analysis',
       icon: Download,
       link: '/analysis/export',
-      status: 'Coming Soon'
-    }
+      status: 'Coming Soon',
+    },
   ];
 
   return (
@@ -96,11 +97,13 @@ export default function AnalysisToolsPage() {
                   <h3 className="text-xl font-semibold mb-2">{tool.title}</h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-4">{tool.description}</p>
                   <div className="flex items-center justify-between">
-                    <span className={`text-sm font-medium ${
-                      tool.status === 'Available' 
-                        ? 'text-green-600 dark:text-green-400' 
-                        : 'text-orange-600 dark:text-orange-400'
-                    }`}>
+                    <span
+                      className={`text-sm font-medium ${
+                        tool.status === 'Available'
+                          ? 'text-green-600 dark:text-green-400'
+                          : 'text-orange-600 dark:text-orange-400'
+                      }`}
+                    >
                       {tool.status}
                     </span>
                     {tool.status === 'Available' && (

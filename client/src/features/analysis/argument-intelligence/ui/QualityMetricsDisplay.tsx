@@ -1,10 +1,9 @@
 /**
  * Quality Metrics Display Component
- * 
+ *
  * Displays the 5 quality dimensions for arguments.
  */
 
-import React from 'react';
 import type { QualityMetrics } from '../types';
 
 interface QualityMetricsDisplayProps {
@@ -23,7 +22,13 @@ export function QualityMetricsDisplay({
     { key: 'evidence', label: 'Evidence', value: metrics.evidence, icon: '📊', color: 'green' },
     { key: 'reasoning', label: 'Reasoning', value: metrics.reasoning, icon: '🧠', color: 'purple' },
     { key: 'relevance', label: 'Relevance', value: metrics.relevance, icon: '🎯', color: 'orange' },
-    { key: 'constructiveness', label: 'Constructiveness', value: metrics.constructiveness, icon: '🤝', color: 'teal' },
+    {
+      key: 'constructiveness',
+      label: 'Constructiveness',
+      value: metrics.constructiveness,
+      icon: '🤝',
+      color: 'teal',
+    },
   ];
 
   const getColorClasses = (color: string) => {
@@ -52,26 +57,24 @@ export function QualityMetricsDisplay({
       </div>
 
       <div className="space-y-4">
-        {metricItems.map((item) => {
+        {metricItems.map(item => {
           const colors = getColorClasses(item.color);
           const percentage = item.value * 100;
-          
+
           return (
             <div key={item.key} className="space-y-1">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{item.icon}</span>
                   {showLabels && (
-                    <span className="text-sm font-medium text-gray-700">
-                      {item.label}
-                    </span>
+                    <span className="text-sm font-medium text-gray-700">{item.label}</span>
                   )}
                 </div>
                 <span className={`text-sm font-semibold ${colors.text}`}>
                   {percentage.toFixed(0)}%
                 </span>
               </div>
-              
+
               <div className={`w-full h-3 ${colors.bg} rounded-full overflow-hidden`}>
                 <div
                   className={`h-full ${colors.bar} transition-all duration-500 ease-out`}
@@ -87,7 +90,7 @@ export function QualityMetricsDisplay({
       <div className="mt-6 pt-4 border-t">
         <p className="text-xs font-medium text-gray-600 mb-3">Quality Profile</p>
         <div className="grid grid-cols-5 gap-2">
-          {metricItems.map((item) => {
+          {metricItems.map(item => {
             const height = item.value * 100;
             return (
               <div key={item.key} className="flex flex-col items-center">
@@ -111,10 +114,10 @@ export function QualityMetricsDisplay({
           {averageScore >= 0.8
             ? '✅ Excellent quality argument with strong evidence and reasoning'
             : averageScore >= 0.6
-            ? '👍 Good quality argument with solid foundation'
-            : averageScore >= 0.4
-            ? '⚠️ Moderate quality - could benefit from more evidence or clarity'
-            : '❌ Low quality - needs significant improvement'}
+              ? '👍 Good quality argument with solid foundation'
+              : averageScore >= 0.4
+                ? '⚠️ Moderate quality - could benefit from more evidence or clarity'
+                : '❌ Low quality - needs significant improvement'}
         </p>
       </div>
     </div>

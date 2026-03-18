@@ -36,16 +36,7 @@ const isPretextIndicator = (value: unknown): value is PretextIndicator => {
   );
 };
 
-export const PretextDetectionPanel = React.memo<PretextDetectionPanelProps>(({ billId }) => {
-  // Destructure with the correct property names from the hook
-  const {
-    data: hookAnalysis,
-    isLoading: loading,
-    error,
-    analyzeContent,
-    refetch,
-  } = usePretextAnalysis({ billId });
-
+export 
   // Transform hook data to match component expectations
   const analysis = hookAnalysis
     ? {

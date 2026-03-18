@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence E2E Tests
- * 
+ *
  * End-to-end tests for the complete argument intelligence workflow.
  */
 

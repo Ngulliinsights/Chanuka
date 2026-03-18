@@ -12,7 +12,6 @@ import {
   Trash,
   Settings,
 } from 'lucide-react';
-import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription } from '@client/lib/design-system';

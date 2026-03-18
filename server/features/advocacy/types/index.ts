@@ -11,14 +11,6 @@ export type {
   CampaignMetrics,
   ActionTemplate
 } from '@shared/types';
-    resources: string[];
-  };
-  customization: {
-    requiredFields: string[];
-    optionalFields: string[];
-    validationRules: Record<string, unknown>;
-  };
-}
 
 export interface CoalitionOpportunity {
   id: string;

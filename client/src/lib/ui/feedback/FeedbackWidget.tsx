@@ -15,10 +15,10 @@ type FeedbackType = 'positive' | 'negative' | 'bug' | 'feature' | null;
 
 /**
  * Feedback Widget Component
- * 
+ *
  * Floating widget that allows users to provide feedback, report bugs,
  * or suggest features from anywhere in the application.
- * 
+ *
  * Features:
  * - Quick feedback (thumbs up/down)
  * - Bug reports
@@ -26,10 +26,7 @@ type FeedbackType = 'positive' | 'negative' | 'bug' | 'feature' | null;
  * - Context-aware (captures current page)
  * - Accessible keyboard navigation
  */
-export function FeedbackWidget({
-  position = 'bottom-right',
-  className = '',
-}: FeedbackWidgetProps) {
+export function FeedbackWidget({ position = 'bottom-right', className = '' }: FeedbackWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackType, setFeedbackType] = useState<FeedbackType>(null);
   const [message, setMessage] = useState('');
@@ -99,7 +96,7 @@ export function FeedbackWidget({
       // });
 
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast({
         title: 'Thank you for your feedback!',
@@ -190,7 +187,7 @@ export function FeedbackWidget({
                     What would you like to share?
                   </label>
                   <div className="grid grid-cols-2 gap-2">
-                    {feedbackTypes.map((type) => (
+                    {feedbackTypes.map(type => (
                       <button
                         key={type.id}
                         type="button"
@@ -210,7 +207,7 @@ export function FeedbackWidget({
                   </div>
                   {feedbackType && (
                     <p className="text-xs text-gray-500 mt-2">
-                      {feedbackTypes.find((t) => t.id === feedbackType)?.description}
+                      {feedbackTypes.find(t => t.id === feedbackType)?.description}
                     </p>
                   )}
                 </div>
@@ -226,15 +223,13 @@ export function FeedbackWidget({
                   <textarea
                     id="feedback-message"
                     value={message}
-                    onChange={(e) => setMessage(e.target.value)}
+                    onChange={e => setMessage(e.target.value)}
                     placeholder="Tell us more about your experience..."
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows={4}
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {message.length}/500 characters
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{message.length}/500 characters</p>
                 </div>
 
                 {/* Email (Optional) */}
@@ -249,7 +244,7 @@ export function FeedbackWidget({
                     id="feedback-email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />

@@ -1,6 +1,6 @@
 /**
  * Health Status Display Component
- * 
+ *
  * Displays the health status of a feature with appropriate styling
  */
 
@@ -44,9 +44,7 @@ export function HealthStatusDisplay({ status, size = 'md' }: HealthStatusDisplay
   return (
     <div className="flex items-center gap-2">
       <div className={`${sizeClasses[size]} ${config.color} rounded-full`} />
-      <span className={`text-sm font-medium ${config.textColor}`}>
-        {config.label}
-      </span>
+      <span className={`text-sm font-medium ${config.textColor}`}>{config.label}</span>
     </div>
   );
 }

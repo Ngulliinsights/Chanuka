@@ -1,10 +1,9 @@
 /**
  * Recommendation Card Component
- * 
+ *
  * Displays a single recommendation in card format
  */
 
-import React from 'react';
 import { Link } from 'react-router-dom';
 import type { BillRecommendation } from '../types';
 import { useTrackEngagement } from '../hooks/useRecommendations';
@@ -14,9 +13,9 @@ interface RecommendationCardProps {
   onClickTracking?: boolean;
 }
 
-export function RecommendationCard({ 
-  recommendation, 
-  onClickTracking = true 
+export function RecommendationCard({
+  recommendation,
+  onClickTracking = true,
 }: RecommendationCardProps) {
   const trackEngagement = useTrackEngagement();
   const { metadata, score, reason } = recommendation;
@@ -51,17 +50,15 @@ export function RecommendationCard({
           </span>
         </div>
       </div>
-      
+
       {metadata.summary && (
         <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
           {metadata.summary}
         </p>
       )}
-      
+
       <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-          {reason}
-        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 italic">{reason}</p>
         {metadata.introducedDate && (
           <p className="text-xs text-gray-400 dark:text-gray-500">
             {new Date(metadata.introducedDate).toLocaleDateString()}

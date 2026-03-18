@@ -1,4 +1,13 @@
-import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2, GitCompare } from 'lucide-react';
+import {
+  Calendar,
+  Clock,
+  Users,
+  Eye,
+  Bookmark,
+  MessageCircle,
+  Share2,
+  GitCompare,
+} from 'lucide-react';
 import React, { useState } from 'react';
 
 import { Badge, Button } from '@client/lib/design-system';
@@ -78,7 +87,14 @@ export function BillHeader({ bill }: BillHeaderProps) {
               <Badge variant="outline" className="font-mono">
                 {bill.billNumber}
               </Badge>
-              <Badge variant="default" className={getStatusColor(bill.status) === 'hsl(var(--status-introduced))' ? 'bg-blue-500' : 'bg-gray-500'}>
+              <Badge
+                variant="default"
+                className={
+                  getStatusColor(bill.status) === 'hsl(var(--status-introduced))'
+                    ? 'bg-blue-500'
+                    : 'bg-gray-500'
+                }
+              >
                 {bill.status}
               </Badge>
             </div>
@@ -92,12 +108,19 @@ export function BillHeader({ bill }: BillHeaderProps) {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>Introduced: {new Date(bill.introductionDate ?? '').toLocaleDateString()}</span>
+                <span>
+                  Introduced: {new Date(bill.introductionDate ?? '').toLocaleDateString()}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>Updated: {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introductionDate || '').toLocaleDateString()}</span>
+                <span>
+                  Updated:{' '}
+                  {new Date(
+                    bill.timeline?.[bill.timeline.length - 1]?.date || bill.introductionDate || ''
+                  ).toLocaleDateString()}
+                </span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -110,7 +133,7 @@ export function BillHeader({ bill }: BillHeaderProps) {
           {/* Engagement Actions */}
           <div className="flex items-center gap-3">
             <Button
-              variant={isInCart ? "default" : "outline"}
+              variant={isInCart ? 'default' : 'outline'}
               size="sm"
               onClick={() => setIsComparisonModalOpen(true)}
               className="gap-2"

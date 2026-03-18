@@ -491,14 +491,9 @@ export class LoadingPerformanceMonitor {
 }
 
 // Global performance monitor instance for application-wide tracking
-export const globalLoadingMonitor = new LoadingPerformanceMonitor();
-
+export 
 // Utility functions for common loading patterns
-export const LoadingUtils = {
-  // Create a page loading operation with proper scenario lookup
-  createPageLoading: (
-    pageId: string,
-    connectionInfo?: { connectionType?: string; isOnline?: boolean }
+export  isOnline?: boolean }
   ) => {
     const scenario = LOADING_SCENARIOS.PAGE_INITIAL;
     if (!scenario) {

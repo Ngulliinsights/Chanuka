@@ -139,9 +139,7 @@ export const MobileHeader = React.forwardRef<HTMLDivElement, MobileHeaderProps>(
             {/* Logo */}
             {showLogo && (
               <div className="flex items-center">
-                {logo || (
-                  <ChanukaWordmark size={100} className="text-primary" />
-                )}
+                {logo || <ChanukaWordmark size={100} className="text-primary" />}
               </div>
             )}
 

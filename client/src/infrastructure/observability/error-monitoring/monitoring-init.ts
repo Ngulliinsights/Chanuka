@@ -1,5 +1,5 @@
 import { ErrorMonitor, initializeErrorMonitoring } from './index';
-import { datadogRum, type Site } from '@datadog/browser-rum';
+import { datadogRum } from '@datadog/browser-rum';
 
 export interface MonitoringConfig {
   environment: string;
@@ -89,7 +89,7 @@ class MonitoringInstance {
     if (this.config.enableAnalytics) {
       datadogRum.setUser({
         id: userId,
-        ...metadata
+        ...metadata,
       });
     }
   }
@@ -114,7 +114,7 @@ class MonitoringInstance {
       services: {
         sentry: !!this.config.sentry?.dsn,
         datadog: !!this.config.datadog?.applicationId,
-      }
+      },
     };
   }
 }
@@ -157,9 +157,11 @@ export function autoInitializeMonitoring() {
       dsn: (import.meta as unknown as Record<string, unknown>).env?.VITE_SENTRY_DSN || '',
     },
     datadog: {
-      applicationId: (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_APPLICATION_ID || '',
-      clientToken: (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_CLIENT_TOKEN || '',
-    }
+      applicationId:
+        (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_APPLICATION_ID || '',
+      clientToken:
+        (import.meta as unknown as Record<string, unknown>).env?.VITE_DATADOG_CLIENT_TOKEN || '',
+    },
   };
 
   if (env === 'production') {

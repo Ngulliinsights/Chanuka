@@ -127,28 +127,14 @@ export * from './performance';
 // ============================================================================
 
 // Authentication types
-export {
-  ExpertStatus,
-} from '../../auth'; // Points to infrastructure/auth
+export { ExpertStatus } from '../../auth'; // Points to infrastructure/auth
 
-export type {
-  Badge,
-  LoginCredentials,
-  UpdateUserProfile,
-} from '../../auth'; // Points to infrastructure/auth
+export type { Badge, LoginCredentials, UpdateUserProfile } from '../../auth'; // Points to infrastructure/auth
 
 // Bill types (canonical source: @client/lib/types/bill)
-export type {
-  BillStatus,
-  UrgencyLevel,
-  ComplexityLevel,
-} from '@client/lib/types/bill';
+export type { BillStatus, UrgencyLevel, ComplexityLevel } from '@client/lib/types/bill';
 
-export type {
-  Bill,
-  Sponsor,
-  BillsQueryParams,
-} from '@client/lib/types/bill';
+export type { Bill, Sponsor, BillsQueryParams } from '@client/lib/types/bill';
 
 // Community types (canonical source: @client/lib/types/community)
 export type {

@@ -44,23 +44,11 @@ const swTranslations = {
 };
 
 // Export languages object with translations
-export const languages = {
-  en: enTranslations,
-  sw: swTranslations,
-} as const;
-
-export const detectLanguage = () => {
-  const saved = localStorage.getItem('language');
-  if (saved === 'en' || saved === 'sw') return saved;
+export 
+export   if (saved === 'en' || saved === 'sw') return saved;
   return 'en' as const;
 };
 
-export const saveLanguagePreference = (lang: string) => {
-  localStorage.setItem('language', lang);
-};
+export };
 
-export const getKenyanContext = () => ({
-  locale: 'en-KE',
-  currency: 'KES',
-  timezone: 'Africa/Nairobi',
-});
+export 

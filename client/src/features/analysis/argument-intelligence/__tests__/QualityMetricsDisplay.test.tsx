@@ -11,27 +11,27 @@ describe('QualityMetricsDisplay', () => {
   const mockMetrics: QualityMetrics = {
     clarity: 0.85,
     evidence: 0.75,
-    reasoning: 0.80,
-    relevance: 0.90,
-    constructiveness: 0.70,
+    reasoning: 0.8,
+    relevance: 0.9,
+    constructiveness: 0.7,
   };
 
   it('renders quality metrics title', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} />);
-    
+
     expect(screen.getByText('Quality Metrics')).toBeInTheDocument();
   });
 
   it('displays overall quality score', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} />);
-    
-    const average = (0.85 + 0.75 + 0.80 + 0.90 + 0.70) / 5;
+
+    const average = (0.85 + 0.75 + 0.8 + 0.9 + 0.7) / 5;
     expect(screen.getByText(`${(average * 100).toFixed(0)}%`)).toBeInTheDocument();
   });
 
   it('shows all five quality dimensions', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} />);
-    
+
     expect(screen.getByText('Clarity')).toBeInTheDocument();
     expect(screen.getByText('Evidence')).toBeInTheDocument();
     expect(screen.getByText('Reasoning')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('QualityMetricsDisplay', () => {
 
   it('displays correct percentages for each metric', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} />);
-    
+
     const percentages = screen.getAllByText('85%');
     expect(percentages.length).toBeGreaterThan(0);
     expect(screen.getAllByText('75%').length).toBeGreaterThan(0);
@@ -52,7 +52,7 @@ describe('QualityMetricsDisplay', () => {
 
   it('shows quality profile visualization', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} />);
-    
+
     expect(screen.getByText('Quality Profile')).toBeInTheDocument();
   });
 
@@ -64,9 +64,9 @@ describe('QualityMetricsDisplay', () => {
       relevance: 0.92,
       constructiveness: 0.87,
     };
-    
+
     render(<QualityMetricsDisplay metrics={highQualityMetrics} />);
-    
+
     expect(screen.getByText(/Excellent quality argument/)).toBeInTheDocument();
   });
 
@@ -78,15 +78,15 @@ describe('QualityMetricsDisplay', () => {
       relevance: 0.6,
       constructiveness: 0.4,
     };
-    
+
     render(<QualityMetricsDisplay metrics={moderateMetrics} />);
-    
+
     expect(screen.getByText(/Moderate quality/)).toBeInTheDocument();
   });
 
   it('can hide labels when showLabels is false', () => {
     render(<QualityMetricsDisplay metrics={mockMetrics} showLabels={false} />);
-    
+
     expect(screen.queryByText('Clarity')).not.toBeInTheDocument();
     expect(screen.queryByText('Evidence')).not.toBeInTheDocument();
   });

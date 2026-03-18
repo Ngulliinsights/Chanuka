@@ -1,6 +1,6 @@
 /**
  * User-Initiated Recovery Actions (Strategic)
- * 
+ *
  * Manual recovery actions that require user decision:
  * - Page reload
  * - Cache clear
@@ -48,10 +48,14 @@ export async function cacheClearStrategy(): Promise<boolean> {
 
     return true;
   } catch (clearError) {
-    logger.error('Cache clear failed', {
-      component: 'UserActions',
-      operation: 'cacheClearStrategy',
-    }, clearError);
+    logger.error(
+      'Cache clear failed',
+      {
+        component: 'UserActions',
+        operation: 'cacheClearStrategy',
+      },
+      clearError
+    );
     return false;
   }
 }

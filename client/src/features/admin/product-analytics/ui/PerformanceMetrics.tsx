@@ -1,6 +1,6 @@
 /**
  * Performance Metrics Component
- * 
+ *
  * Displays performance metrics for a feature
  */
 
@@ -13,7 +13,7 @@ interface PerformanceMetricsProps {
 export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
   const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
   const endTime = new Date();
-  
+
   const { data: metrics, isLoading, error } = useFeatureMetrics(featureId, startTime, endTime);
 
   if (isLoading) {
@@ -25,11 +25,7 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
   }
 
   if (error || !metrics || metrics.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No performance data available
-      </div>
-    );
+    return <div className="text-center py-8 text-gray-500">No performance data available</div>;
   }
 
   // Calculate max values for scaling
@@ -41,7 +37,7 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics (Last 24h)</h3>
-      
+
       {/* Response Time Chart */}
       <div className="mb-6">
         <h4 className="text-sm font-medium text-gray-700 mb-2">Response Times</h4>
@@ -51,7 +47,13 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
             <div>
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span>Average</span>
-                <span>{(metrics.reduce((sum, m) => sum + parseFloat(m.avgResponseTime), 0) / metrics.length).toFixed(0)}ms</span>
+                <span>
+                  {(
+                    metrics.reduce((sum, m) => sum + parseFloat(m.avgResponseTime), 0) /
+                    metrics.length
+                  ).toFixed(0)}
+                  ms
+                </span>
               </div>
               <div className="flex items-end gap-1 h-16">
                 {metrics.map((metric, index) => {
@@ -76,7 +78,13 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
             <div>
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span>P95</span>
-                <span>{(metrics.reduce((sum, m) => sum + parseFloat(m.p95ResponseTime), 0) / metrics.length).toFixed(0)}ms</span>
+                <span>
+                  {(
+                    metrics.reduce((sum, m) => sum + parseFloat(m.p95ResponseTime), 0) /
+                    metrics.length
+                  ).toFixed(0)}
+                  ms
+                </span>
               </div>
               <div className="flex items-end gap-1 h-16">
                 {metrics.map((metric, index) => {
@@ -101,7 +109,13 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
             <div>
               <div className="flex justify-between text-xs text-gray-600 mb-1">
                 <span>P99</span>
-                <span>{(metrics.reduce((sum, m) => sum + parseFloat(m.p99ResponseTime), 0) / metrics.length).toFixed(0)}ms</span>
+                <span>
+                  {(
+                    metrics.reduce((sum, m) => sum + parseFloat(m.p99ResponseTime), 0) /
+                    metrics.length
+                  ).toFixed(0)}
+                  ms
+                </span>
               </div>
               <div className="flex items-end gap-1 h-16">
                 {metrics.map((metric, index) => {
@@ -134,21 +148,30 @@ export function PerformanceMetrics({ featureId }: PerformanceMetricsProps) {
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <div className="text-xs font-medium text-blue-700 mb-1">Avg Response</div>
           <div className="text-xl font-bold text-blue-900">
-            {(metrics.reduce((sum, m) => sum + parseFloat(m.avgResponseTime), 0) / metrics.length).toFixed(0)}ms
+            {(
+              metrics.reduce((sum, m) => sum + parseFloat(m.avgResponseTime), 0) / metrics.length
+            ).toFixed(0)}
+            ms
           </div>
         </div>
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="text-xs font-medium text-yellow-700 mb-1">P95 Response</div>
           <div className="text-xl font-bold text-yellow-900">
-            {(metrics.reduce((sum, m) => sum + parseFloat(m.p95ResponseTime), 0) / metrics.length).toFixed(0)}ms
+            {(
+              metrics.reduce((sum, m) => sum + parseFloat(m.p95ResponseTime), 0) / metrics.length
+            ).toFixed(0)}
+            ms
           </div>
         </div>
 
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-xs font-medium text-red-700 mb-1">P99 Response</div>
           <div className="text-xl font-bold text-red-900">
-            {(metrics.reduce((sum, m) => sum + parseFloat(m.p99ResponseTime), 0) / metrics.length).toFixed(0)}ms
+            {(
+              metrics.reduce((sum, m) => sum + parseFloat(m.p99ResponseTime), 0) / metrics.length
+            ).toFixed(0)}
+            ms
           </div>
         </div>
       </div>

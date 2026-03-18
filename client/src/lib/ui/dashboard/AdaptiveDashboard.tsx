@@ -5,7 +5,6 @@ import type {
 } from '@client/infrastructure/observability/personalization';
 import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, LayoutGrid } from 'lucide-react';
-import React from 'react';
 import { useReducer, useEffect, useMemo, useCallback, useRef } from 'react';
 
 import { useAuth } from '@client/infrastructure/auth';
@@ -191,14 +190,16 @@ export function AdaptiveDashboard({
         performanceMonitor.markDataFetchStart();
 
         // Convert UserProfile to User type for persona detection
-        const userForDetection = userProfile ? {
-          id: userProfile.id,
-          name: userProfile.name,
-          email: userProfile.email,
-          role: userProfile.role,
-          profile: userProfile,
-          verification: { verified: userProfile.verified || false }
-        } : null;
+        const userForDetection = userProfile
+          ? {
+              id: userProfile.id,
+              name: userProfile.name,
+              email: userProfile.email,
+              role: userProfile.role,
+              profile: userProfile,
+              verification: { verified: userProfile.verified || false },
+            }
+          : null;
 
         const classification = await personaDetector.detectPersona(
           userForDetection,

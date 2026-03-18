@@ -52,16 +52,12 @@ export function ArgumentMap({ billId }: ArgumentMapProps) {
     const opposeNodes = nodes.filter(n => n.position === 'oppose');
     const neutralNodes = nodes.filter(n => n.position === 'neutral');
 
-    const drawCluster = (
-      clusterNodes: ArgumentNode[],
-      startAngle: number,
-      color: string
-    ) => {
+    const drawCluster = (clusterNodes: ArgumentNode[], startAngle: number, color: string) => {
       clusterNodes.forEach((node, idx) => {
-        const angle = startAngle + (idx / clusterNodes.length) * (Math.PI * 2 / 3);
+        const angle = startAngle + (idx / clusterNodes.length) * ((Math.PI * 2) / 3);
         const x = centerX + Math.cos(angle) * radius;
         const y = centerY + Math.sin(angle) * radius;
-        const size = 5 + (node.strength * 20);
+        const size = 5 + node.strength * 20;
 
         // Draw node
         ctx.beginPath();
@@ -89,8 +85,8 @@ export function ArgumentMap({ billId }: ArgumentMapProps) {
 
     // Draw clusters
     drawCluster(supportNodes, 0, '#10b981'); // Green
-    drawCluster(opposeNodes, Math.PI * 2 / 3, '#ef4444'); // Red
-    drawCluster(neutralNodes, Math.PI * 4 / 3, '#6b7280'); // Gray
+    drawCluster(opposeNodes, (Math.PI * 2) / 3, '#ef4444'); // Red
+    drawCluster(neutralNodes, (Math.PI * 4) / 3, '#6b7280'); // Gray
 
     // Draw center
     ctx.beginPath();
@@ -149,7 +145,8 @@ export function ArgumentMap({ billId }: ArgumentMapProps) {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Argument Network</h3>
         <p className="text-sm text-gray-600 mb-4">
-          Visual representation of argument clusters. Size indicates strength, position shows stance.
+          Visual representation of argument clusters. Size indicates strength, position shows
+          stance.
         </p>
         <canvas
           ref={canvasRef}

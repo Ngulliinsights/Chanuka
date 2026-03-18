@@ -4,19 +4,10 @@
  */
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { 
-  Eye, 
-  Edit, 
-  Trash2, 
-  ExternalLink, 
-  Calendar, 
-  Database,
-  FileText,
-  Clock
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Eye, Edit, Trash2, ExternalLink, Calendar, Database, FileText, Clock } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
 import { GovernmentData, GovernmentDataCardProps } from '../types';
 
@@ -102,7 +93,7 @@ export const GovernmentDataCard: React.FC<GovernmentDataCardProps> = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.stopPropagation();
                     handleView();
                   }}
@@ -114,7 +105,7 @@ export const GovernmentDataCard: React.FC<GovernmentDataCardProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation();
                       handleEdit();
                     }}
@@ -136,9 +127,7 @@ export const GovernmentDataCard: React.FC<GovernmentDataCardProps> = ({
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              {getDataTypeIcon(data.data_type)}
-            </div>
+            <div className="p-2 bg-blue-50 rounded-lg">{getDataTypeIcon(data.data_type)}</div>
             <div className="flex-1 min-w-0">
               <CardTitle className="text-lg font-semibold truncate">
                 {data.title || `${data.data_type} Record`}
@@ -164,7 +153,12 @@ export const GovernmentDataCard: React.FC<GovernmentDataCardProps> = ({
                 </Button>
               )}
               {onDelete && (
-                <Button variant="ghost" size="sm" onClick={handleDelete} className="text-red-600 hover:text-red-700">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleDelete}
+                  className="text-red-600 hover:text-red-700"
+                >
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )}
@@ -176,9 +170,7 @@ export const GovernmentDataCard: React.FC<GovernmentDataCardProps> = ({
       <CardContent className="pt-0">
         {/* Content Preview */}
         <div className="mb-4">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            {formatContent(data.content)}
-          </p>
+          <p className="text-sm text-gray-600 leading-relaxed">{formatContent(data.content)}</p>
         </div>
 
         {/* Metadata */}

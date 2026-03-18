@@ -13,18 +13,22 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
   const [userInput, setUserInput] = useState<UserInput>({
     useMobileMoney: true,
     useOnlineServices: true,
-    isEmployed: true
+    isEmployed: true,
   });
   const [showResults, setShowResults] = useState(false);
 
-  const { mutate: calculateImpact, data: impact, isLoading } = useMutation<PersonalImpact, Error, UserInput>({
+  const {
+    mutate: calculateImpact,
+    data: impact,
+    isLoading,
+  } = useMutation<PersonalImpact, Error, UserInput>({
     mutationFn: async (input: UserInput) => {
       const response = await api.post(`/api/bills/${billId}/calculate-impact`, input);
       return response.data;
     },
     onSuccess: () => {
       setShowResults(true);
-    }
+    },
   });
 
   const handleCalculate = () => {
@@ -33,10 +37,14 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'bg-red-100 text-red-900 border-red-300';
-      case 'high': return 'bg-orange-100 text-orange-900 border-orange-300';
-      case 'medium': return 'bg-yellow-100 text-yellow-900 border-yellow-300';
-      default: return 'bg-green-100 text-green-900 border-green-300';
+      case 'critical':
+        return 'bg-red-100 text-red-900 border-red-300';
+      case 'high':
+        return 'bg-orange-100 text-orange-900 border-orange-300';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-900 border-yellow-300';
+      default:
+        return 'bg-green-100 text-green-900 border-green-300';
     }
   };
 
@@ -62,7 +70,9 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
               <input
                 type="number"
                 value={userInput.monthlyIncome || ''}
-                onChange={(e) => setUserInput({ ...userInput, monthlyIncome: Number(e.target.value) })}
+                onChange={e =>
+                  setUserInput({ ...userInput, monthlyIncome: Number(e.target.value) })
+                }
                 placeholder="e.g., 50000"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
@@ -73,12 +83,10 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
 
             {/* County */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                County
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">County</label>
               <select
                 value={userInput.county || ''}
-                onChange={(e) => setUserInput({ ...userInput, county: e.target.value })}
+                onChange={e => setUserInput({ ...userInput, county: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="">Select your county</option>
@@ -93,13 +101,13 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
 
             {/* Household Size */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Household Size
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Household Size</label>
               <input
                 type="number"
                 value={userInput.householdSize || ''}
-                onChange={(e) => setUserInput({ ...userInput, householdSize: Number(e.target.value) })}
+                onChange={e =>
+                  setUserInput({ ...userInput, householdSize: Number(e.target.value) })
+                }
                 placeholder="e.g., 4"
                 min="1"
                 max="20"
@@ -109,35 +117,39 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
 
             {/* Usage Patterns */}
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Your Usage Patterns
-              </label>
-              
+              <label className="block text-sm font-medium text-gray-700">Your Usage Patterns</label>
+
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={userInput.useMobileMoney}
-                  onChange={(e) => setUserInput({ ...userInput, useMobileMoney: e.target.checked })}
+                  onChange={e => setUserInput({ ...userInput, useMobileMoney: e.target.checked })}
                   className="h-4 w-4 text-blue-600 rounded"
                 />
-                <span className="text-gray-700">I use mobile money (M-Pesa, Airtel Money, etc.)</span>
+                <span className="text-gray-700">
+                  I use mobile money (M-Pesa, Airtel Money, etc.)
+                </span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={userInput.useOnlineServices}
-                  onChange={(e) => setUserInput({ ...userInput, useOnlineServices: e.target.checked })}
+                  onChange={e =>
+                    setUserInput({ ...userInput, useOnlineServices: e.target.checked })
+                  }
                   className="h-4 w-4 text-blue-600 rounded"
                 />
-                <span className="text-gray-700">I use online services (Jumia, Uber, food delivery, etc.)</span>
+                <span className="text-gray-700">
+                  I use online services (Jumia, Uber, food delivery, etc.)
+                </span>
               </label>
 
               <label className="flex items-center gap-3">
                 <input
                   type="checkbox"
                   checked={userInput.isEmployed}
-                  onChange={(e) => setUserInput({ ...userInput, isEmployed: e.target.checked })}
+                  onChange={e => setUserInput({ ...userInput, isEmployed: e.target.checked })}
                   className="h-4 w-4 text-blue-600 rounded"
                 />
                 <span className="text-gray-700">I am formally employed (receive a salary)</span>
@@ -256,9 +268,9 @@ export function ImpactCalculator({ billId }: ImpactCalculatorProps) {
       {/* Disclaimer */}
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
         <p className="text-xs text-gray-600">
-          <strong>Disclaimer:</strong> This calculator provides estimates based on typical usage patterns.
-          Your actual impact may vary. Calculations are conservative and based on available data.
-          Confidence level: {impact?.confidence || 'N/A'}.
+          <strong>Disclaimer:</strong> This calculator provides estimates based on typical usage
+          patterns. Your actual impact may vary. Calculations are conservative and based on
+          available data. Confidence level: {impact?.confidence || 'N/A'}.
         </p>
       </div>
     </div>

@@ -559,8 +559,7 @@ export function Service(config: {
  */
 export function Inject(serviceId: string) {
   return function (target: unknown, propertyKey: string) {
-    const originalDescriptor = Object.getOwnPropertyDescriptor(target, propertyKey);
-
+    
     Object.defineProperty(target, propertyKey, {
       get() {
         return ServiceFactory.resolve(serviceId);
@@ -672,4 +671,4 @@ export function createScopedRegistration<T>(
 }
 
 // Export default container and factory
-export const container = new ServiceContainer();
+export 

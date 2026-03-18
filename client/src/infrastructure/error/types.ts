@@ -6,7 +6,13 @@
  * with enhanced modular architecture.
  */
 
-import { ErrorDomain, ErrorSeverity, RecoveryAction, RecoveryConditionOperator, ErrorRecoveryStrategyType } from './constants';
+import {
+  ErrorDomain,
+  ErrorSeverity,
+  RecoveryAction,
+  RecoveryConditionOperator,
+  ErrorRecoveryStrategyType,
+} from './constants';
 
 // ============================================================================
 // Recovery Strategy Types

@@ -56,7 +56,7 @@ export function addToRecentPages(path: string, title: string): void {
     // Convert string path to RecentPage object if needed, or handle check
     // Wait, RecentPage is object { path, title, visitedAt, visitCount }
     // But usage passed path, title.
-    
+
     // Remove if already exists
     const filtered = recentPages.filter(p => p.path !== path);
 
@@ -64,7 +64,7 @@ export function addToRecentPages(path: string, title: string): void {
       path,
       title,
       visitedAt: new Date().toISOString(),
-      visitCount: (recentPages.find(p => p.path === path)?.visitCount || 0) + 1
+      visitCount: (recentPages.find(p => p.path === path)?.visitCount || 0) + 1,
     };
 
     // Add to beginning

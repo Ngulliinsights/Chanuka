@@ -330,7 +330,7 @@ export function createServiceRetryHandler(
 
 /**
  * Simple retry utility with configurable retry logic
- * 
+ *
  * Requirements: 13.2, 13.3, 13.4
  * - Retry network errors up to 3 times
  * - Retry 5xx errors with exponential backoff
@@ -352,7 +352,7 @@ export interface RetryContextInfo {
 
 /**
  * Executes an operation with retry logic
- * 
+ *
  * @param operation - The async operation to execute
  * @param config - Retry configuration
  * @returns The result of the operation
@@ -387,7 +387,7 @@ export async function withRetry<T>(
 
       // Calculate backoff delay
       const delay = config.initialDelay * Math.pow(config.backoffMultiplier, attempt);
-      
+
       logger.info('Retrying operation', {
         component: 'withRetry',
         attempt: attempt + 1,
@@ -411,7 +411,7 @@ function isClientError(error: unknown): boolean {
     const status = (error as { status: number }).status;
     return status >= 400 && status < 500;
   }
-  
+
   // Check error message for 4xx status codes
   if (error instanceof Error) {
     const message = error.message.toLowerCase();
@@ -426,7 +426,7 @@ function isClientError(error: unknown): boolean {
       }
     }
   }
-  
+
   return false;
 }
 

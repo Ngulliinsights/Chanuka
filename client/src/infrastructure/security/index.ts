@@ -41,7 +41,7 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
   try {
     logger.info('Initializing security infrastructure', {
       config,
-      environment: process.env.NODE_ENV
+      environment: process.env.NODE_ENV,
     });
 
     const csp = new CSPManager({
@@ -60,7 +60,7 @@ export async function initializeSecurity(config: SecurityConfig): Promise<Securi
     const sanitizer = new InputSanitizer({
       enabled: config.enableInputSanitization,
       allowedTags: ['b', 'i', 'em', 'strong', 'p', 'br'],
-      allowedAttributes: { 'a': ['href'] },
+      allowedAttributes: { a: ['href'] },
     });
 
     const rateLimiter = new RateLimiter({
@@ -172,6 +172,6 @@ export {
   generateSecureToken,
   isSecureContext,
   SECURITY_HEADERS,
-  DEFAULT_CSP
+  DEFAULT_CSP,
 } from './security-utils';
 export { securityUtils } from './security-utils';

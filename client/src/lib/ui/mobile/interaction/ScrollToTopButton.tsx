@@ -8,8 +8,6 @@
  */
 
 import { ChevronUp } from 'lucide-react';
-import { type ReactNode } from 'react';
-import React from 'react';
 
 import { useScrollManager } from '@client/lib/hooks/mobile';
 import { cn } from '@client/lib/utils/cn';

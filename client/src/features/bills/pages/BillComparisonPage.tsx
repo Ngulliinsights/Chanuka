@@ -1,6 +1,6 @@
 /**
  * Bill Comparison Page
- * 
+ *
  * Main page for comparing multiple bills side-by-side.
  * Supports text comparison, metadata comparison, and analysis comparison.
  */
@@ -12,7 +12,17 @@ import { useBillComparison } from '../hooks/useBillComparison';
 import { BillSelector } from '../ui/comparison/BillSelector';
 import { MetadataComparison } from '../ui/comparison/MetadataComparison';
 import { TextDiff } from '../ui/comparison/TextDiff';
-import { Button, Card, CardContent, CardHeader, CardTitle, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@client/lib/design-system';
 import { LoadingStates } from '@client/lib/ui/loading/LoadingStates';
 
 export default function BillComparisonPage() {
@@ -107,12 +117,12 @@ export default function BillComparisonPage() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Common Keywords</div>
-                    <div className="text-sm font-medium">
-                      {differences.commonKeywords.length}
-                    </div>
+                    <div className="text-sm font-medium">{differences.commonKeywords.length}</div>
                   </div>
                   <div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400">Metadata Differences</div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      Metadata Differences
+                    </div>
                     <div className="text-sm font-medium">
                       {differences.metadata.filter(d => d.isDifferent).length}
                     </div>
@@ -140,9 +150,7 @@ export default function BillComparisonPage() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <div className="text-red-500 mb-2">Error loading bills</div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {error.message}
-                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{error.message}</p>
                 </CardContent>
               </Card>
             ) : bills.length >= 2 ? (
@@ -294,7 +302,8 @@ export default function BillComparisonPage() {
                           <h4 className="font-medium mb-3">Unique Keywords</h4>
                           <div className="grid md:grid-cols-2 gap-4">
                             {bills.map((bill, index) => {
-                              const uniqueKeywords = differences.uniqueKeywords[`bill${index + 1}`] || [];
+                              const uniqueKeywords =
+                                differences.uniqueKeywords[`bill${index + 1}`] || [];
                               return (
                                 <div key={bill.id}>
                                   <div className="text-sm font-medium mb-2">{bill.bill_number}</div>
@@ -322,7 +331,10 @@ export default function BillComparisonPage() {
                               .filter(d => d.isDifferent)
                               .slice(0, 5)
                               .map((diff, index) => (
-                                <li key={index} className="text-sm text-gray-700 dark:text-gray-300">
+                                <li
+                                  key={index}
+                                  className="text-sm text-gray-700 dark:text-gray-300"
+                                >
                                   <span className="font-medium">{diff.label}:</span>{' '}
                                   {Object.entries(diff.values).map(([key, value], i, arr) => (
                                     <span key={key}>

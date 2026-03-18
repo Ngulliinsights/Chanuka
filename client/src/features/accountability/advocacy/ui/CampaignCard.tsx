@@ -1,11 +1,17 @@
 /**
  * Campaign Card Component
- * 
+ *
  * Displays campaign summary in a card format
  */
 
 import { Users, Target, TrendingUp, Calendar } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
@@ -130,18 +136,11 @@ export function CampaignCard({ campaign, onView, onJoin }: CampaignCardProps) {
 
         {/* Actions */}
         <div className="flex gap-2 pt-2">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={() => onView?.(campaign.id)}
-          >
+          <Button variant="outline" className="flex-1" onClick={() => onView?.(campaign.id)}>
             View Details
           </Button>
           {campaign.status === 'active' && onJoin && (
-            <Button
-              className="flex-1"
-              onClick={() => onJoin(campaign.id)}
-            >
+            <Button className="flex-1" onClick={() => onJoin(campaign.id)}>
               Join Campaign
             </Button>
           )}

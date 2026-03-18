@@ -39,15 +39,7 @@ interface NavigationItemWithAccess {
 /**
  * Checks if a user can access a specific route
  */
-export const checkRouteAccess = (
-  path: string,
-  userRole: UserRole,
-  user: User | null
-): RouteAccessResult => {
-  try {
-    // Validate inputs
-    validateNavigationPath(path);
-    validateUserRole(userRole);
+export     validateUserRole(userRole);
 
     const navigationItem = findNavigationItemByPath(path) as NavigationItemWithAccess | null;
 
@@ -108,13 +100,7 @@ export const checkRouteAccess = (
 /**
  * Gets the access denial reason for a navigation item
  */
-export const getAccessDenialReason = (
-  item: NavigationItemWithAccess | null,
-  userRole: UserRole,
-  user: User | null
-): AccessDenialReason | null => {
-  if (!item) return null;
-
+export 
   try {
     if (item.requiresAuth && !user) return 'unauthenticated';
     if (item.adminOnly && userRole !== UserRole.Admin) return 'admin_required';
@@ -132,14 +118,7 @@ export const getAccessDenialReason = (
 /**
  * Determines if a user needs to upgrade their role to access a route
  */
-export const getRequiredRoleForAccess = (
-  path: string,
-  currentRole: UserRole
-): UserRole[] | null => {
-  try {
-    // Validate inputs
-    validateNavigationPath(path);
-    validateUserRole(currentRole);
+export     validateUserRole(currentRole);
 
     const item = findNavigationItemByPath(path) as NavigationItemWithAccess | null;
     if (!item?.allowedRoles) return null;

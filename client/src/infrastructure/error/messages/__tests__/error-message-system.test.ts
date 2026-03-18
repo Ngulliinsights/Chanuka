@@ -10,14 +10,12 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { ErrorDomain, ErrorSeverity } from '../../constants';
 import { AppError } from '../../types';
 import {
-  ErrorMessageTemplate,
   getTemplateById,
   getTemplatesByDomain,
   getTemplatesBySeverity,
   getBestMatchTemplate,
   getLocalizedMessage,
   addLocalizedMessages,
-  FormattedErrorMessage,
   formatErrorMessage,
   formatMessageWithContext,
   createAppErrorFromError,
@@ -122,7 +120,7 @@ describe('Localization', () => {
 
   it('should provide French translations', () => {
     const message = getLocalizedMessage('network-connection-failed', 'fr-FR');
-    expect(message).toContain('Nous n\'avons pas pu nous connecter');
+    expect(message).toContain("Nous n'avons pas pu nous connecter");
   });
 
   it('should fallback to English for unknown locales', () => {

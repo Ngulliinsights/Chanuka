@@ -15,12 +15,14 @@ The Storage Infrastructure module provides comprehensive storage functionality i
 ## Public Exports
 
 ### Classes
+
 - `SecureStorage` - Encrypted storage manager
 - `SessionManager` - Session lifecycle management
 - `TokenManager` - Token storage and refresh
 - `CacheStorageManager` - Cache management with eviction
 
 ### Functions
+
 - `storeSecurely()` - Store data with encryption
 - `retrieveSecurely()` - Retrieve encrypted data
 - `getCurrentSession()` - Get current session
@@ -46,7 +48,7 @@ import { storeSecurely, retrieveSecurely } from '@/infrastructure/storage';
 // Store sensitive data
 await storeSecurely('user-preferences', preferences, {
   encrypt: true,
-  ttl: 3600 // 1 hour
+  ttl: 3600, // 1 hour
 });
 
 // Retrieve data

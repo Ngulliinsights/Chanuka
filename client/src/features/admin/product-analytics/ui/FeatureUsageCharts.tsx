@@ -1,6 +1,6 @@
 /**
  * Feature Usage Charts Component
- * 
+ *
  * Displays usage charts for a feature
  */
 
@@ -13,7 +13,7 @@ interface FeatureUsageChartsProps {
 export function FeatureUsageCharts({ featureId }: FeatureUsageChartsProps) {
   const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
   const endTime = new Date();
-  
+
   const { data: metrics, isLoading, error } = useFeatureMetrics(featureId, startTime, endTime);
 
   if (isLoading) {
@@ -25,11 +25,7 @@ export function FeatureUsageCharts({ featureId }: FeatureUsageChartsProps) {
   }
 
   if (error || !metrics || metrics.length === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        No usage data available
-      </div>
-    );
+    return <div className="text-center py-8 text-gray-500">No usage data available</div>;
   }
 
   // Calculate max values for scaling
@@ -39,7 +35,7 @@ export function FeatureUsageCharts({ featureId }: FeatureUsageChartsProps) {
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Usage Trends (Last 24h)</h3>
-      
+
       {/* Requests Chart */}
       <div className="mb-6">
         <h4 className="text-sm font-medium text-gray-700 mb-2">Total Requests</h4>
@@ -104,13 +100,17 @@ export function FeatureUsageCharts({ featureId }: FeatureUsageChartsProps) {
         <div className="bg-white border border-gray-200 rounded-lg p-4">
           <div className="flex items-end gap-1 h-32">
             {metrics.map((metric, index) => {
-              const successRate = metric.totalRequests > 0
-                ? ((metric.successfulRequests / metric.totalRequests) * 100)
-                : 100;
+              const successRate =
+                metric.totalRequests > 0
+                  ? (metric.successfulRequests / metric.totalRequests) * 100
+                  : 100;
               const height = successRate;
-              const color = successRate >= 95 ? 'bg-green-500 hover:bg-green-600' : 
-                           successRate >= 90 ? 'bg-yellow-500 hover:bg-yellow-600' : 
-                           'bg-red-500 hover:bg-red-600';
+              const color =
+                successRate >= 95
+                  ? 'bg-green-500 hover:bg-green-600'
+                  : successRate >= 90
+                    ? 'bg-yellow-500 hover:bg-yellow-600'
+                    : 'bg-red-500 hover:bg-red-600';
               return (
                 <div
                   key={index}

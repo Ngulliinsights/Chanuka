@@ -276,24 +276,4 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
  * Contract-based API client
  * Provides type-safe methods for calling API endpoints
  */
-export const contractApiClient = {
-  /**
-   * Call an endpoint with just a request body
-   */
-  call: callEndpoint,
-
-  /**
-   * Call an endpoint with path parameters
-   */
-  callWithParams: callEndpointWithParams,
-
-  /**
-   * Call an endpoint with query parameters
-   */
-  callWithQuery: callEndpointWithQuery,
-
-  /**
-   * Call an endpoint with both path and query parameters
-   */
-  callWithParamsAndQuery: callEndpointWithParamsAndQuery,
-};
+export 

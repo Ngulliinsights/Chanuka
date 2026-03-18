@@ -14,22 +14,26 @@ Complete admin interface for managing feature flags, rollouts, and A/B tests.
 ## Components
 
 ### FeatureFlagsPage
+
 Main admin page that orchestrates all feature flag management functionality.
 
 **Location**: `pages/FeatureFlagsPage.tsx`
 
 **Features**:
+
 - Flag list display
 - Create/edit modal
 - Analytics modal
 - Responsive layout
 
 ### FlagList
+
 Displays all feature flags with status, rollout percentage, and action buttons.
 
 **Location**: `ui/FlagList.tsx`
 
 **Features**:
+
 - Flag status badges (Enabled/Disabled)
 - Rollout percentage display
 - A/B test indicators
@@ -37,11 +41,13 @@ Displays all feature flags with status, rollout percentage, and action buttons.
 - Loading and error states
 
 ### FlagEditor
+
 Modal form for creating and editing feature flags.
 
 **Location**: `ui/FlagEditor.tsx`
 
 **Features**:
+
 - Basic flag configuration (name, description, enabled)
 - Rollout percentage slider (0-100%)
 - User targeting (include/exclude lists)
@@ -50,22 +56,26 @@ Modal form for creating and editing feature flags.
 - Create and update modes
 
 ### RolloutControls
+
 Dedicated component for managing rollout percentage.
 
 **Location**: `ui/RolloutControls.tsx`
 
 **Features**:
+
 - Visual slider for percentage adjustment
 - Quick-set buttons (0%, 10%, 25%, 50%, 100%)
 - Change preview before applying
 - Real-time percentage display
 
 ### AnalyticsDashboard
+
 Modal displaying comprehensive analytics for a feature flag.
 
 **Location**: `ui/AnalyticsDashboard.tsx`
 
 **Features**:
+
 - Total evaluations count
 - Enabled/disabled counts and percentages
 - Visual distribution bar
@@ -75,6 +85,7 @@ Modal displaying comprehensive analytics for a feature flag.
 ## API Integration
 
 ### Hooks
+
 All API interactions are handled through React Query hooks:
 
 - `useFeatureFlags()` - Fetch all flags
@@ -87,9 +98,11 @@ All API interactions are handled through React Query hooks:
 - `useUpdateRollout()` - Update rollout percentage
 
 ### API Client
+
 **Location**: `api/feature-flags-api.ts`
 
 Provides typed API methods for all feature flag operations:
+
 - `getAllFlags()` - GET /api/feature-flags/flags
 - `getFlag(name)` - GET /api/feature-flags/flags/:name
 - `createFlag(data)` - POST /api/feature-flags/flags
@@ -104,6 +117,7 @@ Provides typed API methods for all feature flag operations:
 **Location**: `types.ts`
 
 ### FeatureFlag
+
 ```typescript
 interface FeatureFlag {
   id: string;
@@ -124,6 +138,7 @@ interface FeatureFlag {
 ```
 
 ### UserTargeting
+
 ```typescript
 interface UserTargeting {
   include?: string[];
@@ -133,6 +148,7 @@ interface UserTargeting {
 ```
 
 ### ABTestConfig
+
 ```typescript
 interface ABTestConfig {
   variants: string[];
@@ -144,6 +160,7 @@ interface ABTestConfig {
 ## Usage
 
 ### Adding to Routes
+
 ```typescript
 import { FeatureFlagsPage } from '@/features/feature-flags';
 
@@ -155,15 +172,16 @@ import { FeatureFlagsPage } from '@/features/feature-flags';
 ```
 
 ### Using Individual Components
+
 ```typescript
 import { FlagList, FlagEditor, RolloutControls } from '@/features/feature-flags';
 
 function CustomFlagManager() {
   const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | undefined>();
-  
+
   return (
     <div>
-      <FlagList 
+      <FlagList
         onEdit={setSelectedFlag}
         onViewAnalytics={(flag) => console.log(flag)}
       />
@@ -178,6 +196,7 @@ function CustomFlagManager() {
 ## Testing
 
 Test files are located in `__tests__/`:
+
 - `FlagList.test.tsx` - Flag list component tests
 - `FlagEditor.test.tsx` - Flag editor component tests
 - `RolloutControls.test.tsx` - Rollout controls tests
@@ -185,6 +204,7 @@ Test files are located in `__tests__/`:
 - `feature-flags-e2e.test.tsx` - End-to-end workflow tests
 
 Run tests:
+
 ```bash
 npm test -- src/features/feature-flags/__tests__/
 ```
@@ -192,11 +212,13 @@ npm test -- src/features/feature-flags/__tests__/
 ## Backend Integration
 
 This UI integrates with the existing backend feature flag system:
+
 - **Service**: `server/features/feature-flags/domain/service.ts`
 - **Routes**: `server/features/feature-flags/application/routes.ts`
 - **API Base**: `/api/feature-flags`
 
 The backend provides:
+
 - Feature flag CRUD operations
 - User targeting logic
 - Percentage-based rollouts
@@ -206,6 +228,7 @@ The backend provides:
 ## Styling
 
 Components use Tailwind CSS for styling with a consistent design system:
+
 - **Colors**: Blue for primary actions, green for enabled states, red for destructive actions
 - **Spacing**: Consistent padding and margins
 - **Typography**: Clear hierarchy with appropriate font sizes

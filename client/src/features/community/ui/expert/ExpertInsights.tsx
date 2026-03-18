@@ -24,7 +24,6 @@ import {
   FileText,
   Link as LinkIcon,
 } from 'lucide-react';
-import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
@@ -210,7 +209,12 @@ export function ExpertInsights({ insights, compact = false, className }: ExpertI
               <div className="flex items-start gap-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={insight.expertAvatar} alt={insight.expertName} />
-                  <AvatarFallback className="cursor-pointer" onClick={() => toggleExpanded(String(insight.id))}>{getInitials(insight.expertName || '')}</AvatarFallback>
+                  <AvatarFallback
+                    className="cursor-pointer"
+                    onClick={() => toggleExpanded(String(insight.id))}
+                  >
+                    {getInitials(insight.expertName || '')}
+                  </AvatarFallback>
                 </Avatar>
 
                 <div className="flex-1 min-w-0">

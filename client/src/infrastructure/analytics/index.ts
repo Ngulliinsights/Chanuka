@@ -31,16 +31,9 @@ export {
   useAnalyticsExport,
 } from './hooks/use-analytics';
 
-export {
-  useJourneyTracker,
-  useJourneyAnalytics,
-} from './hooks/use-journey-tracker';
+export { useJourneyTracker, useJourneyAnalytics } from './hooks/use-journey-tracker';
 
-export {
-  useWebVitals,
-  getPerformanceRating,
-  usePerformanceBudget,
-} from './hooks/use-web-vitals';
+export { useWebVitals, getPerformanceRating, usePerformanceBudget } from './hooks/use-web-vitals';
 
 export { useErrorAnalytics } from './hooks/use-error-analytics';
 export { useRenderTracker } from './hooks/use-render-tracker';
@@ -74,7 +67,4 @@ export type {
   ConversionFunnel,
 } from './model/user-journey-tracker';
 
-export type {
-  WebVitalsMetrics,
-  WebVitalsHookOptions,
-} from './hooks/use-web-vitals';
+export type { WebVitalsMetrics, WebVitalsHookOptions } from './hooks/use-web-vitals';

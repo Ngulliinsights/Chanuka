@@ -4,38 +4,39 @@
  */
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { Button } from '@client/components/ui/button';
-import { Badge } from '@client/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/components/ui/tabs';
-import { 
-  Database, 
-  TrendingUp, 
-  Activity, 
-  AlertCircle,
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import {
+  Database,
+  Activity,
   RefreshCw,
   Settings,
   BarChart3,
   FileText,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { GovernmentDataList } from '../ui/GovernmentDataList';
-import { 
-  useGovernmentDataStatistics, 
+import {
+  useGovernmentDataStatistics,
   useGovernmentDataHealth,
-  useGovernmentDataSyncLogs 
+  useGovernmentDataSyncLogs,
 } from '../hooks';
 import { GovernmentData, GovernmentDataFilters } from '../types';
 import { formatDistanceToNow } from 'date-fns';
 
 export const GovernmentDataPage: React.FC = () => {
-  const [selectedData, setSelectedData] = useState<GovernmentData | null>(null);
+  const [_selectedData, setSelectedData] = useState<GovernmentData | null>(null);
   const [filters, setFilters] = useState<GovernmentDataFilters>({});
 
   // Fetch overview data
   const { data: statisticsResponse, isLoading: statsLoading } = useGovernmentDataStatistics();
   const { data: healthResponse, isLoading: healthLoading } = useGovernmentDataHealth();
-  const { data: syncLogsResponse, isLoading: syncLoading } = useGovernmentDataSyncLogs(undefined, 5);
+  const { data: syncLogsResponse, isLoading: syncLoading } = useGovernmentDataSyncLogs(
+    undefined,
+    5
+  );
 
   const statistics = statisticsResponse?.data;
   const health = healthResponse?.data;
@@ -106,9 +107,7 @@ export const GovernmentDataPage: React.FC = () => {
             <div className="text-2xl font-bold">
               {statsLoading ? '...' : (statistics?.total || 0).toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Across all data sources
-            </p>
+            <p className="text-xs text-muted-foreground">Across all data sources</p>
           </CardContent>
         </Card>
 
@@ -122,9 +121,7 @@ export const GovernmentDataPage: React.FC = () => {
             <div className="text-2xl font-bold">
               {statsLoading ? '...' : Object.keys(statistics?.bySource || {}).length}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Active integration sources
-            </p>
+            <p className="text-xs text-muted-foreground">Active integration sources</p>
           </CardContent>
         </Card>
 
@@ -138,9 +135,7 @@ export const GovernmentDataPage: React.FC = () => {
             <div className="text-2xl font-bold">
               {statsLoading ? '...' : Object.keys(statistics?.byDataType || {}).length}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Different content types
-            </p>
+            <p className="text-xs text-muted-foreground">Different content types</p>
           </CardContent>
         </Card>
 
@@ -153,14 +148,13 @@ export const GovernmentDataPage: React.FC = () => {
           <CardContent>
             <div className="flex items-center gap-2">
               <Badge className={getHealthStatusColor(health?.status || 'unknown')}>
-                {healthLoading ? '...' : (health?.status || 'Unknown')}
+                {healthLoading ? '...' : health?.status || 'Unknown'}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {health?.lastSync 
+              {health?.lastSync
                 ? `Last sync ${formatDistanceToNow(health.lastSync, { addSuffix: true })}`
-                : 'No recent sync'
-              }
+                : 'No recent sync'}
             </p>
           </CardContent>
         </Card>
@@ -202,17 +196,18 @@ export const GovernmentDataPage: React.FC = () => {
                 ) : (
                   <div className="space-y-3">
                     {Object.entries(statistics?.byDataType || {})
-                      .sort(([,a], [,b]) => b - a)
+                      .sort(([, a], [, b]) => b - a)
                       .slice(0, 5)
                       .map(([type, count]) => (
                         <div key={type} className="flex items-center justify-between">
                           <span className="text-sm font-medium capitalize">{type}</span>
                           <div className="flex items-center gap-2">
                             <div className="w-24 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full" 
-                                style={{ 
-                                  width: `${statistics?.total ? (count / statistics.total) * 100 : 0}%` 
+                              {/* cspell:disable-next-line no-inline-styles */}
+                              <div
+                                className="bg-blue-600 h-2 rounded-full"
+                                style={{
+                                  width: `${statistics?.total ? (count / statistics.total) * 100 : 0}%`,
                                 }}
                               />
                             </div>
@@ -240,17 +235,18 @@ export const GovernmentDataPage: React.FC = () => {
                 ) : (
                   <div className="space-y-3">
                     {Object.entries(statistics?.bySource || {})
-                      .sort(([,a], [,b]) => b - a)
+                      .sort(([, a], [, b]) => b - a)
                       .slice(0, 5)
                       .map(([source, count]) => (
                         <div key={source} className="flex items-center justify-between">
                           <span className="text-sm font-medium">{source}</span>
                           <div className="flex items-center gap-2">
                             <div className="w-24 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-green-600 h-2 rounded-full" 
-                                style={{ 
-                                  width: `${statistics?.total ? (count / statistics.total) * 100 : 0}%` 
+                              {/* cspell:disable-next-line webhint-disable-line no-inline-styles */}
+                              <div
+                                className="bg-green-600 h-2 rounded-full"
+                                style={{
+                                  width: `${statistics?.total ? (count / statistics.total) * 100 : 0}%`,
                                 }}
                               />
                             </div>
@@ -284,21 +280,20 @@ export const GovernmentDataPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {syncLogs.map((log) => (
-                    <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  {syncLogs.map(log => (
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-4">
-                        <Badge className={getSyncStatusColor(log.status)}>
-                          {log.status}
-                        </Badge>
+                        <Badge className={getSyncStatusColor(log.status)}>{log.status}</Badge>
                         <div>
                           <p className="font-medium">{log.source}</p>
                           <p className="text-sm text-gray-600">{log.operation}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium">
-                          {log.records_processed} processed
-                        </p>
+                        <p className="text-sm font-medium">{log.records_processed} processed</p>
                         <p className="text-xs text-gray-600">
                           {formatDistanceToNow(log.created_at, { addSuffix: true })}
                         </p>
@@ -335,19 +330,19 @@ export const GovernmentDataPage: React.FC = () => {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Database</span>
-                        <Badge variant={health?.checks.database ? 'default' : 'destructive'}>
+                        <Badge className={health?.checks.database ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                           {health?.checks.database ? 'Healthy' : 'Unhealthy'}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">Cache</span>
-                        <Badge variant={health?.checks.cache ? 'default' : 'destructive'}>
+                        <Badge className={health?.checks.cache ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                           {health?.checks.cache ? 'Healthy' : 'Unhealthy'}
                         </Badge>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm">External APIs</span>
-                        <Badge variant={health?.checks.externalAPIs ? 'default' : 'destructive'}>
+                        <Badge className={health?.checks.externalAPIs ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
                           {health?.checks.externalAPIs ? 'Healthy' : 'Unhealthy'}
                         </Badge>
                       </div>
@@ -378,10 +373,9 @@ export const GovernmentDataPage: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Last Sync</span>
                       <span className="font-medium">
-                        {health?.lastSync 
+                        {health?.lastSync
                           ? formatDistanceToNow(health.lastSync, { addSuffix: true })
-                          : 'Never'
-                        }
+                          : 'Never'}
                       </span>
                     </div>
                   </div>

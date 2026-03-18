@@ -9,18 +9,21 @@ The Argument Intelligence feature provides comprehensive tools for processing, a
 ## Features
 
 ### 1. Argument Clustering
+
 - Automatically groups similar arguments by semantic similarity
 - Identifies key themes and concerns
 - Shows cohesion scores for each cluster
 - Displays representative claims
 
 ### 2. Sentiment Analysis
+
 - Overall sentiment scoring (-1 to 1 scale)
 - Position-based sentiment breakdown
 - Visual heatmap representation
 - Distribution analysis
 
 ### 3. Quality Metrics
+
 - 5-dimensional quality assessment:
   - **Clarity**: How well-articulated the argument is
   - **Evidence**: Strength of supporting evidence
@@ -31,12 +34,14 @@ The Argument Intelligence feature provides comprehensive tools for processing, a
 - Overall quality scoring
 
 ### 4. Position Tracking
+
 - Track how user positions change over time
 - Visualize position history
 - Show strength of conviction
 - Identify position changes
 
 ### 5. Filtering & Search
+
 - Filter by position (support/oppose/neutral)
 - Filter by argument type
 - Filter by confidence and strength thresholds
@@ -45,24 +50,23 @@ The Argument Intelligence feature provides comprehensive tools for processing, a
 ## Components
 
 ### ArgumentIntelligenceDashboard
+
 Main dashboard component that integrates all features.
 
 ```tsx
 import { ArgumentIntelligenceDashboard } from '@client/features/argument-intelligence';
 
-<ArgumentIntelligenceDashboard billId="bill_123" />
+<ArgumentIntelligenceDashboard billId="bill_123" />;
 ```
 
 ### ArgumentIntelligenceWidget
+
 Compact widget for embedding in bill pages or community discussions.
 
 ```tsx
 import { ArgumentIntelligenceWidget } from '@client/features/argument-intelligence';
 
-<ArgumentIntelligenceWidget 
-  billId="bill_123" 
-  compact={false}
-/>
+<ArgumentIntelligenceWidget billId="bill_123" compact={false} />;
 ```
 
 ### Individual Components
@@ -77,7 +81,7 @@ import {
 } from '@client/features/argument-intelligence';
 
 // Use individual components as needed
-<ArgumentClusterDisplay 
+<ArgumentClusterDisplay
   clusters={clusters}
   onClusterClick={handleClusterClick}
 />
@@ -99,6 +103,7 @@ import {
 ## Hooks
 
 ### useArgumentIntelligence
+
 Main hook for managing argument intelligence data.
 
 ```tsx
@@ -147,7 +152,7 @@ function BillDiscussionPage({ billId }) {
     <div>
       {/* Show argument intelligence widget */}
       <ArgumentIntelligenceWidget billId={billId} />
-      
+
       {/* Show discussion thread */}
       <DiscussionThread billId={billId} />
     </div>
@@ -181,6 +186,7 @@ The feature includes comprehensive tests:
 - **E2E Tests**: Complete user workflows
 
 Run tests:
+
 ```bash
 npm test argument-intelligence
 ```

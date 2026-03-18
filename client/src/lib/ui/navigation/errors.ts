@@ -1,6 +1,6 @@
 /**
  * Navigation-specific error types
- * 
+ *
  * Uses shared BaseError from dashboard/errors.ts (canonical source)
  * to unify the error hierarchy across the application.
  */

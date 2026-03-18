@@ -234,13 +234,7 @@ export const createHelpCommands = (actions: {
 /**
  * Create default command sections
  */
-export const createDefaultSections = (
-  navigate: (path: string) => void,
-  quickActions: Parameters<typeof createQuickActionCommands>[0] = {},
-  helpActions: Parameters<typeof createHelpCommands>[0] = {}
-): CommandSection[] => {
-  const sections: CommandSection[] = [];
-
+export 
   // Quick Actions Section
   const quickActionCommands = createQuickActionCommands(quickActions);
   if (quickActionCommands.length > 0) {
@@ -277,10 +271,7 @@ export const createDefaultSections = (
 /**
  * Filter commands based on search query
  */
-export const filterCommands = (commands: Command[], query: string): Command[] => {
-  if (!query.trim()) {
-    return commands.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-  }
+export   }
 
   const normalizedQuery = query.toLowerCase().trim();
 
@@ -311,11 +302,7 @@ export const filterCommands = (commands: Command[], query: string): Command[] =>
 /**
  * Group commands by section
  */
-export const groupCommandsBySection = (commands: Command[]): Record<string, Command[]> => {
-  return commands.reduce(
-    (groups, command) => {
-      const section = command.section || 'other';
-      if (!groups[section]) {
+export       if (!groups[section]) {
         groups[section] = [];
       }
       groups[section].push(command);

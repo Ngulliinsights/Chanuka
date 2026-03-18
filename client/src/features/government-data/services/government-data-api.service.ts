@@ -15,7 +15,7 @@ import {
   GovernmentDataStatsResponse,
   GovernmentDataHealthResponse,
   GovernmentDataSyncResponse,
-  BulkUpdateRequest
+  BulkUpdateRequest,
 } from '@shared/types/api/contracts/government-data.contracts';
 
 class GovernmentDataApiService extends SyncableApiService<
@@ -29,11 +29,17 @@ class GovernmentDataApiService extends SyncableApiService<
   }
 
   // Enhanced query methods
-  async getByType(dataType: string, params?: Partial<GovernmentDataQueryParams>): Promise<GovernmentDataListResponse> {
+  async getByType(
+    dataType: string,
+    params?: Partial<GovernmentDataQueryParams>
+  ): Promise<GovernmentDataListResponse> {
     return this.client.get(`${this.baseUrl}/type/${dataType}`, params);
   }
 
-  async getBySource(source: string, params?: Partial<GovernmentDataQueryParams>): Promise<GovernmentDataListResponse> {
+  async getBySource(
+    source: string,
+    params?: Partial<GovernmentDataQueryParams>
+  ): Promise<GovernmentDataListResponse> {
     return this.client.get(`${this.baseUrl}/source/${source}`, params);
   }
 
@@ -41,7 +47,9 @@ class GovernmentDataApiService extends SyncableApiService<
     return this.client.get(`${this.baseUrl}/recent`, { limit });
   }
 
-  async getTrending(period: 'day' | 'week' | 'month' = 'week'): Promise<GovernmentDataListResponse> {
+  async getTrending(
+    period: 'day' | 'week' | 'month' = 'week'
+  ): Promise<GovernmentDataListResponse> {
     return this.client.get(`${this.baseUrl}/trending`, { period });
   }
 
@@ -59,16 +67,25 @@ class GovernmentDataApiService extends SyncableApiService<
     return this.client.patch(`${this.baseUrl}/bulk`, request);
   }
 
-  async bulkUpdateByQuery(query: Partial<GovernmentDataQueryParams>, updates: Partial<UpdateGovernmentDataRequest>): Promise<GovernmentDataListResponse> {
+  async bulkUpdateByQuery(
+    query: Partial<GovernmentDataQueryParams>,
+    updates: Partial<UpdateGovernmentDataRequest>
+  ): Promise<GovernmentDataListResponse> {
     return this.client.patch(`${this.baseUrl}/bulk/query`, { query, updates });
   }
 
   // Sync operations (inherited from SyncableApiService)
-  async syncFromSource(source: string, options?: { force?: boolean }): Promise<GovernmentDataSyncResponse> {
+  async syncFromSource(
+    source: string,
+    options?: { force?: boolean }
+  ): Promise<GovernmentDataSyncResponse> {
     return this.client.post(`${this.baseUrl}/sync/source/${source}`, options);
   }
 
-  async syncAll(options?: { force?: boolean; parallel?: boolean }): Promise<GovernmentDataSyncResponse> {
+  async syncAll(options?: {
+    force?: boolean;
+    parallel?: boolean;
+  }): Promise<GovernmentDataSyncResponse> {
     return this.client.post(`${this.baseUrl}/sync/all`, options);
   }
 
@@ -100,10 +117,12 @@ class GovernmentDataApiService extends SyncableApiService<
     filters?: Record<string, any>;
     facets?: string[];
     highlight?: boolean;
-  }): Promise<GovernmentDataListResponse & {
-    facets?: Record<string, Array<{ value: string; count: number }>>;
-    highlights?: Record<string, string[]>;
-  }> {
+  }): Promise<
+    GovernmentDataListResponse & {
+      facets?: Record<string, Array<{ value: string; count: number }>>;
+      highlights?: Record<string, string[]>;
+    }
+  > {
     return this.client.post(`${this.baseUrl}/search/advanced`, params);
   }
 
@@ -116,11 +135,16 @@ class GovernmentDataApiService extends SyncableApiService<
     return this.client.post(`${this.baseUrl}/${id}/validate`);
   }
 
-  async validateBatch(ids: string[]): Promise<Record<string, {
-    isValid: boolean;
-    errors: Array<{ field: string; message: string; severity: 'error' | 'warning' }>;
-    score: number;
-  }>> {
+  async validateBatch(ids: string[]): Promise<
+    Record<
+      string,
+      {
+        isValid: boolean;
+        errors: Array<{ field: string; message: string; severity: 'error' | 'warning' }>;
+        score: number;
+      }
+    >
+  > {
     return this.client.post(`${this.baseUrl}/validate/batch`, { ids });
   }
 }

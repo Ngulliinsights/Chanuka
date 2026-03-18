@@ -1,9 +1,9 @@
 /**
  * Observability Module
- * 
+ *
  * Unified observability infrastructure consolidating error monitoring,
  * performance tracking, telemetry, and analytics.
- * 
+ *
  * Requirements: 4.1, 11.1
  */
 
@@ -28,10 +28,19 @@ export * from './system';
 
 // Import sub-module functions
 import { trackError as trackErrorImpl, initializeErrorMonitoring } from './error-monitoring';
-import { trackPerformance as trackPerformanceImpl, initializePerformanceMonitoring } from './performance';
+import {
+  trackPerformance as trackPerformanceImpl,
+  initializePerformanceMonitoring,
+} from './performance';
 import { trackEvent as trackEventImpl, initializeAnalyticsTracking } from './analytics';
 import { sendTelemetry as sendTelemetryImpl, initializeTelemetry } from './telemetry';
-import type { ErrorContext, PerformanceMetric, AnalyticsEvent, TelemetryData, ObservabilityMetrics } from './types';
+import type {
+  ErrorContext,
+  PerformanceMetric,
+  AnalyticsEvent,
+  TelemetryData,
+  ObservabilityMetrics,
+} from './types';
 
 /**
  * Unified observability service

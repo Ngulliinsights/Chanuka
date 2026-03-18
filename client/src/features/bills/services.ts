@@ -22,10 +22,8 @@ export type {
 export class BillService {
   static instance = new BillService();
 }
-export const billService = BillService.instance;
-
-// Service configuration interfaces
-export interface BillServiceConfig {
+export // Service configuration interfaces
+interface BillServiceConfig {
   maxRetries?: number;
   timeout?: number;
 }

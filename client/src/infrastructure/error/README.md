@@ -47,11 +47,13 @@ The unified error handling system provides:
 ### 1. Separation of Concerns
 
 **Error Construction** (pure, no side effects):
+
 ```typescript
 const error = createValidationError([{ field: 'email', message: 'Invalid' }]);
 ```
 
 **Error Handling** (explicit side effects):
+
 ```typescript
 handleUnifiedError(error); // Logs, tracks, attempts recovery
 ```
@@ -59,6 +61,7 @@ handleUnifiedError(error); // Logs, tracks, attempts recovery
 ### 2. Type Alignment
 
 Client errors align with server `StandardizedError`:
+
 - Uses `ErrorDomain` (not `ErrorCategory` or `ErrorClassification`)
 - Uses `type` field (not `category`)
 - Uses `statusCode` field (not `httpStatusCode`)
@@ -66,6 +69,7 @@ Client errors align with server `StandardizedError`:
 ### 3. HTTP Boundary Serialization
 
 Errors can be serialized for transmission:
+
 ```typescript
 // Client → Server
 const apiError = toApiError(clientError);
@@ -79,17 +83,13 @@ const clientError = fromApiError(apiErrorResponse);
 ### Basic Usage
 
 ```typescript
-import {
-  createNetworkError,
-  handleUnifiedError,
-} from '@/infrastructure/error';
+import { createNetworkError, handleUnifiedError } from '@/infrastructure/error';
 
 // 1. Create error (pure function)
-const error = createNetworkError(
-  'Request failed',
-  500,
-  { component: 'APIClient', operation: 'fetchData' }
-);
+const error = createNetworkError('Request failed', 500, {
+  component: 'APIClient',
+  operation: 'fetchData',
+});
 
 // 2. Handle error (side effects)
 handleUnifiedError(error);
@@ -101,22 +101,17 @@ throw error;
 ### With Try-Catch
 
 ```typescript
-import {
-  errorToClientError,
-  handleUnifiedError,
-} from '@/infrastructure/error';
+import { errorToClientError, handleUnifiedError } from '@/infrastructure/error';
 import { ErrorDomain, ErrorSeverity } from '@shared/core';
 
 try {
   await fetchData();
 } catch (err) {
-  const clientError = errorToClientError(
-    err as Error,
-    ErrorDomain.NETWORK,
-    ErrorSeverity.MEDIUM,
-    { component: 'DataFetcher', operation: 'fetchData' }
-  );
-  
+  const clientError = errorToClientError(err as Error, ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
+    component: 'DataFetcher',
+    operation: 'fetchData',
+  });
+
   handleUnifiedError(clientError);
   throw clientError;
 }
@@ -125,11 +120,7 @@ try {
 ### With Result Monad (Functional)
 
 ```typescript
-import {
-  safeAsync,
-  isOk,
-  createNetworkError,
-} from '@/infrastructure/error';
+import { safeAsync, isOk, createNetworkError } from '@/infrastructure/error';
 
 async function fetchUser(id: string) {
   return safeAsync(
@@ -137,10 +128,11 @@ async function fetchUser(id: string) {
       const response = await fetch(`/api/users/${id}`);
       return response.json();
     },
-    (error) => createNetworkError(error.message, 0, {
-      component: 'UserService',
-      operation: 'fetchUser',
-    })
+    error =>
+      createNetworkError(error.message, 0, {
+        component: 'UserService',
+        operation: 'fetchUser',
+      })
   );
 }
 
@@ -187,10 +179,10 @@ const error = createNetworkError(
 ```typescript
 import { createAuthenticationError } from '@/infrastructure/error';
 
-const error = createAuthenticationError(
-  'Invalid credentials',
-  { component: 'AuthService', operation: 'login' }
-);
+const error = createAuthenticationError('Invalid credentials', {
+  component: 'AuthService',
+  operation: 'login',
+});
 ```
 
 ### Authorization Errors
@@ -235,10 +227,11 @@ const error = createSystemError(
 ```typescript
 import { createNotFoundError } from '@/infrastructure/error';
 
-const error = createNotFoundError(
-  'User',
-  { component: 'UserService', operation: 'findById', userId: '123' }
-);
+const error = createNotFoundError('User', {
+  component: 'UserService',
+  operation: 'findById',
+  userId: '123',
+});
 ```
 
 ### Timeout Errors
@@ -261,10 +254,10 @@ const error = createTimeoutError(
 import { errorHandler } from '@/infrastructure/error';
 
 errorHandler.updateConfig({
-  enableTracking: true,      // Track in observability
-  enableLogging: true,        // Log with structured logger
-  enableRecovery: true,       // Attempt automatic recovery
-  maxRecoveryAttempts: 3,     // Max recovery attempts per error
+  enableTracking: true, // Track in observability
+  enableLogging: true, // Log with structured logger
+  enableRecovery: true, // Attempt automatic recovery
+  maxRecoveryAttempts: 3, // Max recovery attempts per error
 });
 ```
 
@@ -321,7 +314,7 @@ import { fromApiError, handleUnifiedError } from '@/infrastructure/error';
 try {
   const response = await fetch('/api/data');
   const data = await response.json();
-  
+
   if (!data.success) {
     // Deserialize server error
     const clientError = fromApiError(data);
@@ -363,7 +356,7 @@ async function fetchUser(id: string) {
       const response = await fetch(`/api/users/${id}`);
       return response.json();
     },
-    (error) => createNetworkError(error.message, 0)
+    error => createNetworkError(error.message, 0)
   );
 }
 ```
@@ -375,7 +368,7 @@ import { andThen, map } from '@/infrastructure/error';
 
 const result = await fetchUser('123');
 
-const processedResult = andThen(result, (user) => {
+const processedResult = andThen(result, user => {
   // Validate user
   if (!user.email) {
     return err(createValidationError([{ field: 'email', message: 'Required' }]));
@@ -383,7 +376,7 @@ const processedResult = andThen(result, (user) => {
   return ok(user);
 });
 
-const transformedResult = map(processedResult, (user) => ({
+const transformedResult = map(processedResult, user => ({
   ...user,
   displayName: `${user.firstName} ${user.lastName}`,
 }));
@@ -417,12 +410,16 @@ Errors are automatically logged with structured logger:
 handleUnifiedError(error);
 
 // Equivalent to:
-logger.error(error.message, {
-  component: error.context.component,
-  errorType: error.type,
-  errorCode: error.code,
-  // ... more context
-}, errorObj);
+logger.error(
+  error.message,
+  {
+    component: error.context.component,
+    errorType: error.type,
+    errorCode: error.code,
+    // ... more context
+  },
+  errorObj
+);
 ```
 
 ## Migration Guide
@@ -499,7 +496,7 @@ See the following files for complete examples:
 
 - [UNIFIED_ERROR_MIGRATION.md](./UNIFIED_ERROR_MIGRATION.md) - Migration guide with examples
 - [RESULT_MONAD_GUIDE.md](./RESULT_MONAD_GUIDE.md) - Result monad examples
-- [__tests__/serialization.test.ts](./__tests__/serialization.test.ts) - Test examples
+- [**tests**/serialization.test.ts](./__tests__/serialization.test.ts) - Test examples
 
 ## Requirements
 
@@ -525,5 +522,5 @@ For questions or issues:
 
 1. Check the migration guide: [UNIFIED_ERROR_MIGRATION.md](./UNIFIED_ERROR_MIGRATION.md)
 2. Check the Result monad guide: [RESULT_MONAD_GUIDE.md](./RESULT_MONAD_GUIDE.md)
-3. Review test examples: [__tests__/serialization.test.ts](./__tests__/serialization.test.ts)
-4. Check integration tests: [__tests__/integration.test.md](./__tests__/integration.test.md)
+3. Review test examples: [**tests**/serialization.test.ts](./__tests__/serialization.test.ts)
+4. Check integration tests: [**tests**/integration.test.md](./__tests__/integration.test.md)

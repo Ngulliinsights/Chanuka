@@ -7,7 +7,7 @@
 import { ErrorDomain, ErrorSeverity } from '../constants';
 import { AppError, ErrorContext } from '../types';
 
-import { ErrorMessageTemplate, getBestMatchTemplate, getLocalizedMessage } from './error-message-templates';
+import { getBestMatchTemplate, getLocalizedMessage } from './error-message-templates';
 
 // ============================================================================
 // Error Message Formatter
@@ -41,17 +41,18 @@ export function formatErrorMessage(
   error: AppError | Error,
   options: FormatOptions = {}
 ): FormattedErrorMessage {
-  const { locale = 'en-US', showTechnicalDetails = false, includeContext = true, maxSuggestions = 3 } = options;
+  const {
+    locale = 'en-US',
+    showTechnicalDetails = false,
+    includeContext = true,
+    maxSuggestions = 3,
+  } = options;
 
   // Handle both AppError and standard Error
   const appError = error instanceof AppError ? error : createAppErrorFromError(error);
 
   // Get the best matching template
-  const template = getBestMatchTemplate(
-    appError.type,
-    appError.severity,
-    appError.code
-  );
+  const template = getBestMatchTemplate(appError.type, appError.severity, appError.code);
 
   // Format the message with context variables
   const formattedMessage = formatMessageWithContext(template.message, appError);
@@ -61,8 +62,9 @@ export function formatErrorMessage(
   const localizedMessage = getLocalizedMessage(template.id, locale);
 
   // Build recovery suggestions
-  const suggestions = template.recoverySuggestions ?
-    template.recoverySuggestions.slice(0, maxSuggestions) : [];
+  const suggestions = template.recoverySuggestions
+    ? template.recoverySuggestions.slice(0, maxSuggestions)
+    : [];
 
   // Build technical details if requested
   let technicalDetails: string | undefined;
@@ -97,24 +99,38 @@ export function formatErrorMessage(
 // Context-Based Formatting
 // ============================================================================
 
-export function formatMessageWithContext(
-  message: string,
-  error: AppError
-): string {
+export function formatMessageWithContext(message: string, error: AppError): string {
   if (!message || !error) return message;
 
   // Replace common placeholders
   let formatted = message
     .replace(/{errorCode}/g, error.code || 'UNKNOWN')
     .replace(/{errorMessage}/g, error.message || '')
-    .replace(/{endpoint}/g, (error.context?.url || error.details?.url || 'unknown endpoint') as string)
+    .replace(
+      /{endpoint}/g,
+      (error.context?.url || error.details?.url || 'unknown endpoint') as string
+    )
     .replace(/{timeout}/g, error.details?.timeout ? String(error.details.timeout) : 'unknown')
     .replace(/{statusCode}/g, error.statusCode ? String(error.statusCode) : 'unknown')
-    .replace(/{statusText}/g, error.details?.statusText ? String(error.details.statusText) : 'unknown')
+    .replace(
+      /{statusText}/g,
+      error.details?.statusText ? String(error.details.statusText) : 'unknown'
+    )
     .replace(/{fieldName}/g, error.details?.fieldName ? String(error.details.fieldName) : 'field')
-    .replace(/{validationError}/g, error.details?.validationError ? String(error.details.validationError) : 'validation error')
-    .replace(/{serviceName}/g, error.details?.serviceName ? String(error.details.serviceName) : 'external service')
-    .replace(/{memoryUsage}/g, error.details?.memoryUsage ? formatMemoryUsage(error.details.memoryUsage as number) : 'high memory')
+    .replace(
+      /{validationError}/g,
+      error.details?.validationError ? String(error.details.validationError) : 'validation error'
+    )
+    .replace(
+      /{serviceName}/g,
+      error.details?.serviceName ? String(error.details.serviceName) : 'external service'
+    )
+    .replace(
+      /{memoryUsage}/g,
+      error.details?.memoryUsage
+        ? formatMemoryUsage(error.details.memoryUsage as number)
+        : 'high memory'
+    )
     .replace(/{errorDetails}/g, error.message || 'unknown error');
 
   // Add component context if available

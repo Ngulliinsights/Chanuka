@@ -1,11 +1,4 @@
-import {
-  PretextScore,
-  BillAnalysis,
-  AnalysisConfig,
-  TimelineEvent,
-  Stakeholder,
-  Source,
-} from '../types';
+import { PretextScore, AnalysisConfig, TimelineEvent, Stakeholder, Source } from '../types';
 
 export class PretextAnalysisService {
   private config: AnalysisConfig;

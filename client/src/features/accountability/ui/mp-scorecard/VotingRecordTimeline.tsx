@@ -1,6 +1,6 @@
 /**
  * Voting Record Timeline Component
- * 
+ *
  * Visual timeline of MP votes with alignment indicators
  */
 
@@ -41,7 +41,12 @@ export function VotingRecordTimeline({
   onVoteClick,
   className = '',
 }: VotingRecordTimelineProps) {
-  const { data: records, isLoading, isError, error } = useMPVotingRecord({
+  const {
+    data: records,
+    isLoading,
+    isError,
+    error,
+  } = useMPVotingRecord({
     sponsorId,
     constituency,
     startDate,
@@ -76,7 +81,9 @@ export function VotingRecordTimeline({
 
   if (!records || records.length === 0) {
     return (
-      <div className={`rounded-lg border-2 border-gray-200 bg-gray-50 p-12 text-center ${className}`}>
+      <div
+        className={`rounded-lg border-2 border-gray-200 bg-gray-50 p-12 text-center ${className}`}
+      >
         <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
         <h3 className="text-lg font-semibold text-gray-700">No voting records found</h3>
         <p className="text-sm text-gray-600 mt-1">
@@ -104,7 +111,7 @@ export function VotingRecordTimeline({
 
         {/* Voting records */}
         <div className="space-y-6">
-          {records.map((record) => {
+          {records.map(record => {
             const VoteIcon = voteIcons[record.vote];
             const alignmentStatus = getAlignmentStatus(record);
 
@@ -114,9 +121,13 @@ export function VotingRecordTimeline({
                 className={`
                   relative pl-20 pr-6 py-4 rounded-lg border-2 transition-all duration-200
                   ${onVoteClick ? 'cursor-pointer hover:shadow-md hover:border-blue-300' : ''}
-                  ${alignmentStatus === 'aligned' ? 'bg-green-50 border-green-200' : 
-                    alignmentStatus === 'misaligned' ? 'bg-red-50 border-red-200' : 
-                    'bg-white border-gray-200'}
+                  ${
+                    alignmentStatus === 'aligned'
+                      ? 'bg-green-50 border-green-200'
+                      : alignmentStatus === 'misaligned'
+                        ? 'bg-red-50 border-red-200'
+                        : 'bg-white border-gray-200'
+                  }
                 `}
                 onClick={() => onVoteClick?.(record)}
                 role={onVoteClick ? 'button' : undefined}
@@ -138,7 +149,9 @@ export function VotingRecordTimeline({
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${voteColors[record.vote]}`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded ${voteColors[record.vote]}`}
+                        >
                           Voted {record.vote.toUpperCase()}
                         </span>
                         {alignmentStatus === 'aligned' && (
@@ -152,7 +165,7 @@ export function VotingRecordTimeline({
                           </span>
                         )}
                       </div>
-                      
+
                       <h4 className="font-semibold text-gray-900">
                         Bill {record.billId.substring(0, 8)}...
                       </h4>
@@ -174,7 +187,7 @@ export function VotingRecordTimeline({
                       <Calendar className="w-4 h-4" />
                       <span>{format(new Date(record.voteDate), 'MMM d, yyyy')}</span>
                     </div>
-                    
+
                     {record.readingStage && (
                       <div>
                         <span className="font-medium">Stage:</span> {record.readingStage}
@@ -183,16 +196,15 @@ export function VotingRecordTimeline({
 
                     {record.daysUntilNextElection !== null && (
                       <div>
-                        <span className="font-medium">Election:</span> {record.daysUntilNextElection} days
+                        <span className="font-medium">Election:</span>{' '}
+                        {record.daysUntilNextElection} days
                       </div>
                     )}
                   </div>
 
                   {/* Hansard reference */}
                   {record.hansardReference && (
-                    <div className="text-xs text-gray-500">
-                      Hansard: {record.hansardReference}
-                    </div>
+                    <div className="text-xs text-gray-500">Hansard: {record.hansardReference}</div>
                   )}
                 </div>
               </div>

@@ -294,19 +294,7 @@ const safeParseTimestamp = (timestamp: string | Date): number => {
 };
 
 // Selectors
-export const selectConnectionState = (state: { realTime: RealTimeState }) =>
-  state.realTime.connection;
-export const selectBillUpdates = (billId: number) => (state: { realTime: RealTimeState }) =>
-  state.realTime.billUpdates[billId] || [];
-export const selectEngagementMetrics = (billId: number) => (state: { realTime: RealTimeState }) =>
-  state.realTime.engagementMetrics[billId];
-export const selectUnreadNotifications = (state: { realTime: RealTimeState }) =>
-  state.realTime.notifications.filter(n => !n.read);
-export const selectNotificationCount = (state: { realTime: RealTimeState }) =>
-  state.realTime.notificationCount;
-export const selectRecentActivity = (state: { realTime: RealTimeState }) => {
-  const allUpdates: (BillRealTimeUpdate | CommunityRealTimeUpdate)[] = [];
-
+export export export export export export 
   // Collect all bill updates
   Object.values(state.realTime.billUpdates).forEach(updates => {
     allUpdates.push(...updates);

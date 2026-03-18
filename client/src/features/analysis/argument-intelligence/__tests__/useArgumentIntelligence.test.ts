@@ -11,7 +11,7 @@ vi.mock('../api/argument-intelligence-api');
 
 describe('useArgumentIntelligence', () => {
   const mockBillId = 'bill_123';
-  
+
   const mockArguments = [
     {
       id: 'arg_1',
@@ -61,21 +61,21 @@ describe('useArgumentIntelligence', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    
+
     vi.mocked(api.getArguments).mockResolvedValue({
       arguments: mockArguments,
       count: 1,
       pagination: {},
     });
-    
+
     vi.mocked(api.getArgumentStatistics).mockResolvedValue(mockStatistics);
-    
+
     vi.mocked(api.clusterArguments).mockResolvedValue({
       clusters: mockClusters,
       outliers: [],
       metrics: {},
     });
-    
+
     vi.mocked(api.getArgumentMap).mockResolvedValue({
       nodes: [],
       edges: [],
@@ -85,46 +85,46 @@ describe('useArgumentIntelligence', () => {
 
   it('fetches arguments on mount', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     expect(result.current.loading).toBe(true);
-    
+
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
-    
+
     expect(api.getArguments).toHaveBeenCalledWith(mockBillId, {});
     expect(result.current.arguments).toEqual(mockArguments);
   });
 
   it('fetches statistics on mount', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.statistics).toEqual(mockStatistics);
     });
-    
+
     expect(api.getArgumentStatistics).toHaveBeenCalledWith(mockBillId);
   });
 
   it('fetches clusters after arguments are loaded', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.clusters).toEqual(mockClusters);
     });
-    
+
     expect(api.clusterArguments).toHaveBeenCalled();
   });
 
   it('updates filters correctly', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
-    
+
     result.current.updateFilters({ position: 'support' });
-    
+
     await waitFor(() => {
       expect(result.current.filters.position).toBe('support');
     });
@@ -132,14 +132,14 @@ describe('useArgumentIntelligence', () => {
 
   it('clears filters correctly', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
-    
+
     result.current.updateFilters({ position: 'support', minConfidence: 0.8 });
     result.current.clearFilters();
-    
+
     await waitFor(() => {
       expect(result.current.filters).toEqual({});
     });
@@ -147,9 +147,9 @@ describe('useArgumentIntelligence', () => {
 
   it('handles errors gracefully', async () => {
     vi.mocked(api.getArguments).mockRejectedValue(new Error('API Error'));
-    
+
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.error).toBe('API Error');
       expect(result.current.loading).toBe(false);
@@ -158,15 +158,15 @@ describe('useArgumentIntelligence', () => {
 
   it('refetches data when refetch is called', async () => {
     const { result } = renderHook(() => useArgumentIntelligence(mockBillId));
-    
+
     await waitFor(() => {
       expect(result.current.loading).toBe(false);
     });
-    
+
     vi.clearAllMocks();
-    
+
     result.current.refetch();
-    
+
     await waitFor(() => {
       expect(api.getArguments).toHaveBeenCalled();
     });

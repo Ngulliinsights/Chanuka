@@ -60,7 +60,7 @@ const PlatformStats: React.FC<{ stats: StatItem[] }> = ({ stats }) => (
   <div className="text-center">
     <h2 className="text-3xl font-bold text-gray-900 mb-8">Platform Statistics</h2>
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-      {stats.map((stat) => {
+      {stats.map(stat => {
         const Icon = stat.icon;
         return (
           <div key={stat.label} className="text-center">
@@ -80,9 +80,7 @@ const RecentActivity: React.FC = () => (
   <div className="max-w-4xl mx-auto">
     <div className="text-center mb-12">
       <h2 className="text-4xl font-bold text-gray-900 mb-4">Recent Activity</h2>
-      <p className="text-xl text-gray-600">
-        Stay updated with the latest legislative developments
-      </p>
+      <p className="text-xl text-gray-600">Stay updated with the latest legislative developments</p>
     </div>
 
     <Card className="border-0 shadow-xl">
@@ -94,9 +92,7 @@ const RecentActivity: React.FC = () => (
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-2">
-                <h4 className="font-semibold text-gray-900">
-                  New Bill: Climate Action Framework
-                </h4>
+                <h4 className="font-semibold text-gray-900">New Bill: Climate Action Framework</h4>
                 <Badge variant="secondary" className="text-xs">
                   New
                 </Badge>
@@ -115,7 +111,11 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/bills">
-              <Button variant="ghost" size="sm" className="hover:bg-brand-navy/10 hover:text-brand-navy">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-brand-navy/10 hover:text-brand-navy"
+              >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -148,7 +148,11 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/bills">
-              <Button variant="ghost" size="sm" className="hover:bg-brand-gold/10 hover:text-brand-gold">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-brand-gold/10 hover:text-brand-gold"
+              >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -163,7 +167,9 @@ const RecentActivity: React.FC = () => (
                 <h4 className="font-semibold text-gray-900">
                   Community Discussion: Healthcare Access
                 </h4>
-                <Badge className="text-xs bg-brand-teal/20 text-brand-teal border-brand-teal/20">Active</Badge>
+                <Badge className="text-xs bg-brand-teal/20 text-brand-teal border-brand-teal/20">
+                  Active
+                </Badge>
               </div>
               <p className="text-gray-600 text-sm mb-2">
                 Active discussion on proposed healthcare legislation changes
@@ -179,7 +185,11 @@ const RecentActivity: React.FC = () => (
               </div>
             </div>
             <Link to="/community">
-              <Button variant="ghost" size="sm" className="hover:bg-brand-teal/10 hover:text-brand-teal">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-brand-teal/10 hover:text-brand-teal"
+              >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </Link>
@@ -339,9 +349,7 @@ const AnonymousHero: React.FC<{
       <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight tracking-tight text-white drop-shadow-2xl">
         Democracy
         <br />
-        <span className="text-yellow-400 drop-shadow-md filter shadow-black/50">
-          in Your Hands
-        </span>
+        <span className="text-yellow-400 drop-shadow-md filter shadow-black/50">in Your Hands</span>
       </h1>
 
       <p className="text-lg md:text-2xl text-gray-50 max-w-4xl mx-auto mb-12 leading-relaxed font-light drop-shadow-lg px-4">
@@ -393,7 +401,7 @@ const AnonymousHero: React.FC<{
 
       {/* Statistics carousel */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-16">
-        {stats.map((stat) => {
+        {stats.map(stat => {
           const Icon = stat.icon;
           return (
             <div
@@ -506,8 +514,8 @@ const AuthenticatedHero: React.FC<{
                 size="lg"
                 variant={index === 0 ? 'primary' : 'outline'}
                 className={`text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 ${
-                  index === 0 
-                    ? 'bg-brand-gold hover:bg-brand-gold/90 text-white border-none' 
+                  index === 0
+                    ? 'bg-brand-gold hover:bg-brand-gold/90 text-white border-none'
                     : 'border-2 border-white/30 text-white hover:bg-white hover:text-brand-navy backdrop-blur-sm bg-white/5'
                 }`}
               >
@@ -654,9 +662,9 @@ export default function CoreHomePage() {
       <section className="relative overflow-hidden min-h-[80vh] flex items-center justify-center bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold">
         {/* Background Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/chanuka-hero-parliament.png" 
-            alt="Parliament Building" 
+          <img
+            src="/chanuka-hero-parliament.png"
+            alt="Parliament Building"
             className="w-full h-full object-cover mix-blend-overlay opacity-30"
           />
           {/* Brand Overlay - Navy tint for readability */}
@@ -748,7 +756,6 @@ export default function CoreHomePage() {
                     tactics in legislation.
                   </CardDescription>
                   <Link to="/workarounds">
-                
                     <Button
                       variant="ghost"
                       className="group-hover:bg-orange-600 group-hover:text-white transition-all duration-300"
@@ -837,7 +844,6 @@ export default function CoreHomePage() {
                   </Link>
                 </CardContent>
               </Card>
-
 
               <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg bg-gradient-to-br from-brand-teal/5 to-brand-teal/10">
                 <CardHeader className="text-center pb-4">

@@ -1,6 +1,6 @@
 /**
  * Alert Management Component
- * 
+ *
  * Displays and manages alerts for a feature
  */
 
@@ -14,7 +14,11 @@ interface AlertManagementProps {
 
 export function AlertManagement({ featureId }: AlertManagementProps) {
   const [showResolved, setShowResolved] = useState(false);
-  const { data: alerts, isLoading, error } = useFeatureAlerts(featureId, showResolved ? undefined : false);
+  const {
+    data: alerts,
+    isLoading,
+    error,
+  } = useFeatureAlerts(featureId, showResolved ? undefined : false);
   const acknowledgeAlert = useAcknowledgeAlert();
   const resolveAlert = useResolveAlert();
 
@@ -43,11 +47,7 @@ export function AlertManagement({ featureId }: AlertManagementProps) {
   }
 
   if (error) {
-    return (
-      <div className="text-center py-8 text-red-600">
-        Failed to load alerts
-      </div>
-    );
+    return <div className="text-center py-8 text-red-600">Failed to load alerts</div>;
   }
 
   const getSeverityColor = (severity: IntegrationAlert['severity']) => {
@@ -73,7 +73,7 @@ export function AlertManagement({ featureId }: AlertManagementProps) {
           <input
             type="checkbox"
             checked={showResolved}
-            onChange={(e) => setShowResolved(e.target.checked)}
+            onChange={e => setShowResolved(e.target.checked)}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
           Show resolved
@@ -81,12 +81,10 @@ export function AlertManagement({ featureId }: AlertManagementProps) {
       </div>
 
       {!alerts || alerts.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No alerts found
-        </div>
+        <div className="text-center py-8 text-gray-500">No alerts found</div>
       ) : (
         <div className="space-y-3">
-          {alerts.map((alert) => (
+          {alerts.map(alert => (
             <div
               key={alert.id}
               className={`border rounded-lg p-4 ${getSeverityColor(alert.severity)}`}
@@ -94,12 +92,8 @@ export function AlertManagement({ featureId }: AlertManagementProps) {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-semibold uppercase">
-                      {alert.severity}
-                    </span>
-                    <span className="text-xs text-gray-600">
-                      {alert.type}
-                    </span>
+                    <span className="text-xs font-semibold uppercase">{alert.severity}</span>
+                    <span className="text-xs text-gray-600">{alert.type}</span>
                   </div>
                   <h4 className="font-semibold mb-1">{alert.title}</h4>
                   <p className="text-sm mb-2">{alert.message}</p>

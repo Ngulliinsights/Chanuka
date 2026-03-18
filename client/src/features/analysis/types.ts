@@ -136,7 +136,6 @@ export interface PatternAnalysis {
   insights: string[];
 }
 
-
 export interface AnalysisResult {
   id: string;
   type: string;
@@ -184,12 +183,14 @@ export interface ConflictVisualizationProps {
 }
 
 export interface AccessibilityFallbackData {
-  summary: string | {
-    totalConnections: number;
-    highRiskConnections: number;
-    averageTransparencyScore: number;
-    topIndustries: string[];
-  };
+  summary:
+    | string
+    | {
+        totalConnections: number;
+        highRiskConnections: number;
+        averageTransparencyScore: number;
+        topIndustries: string[];
+      };
   details?: string[];
   recommendations?: string[];
   sponsors?: Array<{

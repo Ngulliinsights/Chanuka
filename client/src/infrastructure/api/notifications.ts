@@ -520,18 +520,9 @@ export class NotificationApiService {
    *
    * // Get bill-related notifications from last 24 hours
    * const yesterday = new Date(Date.now() - 86400000).toISOString();
-   * const recent = await notificationApiService.getNotifications({
-   *   category: 'bills',
-   *   since: yesterday,
-   *   limit: 50
-   * });
-   *
+   *    *
    * // Load next page for infinite scroll
-   * const nextPage = await notificationApiService.getNotifications({
-   *   limit: 20,
-   *   offset: currentNotifications.length
-   * });
-   * ```
+   *    * ```
    */
   async getNotifications(options: GetNotificationsOptions = {}): Promise<NotificationResponse[]> {
     const operation = 'getNotifications';
@@ -664,9 +655,7 @@ export class NotificationApiService {
    * @example
    * ```typescript
    * // Add to "Clear All" button click handler
-   * const handleClearAll = async () => {
-   *   await notificationApiService.markAllAsRead();
-   *   refreshNotifications();
+   *    *   refreshNotifications();
    * };
    * ```
    */
@@ -715,10 +704,7 @@ export class NotificationApiService {
    * @example
    * ```typescript
    * // Add to notification dismiss/delete button
-   * const handleDelete = async (id: string) => {
-   *   if (confirm('Delete this notification?')) {
-   *     await notificationApiService.deleteNotification(id);
-   *     refreshNotifications();
+   *    *     refreshNotifications();
    *   }
    * };
    * ```
@@ -1083,11 +1069,7 @@ export class NotificationApiService {
  * import { notificationApiService } from '@client/api/notifications';
  *
  * // In a component
- * const notifications = await notificationApiService.getNotifications({
- *   limit: 10,
- *   unreadOnly: true
- * });
- *
+ *  *
  * // In a service
  * await notificationApiService.markAsRead(notificationId);
  *
@@ -1096,4 +1078,4 @@ export class NotificationApiService {
  * updateNotificationBadge(stats.unread);
  * ```
  */
-export const notificationApiService = new NotificationApiService();
+export 

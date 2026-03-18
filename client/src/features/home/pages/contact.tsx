@@ -7,7 +7,7 @@ export default function ContactPage() {
     email: '',
     subject: '',
     message: '',
-    category: 'general'
+    category: 'general',
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -15,13 +15,13 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     setSubmitted(true);
     setIsSubmitting(false);
-    
+
     // Reset form after 3 seconds
     setTimeout(() => {
       setSubmitted(false);
@@ -29,10 +29,12 @@ export default function ContactPage() {
     }, 3000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -55,19 +57,21 @@ export default function ContactPage() {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Contact Information */}
             <div className="lg:col-span-1 space-y-6">
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
                 <h2 className="text-xl font-semibold mb-4">Get in Touch</h2>
-                
+
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1" />
                     <div>
                       <p className="font-medium">Email</p>
-                      <a href="mailto:hello@chanuka.org" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      <a
+                        href="mailto:hello@chanuka.org"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
                         hello@chanuka.org
                       </a>
                     </div>
@@ -77,7 +81,10 @@ export default function ContactPage() {
                     <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1" />
                     <div>
                       <p className="font-medium">Support</p>
-                      <a href="mailto:support@chanuka.org" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      <a
+                        href="mailto:support@chanuka.org"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
                         support@chanuka.org
                       </a>
                     </div>
@@ -97,9 +104,12 @@ export default function ContactPage() {
                     <div>
                       <p className="font-medium">Address</p>
                       <p className="text-gray-600 dark:text-gray-400">
-                        Chanuka Platform<br />
-                        Westlands, Nairobi<br />
-                        Kenya<br />
+                        Chanuka Platform
+                        <br />
+                        Westlands, Nairobi
+                        <br />
+                        Kenya
+                        <br />
                         P.O. Box 12345-00100
                       </p>
                     </div>
@@ -117,7 +127,10 @@ export default function ContactPage() {
                     </a>
                   </li>
                   <li>
-                    <a href="/documentation" className="text-blue-600 dark:text-blue-400 hover:underline">
+                    <a
+                      href="/documentation"
+                      className="text-blue-600 dark:text-blue-400 hover:underline"
+                    >
                       Documentation
                     </a>
                   </li>
@@ -255,7 +268,10 @@ export default function ContactPage() {
 
                     <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                       By submitting this form, you agree to our{' '}
-                      <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                      <a
+                        href="/privacy"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
                         Privacy Policy
                       </a>
                     </p>

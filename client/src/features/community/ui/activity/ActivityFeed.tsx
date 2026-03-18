@@ -25,7 +25,6 @@ import {
   Pen as PenTool,
   Bookmark,
 } from 'lucide-react';
-import React from 'react';
 import { useState, useCallback, memo } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';

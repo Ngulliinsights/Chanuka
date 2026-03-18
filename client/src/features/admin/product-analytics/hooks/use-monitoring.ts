@@ -1,6 +1,6 @@
 /**
  * Monitoring Hooks
- * 
+ *
  * React hooks for monitoring data
  */
 
@@ -69,7 +69,7 @@ export function useFeatureAlerts(featureId: string, resolved?: boolean) {
 
 export function useAcknowledgeAlert() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: acknowledgeAlert,
     onSuccess: () => {
@@ -81,7 +81,7 @@ export function useAcknowledgeAlert() {
 
 export function useResolveAlert() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: resolveAlert,
     onSuccess: () => {
@@ -95,12 +95,7 @@ export function useResolveAlert() {
 // LOGS HOOKS
 // ============================================================================
 
-export function useFeatureLogs(
-  featureId: string,
-  level?: string,
-  limit?: number,
-  enabled = true
-) {
+export function useFeatureLogs(featureId: string, level?: string, limit?: number, enabled = true) {
   return useQuery({
     queryKey: ['monitoring', 'logs', featureId, level, limit],
     queryFn: () => getFeatureLogs(featureId, level, limit),

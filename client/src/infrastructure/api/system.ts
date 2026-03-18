@@ -621,4 +621,4 @@ export class SystemApiService {
  * const health = await systemApiService.getHealth();
  * ```
  */
-export const systemApiService = new SystemApiService();
+export 

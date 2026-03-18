@@ -62,9 +62,7 @@ describe('useMonitoring hooks', () => {
     });
 
     it('handles errors', async () => {
-      vi.mocked(monitoringApi.getDashboardData).mockRejectedValue(
-        new Error('API Error')
-      );
+      vi.mocked(monitoringApi.getDashboardData).mockRejectedValue(new Error('API Error'));
 
       const { result } = renderHook(() => useDashboardData(0), {
         wrapper: createWrapper(),

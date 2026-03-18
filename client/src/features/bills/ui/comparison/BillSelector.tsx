@@ -1,6 +1,6 @@
 /**
  * Bill Selector Component
- * 
+ *
  * Allows users to select multiple bills for comparison.
  * Supports search, filtering, and recent bills.
  */
@@ -17,10 +17,10 @@ interface BillSelectorProps {
   maxBills?: number;
 }
 
-export function BillSelector({ 
-  selectedBillIds, 
+export function BillSelector({
+  selectedBillIds,
   onBillsSelected,
-  maxBills = 4 
+  maxBills = 4,
 }: BillSelectorProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -28,10 +28,11 @@ export function BillSelector({
   // Fetch bills for search
   const { data: searchResults, isLoading } = useQuery({
     queryKey: ['bills', 'search', searchQuery],
-    queryFn: () => billsApiService.getBills({ 
-      query: searchQuery, 
-      limit: 10 
-    }),
+    queryFn: () =>
+      billsApiService.getBills({
+        query: searchQuery,
+        limit: 10,
+      }),
     enabled: searchQuery.length > 2,
   });
 
@@ -39,9 +40,7 @@ export function BillSelector({
   const { data: selectedBills } = useQuery({
     queryKey: ['bills', 'selected', selectedBillIds],
     queryFn: async () => {
-      const bills = await Promise.all(
-        selectedBillIds.map(id => billsApiService.getBillById(id))
-      );
+      const bills = await Promise.all(selectedBillIds.map(id => billsApiService.getBillById(id)));
       return bills;
     },
     enabled: selectedBillIds.length > 0,
@@ -63,7 +62,7 @@ export function BillSelector({
   };
 
   const canAddMore = selectedBillIds.length < maxBills;
-  
+
   // Get bills array from paginated response
   const billsList = (searchResults as any)?.bills || [];
 
@@ -95,9 +94,7 @@ export function BillSelector({
                       <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                         {bill.status}
                       </span>
-                      <span className="text-xs text-gray-500">
-                        {bill.chamber}
-                      </span>
+                      <span className="text-xs text-gray-500">{bill.chamber}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -111,11 +108,7 @@ export function BillSelector({
       {canAddMore && (
         <div>
           {!isSearching ? (
-            <Button
-              onClick={() => setIsSearching(true)}
-              variant="outline"
-              className="w-full"
-            >
+            <Button onClick={() => setIsSearching(true)} variant="outline" className="w-full">
               <Plus className="w-4 h-4 mr-2" />
               Add Bill to Compare
             </Button>
@@ -127,7 +120,7 @@ export function BillSelector({
                   type="text"
                   placeholder="Search bills by title, number, or keyword..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={e => setSearchQuery(e.target.value)}
                   className="pl-10"
                   autoFocus
                 />
@@ -147,9 +140,7 @@ export function BillSelector({
                 <Card>
                   <CardContent className="p-2 max-h-64 overflow-y-auto">
                     {isLoading ? (
-                      <div className="text-center py-4 text-sm text-gray-500">
-                        Searching...
-                      </div>
+                      <div className="text-center py-4 text-sm text-gray-500">Searching...</div>
                     ) : billsList && billsList.length > 0 ? (
                       <div className="space-y-1">
                         {billsList
@@ -173,9 +164,7 @@ export function BillSelector({
                           ))}
                       </div>
                     ) : (
-                      <div className="text-center py-4 text-sm text-gray-500">
-                        No bills found
-                      </div>
+                      <div className="text-center py-4 text-sm text-gray-500">No bills found</div>
                     )}
                   </CardContent>
                 </Card>
@@ -187,9 +176,7 @@ export function BillSelector({
 
       {/* Help Text */}
       {selectedBillIds.length < 2 && (
-        <p className="text-xs text-gray-500 text-center">
-          Select at least 2 bills to compare
-        </p>
+        <p className="text-xs text-gray-500 text-center">Select at least 2 bills to compare</p>
       )}
     </div>
   );

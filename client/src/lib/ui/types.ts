@@ -103,4 +103,3 @@ export type {
 
 // Alias for legacy compatibility
 export type DashboardSectionConfig = any;
-

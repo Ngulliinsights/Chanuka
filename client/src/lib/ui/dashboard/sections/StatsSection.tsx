@@ -1,5 +1,4 @@
 import { TrendingUp, MessageSquare, Award } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';

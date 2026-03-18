@@ -1,15 +1,4 @@
-import {
-  CheckCircle,
-  Clock,
-  AlertTriangle,
-  Settings,
-  Network as GitBranch, // Using Network as GitBranch replacement
-  Shield,
-  Database,
-  LayoutGrid as Layers, // Using LayoutGrid as Layers replacement
-  RefreshCw,
-} from 'lucide-react';
-import React from 'react';
+import { CheckCircle, Clock, AlertTriangle, Settings, Database } from 'lucide-react';
 
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';

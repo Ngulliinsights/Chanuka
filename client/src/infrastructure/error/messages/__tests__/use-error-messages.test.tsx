@@ -1,12 +1,12 @@
 /**
  * React Hook Tests for User-Friendly Error Message System
- * 
+ *
  * Tests for the React hooks that integrate the error message system
  * with React components
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 
 import { ErrorDomain, ErrorSeverity } from '../../constants';
 import { AppError } from '../../types';
@@ -152,10 +152,9 @@ describe('useErrorMessageComponent Hook', () => {
     const error1 = createMockAppError(ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
     const error2 = createMockAppError(ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH);
 
-    const { result, rerender } = renderHook(
-      ({ error }) => useErrorMessageComponent(error),
-      { initialProps: { error: error1 } }
-    );
+    const { result, rerender } = renderHook(({ error }) => useErrorMessageComponent(error), {
+      initialProps: { error: error1 },
+    });
 
     const initialMessage = result.current.formattedMessage;
     expect(initialMessage?.domain).toBe(ErrorDomain.NETWORK);
@@ -208,10 +207,9 @@ describe('useErrorRecovery Hook', () => {
     const error1 = createMockAppError(ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
     const error2 = createMockAppError(ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH);
 
-    const { result, rerender } = renderHook(
-      ({ error }) => useErrorRecovery(error),
-      { initialProps: { error: error1 } }
-    );
+    const { result, rerender } = renderHook(({ error }) => useErrorRecovery(error), {
+      initialProps: { error: error1 },
+    });
 
     const initialSuggestions = result.current.suggestions;
     expect(initialSuggestions.length).toBeGreaterThan(0);
@@ -257,9 +255,7 @@ describe('ErrorMessageProvider and useErrorMessageContext', () => {
   it('should work with nested providers', () => {
     const wrapper = ({ children }: { children: React.ReactNode }) => (
       <ErrorMessageProvider>
-        <ErrorMessageProvider>
-          {children}
-        </ErrorMessageProvider>
+        <ErrorMessageProvider>{children}</ErrorMessageProvider>
       </ErrorMessageProvider>
     );
 
@@ -290,7 +286,9 @@ describe('Hook Integration Tests', () => {
     const suggestions = messagesResult.current.getSuggestions(error);
 
     // Test useErrorMessageComponent
-    const { result: componentResult } = renderHook(() => useErrorMessageComponent(error), { wrapper });
+    const { result: componentResult } = renderHook(() => useErrorMessageComponent(error), {
+      wrapper,
+    });
     const componentData = componentResult.current;
 
     // Test useErrorRecovery
@@ -324,9 +322,9 @@ describe('Hook Integration Tests', () => {
         component: useErrorMessageComponent(error),
         recovery: useErrorRecovery(error),
       }),
-      { 
+      {
         initialProps: { error: error1 },
-        wrapper 
+        wrapper,
       }
     );
 

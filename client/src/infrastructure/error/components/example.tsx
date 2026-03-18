@@ -8,52 +8,51 @@ import type { ErrorFallbackProps } from './ErrorBoundary';
  */
 
 // Example 1: Simple error fallback component
-const SimpleErrorFallback = React.memo<ErrorFallbackProps>(
-  ({ error, onRetry }) => (
-    <div className="error-fallback p-4 border border-red-300 rounded bg-red-50">
-      <h2 className="text-red-800 font-semibold">Something went wrong</h2>
-      <p className="text-red-600 mt-2">{error.message}</p>
-      <button
-        onClick={onRetry}
-        className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-      >
-        Try again
-      </button>
-    </div>
-  )
-);
+const SimpleErrorFallback = React.memo<ErrorFallbackProps>(({ error, onRetry }) => (
+  <div className="error-fallback p-4 border border-red-300 rounded bg-red-50">
+    <h2 className="text-red-800 font-semibold">Something went wrong</h2>
+    <p className="text-red-600 mt-2">{error.message}</p>
+    <button
+      onClick={onRetry}
+      className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+    >
+      Try again
+    </button>
+  </div>
+));
 
 SimpleErrorFallback.displayName = 'SimpleErrorFallback';
 
 // Example 2: Detailed error fallback with stack trace
-const DetailedErrorFallback = React.memo<ErrorFallbackProps>(
-  ({ error, onRetry }) => (
-    <div className="error-fallback p-6 border border-red-300 rounded bg-red-50 max-w-2xl">
-      <h2 className="text-red-800 font-semibold text-lg">Application Error</h2>
-      <p className="text-red-600 mt-2">{error.message}</p>
-      {process.env.NODE_ENV === 'development' && (error instanceof Error ? error.stack : String(error)) && (
+const DetailedErrorFallback = React.memo<ErrorFallbackProps>(({ error, onRetry }) => (
+  <div className="error-fallback p-6 border border-red-300 rounded bg-red-50 max-w-2xl">
+    <h2 className="text-red-800 font-semibold text-lg">Application Error</h2>
+    <p className="text-red-600 mt-2">{error.message}</p>
+    {process.env.NODE_ENV === 'development' &&
+      (error instanceof Error ? error.stack : String(error)) && (
         <details className="mt-4">
           <summary className="cursor-pointer text-red-700 font-medium">Stack Trace</summary>
-          <pre className="mt-2 text-xs bg-red-100 p-3 rounded overflow-auto">{(error instanceof Error ? error.stack : String(error))}</pre>
+          <pre className="mt-2 text-xs bg-red-100 p-3 rounded overflow-auto">
+            {error instanceof Error ? error.stack : String(error)}
+          </pre>
         </details>
       )}
-      <div className="mt-4 flex gap-2">
-        <button
-          onClick={onRetry}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Try again
-        </button>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-        >
-          Reload page
-        </button>
-      </div>
+    <div className="mt-4 flex gap-2">
+      <button
+        onClick={onRetry}
+        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+      >
+        Try again
+      </button>
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+      >
+        Reload page
+      </button>
     </div>
-  )
-);
+  </div>
+));
 
 DetailedErrorFallback.displayName = 'DetailedErrorFallback';
 

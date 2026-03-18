@@ -9,7 +9,6 @@
 
 import { AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import React from 'react';
 
 import { cn } from '@client/lib/utils/cn';
 

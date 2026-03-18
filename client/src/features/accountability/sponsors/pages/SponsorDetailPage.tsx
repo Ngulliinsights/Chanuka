@@ -10,24 +10,24 @@ import { Button } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import { LoadingSpinner } from '@client/lib/design-system';
-import { 
-  ArrowLeft, 
-  User, 
-  Building, 
-  Eye, 
-  Shield, 
+import {
+  ArrowLeft,
+  User,
+  Building,
+  Eye,
+  Shield,
   AlertTriangle,
   Phone,
   MapPin,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 
-import { 
-  useSponsor, 
-  useSponsorAffiliations, 
+import {
+  useSponsor,
+  useSponsorAffiliations,
   useSponsorTransparency,
   useSponsorConflicts,
-  useSponsorRiskProfile
+  useSponsorRiskProfile,
 } from '../hooks';
 import { ConflictVisualization } from '../ui/ConflictVisualization';
 import { RiskProfile } from '../ui/RiskProfile';
@@ -173,15 +173,13 @@ function AffiliationsTab({ sponsorId }: { sponsorId: string | number }) {
 
   return (
     <div className="space-y-4">
-      {affiliations.map((affiliation) => (
+      {affiliations.map(affiliation => (
         <Card key={affiliation.id}>
           <CardHeader>
             <div className="flex items-start justify-between">
               <div>
                 <CardTitle className="text-lg">{affiliation.organization}</CardTitle>
-                {affiliation.role && (
-                  <p className="text-gray-600 mt-1">{affiliation.role}</p>
-                )}
+                {affiliation.role && <p className="text-gray-600 mt-1">{affiliation.role}</p>}
               </div>
               <div className="flex gap-2">
                 <Badge variant="outline">{affiliation.type}</Badge>
@@ -245,7 +243,7 @@ function TransparencyTab({ sponsorId }: { sponsorId: string | number }) {
 
   return (
     <div className="space-y-4">
-      {transparency.map((record) => (
+      {transparency.map(record => (
         <Card key={record.id}>
           <CardHeader>
             <div className="flex items-start justify-between">
@@ -255,9 +253,7 @@ function TransparencyTab({ sponsorId }: { sponsorId: string | number }) {
               </div>
               <div className="flex gap-2">
                 {record.is_verified && <Badge variant="default">Verified</Badge>}
-                {record.amount && (
-                  <Badge variant="outline">{formatCurrency(record.amount)}</Badge>
-                )}
+                {record.amount && <Badge variant="outline">{formatCurrency(record.amount)}</Badge>}
               </div>
             </div>
           </CardHeader>
@@ -341,7 +337,11 @@ export function SponsorDetailPage() {
             </Badge>
           )}
           {riskProfile && (
-            <Badge variant={riskLevel === 'critical' || riskLevel === 'high' ? 'destructive' : 'secondary'}>
+            <Badge
+              variant={
+                riskLevel === 'critical' || riskLevel === 'high' ? 'destructive' : 'secondary'
+              }
+            >
               {riskLevel.toUpperCase()} RISK
             </Badge>
           )}
@@ -408,7 +408,7 @@ export function SponsorDetailPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="font-medium mb-3">Performance Metrics</h3>
                   <div className="space-y-2 text-sm">

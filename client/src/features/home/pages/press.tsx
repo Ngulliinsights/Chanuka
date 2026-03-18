@@ -5,21 +5,24 @@ export default function PressPage() {
     {
       date: '2024-01-15',
       title: 'Chanuka Launches Enhanced Bill Tracking Features',
-      excerpt: 'New real-time notifications and analysis tools help citizens stay informed about legislative changes.',
-      link: '#'
+      excerpt:
+        'New real-time notifications and analysis tools help citizens stay informed about legislative changes.',
+      link: '#',
     },
     {
       date: '2023-12-01',
       title: 'Chanuka Reaches 100,000 Active Users Milestone',
-      excerpt: 'Platform growth reflects increasing demand for transparent access to legislative information.',
-      link: '#'
+      excerpt:
+        'Platform growth reflects increasing demand for transparent access to legislative information.',
+      link: '#',
     },
     {
       date: '2023-10-15',
       title: 'Partnership Announcement: Civic Tech Coalition',
-      excerpt: 'Chanuka joins forces with leading civic technology organizations to expand democratic engagement.',
-      link: '#'
-    }
+      excerpt:
+        'Chanuka joins forces with leading civic technology organizations to expand democratic engagement.',
+      link: '#',
+    },
   ];
 
   const mediaKit = [
@@ -28,29 +31,29 @@ export default function PressPage() {
       description: 'Logo usage, colors, typography, and brand standards',
       icon: FileText,
       size: '2.4 MB',
-      format: 'PDF'
+      format: 'PDF',
     },
     {
       title: 'Logo Package',
       description: 'High-resolution logos in various formats',
       icon: Image,
       size: '8.1 MB',
-      format: 'ZIP'
+      format: 'ZIP',
     },
     {
       title: 'Product Screenshots',
       description: 'High-quality screenshots of our platform',
       icon: Image,
       size: '15.3 MB',
-      format: 'ZIP'
+      format: 'ZIP',
     },
     {
       title: 'Demo Video',
       description: 'Platform overview and feature demonstrations',
       icon: FileText,
       size: '45.2 MB',
-      format: 'MP4'
-    }
+      format: 'MP4',
+    },
   ];
 
   return (
@@ -115,7 +118,7 @@ export default function PressPage() {
                       {new Date(release.date).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
-                        day: 'numeric'
+                        day: 'numeric',
                       })}
                     </p>
                     <h3 className="text-xl font-semibold mb-2">{release.title}</h3>
@@ -210,7 +213,9 @@ export default function PressPage() {
               <div>
                 <h3 className="font-semibold mb-4">Mission</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Chanuka empowers Kenyan citizens with transparent access to legislative information from the National Assembly, Senate, and County Assemblies, strengthening democratic participation through technology.
+                  Chanuka empowers Kenyan citizens with transparent access to legislative
+                  information from the National Assembly, Senate, and County Assemblies,
+                  strengthening democratic participation through technology.
                 </p>
                 <h3 className="font-semibold mb-2">Key Features</h3>
                 <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
@@ -231,7 +236,8 @@ export default function PressPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">In the News</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-8">
-            Chanuka has been featured in leading Kenyan and international publications covering civic technology and democratic innovation.
+            Chanuka has been featured in leading Kenyan and international publications covering
+            civic technology and democratic innovation.
           </p>
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-8 border border-blue-200 dark:border-blue-800">
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">

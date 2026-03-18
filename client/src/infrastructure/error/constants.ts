@@ -44,11 +44,11 @@ export enum RecoveryAction {
 // ============================================================================
 
 export enum ErrorPropagationMode {
-  IMMEDIATE = 'immediate',               // Propagate immediately
-  BATCHED = 'batched',                   // Batch errors before propagation
-  THROTTLED = 'throttled',               // Throttle propagation rate
-  FILTERED = 'filtered',                 // Filter errors before propagation
-  NONE = 'none',                         // No propagation
+  IMMEDIATE = 'immediate', // Propagate immediately
+  BATCHED = 'batched', // Batch errors before propagation
+  THROTTLED = 'throttled', // Throttle propagation rate
+  FILTERED = 'filtered', // Filter errors before propagation
+  NONE = 'none', // No propagation
 }
 
 // ============================================================================
@@ -56,11 +56,11 @@ export enum ErrorPropagationMode {
 // ============================================================================
 
 export enum ErrorHandlingMode {
-  STRICT = 'strict',                     // Strict error handling, no recovery
-  RECOVERABLE = 'recoverable',           // Allow recovery strategies
-  GRACEFUL = 'graceful',                 // Graceful degradation
-  MONITORING_ONLY = 'monitoring_only',   // Only log and monitor
-  DISABLED = 'disabled',                 // Disable error handling
+  STRICT = 'strict', // Strict error handling, no recovery
+  RECOVERABLE = 'recoverable', // Allow recovery strategies
+  GRACEFUL = 'graceful', // Graceful degradation
+  MONITORING_ONLY = 'monitoring_only', // Only log and monitor
+  DISABLED = 'disabled', // Disable error handling
 }
 
 // ============================================================================
@@ -90,9 +90,9 @@ export enum ErrorRecoveryStrategyType {
 // ============================================================================
 
 export enum CircuitBreakerState {
-  CLOSED = 'closed',                     // Normal operation
-  OPEN = 'open',                         // Circuit breaker open, blocking calls
-  HALF_OPEN = 'half_open',               // Testing if service is recovered
+  CLOSED = 'closed', // Normal operation
+  OPEN = 'open', // Circuit breaker open, blocking calls
+  HALF_OPEN = 'half_open', // Testing if service is recovered
 }
 
 // ============================================================================

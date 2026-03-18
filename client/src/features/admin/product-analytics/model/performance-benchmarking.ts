@@ -10,7 +10,6 @@
  * Requirements: 9.1, 9.2
  */
 
-import { PerformanceMonitor } from '@client/infrastructure/observability/performance/index';
 import { logger } from '@client/lib/utils/logger';
 
 export interface PerformanceThresholds {
@@ -447,4 +446,4 @@ class PerformanceBenchmarking {
 }
 
 // Export singleton instance
-export const performanceBenchmarking = PerformanceBenchmarking.getInstance();
+export 

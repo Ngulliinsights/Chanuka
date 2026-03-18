@@ -1,6 +1,6 @@
 /**
  * Feature Flag Manager Component
- * 
+ *
  * Main admin UI for managing feature flags
  */
 
@@ -100,19 +100,19 @@ export function FeatureFlagManager() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="text-sm font-medium text-gray-600 mb-1">Enabled</div>
           <div className="text-3xl font-bold text-green-600">
-            {flags.filter((f) => f.enabled).length}
+            {flags.filter(f => f.enabled).length}
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="text-sm font-medium text-gray-600 mb-1">Disabled</div>
           <div className="text-3xl font-bold text-gray-600">
-            {flags.filter((f) => !f.enabled).length}
+            {flags.filter(f => !f.enabled).length}
           </div>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="text-sm font-medium text-gray-600 mb-1">A/B Tests</div>
           <div className="text-3xl font-bold text-purple-600">
-            {flags.filter((f) => f.abTestConfig).length}
+            {flags.filter(f => f.abTestConfig).length}
           </div>
         </div>
       </div>
@@ -141,7 +141,7 @@ export function FeatureFlagManager() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {flags.map((flag) => (
+              {flags.map(flag => (
                 <tr key={flag.name} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div>
@@ -226,7 +226,11 @@ export function FeatureFlagManager() {
 
       {/* Modals */}
       {showEditor && (
-        <FlagEditor flag={editingFlag} onClose={handleEditorClose} onSuccess={handleEditorSuccess} />
+        <FlagEditor
+          flag={editingFlag}
+          onClose={handleEditorClose}
+          onSuccess={handleEditorSuccess}
+        />
       )}
 
       {showRollout && (

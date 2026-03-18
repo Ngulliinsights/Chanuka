@@ -1,11 +1,11 @@
 /**
  * Pretext Detection API Hooks
- * 
+ *
  * React hooks for interacting with the pretext detection API
  */
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { pretextDetectionApi, type AnalyzeRequest, type ReviewAlertRequest, type GetAlertsParams } from '../api/pretext-detection-api';
+import { pretextDetectionApi } from '../api/pretext-detection-api';
 import { logger } from '@client/lib/utils/logger';
 import { notificationService } from '@client/infrastructure/notifications/model/notification-service';
 
@@ -17,9 +17,9 @@ export function useAnalyzeBill() {
 
   return useMutation({
     mutationFn: (request: AnalyzeRequest) => pretextDetectionApi.analyze(request),
-    onSuccess: (data) => {
+    onSuccess: data => {
       logger.info('Bill analysis completed', { billId: data.billId, score: data.score });
-      
+
       // Show notification if high risk detected
       if (data.score > 70) {
         notificationService.addNotification({
@@ -32,13 +32,13 @@ export function useAnalyzeBill() {
           metadata: { billId: data.billId, score: data.score },
         });
       }
-      
+
       // Invalidate alerts query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['pretext-alerts'] });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Bill analysis failed', { component: 'usePretextDetectionApi' }, error);
-      
+
       // Show error notification
       notificationService.addNotification({
         type: 'system',
@@ -73,7 +73,7 @@ export function useReviewAlert() {
     mutationFn: (request: ReviewAlertRequest) => pretextDetectionApi.reviewAlert(request),
     onSuccess: (_, variables) => {
       logger.info('Alert reviewed successfully');
-      
+
       // Show success notification
       notificationService.addNotification({
         type: 'system',
@@ -82,13 +82,13 @@ export function useReviewAlert() {
         priority: 'low',
         category: 'pretext_detection',
       });
-      
+
       // Invalidate alerts query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['pretext-alerts'] });
     },
-    onError: (error) => {
+    onError: error => {
       logger.error('Alert review failed', { component: 'usePretextDetectionApi' }, error);
-      
+
       // Show error notification
       notificationService.addNotification({
         type: 'system',

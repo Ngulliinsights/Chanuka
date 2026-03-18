@@ -1,9 +1,9 @@
 /**
  * Unit tests for Dependency Injection Container
- * 
+ *
  * Tests service registration, resolution, lifecycle management,
  * and circular dependency detection.
- * 
+ *
  * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 10.1, 10.2
  */
 
@@ -18,10 +18,6 @@ import {
   initializeInThreePhases,
   validateNoCycles,
   ServicePhase,
-  type IDIContainer,
-  type ServiceToken,
-  type ServiceFactory,
-  type PhasedServiceFactory,
 } from '../di-container';
 
 describe('DIContainer', () => {
@@ -98,7 +94,7 @@ describe('DIContainer', () => {
 
       const depFactory = createServiceFactory(() => ({ value: 10 }));
       const serviceFactory = createServiceFactory(
-        (c) => {
+        c => {
           const dep = c.resolve(depToken);
           return { result: dep.value * 2 };
         },
@@ -117,12 +113,18 @@ describe('DIContainer', () => {
       const dep2Token = createServiceToken('Dep2');
       const serviceToken = createServiceToken('Service');
 
-      container.register(dep1Token, createServiceFactory(() => ({ a: 5 })));
-      container.register(dep2Token, createServiceFactory(() => ({ b: 10 })));
+      container.register(
+        dep1Token,
+        createServiceFactory(() => ({ a: 5 }))
+      );
+      container.register(
+        dep2Token,
+        createServiceFactory(() => ({ b: 10 }))
+      );
       container.register(
         serviceToken,
         createServiceFactory(
-          (c) => {
+          c => {
             const dep1 = c.resolve(dep1Token);
             const dep2 = c.resolve(dep2Token);
             return { sum: dep1.a + dep2.b };
@@ -207,7 +209,7 @@ describe('DIContainer', () => {
       const token2 = createServiceToken('Service2');
 
       const factory1 = createServiceFactory(
-        (c) => {
+        c => {
           const dep = c.resolve(token2);
           return { dep };
         },
@@ -215,7 +217,7 @@ describe('DIContainer', () => {
       );
 
       const factory2 = createServiceFactory(
-        (c) => {
+        c => {
           const dep = c.resolve(token1);
           return { dep };
         },
@@ -235,21 +237,21 @@ describe('DIContainer', () => {
 
       container.register(
         token1,
-        createServiceFactory((c) => ({ dep: c.resolve(token2) }), {
+        createServiceFactory(c => ({ dep: c.resolve(token2) }), {
           dependencies: [token2],
         })
       );
 
       container.register(
         token2,
-        createServiceFactory((c) => ({ dep: c.resolve(token3) }), {
+        createServiceFactory(c => ({ dep: c.resolve(token3) }), {
           dependencies: [token3],
         })
       );
 
       container.register(
         token3,
-        createServiceFactory((c) => ({ dep: c.resolve(token1) }), {
+        createServiceFactory(c => ({ dep: c.resolve(token1) }), {
           dependencies: [token1],
         })
       );
@@ -263,11 +265,11 @@ describe('DIContainer', () => {
 
       container.register(
         token1,
-        createServiceFactory((c) => c.resolve(token2), { dependencies: [token2] })
+        createServiceFactory(c => c.resolve(token2), { dependencies: [token2] })
       );
       container.register(
         token2,
-        createServiceFactory((c) => c.resolve(token1), { dependencies: [token1] })
+        createServiceFactory(c => c.resolve(token1), { dependencies: [token1] })
       );
 
       try {
@@ -477,7 +479,7 @@ describe('Three-Phase Initialization', () => {
     factories.set(
       'Logger',
       createServiceFactory(
-        (c) => {
+        c => {
           initOrder.push('Logger');
           const eventBus = c.resolve(eventBusToken);
           return { type: 'Logger', eventBus };
@@ -491,7 +493,7 @@ describe('Three-Phase Initialization', () => {
     factories.set(
       'APIClient',
       createServiceFactory(
-        (c) => {
+        c => {
           initOrder.push('APIClient');
           const logger = c.resolve(loggerToken);
           return { type: 'APIClient', logger };
@@ -528,7 +530,7 @@ describe('Three-Phase Initialization', () => {
     factories.set(
       'Service2',
       createServiceFactory(
-        (c) => {
+        c => {
           const s1 = c.resolve(service1Token);
           return { value: s1.value + 1 };
         },

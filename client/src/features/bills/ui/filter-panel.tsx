@@ -198,10 +198,7 @@ const serializeFiltersToUrl = (filters: ReturnType<typeof normalizeFilters>): UR
 // Main Component
 // ============================================================================
 
-export const FilterPanel = React.memo<FilterPanelProps>(
-  ({ filters, onFiltersChange, isMobile = false, resultCount, totalCount, className }) => {
-    const [searchParams, setSearchParams] = useSearchParams();
-
+export 
     // Track which filter sections are expanded (for better UX on long filter lists)
     const [expandedSections, setExpandedSections] = useState<Set<string>>(
       new Set(['status', 'urgency'])

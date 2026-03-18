@@ -1,6 +1,6 @@
 /**
  * useLegalRisks Hook
- * 
+ *
  * Fetches legal risks and mitigation strategies for a bill
  * Uses React Query for caching (10 minute TTL)
  */

@@ -1,13 +1,13 @@
 /**
  * Comparison Modal
- * 
+ *
  * Modal for quick bill comparison from any page.
  * Allows users to select bills and navigate to full comparison view.
  */
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { GitCompare, X, Search } from 'lucide-react';
+import { GitCompare } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,6 @@ import {
   DialogDescription,
   DialogFooter,
   Button,
-  Input,
   Badge,
 } from '@client/lib/design-system';
 import { useComparisonCart } from '../../hooks/useComparisonCart';
@@ -28,11 +27,7 @@ interface ComparisonModalProps {
   preselectedBillId?: string;
 }
 
-export function ComparisonModal({
-  isOpen,
-  onClose,
-  preselectedBillId,
-}: ComparisonModalProps) {
+export function ComparisonModal({ isOpen, onClose, preselectedBillId }: ComparisonModalProps) {
   const navigate = useNavigate();
   const { billIds, addBill, removeBill, clearCart, canAddMore } = useComparisonCart();
   const [localSelection, setLocalSelection] = useState<string[]>([]);
@@ -79,10 +74,9 @@ export function ComparisonModal({
             Compare Bills
           </DialogTitle>
           <DialogDescription>
-            Select 2-4 bills to compare side-by-side. {localSelection.length > 0 && (
-              <span className="font-medium">
-                {localSelection.length} selected
-              </span>
+            Select 2-4 bills to compare side-by-side.{' '}
+            {localSelection.length > 0 && (
+              <span className="font-medium">{localSelection.length} selected</span>
             )}
           </DialogDescription>
         </DialogHeader>
@@ -106,9 +100,7 @@ export function ComparisonModal({
         <DialogFooter className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {localSelection.length > 0 && (
-              <Badge variant="secondary">
-                {localSelection.length} / 4 bills
-              </Badge>
+              <Badge variant="secondary">{localSelection.length} / 4 bills</Badge>
             )}
           </div>
 
@@ -116,11 +108,7 @@ export function ComparisonModal({
             <Button variant="outline" onClick={handleClose}>
               Cancel
             </Button>
-            <Button
-              onClick={handleCompare}
-              disabled={!canCompare}
-              className="gap-2"
-            >
+            <Button onClick={handleCompare} disabled={!canCompare} className="gap-2">
               <GitCompare className="w-4 h-4" />
               View Comparison
             </Button>

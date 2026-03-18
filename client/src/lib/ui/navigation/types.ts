@@ -1,6 +1,6 @@
 /**
  * Navigation Types Re-export
- * 
+ *
  * This file re-exports types from the canonical types location for legacy imports.
  * The source of truth for navigation types is @client/lib/types/navigation.
  */

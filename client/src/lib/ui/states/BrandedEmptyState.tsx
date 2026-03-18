@@ -1,6 +1,6 @@
 /**
  * BrandedEmptyState Component
- * 
+ *
  * Creates engaging empty states that maintain brand consistency
  * and provide clear calls to action. Includes preset configurations
  * for common scenarios.
@@ -32,15 +32,15 @@ export interface BrandedEmptyStateProps {
 
 /**
  * BrandedEmptyState Component
- * 
+ *
  * Provides consistent, branded empty state UI with optional actions.
- * 
+ *
  * @param title - Main heading text
  * @param description - Supporting description text
  * @param icon - Icon type: 'logo', 'shield', or 'custom' (default: 'logo')
  * @param actionLabel - Primary action button text
  * @param compact - Use smaller spacing (default: false)
- * 
+ *
  * @example
  * <BrandedEmptyState
  *   title="No Results Found"
@@ -50,164 +50,145 @@ export interface BrandedEmptyStateProps {
  *   onAction={handleClearFilters}
  * />
  */
-export const BrandedEmptyState = React.memo<BrandedEmptyStateProps>(({
-  title,
-  description,
-  icon = 'logo',
-  customIcon,
-  actionLabel,
-  actionLink,
-  onAction,
-  secondaryActionLabel,
-  secondaryActionLink,
-  onSecondaryAction,
-  className,
-  compact = false,
-}) => {
-  const renderIcon = React.useCallback(() => {
-    if (customIcon) {
-      return <div className="w-20 h-20 flex items-center justify-center">{customIcon}</div>;
-    }
+export const BrandedEmptyState = React.memo<BrandedEmptyStateProps>(
+  ({
+    title,
+    description,
+    icon = 'logo',
+    customIcon,
+    actionLabel,
+    actionLink,
+    onAction,
+    secondaryActionLabel,
+    secondaryActionLink,
+    onSecondaryAction,
+    className,
+    compact = false,
+  }) => {
+    const renderIcon = React.useCallback(() => {
+      if (customIcon) {
+        return <div className="w-20 h-20 flex items-center justify-center">{customIcon}</div>;
+      }
 
-    switch (icon) {
-      case 'shield':
-        return (
-          <ChanukaShield 
-            size={compact ? 64 : 80} 
-            variant="brand" 
-            className="opacity-20" 
-          />
-        );
-      case 'logo':
-      default:
-        return (
-          <ChanukaLogo 
-            size={compact ? 64 : 80} 
-            variant="brand" 
-            showWordmark={false}
-            className="opacity-20" 
-          />
-        );
-    }
-  }, [customIcon, icon, compact]);
+      switch (icon) {
+        case 'shield':
+          return <ChanukaShield size={compact ? 64 : 80} variant="brand" className="opacity-20" />;
+        case 'logo':
+        default:
+          return (
+            <ChanukaLogo
+              size={compact ? 64 : 80}
+              variant="brand"
+              showWordmark={false}
+              className="opacity-20"
+            />
+          );
+      }
+    }, [customIcon, icon, compact]);
 
-  const renderAction = React.useCallback(() => {
-    if (!actionLabel) return null;
+    const renderAction = React.useCallback(() => {
+      if (!actionLabel) return null;
 
-    const buttonContent = (
-      <>
-        {actionLabel}
-        <ChevronRight className="ml-2 h-5 w-5" aria-hidden="true" />
-      </>
-    );
-
-    if (actionLink) {
-      return (
-        <Link to={actionLink} className="inline-block">
-          <Button 
-            size={compact ? 'md' : 'lg'} 
-            className="shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            {buttonContent}
-          </Button>
-        </Link>
+      const buttonContent = (
+        <>
+          {actionLabel}
+          <ChevronRight className="ml-2 h-5 w-5" aria-hidden="true" />
+        </>
       );
-    }
+
+      if (actionLink) {
+        return (
+          <Link to={actionLink} className="inline-block">
+            <Button
+              size={compact ? 'md' : 'lg'}
+              className="shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              {buttonContent}
+            </Button>
+          </Link>
+        );
+      }
+
+      return (
+        <Button
+          size={compact ? 'md' : 'lg'}
+          onClick={onAction}
+          className="shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          {buttonContent}
+        </Button>
+      );
+    }, [actionLabel, actionLink, onAction, compact]);
+
+    const renderSecondaryAction = React.useCallback(() => {
+      if (!secondaryActionLabel) return null;
+
+      if (secondaryActionLink) {
+        return (
+          <Link to={secondaryActionLink} className="inline-block">
+            <Button variant="outline" size={compact ? 'md' : 'lg'}>
+              {secondaryActionLabel}
+            </Button>
+          </Link>
+        );
+      }
+
+      return (
+        <Button variant="outline" size={compact ? 'md' : 'lg'} onClick={onSecondaryAction}>
+          {secondaryActionLabel}
+        </Button>
+      );
+    }, [secondaryActionLabel, secondaryActionLink, onSecondaryAction, compact]);
 
     return (
-      <Button
-        size={compact ? 'md' : 'lg'}
-        onClick={onAction}
-        className="shadow-lg hover:shadow-xl transition-all duration-300"
+      <div
+        className={cn(
+          'flex flex-col items-center justify-center px-4',
+          compact ? 'py-12' : 'py-16',
+          className
+        )}
+        role="status"
+        aria-live="polite"
       >
-        {buttonContent}
-      </Button>
-    );
-  }, [actionLabel, actionLink, onAction, compact]);
+        {/* Icon with Gradient Background */}
+        <div className={cn('relative', compact ? 'mb-6' : 'mb-8')}>
+          {/* Gradient glow effect */}
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-brand-navy/10 via-brand-teal/10 to-brand-gold/10 blur-2xl animate-pulse"
+            aria-hidden="true"
+          />
 
-  const renderSecondaryAction = React.useCallback(() => {
-    if (!secondaryActionLabel) return null;
-
-    if (secondaryActionLink) {
-      return (
-        <Link to={secondaryActionLink} className="inline-block">
-          <Button variant="outline" size={compact ? 'md' : 'lg'}>
-            {secondaryActionLabel}
-          </Button>
-        </Link>
-      );
-    }
-
-    return (
-      <Button 
-        variant="outline" 
-        size={compact ? 'md' : 'lg'} 
-        onClick={onSecondaryAction}
-      >
-        {secondaryActionLabel}
-      </Button>
-    );
-  }, [secondaryActionLabel, secondaryActionLink, onSecondaryAction, compact]);
-
-  return (
-    <div 
-      className={cn(
-        'flex flex-col items-center justify-center px-4',
-        compact ? 'py-12' : 'py-16',
-        className
-      )}
-      role="status"
-      aria-live="polite"
-    >
-      {/* Icon with Gradient Background */}
-      <div className={cn("relative", compact ? "mb-6" : "mb-8")}>
-        {/* Gradient glow effect */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-brand-navy/10 via-brand-teal/10 to-brand-gold/10 blur-2xl animate-pulse" 
-          aria-hidden="true"
-        />
-        
-        {/* Icon */}
-        <div className="relative z-10">
-          {renderIcon()}
+          {/* Icon */}
+          <div className="relative z-10">{renderIcon()}</div>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className={cn(
-        "text-center max-w-md space-y-3",
-        compact ? "mb-6" : "mb-8"
-      )}>
-        <h3 className={cn(
-          "font-bold text-gray-900",
-          compact ? "text-xl" : "text-2xl"
-        )}>
-          {title}
-        </h3>
-        <p className={cn(
-          "text-gray-600 leading-relaxed",
-          compact ? "text-sm" : "text-base"
-        )}>
-          {description}
-        </p>
-      </div>
-
-      {/* Actions */}
-      {(actionLabel || secondaryActionLabel) && (
-        <div className="flex flex-col sm:flex-row items-center gap-4">
-          {renderAction()}
-          {renderSecondaryAction()}
+        {/* Content */}
+        <div className={cn('text-center max-w-md space-y-3', compact ? 'mb-6' : 'mb-8')}>
+          <h3 className={cn('font-bold text-gray-900', compact ? 'text-xl' : 'text-2xl')}>
+            {title}
+          </h3>
+          <p className={cn('text-gray-600 leading-relaxed', compact ? 'text-sm' : 'text-base')}>
+            {description}
+          </p>
         </div>
-      )}
-    </div>
-  );
-});
+
+        {/* Actions */}
+        {(actionLabel || secondaryActionLabel) && (
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            {renderAction()}
+            {renderSecondaryAction()}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
 
 BrandedEmptyState.displayName = 'BrandedEmptyState';
 
 /**
  * Preset Empty States
- * 
+ *
  * Pre-configured empty state components for common scenarios.
  * Provides consistent messaging and actions across the application.
  */

@@ -5,7 +5,7 @@
  * - Secure encrypted storage with AES-GCM
  * - Intelligent caching with eviction policies
  * - Cross-storage backend support
- * 
+ *
  * Note: Session and token management have been moved to the auth module.
  * Import from @client/infrastructure/auth instead.
  */
@@ -13,7 +13,6 @@
 // Core storage types
 export {
   type StorageOptions,
-  type SessionInfo,
   type TokenInfo,
   type StorageStats,
   type SessionValidation,
@@ -54,7 +53,7 @@ import { TokenManager, tokenManager } from '../auth/services/token-manager';
 
 import { CacheStorageManager } from './cache-storage';
 import { SecureStorage } from './secure-storage';
-import { cacheInvalidationManager } from './cache-manager';
+import { cacheInvalidationManager } from './cache-invalidation-manager';
 
 // Create singleton instances
 const secureStorage = SecureStorage.getInstance();

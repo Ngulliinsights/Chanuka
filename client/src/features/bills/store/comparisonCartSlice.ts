@@ -52,7 +52,7 @@ const comparisonCartSlice = createSlice({
     toggleBill: (state, action: PayloadAction<string>) => {
       const id = action.payload;
       const index = state.billIds.indexOf(id);
-      
+
       if (index !== -1) {
         state.billIds.splice(index, 1);
       } else if (state.billIds.length < state.maxBills) {
@@ -61,7 +61,7 @@ const comparisonCartSlice = createSlice({
       saveToStorage(state.billIds);
     },
 
-    clearCart: (state) => {
+    clearCart: state => {
       state.billIds = [];
       saveToStorage([]);
     },
@@ -86,20 +86,5 @@ function saveToStorage(billIds: string[]): void {
 export const { addBill, removeBill, toggleBill, clearCart, setBills } = comparisonCartSlice.actions;
 
 // Export selectors
-export const selectComparisonBillIds = (state: { comparisonCart: ComparisonCartState }) => 
-  state.comparisonCart.billIds;
-
-export const selectComparisonMaxBills = (state: { comparisonCart: ComparisonCartState }) => 
-  state.comparisonCart.maxBills;
-
-export const selectComparisonCount = (state: { comparisonCart: ComparisonCartState }) => 
-  state.comparisonCart.billIds.length;
-
-export const selectCanAddMore = (state: { comparisonCart: ComparisonCartState }) => 
-  state.comparisonCart.billIds.length < state.comparisonCart.maxBills;
-
-export const selectHasBill = (billId: string) => (state: { comparisonCart: ComparisonCartState }) =>
-  state.comparisonCart.billIds.includes(billId);
-
-// Export reducer
-export default comparisonCartSlice.reducer;
+export default // Export reducer
+comparisonCartSlice.reducer;

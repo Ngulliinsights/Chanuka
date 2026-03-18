@@ -6,8 +6,6 @@ import {
   Network,
   DollarSign,
   Users,
-  FileText,
-  Eye,
   RefreshCw,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
@@ -24,7 +22,6 @@ import {
 } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
-import { logger } from '@client/lib/utils/logger';
 
 interface ConflictData {
   conflicts: ConflictDetectionResult[];

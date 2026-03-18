@@ -17,12 +17,16 @@ import {
   Info,
   Calendar,
 } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Progress } from '@client/lib/design-system/feedback/Progress';
 import { Button } from '@client/lib/design-system/interactive/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system/typography/Card';
 import { CivicImpactMetrics } from '@client/lib/types/user-dashboard';
 
 import styles from './DashboardSections.module.css';

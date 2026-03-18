@@ -15,12 +15,14 @@ The Browser Compatibility module provides centralized browser detection, feature
 ## Public Exports
 
 ### Classes
+
 - `BrowserDetector` - Browser detection and capabilities
 - `FeatureDetector` - Feature detection utilities
 - `PolyfillManager` - Polyfill loading and management
 - `BrowserCompatibilityManager` - Overall compatibility management
 
 ### Functions
+
 - `getBrowserInfo()` - Get browser information
 - `isBrowserSupported()` - Check if browser is supported
 - `hasFeature()` - Check if feature is available
@@ -69,7 +71,7 @@ import { initializeBrowserCompatibility } from '@/infrastructure/browser';
 
 async function initApp() {
   const status = await initializeBrowserCompatibility();
-  
+
   if (status.compatible) {
     startApp();
   } else {

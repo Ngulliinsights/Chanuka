@@ -751,8 +751,7 @@ export function Service(name: string, dependencies: string[] = []) {
  * }
  *
  * Note: The property will return a Promise, so you'll need to await it:
- * const result = await this.otherService;
- */
+ *  */
 export function Inject(serviceName: string) {
   return function (target: object, propertyKey: string): void {
     Object.defineProperty(target, propertyKey, {

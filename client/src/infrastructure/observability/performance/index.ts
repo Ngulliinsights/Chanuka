@@ -57,62 +57,33 @@ export const PerformanceMonitor = {
   trackRouteTransition: (from: string, to: string) => console.debug(`[PerformanceMonitor] Route transition: ${from} -> ${to}`)
 };
 
-export const architecturePerformanceMonitor = PerformanceMonitor;
-
-export const WebVitalsMonitor = {
-  startTracking: () => console.debug('[WebVitalsMonitor] Tracking started')
-};
-export const PerformanceBudgetChecker = {
-  checkBudget: (_metric: string, _value: number) => {
-    console.debug(`[PerformanceBudgetChecker] Checking budget`);
-    return { withinBudget: true };
+export 
+export export     return { withinBudget: true };
   }
 };
-export const PerformanceAlertsManager = {
-  triggerAlert: (alert: any) => console.warn('[PerformanceAlertsManager] Alert triggered:', alert)
-};
-
-export const getPerformanceMonitor = () => PerformanceMonitor;
-
+export 
+export 
 export const recordMetric = async (metric?: any) => {
   await new Promise(resolve => setTimeout(resolve, 150));
   console.debug('[Performance API] Metric recorded:', metric);
   return { success: true };
 };
 
-export const getWebVitalsScores = async () => {
-  await new Promise(resolve => setTimeout(resolve, 50));
-  return { LCP: 1200, FID: 15, CLS: 0.05 };
+export   return { LCP: 1200, FID: 15, CLS: 0.05 };
 };
 
-export const getOverallPerformanceScore = async () => {
-  await new Promise(resolve => setTimeout(resolve, 80));
-  return 98;
+export   return 98;
 };
 
-export const getPerformanceStats = async () => {
-  await new Promise(resolve => setTimeout(resolve, 120));
-  return { totalMetrics: 150, avgResponseTime: 240 };
+export   return { totalMetrics: 150, avgResponseTime: 240 };
 };
 
-export const getActiveAlerts = () => [];
-export const getBudgetCompliance = () => ({ compliant: true });
-export const checkBudget = () => true;
-export const setBudget = (metric: string, budget: number, warning: number, _description?: string) => {
+export export export export const setBudget = (metric: string, budget: number, warning: number, _description?: string) => {
   console.debug(`[Performance API] Budget set for ${metric}: ${budget} (warning: ${warning})`);
 };
-export const setAlertThreshold = () => {};
-export const resolveAlert = () => {};
-export const addWebVitalsListener = () => {};
-export const addAlertListener = () => {};
-export const exportPerformanceReport = async () => {
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  return 'Mock Performance Report Content';
+export export export export export   return 'Mock Performance Report Content';
 };
-export const resetPerformanceData = () => {};
-export const updatePerformanceConfig = () => {};
-export const stopPerformanceMonitoring = () => {};
-export const measureAsync = async (fn: any) => {
+export export export export const measureAsync = async (fn: any) => {
   const start = performance.now();
   const result = await fn();
   const end = performance.now();
@@ -126,16 +97,12 @@ export const measureSync = (fn: any) => {
   recordMetric({ name: 'measureSync', value: end - start, unit: 'ms' }).catch(() => {});
   return result;
 };
-export const startTiming = (name: string) => {
-  const start = performance.now();
-  return () => {
+export   return () => {
     const end = performance.now();
     recordMetric({ name, value: end - start, unit: 'ms' }).catch(() => {});
   };
 };
-export const markPerformance = (name: string) => performance.mark(name);
-export const measurePerformance = (name: string, start: string, end: string) => performance.measure(name, start, end);
-
+export export 
 // Export types
 export type PerformanceMetric = any;
 export type WebVitalsMetric = any;

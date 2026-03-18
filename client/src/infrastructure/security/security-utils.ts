@@ -314,17 +314,4 @@ export class RateLimiter {
   }
 }
 
-export const securityUtils = {
-  generateCSPHeader,
-  sanitizeInput,
-  sanitizeHTML,
-  sanitizeUrl,
-  generateSecureToken,
-  hashData,
-  validateCSRFToken,
-  validatePasswordStrength,
-  isSecureContext,
-  RateLimiter,
-  SECURITY_HEADERS,
-  DEFAULT_CSP,
-};
+export 

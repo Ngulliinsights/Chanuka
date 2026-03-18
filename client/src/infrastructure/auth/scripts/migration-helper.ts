@@ -12,13 +12,12 @@ import { logger } from '@client/lib/utils/logger';
  */
 export const IMPORT_MAPPINGS = {
   // Hooks
-  "import { useAuth } from '@client/infrastructure/auth'": "import { useAuth } from '@client/infrastructure/auth'",
+  '': '',
   "from '@client/infrastructure/auth'": "from '@client/infrastructure/auth'",
 
   // Redux
-  "import { authSlice } from '@client/store/slices/authSlice'":
-    "import { authReducer } from '@client/infrastructure/auth'",
-  "import authSlice from '@client/store/slices/authSlice'": "import { authReducer } from '@client/infrastructure/auth'",
+  "import { authSlice } from '@client/store/slices/authSlice'": '',
+  "import authSlice from '@client/store/slices/authSlice'": '',
   "from '@client/store/slices/authSlice'": "from '@client/infrastructure/auth'",
   'authSlice.reducer': 'authReducer',
 
@@ -30,19 +29,18 @@ export const IMPORT_MAPPINGS = {
   // API Service
   "import { authService } from '@client/services/auth-service-init'":
     "import { authApiService } from '@client/infrastructure/auth'",
-  "import { AuthApiService } from '@client/infrastructure/api/auth'":
-    "import { AuthApiService } from '@client/infrastructure/auth'",
+  "import { AuthApiService } from '@client/infrastructure/api/auth'": '',
   "from '@client/infrastructure/api/auth'": "from '@client/infrastructure/auth'",
   authService: 'authApiService.instance',
 
   // Storage
-  "import { tokenManager } from '@client/utils/storage'": "import { tokenManager } from '@client/infrastructure/auth'",
+  "import { tokenManager } from '@client/utils/storage'":
+    "import { tokenManager } from '@client/infrastructure/auth'",
   "import { sessionManager } from '@client/utils/storage'":
     "import { sessionManager } from '@client/infrastructure/auth'",
 
   // Validation
-  "import { validatePasswordComprehensive } from '@client/lib/ui/auth/utils/auth-validation'":
-    "import { validatePasswordComprehensive } from '@client/infrastructure/auth'",
+  "import { validatePasswordComprehensive } from '@client/lib/ui/auth/utils/auth-validation'": '',
   "from '@client/lib/ui/auth/utils/auth-validation'": "from '@client/infrastructure/auth'",
 };
 
@@ -237,8 +235,16 @@ export function generateMigrationChecklist(): Array<{
     {
       category: 'Import Updates',
       items: [
-        { task: 'All useAuth imports updated to @client/infrastructure/auth', completed: false, critical: true },
-        { task: 'All authSlice imports updated to @client/infrastructure/auth', completed: false, critical: true },
+        {
+          task: 'All useAuth imports updated to @client/infrastructure/auth',
+          completed: false,
+          critical: true,
+        },
+        {
+          task: 'All authSlice imports updated to @client/infrastructure/auth',
+          completed: false,
+          critical: true,
+        },
         {
           task: 'All authMiddleware imports updated to @client/infrastructure/auth',
           completed: false,

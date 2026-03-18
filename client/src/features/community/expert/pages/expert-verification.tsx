@@ -4,7 +4,6 @@
  */
 
 import { Shield, Users, CheckCircle, Clock, Star, Award, FileText } from 'lucide-react';
-import React from 'react';
 import { useState } from 'react';
 
 import { ExpertBadge } from '@client/features/users/ui/verification/ExpertBadge';

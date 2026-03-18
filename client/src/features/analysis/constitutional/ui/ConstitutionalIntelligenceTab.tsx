@@ -1,10 +1,9 @@
 /**
  * Constitutional Intelligence Tab Component
- * 
+ *
  * Tab content for displaying constitutional analysis on bill detail pages
  */
 
-import React from 'react';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@client/lib/design-system';
 import { Alert, AlertDescription } from '@client/lib/design-system';
@@ -47,7 +46,8 @@ export function ConstitutionalIntelligenceTab({ bill }: ConstitutionalIntelligen
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Failed to load constitutional analysis: {error instanceof Error ? error.message : 'Unknown error'}
+          Failed to load constitutional analysis:{' '}
+          {error instanceof Error ? error.message : 'Unknown error'}
         </AlertDescription>
       </Alert>
     );
@@ -65,14 +65,10 @@ export function ConstitutionalIntelligenceTab({ bill }: ConstitutionalIntelligen
             No Constitutional Analysis Available
           </h3>
           <p className="text-gray-600 max-w-md mx-auto">
-            This bill has not been analyzed for constitutional compliance yet. 
-            Click the button below to run an analysis.
+            This bill has not been analyzed for constitutional compliance yet. Click the button
+            below to run an analysis.
           </p>
-          <Button
-            onClick={handleAnalyze}
-            disabled={analyzeMutation.isPending}
-            className="mt-4"
-          >
+          <Button onClick={handleAnalyze} disabled={analyzeMutation.isPending} className="mt-4">
             {analyzeMutation.isPending ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -88,7 +84,10 @@ export function ConstitutionalIntelligenceTab({ bill }: ConstitutionalIntelligen
           {analyzeMutation.isError && (
             <Alert variant="destructive" className="mt-4">
               <AlertDescription>
-                Analysis failed: {analyzeMutation.error instanceof Error ? analyzeMutation.error.message : 'Unknown error'}
+                Analysis failed:{' '}
+                {analyzeMutation.error instanceof Error
+                  ? analyzeMutation.error.message
+                  : 'Unknown error'}
               </AlertDescription>
             </Alert>
           )}
@@ -107,11 +106,7 @@ export function ConstitutionalIntelligenceTab({ bill }: ConstitutionalIntelligen
             AI-powered analysis of constitutional compliance and potential concerns
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={handleAnalyze}
-          disabled={analyzeMutation.isPending}
-        >
+        <Button variant="outline" onClick={handleAnalyze} disabled={analyzeMutation.isPending}>
           {analyzeMutation.isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -6,7 +6,6 @@
 import { securityMonitor } from '@client/lib/utils/security';
 import { Middleware, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 
-import { authApiService as authService } from '@client/infrastructure/api';
 import { logout, tokenManager, clearError } from '@client/infrastructure/auth';
 import { rbacManager } from '@client/infrastructure/auth/rbac';
 import { requestDeduplicator } from '@client/infrastructure/api/http/request-deduplicator';
@@ -357,7 +356,7 @@ function clearSensitiveData(): void {
 }
 
 // Export default middleware with default config
-export const authMiddleware = createAuthMiddleware();
-
-// Export types for configuration
-export type { AuthMiddlewareConfig };
+export type {
+  // Export types for configuration
+  AuthMiddlewareConfig,
+};

@@ -55,7 +55,7 @@ export function toApiError(error: ClientError): ApiErrorResponse {
  */
 export function fromApiError(response: ApiErrorResponse): ClientError {
   const { error } = response;
-  
+
   // Extract client-specific data from details
   const severity = (error.details?.severity as ErrorSeverity) || ErrorSeverity.MEDIUM;
   const context = (error.details?.context as ErrorContext) || {};
@@ -64,7 +64,14 @@ export function fromApiError(response: ApiErrorResponse): ClientError {
   const stack = error.details?.stack as string | undefined;
 
   // Remove client-specific data from details to avoid duplication
-  const { severity: _, context: __, recoverable: ___, retryable: ____, stack: _____, ...details } = error.details || {};
+  const {
+    severity: _,
+    context: __,
+    recoverable: ___,
+    retryable: ____,
+    stack: _____,
+    ...details
+  } = error.details || {};
 
   return {
     id: error.id,
@@ -234,16 +241,11 @@ export function enrichErrorContext(
  * @param modifications - Fields to modify
  * @returns New ClientError with modifications
  */
-export function cloneError(
-  error: ClientError,
-  modifications: Partial<ClientError>
-): ClientError {
+export function cloneError(error: ClientError, modifications: Partial<ClientError>): ClientError {
   return {
     ...error,
     ...modifications,
     // Ensure timestamp is a Date object
-    timestamp: modifications.timestamp instanceof Date
-      ? modifications.timestamp
-      : error.timestamp,
+    timestamp: modifications.timestamp instanceof Date ? modifications.timestamp : error.timestamp,
   };
 }

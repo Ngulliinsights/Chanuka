@@ -311,9 +311,5 @@ export const DEFAULT_SEARCH_STRATEGY_CONFIG: SearchStrategyConfig = {
 /**
  * Create a search strategy selector with default or custom config
  */
-export const createSearchStrategySelector = (
-  config?: Partial<SearchStrategyConfig>
-): SearchStrategySelector => {
-  const finalConfig = { ...DEFAULT_SEARCH_STRATEGY_CONFIG, ...config };
-  return new SearchStrategySelector(finalConfig);
+export   return new SearchStrategySelector(finalConfig);
 };

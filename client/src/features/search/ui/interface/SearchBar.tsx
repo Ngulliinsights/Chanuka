@@ -1,13 +1,15 @@
-import { useSearchSuggestions, useLiveSearch, useSearchHistory } from '@client/lib/hooks/use-search';
-import { Search, X, Clock, Star, TrendingUp } from 'lucide-react';
+import {
+  useSearchSuggestions,
+  useLiveSearch,
+  useSearchHistory,
+} from '@client/lib/hooks/use-search';
+import { Search, X, Clock, TrendingUp } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { Input } from '@client/lib/design-system';
-
 
 import type { SearchSuggestion } from '@client/lib/types/search';
 
@@ -158,9 +160,7 @@ export function SearchBar({
   const renderDropdown = () => {
     if (
       !isFocused ||
-      (!suggestions?.length &&
-        !liveResults?.length &&
-        (!showHistory || !history?.data?.length))
+      (!suggestions?.length && !liveResults?.length && (!showHistory || !history?.data?.length))
     ) {
       return null;
     }
@@ -209,9 +209,7 @@ export function SearchBar({
                       onClick={() => handleSelect(actualIndex)}
                     >
                       <div className="font-medium">{result.text}</div>
-                      <div className="text-xs text-muted-foreground truncate">
-                        {result.type}
-                      </div>
+                      <div className="text-xs text-muted-foreground truncate">{result.type}</div>
                       <Badge variant="outline" className="mt-1 text-xs">
                         {result.category || result.type}
                       </Badge>

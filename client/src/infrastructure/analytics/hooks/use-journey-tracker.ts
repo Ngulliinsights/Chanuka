@@ -51,7 +51,9 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   /**
    * Map navigation NavigationSection to journey tracker NavigationSection
    */
-  function mapToJourneySection(section: NavigationSection): 'legislative' | 'community' | 'admin' | 'user' | 'tools' {
+  function mapToJourneySection(
+    section: NavigationSection
+  ): 'legislative' | 'community' | 'admin' | 'user' | 'tools' {
     if (section === 'system') return 'tools'; // Map system to tools
     return section as 'legislative' | 'community' | 'admin' | 'user' | 'tools';
   }
@@ -91,13 +93,10 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
   /**
    * Get journey analytics
    */
-  const getAnalytics = useCallback(
-    (start_date?: Date, end_date?: Date): JourneyAnalytics => {
-      const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
-      return tracker.current.getJourneyAnalytics(timeRange);
-    },
-    []
-  );
+  const getAnalytics = useCallback((start_date?: Date, end_date?: Date): JourneyAnalytics => {
+    const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
+    return tracker.current.getJourneyAnalytics(timeRange);
+  }, []);
 
   /**
    * Get optimization recommendations
@@ -233,13 +232,10 @@ export function useJourneyTracker(session_id?: string, user_id?: string) {
 export function useJourneyAnalytics() {
   const tracker = useRef(userJourneyTracker);
 
-  const getAnalytics = useCallback(
-    (start_date?: Date, end_date?: Date): JourneyAnalytics => {
-      const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
-      return tracker.current.getJourneyAnalytics(timeRange);
-    },
-    []
-  );
+  const getAnalytics = useCallback((start_date?: Date, end_date?: Date): JourneyAnalytics => {
+    const timeRange = start_date && end_date ? { start: start_date, end: end_date } : undefined;
+    return tracker.current.getJourneyAnalytics(timeRange);
+  }, []);
 
   const getOptimizations = useCallback((start_date?: Date, end_date?: Date): unknown[] => {
     // No dedicated optimization API in the tracker; return an empty list for now.

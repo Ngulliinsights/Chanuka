@@ -779,4 +779,4 @@ export class AuthService implements IAuthService, ServiceLifecycleInterface {
 }
 
 // Export singleton instance
-export const authService = new AuthService();
+export 

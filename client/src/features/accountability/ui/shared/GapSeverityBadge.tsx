@@ -1,6 +1,6 @@
 /**
  * Gap Severity Badge
- * 
+ *
  * Visual indicator for gap severity levels
  */
 

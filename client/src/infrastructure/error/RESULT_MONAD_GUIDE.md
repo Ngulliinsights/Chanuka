@@ -66,7 +66,7 @@ const value = unwrap(result); // Throws if Err
 const value = unwrapOr(result, defaultValue);
 
 // Unwrap or compute default
-const value = unwrapOrElse(result, (error) => computeDefault(error));
+const value = unwrapOrElse(result, error => computeDefault(error));
 ```
 
 ## Common Patterns
@@ -82,11 +82,12 @@ async function fetchUser(id: string): Promise<ClientResult<User>> {
       const response = await fetch(`/api/users/${id}`);
       return response.json();
     },
-    (error) => createNetworkError(error.message, 0, {
-      component: 'UserService',
-      operation: 'fetchUser',
-      userId: id,
-    })
+    error =>
+      createNetworkError(error.message, 0, {
+        component: 'UserService',
+        operation: 'fetchUser',
+        userId: id,
+      })
   );
 }
 
@@ -108,23 +109,21 @@ import { andThen, map, createValidationError } from '@/infrastructure/error';
 async function processUser(id: string): Promise<ClientResult<ProcessedUser>> {
   // Fetch user
   const userResult = await fetchUser(id);
-  
+
   // Validate user
-  const validatedResult = andThen(userResult, (user) => {
+  const validatedResult = andThen(userResult, user => {
     if (!user.email) {
-      return err(createValidationError(
-        [{ field: 'email', message: 'Email is required' }]
-      ));
+      return err(createValidationError([{ field: 'email', message: 'Email is required' }]));
     }
     return ok(user);
   });
-  
+
   // Transform user
-  const processedResult = map(validatedResult, (user) => ({
+  const processedResult = map(validatedResult, user => ({
     ...user,
     displayName: `${user.firstName} ${user.lastName}`,
   }));
-  
+
   return processedResult;
 }
 ```
@@ -140,10 +139,10 @@ async function fetchUserData(id: string): Promise<ClientResult<UserData>> {
     fetchUserPosts(id),
     fetchUserComments(id),
   ]);
-  
+
   // Combine results - returns first error if any fail
   const combinedResult = combineWith(userResult, postsResult, commentsResult);
-  
+
   return map(combinedResult, ([user, posts, comments]) => ({
     user,
     posts,
@@ -158,8 +157,8 @@ async function fetchUserData(id: string): Promise<ClientResult<UserData>> {
 import { match } from '@/infrastructure/error';
 
 const message = match(result, {
-  ok: (value) => `Success: ${value.name}`,
-  err: (error) => `Error: ${error.message}`,
+  ok: value => `Success: ${value.name}`,
+  err: error => `Error: ${error.message}`,
 });
 
 console.log(message);
@@ -173,12 +172,12 @@ import { tap, tapError, handleUnifiedError } from '@/infrastructure/error';
 const result = await fetchUser('123');
 
 // Log success
-const tappedResult = tap(result, (user) => {
+const tappedResult = tap(result, user => {
   console.log('Fetched user:', user.name);
 });
 
 // Handle errors
-const finalResult = tapError(tappedResult, (error) => {
+const finalResult = tapError(tappedResult, error => {
   handleUnifiedError(error);
 });
 ```
@@ -191,7 +190,7 @@ import { fromPromise, toPromise, createNetworkError } from '@/infrastructure/err
 // Convert Promise to Result
 const result = await fromPromise(
   fetch('/api/data').then(r => r.json()),
-  (error) => createNetworkError(error.message, 0)
+  error => createNetworkError(error.message, 0)
 );
 
 // Convert Result to Promise (for integration with Promise-based code)
@@ -228,26 +227,28 @@ interface User {
 // Step 1: Validate input
 function validateRegistration(data: RegistrationData): ClientResult<RegistrationData> {
   const errors: Array<{ field: string; message: string }> = [];
-  
+
   if (!data.email || !data.email.includes('@')) {
     errors.push({ field: 'email', message: 'Invalid email' });
   }
-  
+
   if (!data.password || data.password.length < 8) {
     errors.push({ field: 'password', message: 'Password must be at least 8 characters' });
   }
-  
+
   if (!data.name) {
     errors.push({ field: 'name', message: 'Name is required' });
   }
-  
+
   if (errors.length > 0) {
-    return err(createValidationError(errors, {
-      component: 'RegistrationForm',
-      operation: 'validateInput',
-    }));
+    return err(
+      createValidationError(errors, {
+        component: 'RegistrationForm',
+        operation: 'validateInput',
+      })
+    );
   }
-  
+
   return ok(data);
 }
 
@@ -257,17 +258,18 @@ async function checkEmailAvailable(email: string): Promise<ClientResult<string>>
     async () => {
       const response = await fetch(`/api/users/check-email?email=${email}`);
       const data = await response.json();
-      
+
       if (data.exists) {
         throw new Error('Email already exists');
       }
-      
+
       return email;
     },
-    (error) => createValidationError(
-      [{ field: 'email', message: error.message }],
-      { component: 'RegistrationService', operation: 'checkEmail' }
-    )
+    error =>
+      createValidationError([{ field: 'email', message: error.message }], {
+        component: 'RegistrationService',
+        operation: 'checkEmail',
+      })
   );
 }
 
@@ -280,17 +282,18 @@ async function createUser(data: RegistrationData): Promise<ClientResult<User>> {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to create user');
       }
-      
+
       return response.json();
     },
-    (error) => createNetworkError(error.message, 500, {
-      component: 'RegistrationService',
-      operation: 'createUser',
-    })
+    error =>
+      createNetworkError(error.message, 500, {
+        component: 'RegistrationService',
+        operation: 'createUser',
+      })
   );
 }
 
@@ -303,14 +306,15 @@ async function sendWelcomeEmail(user: User): Promise<ClientResult<User>> {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id }),
       });
-      
+
       return user;
     },
-    (error) => createNetworkError(error.message, 500, {
-      component: 'EmailService',
-      operation: 'sendWelcome',
-      userId: user.id,
-    })
+    error =>
+      createNetworkError(error.message, 500, {
+        component: 'EmailService',
+        operation: 'sendWelcome',
+        userId: user.id,
+      })
   );
 }
 
@@ -322,42 +326,42 @@ export async function registerUser(data: RegistrationData): Promise<ClientResult
     handleUnifiedError(validatedData.error);
     return validatedData;
   }
-  
+
   // Check email availability
   const emailCheck = await checkEmailAvailable(data.email);
   if (isErr(emailCheck)) {
     handleUnifiedError(emailCheck.error);
     return emailCheck;
   }
-  
+
   // Create user
   const userResult = await createUser(data);
   if (isErr(userResult)) {
     handleUnifiedError(userResult.error);
     return userResult;
   }
-  
+
   // Send welcome email (non-critical, don't fail registration)
   const emailResult = await sendWelcomeEmail(userResult.value);
   if (isErr(emailResult)) {
     // Log error but don't fail registration
     handleUnifiedError(emailResult.error);
   }
-  
+
   return userResult;
 }
 
 // Alternative: Using andThen for chaining
 export async function registerUserChained(data: RegistrationData): Promise<ClientResult<User>> {
   const validatedData = validateRegistration(data);
-  
-  const emailChecked = await andThen(validatedData, async (data) => {
+
+  const emailChecked = await andThen(validatedData, async data => {
     const result = await checkEmailAvailable(data.email);
     return map(result, () => data);
   });
-  
+
   const userCreated = await andThen(emailChecked, createUser);
-  
+
   // Send welcome email (don't fail on error)
   if (isOk(userCreated)) {
     const emailResult = await sendWelcomeEmail(userCreated.value);
@@ -365,7 +369,7 @@ export async function registerUserChained(data: RegistrationData): Promise<Clien
       handleUnifiedError(emailResult.error);
     }
   }
-  
+
   return userCreated;
 }
 ```
@@ -380,13 +384,13 @@ import { registerUser } from './registration-service';
 function RegistrationForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const handleSubmit = async (data: RegistrationData) => {
     setLoading(true);
     setError(null);
-    
+
     const result = await registerUser(data);
-    
+
     if (isOk(result)) {
       // Success
       console.log('User registered:', result.value);
@@ -395,10 +399,10 @@ function RegistrationForm() {
       // Error
       setError(result.error.message);
     }
-    
+
     setLoading(false);
   };
-  
+
   return (
     <form onSubmit={handleSubmit}>
       {error && <div className="error">{error}</div>}
@@ -416,14 +420,14 @@ function RegistrationForm() {
 async function fetchUserData(id: string): Promise<UserData> {
   try {
     const user = await fetchUser(id);
-    
+
     if (!user.email) {
       throw new Error('Email is required');
     }
-    
+
     const posts = await fetchUserPosts(id);
     const comments = await fetchUserComments(id);
-    
+
     return { user, posts, comments };
   } catch (error) {
     const clientError = errorToClientError(error as Error);
@@ -438,21 +442,22 @@ async function fetchUserData(id: string): Promise<UserData> {
 ```typescript
 async function fetchUserData(id: string): Promise<ClientResult<UserData>> {
   const userResult = await fetchUser(id);
-  
-  const validatedResult = andThen(userResult, (user) => {
+
+  const validatedResult = andThen(userResult, user => {
     if (!user.email) {
       return err(createValidationError([{ field: 'email', message: 'Required' }]));
     }
     return ok(user);
   });
-  
+
   const [postsResult, commentsResult] = await Promise.all([
     fetchUserPosts(id),
     fetchUserComments(id),
   ]);
-  
-  return combineWith(validatedResult, postsResult, commentsResult)
-    .then(([user, posts, comments]) => ({ user, posts, comments }));
+
+  return combineWith(validatedResult, postsResult, commentsResult).then(
+    ([user, posts, comments]) => ({ user, posts, comments })
+  );
 }
 ```
 
@@ -499,7 +504,7 @@ Document what errors a function can return.
 ```typescript
 /**
  * Fetch user by ID
- * 
+ *
  * @returns Ok with User, or Err with:
  * - NetworkError if request fails
  * - NotFoundError if user doesn't exist
@@ -522,12 +527,12 @@ const result = await fetchUser('123')
 
 ## Summary
 
-| Aspect | Imperative (try/catch) | Functional (Result) |
-|--------|------------------------|---------------------|
-| Error Handling | Implicit (exceptions) | Explicit (Result type) |
-| Composability | Limited | High |
-| Type Safety | Good | Excellent |
-| Learning Curve | Low | Medium |
-| Best For | Simple operations | Complex workflows |
+| Aspect         | Imperative (try/catch) | Functional (Result)    |
+| -------------- | ---------------------- | ---------------------- |
+| Error Handling | Implicit (exceptions)  | Explicit (Result type) |
+| Composability  | Limited                | High                   |
+| Type Safety    | Good                   | Excellent              |
+| Learning Curve | Low                    | Medium                 |
+| Best For       | Simple operations      | Complex workflows      |
 
 Choose the pattern that best fits your use case and team preferences!

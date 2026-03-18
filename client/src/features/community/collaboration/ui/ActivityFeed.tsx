@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Activity, FileText, MessageSquare, UserPlus, UserMinus, FolderPlus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
-import { activityService, ActivityItem } from '@client/features/community/collaboration/services/activity-service';
+import {
+  activityService,
+  ActivityItem,
+} from '@client/features/community/collaboration/services/activity-service';
 import { formatDistanceToNow } from 'date-fns';
 
 interface ActivityFeedProps {
@@ -45,7 +48,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {activities.map((activity) => {
+          {activities.map(activity => {
             const Icon = activityIcons[activity.type];
             return (
               <div key={activity.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
@@ -54,8 +57,7 @@ export function ActivityFeed({ workspaceId }: ActivityFeedProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-gray-900">
-                    <span className="font-medium">{activity.userName}</span>{' '}
-                    {activity.description}
+                    <span className="font-medium">{activity.userName}</span> {activity.description}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {formatDistanceToNow(new Date(activity.timestamp), { addSuffix: true })}

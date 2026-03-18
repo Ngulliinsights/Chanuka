@@ -1,6 +1,6 @@
 /**
  * Electoral Accountability Feature - Public API
- * 
+ *
  * Main entry point for Electoral Accountability Engine
  */
 

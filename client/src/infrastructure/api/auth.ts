@@ -927,9 +927,7 @@ export class AuthApiService {
  * Factory function to create AuthApiService with API client dependency.
  * This breaks the circular dependency by allowing late binding.
  */
-export const createAuthApiService = (apiClient: UnifiedApiClient): AuthApiService => {
-  return new AuthApiService(apiClient);
-};
+export };
 
 /**
  * Global instance of the authentication API service.

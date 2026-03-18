@@ -53,14 +53,14 @@ const response = await globalApiClient.get<User>('/api/users/123');
 // POST request with data
 const newUser = await globalApiClient.post<User>('/api/users', {
   name: 'John Doe',
-  email: 'john@example.com'
+  email: 'john@example.com',
 });
 
 // With options
 const data = await globalApiClient.get<Data>('/api/data', {
   params: { page: 1, limit: 10 },
   cache: { ttl: 60000 },
-  retry: { maxRetries: 3 }
+  retry: { maxRetries: 3 },
 });
 ```
 
@@ -72,14 +72,14 @@ import { createWebSocketClient } from '@/infrastructure/api';
 const wsClient = createWebSocketClient({
   url: 'wss://api.example.com/ws',
   reconnect: true,
-  heartbeat: { interval: 30000 }
+  heartbeat: { interval: 30000 },
 });
 
 // Connect
 wsClient.connect();
 
 // Listen for messages
-wsClient.on('message', (message) => {
+wsClient.on('message', message => {
   console.log('Received:', message);
 });
 
@@ -87,7 +87,7 @@ wsClient.on('message', (message) => {
 wsClient.send({
   type: 'chat',
   data: { text: 'Hello!' },
-  timestamp: Date.now()
+  timestamp: Date.now(),
 });
 
 // Subscribe to topics
@@ -103,14 +103,14 @@ wsClient.disconnect();
 import { realTimeHub } from '@/infrastructure/api';
 
 // Subscribe to events
-const subscription = realTimeHub.subscribe('bill-updates', (data) => {
+const subscription = realTimeHub.subscribe('bill-updates', data => {
   console.log('Bill updated:', data);
 });
 
 // Publish event
 realTimeHub.publish('user-action', {
   action: 'vote',
-  billId: '123'
+  billId: '123',
 });
 
 // Unsubscribe
@@ -160,17 +160,17 @@ globalApiClient.configure({
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer token'
+    Authorization: 'Bearer token',
   },
   retry: {
     maxRetries: 3,
     baseDelay: 1000,
-    maxDelay: 10000
+    maxDelay: 10000,
   },
   cache: {
     ttl: 60000,
-    maxSize: 100
-  }
+    maxSize: 100,
+  },
 });
 ```
 
@@ -182,13 +182,13 @@ const wsClient = createWebSocketClient({
   reconnect: {
     enabled: true,
     maxAttempts: 5,
-    delay: 1000
+    delay: 1000,
   },
   heartbeat: {
     interval: 30000,
-    timeout: 5000
+    timeout: 5000,
   },
-  timeout: 10000
+  timeout: 10000,
 });
 ```
 
@@ -214,11 +214,11 @@ import { observability } from '@/infrastructure/observability';
 The API module provides React hooks for easy integration:
 
 ```typescript
-import { 
-  useSafeQuery, 
+import {
+  useSafeQuery,
   useSafeMutation,
   useWebSocket,
-  useApiConnection 
+  useApiConnection,
 } from '@/infrastructure/api/hooks';
 
 // Safe query with error handling
@@ -276,21 +276,21 @@ import type {
   ApiRequest,
   ApiResponse,
   RequestOptions,
-  
+
   // WebSocket types
   IWebSocketClient,
   WebSocketOptions,
   WebSocketMessage,
   ConnectionState,
-  
+
   // Realtime types
   IRealtimeClient,
   Subscription,
   RealtimeEvent,
-  
+
   // Common types
   UnifiedApiClient,
-  ClientConfig
+  ClientConfig,
 } from '@/infrastructure/api';
 ```
 
@@ -313,19 +313,19 @@ import { createWebSocketClient } from '@/infrastructure/api/websocket';
 // Mock HTTP client
 const mockClient = new UnifiedApiClientImpl({
   baseUrl: 'http://localhost:3000',
-  timeout: 5000
+  timeout: 5000,
 });
 
 // Mock WebSocket client
 const mockWsClient = createWebSocketClient({
-  url: 'ws://localhost:3000/ws'
+  url: 'ws://localhost:3000/ws',
 });
 ```
 
 ## Requirements Satisfied
 
 - **Requirement 3.3**: API modules consolidated (http, websocket, realtime → api)
-- **Requirement 4.1-4.5**: Standard module structure (index.ts, types/, README.md, __tests__/)
+- **Requirement 4.1-4.5**: Standard module structure (index.ts, types/, README.md, **tests**/)
 - **Requirement 13.1-13.5**: API module integration (HTTP, WebSocket, realtime, observability)
 - **Requirement 14.4-14.5**: Import path migration
 

@@ -266,7 +266,8 @@ class ContinuousPerformanceMonitor {
 }
 
 // Export singleton instance
-export const continuousPerformanceMonitor = ContinuousPerformanceMonitor.getInstance();
-
-// Export types
-export type { MonitoringConfig, PerformanceAlert };
+export type {
+  // Export types
+  MonitoringConfig,
+  PerformanceAlert,
+};

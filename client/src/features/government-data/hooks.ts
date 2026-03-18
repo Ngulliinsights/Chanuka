@@ -3,10 +3,15 @@
  * Optimized data fetching with intelligent caching and error handling
  */
 
-import { useQuery, useMutation, useQueryClient, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
-import { toast } from 'react-hot-toast';
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+  UseMutationOptions,
+} from '@tanstack/react-query';
+import { toast } from '@client/lib/hooks/use-toast';
 import { governmentDataApiService } from './services/api';
-import { errorHandler } from '@client/infrastructure/error';
 import {
   GovernmentData,
   GovernmentDataListResponse,
@@ -21,7 +26,7 @@ import {
   HealthStatus,
   SearchOptions,
   SearchResult,
-  DataAnalytics
+  DataAnalytics,
 } from './types';
 
 // ==========================================================================
@@ -34,14 +39,16 @@ export const governmentDataKeys = {
   list: (options: GovernmentDataQueryOptions) => [...governmentDataKeys.lists(), options] as const,
   details: () => [...governmentDataKeys.all, 'detail'] as const,
   detail: (id: number) => [...governmentDataKeys.details(), id] as const,
-  external: (source: string, externalId: string) => [...governmentDataKeys.all, 'external', source, externalId] as const,
+  external: (source: string, externalId: string) =>
+    [...governmentDataKeys.all, 'external', source, externalId] as const,
   search: (options: SearchOptions) => [...governmentDataKeys.all, 'search', options] as const,
   metadata: () => [...governmentDataKeys.all, 'metadata'] as const,
   dataTypes: () => [...governmentDataKeys.metadata(), 'data-types'] as const,
   sources: () => [...governmentDataKeys.metadata(), 'sources'] as const,
   statistics: () => [...governmentDataKeys.metadata(), 'statistics'] as const,
   analytics: () => [...governmentDataKeys.all, 'analytics'] as const,
-  syncLogs: (source?: string, limit?: number) => [...governmentDataKeys.all, 'sync-logs', source, limit] as const,
+  syncLogs: (source?: string, limit?: number) =>
+    [...governmentDataKeys.all, 'sync-logs', source, limit] as const,
   health: () => [...governmentDataKeys.all, 'health'] as const,
 };
 
@@ -157,15 +164,18 @@ export function useGovernmentDataSources(
  * Hook to fetch statistics
  */
 export function useGovernmentDataStatistics(
-  queryOptions?: Omit<UseQueryOptions<{ 
-    success: boolean; 
-    data: {
-      total: number;
-      byDataType: Record<string, number>;
-      bySource: Record<string, number>;
-      byStatus: Record<string, number>;
-    }
-  }>, 'queryKey' | 'queryFn'>
+  queryOptions?: Omit<
+    UseQueryOptions<{
+      success: boolean;
+      data: {
+        total: number;
+        byDataType: Record<string, number>;
+        bySource: Record<string, number>;
+        byStatus: Record<string, number>;
+      };
+    }>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: governmentDataKeys.statistics(),
@@ -181,7 +191,10 @@ export function useGovernmentDataStatistics(
  * Hook to fetch complete metadata
  */
 export function useGovernmentDataMetadata(
-  queryOptions?: Omit<UseQueryOptions<{ success: boolean; data: GovernmentDataMetadata }>, 'queryKey' | 'queryFn'>
+  queryOptions?: Omit<
+    UseQueryOptions<{ success: boolean; data: GovernmentDataMetadata }>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: governmentDataKeys.metadata(),
@@ -197,7 +210,10 @@ export function useGovernmentDataMetadata(
  * Hook to fetch analytics data
  */
 export function useGovernmentDataAnalytics(
-  queryOptions?: Omit<UseQueryOptions<{ success: boolean; data: DataAnalytics }>, 'queryKey' | 'queryFn'>
+  queryOptions?: Omit<
+    UseQueryOptions<{ success: boolean; data: DataAnalytics }>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: governmentDataKeys.analytics(),
@@ -215,7 +231,10 @@ export function useGovernmentDataAnalytics(
 export function useGovernmentDataSyncLogs(
   source?: string,
   limit: number = 50,
-  queryOptions?: Omit<UseQueryOptions<{ success: boolean; data: GovernmentSyncLog[] }>, 'queryKey' | 'queryFn'>
+  queryOptions?: Omit<
+    UseQueryOptions<{ success: boolean; data: GovernmentSyncLog[] }>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: governmentDataKeys.syncLogs(source, limit),
@@ -232,7 +251,10 @@ export function useGovernmentDataSyncLogs(
  * Hook to fetch health status
  */
 export function useGovernmentDataHealth(
-  queryOptions?: Omit<UseQueryOptions<{ success: boolean; data: HealthStatus }>, 'queryKey' | 'queryFn'>
+  queryOptions?: Omit<
+    UseQueryOptions<{ success: boolean; data: HealthStatus }>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: governmentDataKeys.health(),
@@ -259,18 +281,18 @@ export function useCreateGovernmentData(
 
   return useMutation({
     mutationFn: (input: GovernmentDataCreateInput) => governmentDataApiService.create(input),
-    onSuccess: (response) => {
+    onSuccess: (_response) => {
       // Invalidate and refetch relevant queries
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.lists() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.metadata() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.statistics() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.analytics() });
 
-      toast.success('Government data created successfully');
+      toast({ title: 'Government data created successfully' });
     },
-    onError: (error) => {
-      const handledError = errorHandler.handleError(error);
-      toast.error(handledError.userMessage);
+    onError: (error: Error) => {
+      const message = error instanceof Error ? error.message : 'An error occurred';
+      toast({ title: message, variant: 'destructive' });
     },
     ...mutationOptions,
   });
@@ -280,27 +302,31 @@ export function useCreateGovernmentData(
  * Hook to update government data
  */
 export function useUpdateGovernmentData(
-  mutationOptions?: UseMutationOptions<GovernmentDataResponse, Error, { id: number; input: GovernmentDataUpdateInput }>
+  mutationOptions?: UseMutationOptions<
+    GovernmentDataResponse,
+    Error,
+    { id: number; input: GovernmentDataUpdateInput }
+  >
 ) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, input }: { id: number; input: GovernmentDataUpdateInput }) => 
+    mutationFn: ({ id, input }: { id: number; input: GovernmentDataUpdateInput }) =>
       governmentDataApiService.update(id, input),
-    onSuccess: (response, { id }) => {
+    onSuccess: (_response, { id }) => {
       // Update the specific item in cache
-      queryClient.setQueryData(governmentDataKeys.detail(id), response);
-      
+      queryClient.setQueryData(governmentDataKeys.detail(id), _response);
+
       // Invalidate list queries to ensure consistency
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.lists() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.statistics() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.analytics() });
 
-      toast.success('Government data updated successfully');
+      toast({ title: 'Government data updated successfully' });
     },
-    onError: (error) => {
-      const handledError = errorHandler.handleError(error);
-      toast.error(handledError.userMessage);
+    onError: (error: Error) => {
+      const message = error instanceof Error ? error.message : 'An error occurred';
+      toast({ title: message, variant: 'destructive' });
     },
     ...mutationOptions,
   });
@@ -316,20 +342,20 @@ export function useDeleteGovernmentData(
 
   return useMutation({
     mutationFn: (id: number) => governmentDataApiService.delete(id),
-    onSuccess: (response, id) => {
+    onSuccess: (_response, id) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: governmentDataKeys.detail(id) });
-      
+
       // Invalidate list queries
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.lists() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.statistics() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.analytics() });
 
-      toast.success('Government data deleted successfully');
+      toast({ title: 'Government data deleted successfully' });
     },
-    onError: (error) => {
-      const handledError = errorHandler.handleError(error);
-      toast.error(handledError.userMessage);
+    onError: (error: Error) => {
+      const message = error instanceof Error ? error.message : 'An error occurred';
+      toast({ title: message, variant: 'destructive' });
     },
     ...mutationOptions,
   });
@@ -339,7 +365,11 @@ export function useDeleteGovernmentData(
  * Hook to trigger data synchronization
  */
 export function useTriggerSync(
-  mutationOptions?: UseMutationOptions<{ success: boolean; data: SyncStatus }, Error, SyncTriggerOptions>
+  mutationOptions?: UseMutationOptions<
+    { success: boolean; data: SyncStatus },
+    Error,
+    SyncTriggerOptions
+  >
 ) {
   const queryClient = useQueryClient();
 
@@ -350,11 +380,11 @@ export function useTriggerSync(
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.syncLogs() });
       queryClient.invalidateQueries({ queryKey: governmentDataKeys.health() });
 
-      toast.success('Data synchronization triggered successfully');
+      toast({ title: 'Data synchronization triggered successfully' });
     },
-    onError: (error) => {
-      const handledError = errorHandler.handleError(error);
-      toast.error(handledError.userMessage);
+    onError: (error: Error) => {
+      const message = error instanceof Error ? error.message : 'An error occurred';
+      toast({ title: message, variant: 'destructive' });
     },
     ...mutationOptions,
   });
@@ -362,7 +392,7 @@ export function useTriggerSync(
 
 // ==========================================================================
 // Utility Hooks
-// ==========================================================================
+// =========================================================================
 
 /**
  * Hook to prefetch government data

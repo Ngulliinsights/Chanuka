@@ -26,19 +26,26 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
 
   const getActionIcon = () => {
     switch (prompt.action) {
-      case 'comment': return '💬';
-      case 'vote': return '🗳️';
-      case 'attend_hearing': return '🏛️';
-      case 'contact_mp': return '📧';
-      case 'share': return '📤';
-      default: return '📋';
+      case 'comment':
+        return '💬';
+      case 'vote':
+        return '🗳️';
+      case 'attend_hearing':
+        return '🏛️';
+      case 'contact_mp':
+        return '📧';
+      case 'share':
+        return '📤';
+      default:
+        return '📋';
     }
   };
 
   const getDeadlineText = () => {
     if (!prompt.deadline) return null;
 
-    const deadline = typeof prompt.deadline === 'string' ? new Date(prompt.deadline) : prompt.deadline;
+    const deadline =
+      typeof prompt.deadline === 'string' ? new Date(prompt.deadline) : prompt.deadline;
     const now = new Date();
     const diff = deadline.getTime() - now.getTime();
     const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
@@ -86,12 +93,8 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
               <h3 className="font-semibold text-lg">{prompt.title}</h3>
               <p className="text-sm opacity-90 mt-1">{prompt.description}</p>
               <div className="flex items-center gap-3 mt-2 text-xs">
-                {getDeadlineText() && (
-                  <span className="font-medium">{getDeadlineText()}</span>
-                )}
-                <span className="opacity-75">
-                  ⏱️ {prompt.estimatedTimeMinutes} min
-                </span>
+                {getDeadlineText() && <span className="font-medium">{getDeadlineText()}</span>}
+                <span className="opacity-75">⏱️ {prompt.estimatedTimeMinutes} min</span>
               </div>
             </div>
           </div>
@@ -108,7 +111,9 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
           <div className="mt-3">
             <div className="flex items-center justify-between text-xs mb-1">
               <span className="opacity-75">Progress</span>
-              <span className="font-medium">{completedSteps.size}/{prompt.steps.length} steps</span>
+              <span className="font-medium">
+                {completedSteps.size}/{prompt.steps.length} steps
+              </span>
             </div>
             <div className="h-2 bg-white bg-opacity-30 rounded-full overflow-hidden">
               <div
@@ -126,7 +131,7 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
           {/* Steps */}
           <div className="space-y-2">
             <h4 className="font-medium text-sm">Steps to Complete:</h4>
-            {prompt.steps.map((step) => (
+            {prompt.steps.map(step => (
               <div
                 key={step.step}
                 className="flex items-start gap-3 p-3 bg-white bg-opacity-50 rounded-lg"
@@ -138,7 +143,9 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
                   className="mt-1 h-4 w-4 rounded border-gray-300"
                 />
                 <div className="flex-1">
-                  <p className={`text-sm ${completedSteps.has(step.step) ? 'line-through opacity-60' : ''}`}>
+                  <p
+                    className={`text-sm ${completedSteps.has(step.step) ? 'line-through opacity-60' : ''}`}
+                  >
                     <span className="font-medium">Step {step.step}:</span> {step.instruction}
                   </p>
                   {step.link && (
@@ -175,7 +182,11 @@ export function ActionPromptCard({ prompt, onActionComplete }: ActionPromptCardP
                   </pre>
                   <button
                     onClick={() => {
-                      const text = prompt.templates?.comment || prompt.templates?.email || prompt.templates?.sms || '';
+                      const text =
+                        prompt.templates?.comment ||
+                        prompt.templates?.email ||
+                        prompt.templates?.sms ||
+                        '';
                       navigator.clipboard.writeText(text);
                     }}
                     className="mt-2 px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded text-xs transition-colors"

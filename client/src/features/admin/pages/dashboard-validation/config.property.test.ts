@@ -6,7 +6,7 @@
 
 import { describe, it, expect } from 'vitest';
 import fc from 'fast-check';
-import { validateDashboardConfig, type DashboardConfig, type WidgetType } from './config';
+import { validateDashboardConfig } from './config';
 
 // ============================================================================
 // Generators
@@ -35,16 +35,17 @@ const layoutArb = (widgetIds: string[]) =>
   fc.record({
     columns: fc.integer({ min: 1, max: 12 }),
     rows: fc.integer({ min: 1, max: 12 }),
-    positions: fc.array(widgetPositionArb(widgetIds), { minLength: 0, maxLength: widgetIds.length }),
+    positions: fc.array(widgetPositionArb(widgetIds), {
+      minLength: 0,
+      maxLength: widgetIds.length,
+    }),
   });
 
 const validDashboardConfigArb = fc
   .array(widgetArb, { minLength: 1, maxLength: 10 })
   .chain(widgets => {
     // Ensure unique widget IDs
-    const uniqueWidgets = Array.from(
-      new Map(widgets.map(w => [w.id, w])).values()
-    );
+    const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
     const widgetIds = uniqueWidgets.map(w => w.id);
 
     return fc.record({
@@ -61,13 +62,13 @@ const validDashboardConfigArb = fc
 
 describe('Dashboard Config Validation - Property Tests', () => {
   // Feature: comprehensive-bug-fixes, Property 16: Dashboard Config Validation
-  
+
   it('Property 16.1: Should accept all valid dashboard configurations', () => {
     fc.assert(
-      fc.property(validDashboardConfigArb, (config) => {
+      fc.property(validDashboardConfigArb, config => {
         // Valid configurations should not throw
         expect(() => validateDashboardConfig(config)).not.toThrow();
-        
+
         // The returned config should match the input
         const result = validateDashboardConfig(config);
         expect(result).toEqual(config);
@@ -80,9 +81,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const invalidWidgetTypeArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         // Replace one widget's type with an invalid type
@@ -101,7 +100,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(invalidWidgetTypeArb, (config) => {
+      fc.property(invalidWidgetTypeArb, config => {
         // Invalid widget types should throw with descriptive error
         expect(() => validateDashboardConfig(config)).toThrow(/Widget type must be one of/);
       }),
@@ -113,9 +112,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const invalidLayoutColumnsArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         return fc.record({
@@ -129,7 +126,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(invalidLayoutColumnsArb, (config) => {
+      fc.property(invalidLayoutColumnsArb, config => {
         // Invalid layout should throw with descriptive error
         expect(() => validateDashboardConfig(config)).toThrow(/Columns must be a positive integer/);
       }),
@@ -141,9 +138,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const invalidLayoutRowsArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         return fc.record({
@@ -157,7 +152,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(invalidLayoutRowsArb, (config) => {
+      fc.property(invalidLayoutRowsArb, config => {
         // Invalid layout should throw with descriptive error
         expect(() => validateDashboardConfig(config)).toThrow(/Rows must be a positive integer/);
       }),
@@ -169,9 +164,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const invalidPositionRefArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         // Create a position that references a non-existent widget
@@ -197,9 +190,11 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(invalidPositionRefArb, (config) => {
+      fc.property(invalidPositionRefArb, config => {
         // Positions referencing non-existent widgets should throw
-        expect(() => validateDashboardConfig(config)).toThrow(/Widget position references non-existent widget/);
+        expect(() => validateDashboardConfig(config)).toThrow(
+          /Widget position references non-existent widget/
+        );
       }),
       { numRuns: 50 }
     );
@@ -231,7 +226,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     );
 
     fc.assert(
-      fc.property(invalidConfigArb, (config) => {
+      fc.property(invalidConfigArb, config => {
         // All validation failures should provide descriptive error messages
         expect(() => validateDashboardConfig(config)).toThrow(/Invalid dashboard configuration/);
       }),
@@ -243,9 +238,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const configWithOptionalFieldsArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         return fc.record({
@@ -257,10 +250,10 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(configWithOptionalFieldsArb, (config) => {
+      fc.property(configWithOptionalFieldsArb, config => {
         // Valid configurations with optional fields should not throw
         expect(() => validateDashboardConfig(config)).not.toThrow();
-        
+
         const result = validateDashboardConfig(config);
         expect(result.theme).toBe(config.theme);
         expect(result.refreshInterval).toBe(config.refreshInterval);
@@ -273,9 +266,7 @@ describe('Dashboard Config Validation - Property Tests', () => {
     const invalidRefreshIntervalArb = fc
       .array(widgetArb, { minLength: 1, maxLength: 5 })
       .chain(widgets => {
-        const uniqueWidgets = Array.from(
-          new Map(widgets.map(w => [w.id, w])).values()
-        );
+        const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
         const widgetIds = uniqueWidgets.map(w => w.id);
 
         return fc.record({
@@ -286,9 +277,11 @@ describe('Dashboard Config Validation - Property Tests', () => {
       });
 
     fc.assert(
-      fc.property(invalidRefreshIntervalArb, (config) => {
+      fc.property(invalidRefreshIntervalArb, config => {
         // Invalid refresh intervals should throw
-        expect(() => validateDashboardConfig(config)).toThrow(/Refresh interval must be a positive integer/);
+        expect(() => validateDashboardConfig(config)).toThrow(
+          /Refresh interval must be a positive integer/
+        );
       }),
       { numRuns: 50 }
     );

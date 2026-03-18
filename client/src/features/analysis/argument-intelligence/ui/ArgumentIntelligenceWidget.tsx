@@ -1,6 +1,6 @@
 /**
  * Argument Intelligence Widget Component
- * 
+ *
  * Compact widget for displaying argument intelligence on bill pages.
  * Can be embedded in community discussions or bill detail pages.
  */
@@ -52,7 +52,9 @@ export function ArgumentIntelligenceWidget({
   };
 
   return (
-    <div className={`bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 ${className}`}>
+    <div
+      className={`bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200 p-4 ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
@@ -123,7 +125,7 @@ export function ArgumentIntelligenceWidget({
                 Top Argument Clusters ({clusters.length})
               </p>
               <div className="space-y-2">
-                {clusters.slice(0, 3).map((cluster) => (
+                {clusters.slice(0, 3).map(cluster => (
                   <div
                     key={cluster.id}
                     className="flex items-center justify-between text-xs p-2 bg-gray-50 rounded"

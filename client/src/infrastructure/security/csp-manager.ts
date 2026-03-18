@@ -90,7 +90,11 @@ export class CSPManager {
     const environmentDirectives = this.getEnvironmentDirectives();
 
     // Merge directives with priority: base <- environment <- config
-    const mergedDirectives = this.mergeDirectives(baseDirectives, environmentDirectives, this.config.directives);
+    const mergedDirectives = this.mergeDirectives(
+      baseDirectives,
+      environmentDirectives,
+      this.config.directives
+    );
 
     return (Object.entries(mergedDirectives) as [keyof CSPDirectives, string[]][])
       .map(([directive, sources]) => {
@@ -150,11 +154,7 @@ export class CSPManager {
     }
 
     return {
-      'script-src': [
-        "'self'",
-        "'strict-dynamic'",
-        'https://cdn.chanuka.ke',
-      ],
+      'script-src': ["'self'", "'strict-dynamic'", 'https://cdn.chanuka.ke'],
       'style-src': [
         "'self'",
         "'unsafe-inline'", // Required for CSS-in-JS
@@ -210,7 +210,7 @@ export class CSPManager {
 
     // Set up reporting endpoint
     if (typeof window !== 'undefined') {
-      window.__reportCSPViolation__ = (violation) => {
+      window.__reportCSPViolation__ = violation => {
         this.handleCSPViolation(violation);
       };
     }
@@ -397,7 +397,12 @@ export class CSPManager {
   /**
    * Get metrics
    */
-  getMetrics(): { requestsProcessed: number; threatsBlocked: number; averageResponseTime: number; errorRate: number } {
+  getMetrics(): {
+    requestsProcessed: number;
+    threatsBlocked: number;
+    averageResponseTime: number;
+    errorRate: number;
+  } {
     return {
       requestsProcessed: 0, // CSP doesn't process requests directly
       threatsBlocked: this.violations.length,

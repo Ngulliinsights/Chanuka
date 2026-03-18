@@ -1,6 +1,6 @@
 /**
  * Error Tracking Display Component
- * 
+ *
  * Displays error tracking information for a feature
  */
 
@@ -15,8 +15,12 @@ export function ErrorTrackingDisplay({ featureId }: ErrorTrackingDisplayProps) {
   const [logLevel, setLogLevel] = useState<string>('error');
   const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // Last 24 hours
   const endTime = new Date();
-  
-  const { data: metrics, isLoading: metricsLoading } = useFeatureMetrics(featureId, startTime, endTime);
+
+  const { data: metrics, isLoading: metricsLoading } = useFeatureMetrics(
+    featureId,
+    startTime,
+    endTime
+  );
   const { data: logs, isLoading: logsLoading } = useFeatureLogs(featureId, logLevel, 50);
 
   if (metricsLoading || logsLoading) {
@@ -38,28 +42,22 @@ export function ErrorTrackingDisplay({ featureId }: ErrorTrackingDisplayProps) {
   return (
     <div>
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Error Tracking (Last 24h)</h3>
-      
+
       {/* Error Statistics */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-sm font-medium text-red-700 mb-1">Total Errors</div>
-          <div className="text-2xl font-bold text-red-900">
-            {totalErrors.toLocaleString()}
-          </div>
+          <div className="text-2xl font-bold text-red-900">{totalErrors.toLocaleString()}</div>
         </div>
 
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
           <div className="text-sm font-medium text-orange-700 mb-1">Error Rate</div>
-          <div className="text-2xl font-bold text-orange-900">
-            {errorRate.toFixed(2)}%
-          </div>
+          <div className="text-2xl font-bold text-orange-900">{errorRate.toFixed(2)}%</div>
         </div>
 
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
           <div className="text-sm font-medium text-yellow-700 mb-1">Peak Errors</div>
-          <div className="text-2xl font-bold text-yellow-900">
-            {maxErrors.toLocaleString()}
-          </div>
+          <div className="text-2xl font-bold text-yellow-900">{maxErrors.toLocaleString()}</div>
         </div>
       </div>
 
@@ -71,12 +69,16 @@ export function ErrorTrackingDisplay({ featureId }: ErrorTrackingDisplayProps) {
             <div className="flex items-end gap-1 h-32">
               {metrics.map((metric, index) => {
                 const height = maxErrors > 0 ? (metric.failedRequests / maxErrors) * 100 : 0;
-                const errorRateForMetric = metric.totalRequests > 0 
-                  ? (metric.failedRequests / metric.totalRequests) * 100 
-                  : 0;
-                const color = errorRateForMetric > 5 ? 'bg-red-500 hover:bg-red-600' : 
-                             errorRateForMetric > 1 ? 'bg-orange-500 hover:bg-orange-600' : 
-                             'bg-yellow-500 hover:bg-yellow-600';
+                const errorRateForMetric =
+                  metric.totalRequests > 0
+                    ? (metric.failedRequests / metric.totalRequests) * 100
+                    : 0;
+                const color =
+                  errorRateForMetric > 5
+                    ? 'bg-red-500 hover:bg-red-600'
+                    : errorRateForMetric > 1
+                      ? 'bg-orange-500 hover:bg-orange-600'
+                      : 'bg-yellow-500 hover:bg-yellow-600';
                 return (
                   <div
                     key={index}
@@ -108,7 +110,7 @@ export function ErrorTrackingDisplay({ featureId }: ErrorTrackingDisplayProps) {
           <h4 className="text-sm font-medium text-gray-700">Recent Error Logs</h4>
           <select
             value={logLevel}
-            onChange={(e) => setLogLevel(e.target.value)}
+            onChange={e => setLogLevel(e.target.value)}
             className="text-xs border border-gray-300 rounded px-2 py-1"
           >
             <option value="error">Errors</option>
@@ -117,25 +119,28 @@ export function ErrorTrackingDisplay({ featureId }: ErrorTrackingDisplayProps) {
             <option value="debug">Debug</option>
           </select>
         </div>
-        
+
         <div className="bg-white border border-gray-200 rounded-lg max-h-96 overflow-y-auto">
           {!logs || logs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No logs found
-            </div>
+            <div className="text-center py-8 text-gray-500">No logs found</div>
           ) : (
             <div className="divide-y divide-gray-200">
-              {logs.map((log) => (
+              {logs.map(log => (
                 <div key={log.id} className="p-3 hover:bg-gray-50">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`text-xs font-semibold uppercase ${
-                          log.level === 'error' ? 'text-red-600' :
-                          log.level === 'warn' ? 'text-yellow-600' :
-                          log.level === 'info' ? 'text-blue-600' :
-                          'text-gray-600'
-                        }`}>
+                        <span
+                          className={`text-xs font-semibold uppercase ${
+                            log.level === 'error'
+                              ? 'text-red-600'
+                              : log.level === 'warn'
+                                ? 'text-yellow-600'
+                                : log.level === 'info'
+                                  ? 'text-blue-600'
+                                  : 'text-gray-600'
+                          }`}
+                        >
                           {log.level}
                         </span>
                         <span className="text-xs text-gray-500">{log.category}</span>

@@ -1,6 +1,6 @@
 /**
  * Electoral Accountability Dashboard Page
- * 
+ *
  * Main dashboard for Electoral Accountability Engine
  */
 
@@ -15,7 +15,7 @@ export function ElectoralAccountabilityDashboard() {
   const { sponsorId: routeSponsorId } = useParams<{ sponsorId?: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   // Get sponsorId from route params or use demo data
   const [sponsorId] = useState(routeSponsorId || 'demo-sponsor-id');
   // Get constituency from user profile or use default
@@ -46,9 +46,7 @@ export function ElectoralAccountabilityDashboard() {
               <Shield className="w-8 h-8 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Electoral Accountability Engine
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900">Electoral Accountability Engine</h1>
               <p className="text-gray-600 mt-1">
                 Converting transparency into electoral consequence
               </p>
@@ -69,9 +67,9 @@ export function ElectoralAccountabilityDashboard() {
                   What is Electoral Accountability?
                 </h3>
                 <p className="text-sm text-blue-800 leading-relaxed">
-                  This feature tracks the "accountability distance" between what constituents want 
-                  and how their MP votes. Unlike other platforms that measure engagement, we measure 
-                  outcomes: MPs who changed votes under pressure, bills challenged in court, and 
+                  This feature tracks the "accountability distance" between what constituents want
+                  and how their MP votes. Unlike other platforms that measure engagement, we measure
+                  outcomes: MPs who changed votes under pressure, bills challenged in court, and
                   candidates who lost seats after voting records became campaign material.
                 </p>
               </div>

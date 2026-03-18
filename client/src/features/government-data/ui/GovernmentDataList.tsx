@@ -4,35 +4,37 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Input } from '@client/components/ui/input';
-import { Button } from '@client/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@client/components/ui/select';
-import { Badge } from '@client/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@client/components/ui/card';
-import { 
-  Search, 
-  Filter, 
-  SortAsc, 
-  SortDesc, 
-  RefreshCw, 
+import { Input } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@client/lib/design-system';
+import { Badge } from '@client/lib/design-system';
+import { Card, CardContent } from '@client/lib/design-system';
+import {
+  Search,
+  Filter,
+  SortAsc,
+  SortDesc,
+  RefreshCw,
   Plus,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
 } from 'lucide-react';
-import { useDebounce } from '@client/hooks/useDebounce';
+import { useDebounce } from '@client/lib/hooks/use-debounce';
 import { GovernmentDataCard } from './GovernmentDataCard';
-import { 
-  useGovernmentDataList, 
-  useGovernmentDataTypes, 
-  useGovernmentDataSources 
-} from '../hooks';
-import { 
-  GovernmentDataListProps, 
-  GovernmentDataFilters, 
+import { useGovernmentDataList, useGovernmentDataTypes, useGovernmentDataSources } from '../hooks';
+import {
+  GovernmentDataListProps,
+  GovernmentDataFilters,
   GovernmentDataQueryOptions,
   GovernmentDataSortField,
-  SortOrder
+  SortOrder,
 } from '../types';
 
 export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
@@ -57,28 +59,25 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
   const [showFilters, setShowFilters] = useState(false);
 
   // Debounce search to avoid excessive API calls
-  const debouncedSearch = useDebounce(localFilters.search || '', 300);
 
   // Build query options
-  const queryOptions: GovernmentDataQueryOptions = useMemo(() => ({
-    dataType: localFilters.dataType || undefined,
-    source: localFilters.source || undefined,
-    status: localFilters.status || undefined,
-    dateFrom: localFilters.dateRange?.from,
-    dateTo: localFilters.dateRange?.to,
-    limit: pageSize,
-    offset: (currentPage - 1) * pageSize,
-    sortBy: sortField,
-    sortOrder,
-  }), [localFilters, sortField, sortOrder, currentPage, pageSize]);
+  const queryOptions: GovernmentDataQueryOptions = useMemo(
+    () => ({
+      dataType: localFilters.dataType || undefined,
+      source: localFilters.source || undefined,
+      status: localFilters.status || undefined,
+      dateFrom: localFilters.dateRange?.from,
+      dateTo: localFilters.dateRange?.to,
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
+      sortBy: sortField,
+      sortOrder,
+    }),
+    [localFilters, sortField, sortOrder, currentPage, pageSize]
+  );
 
   // Fetch data
-  const { 
-    data: listResponse, 
-    isLoading, 
-    error, 
-    refetch 
-  } = useGovernmentDataList(queryOptions);
+  const { data: listResponse, isLoading, error, refetch } = useGovernmentDataList(queryOptions);
 
   const { data: dataTypesResponse } = useGovernmentDataTypes();
   const { data: sourcesResponse } = useGovernmentDataSources();
@@ -161,16 +160,10 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Government Data</h2>
-          <p className="text-gray-600">
-            {totalItems} records found
-          </p>
+          <p className="text-gray-600">{totalItems} records found</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            onClick={() => refetch()}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => refetch()} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
@@ -192,7 +185,7 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
                 <Input
                   placeholder="Search government data..."
                   value={localFilters.search || ''}
-                  onChange={(e) => handleFiltersChange({ search: e.target.value })}
+                  onChange={e => handleFiltersChange({ search: e.target.value })}
                   className="pl-10"
                 />
               </div>
@@ -216,14 +209,14 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
                 <Select
                   value={localFilters.dataType || ''}
-                  onValueChange={(value) => handleFiltersChange({ dataType: value || undefined })}
+                  onValueChange={value => handleFiltersChange({ dataType: value || undefined })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Data Type" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All Types</SelectItem>
-                    {dataTypes.map((type) => (
+                    {dataTypes.map(type => (
                       <SelectItem key={type} value={type}>
                         {type}
                       </SelectItem>
@@ -233,14 +226,14 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
 
                 <Select
                   value={localFilters.source || ''}
-                  onValueChange={(value) => handleFiltersChange({ source: value || undefined })}
+                  onValueChange={value => handleFiltersChange({ source: value || undefined })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Source" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All Sources</SelectItem>
-                    {sources.map((source) => (
+                    {sources.map(source => (
                       <SelectItem key={source} value={source}>
                         {source}
                       </SelectItem>
@@ -250,14 +243,14 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
 
                 <Select
                   value={localFilters.status || ''}
-                  onValueChange={(value) => handleFiltersChange({ status: value || undefined })}
+                  onValueChange={value => handleFiltersChange({ status: value || undefined })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">All Statuses</SelectItem>
-                    {statuses.map((status) => (
+                    {statuses.map(status => (
                       <SelectItem key={status} value={status}>
                         {status}
                       </SelectItem>
@@ -277,20 +270,25 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
       {/* Sort Controls */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-600">Sort by:</span>
-        {(['created_at', 'updated_at', 'data_type', 'source'] as GovernmentDataSortField[]).map((field) => (
-          <Button
-            key={field}
-            variant={sortField === field ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => handleSort(field)}
-            className="capitalize"
-          >
-            {field.replace('_', ' ')}
-            {sortField === field && (
-              sortOrder === 'asc' ? <SortAsc className="h-3 w-3 ml-1" /> : <SortDesc className="h-3 w-3 ml-1" />
-            )}
-          </Button>
-        ))}
+        {(['created_at', 'updated_at', 'data_type', 'source'] as GovernmentDataSortField[]).map(
+          field => (
+            <Button
+              key={field}
+              variant={sortField === field ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => handleSort(field)}
+              className="capitalize"
+            >
+              {field.replace('_', ' ')}
+              {sortField === field &&
+                (sortOrder === 'asc' ? (
+                  <SortAsc className="h-3 w-3 ml-1" />
+                ) : (
+                  <SortDesc className="h-3 w-3 ml-1" />
+                ))}
+            </Button>
+          )
+        )}
       </div>
 
       {/* Loading State */}
@@ -315,7 +313,7 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
             </Card>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {listResponse.data.map((data) => (
+              {listResponse.data.map(data => (
                 <GovernmentDataCard
                   key={data.id}
                   data={data}
@@ -331,7 +329,8 @@ export const GovernmentDataList: React.FC<GovernmentDataListProps> = ({
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-600">
-                Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, totalItems)} of {totalItems} results
+                Showing {(currentPage - 1) * pageSize + 1} to{' '}
+                {Math.min(currentPage * pageSize, totalItems)} of {totalItems} results
               </div>
               <div className="flex items-center gap-2">
                 <Button

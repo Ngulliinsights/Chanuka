@@ -126,4 +126,4 @@ class BackgroundSyncManager {
   }
 }
 
-export const backgroundSyncManager = new BackgroundSyncManager();
+export 

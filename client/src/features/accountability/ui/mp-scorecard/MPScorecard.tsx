@@ -1,6 +1,6 @@
 /**
  * MP Scorecard Component
- * 
+ *
  * Comprehensive MP accountability metrics display
  */
 
@@ -76,14 +76,10 @@ export function MPScorecard({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">MP Accountability Scorecard</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            {constituency} Constituency
-          </p>
+          <p className="text-sm text-gray-600 mt-1">{constituency} Constituency</p>
         </div>
-        
-        {scorecard.criticalGaps > 0 && (
-          <GapSeverityBadge severity="critical" size="lg" />
-        )}
+
+        {scorecard.criticalGaps > 0 && <GapSeverityBadge severity="critical" size="lg" />}
       </div>
 
       {/* Main Metrics Grid */}
@@ -135,7 +131,7 @@ export function MPScorecard({
             <h3 className="text-sm font-medium text-gray-700">Average Alignment Gap</h3>
             <Target className="w-5 h-5 text-gray-400" />
           </div>
-          
+
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-gray-900">
               {scorecard.averageGap.toFixed(1)}%
@@ -148,9 +144,11 @@ export function MPScorecard({
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${
-                  scorecard.averageGap >= 50 ? 'bg-red-500' : 
-                  scorecard.averageGap >= 25 ? 'bg-yellow-500' : 
-                  'bg-green-500'
+                  scorecard.averageGap >= 50
+                    ? 'bg-red-500'
+                    : scorecard.averageGap >= 25
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
                 }`}
                 style={{ width: `${Math.min(scorecard.averageGap, 100)}%` }}
               />
@@ -169,9 +167,11 @@ export function MPScorecard({
             <h3 className="text-sm font-medium text-gray-700">Electoral Risk Score</h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
-          
+
           <div className="flex items-baseline gap-2">
-            <span className={`text-3xl font-bold ${getAlignmentColor(100 - scorecard.electoralRiskScore)}`}>
+            <span
+              className={`text-3xl font-bold ${getAlignmentColor(100 - scorecard.electoralRiskScore)}`}
+            >
               {scorecard.electoralRiskScore.toFixed(1)}
             </span>
             <span className="text-sm text-gray-600">/ 100</span>
@@ -179,10 +179,7 @@ export function MPScorecard({
 
           {/* Risk Level Badge */}
           <div className="mt-4">
-            <GapSeverityBadge 
-              severity={getRiskSeverity(scorecard.electoralRiskScore)} 
-              size="md"
-            />
+            <GapSeverityBadge severity={getRiskSeverity(scorecard.electoralRiskScore)} size="md" />
           </div>
         </div>
       </div>
@@ -197,7 +194,7 @@ export function MPScorecard({
             View Detailed Analysis
           </button>
         )}
-        
+
         {onCreateCampaign && scorecard.criticalGaps > 0 && (
           <button
             onClick={onCreateCampaign}
@@ -211,17 +208,20 @@ export function MPScorecard({
       {/* Summary Text */}
       <div className="rounded-lg bg-gray-50 border border-gray-200 p-4">
         <p className="text-sm text-gray-700">
-          <strong>Summary:</strong> This MP has voted {scorecard.totalVotes} times in {constituency}, 
-          with an alignment rate of {scorecard.alignmentPercentage.toFixed(1)}%. 
+          <strong>Summary:</strong> This MP has voted {scorecard.totalVotes} times in {constituency}
+          , with an alignment rate of {scorecard.alignmentPercentage.toFixed(1)}%.
           {scorecard.criticalGaps > 0 && (
             <span className="text-red-700 font-medium">
-              {' '}There {scorecard.criticalGaps === 1 ? 'is' : 'are'} {scorecard.criticalGaps} critical 
+              {' '}
+              There {scorecard.criticalGaps === 1 ? 'is' : 'are'} {scorecard.criticalGaps} critical
               misalignment{scorecard.criticalGaps === 1 ? '' : 's'} requiring immediate attention.
             </span>
           )}
           {scorecard.activeCampaigns > 0 && (
             <span className="text-blue-700 font-medium">
-              {' '}{scorecard.activeCampaigns} accountability campaign{scorecard.activeCampaigns === 1 ? ' is' : 's are'} currently active.
+              {' '}
+              {scorecard.activeCampaigns} accountability campaign
+              {scorecard.activeCampaigns === 1 ? ' is' : 's are'} currently active.
             </span>
           )}
         </p>

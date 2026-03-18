@@ -16,8 +16,6 @@ import {
   selectOperationsByPriority,
   selectActiveOperationsCount,
   selectShouldShowGlobalLoader,
-  type LoadingStateData,
-  type ExtendedLoadingOperation,
 } from '@client/infrastructure/store';
 import { LoadingOperation, LoadingPriority } from '@client/lib/types/loading';
 
@@ -36,22 +34,22 @@ const convertToLoadingOperation = (extended: ExtendedLoadingOperation): LoadingO
   endTime: extended.endTime,
   timeout: extended.timeout,
   estimatedTime: extended.estimatedTime,
-  
+
   retryCount: extended.retryCount,
   maxRetries: extended.maxRetries,
   retryStrategy: extended.retryStrategy,
   retryDelay: extended.retryDelay,
-  
+
   state: extended.state,
   message: extended.message,
   error: extended.error,
   progress: extended.progress,
   stage: extended.stage,
-  
+
   connectionAware: extended.connectionAware,
   dependencies: extended.dependencies,
   metadata: extended.metadata,
-  
+
   timeoutWarningShown: extended.timeoutWarningShown || false,
   cancelled: extended.cancelled || false,
   description: extended.description,
@@ -165,7 +163,9 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   const startOperation = useCallback(
     async (operation: Omit<LoadingOperation, 'startTime' | 'retryCount'>): Promise<string> => {
       type StartLoadingOperationAction = ReturnType<typeof startLoadingOperation>;
-      const result = await dispatch(startLoadingOperation(operation) as unknown as StartLoadingOperationAction);
+      const result = await dispatch(
+        startLoadingOperation(operation) as unknown as StartLoadingOperationAction
+      );
       if (startLoadingOperation.fulfilled.match(result)) {
         return result.payload.id;
       }
@@ -177,7 +177,13 @@ export const GlobalLoadingProvider: React.FC<GlobalLoadingProviderProps> = ({ ch
   const completeOperation = useCallback(
     async (id: string, success: boolean = true, error?: string): Promise<void> => {
       type CompleteLoadingOperationAction = ReturnType<typeof completeLoadingOperation>;
-      await dispatch(completeLoadingOperation({ id, success, error }) as unknown as CompleteLoadingOperationAction);
+      await dispatch(
+        completeLoadingOperation({
+          id,
+          success,
+          error,
+        }) as unknown as CompleteLoadingOperationAction
+      );
     },
     [dispatch]
   );

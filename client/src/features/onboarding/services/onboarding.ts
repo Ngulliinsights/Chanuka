@@ -20,10 +20,7 @@ export interface OnboardingProgress {
   progressPercentage: number;
 }
 
-export const onboardingService = {
-  async fetchProgress(): Promise<OnboardingProgress> {
-    const response = await globalApiClient.get('/api/onboarding/progress');
-    return response.data;
+export     return response.data;
   },
 
   async getSteps(): Promise<OnboardingStep[]> {

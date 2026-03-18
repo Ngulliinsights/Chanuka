@@ -469,12 +469,4 @@ export const mockAchievements: UserAchievement[] = [
 ];
 
 // Export all mock data
-export const mockUserData = {
-  profile: mockUserProfile,
-  preferences: mockUserPreferences,
-  savedBills: mockSavedBills,
-  engagementHistory: mockEngagementHistory,
-  dashboardData: mockDashboardData,
-  badges: mockBadges,
-  achievements: mockAchievements,
-};
+export 

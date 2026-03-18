@@ -1,4 +1,4 @@
-import { AlertTriangle, Scale, Users, TrendingUp, Shield, FileText, Star } from 'lucide-react';
+import { AlertTriangle, Scale, Users, Shield, FileText, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
 import {
@@ -89,8 +89,6 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
   ];
 
   // Extract constitutional concerns for civic action guidance
-  const constitutionalConcerns =
-    bill.constitutionalFlags?.map((flag: unknown) => flag.type || 'General') || [];
   const recommendations = [
     'Review income-based eligibility criteria for equal protection compliance',
     'Clarify federal-state authority boundaries in healthcare regulation',
@@ -140,19 +138,22 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold text-green-600">
-                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'low').length || 0}
+                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'low')
+                        .length || 0}
                     </div>
                     <div className="text-sm text-muted-foreground">Low Risk</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold text-yellow-600">
-                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'medium').length || 0}
+                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'medium')
+                        .length || 0}
                     </div>
                     <div className="text-sm text-muted-foreground">Medium Risk</div>
                   </div>
                   <div className="text-center p-4 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold text-red-600">
-                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'high').length || 0}
+                      {bill.constitutionalFlags?.filter((f: unknown) => f.severity === 'high')
+                        .length || 0}
                     </div>
                     <div className="text-sm text-muted-foreground">High Risk</div>
                   </div>

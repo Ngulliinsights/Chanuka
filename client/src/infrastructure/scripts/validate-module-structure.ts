@@ -1,6 +1,6 @@
 /**
  * Module Structure Validation Script
- * 
+ *
  * This script validates the infrastructure module count and structure compliance.
  * Requirements: 3.4, 4.1, 4.2, 4.3, 4.4, 4.5
  */
@@ -9,9 +9,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 interface ModuleValidation {
   name: string;
@@ -114,7 +111,7 @@ function validateInfrastructure(): ValidationReport {
   for (const entry of entries) {
     if (entry.isDirectory()) {
       const modulePath = path.join(INFRASTRUCTURE_PATH, entry.name);
-      
+
       // Check if this is a module directory
       if (isModuleDirectory(modulePath, entry.name)) {
         const validation = validateModule(modulePath, entry.name);
@@ -151,21 +148,27 @@ function generateReport(report: ValidationReport): string {
   lines.push('');
   lines.push(`Generated: ${new Date().toISOString()}`);
   lines.push('');
-  
+
   lines.push('## Summary');
   lines.push('');
   lines.push(`- **Total Modules**: ${report.totalModules}`);
   lines.push(`- **Target Range**: ${report.targetRange.min}-${report.targetRange.max} modules`);
   lines.push(`- **In Target Range**: ${report.inTargetRange ? '✅ YES' : '❌ NO'}`);
-  lines.push(`- **Compliant Modules**: ${report.compliantModules} (${Math.round(report.compliantModules / report.totalModules * 100)}%)`);
+  lines.push(
+    `- **Compliant Modules**: ${report.compliantModules} (${Math.round((report.compliantModules / report.totalModules) * 100)}%)`
+  );
   lines.push(`- **Non-Compliant Modules**: ${report.nonCompliantModules}`);
   lines.push('');
 
   if (!report.inTargetRange) {
     if (report.totalModules < report.targetRange.min) {
-      lines.push(`⚠️ **Warning**: Module count (${report.totalModules}) is below target minimum (${report.targetRange.min})`);
+      lines.push(
+        `⚠️ **Warning**: Module count (${report.totalModules}) is below target minimum (${report.targetRange.min})`
+      );
     } else {
-      lines.push(`⚠️ **Warning**: Module count (${report.totalModules}) exceeds target maximum (${report.targetRange.max})`);
+      lines.push(
+        `⚠️ **Warning**: Module count (${report.totalModules}) exceeds target maximum (${report.targetRange.max})`
+      );
     }
     lines.push('');
   }
@@ -186,7 +189,7 @@ function generateReport(report: ValidationReport): string {
   if (report.nonCompliantModules > 0) {
     lines.push('## Non-Compliant Modules');
     lines.push('');
-    
+
     const nonCompliant = report.modules.filter(m => !m.isCompliant);
     for (const module of nonCompliant) {
       lines.push(`### ${module.name}`);
@@ -207,23 +210,35 @@ function generateReport(report: ValidationReport): string {
   lines.push('');
   lines.push('- **Requirement 4.1**: All modules have index.ts');
   lines.push(`  - Status: ${report.modules.every(m => m.hasIndexTs) ? '✅ PASS' : '❌ FAIL'}`);
-  lines.push(`  - Compliant: ${report.modules.filter(m => m.hasIndexTs).length}/${report.totalModules}`);
+  lines.push(
+    `  - Compliant: ${report.modules.filter(m => m.hasIndexTs).length}/${report.totalModules}`
+  );
   lines.push('');
   lines.push('- **Requirement 4.2**: All modules have types.ts or types/');
   lines.push(`  - Status: ${report.modules.every(m => m.hasTypes) ? '✅ PASS' : '❌ FAIL'}`);
-  lines.push(`  - Compliant: ${report.modules.filter(m => m.hasTypes).length}/${report.totalModules}`);
+  lines.push(
+    `  - Compliant: ${report.modules.filter(m => m.hasTypes).length}/${report.totalModules}`
+  );
   lines.push('');
   lines.push('- **Requirement 4.3**: All modules have README.md');
   lines.push(`  - Status: ${report.modules.every(m => m.hasReadme) ? '✅ PASS' : '❌ FAIL'}`);
-  lines.push(`  - Compliant: ${report.modules.filter(m => m.hasReadme).length}/${report.totalModules}`);
+  lines.push(
+    `  - Compliant: ${report.modules.filter(m => m.hasReadme).length}/${report.totalModules}`
+  );
   lines.push('');
   lines.push('- **Requirement 4.4**: All modules have __tests__/');
   lines.push(`  - Status: ${report.modules.every(m => m.hasTests) ? '✅ PASS' : '❌ FAIL'}`);
-  lines.push(`  - Compliant: ${report.modules.filter(m => m.hasTests).length}/${report.totalModules}`);
+  lines.push(
+    `  - Compliant: ${report.modules.filter(m => m.hasTests).length}/${report.totalModules}`
+  );
   lines.push('');
   lines.push('- **Requirement 4.5**: 100% standard structure compliance');
-  lines.push(`  - Status: ${report.compliantModules === report.totalModules ? '✅ PASS' : '❌ FAIL'}`);
-  lines.push(`  - Compliant: ${report.compliantModules}/${report.totalModules} (${Math.round(report.compliantModules / report.totalModules * 100)}%)`);
+  lines.push(
+    `  - Status: ${report.compliantModules === report.totalModules ? '✅ PASS' : '❌ FAIL'}`
+  );
+  lines.push(
+    `  - Compliant: ${report.compliantModules}/${report.totalModules} (${Math.round((report.compliantModules / report.totalModules) * 100)}%)`
+  );
   lines.push('');
 
   return lines.join('\n');
@@ -247,7 +262,9 @@ function main() {
   console.log(`- Total Modules: ${report.totalModules}`);
   console.log(`- Target Range: ${report.targetRange.min}-${report.targetRange.max}`);
   console.log(`- In Target Range: ${report.inTargetRange ? 'YES ✅' : 'NO ❌'}`);
-  console.log(`- Compliant Modules: ${report.compliantModules}/${report.totalModules} (${Math.round(report.compliantModules / report.totalModules * 100)}%)`);
+  console.log(
+    `- Compliant Modules: ${report.compliantModules}/${report.totalModules} (${Math.round((report.compliantModules / report.totalModules) * 100)}%)`
+  );
   console.log('');
   console.log(`Full report written to: ${reportPath}`);
 

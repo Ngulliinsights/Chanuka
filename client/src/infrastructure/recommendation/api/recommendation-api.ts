@@ -16,16 +16,7 @@ import type {
 /**
  * Recommendation Engine API Client
  */
-export const recommendationApi = {
-  /**
-   * Get personalized recommendations for the authenticated user
-   */
-  async getPersonalized(limit: number = 10): Promise<RecommendationResponse> {
-    const response = await globalApiClient.get<RecommendationResponse>(
-      '/api/recommendation/personalized',
-      { params: { limit } }
-    );
-    return response.data;
+export     return response.data;
   },
 
   /**

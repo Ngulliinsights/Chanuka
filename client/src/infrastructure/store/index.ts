@@ -120,14 +120,9 @@ export {
   updatePreferences,
 } from './slices/navigationSlice';
 
-export {
-  setCurrentSession,
-} from './slices/sessionSlice';
+export { setCurrentSession } from './slices/sessionSlice';
 
-export {
-  setGlobalLoading,
-  resetLoadingState,
-} from './slices/loadingSlice';
+export { setGlobalLoading, resetLoadingState } from './slices/loadingSlice';
 
 // ============================================================================
 // PUBLIC API - Hooks (custom hooks for common patterns)
@@ -151,10 +146,7 @@ export { default as errorHandlingReducer } from './slices/errorHandlingSlice';
 // PUBLIC API - Types
 // ============================================================================
 
-export type {
-  LoadingStateData,
-  ExtendedLoadingOperation,
-} from './slices/loadingSlice';
+export type { LoadingStateData, ExtendedLoadingOperation } from './slices/loadingSlice';
 
 export type { DashboardFilters } from './slices/errorAnalyticsSlice';
 
@@ -181,4 +173,3 @@ export {
   setActiveTab,
   updateFilters,
 } from './slices/errorAnalyticsSlice';
-

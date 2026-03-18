@@ -7,7 +7,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import { cn } from '@client/lib/design-system';
 import type { DashboardConfig } from '@client/lib/types/dashboard';
 
 interface DashboardFooterProps {
@@ -192,4 +191,4 @@ const DashboardFooterComponent = ({ config, content, className }: DashboardFoote
 };
 
  
-export const DashboardFooter = React.memo(DashboardFooterComponent);
+export 

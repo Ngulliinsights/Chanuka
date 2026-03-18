@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ConstitutionalIntelligenceTab } from '../ui/ConstitutionalIntelligenceTab';
@@ -66,11 +66,7 @@ function renderWithProviders(component: React.ReactElement) {
     },
   });
 
-  return render(
-    <QueryClientProvider client={queryClient}>
-      {component}
-    </QueryClientProvider>
-  );
+  return render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
 }
 
 describe('ConstitutionalIntelligenceTab', () => {
@@ -102,7 +98,10 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should render no analysis state with analyze button', () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     useConstitutionalAnalysis.mockReturnValue({
       data: null,
       isLoading: false,
@@ -121,9 +120,12 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should trigger analysis when analyze button is clicked', async () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     const mutateMock = vi.fn();
-    
+
     useConstitutionalAnalysis.mockReturnValue({
       data: null,
       isLoading: false,
@@ -151,7 +153,10 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should render analysis display when data is available', () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     useConstitutionalAnalysis.mockReturnValue({
       data: mockAnalysis,
       isLoading: false,
@@ -172,7 +177,10 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should display violations with correct severity', () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     useConstitutionalAnalysis.mockReturnValue({
       data: mockAnalysis,
       isLoading: false,
@@ -191,7 +199,10 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should display precedents', () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     useConstitutionalAnalysis.mockReturnValue({
       data: mockAnalysis,
       isLoading: false,
@@ -210,7 +221,10 @@ describe('ConstitutionalIntelligenceTab', () => {
   });
 
   it('should display recommendations', () => {
-    const { useConstitutionalAnalysis, useAnalyzeBill } = require('../hooks/useConstitutionalAnalysis');
+    const {
+      useConstitutionalAnalysis,
+      useAnalyzeBill,
+    } = require('../hooks/useConstitutionalAnalysis');
     useConstitutionalAnalysis.mockReturnValue({
       data: mockAnalysis,
       isLoading: false,

@@ -1,6 +1,6 @@
 /**
  * Electoral Accountability Types
- * 
+ *
  * Type definitions for the Electoral Accountability Engine
  */
 
@@ -230,7 +230,12 @@ export interface CampaignCreationFormProps {
 
 // Utility Types
 
-export type VoteSeverity = 'aligned' | 'misaligned-low' | 'misaligned-medium' | 'misaligned-high' | 'misaligned-critical';
+export type VoteSeverity =
+  | 'aligned'
+  | 'misaligned-low'
+  | 'misaligned-medium'
+  | 'misaligned-high'
+  | 'misaligned-critical';
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 

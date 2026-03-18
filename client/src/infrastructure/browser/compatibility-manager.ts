@@ -253,4 +253,4 @@ export class BrowserCompatibilityManager {
   }
 }
 
-export const browserCompatibilityManager = BrowserCompatibilityManager.getInstance();
+export 

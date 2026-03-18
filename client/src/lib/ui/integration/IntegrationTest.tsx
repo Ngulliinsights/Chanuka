@@ -10,13 +10,11 @@ import {
   AlertCircle,
   Loader2,
   Smartphone,
-  Eye as Monitor, // Using Eye as Monitor replacement
-  Users,
+  Eye as Monitor,
   Zap,
   Earth,
   Eye,
 } from 'lucide-react';
-import React from 'react';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 /**
  * Sitemap Page
- * 
+ *
  * Hierarchical site navigation map
  */
 export default function SitemapPage() {
@@ -17,7 +17,7 @@ export default function SitemapPage() {
         { label: 'Search', href: '/search' },
         { label: 'Dashboard', href: '/dashboard' },
         { label: 'Analysis Tools', href: '/analysis' },
-      ]
+      ],
     },
     {
       title: 'Community',
@@ -26,7 +26,7 @@ export default function SitemapPage() {
         { label: 'Community Hub', href: '/community' },
         { label: 'Expert Verification', href: '/community/expert-verification' },
         { label: 'Expert Insights', href: '/expert' },
-      ]
+      ],
     },
     {
       title: 'Education',
@@ -36,7 +36,7 @@ export default function SitemapPage() {
         { label: 'Documentation', href: '/documentation' },
         { label: 'Blog', href: '/blog' },
         { label: 'API Access', href: '/api' },
-      ]
+      ],
     },
     {
       title: 'Legal',
@@ -46,7 +46,7 @@ export default function SitemapPage() {
         { label: 'Terms of Service', href: '/terms' },
         { label: 'Cookie Policy', href: '/cookies' },
         { label: 'Accessibility', href: '/accessibility' },
-      ]
+      ],
     },
     {
       title: 'Company',
@@ -56,7 +56,7 @@ export default function SitemapPage() {
         { label: 'Careers', href: '/careers' },
         { label: 'Press Kit', href: '/press' },
         { label: 'Contact', href: '/contact' },
-      ]
+      ],
     },
     {
       title: 'Support',
@@ -65,8 +65,8 @@ export default function SitemapPage() {
         { label: 'Support Center', href: '/support' },
         { label: 'System Status', href: '/status' },
         { label: 'Security', href: '/security' },
-      ]
-    }
+      ],
+    },
   ];
 
   return (

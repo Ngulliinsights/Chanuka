@@ -27,11 +27,7 @@ import type {
  * Users API service - handles all user-related API calls
  * Centralizes API endpoints and response handling for the users feature
  */
-export const userApi = {
-  // Authentication endpoints
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    const response = await globalApiClient.post<AuthResponse>('/api/auth/login', credentials);
-    return response.data;
+export     return response.data;
   },
 
   async register(data: RegisterData): Promise<AuthResponse> {

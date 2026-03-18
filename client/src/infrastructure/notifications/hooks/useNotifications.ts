@@ -5,26 +5,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsService } from '../services/notifications';
 
-export const useNotificationPreferences = () => {
-  return useQuery({
-    queryKey: ['notification-preferences'],
-    queryFn: () => notificationsService.fetchPreferences(),
-    staleTime: 1000 * 60 * 30, // 30 minutes
-  });
-};
+export };
 
-export const useUnreadNotificationCount = (refetchInterval = 10000) => {
-  return useQuery({
-    queryKey: ['unread-notification-count'],
-    queryFn: () => notificationsService.getUnreadCount(),
-    refetchInterval,
-    staleTime: 5000,
-  });
-};
+export };
 
-export const useUpdateNotificationPreference = () => {
-  const queryClient = useQueryClient();
-
+export 
   return useMutation({
     mutationFn: ({ type, channels, enabled }: { type: string; channels: string[]; enabled: boolean }) =>
       notificationsService.updatePreference(type, channels, enabled),
@@ -34,9 +19,7 @@ export const useUpdateNotificationPreference = () => {
   });
 };
 
-export const useMarkNotificationAsRead = () => {
-  const queryClient = useQueryClient();
-
+export 
   return useMutation({
     mutationFn: (notificationId: string) => notificationsService.markAsRead(notificationId),
     onSuccess: () => {

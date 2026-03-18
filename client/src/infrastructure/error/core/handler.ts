@@ -214,4 +214,4 @@ export class ErrorHandler {
 }
 
 // Export singleton instance
-export const errorHandler = ErrorHandler.getInstance();
+export 

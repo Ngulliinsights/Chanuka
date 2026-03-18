@@ -21,7 +21,7 @@ export function BulkActionsBar({
 
   const handleAddToCollection = () => {
     const collections = collectionsService.getCollections();
-    
+
     if (collections.length === 0) {
       toast({
         title: 'No collections',
@@ -35,7 +35,7 @@ export function BulkActionsBar({
     // In real app, show collection picker dialog
     const collection = collections[0];
     if (!collection) return;
-    
+
     selectedBillIds.forEach(billId => {
       collectionsService.addBillToCollection(collection.id, billId);
     });
@@ -58,20 +58,20 @@ export function BulkActionsBar({
             <X className="h-4 w-4" />
           </Button>
         </div>
-        
+
         <div className="h-6 w-px bg-gray-300" />
-        
+
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleAddToCollection}>
             <Plus className="h-4 w-4 mr-2" />
             Add to Collection
           </Button>
-          
+
           <Button variant="outline" size="sm" onClick={onExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
-          
+
           <Button variant="outline" size="sm">
             <Tag className="h-4 w-4 mr-2" />
             Tag

@@ -81,9 +81,7 @@ function renderWithProviders(ui: React.ReactElement) {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {ui}
-      </BrowserRouter>
+      <BrowserRouter>{ui}</BrowserRouter>
     </QueryClientProvider>
   );
 }
@@ -247,7 +245,7 @@ describe('PretextDetectionPage', () => {
 
   it('tracks page view on mount', () => {
     const { analyticsService } = require('@client/infrastructure/observability/analytics');
-    
+
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: [],
       isLoading: false,
@@ -269,7 +267,7 @@ describe('PretextDetectionPage', () => {
   it('tracks tab changes', async () => {
     const user = userEvent.setup();
     const { analyticsService } = require('@client/infrastructure/observability/analytics');
-    
+
     vi.mocked(hooks.usePretextAlerts).mockReturnValue({
       data: mockAlerts,
       isLoading: false,

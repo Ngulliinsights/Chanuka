@@ -1,6 +1,5 @@
 import { BarChart3 } from 'lucide-react';
 import { useId } from 'react';
-import React from 'react';
 
 import { Button } from '@client/lib/design-system';
 import { cn } from '@client/lib/utils/cn';

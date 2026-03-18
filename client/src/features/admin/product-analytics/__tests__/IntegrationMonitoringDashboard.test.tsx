@@ -34,7 +34,7 @@ describe('IntegrationMonitoringDashboard', () => {
     );
 
     render(<IntegrationMonitoringDashboard />, { wrapper: createWrapper() });
-    
+
     expect(screen.getByText(/loading monitoring dashboard/i)).toBeInTheDocument();
   });
 
@@ -87,9 +87,7 @@ describe('IntegrationMonitoringDashboard', () => {
   });
 
   it('renders error state when API fails', async () => {
-    vi.mocked(monitoringApi.getDashboardData).mockRejectedValue(
-      new Error('API Error')
-    );
+    vi.mocked(monitoringApi.getDashboardData).mockRejectedValue(new Error('API Error'));
 
     render(<IntegrationMonitoringDashboard />, { wrapper: createWrapper() });
 

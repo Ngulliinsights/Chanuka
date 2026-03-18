@@ -2,7 +2,6 @@ import React from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
 
-
 interface AvatarSkeletonProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';

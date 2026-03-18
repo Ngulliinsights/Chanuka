@@ -1,13 +1,16 @@
 /**
  * useAnalysisHistory Hook
- * 
+ *
  * React hook for fetching historical analysis data for a bill.
  * Supports pagination and filtering by analysis type.
  */
 
-import { useQuery, type UseQueryResult } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { analysisApiService } from '../services/analysis-api.service';
-import type { AnalysisHistoryEntry, GetAnalysisHistoryParams } from '@shared/types/features/analysis';
+import type {
+  AnalysisHistoryEntry,
+  GetAnalysisHistoryParams,
+} from '@shared/types/features/analysis';
 
 interface UseAnalysisHistoryOptions extends GetAnalysisHistoryParams {
   enabled?: boolean;
@@ -15,10 +18,10 @@ interface UseAnalysisHistoryOptions extends GetAnalysisHistoryParams {
 
 /**
  * Hook to fetch analysis history for a bill
- * 
+ *
  * @param options - Configuration options including bill ID, pagination, and filters
  * @returns React Query result with history data
- * 
+ *
  * @example
  * ```tsx
  * const { data, isLoading } = useAnalysisHistory({

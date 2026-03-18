@@ -604,8 +604,5 @@ export function setAuthApiService(service: AuthApiService): void {
 }
 
 // Export the getter as the default service
-export const authApiService = {
-  get instance() {
-    return getAuthApiService();
-  },
+export   },
 };

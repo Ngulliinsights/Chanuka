@@ -1,10 +1,10 @@
 /**
  * Result Monad Pattern (Strategic - Future Use)
- * 
+ *
  * Provides type-safe error handling without exceptions.
  * Server uses this extensively (AsyncServiceResult<T>).
  * Available for gradual client adoption.
- * 
+ *
  * @example
  * // Type-safe API call
  * async function fetchBillSafely(id: string): Promise<ClientResult<Bill>> {
@@ -13,7 +13,7 @@
  *     error => ErrorFactory.createFromError(error)
  *   );
  * }
- * 
+ *
  * // Caller gets type-safe error handling
  * const result = await fetchBillSafely('123');
  * if (result.success) {

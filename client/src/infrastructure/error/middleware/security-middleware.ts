@@ -130,22 +130,16 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
     const securityContext = this.extractSecurityContext(error);
     const recoveryStrategies = this.getSecurityRecoveryStrategies(error, securityContext);
 
-    return new AppError(
-      error.message,
-      error.code,
-      error.type,
-      error.severity,
-      {
-        ...error,
-        context: {
-          ...error.context,
-          ...securityContext,
-        },
-        recoveryStrategies,
-        recoverable: this.isRecoverableSecurityError(error),
-        retryable: this.isRetryableSecurityError(error),
-      }
-    );
+    return new AppError(error.message, error.code, error.type, error.severity, {
+      ...error,
+      context: {
+        ...error.context,
+        ...securityContext,
+      },
+      recoveryStrategies,
+      recoverable: this.isRecoverableSecurityError(error),
+      retryable: this.isRetryableSecurityError(error),
+    });
   }
 
   /**
@@ -270,9 +264,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
    * Check if security error is retryable
    */
   private isRetryableSecurityError(error: AppError): boolean {
-    const retryableCodes = [
-      SecurityErrorCode.TOKEN_EXPIRED,
-    ];
+    const retryableCodes = [SecurityErrorCode.TOKEN_EXPIRED];
 
     return retryableCodes.includes(error.code as SecurityErrorCode);
   }
@@ -280,10 +272,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
   /**
    * Log security events with enhanced context
    */
-  private async logSecurityEvent(
-    error: AppError,
-    context: SecurityErrorContext
-  ): Promise<void> {
+  private async logSecurityEvent(error: AppError, context: SecurityErrorContext): Promise<void> {
     const securityLog = {
       timestamp: new Date().toISOString(),
       level: context.securityLevel,
@@ -313,12 +302,8 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
   /**
    * Detect potential intrusion attempts
    */
-  private async detectIntrusion(
-    error: AppError,
-    context: SecurityErrorContext
-  ): Promise<void> {
+  private async detectIntrusion(error: AppError, context: SecurityErrorContext): Promise<void> {
     const userId = context.userId || 'anonymous';
-    const currentTime = Date.now();
 
     // Track failed attempts
     const attempts = this.failedAttempts.get(userId) || 0;
@@ -357,10 +342,7 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
   /**
    * Check if account should be locked out
    */
-  private shouldTriggerLockout(
-    error: AppError,
-    context: SecurityErrorContext
-  ): boolean {
+  private shouldTriggerLockout(error: AppError, context: SecurityErrorContext): boolean {
     if (!context.userId) return false;
 
     const userId = context.userId;
@@ -459,7 +441,8 @@ export class SecurityErrorMiddleware implements ErrorReporter, ErrorTransformer 
 }
 
 // Export singleton instance
-export const securityErrorMiddleware = new SecurityErrorMiddleware();
-
-// Export types
-export type { SecurityErrorContext, SecurityMiddlewareConfig };
+export type {
+  // Export types
+  SecurityErrorContext,
+  SecurityMiddlewareConfig,
+};

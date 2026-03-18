@@ -82,7 +82,9 @@ export function createSafeLazyPage<P extends Record<string, never> = Record<stri
     }
   };
 
-  return createSafeLazyComponent(importFn, componentName) as unknown as LazyExoticComponent<ComponentType<P>>;
+  return createSafeLazyComponent(importFn, componentName) as unknown as LazyExoticComponent<
+    ComponentType<P>
+  >;
 }
 
 /**

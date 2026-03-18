@@ -3,14 +3,14 @@
  *
  * Central export point for all feature modules
  * Follows Feature-Sliced Design (FSD) architecture
- * 
+ *
  * Note: Using selective exports to avoid naming conflicts
  */
 
 // Analytics Features moved to infrastructure
 
 // Bills Features - selective exports to avoid conflicts
-export { 
+export {
   BillCard,
   BillList,
   BillHeader,

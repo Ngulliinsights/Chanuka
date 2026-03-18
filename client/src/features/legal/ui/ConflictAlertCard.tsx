@@ -1,6 +1,6 @@
 /**
  * ConflictAlertCard Component
- * 
+ *
  * Displays a constitutional conflict in a compact alert format
  * Used in bill listings and dashboards to show high-level conflict information
  */
@@ -25,7 +25,11 @@ interface ConflictAlertCardProps {
   onExpandChange?: (expanded: boolean) => void;
 }
 
-export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }: ConflictAlertCardProps) {
+export function ConflictAlertCard({
+  conflict,
+  expanded = false,
+  onExpandChange,
+}: ConflictAlertCardProps) {
   const [isExpanded, setIsExpanded] = useState(expanded);
 
   const handleToggle = () => {
@@ -40,39 +44,36 @@ export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }
       border: 'border-red-200',
       text: 'text-red-900',
       badge: 'bg-red-100 text-red-800',
-      icon: '🔴'
+      icon: '🔴',
     },
     high: {
       bg: 'bg-orange-50',
       border: 'border-orange-200',
       text: 'text-orange-900',
       badge: 'bg-orange-100 text-orange-800',
-      icon: '🟠'
+      icon: '🟠',
     },
     moderate: {
       bg: 'bg-yellow-50',
       border: 'border-yellow-200',
       text: 'text-yellow-900',
       badge: 'bg-yellow-100 text-yellow-800',
-      icon: '🟡'
+      icon: '🟡',
     },
     low: {
       bg: 'bg-green-50',
       border: 'border-green-200',
       text: 'text-green-900',
       badge: 'bg-green-100 text-green-800',
-      icon: '🟢'
-    }
+      icon: '🟢',
+    },
   };
 
   const config = severityConfig[conflict.severity];
 
   return (
     <div className={`border rounded-lg transition-all ${config.bg} ${config.border} border-l-4`}>
-      <button
-        onClick={handleToggle}
-        className="w-full text-left p-4 hover:opacity-90 transition"
-      >
+      <button onClick={handleToggle} className="w-full text-left p-4 hover:opacity-90 transition">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
@@ -80,7 +81,9 @@ export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }
               <h4 className={`font-semibold ${config.text} truncate`}>
                 {conflict.constitutional_provision}
               </h4>
-              <span className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${config.badge}`}>
+              <span
+                className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${config.badge}`}
+              >
                 {conflict.severity.toUpperCase()}
               </span>
             </div>
@@ -95,7 +98,12 @@ export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+              />
             </svg>
           </div>
         </div>
@@ -114,9 +122,7 @@ export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }
           {/* Detailed Description */}
           <div>
             <h5 className="text-sm font-semibold text-gray-700 mb-2">Conflict Analysis</h5>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              {conflict.conflict_description}
-            </p>
+            <p className="text-sm text-gray-700 leading-relaxed">{conflict.conflict_description}</p>
           </div>
 
           {/* Suggested Amendment */}
@@ -140,7 +146,7 @@ export function ConflictAlertCard({ conflict, expanded = false, onExpandChange }
 
 /**
  * ConflictAlertGrid Component
- * 
+ *
  * Displays multiple conflicts in a grid/list format
  */
 interface ConflictAlertGridProps {
@@ -149,7 +155,11 @@ interface ConflictAlertGridProps {
   onConflictClick?: (conflict: ConstitutionalConflict) => void;
 }
 
-export function ConflictAlertGrid({ conflicts, maxVisible = 5, onConflictClick }: ConflictAlertGridProps) {
+export function ConflictAlertGrid({
+  conflicts,
+  maxVisible = 5,
+  onConflictClick,
+}: ConflictAlertGridProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const visibleConflicts = conflicts.slice(0, maxVisible);
   const hiddenCount = Math.max(0, conflicts.length - maxVisible);
@@ -176,7 +186,8 @@ export function ConflictAlertGrid({ conflicts, maxVisible = 5, onConflictClick }
           {hiddenCount > 0 && (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
               <p className="text-sm text-gray-600">
-                <strong>{hiddenCount}</strong> more conflict{hiddenCount !== 1 ? 's' : ''} identified
+                <strong>{hiddenCount}</strong> more conflict{hiddenCount !== 1 ? 's' : ''}{' '}
+                identified
               </p>
               <p className="text-xs text-gray-500 mt-1">View legal analysis for complete details</p>
             </div>
@@ -189,7 +200,7 @@ export function ConflictAlertGrid({ conflicts, maxVisible = 5, onConflictClick }
 
 /**
  * ConflictSummary Component
- * 
+ *
  * Shows high-level conflict summary metrics
  */
 interface ConflictSummaryProps {
@@ -205,19 +216,19 @@ export function ConflictSummary({
   criticalCount,
   highCount,
   moderateCount,
-  lowCount
+  lowCount,
 }: ConflictSummaryProps) {
   const severities = [
     { level: 'critical', count: criticalCount, color: 'text-red-600', bg: 'bg-red-50' },
     { level: 'high', count: highCount, color: 'text-orange-600', bg: 'bg-orange-50' },
     { level: 'moderate', count: moderateCount, color: 'text-yellow-600', bg: 'bg-yellow-50' },
-    { level: 'low', count: lowCount, color: 'text-green-600', bg: 'bg-green-50' }
+    { level: 'low', count: lowCount, color: 'text-green-600', bg: 'bg-green-50' },
   ];
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-4">
       <h4 className="font-semibold text-gray-800 mb-3">Constitutional Conflicts Summary</h4>
-      
+
       {totalConflicts === 0 ? (
         <div className="text-center py-6">
           <p className="text-green-600 font-medium">✓ No conflicts identified</p>
@@ -231,9 +242,7 @@ export function ConflictSummary({
                 <span className="text-sm capitalize text-gray-700">{severity.level}</span>
               </div>
               <div className={`px-2 py-1 rounded ${severity.bg}`}>
-                <span className={`text-sm font-semibold ${severity.color}`}>
-                  {severity.count}
-                </span>
+                <span className={`text-sm font-semibold ${severity.color}`}>{severity.count}</span>
               </div>
             </div>
           ))}

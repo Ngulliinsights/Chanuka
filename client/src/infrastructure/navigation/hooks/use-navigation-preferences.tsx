@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import React from 'react';
 
 import { logger } from '@client/lib/utils/logger';
 

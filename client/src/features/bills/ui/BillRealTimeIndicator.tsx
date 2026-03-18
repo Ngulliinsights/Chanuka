@@ -6,7 +6,6 @@
  */
 
 import { Activity, MessageSquare, Users, TrendingUp, AlertCircle, Clock, Eye } from 'lucide-react';
-import React from 'react';
 import { useEffect, useState } from 'react';
 
 import { BillRealTimeUpdate } from '@client/infrastructure/api/realtime';

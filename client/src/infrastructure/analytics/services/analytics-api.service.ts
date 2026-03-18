@@ -13,18 +13,15 @@ import {
   BatchTrackEngagementRequest,
   AnalyticsQueryParams,
   EngagementQueryParams,
-  CreateDashboardRequest,
-  DashboardWidget,
   EngagementMetricsResponse,
   EngagementMetricsListResponse,
   EngagementSummaryResponse,
   UserEngagementProfileResponse,
-  AnalyticsDashboardResponse,
   TopContentResponse,
   RealTimeMetricsResponse,
   TimePeriod,
   EngagementEntityType,
-  EngagementEventType
+  EngagementEventType,
 } from '@shared/types/api/contracts/analytics.contracts';
 
 class AnalyticsApiService extends CacheableApiService<
@@ -42,52 +39,70 @@ class AnalyticsApiService extends CacheableApiService<
     return this.client.post(`${this.baseUrl}/track`, data);
   }
 
-  async trackBatchEngagement(data: BatchTrackEngagementRequest): Promise<EngagementMetricsListResponse> {
+  async trackBatchEngagement(
+    data: BatchTrackEngagementRequest
+  ): Promise<EngagementMetricsListResponse> {
     return this.client.post(`${this.baseUrl}/track/batch`, data);
   }
 
   // Convenience tracking methods
-  async trackView(entityId: string, entityType: EngagementEntityType, metadata?: any): Promise<void> {
+  async trackView(
+    entityId: string,
+    entityType: EngagementEntityType,
+    metadata?: any
+  ): Promise<void> {
     await this.trackEngagement({
       entityId,
       entityType,
       eventType: EngagementEventType.VIEW,
-      metadata
+      metadata,
     });
   }
 
-  async trackClick(entityId: string, entityType: EngagementEntityType, metadata?: any): Promise<void> {
+  async trackClick(
+    entityId: string,
+    entityType: EngagementEntityType,
+    metadata?: any
+  ): Promise<void> {
     await this.trackEngagement({
       entityId,
       entityType,
       eventType: EngagementEventType.CLICK,
-      metadata
+      metadata,
     });
   }
 
-  async trackShare(entityId: string, entityType: EngagementEntityType, metadata?: any): Promise<void> {
+  async trackShare(
+    entityId: string,
+    entityType: EngagementEntityType,
+    metadata?: any
+  ): Promise<void> {
     await this.trackEngagement({
       entityId,
       entityType,
       eventType: EngagementEventType.SHARE,
-      metadata
+      metadata,
     });
   }
 
-  async trackTimeSpent(entityId: string, entityType: EngagementEntityType, duration: number): Promise<void> {
+  async trackTimeSpent(
+    entityId: string,
+    entityType: EngagementEntityType,
+    duration: number
+  ): Promise<void> {
     await this.trackEngagement({
       entityId,
       entityType,
       eventType: EngagementEventType.VIEW,
       duration,
-      metadata: { type: 'time_spent' }
+      metadata: { type: 'time_spent' },
     });
   }
 
   // Engagement Summaries
   async getEngagementSummary(
-    entityId: string, 
-    entityType: EngagementEntityType, 
+    entityId: string,
+    entityType: EngagementEntityType,
     period: TimePeriod,
     dateFrom?: string,
     dateTo?: string
@@ -95,7 +110,7 @@ class AnalyticsApiService extends CacheableApiService<
     return this.client.get(`${this.baseUrl}/summary/${entityType}/${entityId}`, {
       period,
       dateFrom,
-      dateTo
+      dateTo,
     });
   }
 
@@ -113,7 +128,7 @@ class AnalyticsApiService extends CacheableApiService<
 
   // User Analytics
   async getUserEngagementProfile(
-    userId: string, 
+    userId: string,
     period: TimePeriod,
     dateFrom?: string,
     dateTo?: string
@@ -121,7 +136,7 @@ class AnalyticsApiService extends CacheableApiService<
     return this.client.get(`${this.baseUrl}/users/${userId}/profile`, {
       period,
       dateFrom,
-      dateTo
+      dateTo,
     });
   }
 
@@ -145,8 +160,8 @@ class AnalyticsApiService extends CacheableApiService<
   // WebSocket subscriptions for real-time updates
   async subscribeToRealTimeMetrics(callback: (metrics: any) => void): Promise<() => void> {
     const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/analytics/realtime`);
-    
-    ws.onmessage = (event) => {
+
+    ws.onmessage = event => {
       const data = JSON.parse(event.data);
       callback(data);
     };
@@ -155,13 +170,15 @@ class AnalyticsApiService extends CacheableApiService<
   }
 
   async subscribeToEntityEngagement(
-    entityId: string, 
-    entityType: EngagementEntityType, 
+    entityId: string,
+    entityType: EngagementEntityType,
     callback: (event: EngagementMetrics) => void
   ): Promise<() => void> {
-    const ws = new WebSocket(`${process.env.REACT_APP_WS_URL}/analytics/engagement/${entityType}/${entityId}`);
-    
-    ws.onmessage = (event) => {
+    const ws = new WebSocket(
+      `${process.env.REACT_APP_WS_URL}/analytics/engagement/${entityType}/${entityId}`
+    );
+
+    ws.onmessage = event => {
       const data = JSON.parse(event.data);
       if (data.type === 'engagement_event') {
         callback(data.event);

@@ -16,7 +16,6 @@ import {
   AnalyticsEventType,
   AnalyticsDashboardData,
   PagePerformanceMetrics,
-  UserEngagementMetrics,
 } from '@client/infrastructure/observability/analytics';
 import { useNavigation } from '@client/infrastructure/navigation/context';
 import { logger } from '@client/lib/utils/logger';

@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Retry Logic
- * 
+ *
  * Tests RetryHandler class, exponential backoff, retry conditions,
  * and service-specific configurations.
  */
@@ -151,11 +151,7 @@ describe('RetryHandler', () => {
 
       await promise;
 
-      expect(onRetry).toHaveBeenCalledWith(
-        expect.any(Error),
-        0,
-        expect.any(Number)
-      );
+      expect(onRetry).toHaveBeenCalledWith(expect.any(Error), 0, expect.any(Number));
     });
 
     it('should use exponential backoff', async () => {
@@ -270,10 +266,7 @@ describe('RetryHandler', () => {
       const handler = new RetryHandler({ maxRetries: 1, baseDelay: 100 });
       const serverError = new Error('500 Internal Server Error');
 
-      const operation = vi
-        .fn()
-        .mockRejectedValueOnce(serverError)
-        .mockResolvedValueOnce('success');
+      const operation = vi.fn().mockRejectedValueOnce(serverError).mockResolvedValueOnce('success');
 
       const promise = handler.execute(operation);
 
@@ -419,10 +412,7 @@ describe('HTTP Retry Handler', () => {
     const timeoutError = new Error('Request timeout');
     timeoutError.name = 'TimeoutError';
 
-    const operation = vi
-      .fn()
-      .mockRejectedValueOnce(timeoutError)
-      .mockResolvedValueOnce('success');
+    const operation = vi.fn().mockRejectedValueOnce(timeoutError).mockResolvedValueOnce('success');
 
     const promise = handler.execute(operation);
 
@@ -497,10 +487,7 @@ describe('withRetry', () => {
 
   it('should retry 408 and 429 errors', async () => {
     const timeoutError = new Error('408 Request Timeout');
-    const operation = vi
-      .fn()
-      .mockRejectedValueOnce(timeoutError)
-      .mockResolvedValueOnce('success');
+    const operation = vi.fn().mockRejectedValueOnce(timeoutError).mockResolvedValueOnce('success');
 
     const promise = withRetry(operation);
 

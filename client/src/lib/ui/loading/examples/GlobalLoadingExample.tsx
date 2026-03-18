@@ -158,9 +158,7 @@ const AppExample: React.FC = () => {
  * ```tsx
  * const { show, hide } = useGlobalLoadingIndicator();
  *
- * const handleAsyncAction = async () => {
- *   const opId = await show({ message: 'Loading...' });
- *   try {
+ *  *   try {
  *     await someAsyncOperation();
  *   } finally {
  *     await hide(opId);
@@ -173,9 +171,7 @@ const AppExample: React.FC = () => {
  * const { withLoading } = useLoadingState();
  * const { show, hide } = useGlobalLoadingIndicator();
  *
- * const handleAction = withLoading(async () => {
- *   const opId = await show({ message: 'Processing...' });
- *   try {
+ *  *   try {
  *     return await apiCall();
  *   } finally {
  *     await hide(opId);

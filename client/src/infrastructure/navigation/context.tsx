@@ -24,7 +24,11 @@ import {
 } from '@client/infrastructure/store';
 import { UserRole } from '@client/lib/types/navigation';
 
-import { NavigationContextValue, BreadcrumbItem, RelatedPage } from '@client/infrastructure/navigation/types';
+import {
+  NavigationContextValue,
+  BreadcrumbItem,
+  RelatedPage,
+} from '@client/infrastructure/navigation/types';
 import {
   generateBreadcrumbs,
   calculateRelatedPages,
@@ -93,7 +97,7 @@ export function createNavigationProvider(
           dispatch(setCurrentPath(currentPath));
           dispatch(setCurrentSection(determineNavigationSection(currentPath)));
           dispatch(updateBreadcrumbs(generateBreadcrumbs(currentPath)));
-           
+
           dispatch(updateRelatedPages(calculateRelatedPages(currentPath, state.user_role) as any));
           dispatch(addToRecentPages({ path: currentPath, title: document.title || currentPath }));
         });
@@ -133,7 +137,6 @@ export function createNavigationProvider(
 
     const updateRelatedPagesAction = useCallback(
       (pages: RelatedPage[]) => {
-         
         dispatch(updateRelatedPages(pages as any));
       },
       [dispatch]
@@ -156,7 +159,6 @@ export function createNavigationProvider(
           autoExpand: boolean;
         }>
       ) => {
-         
         dispatch(updatePreferences(preferences as any));
       },
       [dispatch]
@@ -193,7 +195,7 @@ export function createNavigationProvider(
 
     // Context value with all functionality - no memoization to avoid dependency issues
     // Use `any` here to bridge type differences between core and shared navigation types.
-     
+
     const contextValue: any = {
       ...state,
 

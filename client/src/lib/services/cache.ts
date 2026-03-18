@@ -133,7 +133,12 @@ class MemoryStorageBackend implements StorageBackend {
     // Check size limits
     const entrySize = this.calculateEntrySize(entry);
     if (entrySize > this.maxSize) {
-      throw new CacheError(`Entry size ${entrySize} exceeds maximum size ${this.maxSize}`, 'set', key, 'set');
+      throw new CacheError(
+        `Entry size ${entrySize} exceeds maximum size ${this.maxSize}`,
+        'set',
+        key,
+        'set'
+      );
     }
 
     // Evict old entries if needed
@@ -216,7 +221,7 @@ class IndexedDBStorageBackend implements StorageBackend {
         resolve();
       };
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = event => {
         const db = (event.target as IDBOpenDBRequest).result;
         if (!db.objectStoreNames.contains('cache')) {
           const store = db.createObjectStore('cache', { keyPath: 'key' });
@@ -261,7 +266,8 @@ class IndexedDBStorageBackend implements StorageBackend {
         resolve(entry as CacheEntry<T>);
       };
 
-      request.onerror = () => reject(new CacheError('Failed to get from IndexedDB', 'get', key, 'get'));
+      request.onerror = () =>
+        reject(new CacheError('Failed to get from IndexedDB', 'get', key, 'get'));
     });
   }
 
@@ -274,7 +280,8 @@ class IndexedDBStorageBackend implements StorageBackend {
       const request = store.put(entry);
 
       request.onsuccess = () => resolve();
-      request.onerror = () => reject(new CacheError('Failed to set in IndexedDB', 'set', key, 'set'));
+      request.onerror = () =>
+        reject(new CacheError('Failed to set in IndexedDB', 'set', key, 'set'));
     });
   }
 
@@ -287,7 +294,8 @@ class IndexedDBStorageBackend implements StorageBackend {
       const request = store.delete(key);
 
       request.onsuccess = () => resolve();
-      request.onerror = () => reject(new CacheError('Failed to delete from IndexedDB', 'delete', key, 'delete'));
+      request.onerror = () =>
+        reject(new CacheError('Failed to delete from IndexedDB', 'delete', key, 'delete'));
     });
   }
 
@@ -459,7 +467,10 @@ class HybridStorageBackend implements StorageBackend {
       try {
         await backend.init();
       } catch (error) {
-        logger.warn('Storage backend initialization failed', { backend: backend.constructor.name, error });
+        logger.warn('Storage backend initialization failed', {
+          backend: backend.constructor.name,
+          error,
+        });
       }
     }
   }
@@ -470,7 +481,11 @@ class HybridStorageBackend implements StorageBackend {
         const result = await backend.get<T>(key);
         if (result) return result;
       } catch (error) {
-        logger.warn('Storage backend get failed', { backend: backend.constructor.name, key, error });
+        logger.warn('Storage backend get failed', {
+          backend: backend.constructor.name,
+          key,
+          error,
+        });
       }
     }
     return null;
@@ -482,7 +497,11 @@ class HybridStorageBackend implements StorageBackend {
         await backend.set(key, entry);
         return;
       } catch (error) {
-        logger.warn('Storage backend set failed', { backend: backend.constructor.name, key, error });
+        logger.warn('Storage backend set failed', {
+          backend: backend.constructor.name,
+          key,
+          error,
+        });
       }
     }
     throw new CacheError('All storage backends failed', 'set', key, 'set');
@@ -493,7 +512,11 @@ class HybridStorageBackend implements StorageBackend {
       try {
         await backend.delete(key);
       } catch (error) {
-        logger.warn('Storage backend delete failed', { backend: backend.constructor.name, key, error });
+        logger.warn('Storage backend delete failed', {
+          backend: backend.constructor.name,
+          key,
+          error,
+        });
       }
     }
   }
@@ -554,7 +577,7 @@ class CacheCompression {
     // Simple compression simulation (in real implementation, use pako or similar)
     return {
       compressed: uint8Array,
-      algorithm: 'text-encoder'
+      algorithm: 'text-encoder',
     };
   }
 
@@ -589,7 +612,7 @@ export class CacheService {
       metrics: true,
       invalidationStrategy: 'ttl',
       persistent: true,
-      ...config
+      ...config,
     };
 
     this.compressionEnabled = this.config.compression ?? false;
@@ -617,7 +640,7 @@ export class CacheService {
         this.storage = new HybridStorageBackend([
           new MemoryStorageBackend(),
           new IndexedDBStorageBackend(this.config.name),
-          new LocalStorageBackend(this.config.name + '_')
+          new LocalStorageBackend(this.config.name + '_'),
         ]);
         break;
     }
@@ -635,7 +658,7 @@ export class CacheService {
       size: 0,
       hitRate: 0,
       avgAccessTime: 0,
-      efficiency: 0
+      efficiency: 0,
     };
   }
 
@@ -661,7 +684,10 @@ export class CacheService {
       // Decompress if needed
       let data: T = (entry as CacheEntry<T>).data as T;
       if ((entry as CacheEntry<T>).compressed && this.compressionEnabled) {
-        const decompressed = await CacheCompression.decompress((entry as CacheEntry<T>).data as unknown as Uint8Array, (entry as CacheEntry<T>).compressionAlgorithm!);
+        const decompressed = await CacheCompression.decompress(
+          (entry as CacheEntry<T>).data as unknown as Uint8Array,
+          (entry as CacheEntry<T>).compressionAlgorithm!
+        );
         data = decompressed as T;
       }
 
@@ -670,13 +696,9 @@ export class CacheService {
       if (error instanceof CacheMissError) {
         throw error;
       }
-      throw ServiceErrorFactory.createCacheError(
-        'Failed to get from cache',
-        key,
-        'get',
-        'get',
-        { originalError: error }
-      );
+      throw ServiceErrorFactory.createCacheError('Failed to get from cache', key, 'get', 'get', {
+        originalError: error,
+      });
     }
   }
 
@@ -707,19 +729,15 @@ export class CacheService {
         compressed,
         compressionAlgorithm,
         accessCount: 0,
-        lastAccess: Date.now()
+        lastAccess: Date.now(),
       };
 
       await this.storage.set(key, entry);
       await this.updateMetrics(startTime);
     } catch (error) {
-      throw ServiceErrorFactory.createCacheError(
-        'Failed to set in cache',
-        key,
-        'set',
-        'set',
-        { originalError: error }
-      );
+      throw ServiceErrorFactory.createCacheError('Failed to set in cache', key, 'set', 'set', {
+        originalError: error,
+      });
     }
   }
 
@@ -796,9 +814,10 @@ export class CacheService {
 
     const accessTime = performance.now() - startTime;
     this.metrics.size = await this.storage.size();
-    this.metrics.hitRate = this.metrics.totalOperations > 0
-      ? (this.metrics.hits / this.metrics.totalOperations) * 100
-      : 0;
+    this.metrics.hitRate =
+      this.metrics.totalOperations > 0
+        ? (this.metrics.hits / this.metrics.totalOperations) * 100
+        : 0;
     this.metrics.avgAccessTime = (this.metrics.avgAccessTime + accessTime) / 2;
     this.metrics.efficiency = this.calculateEfficiency();
   }
@@ -834,9 +853,9 @@ export class CacheService {
         backend: this.config.storageBackend || 'hybrid',
         available: this.storage.isAvailable(),
         size: await this.storage.size(),
-        keys: (await this.storage.keys()).length
+        keys: (await this.storage.keys()).length,
       },
-      warmingTasks: this.warmingTasks.size
+      warmingTasks: this.warmingTasks.size,
     };
   }
 }
@@ -892,11 +911,7 @@ export function Cacheable(config: {
   cacheName?: string;
   condition?: (args: unknown[]) => boolean;
 }) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const cacheName = config.cacheName || target.constructor.name;
 
@@ -912,7 +927,7 @@ export function Cacheable(config: {
       // Get cache service
       const cache = CacheServiceFactory.getInstance({
         name: cacheName,
-        defaultTTL: config.ttl
+        defaultTTL: config.ttl,
       });
 
       try {
@@ -939,15 +954,8 @@ export function Cacheable(config: {
 /**
  * Cache invalidation decorator
  */
-export function InvalidateCache(config: {
-  key?: string;
-  cacheName?: string;
-}) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+export function InvalidateCache(config: { key?: string; cacheName?: string }) {
+  return function (target: any, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: unknown[]) {
@@ -956,7 +964,7 @@ export function InvalidateCache(config: {
       // Invalidate cache
       if (config.cacheName) {
         const cache = CacheServiceFactory.getInstance({
-          name: config.cacheName
+          name: config.cacheName,
         });
 
         const key = config.key || `${propertyKey}_${JSON.stringify(args)}`;

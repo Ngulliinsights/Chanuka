@@ -336,7 +336,9 @@ class BundleAnalyzer {
 }
 
 // Export singleton instance
-export const bundleAnalyzer = BundleAnalyzer.getInstance();
-
-// Export types
-export type { BundleMetrics, ChunkInfo, OptimizationRecommendation };
+export type {
+  // Export types
+  BundleMetrics,
+  ChunkInfo,
+  OptimizationRecommendation,
+};

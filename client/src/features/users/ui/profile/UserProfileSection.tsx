@@ -6,7 +6,6 @@
 
 import { Shield, User, Settings, Lock } from 'lucide-react';
 import { useState } from 'react';
-import React from 'react';
 
 import { useAuth } from '@client/infrastructure/auth';
 import { Button } from '@client/lib/design-system';
@@ -74,7 +73,12 @@ export function UserProfileSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div data-testid="profile-name">
                 <label className="text-sm font-medium text-slate-500">Name</label>
-                <p className="text-slate-900">{user.profile?.displayName || user.name || (user.username as string | undefined) || 'User'}</p>
+                <p className="text-slate-900">
+                  {user.profile?.displayName ||
+                    user.name ||
+                    (user.username as string | undefined) ||
+                    'User'}
+                </p>
               </div>
               <div data-testid="profile-email">
                 <label className="text-sm font-medium text-slate-500">Email</label>

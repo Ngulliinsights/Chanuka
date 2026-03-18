@@ -6,7 +6,12 @@
 
 import { Middleware, Action } from '@reduxjs/toolkit';
 
-import { ErrorDomain, ErrorSeverity, errorHandler, createError } from '@client/infrastructure/error';
+import {
+  ErrorDomain,
+  ErrorSeverity,
+  errorHandler,
+  createError,
+} from '@client/infrastructure/error';
 import { logger } from '@client/lib/utils/logger';
 
 export const errorHandlingMiddleware: Middleware = store => next => (action: unknown) => {
@@ -33,7 +38,7 @@ export const errorHandlingMiddleware: Middleware = store => next => (action: unk
           operation: 'action_execution',
           metadata: {
             actionType: reduxAction.type,
-          }
+          },
         },
         recoverable: false,
         retryable: false,

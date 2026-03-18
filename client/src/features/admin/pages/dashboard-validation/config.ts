@@ -53,13 +53,14 @@ const WidgetSchema = z.object({
   id: z.string().min(1, 'Widget ID cannot be empty'),
   type: WidgetTypeSchema,
   config: z.record(z.unknown()).refine(
-    (config) => {
+    config => {
       // Reject configs with dangerous property names
       const keys = Object.keys(config);
       return !keys.some(key => DANGEROUS_PROPERTY_NAMES.includes(key));
     },
     {
-      message: 'Widget config cannot contain dangerous property names (__proto__, constructor, prototype)',
+      message:
+        'Widget config cannot contain dangerous property names (__proto__, constructor, prototype)',
     }
   ),
 });
@@ -82,7 +83,11 @@ export const dashboardConfigSchema = z.object({
   widgets: z.array(WidgetSchema).min(1, 'Dashboard must have at least one widget'),
   layout: LayoutSchema,
   theme: z.string().optional(),
-  refreshInterval: z.number().int().positive('Refresh interval must be a positive integer').optional(),
+  refreshInterval: z
+    .number()
+    .int()
+    .positive('Refresh interval must be a positive integer')
+    .optional(),
 });
 
 // ============================================================================
@@ -91,13 +96,13 @@ export const dashboardConfigSchema = z.object({
 
 /**
  * Validates a dashboard configuration object
- * 
+ *
  * Requirements:
  * - 15.1: Validate all required fields (widgets, layout)
  * - 15.2: Reject configs with invalid widget types
  * - 15.3: Reject configs with invalid layout
  * - 15.5: Ensure widget positions reference existing widgets
- * 
+ *
  * @param config - The dashboard configuration to validate
  * @returns The validated dashboard configuration
  * @throws Error with descriptive message if validation fails
@@ -112,22 +117,18 @@ export function validateDashboardConfig(config: unknown): DashboardConfig {
       const path = err.path.length > 0 ? `${err.path.join('.')}: ` : '';
       return `${path}${err.message}`;
     });
-    
-    throw new Error(
-      `Invalid dashboard configuration: ${errors.join(', ')}`
-    );
+
+    throw new Error(`Invalid dashboard configuration: ${errors.join(', ')}`);
   }
 
   const validatedConfig = result.data;
 
   // Additional validation: ensure all widget positions reference existing widgets
   const widgetIds = new Set(validatedConfig.widgets.map(w => w.id));
-  
+
   for (const position of validatedConfig.layout.positions) {
     if (!widgetIds.has(position.widgetId)) {
-      throw new Error(
-        `Widget position references non-existent widget: ${position.widgetId}`
-      );
+      throw new Error(`Widget position references non-existent widget: ${position.widgetId}`);
     }
   }
 
@@ -140,7 +141,7 @@ export function validateDashboardConfig(config: unknown): DashboardConfig {
 
 /**
  * Safe validation that returns a result object instead of throwing
- * 
+ *
  * @param config - The dashboard configuration to validate
  * @returns Validation result with success flag and data or error
  */

@@ -603,13 +603,4 @@ export const PermissionConditions = {
 export { RBACManager, ROLE_DEFINITIONS };
 
 // Export utilities object
-export const rbacUtils = {
-  hasPermission,
-  checkPermission,
-  canAccessRoute,
-  hasRoleLevel,
-  filterByPermissions,
-  getEffectivePermissions,
-  manager: rbacManager,
-  conditions: PermissionConditions,
-};
+export 

@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 import { DEFAULT_LOADING_CONFIG } from '../constants';
 import { LoadingError, LoadingOperationFailedError, LoadingTimeoutError } from '../errors';
-import { LoadingOperation, LoadingConfig, LoadingStats, ExtendedLoadingConfig, LoadingProgress } from '../types';
+import { LoadingOperation, LoadingConfig, LoadingStats, ExtendedLoadingConfig } from '../types';
 import {
   createLoadingOperation,
   hasOperationTimedOut,
@@ -138,7 +138,9 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseUn
           }
         }
 
-        setOperations((prev: Map<string, LoadingOperation>) => new Map(prev).set(operation.id, operation));
+        setOperations((prev: Map<string, LoadingOperation>) =>
+          new Map(prev).set(operation.id, operation)
+        );
         updateStats();
 
         return operation.id;
@@ -260,14 +262,14 @@ export function useUnifiedLoading(options: UseUnifiedLoadingOptions = {}): UseUn
 
   const isLoading = operations.size > 0;
   const hasErrors = Array.from(operations.values()).some(op => op.error);
-  
+
   const getErrorObject = () => {
     const errorOp = Array.from(operations.values()).find(op => op.error);
     if (!errorOp || !errorOp.error) return null;
     return typeof errorOp.error === 'string' ? new Error(errorOp.error) : errorOp.error;
   };
-  
-  const currentError = hasErrors ? (getErrorObject() || new Error('Unknown error')) : null;
+
+  const currentError = hasErrors ? getErrorObject() || new Error('Unknown error') : null;
 
   // Calculate overall progress
   const progress =

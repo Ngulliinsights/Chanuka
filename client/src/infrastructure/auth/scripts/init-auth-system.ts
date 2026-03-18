@@ -10,7 +10,7 @@
 import { logger } from '@client/lib/utils/logger';
 
 import type { UnifiedApiClient } from '../../api/types';
-import { initializeAuth, getAuthSystemStatus, type AuthInitOptions } from '../config/auth-init';
+import { initializeAuth, getAuthSystemStatus } from '../config/auth-init';
 
 // ==========================================================================
 // Types
@@ -375,15 +375,7 @@ function App() {
 // In your store configuration
 import { authReducer, authMiddleware } from '@client/infrastructure/auth';
 
-export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    // ... other reducers
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authMiddleware),
-});
-`,
+export `,
 
   testing: `
 // In your test setup

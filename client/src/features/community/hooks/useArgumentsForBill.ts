@@ -1,6 +1,6 @@
 /**
  * Hook: useArgumentsForBill
- * 
+ *
  * Fetches all arguments extracted from comments for a specific bill
  * Part of argument-intelligence feature integration with community
  */
@@ -19,6 +19,6 @@ export function useArgumentsForBill(billId: string) {
       return data.arguments as Argument[];
     },
     enabled: !!billId,
-    staleTime: 5 * 60 * 1000 // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

@@ -15,7 +15,6 @@ import {
   Download,
   Share2,
 } from 'lucide-react';
-import React from 'react';
 import { useState, useMemo } from 'react';
 
 import { ConflictAnalysis, NetworkNode, NetworkLink } from '@client/features/analysis/types';
@@ -199,7 +198,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
 
     // Voting correlation risk (0-35 points)
     const correlationPercentage =
-      ((highCorrelationVotes / (conflictAnalysis.votingPatterns?.length ?? 1)) * 100);
+      (highCorrelationVotes / (conflictAnalysis.votingPatterns?.length ?? 1)) * 100;
     if (correlationPercentage > 50) riskScore += 35;
     else if (correlationPercentage > 30) riskScore += 25;
     else if (correlationPercentage > 15) riskScore += 15;
@@ -320,7 +319,7 @@ export function ConflictOfInterestAnalysis({ bill }: ConflictOfInterestAnalysisP
               <div className="text-2xl font-bold">
                 {typeof conflictAnalysis.transparencyScore === 'number'
                   ? conflictAnalysis.transparencyScore
-                  : conflictAnalysis.transparencyScore?.overall ?? 0}
+                  : (conflictAnalysis.transparencyScore?.overall ?? 0)}
               </div>
               <div className="text-sm text-muted-foreground">Transparency Score</div>
             </div>

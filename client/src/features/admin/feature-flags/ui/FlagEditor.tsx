@@ -27,12 +27,8 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
     dependencies: flag?.dependencies || [],
   });
 
-  const [includeUsers, setIncludeUsers] = useState(
-    flag?.userTargeting?.include?.join(', ') || ''
-  );
-  const [excludeUsers, setExcludeUsers] = useState(
-    flag?.userTargeting?.exclude?.join(', ') || ''
-  );
+  const [includeUsers, setIncludeUsers] = useState(flag?.userTargeting?.include?.join(', ') || '');
+  const [excludeUsers, setExcludeUsers] = useState(flag?.userTargeting?.exclude?.join(', ') || '');
   const [abTestEnabled, setAbTestEnabled] = useState(!!flag?.abTestConfig);
   const [variants, setVariants] = useState(
     flag?.abTestConfig?.variants.join(', ') || 'control,variant-a'
@@ -47,13 +43,13 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
     const data: CreateFlagRequest = {
       ...formData,
       userTargeting: {
-        include: includeUsers ? includeUsers.split(',').map((s) => s.trim()) : undefined,
-        exclude: excludeUsers ? excludeUsers.split(',').map((s) => s.trim()) : undefined,
+        include: includeUsers ? includeUsers.split(',').map(s => s.trim()) : undefined,
+        exclude: excludeUsers ? excludeUsers.split(',').map(s => s.trim()) : undefined,
       },
       abTestConfig: abTestEnabled
         ? {
-            variants: variants.split(',').map((s) => s.trim()),
-            distribution: distribution.split(',').map((s) => parseInt(s.trim(), 10)),
+            variants: variants.split(',').map(s => s.trim()),
+            distribution: distribution.split(',').map(s => parseInt(s.trim(), 10)),
             metrics: [],
           }
         : undefined,
@@ -82,13 +78,11 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Info */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Flag Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Flag Name</label>
               <input
                 type="text"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
                 disabled={isEditing}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
                 required
@@ -96,12 +90,10 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Description
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
               <textarea
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={e => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={3}
                 required
@@ -113,7 +105,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                 type="checkbox"
                 id="enabled"
                 checked={formData.enabled}
-                onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                onChange={e => setFormData({ ...formData, enabled: e.target.checked })}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
               <label htmlFor="enabled" className="ml-2 block text-sm text-gray-700">
@@ -131,7 +123,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                 min="0"
                 max="100"
                 value={formData.rolloutPercentage}
-                onChange={(e) =>
+                onChange={e =>
                   setFormData({ ...formData, rolloutPercentage: parseInt(e.target.value, 10) })
                 }
                 className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -154,7 +146,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                   <input
                     type="text"
                     value={includeUsers}
-                    onChange={(e) => setIncludeUsers(e.target.value)}
+                    onChange={e => setIncludeUsers(e.target.value)}
                     placeholder="user1, user2, user3"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -166,7 +158,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                   <input
                     type="text"
                     value={excludeUsers}
-                    onChange={(e) => setExcludeUsers(e.target.value)}
+                    onChange={e => setExcludeUsers(e.target.value)}
                     placeholder="user4, user5, user6"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -181,7 +173,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                   type="checkbox"
                   id="abTest"
                   checked={abTestEnabled}
-                  onChange={(e) => setAbTestEnabled(e.target.checked)}
+                  onChange={e => setAbTestEnabled(e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
                 <label htmlFor="abTest" className="ml-2 block text-lg font-semibold text-gray-900">
@@ -198,7 +190,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                     <input
                       type="text"
                       value={variants}
-                      onChange={(e) => setVariants(e.target.value)}
+                      onChange={e => setVariants(e.target.value)}
                       placeholder="control, variant-a, variant-b"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -210,7 +202,7 @@ export function FlagEditor({ flag, onClose, onSuccess }: FlagEditorProps) {
                     <input
                       type="text"
                       value={distribution}
-                      onChange={(e) => setDistribution(e.target.value)}
+                      onChange={e => setDistribution(e.target.value)}
                       placeholder="50, 50"
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

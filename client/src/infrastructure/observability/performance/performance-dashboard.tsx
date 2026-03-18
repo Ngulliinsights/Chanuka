@@ -23,10 +23,10 @@ interface WebVitalsData {
 
 /**
  * Performance Dashboard Component
- * 
+ *
  * Displays real-time performance metrics including Web Vitals,
  * bundle size, and custom performance indicators.
- * 
+ *
  * Thresholds based on Google's Core Web Vitals:
  * - LCP: Good < 2500ms, Poor > 4000ms
  * - FID: Good < 100ms, Poor > 300ms
@@ -53,28 +53,28 @@ export function PerformanceDashboard() {
       try {
         const { onLCP, onFID, onCLS, onFCP, onTTFB, onINP } = await import('web-vitals');
 
-        onLCP((metric) => {
-          setWebVitals((prev) => ({ ...prev, lcp: metric.value }));
+        onLCP(metric => {
+          setWebVitals(prev => ({ ...prev, lcp: metric.value }));
         });
 
-        onFID((metric) => {
-          setWebVitals((prev) => ({ ...prev, fid: metric.value }));
+        onFID(metric => {
+          setWebVitals(prev => ({ ...prev, fid: metric.value }));
         });
 
-        onCLS((metric) => {
-          setWebVitals((prev) => ({ ...prev, cls: metric.value }));
+        onCLS(metric => {
+          setWebVitals(prev => ({ ...prev, cls: metric.value }));
         });
 
-        onFCP((metric) => {
-          setWebVitals((prev) => ({ ...prev, fcp: metric.value }));
+        onFCP(metric => {
+          setWebVitals(prev => ({ ...prev, fcp: metric.value }));
         });
 
-        onTTFB((metric) => {
-          setWebVitals((prev) => ({ ...prev, ttfb: metric.value }));
+        onTTFB(metric => {
+          setWebVitals(prev => ({ ...prev, ttfb: metric.value }));
         });
 
-        onINP((metric) => {
-          setWebVitals((prev) => ({ ...prev, inp: metric.value }));
+        onINP(metric => {
+          setWebVitals(prev => ({ ...prev, inp: metric.value }));
         });
       } catch (error) {
         console.error('Failed to load web-vitals:', error);
@@ -85,8 +85,10 @@ export function PerformanceDashboard() {
 
     // Collect custom metrics
     const collectCustomMetrics = () => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
+
       if (navigation) {
         const metrics: PerformanceMetric[] = [
           {
@@ -120,7 +122,7 @@ export function PerformanceDashboard() {
         ];
 
         // Calculate status based on thresholds
-        metrics.forEach((metric) => {
+        metrics.forEach(metric => {
           if (metric.value < metric.threshold) {
             metric.status = 'good';
           } else if (metric.value < metric.threshold * 1.5) {
@@ -264,10 +266,20 @@ export function PerformanceDashboard() {
               </p>
             </div>
             <Badge
-              variant={scorePercentage >= 80 ? 'default' : scorePercentage >= 50 ? 'secondary' : 'destructive'}
+              variant={
+                scorePercentage >= 80
+                  ? 'default'
+                  : scorePercentage >= 50
+                    ? 'secondary'
+                    : 'destructive'
+              }
               className="text-lg px-4 py-2"
             >
-              {scorePercentage >= 80 ? 'Good' : scorePercentage >= 50 ? 'Needs Improvement' : 'Poor'}
+              {scorePercentage >= 80
+                ? 'Good'
+                : scorePercentage >= 50
+                  ? 'Needs Improvement'
+                  : 'Poor'}
             </Badge>
           </div>
         </CardContent>
@@ -280,8 +292,12 @@ export function PerformanceDashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {webVitalsMetrics.map((metric) => {
-              const status = getMetricStatus(metric.value, metric.goodThreshold, metric.poorThreshold);
+            {webVitalsMetrics.map(metric => {
+              const status = getMetricStatus(
+                metric.value,
+                metric.goodThreshold,
+                metric.poorThreshold
+              );
               return (
                 <div
                   key={metric.name}
@@ -290,9 +306,7 @@ export function PerformanceDashboard() {
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <div className="font-semibold text-sm">{metric.name}</div>
-                      <div className="text-xs text-muted-foreground mt-1">
-                        {metric.description}
-                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">{metric.description}</div>
                     </div>
                     {getStatusIcon(status)}
                   </div>
@@ -320,7 +334,7 @@ export function PerformanceDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {customMetrics.map((metric) => (
+              {customMetrics.map(metric => (
                 <div
                   key={metric.name}
                   className={`p-4 rounded-lg border ${getStatusColor(metric.status)}`}

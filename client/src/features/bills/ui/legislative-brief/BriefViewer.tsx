@@ -38,10 +38,16 @@ interface BriefViewerProps {
 }
 
 export function BriefViewer({ billId }: BriefViewerProps) {
-  const [selectedPosition, setSelectedPosition] = useState<'all' | 'support' | 'oppose' | 'neutral'>('all');
+  const [selectedPosition, setSelectedPosition] = useState<
+    'all' | 'support' | 'oppose' | 'neutral'
+  >('all');
   const [sortBy, setSortBy] = useState<'strength' | 'endorsements'>('strength');
 
-  const { data: brief, isLoading, error } = useQuery<LegislativeBrief>({
+  const {
+    data: brief,
+    isLoading,
+    error,
+  } = useQuery<LegislativeBrief>({
     queryKey: ['legislative-brief', billId],
     queryFn: async () => {
       const response = await api.post(`/api/argument-intelligence/generate-brief`, {
@@ -92,11 +98,16 @@ export function BriefViewer({ billId }: BriefViewerProps) {
 
   const getPositionColor = (position: string) => {
     switch (position) {
-      case 'support': return 'bg-green-100 text-green-800 border-green-300';
-      case 'oppose': return 'bg-red-100 text-red-800 border-red-300';
-      case 'neutral': return 'bg-gray-100 text-gray-800 border-gray-300';
-      case 'conditional': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      default: return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'support':
+        return 'bg-green-100 text-green-800 border-green-300';
+      case 'oppose':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'neutral':
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+      case 'conditional':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
     }
   };
 
@@ -108,7 +119,8 @@ export function BriefViewer({ billId }: BriefViewerProps) {
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Legislative Brief</h2>
             <p className="text-sm text-gray-500 mt-1">
-              Generated {new Date(brief.generated_at).toLocaleDateString('en-KE', {
+              Generated{' '}
+              {new Date(brief.generated_at).toLocaleDateString('en-KE', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
@@ -164,7 +176,7 @@ export function BriefViewer({ billId }: BriefViewerProps) {
             <label className="text-sm font-medium text-gray-700">Position:</label>
             <select
               value={selectedPosition}
-              onChange={(e) => setSelectedPosition(e.target.value as any)}
+              onChange={e => setSelectedPosition(e.target.value as any)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Positions</option>
@@ -177,7 +189,7 @@ export function BriefViewer({ billId }: BriefViewerProps) {
             <label className="text-sm font-medium text-gray-700">Sort by:</label>
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={e => setSortBy(e.target.value as any)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="strength">Argument Strength</option>
@@ -192,14 +204,16 @@ export function BriefViewer({ billId }: BriefViewerProps) {
         <h3 className="text-lg font-semibold text-gray-900">
           Key Arguments ({sortedArguments.length})
         </h3>
-        {sortedArguments.map((argument) => (
+        {sortedArguments.map(argument => (
           <div
             key={argument.id}
             className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getPositionColor(argument.position)}`}>
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ${getPositionColor(argument.position)}`}
+                >
                   {argument.position.toUpperCase()}
                 </span>
                 {argument.is_verified && (
@@ -207,17 +221,13 @@ export function BriefViewer({ billId }: BriefViewerProps) {
                     ✓ VERIFIED
                   </span>
                 )}
-                <span className="text-xs text-gray-500">
-                  {argument.argument_type}
-                </span>
+                <span className="text-xs text-gray-500">{argument.argument_type}</span>
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-600">
                 <span title="Argument Strength">
                   💪 {(argument.strength_score * 100).toFixed(0)}%
                 </span>
-                <span title="Citizen Endorsements">
-                  👥 {argument.citizen_endorsements}
-                </span>
+                <span title="Citizen Endorsements">👥 {argument.citizen_endorsements}</span>
               </div>
             </div>
 
@@ -225,12 +235,8 @@ export function BriefViewer({ billId }: BriefViewerProps) {
             <p className="text-gray-700 leading-relaxed">{argument.argument_text}</p>
 
             <div className="flex items-center gap-4 mt-4 pt-4 border-t border-gray-200 text-sm">
-              <span className="text-green-600">
-                ↑ {argument.support_count} support
-              </span>
-              <span className="text-red-600">
-                ↓ {argument.opposition_count} oppose
-              </span>
+              <span className="text-green-600">↑ {argument.support_count} support</span>
+              <span className="text-red-600">↓ {argument.opposition_count} oppose</span>
             </div>
           </div>
         ))}

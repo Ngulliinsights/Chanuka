@@ -814,7 +814,7 @@ class ErrorAnalyticsBridge {
 
       const firstError = patternErrors[0];
       if (!firstError) continue;
-      
+
       const timestamps = patternErrors.map(e => e.timestamp);
       const affectedUserIds = new Set(
         patternErrors.map(e => e.context?.userId).filter((id): id is string => Boolean(id))
@@ -878,7 +878,7 @@ class ErrorAnalyticsBridge {
         scope: 'isolated',
       };
     }
-    
+
     const frequency = errors.length;
 
     const userExperience =
@@ -1129,10 +1129,8 @@ class ErrorAnalyticsBridge {
 }
 
 // Export singleton instance
-export const errorAnalyticsBridge = ErrorAnalyticsBridge.getInstance();
-
-// Export types for use in other modules
 export type {
+  // Export types for use in other modules
   CoreError,
   DashboardFilters,
   ErrorOverviewMetrics,

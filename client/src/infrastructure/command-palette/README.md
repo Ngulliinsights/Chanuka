@@ -15,13 +15,16 @@ The Command Palette module provides a keyboard-driven command interface for quic
 ## Public Exports
 
 ### Components
+
 - `CommandPalette` - Main command palette component
 - `Modal` - Modal wrapper for command palette
 
 ### Hooks
+
 - `useCommandPalette()` - Command palette state and actions
 
 ### Functions
+
 - `createNavigationCommands()` - Create navigation commands
 - `createQuickActionCommands()` - Create quick action commands
 - `createHelpCommands()` - Create help commands
@@ -29,6 +32,7 @@ The Command Palette module provides a keyboard-driven command interface for quic
 - `groupCommandsBySection()` - Group commands
 
 ### Types
+
 - `Command` - Command definition
 - `CommandSection` - Command section grouping
 - `CommandPaletteState` - Palette state

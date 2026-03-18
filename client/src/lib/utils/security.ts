@@ -3,10 +3,7 @@
  * Provides security helper functions
  */
 
-export const securityUtils = {
-  sanitizeInput: (input: string) => {
-    return input.replace(/[<>]/g, '');
-  },
+export   },
   
   validateToken: (token: string) => {
     return token.length > 0;

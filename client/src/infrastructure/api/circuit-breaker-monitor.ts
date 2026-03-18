@@ -9,7 +9,12 @@ import { logger } from '@client/lib/utils/logger';
 
 import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
 import { getCircuitBreakerStats } from './circuit-breaker/core';
-import type { CircuitBreakerState, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation } from './circuit-breaker/types';
+import type {
+  CircuitBreakerState,
+  CircuitBreakerEvent,
+  ServiceHealthStatus,
+  ErrorCorrelation,
+} from './circuit-breaker/types';
 
 // Re-export types for convenience
 export type { CircuitBreakerState, CircuitBreakerEvent, ServiceHealthStatus, ErrorCorrelation };
@@ -336,7 +341,7 @@ export class CircuitBreakerMonitor {
             correlationId: event.correlationId,
             serviceName: event.serviceName,
             metrics: event.metrics,
-          }
+          },
         },
         retryable: true,
       }

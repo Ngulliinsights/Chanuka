@@ -8,7 +8,7 @@
  * - Authentication with automatic token refresh
  * - Request deduplication and batching
  * - Circuit breaker and monitoring
- * 
+ *
  * MIGRATION NOTE:
  * Domain-specific API services have been moved to their respective feature modules:
  * - Bills API → @client/features/bills/services/api
@@ -23,7 +23,7 @@
 // ============================================================================
 
 // Core HTTP client
-export { 
+export {
   UnifiedApiClientImpl,
   globalApiClient,
   createAuthRequestInterceptor,
@@ -82,31 +82,21 @@ export {
 } from './circuit-breaker-monitor';
 
 // Request deduplication
-export {
-  RequestDeduplicator,
-  requestDeduplicator,
-} from './http/request-deduplicator';
+export { RequestDeduplicator, requestDeduplicator } from './http/request-deduplicator';
 
 // ============================================================================
 // WebSocket Client Sub-Module
 // ============================================================================
 
 // Unified WebSocket client
-export {
-  UnifiedWebSocketClient,
-  createWebSocketClient,
-} from './websocket/client';
-
+export { UnifiedWebSocketClient, createWebSocketClient } from './websocket/client';
 
 // ============================================================================
 // Realtime Client Sub-Module
 // ============================================================================
 
 // Unified realtime client
-export {
-  UnifiedRealtimeClient,
-  createRealtimeClient,
-} from './realtime/client';
+export { UnifiedRealtimeClient, createRealtimeClient } from './realtime/client';
 
 // Legacy realtime hub (for backward compatibility)
 // Note: The full realtime module remains in infrastructure/realtime
@@ -151,111 +141,10 @@ export const api = {
   delete: async (url: string) => {
     const response = await globalApiClient.delete(url);
     return { data: response };
-  }
+  },
 };
-export const analyticsApiService = {
-  trackEvent: async (_event: unknown) => ({ data: {} }),
-  getEvents: async () => ({ data: [] }),
-  getDashboard: async (_filters?: Record<string, unknown>) => ({
-    data: {
-      summary: {
-        total_bills: 0,
-        total_views: 0,
-        total_engagement: 0,
-        average_time_spent: 0,
-        top_categories: [],
-        engagement_trends: [],
-        user_demographics: { total_users: 0, active_users: 0, new_users: 0, returning_users: 0 }
-      },
-      top_bills: [],
-      recent_activity: [],
-      alerts: [],
-      performance_metrics: { page_load_time: 0, api_response_time: 0, error_rate: 0, uptime: 100 }
-    }
-  }),
-  getSummary: async (_filters?: any) => ({
-    data: {
-      total_bills: 0,
-      total_views: 0,
-      total_engagement: 0,
-      average_time_spent: 0,
-      top_categories: [],
-      engagement_trends: [],
-      user_demographics: { total_users: 0, active_users: 0, new_users: 0, returning_users: 0 }
-    }
-  }),
-  getBillAnalytics: async (bill_id: string, _filters?: any) => ({
-    data: {
-      bill_id,
-      title: '',
-      views: 0,
-      comments_count: 0,
-      engagement_score: 0,
-      trending_score: 0,
-      sentiment_score: 0,
-      support_level: 0,
-      opposition_level: 0,
-      neutral_level: 0,
-      categories: [],
-      tags: [],
-      last_updated: new Date().toISOString()
-    }
-  }),
-  getConflictReport: async (bill_id: string) => ({
-    data: {
-      bill_id,
-      conflict_score: 0,
-      conflicts: [],
-      stakeholder_analysis: [],
-      network_analysis: { nodes: [], edges: [] }
-    }
-  }),
-  getEngagementReport: async (bill_id: string, _filters?: any) => ({
-    data: {
-      bill_id,
-      total_engagement: 0,
-      engagement_breakdown: { views: 0, comments: 0, votes: 0, shares: 0, bookmarks: 0 },
-      engagement_timeline: [],
-      user_segments: [],
-      peak_engagement_times: []
-    }
-  }),
-  getUserActivity: async (_userId?: string, _filters?: any) => ({
-    data: [],
-    meta: { total: 0, page: 1, limit: 10, has_more: false },
-    execution_time: 0,
-    cached: false
-  }),
-  getTopBills: async (_limit?: number, _filters?: any) => ({ data: [] }),
-  getAlerts: async (_acknowledged?: boolean) => ({ data: [] }),
-  getTrendingTopics: async (_limit?: number) => ({ data: [] }),
-  getStakeholderAnalysis: async (_billId?: string) => ({ data: [] }),
-  exportAnalytics: async (_filters?: any, _format?: string) => ({
-    data: {
-      format: 'json',
-      data: {},
-      filename: 'export.json',
-      size: 0,
-      generated_at: new Date().toISOString(),
-      expires_at: new Date().toISOString(),
-      download_url: ''
-    }
-  }),
-  getRealtimeMetrics: async () => ({
-    data: {
-      active_users: 0,
-      current_engagement: 0,
-      recent_alerts: 0,
-      system_health: 'healthy',
-      last_updated: new Date().toISOString(),
-      metrics: { page_views_per_minute: 0, api_calls_per_minute: 0, error_rate_per_minute: 0, average_response_time: 0 }
-    }
-  }),
-  acknowledgeAlert: async (_alertId: string) => ({ data: {} }),
-};
-
-// Types
-export * from './types';
+export * from // Types
+'./types';
 
 // WebSocket types
 export type {

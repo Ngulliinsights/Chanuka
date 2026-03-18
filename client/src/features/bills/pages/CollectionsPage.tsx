@@ -1,4 +1,3 @@
-import React from 'react';
 import { CollectionsList } from '@client/features/bills/ui/collections/CollectionsList';
 import { CollectionsDialog } from '@client/features/bills/ui/collections/CollectionsDialog';
 

@@ -1,5 +1,4 @@
 import { AlertTriangle, Network, Database, Shield, AlertCircle } from 'lucide-react';
-import React from 'react';
 /**
  * Error Icon Utility
  * Extracted from ErrorFallback.tsx to reduce file size and improve reusability

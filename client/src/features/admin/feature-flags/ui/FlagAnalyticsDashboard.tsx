@@ -44,9 +44,7 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Analytics: {analytics.flagName}
-            </h2>
+            <h2 className="text-2xl font-bold text-gray-900">Analytics: {analytics.flagName}</h2>
             <button
               onClick={onClose}
               className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -54,7 +52,12 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
               aria-label="Close analytics"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -64,16 +67,12 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
             <div className="flex items-center gap-3">
               <span
                 className={`px-3 py-1 text-sm font-medium rounded-full ${
-                  analytics.enabled
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-gray-100 text-gray-800'
+                  analytics.enabled ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                 }`}
               >
                 {analytics.enabled ? 'Enabled' : 'Disabled'}
               </span>
-              <span className="text-sm text-gray-600">
-                Rollout: {analytics.rolloutPercentage}%
-              </span>
+              <span className="text-sm text-gray-600">Rollout: {analytics.rolloutPercentage}%</span>
             </div>
           </div>
 
@@ -113,15 +112,24 @@ export function AnalyticsDashboard({ flagName, onClose }: AnalyticsDashboardProp
             <div className="h-8 bg-gray-200 rounded-lg overflow-hidden flex">
               <div
                 className={styles.enabledBar}
-                style={{ '--enabled-percentage': `${analytics.enabledPercentage}%` } as React.CSSProperties}
+                style={
+                  {
+                    '--enabled-percentage': `${analytics.enabledPercentage}%`,
+                  } as React.CSSProperties
+                }
               >
                 {analytics.enabledPercentage > 10 && `${analytics.enabledPercentage.toFixed(1)}%`}
               </div>
               <div
                 className={styles.disabledBar}
-                style={{ '--disabled-percentage': `${100 - analytics.enabledPercentage}%` } as React.CSSProperties}
+                style={
+                  {
+                    '--disabled-percentage': `${100 - analytics.enabledPercentage}%`,
+                  } as React.CSSProperties
+                }
               >
-                {100 - analytics.enabledPercentage > 10 && `${(100 - analytics.enabledPercentage).toFixed(1)}%`}
+                {100 - analytics.enabledPercentage > 10 &&
+                  `${(100 - analytics.enabledPercentage).toFixed(1)}%`}
               </div>
             </div>
             <div className="flex justify-between text-xs text-gray-500 mt-1">

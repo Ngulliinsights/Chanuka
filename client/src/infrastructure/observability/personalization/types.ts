@@ -1,6 +1,6 @@
 /**
  * Personalization Types Re-export
- * 
+ *
  * Re-exports personalization types from the central types library.
  * This file exists for backwards compatibility with imports from './types'.
  */

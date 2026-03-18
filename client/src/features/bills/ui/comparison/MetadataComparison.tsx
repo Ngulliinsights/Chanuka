@@ -1,6 +1,6 @@
 /**
  * Metadata Comparison Component
- * 
+ *
  * Displays bill metadata side-by-side in a comparison table.
  */
 
@@ -17,13 +17,25 @@ export function MetadataComparison({ bills }: MetadataComparisonProps) {
     { key: 'status', label: 'Status' },
     { key: 'chamber', label: 'Chamber' },
     { key: 'category', label: 'Category' },
-    { key: 'introduced_date', label: 'Introduced', format: (v) => v ? new Date(v).toLocaleDateString() : 'N/A' },
-    { key: 'last_action_date', label: 'Last Action', format: (v) => v ? new Date(v).toLocaleDateString() : 'N/A' },
+    {
+      key: 'introduced_date',
+      label: 'Introduced',
+      format: v => (v ? new Date(v).toLocaleDateString() : 'N/A'),
+    },
+    {
+      key: 'last_action_date',
+      label: 'Last Action',
+      format: v => (v ? new Date(v).toLocaleDateString() : 'N/A'),
+    },
     { key: 'reading_stage', label: 'Reading Stage' },
     { key: 'priority_level', label: 'Priority' },
-    { key: 'is_urgent', label: 'Urgent', format: (v) => v ? 'Yes' : 'No' },
-    { key: 'is_money_bill', label: 'Money Bill', format: (v) => v ? 'Yes' : 'No' },
-    { key: 'is_constitutional_amendment', label: 'Constitutional Amendment', format: (v) => v ? 'Yes' : 'No' },
+    { key: 'is_urgent', label: 'Urgent', format: v => (v ? 'Yes' : 'No') },
+    { key: 'is_money_bill', label: 'Money Bill', format: v => (v ? 'Yes' : 'No') },
+    {
+      key: 'is_constitutional_amendment',
+      label: 'Constitutional Amendment',
+      format: v => (v ? 'Yes' : 'No'),
+    },
   ];
 
   const getValue = (bill: Bill, key: string, format?: (value: any) => string) => {
@@ -59,7 +71,7 @@ export function MetadataComparison({ bills }: MetadataComparisonProps) {
         <tbody>
           {fields.map(({ key, label, format }) => {
             const different = isDifferent(key);
-            
+
             return (
               <tr
                 key={key}
@@ -75,7 +87,7 @@ export function MetadataComparison({ bills }: MetadataComparisonProps) {
                     )}
                   </div>
                 </td>
-                {bills.map((bill) => (
+                {bills.map(bill => (
                   <td key={bill.id} className="p-3 text-sm">
                     {getValue(bill, key, format)}
                   </td>

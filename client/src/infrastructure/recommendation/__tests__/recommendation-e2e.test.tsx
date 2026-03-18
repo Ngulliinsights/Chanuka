@@ -1,6 +1,6 @@
 /**
  * Recommendation Engine E2E Tests
- * 
+ *
  * End-to-end tests for the recommendation engine feature
  */
 

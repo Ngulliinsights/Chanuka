@@ -1,6 +1,6 @@
 /**
  * Unit Tests for WebSocket Client
- * 
+ *
  * Tests connection/disconnection, message sending/receiving,
  * subscriptions, reconnection, heartbeat, and error handling.
  */
@@ -45,7 +45,7 @@ class MockWebSocket {
   constructor(url: string, protocols?: string | string[]) {
     this.url = url;
     this.protocols = protocols;
-    
+
     // Simulate connection opening
     setTimeout(() => {
       this.readyState = MockWebSocket.OPEN;
@@ -288,9 +288,7 @@ describe('UnifiedWebSocketClient', () => {
       await vi.runAllTimersAsync();
 
       // Subscriptions should be restored
-      expect(client.getSubscriptions()).toEqual(
-        expect.arrayContaining(['topic1', 'topic2'])
-      );
+      expect(client.getSubscriptions()).toEqual(expect.arrayContaining(['topic1', 'topic2']));
     });
   });
 
@@ -399,9 +397,7 @@ describe('UnifiedWebSocketClient', () => {
 
       await vi.advanceTimersByTimeAsync(2000);
 
-      expect(sendSpy).not.toHaveBeenCalledWith(
-        expect.objectContaining({ type: 'heartbeat' })
-      );
+      expect(sendSpy).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'heartbeat' }));
     });
 
     it('should stop heartbeat on disconnection', async () => {
@@ -415,9 +411,7 @@ describe('UnifiedWebSocketClient', () => {
       await vi.advanceTimersByTimeAsync(2000);
 
       // Should not send heartbeat after disconnection
-      const heartbeatCalls = sendSpy.mock.calls.filter(
-        call => call[0].type === 'heartbeat'
-      );
+      const heartbeatCalls = sendSpy.mock.calls.filter(call => call[0].type === 'heartbeat');
       expect(heartbeatCalls.length).toBeLessThanOrEqual(1);
     });
   });

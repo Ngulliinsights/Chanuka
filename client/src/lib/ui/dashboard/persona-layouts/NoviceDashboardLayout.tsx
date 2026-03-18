@@ -11,7 +11,6 @@ import type {
   PersonaPreferences,
 } from '@client/infrastructure/observability/personalization';
 import { BookOpen, Target, Users, ArrowRight, HelpCircle } from 'lucide-react';
-import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -40,7 +39,6 @@ export function NoviceDashboardLayout({
   const isHidden = (widgetId: string) => hiddenWidgets.has(widgetId);
 
   // Use onSectionToggle if needed
-  const _ = { onSectionToggle };
 
   return (
     <div className="novice-dashboard-layout space-y-6">

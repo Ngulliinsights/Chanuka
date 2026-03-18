@@ -15,12 +15,7 @@ import {
   default as LanguageSwitcherDefault,
 } from './LanguageSwitcher';
 
-export {
-  LanguageSwitcher,
-  LanguageToggle,
-  LanguageStatus,
-  LanguageSwitcherDefault,
-};
+export { LanguageSwitcher, LanguageToggle, LanguageStatus, LanguageSwitcherDefault };
 
 // Re-export i18n hook for convenience
 export { useI18n } from '@client/lib/hooks/use-i18n';

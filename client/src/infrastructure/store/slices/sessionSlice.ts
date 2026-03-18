@@ -266,13 +266,7 @@ export const terminateAllSessions = createAsyncThunk(
 /**
  * Creates a new session with proper security setup
  */
-export const createSession = createAsyncThunk(
-  'session/createSession',
-  async (sessionData: SessionData, { dispatch, rejectWithValue }) => {
-    try {
-      // Store session data securely
-      storeSessionData(sessionData);
-
+export 
       // Set session cookie
       setSecureCookie(SESSION_COOKIE_NAME, sessionData.sessionId, SESSION_MAX_AGE_MS / 1000);
 
@@ -361,13 +355,7 @@ export const validateSession = createAsyncThunk(
 /**
  * Destroys the current session and cleans up all session data
  */
-export const destroySession = createAsyncThunk(
-  'session/destroySession',
-  async (_, { dispatch, rejectWithValue }) => {
-    try {
-      // Record session end before cleanup
-      dispatch(recordActivity({ type: 'api', details: { action: 'session_end' } }));
-
+export 
       // Clear secure storage
       removeStoredSessionData();
 
@@ -398,14 +386,7 @@ export const destroySession = createAsyncThunk(
 /**
  * Checks for concurrent sessions and alerts if found
  */
-export const checkConcurrentSessions = createAsyncThunk(
-  'session/checkConcurrentSessions',
-  async (_, { dispatch, rejectWithValue, signal }) => {
-    try {
-      // Check if request was cancelled
-      if (signal.aborted) {
-        throw new Error('Request cancelled');
-      }
+export       }
 
       // Skip if offline
       if (typeof navigator !== 'undefined' && !navigator.onLine) {
@@ -681,35 +662,17 @@ export const {
 const selectSessionState = (state: { session: SessionState }) => state.session;
 
 // Basic selectors with memoization
-export const selectCurrentSession = createSelector(
-  [selectSessionState],
-  session => session.currentSession
-);
-
-export const selectActiveSessions = createSelector(
-  [selectSessionState],
-  session => session.activeSessions
-);
-
-export const selectSessionData = createSelector(
-  [selectSessionState],
-  session => session.sessionData
-);
-
+export 
+export 
+export 
 export const selectSessionIsActive = createSelector(
   [selectSessionState],
   session => session.isActive
 );
 
-export const selectSessionId = createSelector([selectSessionState], session => session.sessionId);
-
-export const selectSessionLastActivity = createSelector(
-  [selectSessionState],
-  session => session.lastActivity
-);
-
-export const selectSessionConfig = createSelector([selectSessionState], session => session.config);
-
+export 
+export 
+export 
 export const selectActivityLog = createSelector(
   [selectSessionState],
   session => session.activityLog
@@ -725,12 +688,9 @@ export const selectSessionIsLoading = createSelector(
   session => session.isLoading
 );
 
-export const selectSessionError = createSelector([selectSessionState], session => session.error);
-
+export 
 // Computed selectors
-export const selectSessionInfo = createSelector([selectSessionState], session => {
-  const now = Date.now();
-  const idleTime = now - session.lastActivity;
+export   const idleTime = now - session.lastActivity;
   const timeUntilExpiry = Math.max(0, session.config.maxIdleTime - idleTime);
 
   return {
@@ -746,10 +706,7 @@ export const selectSessionInfo = createSelector([selectSessionState], session =>
 /**
  * Creates a selector for activity summary over a given time window
  */
-export const selectActivitySummary = (minutes: number = 10) =>
-  createSelector([selectSessionState], session => {
-    const cutoff = Date.now() - minutes * 60 * 1000;
-    const recentActivities = session.activityLog.filter(a => a.timestamp > cutoff);
+export     const recentActivities = session.activityLog.filter(a => a.timestamp > cutoff);
 
     const activityTypes = recentActivities.reduce<Record<string, number>>((acc, activity) => {
       acc[activity.type] = (acc[activity.type] || 0) + 1;
@@ -764,43 +721,19 @@ export const selectActivitySummary = (minutes: number = 10) =>
     };
   });
 
-export const selectIsSessionActive = createSelector([selectSessionState], session => {
-  if (!session.isActive) return false;
-  const idleTime = Date.now() - session.lastActivity;
+export   const idleTime = Date.now() - session.lastActivity;
   return idleTime < session.config.maxIdleTime;
 });
 
-export const selectTimeUntilExpiry = createSelector([selectSessionState], session => {
-  const idleTime = Date.now() - session.lastActivity;
-  return Math.max(0, session.config.maxIdleTime - idleTime);
+export   return Math.max(0, session.config.maxIdleTime - idleTime);
 });
 
-export const selectSessionStatus = createSelector(
-  [selectSessionIsActive, selectSessionIsLoading, selectSessionWarnings],
-  (isActive, isLoading, warnings) => ({
-    isActive,
-    isLoading,
-    hasWarnings: warnings.length > 0,
-    warningCount: warnings.length,
-    criticalWarnings: warnings.filter(w => w.severity === 'critical').length,
-  })
-);
-
-export const selectRecentActivity = createSelector([selectActivityLog], activityLog =>
-  activityLog.slice(-10)
-);
-
+export 
+export 
 /**
  * Selects warnings sorted by severity and timestamp
  */
-export const selectSortedWarnings = createSelector([selectSessionWarnings], warnings => {
-  const severityOrder: Record<WarningSeverity, number> = {
-    critical: 0,
-    high: 1,
-    medium: 2,
-    low: 3,
-  };
-
+export 
   return [...warnings].sort((a, b) => {
     const severityDiff = severityOrder[a.severity] - severityOrder[b.severity];
     if (severityDiff !== 0) return severityDiff;
@@ -811,9 +744,7 @@ export const selectSortedWarnings = createSelector([selectSessionWarnings], warn
 /**
  * Checks if session should show idle warning
  */
-export const selectShouldShowIdleWarning = createSelector([selectSessionState], session => {
-  if (!session.isActive) return false;
-  const idleTime = Date.now() - session.lastActivity;
+export   const idleTime = Date.now() - session.lastActivity;
   const timeUntilExpiry = session.config.maxIdleTime - idleTime;
   return timeUntilExpiry > 0 && timeUntilExpiry <= session.config.warningTime;
 });

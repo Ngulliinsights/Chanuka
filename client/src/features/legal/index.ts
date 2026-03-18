@@ -1,6 +1,6 @@
 /**
  * Legal Feature Index
- * 
+ *
  * Exports all legal analysis components and hooks
  * Used by other features to access constitutional analysis functionality
  */

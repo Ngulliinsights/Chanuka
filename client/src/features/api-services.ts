@@ -27,7 +27,7 @@ export type {
   GovernmentDataType,
   GovernmentDataSource,
   GovernmentDataStatus,
-  
+
   // Community
   Comment,
   Vote,
@@ -39,7 +39,7 @@ export type {
   CommentQueryParams,
   VoteQueryParams,
   ReportQueryParams,
-  
+
   // Analytics
   EngagementMetrics,
   EngagementSummary,
@@ -50,13 +50,17 @@ export type {
   TimePeriod,
   EngagementEntityType,
   EngagementEventType,
-  
+
   // Core API
   ApiResponse,
   BaseQueryParams,
   HealthCheckResponse,
-  MetadataResponse
+  MetadataResponse,
 } from '@shared/types/api/contracts';
 
 // Base API service for extending
-export { BaseApiService, CacheableApiService, SyncableApiService } from '@shared/core/api/base-api-service';
+export {
+  BaseApiService,
+  CacheableApiService,
+  SyncableApiService,
+} from '@shared/core/api/base-api-service';

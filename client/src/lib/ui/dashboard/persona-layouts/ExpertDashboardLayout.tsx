@@ -19,8 +19,6 @@ import {
   AlertTriangle,
   CheckCircle,
   TrendingUp,
-  // Users, // Unused
-  FileText,
   Globe,
   Zap,
   Target,

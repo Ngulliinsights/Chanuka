@@ -1,6 +1,6 @@
 /**
  * Navigation Types Re-export
- * 
+ *
  * Re-exports navigation types from the central types library.
  * This file exists for backwards compatibility with imports from './types'.
  */

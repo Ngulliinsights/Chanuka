@@ -116,11 +116,7 @@ export class ValidationError extends BaseError {
   public override readonly name: string;
   public readonly errors: Record<string, string[]>;
 
-  constructor(
-    message: string,
-    errors: Record<string, string[]>,
-    context?: ErrorContext
-  ) {
+  constructor(message: string, errors: Record<string, string[]>, context?: ErrorContext) {
     super(message, {
       statusCode: 400,
       code: 'VALIDATION_ERROR',
@@ -203,14 +199,11 @@ export class DashboardDataFetchError extends NetworkError {
       context?: ErrorContext;
     }
   ) {
-    super(
-      `Failed to fetch dashboard data from ${endpoint}${reason ? `: ${reason}` : ''}`,
-      {
-        operation: 'data_fetch',
-        endpoint,
-        ...options?.context,
-      }
-    );
+    super(`Failed to fetch dashboard data from ${endpoint}${reason ? `: ${reason}` : ''}`, {
+      operation: 'data_fetch',
+      endpoint,
+      ...options?.context,
+    });
     this.name = 'DashboardDataFetchError';
     this.endpoint = endpoint;
   }
@@ -368,15 +361,11 @@ export function isDashboardError(error: unknown): error is DashboardError {
   return error instanceof DashboardError;
 }
 
-export function isDashboardDataFetchError(
-  error: unknown
-): error is DashboardDataFetchError {
+export function isDashboardDataFetchError(error: unknown): error is DashboardDataFetchError {
   return error instanceof DashboardDataFetchError;
 }
 
-export function isDashboardValidationError(
-  error: unknown
-): error is DashboardValidationError {
+export function isDashboardValidationError(error: unknown): error is DashboardValidationError {
   return error instanceof DashboardValidationError;
 }
 
@@ -386,15 +375,11 @@ export function isDashboardConfigurationError(
   return error instanceof DashboardConfigurationError;
 }
 
-export function isDashboardActionError(
-  error: unknown
-): error is DashboardActionError {
+export function isDashboardActionError(error: unknown): error is DashboardActionError {
   return error instanceof DashboardActionError;
 }
 
-export function isDashboardTopicError(
-  error: unknown
-): error is DashboardTopicError {
+export function isDashboardTopicError(error: unknown): error is DashboardTopicError {
   return error instanceof DashboardTopicError;
 }
 

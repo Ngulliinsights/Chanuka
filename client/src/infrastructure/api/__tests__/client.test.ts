@@ -1,6 +1,6 @@
 /**
  * Unit Tests for UnifiedApiClientImpl
- * 
+ *
  * Tests HTTP client methods, interceptors, retry logic, circuit breaker,
  * caching, timeout handling, and error handling.
  */
@@ -243,7 +243,7 @@ describe('UnifiedApiClientImpl', () => {
 
   describe('Request Interceptors', () => {
     it('should apply request interceptors', async () => {
-      const interceptor = vi.fn((config) => ({
+      const interceptor = vi.fn(config => ({
         ...config,
         headers: { ...config.headers, 'X-Custom': 'test' },
       }));
@@ -267,7 +267,7 @@ describe('UnifiedApiClientImpl', () => {
 
   describe('Response Interceptors', () => {
     it('should apply response interceptors', async () => {
-      const interceptor = vi.fn((response) => response);
+      const interceptor = vi.fn(response => response);
 
       client.addResponseInterceptor(interceptor);
 
@@ -307,9 +307,7 @@ describe('UnifiedApiClientImpl', () => {
     });
 
     it('should handle timeout errors', async () => {
-      fetchMock.mockImplementationOnce(
-        () => new Promise((resolve) => setTimeout(resolve, 10000))
-      );
+      fetchMock.mockImplementationOnce(() => new Promise(resolve => setTimeout(resolve, 10000)));
 
       const shortTimeoutClient = new UnifiedApiClientImpl({
         ...defaultConfig,
@@ -460,11 +458,12 @@ describe('UnifiedApiClientImpl', () => {
       const controller = new AbortController();
 
       fetchMock.mockImplementationOnce(
-        () => new Promise((_, reject) => {
-          controller.signal.addEventListener('abort', () => {
-            reject(new Error('Request aborted'));
-          });
-        })
+        () =>
+          new Promise((_, reject) => {
+            controller.signal.addEventListener('abort', () => {
+              reject(new Error('Request aborted'));
+            });
+          })
       );
 
       const requestPromise = client.get('/test', { signal: controller.signal });

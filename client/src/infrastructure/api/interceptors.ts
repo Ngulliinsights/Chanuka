@@ -173,12 +173,7 @@ export const loggingInterceptor: RequestInterceptor = config => {
  * Adds AbortSignal-based timeout to requests if not already present.
  * This ensures all requests have a maximum execution time.
  */
-export const timeoutInterceptor = (defaultTimeout: number = 10000): RequestInterceptor => {
-  return config => {
-    // Don't override existing signal
-    if (config.signal) {
-      return config;
-    }
+export     }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {

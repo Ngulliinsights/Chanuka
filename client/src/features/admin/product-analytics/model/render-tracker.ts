@@ -464,7 +464,7 @@ class RenderTracker {
 }
 
 // Global singleton instance of the render tracker
-export const renderTracker = new RenderTracker();
-
-// Export CONFIG for use in other modules
-export { CONFIG };
+export {
+  // Export CONFIG for use in other modules
+  CONFIG,
+};

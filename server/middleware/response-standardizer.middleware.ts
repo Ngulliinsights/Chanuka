@@ -10,8 +10,9 @@
  * - Preserves status codes and headers
  */
 
-import { Request, Response, NextFunction } from 'express';
-import { logger } from '@server/infrastructure/observability';
+import { NextFunction, Request, Response } from 'express';
+
+import { logger } from '../infrastructure/observability';
 
 const IGNORED_PATHS = [
   '/health',
@@ -45,33 +46,33 @@ interface StandardResponse<T = unknown> {
 
 export function responseStandardizer() {
   return (req: Request, res: Response, next: NextFunction) => {
-    const originalJson = res.json;
+    const originalJson = res.json.bind(res);
 
     // Override res.json to standardize responses
-    res.json = function(data: unknown) {
+    res.json = function (this: Response, data: unknown) {
       // Skip standardization for certain paths
       if (IGNORED_PATHS.some(path => req.path.startsWith(path))) {
-        return originalJson.call(this, data);
+        return originalJson(data);
       }
 
       // Skip binary/file responses
-      const contentType = res.getHeader('content-type') as string;
+      const contentType = this.getHeader('content-type') as string | undefined;
       if (contentType && BINARY_MIME_TYPES.some(type => contentType.includes(type))) {
-        return originalJson.call(this, data);
+        return originalJson(data);
       }
 
       // If response is already in standard format, don't double-wrap
       if (isStandardResponse(data)) {
-        return originalJson.call(this, data);
+        return originalJson(data);
       }
 
       // If response is already a raw JSON API response from api-utils, pass through
       if (isApiUtilsResponse(data)) {
-        return originalJson.call(this, data);
+        return originalJson(data);
       }
 
       // Transform the response to standard format
-      const statusCode = res.statusCode || 200;
+      const statusCode = this.statusCode || 200;
       let standardResponse: StandardResponse;
 
       // Handle error responses (detect by structure)
@@ -113,8 +114,8 @@ export function responseStandardizer() {
         );
       }
 
-      return originalJson.call(this, standardResponse);
-    } as any;
+      return originalJson(standardResponse);
+    };
 
     next();
   };
@@ -126,11 +127,9 @@ export function responseStandardizer() {
 function isStandardResponse(data: unknown): boolean {
   if (!data || typeof data !== 'object') return false;
   
-  const obj = data as any;
+  const obj = data as Record<string, unknown>;
   // Check if it has the success boolean field which indicates standard format
-  if (typeof obj.success === 'boolean') return true;
-  
-  return false;
+  return typeof obj.success === 'boolean';
 }
 
 /**
@@ -139,7 +138,7 @@ function isStandardResponse(data: unknown): boolean {
 function isApiUtilsResponse(data: unknown): boolean {
   if (!data || typeof data !== 'object') return false;
   
-  const obj = data as any;
+  const obj = data as Record<string, unknown>;
   // ApiUtils responses have { success, data, metadata, timestamp }
   return typeof obj.success === 'boolean' && 
     ('data' in obj || 'error' in obj) &&
@@ -152,13 +151,16 @@ function isApiUtilsResponse(data: unknown): boolean {
 function isErrorObject(data: unknown): boolean {
   if (!data || typeof data !== 'object') return false;
   
-  const obj = data as any;
+  if (data instanceof Error) return true;
+  
+  const obj = data as Record<string, unknown>;
   
   // Check for error properties
-  return ('error' in obj && typeof obj.error === 'object') ||
-    ('errorCode' in obj) ||
-    ('code' in obj && obj.code && 'message' in obj) ||
-    (obj instanceof Error);
+  const hasErrorField = Boolean('error' in obj && typeof obj.error === 'object');
+  const hasErrorCode = Boolean('errorCode' in obj);
+  const hasCodeAndMessage = Boolean('code' in obj && obj.code && 'message' in obj);
+  
+  return hasErrorField || hasErrorCode || hasCodeAndMessage;
 }
 
 /**
@@ -169,12 +171,13 @@ function getErrorMessage(data: unknown): string {
   
   if (!data || typeof data !== 'object') return 'Unknown error';
   
-  const obj = data as any;
+  const obj = data as Record<string, unknown>;
+  const error = obj.error as Record<string, unknown> | undefined;
   return (
-    obj.error?.message ||
-    obj.message ||
-    obj.errorMessage ||
-    obj.error ||
+    (error?.message as string) ||
+    (obj.message as string) ||
+    (obj.errorMessage as string) ||
+    (obj.error as string) ||
     'Unknown error'
   );
 }
@@ -185,8 +188,9 @@ function getErrorMessage(data: unknown): string {
 function getErrorCode(data: unknown): string | undefined {
   if (!data || typeof data !== 'object') return undefined;
   
-  const obj = data as any;
-  return obj.error?.code || obj.code || obj.errorCode;
+  const obj = data as Record<string, unknown>;
+  const error = obj.error as Record<string, unknown> | undefined;
+  return (error?.code as string) || (obj.code as string) || (obj.errorCode as string);
 }
 
 /**
@@ -195,14 +199,18 @@ function getErrorCode(data: unknown): string | undefined {
 function getErrorDetails(data: unknown): unknown {
   if (!data || typeof data !== 'object') return undefined;
   
-  const obj = data as any;
-  return obj.error?.details || obj.details || obj.validationErrors || obj.errors;
+  const obj = data as Record<string, unknown>;
+  const error = obj.error as Record<string, unknown> | undefined;
+  return error?.details || obj.details || obj.validationErrors || obj.errors;
 }
 
 /**
  * Register the middleware in Express app
  */
-export function registerResponseStandardizer(app: any) {
+export function registerResponseStandardizer(app: unknown) {
   // Apply early so it wraps all subsequent responses
-  app.use(responseStandardizer());
+  if (app && typeof app === 'object' && 'use' in app) {
+    const expressApp = app as { use: (fn: unknown) => void };
+    expressApp.use(responseStandardizer());
+  }
 }

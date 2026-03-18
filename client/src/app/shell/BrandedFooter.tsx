@@ -1,6 +1,6 @@
 /**
  * Branded Footer Component
- * 
+ *
  * Comprehensive footer with brand integration, navigation links,
  * and trust indicators.
  */
@@ -145,9 +145,7 @@ export const BrandedFooter: React.FC<{ className?: string }> = ({ className = ''
             </div>
 
             {/* Additional Info */}
-            <div className="text-sm text-gray-400">
-              Made with ❤️ for democracy
-            </div>
+            <div className="text-sm text-gray-400">Made with ❤️ for democracy</div>
           </div>
         </div>
       </div>

@@ -178,10 +178,12 @@ function useDashboardStats(bills: ExtendedBill[], totalItems: number): Dashboard
         (now.getTime() - introducedDate.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      return (bill.status === BillStatus.FIRST_READING || 
-              bill.status === BillStatus.SECOND_READING || 
-              bill.status === BillStatus.COMMITTEE_STAGE) && 
-             daysSinceIntroduction < URGENT_BILL_DAYS_THRESHOLD;
+      return (
+        (bill.status === BillStatus.FIRST_READING ||
+          bill.status === BillStatus.SECOND_READING ||
+          bill.status === BillStatus.COMMITTEE_STAGE) &&
+        daysSinceIntroduction < URGENT_BILL_DAYS_THRESHOLD
+      );
     }).length;
 
     // Identify bills that might have constitutional implications by searching
@@ -360,10 +362,7 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
   // Extract bills array from the response, with a safe fallback to empty array.
   // Using useMemo here prevents unnecessary re-renders when billsResponse object
   // reference changes but the actual bills array hasn't changed.
-  const bills = useMemo(
-    () => (billsResponse?.data || []) as ExtendedBill[],
-    [billsResponse?.data]
-  );
+  const bills = useMemo(() => (billsResponse?.data || []) as ExtendedBill[], [billsResponse?.data]);
 
   // Get total count from the API response, using the correct property name
   const totalItems = billsResponse?.pagination?.total || 0;
@@ -725,9 +724,10 @@ export function BillsDashboard({ className, initialFilters = {} }: BillsDashboar
 
   // Get user level for personalized content, with a safe default
   // Note: userPreferences may be null if preferences are managed elsewhere
-  const userLevel = (userPreferences && typeof userPreferences === 'object' && 'level' in userPreferences) 
-    ? (userPreferences as { level?: string }).level || 'novice'
-    : 'novice';
+  const userLevel =
+    userPreferences && typeof userPreferences === 'object' && 'level' in userPreferences
+      ? (userPreferences as { level?: string }).level || 'novice'
+      : 'novice';
   const isNoviceUser = userLevel === 'novice';
 
   // Retrieve localized copy based on user level and preferences

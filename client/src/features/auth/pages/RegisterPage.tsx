@@ -5,7 +5,6 @@
 
 import { Shield, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
-import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@client/infrastructure/auth';
@@ -66,9 +65,7 @@ export default function RegisterPage() {
     }
   };
 
-  const handleRegisterError = (error: string) => {
-    setError(error);
-  };
+    };
 
   const handleSocialLoginSuccess = (data: unknown) => {
     logger.info('Social registration successful', {
@@ -78,9 +75,7 @@ export default function RegisterPage() {
     navigate('/dashboard', { replace: true });
   };
 
-  const handleSocialLoginError = (error: string) => {
-    setError(`Social registration failed: ${error}`);
-  };
+    };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">

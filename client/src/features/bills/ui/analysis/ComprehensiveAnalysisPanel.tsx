@@ -1,11 +1,17 @@
 /**
  * Comprehensive Analysis Panel
- * 
+ *
  * Displays comprehensive bill analysis including constitutional analysis,
  * stakeholder impact, transparency scores, and public interest assessment.
  */
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@client/lib/design-system';
 import { AlertTriangle, CheckCircle, TrendingUp, Users, Shield, Eye } from 'lucide-react';
 import type { ComprehensiveBillAnalysis } from '@shared/types/features/analysis';
 
@@ -14,14 +20,14 @@ interface ComprehensiveAnalysisPanelProps {
 }
 
 export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPanelProps) {
-  const { 
-    constitutionalAnalysis, 
-    conflictAnalysisSummary, 
+  const {
+    constitutionalAnalysis,
+    conflictAnalysisSummary,
     stakeholderImpact,
     transparency_score,
     publicInterestScore,
     recommendedActions,
-    overallConfidence
+    overallConfidence,
   } = analysis;
 
   return (
@@ -33,9 +39,7 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             <Shield className="h-5 w-5 text-blue-600" />
             Analysis Confidence: {overallConfidence}%
           </CardTitle>
-          <CardDescription>
-            Overall confidence in this automated analysis
-          </CardDescription>
+          <CardDescription>Overall confidence in this automated analysis</CardDescription>
         </CardHeader>
       </Card>
 
@@ -47,8 +51,8 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             Constitutional Analysis
           </CardTitle>
           <CardDescription>
-            Score: {constitutionalAnalysis.constitutionalityScore}/100 | 
-            Risk: {constitutionalAnalysis.riskAssessment.toUpperCase()}
+            Score: {constitutionalAnalysis.constitutionalityScore}/100 | Risk:{' '}
+            {constitutionalAnalysis.riskAssessment.toUpperCase()}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,9 +62,13 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
               {constitutionalAnalysis.riskAssessment === 'low' ? (
                 <CheckCircle className="h-5 w-5 text-green-600" />
               ) : (
-                <AlertTriangle className={`h-5 w-5 ${
-                  constitutionalAnalysis.riskAssessment === 'high' ? 'text-red-600' : 'text-yellow-600'
-                }`} />
+                <AlertTriangle
+                  className={`h-5 w-5 ${
+                    constitutionalAnalysis.riskAssessment === 'high'
+                      ? 'text-red-600'
+                      : 'text-yellow-600'
+                  }`}
+                />
               )}
               <span className="font-medium">
                 {constitutionalAnalysis.concerns.length} constitutional concern(s) identified
@@ -71,16 +79,21 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             {constitutionalAnalysis.concerns.length > 0 && (
               <div className="space-y-2">
                 {constitutionalAnalysis.concerns.map((concern, idx) => (
-                  <div 
-                    key={idx} 
+                  <div
+                    key={idx}
                     className={`p-3 rounded-lg border-l-4 ${
-                      concern.severity === 'critical' ? 'border-red-500 bg-red-50' :
-                      concern.severity === 'major' ? 'border-orange-500 bg-orange-50' :
-                      concern.severity === 'moderate' ? 'border-yellow-500 bg-yellow-50' :
-                      'border-blue-500 bg-blue-50'
+                      concern.severity === 'critical'
+                        ? 'border-red-500 bg-red-50'
+                        : concern.severity === 'major'
+                          ? 'border-orange-500 bg-orange-50'
+                          : concern.severity === 'moderate'
+                            ? 'border-yellow-500 bg-yellow-50'
+                            : 'border-blue-500 bg-blue-50'
                     }`}
                   >
-                    <div className="font-semibold text-sm">{concern.article}: {concern.concern}</div>
+                    <div className="font-semibold text-sm">
+                      {concern.article}: {concern.concern}
+                    </div>
                     <div className="text-xs text-muted-foreground mt-1">{concern.explanation}</div>
                   </div>
                 ))}
@@ -94,7 +107,9 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
                 <div className="space-y-2">
                   {constitutionalAnalysis.precedents.slice(0, 3).map((precedent, idx) => (
                     <div key={idx} className="text-sm p-2 bg-muted/50 rounded">
-                      <div className="font-medium">{precedent.caseName} ({precedent.year})</div>
+                      <div className="font-medium">
+                        {precedent.caseName} ({precedent.year})
+                      </div>
                       <div className="text-xs text-muted-foreground">
                         Relevance: {precedent.relevance}% | {precedent.outcome}
                       </div>
@@ -121,15 +136,21 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">{conflictAnalysisSummary.affectedSponsorsCount}</div>
+              <div className="text-2xl font-bold">
+                {conflictAnalysisSummary.affectedSponsorsCount}
+              </div>
               <div className="text-xs text-muted-foreground">Affected Sponsors</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">{conflictAnalysisSummary.directConflictCount}</div>
+              <div className="text-2xl font-bold">
+                {conflictAnalysisSummary.directConflictCount}
+              </div>
               <div className="text-xs text-muted-foreground">Direct Conflicts</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
-              <div className="text-2xl font-bold">{conflictAnalysisSummary.indirectConflictCount}</div>
+              <div className="text-2xl font-bold">
+                {conflictAnalysisSummary.indirectConflictCount}
+              </div>
               <div className="text-xs text-muted-foreground">Indirect Conflicts</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded-lg">
@@ -170,16 +191,20 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
                 </div>
                 <div className="p-2 bg-blue-50 rounded text-center">
                   <div className="text-sm font-medium">Net Impact</div>
-                  <div className={`text-lg font-bold ${
-                    stakeholderImpact.economicImpact.netImpact >= 0 ? 'text-green-600' : 'text-red-600'
-                  }`}>
+                  <div
+                    className={`text-lg font-bold ${
+                      stakeholderImpact.economicImpact.netImpact >= 0
+                        ? 'text-green-600'
+                        : 'text-red-600'
+                    }`}
+                  >
                     ${(stakeholderImpact.economicImpact.netImpact / 1000000).toFixed(1)}M
                   </div>
                 </div>
               </div>
               <div className="text-xs text-muted-foreground mt-2">
-                Timeframe: {stakeholderImpact.economicImpact.timeframe} | 
-                Confidence: {stakeholderImpact.economicImpact.confidence}%
+                Timeframe: {stakeholderImpact.economicImpact.timeframe} | Confidence:{' '}
+                {stakeholderImpact.economicImpact.confidence}%
               </div>
             </div>
 
@@ -187,10 +212,22 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             <div>
               <h4 className="font-semibold text-sm mb-2">Social Impact Scores</h4>
               <div className="space-y-2">
-                <ImpactBar label="Equity Effect" value={stakeholderImpact.socialImpact.equityEffect} />
-                <ImpactBar label="Accessibility" value={stakeholderImpact.socialImpact.accessibilityEffect} />
-                <ImpactBar label="Public Health" value={stakeholderImpact.socialImpact.publicHealthEffect} />
-                <ImpactBar label="Environmental" value={stakeholderImpact.socialImpact.environmentalEffect} />
+                <ImpactBar
+                  label="Equity Effect"
+                  value={stakeholderImpact.socialImpact.equityEffect}
+                />
+                <ImpactBar
+                  label="Accessibility"
+                  value={stakeholderImpact.socialImpact.accessibilityEffect}
+                />
+                <ImpactBar
+                  label="Public Health"
+                  value={stakeholderImpact.socialImpact.publicHealthEffect}
+                />
+                <ImpactBar
+                  label="Environmental"
+                  value={stakeholderImpact.socialImpact.environmentalEffect}
+                />
               </div>
             </div>
 
@@ -200,7 +237,10 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
                 <h4 className="font-semibold text-sm mb-2">Primary Beneficiaries</h4>
                 <div className="space-y-1">
                   {stakeholderImpact.primaryBeneficiaries.slice(0, 3).map((group, idx) => (
-                    <div key={idx} className="text-sm flex justify-between items-center p-2 bg-green-50 rounded">
+                    <div
+                      key={idx}
+                      className="text-sm flex justify-between items-center p-2 bg-green-50 rounded"
+                    >
                       <span>{group.name}</span>
                       <span className="text-xs text-muted-foreground">
                         ~{(group.sizeEstimate / 1000).toFixed(0)}K people
@@ -221,27 +261,25 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             <Eye className="h-5 w-5 text-blue-600" />
             Transparency Score: {transparency_score.grade}
           </CardTitle>
-          <CardDescription>
-            Overall: {transparency_score.overall}/100
-          </CardDescription>
+          <CardDescription>Overall: {transparency_score.overall}/100</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <ScoreBar 
-              label="Sponsor Disclosure" 
-              value={transparency_score.breakdown.sponsorDisclosure} 
+            <ScoreBar
+              label="Sponsor Disclosure"
+              value={transparency_score.breakdown.sponsorDisclosure}
             />
-            <ScoreBar 
-              label="Legislative Process" 
-              value={transparency_score.breakdown.legislativeProcess} 
+            <ScoreBar
+              label="Legislative Process"
+              value={transparency_score.breakdown.legislativeProcess}
             />
-            <ScoreBar 
-              label="Financial Conflicts" 
-              value={transparency_score.breakdown.financialConflicts} 
+            <ScoreBar
+              label="Financial Conflicts"
+              value={transparency_score.breakdown.financialConflicts}
             />
-            <ScoreBar 
-              label="Public Accessibility" 
-              value={transparency_score.breakdown.publicAccessibility} 
+            <ScoreBar
+              label="Public Accessibility"
+              value={transparency_score.breakdown.publicAccessibility}
             />
           </div>
         </CardContent>
@@ -254,22 +292,26 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
             <TrendingUp className="h-5 w-5 text-indigo-600" />
             Public Interest Score: {publicInterestScore.assessment}
           </CardTitle>
-          <CardDescription>
-            Overall: {publicInterestScore.score}/100
-          </CardDescription>
+          <CardDescription>Overall: {publicInterestScore.score}/100</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center p-3 bg-muted/50 rounded">
-              <div className="text-lg font-bold">{publicInterestScore.factors.economicScoreNormalized}</div>
+              <div className="text-lg font-bold">
+                {publicInterestScore.factors.economicScoreNormalized}
+              </div>
               <div className="text-xs text-muted-foreground">Economic</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded">
-              <div className="text-lg font-bold">{publicInterestScore.factors.socialScoreNormalized}</div>
+              <div className="text-lg font-bold">
+                {publicInterestScore.factors.socialScoreNormalized}
+              </div>
               <div className="text-xs text-muted-foreground">Social</div>
             </div>
             <div className="text-center p-3 bg-muted/50 rounded">
-              <div className="text-lg font-bold">{publicInterestScore.factors.transparency_score}</div>
+              <div className="text-lg font-bold">
+                {publicInterestScore.factors.transparency_score}
+              </div>
               <div className="text-xs text-muted-foreground">Transparency</div>
             </div>
           </div>
@@ -281,9 +323,7 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
         <Card>
           <CardHeader>
             <CardTitle>Recommended Actions</CardTitle>
-            <CardDescription>
-              Suggested next steps based on analysis findings
-            </CardDescription>
+            <CardDescription>Suggested next steps based on analysis findings</CardDescription>
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
@@ -305,8 +345,9 @@ export function ComprehensiveAnalysisPanel({ analysis }: ComprehensiveAnalysisPa
 
 function ScoreBar({ label, value }: { label: string; value: number }) {
   const percentage = Math.max(0, Math.min(100, value));
-  const color = percentage >= 70 ? 'bg-green-500' : percentage >= 40 ? 'bg-yellow-500' : 'bg-red-500';
-  
+  const color =
+    percentage >= 70 ? 'bg-green-500' : percentage >= 40 ? 'bg-yellow-500' : 'bg-red-500';
+
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
@@ -314,7 +355,10 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
         <span className="font-medium">{percentage}/100</span>
       </div>
       <div className="w-full bg-muted rounded-full h-2">
-        <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${percentage}%` }} />
+        <div
+          className={`${color} h-2 rounded-full transition-all`}
+          style={{ width: `${percentage}%` }}
+        />
       </div>
     </div>
   );
@@ -322,17 +366,23 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
 
 function ImpactBar({ label, value }: { label: string; value: number }) {
   // Value is -100 to 100, normalize to 0-100 for display
-  const normalized = ((value + 100) / 2);
+  const normalized = (value + 100) / 2;
   const color = value >= 30 ? 'bg-green-500' : value >= -30 ? 'bg-yellow-500' : 'bg-red-500';
-  
+
   return (
     <div>
       <div className="flex justify-between text-sm mb-1">
         <span>{label}</span>
-        <span className="font-medium">{value > 0 ? '+' : ''}{value}</span>
+        <span className="font-medium">
+          {value > 0 ? '+' : ''}
+          {value}
+        </span>
       </div>
       <div className="w-full bg-muted rounded-full h-2">
-        <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${normalized}%` }} />
+        <div
+          className={`${color} h-2 rounded-full transition-all`}
+          style={{ width: `${normalized}%` }}
+        />
       </div>
     </div>
   );

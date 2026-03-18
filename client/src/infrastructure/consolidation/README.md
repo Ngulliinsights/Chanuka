@@ -5,6 +5,7 @@ This module provides utilities for planning and executing the consolidation of i
 ## Overview
 
 The consolidation process involves:
+
 1. Defining consolidation mappings (source → target modules)
 2. Validating mappings for correctness and conflicts
 3. Defining standard module structure requirements
@@ -15,6 +16,7 @@ The consolidation process involves:
 ### Types (`types.ts`)
 
 Defines core data structures:
+
 - `ConsolidationMapping`: Maps source modules to target modules
 - `Migration`: Describes a migration step (import path, API signature, etc.)
 - `BreakingChange`: Documents breaking changes and mitigation strategies
@@ -23,6 +25,7 @@ Defines core data structures:
 ### Validation (`validation.ts`)
 
 Provides validation functions:
+
 - `validateMapping()`: Validates a single consolidation mapping
 - `validateNoConflicts()`: Checks for conflicts between mappings
 - `validatePlan()`: Validates the entire consolidation plan
@@ -30,6 +33,7 @@ Provides validation functions:
 ### Mappings (`mappings.ts`)
 
 Defines the actual consolidation mappings:
+
 - `observabilityMapping`: Consolidates monitoring, performance, telemetry, analytics → observability
 - `stateManagementMapping`: Consolidates dashboard, navigation, loading → store (with slices)
 - `apiMapping`: Consolidates http, realtime, websocket → api
@@ -38,6 +42,7 @@ Defines the actual consolidation mappings:
 ### Module Structure (`module-structure.ts`)
 
 Defines standard module structure:
+
 - `ModuleMetadata`: Metadata for a module (name, version, dependencies, exports, API)
 - `ModuleStructure`: Physical structure (files and directories)
 - `validateModuleStructure()`: Validates a module follows standard structure
@@ -47,6 +52,7 @@ Defines standard module structure:
 ### Interface Extraction (`interface-extraction.ts`)
 
 Provides tools to break circular dependencies by extracting shared interfaces:
+
 - `SharedInterface`: Represents an interface shared between modules
 - `InterfaceExtractionStrategy`: Strategy for extracting interfaces to separate files
 - `identifySharedInterfaces()`: Identifies interfaces shared between circular modules
@@ -57,6 +63,7 @@ Provides tools to break circular dependencies by extracting shared interfaces:
 ### Dependency Injection Container (`di-container.ts`)
 
 Provides a DI container to manage service instantiation and eliminate circular dependencies:
+
 - `IDIContainer`: Container interface for service registration and resolution
 - `ServiceToken`: Token used to identify services
 - `ServiceFactory`: Factory function that creates service instances
@@ -69,6 +76,7 @@ Provides a DI container to manage service instantiation and eliminate circular d
 ### Consolidation Algorithm (`consolidation-algorithm.ts`)
 
 Implements the core consolidation logic for merging, nesting, and refactoring modules:
+
 - `consolidateModules()`: Main algorithm supporting MERGE, NEST, and REFACTOR strategies
 - `createStandardModuleStructure()`: Creates standard module layout with required directories
 - `mergeExports()`: Merges exports from multiple modules, handling naming conflicts
@@ -81,6 +89,7 @@ Implements the core consolidation logic for merging, nesting, and refactoring mo
 ### Migration Script Framework (`migration-script.ts`)
 
 Provides automated import path migration using ts-morph:
+
 - `findFilesImportingFrom()`: Finds all files importing from a specific module
 - `extractImportInfo()`: Extracts import information including named imports and aliases
 - `replaceImportPath()`: Replaces old import paths with new paths, preserving imports
@@ -91,6 +100,7 @@ Provides automated import path migration using ts-morph:
 ### Rollback Mechanism (`rollback.ts`)
 
 Provides backup and restore functionality for safe consolidation:
+
 - `createBackup()`: Creates backup of current module state before consolidation
 - `restoreBackup()`: Restores backup to original location
 - `validateBuild()`: Validates that build passes after rollback
@@ -139,9 +149,18 @@ if (!result.valid) {
 import { validatePlan, consolidationPlan } from '@/infrastructure/consolidation';
 
 const existingModules = [
-  'monitoring', 'performance', 'telemetry', 'analytics',
-  'store', 'dashboard', 'navigation', 'loading',
-  'api', 'http', 'realtime', 'websocket',
+  'monitoring',
+  'performance',
+  'telemetry',
+  'analytics',
+  'store',
+  'dashboard',
+  'navigation',
+  'loading',
+  'api',
+  'http',
+  'realtime',
+  'websocket',
   // ... other modules
 ];
 
@@ -162,10 +181,7 @@ if (result.warnings.length > 0) {
 import { validateModuleStructure } from '@/infrastructure/consolidation';
 import * as fs from 'fs';
 
-const result = validateModuleStructure(
-  'client/src/infrastructure/observability',
-  fs
-);
+const result = validateModuleStructure('client/src/infrastructure/observability', fs);
 
 if (!result.valid) {
   console.error('Structure validation errors:', result.errors);
@@ -177,7 +193,11 @@ console.log('Module structure:', result.structure);
 ### Generate Module Documentation
 
 ```typescript
-import { createModuleReadmeTemplate, ModuleMetadata, APIType } from '@/infrastructure/consolidation';
+import {
+  createModuleReadmeTemplate,
+  ModuleMetadata,
+  APIType,
+} from '@/infrastructure/consolidation';
 
 const metadata: ModuleMetadata = {
   name: 'observability',
@@ -190,12 +210,11 @@ const metadata: ModuleMetadata = {
       type: APIType.FUNCTION,
       signature: 'function trackError(error: Error, context: ErrorContext): void',
       description: 'Tracks an error with context',
-      examples: [
-        'trackError(new Error("Failed to load"), { component: "Dashboard" })'
-      ],
+      examples: ['trackError(new Error("Failed to load"), { component: "Dashboard" })'],
     },
   ],
-  documentation: 'Unified observability infrastructure for error tracking, performance monitoring, and analytics.',
+  documentation:
+    'Unified observability infrastructure for error tracking, performance monitoring, and analytics.',
 };
 
 const readme = createModuleReadmeTemplate(metadata);
@@ -206,10 +225,10 @@ console.log(readme);
 
 ```typescript
 import { Project } from 'ts-morph';
-import { 
-  identifySharedInterfaces, 
+import {
+  identifySharedInterfaces,
   createInterfaceExtractionStrategy,
-  applyInterfaceExtraction 
+  applyInterfaceExtraction,
 } from '@/infrastructure/consolidation';
 
 // Initialize ts-morph project
@@ -225,7 +244,10 @@ const circularModules = [
 
 // Find shared interfaces
 const sharedInterfaces = identifySharedInterfaces(project, circularModules);
-console.log('Found shared interfaces:', sharedInterfaces.map(i => i.name));
+console.log(
+  'Found shared interfaces:',
+  sharedInterfaces.map(i => i.name)
+);
 
 // Create extraction strategy
 const strategy = createInterfaceExtractionStrategy(
@@ -247,12 +269,12 @@ console.log('Interface extraction complete!');
 ### Use Dependency Injection Container
 
 ```typescript
-import { 
-  DIContainer, 
-  createServiceToken, 
+import {
+  DIContainer,
+  createServiceToken,
   createServiceFactory,
   ServicePhase,
-  initializeInThreePhases 
+  initializeInThreePhases,
 } from '@/infrastructure/consolidation';
 
 // Create container
@@ -267,34 +289,40 @@ const ErrorHandlerToken = createServiceToken('ErrorHandler');
 const factories = new Map();
 
 // Phase 1: Core services (no dependencies)
-factories.set('EventBus', createServiceFactory(
-  () => new EventBus(),
-  { phase: ServicePhase.CORE }
-));
+factories.set(
+  'EventBus',
+  createServiceFactory(() => new EventBus(), { phase: ServicePhase.CORE })
+);
 
 // Phase 2: Foundation services (depend on core)
-factories.set('Logger', createServiceFactory(
-  (container) => {
-    const eventBus = container.resolve(EventBusToken);
-    return new Logger(eventBus);
-  },
-  { 
-    dependencies: [EventBusToken],
-    phase: ServicePhase.FOUNDATION 
-  }
-));
+factories.set(
+  'Logger',
+  createServiceFactory(
+    container => {
+      const eventBus = container.resolve(EventBusToken);
+      return new Logger(eventBus);
+    },
+    {
+      dependencies: [EventBusToken],
+      phase: ServicePhase.FOUNDATION,
+    }
+  )
+);
 
 // Phase 3: Business services (depend on foundation)
-factories.set('ErrorHandler', createServiceFactory(
-  (container) => {
-    const logger = container.resolve(LoggerToken);
-    return new ErrorHandler(logger);
-  },
-  { 
-    dependencies: [LoggerToken],
-    phase: ServicePhase.BUSINESS 
-  }
-));
+factories.set(
+  'ErrorHandler',
+  createServiceFactory(
+    container => {
+      const logger = container.resolve(LoggerToken);
+      return new ErrorHandler(logger);
+    },
+    {
+      dependencies: [LoggerToken],
+      phase: ServicePhase.BUSINESS,
+    }
+  )
+);
 
 // Initialize in three phases
 const registry = initializeInThreePhases(container, factories);
@@ -307,10 +335,10 @@ errorHandler.handleError(new Error('Test error'));
 ### Validate Service Dependencies
 
 ```typescript
-import { 
-  createServiceFactory, 
+import {
+  createServiceFactory,
   createServiceToken,
-  validateNoCycles 
+  validateNoCycles,
 } from '@/infrastructure/consolidation';
 
 // Define service factories
@@ -319,21 +347,27 @@ const factories = new Map();
 const ServiceAToken = createServiceToken('ServiceA');
 const ServiceBToken = createServiceToken('ServiceB');
 
-factories.set('ServiceA', createServiceFactory(
-  (container) => {
-    const serviceB = container.resolve(ServiceBToken);
-    return new ServiceA(serviceB);
-  },
-  { dependencies: [ServiceBToken] }
-));
+factories.set(
+  'ServiceA',
+  createServiceFactory(
+    container => {
+      const serviceB = container.resolve(ServiceBToken);
+      return new ServiceA(serviceB);
+    },
+    { dependencies: [ServiceBToken] }
+  )
+);
 
-factories.set('ServiceB', createServiceFactory(
-  (container) => {
-    const serviceA = container.resolve(ServiceAToken);
-    return new ServiceB(serviceA);
-  },
-  { dependencies: [ServiceAToken] }
-));
+factories.set(
+  'ServiceB',
+  createServiceFactory(
+    container => {
+      const serviceA = container.resolve(ServiceAToken);
+      return new ServiceB(serviceA);
+    },
+    { dependencies: [ServiceAToken] }
+  )
+);
 
 // Validate - this will throw CircularDependencyError
 try {
@@ -348,11 +382,7 @@ try {
 ### Consolidate Modules
 
 ```typescript
-import { 
-  consolidateModules, 
-  ConsolidationStrategy,
-  Module 
-} from '@/infrastructure/consolidation';
+import { consolidateModules, ConsolidationStrategy, Module } from '@/infrastructure/consolidation';
 
 // Define source modules
 const sourceModules: Module[] = [
@@ -360,24 +390,38 @@ const sourceModules: Module[] = [
     name: 'monitoring',
     path: 'client/src/infrastructure/monitoring',
     exports: [
-      { name: 'trackError', type: 'function', signature: 'trackError(error: Error): void', isDefault: false }
+      {
+        name: 'trackError',
+        type: 'function',
+        signature: 'trackError(error: Error): void',
+        isDefault: false,
+      },
     ],
     types: [
-      { name: 'ErrorContext', kind: 'interface', definition: 'interface ErrorContext { ... }' }
+      { name: 'ErrorContext', kind: 'interface', definition: 'interface ErrorContext { ... }' },
     ],
     implementations: [
-      { name: 'trackError', kind: 'function', code: 'function trackError(error: Error) { ... }' }
+      { name: 'trackError', kind: 'function', code: 'function trackError(error: Error) { ... }' },
     ],
   },
   {
     name: 'performance',
     path: 'client/src/infrastructure/performance',
     exports: [
-      { name: 'trackMetric', type: 'function', signature: 'trackMetric(metric: Metric): void', isDefault: false }
+      {
+        name: 'trackMetric',
+        type: 'function',
+        signature: 'trackMetric(metric: Metric): void',
+        isDefault: false,
+      },
     ],
     types: [],
     implementations: [
-      { name: 'trackMetric', kind: 'function', code: 'function trackMetric(metric: Metric) { ... }' }
+      {
+        name: 'trackMetric',
+        kind: 'function',
+        code: 'function trackMetric(metric: Metric) { ... }',
+      },
     ],
   },
 ];
@@ -393,7 +437,10 @@ const result = consolidateModules(
 if (result.success) {
   console.log('Consolidation successful!');
   console.log('Target module:', result.module.name);
-  console.log('Sub-modules:', result.module.subModules.map(sm => sm.name));
+  console.log(
+    'Sub-modules:',
+    result.module.subModules.map(sm => sm.name)
+  );
 } else {
   console.error('Consolidation failed:', result.error);
 }
@@ -402,10 +449,7 @@ if (result.success) {
 ### Migrate Import Paths
 
 ```typescript
-import { 
-  createMigrationScript,
-  updateImportPaths 
-} from '@/infrastructure/consolidation';
+import { createMigrationScript, updateImportPaths } from '@/infrastructure/consolidation';
 
 // Create migration script
 const migrationScript = createMigrationScript({
@@ -459,12 +503,12 @@ console.log('Batch migration complete:', batchResult);
 ### Backup and Rollback
 
 ```typescript
-import { 
+import {
   createBackup,
   restoreBackup,
   rollbackConsolidation,
   listBackups,
-  BackupMetadata 
+  BackupMetadata,
 } from '@/infrastructure/consolidation';
 
 // Create backup before consolidation
@@ -481,17 +525,17 @@ if (backupResult.success) {
   console.log('Backup created:', backupResult.backup.id);
   console.log('Backup path:', backupResult.backup.backupPath);
   console.log('Files backed up:', backupResult.backup.files.length);
-  
+
   // Perform consolidation...
   try {
     // ... consolidation code ...
     console.log('Consolidation successful!');
   } catch (error) {
     console.error('Consolidation failed, rolling back...');
-    
+
     // Restore backup
     const restoreResult = await restoreBackup(backupResult.backup);
-    
+
     if (restoreResult.success) {
       console.log('Rollback successful!');
       console.log('Files restored:', restoreResult.filesRestored);
@@ -529,6 +573,7 @@ if (rollbackResult.success) {
 **Strategy:** NEST (create sub-modules)
 
 **Migrations:**
+
 - `@/infrastructure/monitoring` → `@/infrastructure/observability/error-monitoring`
 - `@/infrastructure/performance` → `@/infrastructure/observability/performance`
 - `@/infrastructure/telemetry` → `@/infrastructure/observability/telemetry`
@@ -541,6 +586,7 @@ if (rollbackResult.success) {
 **Strategy:** REFACTOR (extract common code, create slices)
 
 **Migrations:**
+
 - `@/infrastructure/dashboard` → `@/infrastructure/store/slices/dashboard`
 - `@/infrastructure/navigation` → `@/infrastructure/store/slices/navigation`
 - `@/infrastructure/loading` → `@/infrastructure/store/slices/loading`
@@ -552,6 +598,7 @@ if (rollbackResult.success) {
 **Strategy:** NEST (create sub-modules)
 
 **Migrations:**
+
 - `@/infrastructure/http` → `@/infrastructure/api/http`
 - `@/infrastructure/realtime` → `@/infrastructure/api/realtime`
 - `@/infrastructure/websocket` → `@/infrastructure/api/websocket`
@@ -559,6 +606,7 @@ if (rollbackResult.success) {
 ## Timeline
 
 The consolidation is planned for 10 weeks across 4 phases:
+
 1. **Phase 1 (Weeks 1-2):** Infrastructure Analysis & Planning
 2. **Phase 2 (Weeks 3-4):** Infrastructure Consolidation
 3. **Phase 3 (Weeks 5-7):** Error Handling Integration
@@ -573,17 +621,23 @@ The consolidation process includes two main strategies for resolving circular de
 When two modules have circular dependencies because they reference each other's types:
 
 **Problem:**
+
 ```typescript
 // monitoring/index.ts
 import { ErrorHandler } from '../error';
-export interface Monitor { errorHandler: ErrorHandler; }
+export interface Monitor {
+  errorHandler: ErrorHandler;
+}
 
 // error/index.ts
 import { Monitor } from '../monitoring';
-export interface ErrorHandler { monitor: Monitor; }
+export interface ErrorHandler {
+  monitor: Monitor;
+}
 ```
 
 **Solution:** Extract shared interfaces to a separate file:
+
 ```typescript
 // types/monitoring-interfaces.ts
 export interface Monitor { errorHandler: ErrorHandler; }
@@ -599,6 +653,7 @@ export class ErrorHandlerImpl implements ErrorHandler { ... }
 ```
 
 **When to use:**
+
 - Circular dependencies are primarily type-level (interfaces, types)
 - Modules need to reference each other's types but not implementations
 - The shared types form a cohesive contract
@@ -608,6 +663,7 @@ export class ErrorHandlerImpl implements ErrorHandler { ... }
 When modules have circular dependencies at the implementation level:
 
 **Problem:**
+
 ```typescript
 // logger/index.ts
 import { ErrorHandler } from '../error';
@@ -623,6 +679,7 @@ export class ErrorHandler {
 ```
 
 **Solution:** Use dependency injection with three-phase initialization:
+
 ```typescript
 // Phase 1: Core services (no dependencies)
 const eventBus = new EventBus();
@@ -638,6 +695,7 @@ const apiClient = new APIClient(cache, errorHandler);
 ```
 
 **When to use:**
+
 - Circular dependencies involve concrete implementations
 - Services need to be initialized in a specific order
 - You want to support testing with mock implementations
@@ -645,12 +703,12 @@ const apiClient = new APIClient(cache, errorHandler);
 
 ### Choosing the Right Strategy
 
-| Scenario | Strategy | Reason |
-|----------|----------|--------|
-| Type-only circular dependency | Interface Extraction | Simpler, no runtime overhead |
-| Implementation circular dependency | Dependency Injection | Provides proper initialization order |
-| Mixed type and implementation | Both | Extract types first, then use DI for implementations |
-| Tight coupling between modules | Module Consolidation | Consider merging modules instead |
+| Scenario                           | Strategy             | Reason                                               |
+| ---------------------------------- | -------------------- | ---------------------------------------------------- |
+| Type-only circular dependency      | Interface Extraction | Simpler, no runtime overhead                         |
+| Implementation circular dependency | Dependency Injection | Provides proper initialization order                 |
+| Mixed type and implementation      | Both                 | Extract types first, then use DI for implementations |
+| Tight coupling between modules     | Module Consolidation | Consider merging modules instead                     |
 
 ## Success Criteria
 

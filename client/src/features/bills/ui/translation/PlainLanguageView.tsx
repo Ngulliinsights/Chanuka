@@ -15,7 +15,7 @@ export function PlainLanguageView({ billId }: PlainLanguageViewProps) {
     queryKey: ['bill-translation', billId],
     queryFn: async () => {
       const response = await api.post(`/api/bills/${billId}/translate`, {
-        fullBill: true
+        fullBill: true,
       });
       return response.data;
     },
@@ -37,8 +37,9 @@ export function PlainLanguageView({ billId }: PlainLanguageViewProps) {
           Translation Not Available Yet
         </h3>
         <p className="text-yellow-800">
-          Plain-language translation for this bill is not available yet. We're working on translating all bills.
-          In the meantime, you can read the full legal text in the "Full Text" tab.
+          Plain-language translation for this bill is not available yet. We're working on
+          translating all bills. In the meantime, you can read the full legal text in the "Full
+          Text" tab.
         </p>
       </div>
     );
@@ -53,9 +54,7 @@ export function PlainLanguageView({ billId }: PlainLanguageViewProps) {
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Plain-Language Translation</h2>
-            <p className="text-gray-600 mt-1">
-              Understanding the bill in simple terms
-            </p>
+            <p className="text-gray-600 mt-1">Understanding the bill in simple terms</p>
           </div>
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
             <button
@@ -194,7 +193,9 @@ export function PlainLanguageView({ billId }: PlainLanguageViewProps) {
                       <div className="mt-3 bg-amber-50 border border-amber-200 rounded p-3">
                         <p className="text-xs font-medium text-amber-900 mb-1">Examples:</p>
                         {translation.examples.map((ex, i) => (
-                          <p key={i} className="text-xs text-amber-800">→ {ex}</p>
+                          <p key={i} className="text-xs text-amber-800">
+                            → {ex}
+                          </p>
                         ))}
                       </div>
                     )}

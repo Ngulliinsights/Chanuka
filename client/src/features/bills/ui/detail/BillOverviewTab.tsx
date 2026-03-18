@@ -1,8 +1,6 @@
 import { Calendar, Users, FileText, AlertTriangle } from 'lucide-react';
-import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
-import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
@@ -81,7 +79,11 @@ function BillOverviewTab({ bill }: BillOverviewTabProps) {
             <div className="flex items-center justify-between">
               <span className="font-medium">Last Updated:</span>
               <span className="text-muted-foreground">
-                {new Date(bill.timeline?.[bill.timeline.length - 1]?.date || bill.introducedDate || new Date()).toLocaleDateString()}
+                {new Date(
+                  bill.timeline?.[bill.timeline.length - 1]?.date ||
+                    bill.introducedDate ||
+                    new Date()
+                ).toLocaleDateString()}
               </span>
             </div>
           </div>

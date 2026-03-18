@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
-import { Star, Bell, BellOff, Trash2, Search } from 'lucide-react';
+import { Star, Bell, Trash2, Search } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Switch } from '@client/lib/design-system';
-import { searchHistoryService, SavedSearch } from '@client/features/search/services/search-history-service';
+import {
+  searchHistoryService,
+  SavedSearch,
+} from '@client/features/search/services/search-history-service';
 import { useToast } from '@client/lib/hooks/use-toast';
 
 interface SavedSearchesPanelProps {
@@ -18,17 +21,17 @@ export function SavedSearchesPanel({ onExecuteSearch }: SavedSearchesPanelProps)
   const handleToggleAlerts = (id: string, enabled: boolean) => {
     searchHistoryService.updateSavedSearch(id, { alertsEnabled: enabled });
     setSearches(searchHistoryService.getSavedSearches());
-    
+
     toast({
       title: enabled ? 'Alerts enabled' : 'Alerts disabled',
-      description: enabled ? 'You\'ll be notified of new results' : 'Alerts turned off',
+      description: enabled ? "You'll be notified of new results" : 'Alerts turned off',
     });
   };
 
   const handleDelete = (id: string) => {
     searchHistoryService.deleteSavedSearch(id);
     setSearches(searchHistoryService.getSavedSearches());
-    
+
     toast({
       title: 'Search deleted',
       description: 'Saved search removed',
@@ -58,7 +61,7 @@ export function SavedSearchesPanel({ onExecuteSearch }: SavedSearchesPanelProps)
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {searches.map((search) => (
+          {searches.map(search => (
             <div
               key={search.id}
               className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50"
@@ -75,26 +78,18 @@ export function SavedSearchesPanel({ onExecuteSearch }: SavedSearchesPanelProps)
                 </div>
                 <p className="text-sm text-gray-600 truncate mt-1">{search.query}</p>
               </div>
-              
+
               <div className="flex items-center gap-2 ml-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleExecute(search)}
-                >
+                <Button variant="ghost" size="sm" onClick={() => handleExecute(search)}>
                   <Search className="h-4 w-4" />
                 </Button>
-                
+
                 <Switch
                   checked={search.alertsEnabled}
-                  onCheckedChange={(checked) => handleToggleAlerts(search.id, checked)}
+                  onCheckedChange={checked => handleToggleAlerts(search.id, checked)}
                 />
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDelete(search.id)}
-                >
+
+                <Button variant="ghost" size="sm" onClick={() => handleDelete(search.id)}>
                   <Trash2 className="h-4 w-4 text-red-600" />
                 </Button>
               </div>

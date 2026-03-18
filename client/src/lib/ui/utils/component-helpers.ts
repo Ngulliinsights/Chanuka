@@ -1,6 +1,6 @@
 // Shared utility functions for components
 
-import { type ClassValue, clsx } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -20,32 +20,16 @@ export function generateTestId(component: string, element?: string): string {
 /**
  * Common component size mappings
  */
-export const componentSizes = {
-  small: 'text-sm',
-  medium: 'text-base',
-  large: 'text-lg',
-} as const;
-
-/**
+export /**
  * Common theme mappings
  */
-export const componentThemes = {
-  light: 'bg-white text-gray-900',
-  dark: 'bg-gray-900 text-white',
-} as const;
-
-/**
+function /**
  * Common layout mappings
  */
-export const componentLayouts = {
-  grid: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
-  list: 'flex flex-col space-y-2',
-} as const;
-
 /**
  * Debounce function for component handlers
  */
-export function debounce<T extends (...args: unknown[]) => unknown>(
+debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {

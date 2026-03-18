@@ -15,14 +15,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@client/lib/design-system';
-import {
-  AlertTriangle,
-  FileText,
-  Scale,
-  Shield,
-  Star,
-  Users,
-} from 'lucide-react';
+import { AlertTriangle, FileText, Scale, Shield, Star, Users } from 'lucide-react';
 import type { ExtendedBill } from '@client/lib/types';
 
 interface BillAnalysisProps {
@@ -94,8 +87,6 @@ function BillAnalysis({ bill }: BillAnalysisProps) {
   ];
 
   // Extract constitutional concerns for civic action guidance
-  const constitutionalConcerns =
-    bill.constitutionalFlags?.map(flag => flag.type || 'General') || [];
   const recommendations = [
     'Review income-based eligibility criteria for Article 27 compliance',
     'Clarify national-county authority boundaries in healthcare regulation',

@@ -1,6 +1,6 @@
 /**
  * Argument Filters Component
- * 
+ *
  * Provides filtering and search capabilities for arguments.
  */
 
@@ -51,7 +51,7 @@ export function ArgumentFilters({
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search arguments..."
             className="w-full px-4 py-2 pr-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -67,23 +67,26 @@ export function ArgumentFilters({
       <div className="space-y-4">
         {/* Position Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Position
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Position</label>
           <div className="flex gap-2">
-            {['support', 'oppose', 'neutral'].map((position) => (
+            {['support', 'oppose', 'neutral'].map(position => (
               <button
                 key={position}
-                onClick={() => onFiltersChange({ position: filters.position === position ? undefined : position as any })}
+                onClick={() =>
+                  onFiltersChange({
+                    position: filters.position === position ? undefined : (position as any),
+                  })
+                }
                 className={`
                   px-3 py-1 rounded-full text-sm font-medium transition-colors
-                  ${filters.position === position
-                    ? position === 'support'
-                      ? 'bg-green-500 text-white'
-                      : position === 'oppose'
-                      ? 'bg-red-500 text-white'
-                      : 'bg-gray-500 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ${
+                    filters.position === position
+                      ? position === 'support'
+                        ? 'bg-green-500 text-white'
+                        : position === 'oppose'
+                          ? 'bg-red-500 text-white'
+                          : 'bg-gray-500 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }
                 `}
               >
@@ -96,12 +99,10 @@ export function ArgumentFilters({
 
         {/* Argument Type Filter */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Argument Type
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Argument Type</label>
           <select
             value={filters.argumentType || ''}
-            onChange={(e) => onFiltersChange({ argumentType: e.target.value || undefined })}
+            onChange={e => onFiltersChange({ argumentType: e.target.value || undefined })}
             className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Types</option>
@@ -115,7 +116,10 @@ export function ArgumentFilters({
         {/* Confidence Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Minimum Confidence: {filters.minConfidence !== undefined ? `${(filters.minConfidence * 100).toFixed(0)}%` : 'Any'}
+            Minimum Confidence:{' '}
+            {filters.minConfidence !== undefined
+              ? `${(filters.minConfidence * 100).toFixed(0)}%`
+              : 'Any'}
           </label>
           <input
             type="range"
@@ -123,7 +127,7 @@ export function ArgumentFilters({
             max="100"
             step="5"
             value={filters.minConfidence !== undefined ? filters.minConfidence * 100 : 0}
-            onChange={(e) => {
+            onChange={e => {
               const value = parseInt(e.target.value);
               onFiltersChange({ minConfidence: value > 0 ? value / 100 : undefined });
             }}
@@ -139,7 +143,10 @@ export function ArgumentFilters({
         {/* Strength Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Minimum Strength: {filters.minStrength !== undefined ? `${(filters.minStrength * 100).toFixed(0)}%` : 'Any'}
+            Minimum Strength:{' '}
+            {filters.minStrength !== undefined
+              ? `${(filters.minStrength * 100).toFixed(0)}%`
+              : 'Any'}
           </label>
           <input
             type="range"
@@ -147,7 +154,7 @@ export function ArgumentFilters({
             max="100"
             step="5"
             value={filters.minStrength !== undefined ? filters.minStrength * 100 : 0}
-            onChange={(e) => {
+            onChange={e => {
               const value = parseInt(e.target.value);
               onFiltersChange({ minStrength: value > 0 ? value / 100 : undefined });
             }}

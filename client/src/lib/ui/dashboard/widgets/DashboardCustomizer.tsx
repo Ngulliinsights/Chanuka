@@ -5,23 +5,11 @@
  * and preferences based on their persona type.
  */
 
-import type { PersonaType, PersonaPreferences } from '@client/infrastructure/observability/personalization';
-import {
-  LayoutGrid as Layout, // Using LayoutGrid as Layout replacement
-  // Eye, // Unused
-  // EyeOff, // Unused
-  Settings,
-  Grid3X3 as Grid, // Using Grid3X3 as Grid replacement
-  List,
-  LayoutGrid as Columns, // Using LayoutGrid as Columns replacement
-  Save,
-  RefreshCw as RotateCcw, // Using RefreshCw as RotateCcw replacement
-  // Settings as Palette, // Using Settings as Palette replacement - Unused
-  // Bell, // Unused
-  // Clock // Unused
-} from 'lucide-react';
+import type {
+  PersonaType,
+  PersonaPreferences,
+} from '@client/infrastructure/observability/personalization';
 import { useState } from 'react';
-import React from 'react';
 
 import { Button } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';

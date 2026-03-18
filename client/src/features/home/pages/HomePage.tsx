@@ -1,13 +1,13 @@
 /**
  * Optimized Unified Home Page - Production-Grade UI/UX
- * 
+ *
  * DESIGN PHILOSOPHY: "Democratic Brutalism meets Refined Clarity"
  * - Bold, asymmetric layouts that break traditional grid patterns
  * - Distinctive typography (DM Serif Display + Work Sans)
  * - Sophisticated micro-interactions and scroll animations
  * - Atmospheric depth through layered transparencies and textures
  * - Accessibility-first with WCAG AAA compliance
- * 
+ *
  * PERFORMANCE OPTIMIZATIONS:
  * - React.memo for all child components
  * - Intersection Observer for scroll-triggered animations
@@ -15,7 +15,7 @@
  * - Optimized re-renders with useMemo and useCallback
  * - Code splitting for heavy components
  * - Image lazy loading with blur placeholders
- * 
+ *
  * UX ENHANCEMENTS:
  * - Skeleton loading states
  * - Error boundaries with graceful degradation
@@ -23,7 +23,7 @@
  * - Reduced motion support for accessibility
  * - Progressive enhancement
  * - Scroll progress indicator
- * 
+ *
  * Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 8.1, 9.1
  */
 
@@ -68,16 +68,16 @@ import { logger } from '@client/lib/utils/logger';
 
 // Strategic color palette with extended semantic colors
 const COLORS = {
-  primary: '#0d3b66',        // Navy blue - authority & trust
-  secondary: '#084c61',       // Teal - innovation & clarity
-  accent: '#f38a1f',          // Orange - action & energy
-  accentHover: '#d47716',     // Darker orange
-  success: '#10b981',         // Green - positive outcomes
-  warning: '#f59e0b',         // Amber - caution
-  danger: '#ef4444',          // Red - critical alerts
-  neutral: '#64748b',         // Slate - supporting text
-  surface: '#f8fafc',         // Light gray - backgrounds
-  surfaceDark: '#1e293b',     // Dark surface for contrast
+  primary: '#0d3b66', // Navy blue - authority & trust
+  secondary: '#084c61', // Teal - innovation & clarity
+  accent: '#f38a1f', // Orange - action & energy
+  accentHover: '#d47716', // Darker orange
+  success: '#10b981', // Green - positive outcomes
+  warning: '#f59e0b', // Amber - caution
+  danger: '#ef4444', // Red - critical alerts
+  neutral: '#64748b', // Slate - supporting text
+  surface: '#f8fafc', // Light gray - backgrounds
+  surfaceDark: '#1e293b', // Dark surface for contrast
 } as const;
 
 // Animation configuration
@@ -328,7 +328,7 @@ const PlatformStats = React.memo<{ stats: StatItem[] }>(({ stats }) => {
 
   return (
     <div ref={ref} className="text-center">
-      <h2 
+      <h2
         className="text-5xl font-display font-bold text-gray-900 mb-4"
         style={{
           opacity: isVisible ? 1 : 0,
@@ -338,7 +338,7 @@ const PlatformStats = React.memo<{ stats: StatItem[] }>(({ stats }) => {
       >
         Platform Impact
       </h2>
-      <p 
+      <p
         className="text-xl font-body text-gray-600 mb-12 max-w-2xl mx-auto"
         style={{
           opacity: isVisible ? 1 : 0,
@@ -348,7 +348,7 @@ const PlatformStats = React.memo<{ stats: StatItem[] }>(({ stats }) => {
       >
         Real metrics from citizens making a difference
       </p>
-      
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
@@ -359,25 +359,21 @@ const PlatformStats = React.memo<{ stats: StatItem[] }>(({ stats }) => {
               style={{
                 opacity: isVisible ? 1 : 0,
                 transform: `translateY(${isVisible ? 0 : 40}px)`,
-                transition: prefersReducedMotion 
-                  ? 'none' 
+                transition: prefersReducedMotion
+                  ? 'none'
                   : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`,
               }}
             >
-              <div 
+              <div
                 className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-lg"
-                style={{ 
+                style={{
                   background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
                 }}
               >
                 <Icon className="h-10 w-10 text-white" />
               </div>
-              <div className="text-4xl font-display font-bold text-gray-900 mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm font-body font-medium text-gray-600 mb-1">
-                {stat.label}
-              </div>
+              <div className="text-4xl font-display font-bold text-gray-900 mb-1">{stat.value}</div>
+              <div className="text-sm font-body font-medium text-gray-600 mb-1">{stat.label}</div>
               {stat.change && (
                 <div className="text-xs font-body font-semibold" style={{ color: COLORS.success }}>
                   {stat.change}
@@ -447,7 +443,7 @@ const RecentActivity = React.memo(() => {
   return (
     <div ref={ref} className="max-w-5xl mx-auto">
       <div className="text-center mb-16">
-        <h2 
+        <h2
           className="text-5xl font-display font-bold text-gray-900 mb-4"
           style={{
             opacity: isVisible ? 1 : 0,
@@ -457,12 +453,14 @@ const RecentActivity = React.memo(() => {
         >
           Recent Activity
         </h2>
-        <p 
+        <p
           className="text-xl font-body text-gray-600"
           style={{
             opacity: isVisible ? 1 : 0,
             transform: `translateY(${isVisible ? 0 : 30}px)`,
-            transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
+            transition: prefersReducedMotion
+              ? 'none'
+              : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
           }}
         >
           Stay updated with the latest legislative developments
@@ -483,18 +481,18 @@ const RecentActivity = React.memo(() => {
                     borderColor: activity.borderColor,
                     opacity: isVisible ? 1 : 0,
                     transform: `translateX(${isVisible ? 0 : -40}px)`,
-                    transition: prefersReducedMotion 
-                      ? 'none' 
+                    transition: prefersReducedMotion
+                      ? 'none'
                       : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
                   }}
                 >
                   {/* Hover gradient effect */}
-                  <div 
+                  <div
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ background: `${activity.bgGradient}` }}
                   />
 
-                  <div 
+                  <div
                     className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg z-10 group-hover:scale-110 transition-transform duration-300"
                     style={{ background: activity.gradient }}
                   >
@@ -527,9 +525,9 @@ const RecentActivity = React.memo(() => {
                   </div>
 
                   <Link to={activity.link} className="z-10">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="group-hover:translate-x-2 transition-transform duration-300"
                       style={{ color: COLORS.primary }}
                     >
@@ -563,14 +561,12 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
   };
 
   return (
-    <section 
-      className="relative overflow-hidden min-h-[80vh] flex items-center py-24 diagonal-accent bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold"
-    >
+    <section className="relative overflow-hidden min-h-[80vh] flex items-center py-24 diagonal-accent bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold">
       {/* Background Image with Overlay - Restored */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="/chanuka-hero-parliament.png" 
-          alt="Parliament Building" 
+        <img
+          src="/chanuka-hero-parliament.png"
+          alt="Parliament Building"
           className="w-full h-full object-cover mix-blend-overlay opacity-30"
           style={{ objectPosition: 'center 30%' }}
         />
@@ -582,10 +578,8 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
 
       <div className="container mx-auto px-4 relative z-10 text-white">
         <div className="text-center max-w-6xl mx-auto">
-
-
           {/* Status Badge */}
-          <div 
+          <div
             className="inline-flex items-center space-x-2 px-6 py-3 rounded-full text-sm font-body font-semibold mb-8 glass shadow-lg"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeIn 0.6s ease-out 0.2s both',
@@ -593,26 +587,28 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
               color: COLORS.success,
             }}
           >
-            <div 
+            <div
               className="w-2.5 h-2.5 rounded-full"
-              style={{ 
+              style={{
                 backgroundColor: COLORS.success,
-                animation: prefersReducedMotion ? 'none' : 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                animation: prefersReducedMotion
+                  ? 'none'
+                  : 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
               }}
             />
             <span>Platform Active • Real-time Updates</span>
           </div>
 
           {/* Main Headline */}
-          <h1 
+          <h1
             className="text-6xl md:text-7xl font-display font-bold mb-6 leading-tight drop-shadow-2xl text-white"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.8s ease-out 0.4s both',
             }}
           >
-            <span 
+            <span
               className="bg-clip-text text-transparent block"
-              style={{ 
+              style={{
                 backgroundImage: `linear-gradient(135deg, #fff, ${COLORS.accent}, ${COLORS.accentHover})`,
                 backgroundSize: '200% auto',
               }}
@@ -622,7 +618,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
             <span className="text-white">in Your Hands</span>
           </h1>
 
-          <p 
+          <p
             className="text-xl font-body text-gray-100 max-w-3xl mx-auto mb-10 leading-relaxed font-light drop-shadow-lg"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeIn 0.6s ease-out 0.6s both',
@@ -632,7 +628,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
           </p>
 
           {/* CTA Buttons */}
-          <div 
+          <div
             className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.6s ease-out 0.8s both',
@@ -643,11 +639,11 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
                 size="lg"
                 className="text-base font-body font-semibold px-8 py-6 shadow-2xl hover:shadow-[0_20px_50px_rgba(243,138,31,0.4)] transition-all duration-500 hover:scale-105 text-white relative overflow-hidden group ripple-container"
                 style={{ backgroundColor: COLORS.accent }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.backgroundColor = COLORS.accentHover;
                   e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.backgroundColor = COLORS.accent;
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
@@ -663,16 +659,16 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
                 variant="outline"
                 size="lg"
                 className="text-base font-body font-semibold px-8 py-6 border-2 transition-all duration-500 bg-white shadow-lg hover:shadow-xl"
-                style={{ 
+                style={{
                   borderColor: COLORS.primary,
                   color: COLORS.primary,
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.backgroundColor = COLORS.primary;
                   e.currentTarget.style.color = 'white';
                   e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.backgroundColor = 'white';
                   e.currentTarget.style.color = COLORS.primary;
                   e.currentTarget.style.transform = 'scale(1)';
@@ -685,18 +681,18 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
           </div>
 
           {/* Enhanced Search Box with Glass Effect */}
-          <div 
+          <div
             className="max-w-2xl mx-auto"
             style={{
               animation: prefersReducedMotion ? 'none' : 'fadeInUp 0.6s ease-out 1s both',
             }}
           >
-            <div 
+            <div
               className="glass rounded-3xl p-6 shadow-2xl transition-all duration-500"
               style={{
                 transform: isSearchFocused ? 'scale(1.02)' : 'scale(1)',
-                boxShadow: isSearchFocused 
-                  ? `0 25px 50px -12px rgba(13, 59, 102, 0.25)` 
+                boxShadow: isSearchFocused
+                  ? `0 25px 50px -12px rgba(13, 59, 102, 0.25)`
                   : undefined,
               }}
             >
@@ -710,7 +706,7 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
               </div>
               <form onSubmit={handleSubmit} className="relative">
                 <div className="relative">
-                  <Search 
+                  <Search
                     className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 transition-colors duration-300"
                     style={{ color: isSearchFocused ? COLORS.primary : COLORS.neutral }}
                   />
@@ -722,20 +718,22 @@ const EnhancedHero = React.memo<{ onSearch: (query: string) => void }>(({ onSear
                     onBlur={() => setIsSearchFocused(false)}
                     placeholder="Search bills, sponsors, policy topics..."
                     className="w-full pl-16 pr-32 py-5 rounded-2xl border-2 font-body text-lg focus:ring-4 outline-none transition-all duration-300 bg-white"
-                    style={{ 
-                      borderColor: isSearchFocused ? COLORS.primary : '#e5e7eb',
-                      '--tw-ring-color': `${COLORS.primary}20`
-                    } as React.CSSProperties}
+                    style={
+                      {
+                        borderColor: isSearchFocused ? COLORS.primary : '#e5e7eb',
+                        '--tw-ring-color': `${COLORS.primary}20`,
+                      } as React.CSSProperties
+                    }
                   />
                   <button
                     type="submit"
                     className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 text-white rounded-xl transition-all duration-300 font-body font-semibold hover:scale-105 shadow-lg flex items-center gap-2"
                     style={{ backgroundColor: COLORS.accent }}
-                    onMouseEnter={(e) => {
+                    onMouseEnter={e => {
                       e.currentTarget.style.backgroundColor = COLORS.accentHover;
                       e.currentTarget.style.transform = 'translateY(-50%) scale(1.05)';
                     }}
-                    onMouseLeave={(e) => {
+                    onMouseLeave={e => {
                       e.currentTarget.style.backgroundColor = COLORS.accent;
                       e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                     }}
@@ -765,7 +763,8 @@ const FeatureCards = React.memo(() => {
     {
       icon: FileText,
       title: 'Legislative Tracking',
-      description: 'Real-time monitoring of bills, amendments, and voting patterns. Get personalized alerts on legislation that matters to you and your community.',
+      description:
+        'Real-time monitoring of bills, amendments, and voting patterns. Get personalized alerts on legislation that matters to you and your community.',
       link: '/bills',
       color: COLORS.primary,
       featured: true,
@@ -773,7 +772,8 @@ const FeatureCards = React.memo(() => {
     {
       icon: Shield,
       title: 'Workaround Detection',
-      description: 'AI-powered detection of implementation workarounds and constitutional bypass tactics using advanced pattern recognition.',
+      description:
+        'AI-powered detection of implementation workarounds and constitutional bypass tactics using advanced pattern recognition.',
       link: '/workarounds',
       color: COLORS.accent,
       brandIcon: true,
@@ -782,7 +782,8 @@ const FeatureCards = React.memo(() => {
     {
       icon: AlertTriangle,
       title: 'Pretext Detection',
-      description: 'Identify potential pretext bills using advanced pattern recognition, timing analysis, and network mapping to detect hidden agendas.',
+      description:
+        'Identify potential pretext bills using advanced pattern recognition, timing analysis, and network mapping to detect hidden agendas.',
       link: '/pretext-detection',
       color: COLORS.accent,
       featured: true,
@@ -790,28 +791,32 @@ const FeatureCards = React.memo(() => {
     {
       icon: Users,
       title: 'Civic Engagement',
-      description: 'Connect with citizens nationwide, share insights, and participate in informed discussions about policy impacts.',
+      description:
+        'Connect with citizens nationwide, share insights, and participate in informed discussions about policy impacts.',
       link: '/community',
       color: COLORS.secondary,
     },
     {
       icon: BarChart3,
       title: 'Impact Analysis',
-      description: 'Comprehensive analysis of how legislation affects different communities and stakeholder groups with data visualization.',
+      description:
+        'Comprehensive analysis of how legislation affects different communities and stakeholder groups with data visualization.',
       link: '/analysis',
       color: COLORS.primary,
     },
     {
       icon: Target,
       title: 'Expert Insights',
-      description: 'Access professional analysis, expert commentary, and scholarly research on complex legislative matters.',
+      description:
+        'Access professional analysis, expert commentary, and scholarly research on complex legislative matters.',
       link: '/expert',
       color: COLORS.accent,
     },
     {
       icon: Activity,
       title: 'Real-time Monitoring',
-      description: 'Stay informed with live updates on legislative sessions, committee votes, and floor activities as they happen.',
+      description:
+        'Stay informed with live updates on legislative sessions, committee votes, and floor activities as they happen.',
       link: '/status',
       color: COLORS.secondary,
     },
@@ -824,10 +829,9 @@ const FeatureCards = React.memo(() => {
         <ChanukaShield size={800} variant="brand" className="w-[1000px] h-auto" />
       </div>
 
-
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <h2 
+          <h2
             className="text-5xl font-display font-bold text-gray-900 mb-4"
             style={{
               opacity: isVisible ? 1 : 0,
@@ -837,12 +841,14 @@ const FeatureCards = React.memo(() => {
           >
             Powerful Tools for Civic Engagement
           </h2>
-          <p 
+          <p
             className="text-xl font-body font-light text-gray-600 max-w-3xl mx-auto"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
-              transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
             }}
           >
             Everything you need to stay informed and engaged with the legislative process
@@ -854,7 +860,7 @@ const FeatureCards = React.memo(() => {
           {features.map((feature, index) => {
             const Icon = feature.icon;
             const spanClass = feature.featured ? 'md:col-span-1 lg:col-span-1' : '';
-            
+
             return (
               <Card
                 key={index}
@@ -863,32 +869,32 @@ const FeatureCards = React.memo(() => {
                   background: `linear-gradient(135deg, ${feature.color}08, ${feature.color}05)`,
                   opacity: isVisible ? 1 : 0,
                   transform: `translateY(${isVisible ? 0 : 40}px)`,
-                  transition: prefersReducedMotion 
-                    ? 'none' 
+                  transition: prefersReducedMotion
+                    ? 'none'
                     : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.1}s`,
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   if (!prefersReducedMotion) {
                     e.currentTarget.style.transform = `translateY(-${ANIMATION_CONFIG.cardHoverY}px)`;
                   }
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
                 {/* Gradient overlay on hover */}
-                <div 
+                <div
                   className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-                  style={{ 
-                    background: `linear-gradient(135deg, ${feature.color}15, transparent)` 
+                  style={{
+                    background: `linear-gradient(135deg, ${feature.color}15, transparent)`,
                   }}
                 />
 
                 <CardHeader className="text-center pb-6 relative z-10">
                   <div
                     className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-xl"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${feature.color}, ${feature.color}dd)` 
+                    style={{
+                      background: `linear-gradient(135deg, ${feature.color}, ${feature.color}dd)`,
                     }}
                   >
                     {feature.brandIcon ? (
@@ -901,7 +907,7 @@ const FeatureCards = React.memo(() => {
                     {feature.title}
                   </CardTitle>
                 </CardHeader>
-                
+
                 <CardContent className="text-center relative z-10">
                   <CardDescription className="font-body text-gray-600 mb-8 leading-relaxed text-base">
                     {feature.description}
@@ -935,25 +941,35 @@ const TrustIndicators = React.memo(() => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   const indicators = [
-    { icon: Shield, label: 'Secure & Private', value: '256-bit Encryption', description: 'Bank-level security' },
-    { icon: CheckCircle, label: 'Verified Data', value: 'Official Sources', description: 'Government APIs' },
+    {
+      icon: Shield,
+      label: 'Secure & Private',
+      value: '256-bit Encryption',
+      description: 'Bank-level security',
+    },
+    {
+      icon: CheckCircle,
+      label: 'Verified Data',
+      value: 'Official Sources',
+      description: 'Government APIs',
+    },
     { icon: Users, label: 'Active Community', value: '10,000+', description: 'Engaged Citizens' },
     { icon: TrendingUp, label: 'Growing Impact', value: '↑ 25%', description: 'Monthly Growth' },
   ];
 
   return (
-    <section 
+    <section
       ref={ref}
       className="py-32 text-white relative overflow-hidden"
-      style={{ 
-        background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})` 
+      style={{
+        background: `linear-gradient(135deg, ${COLORS.primary}, ${COLORS.secondary})`,
       }}
     >
       {/* Noise texture */}
       <div className="noise-overlay opacity-50" />
 
       {/* Brand accent in background */}
-      <div 
+      <div
         className="absolute right-0 top-1/2 -translate-y-1/2 opacity-10"
         style={{
           transform: isVisible ? 'translateY(-50%) scale(1)' : 'translateY(-50%) scale(0.8)',
@@ -965,7 +981,7 @@ const TrustIndicators = React.memo(() => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
-          <h2 
+          <h2
             className="text-5xl font-display font-bold mb-4"
             style={{
               opacity: isVisible ? 1 : 0,
@@ -975,12 +991,14 @@ const TrustIndicators = React.memo(() => {
           >
             Trusted by Citizens Nationwide
           </h2>
-          <p 
+          <p
             className="text-blue-100 text-xl font-body font-light"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
-              transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
             }}
           >
             Built with security, transparency, and civic engagement at its core
@@ -991,14 +1009,14 @@ const TrustIndicators = React.memo(() => {
           {indicators.map((indicator, index) => {
             const Icon = indicator.icon;
             return (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="text-center group cursor-default"
                 style={{
                   opacity: isVisible ? 1 : 0,
                   transform: `translateY(${isVisible ? 0 : 40}px)`,
-                  transition: prefersReducedMotion 
-                    ? 'none' 
+                  transition: prefersReducedMotion
+                    ? 'none'
                     : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
                 }}
               >
@@ -1026,14 +1044,14 @@ const CallToAction = React.memo(() => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   return (
-    <section 
+    <section
       ref={ref}
       className="py-32 relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #f9fafb 0%, #fef6ed 100%)' }}
     >
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-5xl mx-auto text-center">
-          <div 
+          <div
             className="mb-10"
             style={{
               opacity: isVisible ? 1 : 0,
@@ -1044,36 +1062,42 @@ const CallToAction = React.memo(() => {
             <DocumentShieldIcon size="lg" className="mx-auto drop-shadow-xl" />
           </div>
 
-          <h2 
+          <h2
             className="text-6xl md:text-7xl font-display font-bold mb-8"
-            style={{ 
+            style={{
               color: COLORS.primary,
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
-              transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s',
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.2s',
             }}
           >
             Ready to Make Your Voice Heard?
           </h2>
-          
-          <p 
+
+          <p
             className="text-2xl font-body font-light text-gray-600 mb-12 leading-relaxed"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
-              transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s',
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.4s',
             }}
           >
             Join thousands of engaged citizens using Chanuka to stay informed, track legislation,
             and participate in the democratic process.
           </p>
 
-          <div 
+          <div
             className="flex flex-col sm:flex-row gap-5 justify-center mb-8"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: `translateY(${isVisible ? 0 : 30}px)`,
-              transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s',
+              transition: prefersReducedMotion
+                ? 'none'
+                : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.6s',
             }}
           >
             <Link to="/auth?mode=register">
@@ -1081,11 +1105,11 @@ const CallToAction = React.memo(() => {
                 size="lg"
                 className="text-xl font-body font-bold px-12 py-8 shadow-2xl hover:shadow-[0_25px_50px_rgba(243,138,31,0.4)] transition-all duration-500 hover:scale-105 text-white"
                 style={{ backgroundColor: COLORS.accent }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.backgroundColor = COLORS.accentHover;
                   e.currentTarget.style.transform = 'scale(1.05) translateY(-4px)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.backgroundColor = COLORS.accent;
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
@@ -1101,16 +1125,16 @@ const CallToAction = React.memo(() => {
                 variant="outline"
                 size="lg"
                 className="text-xl font-body font-bold px-12 py-8 border-2 transition-all duration-500 bg-white shadow-xl hover:shadow-2xl"
-                style={{ 
+                style={{
                   borderColor: COLORS.primary,
                   color: COLORS.primary,
                 }}
-                onMouseEnter={(e) => {
+                onMouseEnter={e => {
                   e.currentTarget.style.backgroundColor = COLORS.primary;
                   e.currentTarget.style.color = 'white';
                   e.currentTarget.style.transform = 'scale(1.05) translateY(-4px)';
                 }}
-                onMouseLeave={(e) => {
+                onMouseLeave={e => {
                   e.currentTarget.style.backgroundColor = 'white';
                   e.currentTarget.style.color = COLORS.primary;
                   e.currentTarget.style.transform = 'scale(1)';
@@ -1121,7 +1145,7 @@ const CallToAction = React.memo(() => {
             </Link>
           </div>
 
-          <p 
+          <p
             className="text-sm font-body text-gray-500"
             style={{
               opacity: isVisible ? 1 : 0,
@@ -1140,201 +1164,210 @@ CallToAction.displayName = 'CallToAction';
 /**
  * Personalized Dashboard Preview (for authenticated users)
  */
-const PersonalizedDashboardPreview = React.memo<{ user: User; persona: string }>(({ user, persona }) => {
-  const { ref, isVisible } = useIntersectionObserver();
-  const prefersReducedMotion = usePrefersReducedMotion();
+const PersonalizedDashboardPreview = React.memo<{ user: User; persona: string }>(
+  ({ user, persona }) => {
+    const { ref, isVisible } = useIntersectionObserver();
+    const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Content adaptation based on persona
-  const getPersonaContent = () => {
-    switch (persona) {
-      case 'expert':
-        return [
-          {
-            icon: Shield,
-            title: 'Expert Review',
-            value: '3 Pending',
-            subtitle: 'Legislation awaiting analysis',
-            link: '/expert/reviews',
-            color: COLORS.primary,
-          },
-          {
-            icon: Target,
-            title: 'Impact Analysis',
-            value: 'High Priority',
-            subtitle: 'New tax reform bill',
-            link: '/analysis',
-            color: COLORS.accent,
-          },
-          {
-            icon: BarChart3,
-            title: 'Analytics',
-            value: 'Advanced',
-            subtitle: 'System-wide monitoring',
-            link: '/analytics',
-            color: COLORS.secondary,
-          },
-        ];
-      case 'intermediate':
-        return [
-          {
-            icon: FileText,
-            title: 'Tracked Bills',
-            value: '12',
-            subtitle: '3 with recent updates',
-            link: '/dashboard/bills',
-            color: COLORS.primary,
-          },
-          {
-            icon: AlertTriangle,
-            title: 'Active Alerts',
-            value: '2',
-            subtitle: 'Workarounds detected',
-            link: '/dashboard/alerts',
-            color: COLORS.accent,
-          },
-          {
-            icon: MessageSquare,
-            title: 'Discussions',
-            value: '5',
-            subtitle: 'Active conversations',
-            link: '/community',
-            color: COLORS.secondary,
-          },
-        ];
-      case 'novice':
-      default:
-        return [
-          {
-            icon: Sparkles,
-            title: 'Getting Started',
-            value: 'Level 1',
-            subtitle: 'Complete your profile',
-            link: '/onboarding',
-            color: COLORS.accent,
-          },
-          {
-            icon: FileText,
-            title: 'Trending Bills',
-            value: 'Top 3',
-            subtitle: 'Popular in your area',
-            link: '/bills/trending',
-            color: COLORS.primary,
-          },
-          {
-            icon: Users,
-            title: 'Community',
-            value: 'Join Now',
-            subtitle: 'Connect with others',
-            link: '/community',
-            color: COLORS.secondary,
-          },
-        ];
-    }
-  };
+    // Content adaptation based on persona
+    const getPersonaContent = () => {
+      switch (persona) {
+        case 'expert':
+          return [
+            {
+              icon: Shield,
+              title: 'Expert Review',
+              value: '3 Pending',
+              subtitle: 'Legislation awaiting analysis',
+              link: '/expert/reviews',
+              color: COLORS.primary,
+            },
+            {
+              icon: Target,
+              title: 'Impact Analysis',
+              value: 'High Priority',
+              subtitle: 'New tax reform bill',
+              link: '/analysis',
+              color: COLORS.accent,
+            },
+            {
+              icon: BarChart3,
+              title: 'Analytics',
+              value: 'Advanced',
+              subtitle: 'System-wide monitoring',
+              link: '/analytics',
+              color: COLORS.secondary,
+            },
+          ];
+        case 'intermediate':
+          return [
+            {
+              icon: FileText,
+              title: 'Tracked Bills',
+              value: '12',
+              subtitle: '3 with recent updates',
+              link: '/dashboard/bills',
+              color: COLORS.primary,
+            },
+            {
+              icon: AlertTriangle,
+              title: 'Active Alerts',
+              value: '2',
+              subtitle: 'Workarounds detected',
+              link: '/dashboard/alerts',
+              color: COLORS.accent,
+            },
+            {
+              icon: MessageSquare,
+              title: 'Discussions',
+              value: '5',
+              subtitle: 'Active conversations',
+              link: '/community',
+              color: COLORS.secondary,
+            },
+          ];
+        case 'novice':
+        default:
+          return [
+            {
+              icon: Sparkles,
+              title: 'Getting Started',
+              value: 'Level 1',
+              subtitle: 'Complete your profile',
+              link: '/onboarding',
+              color: COLORS.accent,
+            },
+            {
+              icon: FileText,
+              title: 'Trending Bills',
+              value: 'Top 3',
+              subtitle: 'Popular in your area',
+              link: '/bills/trending',
+              color: COLORS.primary,
+            },
+            {
+              icon: Users,
+              title: 'Community',
+              value: 'Join Now',
+              subtitle: 'Connect with others',
+              link: '/community',
+              color: COLORS.secondary,
+            },
+          ];
+      }
+    };
 
-  const quickStats = getPersonaContent();
+    const quickStats = getPersonaContent();
 
-  return (
-    <section ref={ref} className="py-20 bg-gradient-to-b from-white to-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 
-              className="text-6xl font-display font-bold text-gray-900 mb-4"
-              style={{
-                opacity: isVisible ? 1 : 0,
-                transform: `translateY(${isVisible ? 0 : 30}px)`,
-                transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-              }}
-            >
-              Welcome back, {user.display_name || user.first_name || 'Citizen'}!
-            </h2>
-            <p 
-              className="text-2xl font-body font-light text-gray-600"
-              style={{
-                opacity: isVisible ? 1 : 0,
-                transform: `translateY(${isVisible ? 0 : 30}px)`,
-                transition: prefersReducedMotion ? 'none' : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
-              }}
-            >
-              {persona === 'expert' 
-                ? 'Your professional legislative intelligence briefing is ready.'
-                : persona === 'intermediate'
-                  ? "Here's what's happening with your tracked legislation"
-                  : 'Ready to continue exploring how legislation affects your community?'}
-            </p>
-            <div className="mt-6">
-               <Badge variant="secondary" className="text-sm capitalize px-3 py-1">
-                 {persona} User
-               </Badge>
+    return (
+      <section ref={ref} className="py-20 bg-gradient-to-b from-white to-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2
+                className="text-6xl font-display font-bold text-gray-900 mb-4"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: `translateY(${isVisible ? 0 : 30}px)`,
+                  transition: prefersReducedMotion
+                    ? 'none'
+                    : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+                }}
+              >
+                Welcome back, {user.display_name || user.first_name || 'Citizen'}!
+              </h2>
+              <p
+                className="text-2xl font-body font-light text-gray-600"
+                style={{
+                  opacity: isVisible ? 1 : 0,
+                  transform: `translateY(${isVisible ? 0 : 30}px)`,
+                  transition: prefersReducedMotion
+                    ? 'none'
+                    : 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1) 0.1s',
+                }}
+              >
+                {persona === 'expert'
+                  ? 'Your professional legislative intelligence briefing is ready.'
+                  : persona === 'intermediate'
+                    ? "Here's what's happening with your tracked legislation"
+                    : 'Ready to continue exploring how legislation affects your community?'}
+              </p>
+              <div className="mt-6">
+                <Badge variant="secondary" className="text-sm capitalize px-3 py-1">
+                  {persona} User
+                </Badge>
+              </div>
             </div>
-          </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {quickStats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <Card
-                  key={index}
-                  className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden"
-                  style={{
-                    borderTop: `6px solid ${stat.color}`,
-                    opacity: isVisible ? 1 : 0,
-                    transform: `translateY(${isVisible ? 0 : 40}px)`,
-                    transition: prefersReducedMotion 
-                      ? 'none' 
-                      : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!prefersReducedMotion) {
-                      e.currentTarget.style.transform = 'translateY(-8px)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                  }}
-                >
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-3 text-2xl font-display">
-                      <div 
-                        className="p-3 rounded-xl group-hover:scale-110 transition-transform duration-300"
-                        style={{ backgroundColor: `${stat.color}15` }}
-                      >
-                        <Icon className="w-6 h-6" style={{ color: stat.color }} />
-                      </div>
-                      <span>{stat.title}</span>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-5xl font-display font-bold mb-2" style={{ color: stat.color }}>
-                      {stat.value}
-                    </div>
-                    <p className="text-sm font-body text-gray-600 mb-6">{stat.subtitle}</p>
-                    <Link to={stat.link}>
-                      <Button 
-                        variant="ghost" 
-                        className="w-full font-body font-semibold group-hover:bg-gray-50" 
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {quickStats.map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <Card
+                    key={index}
+                    className="border-0 shadow-xl hover:shadow-2xl transition-all duration-500 group overflow-hidden"
+                    style={{
+                      borderTop: `6px solid ${stat.color}`,
+                      opacity: isVisible ? 1 : 0,
+                      transform: `translateY(${isVisible ? 0 : 40}px)`,
+                      transition: prefersReducedMotion
+                        ? 'none'
+                        : `all 0.6s cubic-bezier(0.4, 0, 0.2, 1) ${index * 0.15}s`,
+                    }}
+                    onMouseEnter={e => {
+                      if (!prefersReducedMotion) {
+                        e.currentTarget.style.transform = 'translateY(-8px)';
+                      }
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                    }}
+                  >
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-3 text-2xl font-display">
+                        <div
+                          className="p-3 rounded-xl group-hover:scale-110 transition-transform duration-300"
+                          style={{ backgroundColor: `${stat.color}15` }}
+                        >
+                          <Icon className="w-6 h-6" style={{ color: stat.color }} />
+                        </div>
+                        <span>{stat.title}</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div
+                        className="text-5xl font-display font-bold mb-2"
                         style={{ color: stat.color }}
                       >
-                        View All
-                        <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                      </Button>
-                    </Link>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                        {stat.value}
+                      </div>
+                      <p className="text-sm font-body text-gray-600 mb-6">{stat.subtitle}</p>
+                      <Link to={stat.link}>
+                        <Button
+                          variant="ghost"
+                          className="w-full font-body font-semibold group-hover:bg-gray-50"
+                          style={{ color: stat.color }}
+                        >
+                          View All
+                          <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-  );
-});
+      </section>
+    );
+  }
+);
 PersonalizedDashboardPreview.displayName = 'PersonalizedDashboardPreview';
 
 // ... (leaving file content mostly same but updating component name and export)
 export default function EnhancedHomePage() {
-// ...
+  // ...
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   useUserProfile(user?.id);
@@ -1375,7 +1408,12 @@ export default function EnhancedHomePage() {
     () => [
       { icon: FileText, label: 'Bills Tracked', value: '500+', change: '↑ 15% this week' },
       { icon: Users, label: 'Active Citizens', value: '10,000+', change: '↑ 25% monthly' },
-      { icon: AlertTriangle, label: 'Workarounds Detected', value: '50+', change: '↑ 8% this month' },
+      {
+        icon: AlertTriangle,
+        label: 'Workarounds Detected',
+        value: '50+',
+        change: '↑ 8% this month',
+      },
       { icon: TrendingUp, label: 'Growing Daily', value: '↑ 25%', change: 'Consistent growth' },
     ],
     []
@@ -1401,7 +1439,7 @@ export default function EnhancedHomePage() {
     <>
       <TypographyStyles />
       <ScrollProgressIndicator />
-      
+
       {/* {process.env.NODE_ENV === 'development' && <PerformanceMonitor pageName="home" />} */}
 
       <div className="min-h-screen font-body bg-white">

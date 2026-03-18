@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Star, Bell, Eye, Share2, MessageSquare, TrendingUp, Calendar, User } from 'lucide-react';
-import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 import { globalApiClient } from '@client/infrastructure/api';

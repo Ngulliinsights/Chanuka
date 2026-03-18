@@ -1,5 +1,3 @@
- 
-
 /**
  * Browser Status Hook for React Components
  *
@@ -26,7 +24,7 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { browserCompatibilityManager, type CompatibilityStatus } from '@client/infrastructure';
+import { browserCompatibilityManager } from '@client/infrastructure';
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -318,7 +316,7 @@ BrowserCompatibilityDetails.displayName = 'BrowserCompatibilityDetails';
 /**
  * USAGE EXAMPLE:
  *
- * import { useBrowserCompatibilityStatus, BrowserCompatibilityWarning } from '@client/infrastructure/browser/useBrowserStatus';
+ * import { BrowserCompatibilityWarning} from '@client/infrastructure/browser/useBrowserStatus';
  *
  * export function App() {
  *   return (

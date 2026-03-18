@@ -255,4 +255,4 @@ export class QualityOptimizer {
 }
 
 // Export singleton
-export const qualityOptimizer = new QualityOptimizer();
+export 

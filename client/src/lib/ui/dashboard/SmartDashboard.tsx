@@ -25,7 +25,6 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import React from 'react';
 
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';

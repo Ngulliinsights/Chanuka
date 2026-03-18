@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MessageSquare, HelpCircle, Clock, Phone, MapPin } from 'lucide-react';
 
@@ -26,8 +25,14 @@ export default function SupportPage() {
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 mb-8">
             <h2 className="text-xl font-semibold mb-3">Need Quick Help?</h2>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Check our <Link to="/help" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">Help Center</Link> for
-              guides, tutorials, and answers to common questions about using Chanuka.
+              Check our{' '}
+              <Link
+                to="/help"
+                className="text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+              >
+                Help Center
+              </Link>{' '}
+              for guides, tutorials, and answers to common questions about using Chanuka.
             </p>
           </div>
         </div>
@@ -37,7 +42,7 @@ export default function SupportPage() {
       <section className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">Get in Touch</h2>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             {/* Email Support */}
             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
@@ -48,8 +53,8 @@ export default function SupportPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 For general inquiries and support requests
               </p>
-              <a 
-                href="mailto:support@chanuka.org" 
+              <a
+                href="mailto:support@chanuka.org"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 support@chanuka.org
@@ -65,8 +70,8 @@ export default function SupportPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 For technical issues and bug reports
               </p>
-              <a 
-                href="mailto:tech@chanuka.org" 
+              <a
+                href="mailto:tech@chanuka.org"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 tech@chanuka.org
@@ -82,8 +87,8 @@ export default function SupportPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Call us during business hours (EAT)
               </p>
-              <a 
-                href="tel:+254712345678" 
+              <a
+                href="tel:+254712345678"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 +254 712 345 678
@@ -102,8 +107,8 @@ export default function SupportPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-4">
                 Join discussions and get help from the community
               </p>
-              <Link 
-                to="/community" 
+              <Link
+                to="/community"
                 className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
               >
                 Visit Community Hub →
@@ -126,8 +131,10 @@ export default function SupportPage() {
                 <div>
                   <h3 className="text-xl font-semibold mb-2">Chanuka Platform</h3>
                   <p className="text-gray-600 dark:text-gray-400">
-                    Westlands, Nairobi<br />
-                    Kenya<br />
+                    Westlands, Nairobi
+                    <br />
+                    Kenya
+                    <br />
                     P.O. Box 12345-00100
                   </p>
                   <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">
@@ -144,7 +151,7 @@ export default function SupportPage() {
       <section className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
-          
+
           <div className="space-y-4">
             <details className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 group">
               <summary className="font-semibold cursor-pointer flex items-center justify-between">
@@ -152,9 +159,10 @@ export default function SupportPage() {
                 <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
-                Click the "Sign Up" button in the navigation bar and follow the registration process.
-                You'll need to provide a valid email address and create a secure password. Once registered,
-                you can start tracking bills from the National Assembly, Senate, and County Assemblies.
+                Click the "Sign Up" button in the navigation bar and follow the registration
+                process. You'll need to provide a valid email address and create a secure password.
+                Once registered, you can start tracking bills from the National Assembly, Senate,
+                and County Assemblies.
               </p>
             </details>
 
@@ -164,9 +172,9 @@ export default function SupportPage() {
                 <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
-                Navigate to the Bills Portal and use the filter options to select your county. You can track
-                bills from all 47 counties, the National Assembly, and the Senate. Save bills to your dashboard
-                to receive notifications about updates and progress.
+                Navigate to the Bills Portal and use the filter options to select your county. You
+                can track bills from all 47 counties, the National Assembly, and the Senate. Save
+                bills to your dashboard to receive notifications about updates and progress.
               </p>
             </details>
 
@@ -176,10 +184,12 @@ export default function SupportPage() {
                 <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
-                Yes, we take security seriously and comply with the Kenya Data Protection Act 2019. All data
-                is encrypted in transit and at rest. Read our{' '}
-                <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>
-                {' '}for complete details on how we protect your information.
+                Yes, we take security seriously and comply with the Kenya Data Protection Act 2019.
+                All data is encrypted in transit and at rest. Read our{' '}
+                <a href="/privacy" className="text-blue-600 dark:text-blue-400 hover:underline">
+                  Privacy Policy
+                </a>{' '}
+                for complete details on how we protect your information.
               </p>
             </details>
 
@@ -189,8 +199,9 @@ export default function SupportPage() {
                 <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
-                Yes! Chanuka supports both English and Kiswahili. Use the language switcher in the navigation
-                menu to toggle between languages. We're committed to making civic engagement accessible to all Kenyans.
+                Yes! Chanuka supports both English and Kiswahili. Use the language switcher in the
+                navigation menu to toggle between languages. We're committed to making civic
+                engagement accessible to all Kenyans.
               </p>
             </details>
 
@@ -201,11 +212,14 @@ export default function SupportPage() {
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
                 Email us at{' '}
-                <a href="mailto:tech@chanuka.org" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <a
+                  href="mailto:tech@chanuka.org"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
                   tech@chanuka.org
-                </a>
-                {' '}with a detailed description of the issue, including steps to reproduce, browser information,
-                and any error messages you see. Include screenshots if possible.
+                </a>{' '}
+                with a detailed description of the issue, including steps to reproduce, browser
+                information, and any error messages you see. Include screenshots if possible.
               </p>
             </details>
 
@@ -216,11 +230,15 @@ export default function SupportPage() {
               </summary>
               <p className="mt-4 text-gray-600 dark:text-gray-400">
                 Visit the{' '}
-                <a href="/community/expert-verification" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <a
+                  href="/community/expert-verification"
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
                   Expert Verification
-                </a>
-                {' '}page to learn about the requirements and application process. We verify legal professionals,
-                policy experts, and civic leaders who can provide authoritative analysis of Kenyan legislation.
+                </a>{' '}
+                page to learn about the requirements and application process. We verify legal
+                professionals, policy experts, and civic leaders who can provide authoritative
+                analysis of Kenyan legislation.
               </p>
             </details>
           </div>
@@ -255,15 +273,21 @@ export default function SupportPage() {
                 <ul className="space-y-2 text-gray-700 dark:text-gray-300">
                   <li className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-red-500 rounded-full"></span>
-                    <span><strong>Critical issues:</strong> Within 4 hours</span>
+                    <span>
+                      <strong>Critical issues:</strong> Within 4 hours
+                    </span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
-                    <span><strong>Technical support:</strong> Within 24 hours</span>
+                    <span>
+                      <strong>Technical support:</strong> Within 24 hours
+                    </span>
                   </li>
                   <li className="flex items-center space-x-2">
                     <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    <span><strong>General inquiries:</strong> Within 48 hours</span>
+                    <span>
+                      <strong>General inquiries:</strong> Within 48 hours
+                    </span>
                   </li>
                 </ul>
                 <p className="text-sm text-gray-500 dark:text-gray-500 mt-4">

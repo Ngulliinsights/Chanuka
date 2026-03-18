@@ -1,10 +1,9 @@
 /**
  * Position Tracking Chart Component
- * 
+ *
  * Visualizes how user positions change over time.
  */
 
-import React from 'react';
 import type { PositionTracking } from '../types';
 
 interface PositionTrackingChartProps {
@@ -58,8 +57,9 @@ export function PositionTrackingChart({ tracking, className = '' }: PositionTrac
   };
 
   const currentPosition = tracking.positions[tracking.positions.length - 1];
-  const previousPosition = tracking.positions.length > 1 ? tracking.positions[tracking.positions.length - 2] : null;
-  
+  const previousPosition =
+    tracking.positions.length > 1 ? tracking.positions[tracking.positions.length - 2] : null;
+
   const hasChanged = previousPosition && previousPosition.position !== currentPosition.position;
 
   return (
@@ -77,12 +77,12 @@ export function PositionTrackingChart({ tracking, className = '' }: PositionTrac
       {/* Timeline Visualization */}
       <div className="relative mb-6">
         <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200" />
-        
+
         <div className="relative flex justify-between items-center">
           {tracking.positions.map((pos, idx) => {
             const value = getPositionValue(pos.position);
             const yOffset = value * 30; // Vertical offset based on position
-            
+
             return (
               <div
                 key={idx}
@@ -113,43 +113,43 @@ export function PositionTrackingChart({ tracking, className = '' }: PositionTrac
       <div className="space-y-2 mt-8">
         <h4 className="text-sm font-semibold text-gray-700 mb-2">History</h4>
         <div className="max-h-40 overflow-y-auto space-y-2">
-          {tracking.positions.slice().reverse().map((pos, idx) => (
-            <div
-              key={idx}
-              className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded"
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className={`
+          {tracking.positions
+            .slice()
+            .reverse()
+            .map((pos, idx) => (
+              <div
+                key={idx}
+                className="flex items-center justify-between text-sm p-2 bg-gray-50 rounded"
+              >
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`
                     w-3 h-3 rounded-full
                     ${pos.position === 'support' ? 'bg-green-500' : ''}
                     ${pos.position === 'oppose' ? 'bg-red-500' : ''}
                     ${pos.position === 'neutral' ? 'bg-gray-400' : ''}
                   `}
-                />
-                <span className={`font-medium ${getPositionColor(pos.position)}`}>
-                  {getPositionLabel(pos.position)}
-                </span>
-                <span className="text-gray-500">
-                  (Strength: {(pos.strength * 100).toFixed(0)}%)
-                </span>
+                  />
+                  <span className={`font-medium ${getPositionColor(pos.position)}`}>
+                    {getPositionLabel(pos.position)}
+                  </span>
+                  <span className="text-gray-500">
+                    (Strength: {(pos.strength * 100).toFixed(0)}%)
+                  </span>
+                </div>
+                <span className="text-xs text-gray-500">{formatDate(pos.timestamp)}</span>
               </div>
-              <span className="text-xs text-gray-500">
-                {formatDate(pos.timestamp)}
-              </span>
-            </div>
-          ))}
+            ))}
         </div>
       </div>
 
       {/* Change Indicator */}
       {hasChanged && (
         <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-          <p className="font-medium text-blue-800">
-            📊 Position Changed
-          </p>
+          <p className="font-medium text-blue-800">📊 Position Changed</p>
           <p className="text-blue-600 text-xs mt-1">
-            From {getPositionLabel(previousPosition.position)} to {getPositionLabel(currentPosition.position)}
+            From {getPositionLabel(previousPosition.position)} to{' '}
+            {getPositionLabel(currentPosition.position)}
           </p>
         </div>
       )}
@@ -163,14 +163,17 @@ export function PositionTrackingChart({ tracking, className = '' }: PositionTrac
         <div>
           <p className="text-xs text-gray-600">Avg Strength</p>
           <p className="text-lg font-bold">
-            {(tracking.positions.reduce((sum, p) => sum + p.strength, 0) / tracking.positions.length * 100).toFixed(0)}%
+            {(
+              (tracking.positions.reduce((sum, p) => sum + p.strength, 0) /
+                tracking.positions.length) *
+              100
+            ).toFixed(0)}
+            %
           </p>
         </div>
         <div>
           <p className="text-xs text-gray-600">Consistency</p>
-          <p className="text-lg font-bold">
-            {hasChanged ? 'Variable' : 'Stable'}
-          </p>
+          <p className="text-lg font-bold">{hasChanged ? 'Variable' : 'Stable'}</p>
         </div>
       </div>
     </div>
