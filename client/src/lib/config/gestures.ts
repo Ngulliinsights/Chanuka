@@ -58,4 +58,4 @@ export const gestureConfig: GestureConfig = {
 export default gestureConfig;
 
 
-export const GESTURE_CONFIG = gestureConfig;
+export 

@@ -123,7 +123,7 @@ export function usePerformanceMonitor(
         timestamp: new Date(),
         category: 'memory',
         url: window.location.href,
-        metadata: { component: componentName }
+        metadata: { component: componentName },
       });
     }
 
@@ -157,7 +157,7 @@ export function usePerformanceMonitor(
         timestamp: new Date(),
         category: 'custom',
         url: window.location.href,
-        metadata: { component: componentName }
+        metadata: { component: componentName },
       });
     },
     [componentName]
@@ -228,13 +228,15 @@ export function usePerformanceBudget(
 
       const hasViolations = failingMetrics.length > 0;
       setIsWithinBudget(!hasViolations);
-      setViolations(failingMetrics.map((m: any) => `${m.metric}: ${m.value.toFixed(2)} > ${m.budget}`));
+      setViolations(
+        failingMetrics.map((m: any) => `${m.metric}: ${m.value.toFixed(2)} > ${m.budget}`)
+      );
       setLastCheckTime(Date.now());
 
       if (enableAlerts && hasViolations) {
         logger.warn(`Performance budget violations detected in ${componentName}`, {
           violations: failingMetrics.length,
-          metrics: failingMetrics.map((m: any) => m.metric)
+          metrics: failingMetrics.map((m: any) => m.metric),
         });
       }
     } catch (error) {
@@ -279,10 +281,13 @@ export function useCoreWebVitals(): UseCoreWebVitalsReturn {
   useEffect(() => {
     const checkMetrics = () => {
       const webVitals = monitor.getWebVitalsMetrics();
-      const metricsMap = webVitals.reduce((acc: any, m: any) => {
-        acc[m.name.toLowerCase()] = m.value;
-        return acc;
-      }, {} as Record<string, number>);
+      const metricsMap = webVitals.reduce(
+        (acc: any, m: any) => {
+          acc[m.name.toLowerCase()] = m.value;
+          return acc;
+        },
+        {} as Record<string, number>
+      );
 
       const newMetrics = {
         lcp: metricsMap['lcp'],
@@ -354,7 +359,7 @@ export function usePerformanceAlert(
         type,
         description,
         metrics,
-        component: componentName
+        component: componentName,
       });
       // In future: monitor.getAlertsManager().createAlert(...) if exposed
     },
@@ -366,10 +371,10 @@ export function usePerformanceAlert(
    */
   const updateAlertConfig = useCallback(
     (config: Partial<{ slack: boolean; email: boolean; github: boolean }>) => {
-       // Map to match PerformanceConfig['alerts'] structure if possible, or just pass safe subset
-       // The config types might not strictly match, so we cast or adapt as needed
-       // Assuming partial update is supported
-       monitor.getAlertsManager().updateConfig(config as unknown);
+      // Map to match PerformanceConfig['alerts'] structure if possible, or just pass safe subset
+      // The config types might not strictly match, so we cast or adapt as needed
+      // Assuming partial update is supported
+      monitor.getAlertsManager().updateConfig(config as unknown);
     },
     []
   );

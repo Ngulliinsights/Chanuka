@@ -212,7 +212,7 @@ export interface DashboardPreferences {
   hiddenWidgets?: string[];
   /** Custom preferences (key-value pairs) */
   custom?: Record<string, unknown>;
-  
+
   // Legacy compatibility props
   pinnedSections?: string[];
   hiddenSections?: string[];
@@ -255,7 +255,7 @@ export interface DashboardConfig {
   theme?: any;
   refreshInterval?: number;
   enableAutoRefresh?: boolean;
-  
+
   // Dashboard application configuration properties
   /** Maximum number of action items to display */
   maxActionItems?: number;
@@ -404,9 +404,7 @@ export function isDashboardConfig(value: unknown): value is DashboardConfig {
   if (!value || typeof value !== 'object') return false;
   const obj = value as Record<string, unknown>;
   return (
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    isDashboardLayout(obj.layout)
+    typeof obj.id === 'string' && typeof obj.name === 'string' && isDashboardLayout(obj.layout)
   );
 }
 

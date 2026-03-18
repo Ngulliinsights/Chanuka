@@ -139,10 +139,7 @@ export const CACHE_CONFIG = {
 } as const;
 
 // Additional exports for backward compatibility
-export const API_BASE_URL = defaultApiConfig.baseUrl;
-export const API_TIMEOUT = defaultApiConfig.timeout;
-export const MAX_RETRIES = defaultApiConfig.retries;
-
+export export export 
 // Type exports
 export type ApiEndpoints = typeof API_ENDPOINTS;
 export type RetryConfigType = keyof typeof RETRY_CONFIG;
@@ -152,23 +149,17 @@ export type TimeoutType = keyof typeof TIMEOUT_CONFIG;
 /**
  * Helper function to construct full URLs with type safety
  */
-export const buildApiUrl = (endpoint: string, config: unknown = defaultApiConfig): string => {
-  const baseUrl = config.baseUrl.replace(/\/$/, '');
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+export   const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   return `${baseUrl}${cleanEndpoint}`;
 };
 
 /**
  * Helper to determine if an HTTP status code indicates success
  */
-export const isSuccessStatus = (status: number): boolean => {
-  return status >= 200 && status < 300;
-};
+export };
 
 /**
  * Helper to determine if an error should trigger a retry
  */
-export const shouldRetryError = (status: number): boolean => {
-  const retryableCodes = [408, 429, 500, 502, 503, 504];
-  return retryableCodes.includes(status);
+export   return retryableCodes.includes(status);
 };

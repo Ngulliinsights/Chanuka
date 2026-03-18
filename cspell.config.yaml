@@ -17,6 +17,8 @@ words:
   - unregistration
   - fontobject
   - nosniff
+  - webhint
+  - impls
   - Segoe
   - xlarge
   - labelledby
@@ -48,6 +50,7 @@ words:
   - heathcare
   - helthcare
   - eduction
+  - Standardizer
   - enviornment
   - climat
   - chang

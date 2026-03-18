@@ -1,7 +1,7 @@
 /**
  * Cleanup Hook Suite
  * Provides automatic cleanup for resources, side effects, and async operations
- * 
+ *
  * Consolidated from multiple implementations to provide comprehensive cleanup utilities:
  * - useCleanup: Basic cleanup function management
  * - useResourceCleanup: Named resource cleanup with timeout support
@@ -44,7 +44,7 @@ export interface EventListenerCleanupOptions extends CleanupOptions {
 
 /**
  * useCleanup Hook
- * 
+ *
  * A utility hook to manage cleanup operations and prevent memory leaks.
  * Provides a centralized way to register cleanup functions that will be
  * called when the component unmounts.
@@ -147,7 +147,7 @@ export function useCleanup(
 
 /**
  * useResourceCleanup Hook
- * 
+ *
  * Enhanced cleanup for named resources with timeout support and logging.
  * Useful for tracking cleanup of specific resources like connections,
  * subscriptions, or file handles.
@@ -179,20 +179,29 @@ export function useResourceCleanup(
     if (isCleaning) return;
 
     setIsCleaning(true);
-    logger.info(`Starting cleanup for resource: ${resourceName}`, { component: 'useResourceCleanup' });
+    logger.info(`Starting cleanup for resource: ${resourceName}`, {
+      component: 'useResourceCleanup',
+    });
 
     if (options.timeout) {
       cleanupTimerRef.current = setTimeout(() => {
-        logger.warn(`Resource cleanup timeout for: ${resourceName}`, { component: 'useResourceCleanup' });
+        logger.warn(`Resource cleanup timeout for: ${resourceName}`, {
+          component: 'useResourceCleanup',
+        });
         setIsCleaning(false);
       }, options.timeout);
     }
 
     try {
       cleanup();
-      logger.info(`Successfully cleaned up resource: ${resourceName}`, { component: 'useResourceCleanup' });
+      logger.info(`Successfully cleaned up resource: ${resourceName}`, {
+        component: 'useResourceCleanup',
+      });
     } catch (error) {
-      logger.error(`Failed to cleanup resource: ${resourceName}`, { error, component: 'useResourceCleanup' });
+      logger.error(`Failed to cleanup resource: ${resourceName}`, {
+        error,
+        component: 'useResourceCleanup',
+      });
     } finally {
       if (cleanupTimerRef.current) {
         clearTimeout(cleanupTimerRef.current);
@@ -225,7 +234,7 @@ export function useResourceCleanup(
 
 /**
  * useEventListenerCleanup Hook
- * 
+ *
  * Specialized cleanup for event listeners with automatic removal on unmount.
  *
  * @example
@@ -235,9 +244,7 @@ export function useResourceCleanup(
  *   listener: handleResize,
  * });
  */
-export function useEventListenerCleanup(
-  options: EventListenerCleanupOptions
-): {
+export function useEventListenerCleanup(options: EventListenerCleanupOptions): {
   cleanup: () => void;
   addCleanup: (fn: CleanupFunction) => void;
   removeCleanup: (fn: CleanupFunction) => void;
@@ -267,9 +274,7 @@ export function useEventListenerCleanup(
  * @example
  * const { getController, abort } = useAbortController();
  *
- * const fetchData = async () => {
- *   const controller = getController();
- *   const response = await fetch(url, { signal: controller.signal });
+ *  *   const response = await fetch(url, { signal: controller.signal });
  *   // Process response...
  * };
  */
@@ -347,11 +352,7 @@ export function useAbortController() {
  * @example
  * const { safeAsync, abort } = useAsyncOperation();
  *
- * const loadData = async () => {
- *   await safeAsync(
- *     async (signal) => {
- *       const response = await fetch(url, { signal });
- *       return response.json();
+ *  *       return response.json();
  *     },
  *     (data) => setData(data),
  *     (error) => setError(error.message)

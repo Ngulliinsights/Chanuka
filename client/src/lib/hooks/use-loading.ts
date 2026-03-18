@@ -1,14 +1,13 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { useCallback } from 'react';
-import { 
-  RootState, 
+import {
+  RootState,
   AppDispatch,
-  selectLoadingOperation,
   startLoadingOperation,
   completeLoadingOperation,
   retryLoadingOperation,
   setGlobalLoading,
-  resetLoadingState
+  resetLoadingState,
 } from '@client/infrastructure/store';
 import { LoadingOperation } from '@client/lib/types/loading';
 
@@ -20,19 +19,16 @@ export function useLoading() {
   const dispatch = useDispatch<AppDispatch>();
   const state = useSelector((state: RootState) => state.loading);
 
-  const getOperation = useCallback(
-    (id: string) => state.operations[id],
-    [state.operations]
-  );
+  const getOperation = useCallback((id: string) => state.operations[id], [state.operations]);
 
   const startOperation = useCallback(
-    (operation: Parameters<typeof startLoadingOperation>[0]) => 
+    (operation: Parameters<typeof startLoadingOperation>[0]) =>
       dispatch(startLoadingOperation(operation)),
     [dispatch]
   );
 
   const completeOperation = useCallback(
-    (params: { id: string; success: boolean; error?: string }) => 
+    (params: { id: string; success: boolean; error?: string }) =>
       dispatch(completeLoadingOperation(params)),
     [dispatch]
   );

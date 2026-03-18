@@ -19,6 +19,7 @@ This document provides comprehensive documentation for the standardized hooks ar
 ## Architecture Overview
 
 ### Directory Structure
+
 ```
 client/src/hooks/
 ├── index.ts                    # Main exports
@@ -53,6 +54,7 @@ client/src/hooks/
 ## Core Hooks
 
 ### useToast
+
 Toast notification system with reducer pattern.
 
 ```typescript
@@ -81,6 +83,7 @@ function MyComponent() {
 ```
 
 ### useErrorRecovery
+
 Intelligent error recovery with configurable strategies.
 
 ```typescript
@@ -106,6 +109,7 @@ function DataComponent() {
 ```
 
 ### useOfflineDetection
+
 Comprehensive offline detection with connection quality assessment.
 
 ```typescript
@@ -125,6 +129,7 @@ function NetworkStatus() {
 ```
 
 ### useSystem
+
 System-level information and health monitoring.
 
 ```typescript
@@ -150,6 +155,7 @@ function SystemMonitor() {
 ## Error Handling
 
 ### useErrorHandler
+
 Unified error handling across all hooks.
 
 ```typescript
@@ -178,12 +184,13 @@ function ErrorHandlingExample() {
 ```
 
 ### Error Recovery Strategies
+
 Customizable recovery strategies for different error types.
 
 ```typescript
 const customStrategy: ErrorRecoveryStrategy = {
   id: 'custom-recovery',
-  condition: (error) => error.message.includes('timeout'),
+  condition: error => error.message.includes('timeout'),
   action: async () => {
     // Custom recovery logic
     return true;
@@ -199,6 +206,7 @@ const { addStrategy } = useErrorHandler([customStrategy]);
 ## Performance Optimization
 
 ### usePerformanceMonitor
+
 Built-in performance monitoring for hooks.
 
 ```typescript
@@ -212,10 +220,10 @@ function PerformanceExample() {
     // Expensive computation
     const result = await heavyComputation();
     end();
-    
+
     const metrics = getMetrics();
     console.log(`Operation took ${metrics.duration}ms`);
-    
+
     return result;
   };
 
@@ -224,6 +232,7 @@ function PerformanceExample() {
 ```
 
 ### useDebouncedCallback
+
 Debounced callbacks for performance optimization.
 
 ```typescript
@@ -247,6 +256,7 @@ function SearchComponent() {
 ```
 
 ### useCachedValue
+
 Intelligent caching with TTL and size limits.
 
 ```typescript
@@ -271,6 +281,7 @@ function DataComponent() {
 ## Hook Patterns
 
 ### Reducer Pattern
+
 For complex state management with predictable transitions.
 
 ```typescript
@@ -290,6 +301,7 @@ function ReducerExample() {
 ```
 
 ### Callback Pattern
+
 For performance optimization through memoization.
 
 ```typescript
@@ -307,6 +319,7 @@ function CallbackExample() {
 ```
 
 ### Effect Pattern
+
 For side effects and resource management.
 
 ```typescript
@@ -323,6 +336,7 @@ function EffectExample() {
 ```
 
 ### Strategy Pattern
+
 For configurable behavior through multiple algorithms.
 
 ```typescript
@@ -360,6 +374,7 @@ function StrategyExample() {
 ## Usage Examples
 
 ### Basic Hook Usage
+
 ```typescript
 import { useToast, useErrorHandler } from '@client/hooks';
 
@@ -382,6 +397,7 @@ function BasicExample() {
 ```
 
 ### Advanced Error Recovery
+
 ```typescript
 import { useErrorRecovery, useErrorHandler } from '@client/hooks';
 
@@ -408,6 +424,7 @@ function AdvancedExample() {
 ```
 
 ### Performance Monitoring
+
 ```typescript
 import { usePerformanceMonitor, useDebouncedCallback } from '@client/hooks';
 
@@ -431,6 +448,7 @@ function PerformanceExample() {
 ## Migration Guide
 
 ### From Legacy Hooks
+
 ```typescript
 // Before (legacy)
 import { useToast } from '../shared/hooks';
@@ -443,6 +461,7 @@ import { useToastShared } from '@client/hooks';
 ```
 
 ### From Custom Error Handling
+
 ```typescript
 // Before (custom error handling)
 try {
@@ -458,6 +477,7 @@ const result = await retry(operation, 3);
 ```
 
 ### From Manual Performance Optimization
+
 ```typescript
 // Before (manual optimization)
 let timeoutId: NodeJS.Timeout;
@@ -473,30 +493,35 @@ const debouncedFn = useDebouncedCallback(callback, 300);
 ## Best Practices
 
 ### 1. Error Handling
+
 - Always use `useErrorHandler` for consistent error handling
 - Implement appropriate recovery strategies
 - Log errors with context for debugging
 - Provide user-friendly error messages
 
 ### 2. Performance Optimization
+
 - Use `useDebouncedCallback` for user input handling
 - Implement caching with `useCachedValue` for expensive computations
 - Monitor performance with `usePerformanceMonitor`
 - Clean up resources in effects
 
 ### 3. State Management
+
 - Use reducer pattern for complex state
 - Keep state minimal and focused
 - Use memoization for expensive calculations
 - Avoid state mutations
 
 ### 4. Testing
+
 - Test all error scenarios
 - Include performance tests for critical paths
 - Test memory management and cleanup
 - Verify backward compatibility
 
 ### 5. TypeScript Usage
+
 - Always provide explicit types
 - Use utility types for complex interfaces
 - Leverage type inference where appropriate
@@ -505,6 +530,7 @@ const debouncedFn = useDebouncedCallback(callback, 300);
 ## Testing
 
 ### Test Structure
+
 ```
 client/src/hooks/__tests__/
 ├── unit/                    # Unit tests for individual hooks
@@ -520,6 +546,7 @@ client/src/hooks/__tests__/
 ```
 
 ### Running Tests
+
 ```bash
 # Run all hook tests
 npm test -- hooks
@@ -535,6 +562,7 @@ npm test -- hooks/__tests__/performance/
 ```
 
 ### Test Coverage Requirements
+
 - **Minimum Coverage**: 90%
 - **Critical Paths**: 100%
 - **Error Scenarios**: 100%

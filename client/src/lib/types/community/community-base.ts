@@ -288,7 +288,15 @@ export interface ExpertAffiliation {
   readonly expertId?: number;
   readonly organization: string;
   readonly role: string;
-  readonly type: 'academic' | 'government' | 'nonprofit' | 'corporate' | 'independent' | 'ngo' | 'private' | 'judicial';
+  readonly type:
+    | 'academic'
+    | 'government'
+    | 'nonprofit'
+    | 'corporate'
+    | 'independent'
+    | 'ngo'
+    | 'private'
+    | 'judicial';
   readonly startDate?: string;
   readonly endDate?: string;
   readonly verified: boolean;
@@ -302,7 +310,13 @@ export interface ExpertContribution {
   readonly id: string | number;
   readonly expertId: string | number;
   readonly billId?: string | number;
-  readonly type: 'analysis' | 'insight' | 'review' | 'testimony' | 'comment' | 'amendment_suggestion';
+  readonly type:
+    | 'analysis'
+    | 'insight'
+    | 'review'
+    | 'testimony'
+    | 'comment'
+    | 'amendment_suggestion';
   readonly title?: string;
   readonly content: string;
   readonly createdAt: string;
@@ -416,7 +430,14 @@ export interface VerificationWorkflow {
 /**
  * Expert verification type enumeration
  */
-export type ExpertVerificationType = 'official' | 'domain' | 'identity' | 'academic' | 'professional' | 'government' | 'independent';
+export type ExpertVerificationType =
+  | 'official'
+  | 'domain'
+  | 'identity'
+  | 'academic'
+  | 'professional'
+  | 'government'
+  | 'independent';
 
 /**
  * Contribution type enumeration
@@ -881,7 +902,6 @@ export function isComment(value: unknown): value is Comment {
     obj.votes !== undefined
   );
 }
-
 
 /**
  * Check if a value is an Expert

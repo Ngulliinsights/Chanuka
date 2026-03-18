@@ -87,10 +87,7 @@ export type {
   PaginatedAnalyticsResponse,
 } from './bill-analytics';
 
-export {
-  isBillAnalytics,
-  isUserEngagementSummary,
-} from './bill-analytics';
+export { isBillAnalytics, isUserEngagementSummary } from './bill-analytics';
 
 // ============================================================================
 // Bill Services Types
@@ -128,10 +125,7 @@ export type {
   CachedItem as BillCachedItem,
 } from './bill-services';
 
-export {
-  isPaginatedBillsResponse,
-  isBillEngagementMetrics,
-} from './bill-services';
+export { isPaginatedBillsResponse, isBillEngagementMetrics } from './bill-services';
 
 // ============================================================================
 // Authentication and User Types
@@ -167,13 +161,7 @@ export type {
   ActivityLog,
 } from './auth-types';
 
-export {
-  UserRoleEnum,
-  isUser,
-  isExtendedUser,
-  isExpertUser,
-  isLegislatorUser,
-} from './auth-types';
+export { UserRoleEnum, isUser, isExtendedUser, isExpertUser, isLegislatorUser } from './auth-types';
 
 // ============================================================================
 // Utility Functions
@@ -257,8 +245,23 @@ export function getUserRoleLabel(role: string): string {
  */
 export function hasPermission(user: any, permission: string): boolean {
   const rolePermissions: Record<string, readonly string[]> = {
-    admin: ['create:comment', 'edit:comment', 'delete:comment', 'create:analysis', 'moderate:content', 'view:analytics', 'manage:users', 'manage:system'],
-    expert: ['create:comment', 'edit:comment', 'create:analysis', 'submit:insight', 'view:analytics'],
+    admin: [
+      'create:comment',
+      'edit:comment',
+      'delete:comment',
+      'create:analysis',
+      'moderate:content',
+      'view:analytics',
+      'manage:users',
+      'manage:system',
+    ],
+    expert: [
+      'create:comment',
+      'edit:comment',
+      'create:analysis',
+      'submit:insight',
+      'view:analytics',
+    ],
     legislator: ['create:comment', 'edit:comment', 'view:draft'],
     citizen: ['create:comment', 'track:bills'],
     guest: [],
@@ -360,8 +363,7 @@ export function canDeleteBill(user: any, _bill: any): boolean {
  * Format engagement metrics
  *
  * @example
- * const formatted = formatEngagementMetrics(metrics);
- */
+ *  */
 export function formatEngagementMetrics(metrics: any): Record<string, string> {
   return {
     views: `${metrics.views?.toLocaleString() || '0'} views`,
@@ -376,8 +378,7 @@ export function formatEngagementMetrics(metrics: any): Record<string, string> {
  * Get days until deadline
  *
  * @example
- * const days = getDaysUntilDeadline(deadline);
- */
+ *  */
 export function getDaysUntilDeadline(deadline: string): number {
   const now = new Date();
   const deadlineDate = new Date(deadline);

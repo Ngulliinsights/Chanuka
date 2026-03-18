@@ -124,7 +124,10 @@ export interface UseDashboardAnalyticsResult {
   };
 
   // Analytics actions
-  trackWidgetInteraction: (widgetId: string, interactionType: 'view' | 'click' | 'update' | 'remove') => void;
+  trackWidgetInteraction: (
+    widgetId: string,
+    interactionType: 'view' | 'click' | 'update' | 'remove'
+  ) => void;
   trackActionCompletion: (actionId: string) => void;
   trackTopicView: (topicId: string) => void;
 

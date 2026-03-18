@@ -2,7 +2,7 @@
  * Bill Domain Types - Client Layer
  *
  * Re-exports canonical Bill types from shared and adds client-specific extensions.
- * 
+ *
  * IMPORTANT: This file re-exports from @shared/types (canonical source).
  * Do not redefine Bill, Sponsor, or other core types here.
  *
@@ -137,8 +137,6 @@ export interface BillEngagement {
   readonly votes?: number;
   readonly engagement_score?: number;
 }
-
-
 
 // ============================================================================
 // Bill Analysis (Client-Specific)

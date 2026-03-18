@@ -19,12 +19,7 @@ export function LiveRegion({ message, politeness = 'polite', clearAfter = 5000 }
   }, [message, clearAfter]);
 
   return (
-    <div
-      role="status"
-      aria-live={politeness}
-      aria-atomic="true"
-      className="sr-only"
-    >
+    <div role="status" aria-live={politeness} aria-atomic="true" className="sr-only">
       {currentMessage}
     </div>
   );

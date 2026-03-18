@@ -5,6 +5,7 @@ This guide explains how to implement client-side validation using shared Zod sch
 ## Overview
 
 Client-side validation provides:
+
 - Immediate feedback to users
 - Reduced server load
 - Better user experience
@@ -50,11 +51,11 @@ function RegistrationForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         throw new Error('Registration failed');
       }
-      
+
       // Handle success
     } catch (error) {
       // Handle error
@@ -176,7 +177,7 @@ function EmailAvailabilityCheck() {
         `/api/users/check-email?email=${encodeURIComponent(email)}`
       );
       const data = await response.json();
-      
+
       if (data.exists) {
         throw new Error('Email already exists');
       }
@@ -215,7 +216,7 @@ import { BillSchema } from '@shared/validation';
 
 function validateBillData(billData: unknown) {
   const result = validateData(BillSchema, billData);
-  
+
   if (result.success) {
     // Use result.data (type-safe)
     console.log('Valid bill:', result.data);
@@ -223,7 +224,7 @@ function validateBillData(billData: unknown) {
   } else {
     // Handle result.errors
     console.error('Validation errors:', result.errors);
-    result.errors?.forEach((error) => {
+    result.errors?.forEach(error => {
       console.error(`${error.field}: ${error.message}`);
     });
     return null;
@@ -241,15 +242,15 @@ import { UserSchema } from '@shared/validation';
 
 function checkEmailFormat(email: string) {
   const result = validateField(UserSchema, 'email', email);
-  
+
   if (!result.success) {
     // Show errors
-    result.errors?.forEach((error) => {
+    result.errors?.forEach(error => {
       console.error(error.message);
     });
     return false;
   }
-  
+
   return true;
 }
 ```
@@ -293,7 +294,7 @@ function CommentForm() {
             </FormItem>
           )}
         />
-        
+
         <button type="submit">Submit Comment</button>
       </form>
     </Form>
@@ -360,29 +361,29 @@ Prevent multiple submissions:
 Merge server errors with client errors:
 
 ```typescript
-const onSubmit = async (data) => {
+const onSubmit = async data => {
   try {
     const response = await fetch('/api/users', {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    
+
     if (!response.ok) {
       const error = await response.json();
-      
+
       // Set server validation errors
       if (error.validationErrors) {
-        error.validationErrors.forEach((err) => {
+        error.validationErrors.forEach(err => {
           form.setError(err.field, {
             type: 'server',
             message: err.message,
           });
         });
       }
-      
+
       return;
     }
-    
+
     // Handle success
   } catch (error) {
     // Handle network error
@@ -426,7 +427,7 @@ function MultiStepForm() {
         {step === 1 && <Step1Fields />}
         {step === 2 && <Step2Fields />}
         {step === 3 && <Step3Fields />}
-        
+
         {step < 3 && (
           <button type="button" onClick={nextStep}>
             Next

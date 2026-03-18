@@ -34,27 +34,11 @@ export const PASSWORD_STRENGTH_LEVELS = {
   STRONG: 4,
 } as const;
 
-export const PASSWORD_STRENGTH_LABELS = {
-  [PASSWORD_STRENGTH_LEVELS.VERY_WEAK]: 'Very Weak',
-  [PASSWORD_STRENGTH_LEVELS.WEAK]: 'Weak',
-  [PASSWORD_STRENGTH_LEVELS.FAIR]: 'Fair',
-  [PASSWORD_STRENGTH_LEVELS.GOOD]: 'Good',
-  [PASSWORD_STRENGTH_LEVELS.STRONG]: 'Strong',
-} as const;
-
-export const PASSWORD_STRENGTH_COLORS = {
-  [PASSWORD_STRENGTH_LEVELS.VERY_WEAK]: '#ef4444', // red-500
-  [PASSWORD_STRENGTH_LEVELS.WEAK]: '#f97316', // orange-500
-  [PASSWORD_STRENGTH_LEVELS.FAIR]: '#eab308', // yellow-500
-  [PASSWORD_STRENGTH_LEVELS.GOOD]: '#22c55e', // green-500
-  [PASSWORD_STRENGTH_LEVELS.STRONG]: '#16a34a', // green-600
-} as const;
-
-// UI Constants
-export const SIDEBAR_WIDTH = {
-  COLLAPSED: 64,
-  EXPANDED: 256,
-} as const;
+export const // UI Constants
+  SIDEBAR_WIDTH = {
+    COLLAPSED: 64,
+    EXPANDED: 256,
+  } as const;
 
 export const BREAKPOINTS = {
   SM: 640,
@@ -113,57 +97,6 @@ export const APP_INFO = {
 } as const;
 
 // Navigation Constants
-export const DEFAULT_NAVIGATION_MAP = {
-  dashboard: {
-    path: '/dashboard',
-    label: 'Dashboard',
-    icon: 'dashboard',
-    requiresAuth: true,
-  },
-  bills: {
-    path: '/bills',
-    label: 'Bills',
-    icon: 'document',
-    requiresAuth: false,
-  },
-  search: {
-    path: '/search',
-    label: 'Search',
-    icon: 'search',
-    requiresAuth: false,
-  },
-  community: {
-    path: '/community',
-    label: 'Community',
-    icon: 'users',
-    requiresAuth: false,
-  },
-  profile: {
-    path: '/profile',
-    label: 'Profile',
-    icon: 'user',
-    requiresAuth: true,
-  },
-  admin: {
-    path: '/admin',
-    label: 'Admin',
-    icon: 'settings',
-    requiresAuth: true,
-    roles: ['admin'],
-  },
-} as const;
-
-export const SECTION_TITLES = {
-  main: 'Main Navigation',
-  bills: 'Bills & Legislation',
-  community: 'Community',
-  tools: 'Tools & Resources',
-  account: 'Account',
-  admin: 'Administration',
-} as const;
-
-export const SECTION_ORDER = ['main', 'bills', 'community', 'tools', 'account', 'admin'] as const;
-
 export default {
   API_BASE_URL,
   WS_BASE_URL,

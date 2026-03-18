@@ -178,7 +178,11 @@ export interface ReducerInterface<S, A> {
  * Standardized middleware pattern
  */
 export interface MiddlewareInterface<S, A> {
-  (store: { getState: () => S; dispatch: (action: A) => void }, next: (action: A) => void, action: A): void;
+  (
+    store: { getState: () => S; dispatch: (action: A) => void },
+    next: (action: A) => void,
+    action: A
+  ): void;
 }
 
 /**

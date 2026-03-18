@@ -1,6 +1,6 @@
 /**
  * Client-Side Validation Hook
- * 
+ *
  * Provides client-side validation using shared Zod schemas.
  * Integrates with react-hook-form for form validation.
  */
@@ -22,7 +22,7 @@ export interface ValidationError {
  * Transform Zod errors to validation errors
  */
 function transformZodErrors(zodError: ZodError): ValidationError[] {
-  return zodError.errors.map((err) => ({
+  return zodError.errors.map(err => ({
     field: err.path.join('.'),
     message: err.message,
     code: err.code,
@@ -31,11 +31,11 @@ function transformZodErrors(zodError: ZodError): ValidationError[] {
 
 /**
  * Validate data against a Zod schema
- * 
+ *
  * @param schema - Zod schema to validate against
  * @param data - Data to validate
  * @returns Validation result
- * 
+ *
  * @example
  * const result = validateData(UserSchema, formData);
  * if (result.success) {
@@ -44,10 +44,7 @@ function transformZodErrors(zodError: ZodError): ValidationError[] {
  *   // Handle result.errors
  * }
  */
-export function validateData<T>(
-  schema: ZodSchema<T>,
-  data: unknown
-): ValidationResult<T> {
+export function validateData<T>(schema: ZodSchema<T>, data: unknown): ValidationResult<T> {
   const result = schema.safeParse(data);
 
   if (result.success) {
@@ -65,12 +62,12 @@ export function validateData<T>(
 
 /**
  * Validate a single field against a Zod schema
- * 
+ *
  * @param schema - Zod schema to validate against
  * @param fieldName - Name of the field to validate
  * @param value - Value to validate
  * @returns Validation result for the field
- * 
+ *
  * @example
  * const result = validateField(UserSchema, 'email', 'test@example.com');
  * if (!result.success) {
@@ -109,24 +106,24 @@ export function validateField<T>(
 
 /**
  * Hook for form validation with react-hook-form and Zod
- * 
+ *
  * @param schema - Zod schema to validate against
  * @param options - react-hook-form options
  * @returns react-hook-form methods
- * 
+ *
  * @example
  * import { UserRegistrationSchema } from '@shared/validation';
- * 
+ *
  * function RegistrationForm() {
  *   const { register, handleSubmit, formState: { errors } } = useFormValidation(
  *     UserRegistrationSchema
  *   );
- * 
+ *
  *   const onSubmit = (data) => {
  *     // data is validated and type-safe
  *     console.log(data);
  *   };
- * 
+ *
  *   return (
  *     <form onSubmit={handleSubmit(onSubmit)}>
  *       <input {...register('email')} />
@@ -148,10 +145,10 @@ export function useFormValidation<T extends FieldValues>(
 
 /**
  * Hook for async validation (e.g., checking if email exists)
- * 
+ *
  * @param validationFn - Async validation function
  * @returns Validation state and trigger function
- * 
+ *
  * @example
  * const { validate, isValidating, error } = useAsyncValidation(
  *   async (email) => {
@@ -162,16 +159,14 @@ export function useFormValidation<T extends FieldValues>(
  *     }
  *   }
  * );
- * 
+ *
  * // In your form
  * <input
  *   onBlur={(e) => validate(e.target.value)}
  * />
  * {error && <span>{error}</span>}
  */
-export function useAsyncValidation<T>(
-  validationFn: (value: T) => Promise<void>
-) {
+export function useAsyncValidation<T>(validationFn: (value: T) => Promise<void>) {
   const [isValidating, setIsValidating] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
 
@@ -200,27 +195,24 @@ export function useAsyncValidation<T>(
 
 /**
  * Hook for real-time field validation
- * 
+ *
  * @param schema - Zod schema to validate against
  * @param fieldName - Name of the field to validate
  * @returns Validation state and setter
- * 
+ *
  * @example
  * const { value, setValue, error, isValid } = useFieldValidation(
  *   UserSchema,
  *   'email'
  * );
- * 
+ *
  * <input
  *   value={value}
  *   onChange={(e) => setValue(e.target.value)}
  * />
  * {error && <span>{error}</span>}
  */
-export function useFieldValidation<T>(
-  schema: ZodSchema<T>,
-  fieldName: string
-) {
+export function useFieldValidation<T>(schema: ZodSchema<T>, fieldName: string) {
   const [value, setValue] = React.useState<unknown>('');
   const [error, setError] = React.useState<string | null>(null);
   const [touched, setTouched] = React.useState(false);

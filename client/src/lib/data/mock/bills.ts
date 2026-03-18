@@ -8,11 +8,7 @@
 import { faker } from '@faker-js/faker';
 
 import {
-  BillStatus,
-  UrgencyLevel,
-  ComplexityLevel,
-  type Bill as ReadonlyBill,
-} from '../../types/bill/bill-base';
+  BillStatus, UrgencyLevel, ComplexityLevel, } from '../../types/bill/bill-base';
 
 
 export type Severity = 'low' | 'medium' | 'high' | 'critical';
@@ -34,15 +30,7 @@ interface BillsStats {
   lastUpdated: string;
 }
 import {
-  generateId,
-  generateDateInRange,
-  generateEngagementMetrics,
-  generatePolicyAreas,
-  generateBillNumber,
-  generateBillTitle,
-  generateBillSummary,
-  weightedRandom,
-} from './generators';
+  generateDateInRange, generateEngagementMetrics, generatePolicyAreas, generateBillNumber, generateBillTitle, generateBillSummary, weightedRandom, } from './generators';
 
 // Seed faker for consistent data
 faker.seed(12345);
@@ -271,33 +259,20 @@ export const generateMockBillsStats = (bills: ReadonlyBill[]): BillsStats => {
 /**
  * Get mock bills with specific filters for testing
  */
-export const getMockBillsByCategory = (category: string, count: number = 10): ReadonlyBill[] => {
-  return generateMockBills(count).map(bill => ({
-    ...bill,
-    policyAreas: [category, ...bill.policyAreas.slice(1)],
-  }));
-};
+export };
 
 /**
  * Get mock bills with high constitutional concerns
  */
-export const getMockBillsWithConstitutionalConcerns = (count: number = 5): ReadonlyBill[] => {
-  return Array.from({ length: count }, (_, i) =>
-    generateMockBill((i + 1000).toString(), { constitutionalConcerns: 'high' })
-  );
-};
+export };
 
 /**
  * Get mock bills with high urgency
  */
-export const getMockUrgentBills = (count: number = 5): ReadonlyBill[] => {
-  return Array.from({ length: count }, (_, i) =>
-    generateMockBill((i + 2000).toString(), { urgency: UrgencyLevel.CRITICAL, popularity: 2.0 })
-  );
-};
+export };
 
 /**
  * Default mock bills dataset
  */
 export const mockBills = generateMockBills(75);
-export const mockBillsStats = generateMockBillsStats(mockBills);
+export 

@@ -3,7 +3,7 @@ import { useState } from 'react';
 
 /**
  * API Access Page
- * 
+ *
  * Information about Chanuka API access and documentation
  */
 export default function ApiAccessPage() {
@@ -13,46 +13,46 @@ export default function ApiAccessPage() {
     {
       title: 'RESTful API',
       description: 'Clean, intuitive REST endpoints for all legislative data',
-      icon: FileText
+      icon: FileText,
     },
     {
       title: 'Real-time Updates',
       description: 'WebSocket support for live bill status updates',
-      icon: Zap
+      icon: Zap,
     },
     {
       title: 'Secure Authentication',
       description: 'OAuth 2.0 and API key authentication',
-      icon: Shield
+      icon: Shield,
     },
     {
       title: 'Comprehensive Docs',
       description: 'Detailed documentation with code examples',
-      icon: Book
-    }
+      icon: Book,
+    },
   ];
 
   const endpoints = [
     {
       method: 'GET',
       path: '/api/v1/bills',
-      description: 'List all bills with filtering and pagination'
+      description: 'List all bills with filtering and pagination',
     },
     {
       method: 'GET',
       path: '/api/v1/bills/:id',
-      description: 'Get detailed information about a specific bill'
+      description: 'Get detailed information about a specific bill',
     },
     {
       method: 'GET',
       path: '/api/v1/counties',
-      description: 'List all 47 counties with legislative data'
+      description: 'List all 47 counties with legislative data',
     },
     {
       method: 'GET',
       path: '/api/v1/representatives',
-      description: 'Get information about MPs and Senators'
-    }
+      description: 'Get information about MPs and Senators',
+    },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -128,11 +128,13 @@ export default function ApiAccessPage() {
                   className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700"
                 >
                   <div className="flex items-start space-x-4">
-                    <span className={`px-3 py-1 rounded text-xs font-mono font-semibold ${
-                      endpoint.method === 'GET' 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                    }`}>
+                    <span
+                      className={`px-3 py-1 rounded text-xs font-mono font-semibold ${
+                        endpoint.method === 'GET'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                          : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                      }`}
+                    >
                       {endpoint.method}
                     </span>
                     <div className="flex-1">
@@ -214,7 +216,9 @@ export default function ApiAccessPage() {
                 POPULAR
               </div>
               <h3 className="text-xl font-semibold mb-4">Pro</h3>
-              <div className="text-3xl font-bold text-blue-600 mb-4">KES 5,000<span className="text-sm text-gray-600">/mo</span></div>
+              <div className="text-3xl font-bold text-blue-600 mb-4">
+                KES 5,000<span className="text-sm text-gray-600">/mo</span>
+              </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start space-x-2">
                   <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -268,7 +272,10 @@ export default function ApiAccessPage() {
       </section>
 
       {/* Request Access */}
-      <section id="request-access" className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold py-12">
+      <section
+        id="request-access"
+        className="bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold py-12"
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto text-center text-white">
             <Lock className="w-12 h-12 mx-auto mb-4" />
@@ -281,7 +288,7 @@ export default function ApiAccessPage() {
                 type="email"
                 placeholder="Enter your email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
                 className="flex-1 px-4 py-3 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-white"
               />

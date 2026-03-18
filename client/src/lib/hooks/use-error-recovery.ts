@@ -160,7 +160,8 @@ export function useErrorRecovery(
 
     const currentOperation = getOperation(operationId);
     const errorValue = currentOperation?.error;
-    const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
+    const error =
+      errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
     const retryCount = currentOperation?.retryCount || 0;
     const timeElapsed = currentOperation ? Date.now() - currentOperation.startTime : 0;
     const connectionType = state.connectionInfo?.type || 'unknown';
@@ -293,7 +294,8 @@ export function useErrorRecovery(
   useEffect(() => {
     if (operation?.error && !recoveryState.isRecovering) {
       const errorValue = operation.error;
-      const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
+      const error =
+        errorValue instanceof Error ? errorValue : new Error(String(errorValue || 'Unknown error'));
       const retryCount = operation.retryCount || 0;
       const timeElapsed = Date.now() - operation.startTime;
       const connectionType = state.connectionInfo?.type || 'unknown';
@@ -365,9 +367,7 @@ export function useAutoRecovery(
     const errorValue = operation.error;
     const error = errorValue instanceof Error ? errorValue : new Error(String(errorValue));
 
-    const shouldAutoRecover = options.triggerConditions.some(condition =>
-      condition(error)
-    );
+    const shouldAutoRecover = options.triggerConditions.some(condition => condition(error));
 
     if (shouldAutoRecover && autoAttemptsRef.current < options.maxAutoAttempts) {
       autoAttemptsRef.current++;

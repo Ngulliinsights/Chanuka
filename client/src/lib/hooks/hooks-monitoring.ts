@@ -16,20 +16,24 @@ import {
   SystemHealth,
   AppError,
   ErrorDomain,
-  ErrorSeverity
+  ErrorSeverity,
 } from '@client/infrastructure/observability/error-monitoring/index';
 
 class HooksMonitoring implements UnifiedErrorMonitoring {
   private static instance: HooksMonitoring;
   private aggregationService: ErrorAggregationService;
   private analyticsService: CrossSystemErrorAnalytics;
-  private hookExecutionStats: Map<string, {
-    totalCalls: number;
-    errors: number;
-    avgExecutionTime: number;
-    lastExecutionTime: number;
-  }> = new Map();
-  private errorPatterns: Map<string, { threshold: number; count: number; lastTriggered: number }> = new Map();
+  private hookExecutionStats: Map<
+    string,
+    {
+      totalCalls: number;
+      errors: number;
+      avgExecutionTime: number;
+      lastExecutionTime: number;
+    }
+  > = new Map();
+  private errorPatterns: Map<string, { threshold: number; count: number; lastTriggered: number }> =
+    new Map();
   private monitoringEnabled: boolean = true;
   private enabledOperations: Set<string> = new Set(['*']);
 
@@ -48,29 +52,25 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
   async reportError(error: AppError | Error, context: ErrorContext): Promise<void> {
     if (!this.monitoringEnabled) return;
 
-    const appError = error instanceof Error && !(error as unknown as Record<string, unknown>).type
-      ? createError(
-          ErrorDomain.SYSTEM,
-          ErrorSeverity.HIGH,
-          error.message,
-          {
+    const appError =
+      error instanceof Error && !(error as unknown as Record<string, unknown>).type
+        ? createError(ErrorDomain.SYSTEM, ErrorSeverity.HIGH, error.message, {
             details: { originalError: error, hookName: context.operation },
             context: {
               component: context.component,
               operation: context.operation,
               userId: context.userId,
-              sessionId: context.sessionId
-            }
-          }
-        )
-      : error as AppError;
+              sessionId: context.sessionId,
+            },
+          })
+        : (error as AppError);
 
     // Add system-specific context
     const enhancedContext = {
       ...context,
       system: ClientSystem.HOOKS,
       hookComponent: context.component || 'unknown',
-      hookName: context.operation
+      hookName: context.operation,
     };
 
     // Track hook-specific error
@@ -107,15 +107,15 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
           details: { ...metrics },
           context: {
             component: 'HooksMonitoring',
-            operation: 'hook_performance_tracking'
-          }
+            operation: 'hook_performance_tracking',
+          },
         }
       );
 
       await this.reportError(perfError, {
         system: ClientSystem.HOOKS,
         component: 'HooksMonitoring',
-        operation: metrics.operation
+        operation: metrics.operation,
       });
     }
   }
@@ -124,18 +124,21 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     const systemErrors = this.aggregationService.getSystemErrors(ClientSystem.HOOKS, timeRange);
 
     // Group errors by hook
-    const hookGroups: Map<string, {
-      errors: typeof systemErrors;
-      recoveryCount: number;
-      totalImpact: number;
-    }> = new Map();
+    const hookGroups: Map<
+      string,
+      {
+        errors: typeof systemErrors;
+        recoveryCount: number;
+        totalImpact: number;
+      }
+    > = new Map();
 
     systemErrors.forEach(err => {
       const hookName = err.context.operation || 'unknown';
       const existing = hookGroups.get(hookName) || {
         errors: [],
         recoveryCount: 0,
-        totalImpact: 0
+        totalImpact: 0,
       };
 
       existing.errors.push(err);
@@ -153,7 +156,9 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
 
     hookGroups.forEach((group, hookName) => {
       const recentErrors = group.errors.filter(e => e.timestamp > oneDayAgo);
-      const olderErrors = group.errors.filter(e => e.timestamp <= oneDayAgo && e.timestamp > oneDayAgo - 24 * 60 * 60 * 1000);
+      const olderErrors = group.errors.filter(
+        e => e.timestamp <= oneDayAgo && e.timestamp > oneDayAgo - 24 * 60 * 60 * 1000
+      );
 
       const trend = this.calculateTrend(recentErrors.length, olderErrors.length);
 
@@ -163,8 +168,9 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
         frequency: group.errors.length,
         trend,
         impact: Math.min(100, (group.totalImpact / group.errors.length) * 10),
-        recoveryRate: group.errors.length > 0 ? (group.recoveryCount / group.errors.length) * 100 : 0,
-        affectedUsers: new Set(group.errors.map(e => e.context.userId).filter(Boolean)).size
+        recoveryRate:
+          group.errors.length > 0 ? (group.recoveryCount / group.errors.length) * 100 : 0,
+        affectedUsers: new Set(group.errors.map(e => e.context.userId).filter(Boolean)).size,
       });
     });
 
@@ -180,10 +186,10 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     }
 
     // Fallback calculation
-    const recentErrors = this.aggregationService.getSystemErrors(
-      ClientSystem.HOOKS,
-      { start: Date.now() - 60 * 60 * 1000, end: Date.now() }
-    );
+    const recentErrors = this.aggregationService.getSystemErrors(ClientSystem.HOOKS, {
+      start: Date.now() - 60 * 60 * 1000,
+      end: Date.now(),
+    });
 
     const errorRate = recentErrors.length;
     const performanceScore = this.calculateAverageHookPerformance();
@@ -197,7 +203,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
       status,
       errorRate,
       performanceScore,
-      lastUpdated: Date.now()
+      lastUpdated: Date.now(),
     };
   }
 
@@ -205,7 +211,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     this.errorPatterns.set(pattern, {
       threshold,
       count: 0,
-      lastTriggered: 0
+      lastTriggered: 0,
     });
   }
 
@@ -227,17 +233,18 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     const periodMs = {
       hour: 60 * 60 * 1000,
       day: 24 * 60 * 60 * 1000,
-      week: 7 * 24 * 60 * 60 * 1000
+      week: 7 * 24 * 60 * 60 * 1000,
     };
 
     const startTime = Date.now() - periodMs[period];
     const errors = this.aggregationService.getSystemErrors(ClientSystem.HOOKS, {
       start: startTime,
-      end: Date.now()
+      end: Date.now(),
     });
 
     const totalErrors = errors.length;
-    const errorRate = period === 'hour' ? totalErrors : totalErrors / (periodMs[period] / (60 * 60 * 1000));
+    const errorRate =
+      period === 'hour' ? totalErrors : totalErrors / (periodMs[period] / (60 * 60 * 1000));
 
     // Top errors
     const errorCounts: Map<string, number> = new Map();
@@ -258,7 +265,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
       totalErrors,
       errorRate,
       topErrors,
-      performanceImpact
+      performanceImpact,
     };
   }
 
@@ -267,7 +274,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
       totalCalls: 0,
       errors: 0,
       avgExecutionTime: 0,
-      lastExecutionTime: 0
+      lastExecutionTime: 0,
     };
 
     stats.errors++;
@@ -279,7 +286,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
       totalCalls: 0,
       errors: 0,
       avgExecutionTime: 0,
-      lastExecutionTime: 0
+      lastExecutionTime: 0,
     };
 
     stats.totalCalls++;
@@ -296,12 +303,14 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     const hookStats = Array.from(this.hookExecutionStats.values());
     if (hookStats.length === 0) return 100;
 
-    const avgExecutionTime = hookStats.reduce((sum, stat) => sum + stat.avgExecutionTime, 0) / hookStats.length;
-    const errorRate = hookStats.reduce((sum, stat) => sum + (stat.errors / stat.totalCalls), 0) / hookStats.length;
+    const avgExecutionTime =
+      hookStats.reduce((sum, stat) => sum + stat.avgExecutionTime, 0) / hookStats.length;
+    const errorRate =
+      hookStats.reduce((sum, stat) => sum + stat.errors / stat.totalCalls, 0) / hookStats.length;
 
     // Performance score based on execution time and error rate
-    const timeScore = Math.max(0, 100 - (avgExecutionTime / 10)); // Penalize slow hooks
-    const errorScore = Math.max(0, 100 - (errorRate * 1000)); // Penalize high error rates
+    const timeScore = Math.max(0, 100 - avgExecutionTime / 10); // Penalize slow hooks
+    const errorScore = Math.max(0, 100 - errorRate * 1000); // Penalize high error rates
 
     return (timeScore + errorScore) / 2;
   }
@@ -345,19 +354,19 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
           pattern,
           count,
           threshold: this.errorPatterns.get(pattern)?.threshold,
-          lastError: error.message
+          lastError: error.message,
         },
         context: {
           component: 'HooksMonitoring',
-          operation: 'error_pattern_alert'
-        }
+          operation: 'error_pattern_alert',
+        },
       }
     );
 
     this.reportError(alertError, {
       system: ClientSystem.HOOKS,
       component: 'HooksMonitoring',
-      operation: 'error_pattern_monitoring'
+      operation: 'error_pattern_monitoring',
     });
   }
 
@@ -381,7 +390,10 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
     return severityMultiplier[error.severity] || 1;
   }
 
-  private calculateTrend(current: number, previous: number): 'increasing' | 'decreasing' | 'stable' {
+  private calculateTrend(
+    current: number,
+    previous: number
+  ): 'increasing' | 'decreasing' | 'stable' {
     if (previous === 0) return current > 0 ? 'increasing' : 'stable';
     const change = (current - previous) / previous;
     if (change > 0.1) return 'increasing';
@@ -402,7 +414,7 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
       totalCalls: stats.totalCalls,
       errors: stats.errors,
       avgExecutionTime: stats.avgExecutionTime,
-      errorRate: stats.totalCalls > 0 ? (stats.errors / stats.totalCalls) * 100 : 0
+      errorRate: stats.totalCalls > 0 ? (stats.errors / stats.totalCalls) * 100 : 0,
     }));
   }
 
@@ -418,15 +430,15 @@ class HooksMonitoring implements UnifiedErrorMonitoring {
           details: { executionTime, hookName },
           context: {
             component: 'HooksMonitoring',
-            operation: hookName
-          }
+            operation: hookName,
+          },
         }
       );
 
       this.reportError(error, {
         system: ClientSystem.HOOKS,
         component: 'HookExecutionMonitor',
-        operation: hookName
+        operation: hookName,
       });
     }
   }
@@ -453,25 +465,25 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
         // Handle promises (some hooks might return promises)
         if (result instanceof Promise) {
           return result
-            .then((value) => {
+            .then(value => {
               const duration = performance.now() - startTime;
               this.monitoring.trackPerformance({
                 operation: context.operation || 'unknown',
                 duration,
                 success: true,
                 timestamp: Date.now(),
-                context
+                context,
               });
               return value;
             })
-            .catch((error) => {
+            .catch(error => {
               const duration = performance.now() - startTime;
               this.monitoring.trackPerformance({
                 operation: context.operation || 'unknown',
                 duration,
                 success: false,
                 timestamp: Date.now(),
-                context
+                context,
               });
 
               this.monitoring.reportError(error as Error, context);
@@ -486,7 +498,7 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
           duration,
           success: true,
           timestamp: Date.now(),
-          context
+          context,
         });
 
         return result;
@@ -497,7 +509,7 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
           duration,
           success: false,
           timestamp: Date.now(),
-          context
+          context,
         });
 
         this.monitoring.reportError(error as Error, context);
@@ -521,9 +533,9 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
           duration,
           success,
           timestamp: Date.now(),
-          context: { ...context, operation }
+          context: { ...context, operation },
         });
-      }
+      },
     };
   }
 
@@ -535,7 +547,8 @@ class HooksMonitoringMiddleware implements ErrorMonitoringMiddleware {
 
 // Export instances
 export const hooksMonitoring = HooksMonitoring.getInstance();
-export const hooksMonitoringMiddleware = new HooksMonitoringMiddleware();
-
-// Export classes for testing
-export { HooksMonitoring, HooksMonitoringMiddleware };
+export {
+  // Export classes for testing
+  HooksMonitoring,
+  HooksMonitoringMiddleware,
+};

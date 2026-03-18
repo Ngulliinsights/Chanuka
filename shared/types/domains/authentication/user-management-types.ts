@@ -41,10 +41,10 @@ export interface UserInterestData {
 }
 
 /**
- * User preferences
+ * User notification preferences
  * Stores user-specific configuration for notifications and UI
  */
-export interface UserPreferences {
+export interface UserNotificationPreferences {
   emailNotifications?: boolean;
   pushNotifications?: boolean;
   smsNotifications?: boolean;

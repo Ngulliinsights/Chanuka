@@ -1,8 +1,9 @@
 import { backgroundSyncManager } from '@client/infrastructure/storage/sync/background-sync-manager';
-import { cacheInvalidationManager as cacheInvalidation } from '@client/infrastructure/cache/cache-invalidation';
-import { offlineAnalyticsManager as offlineAnalytics } from '@client/infrastructure/analytics/model/offline-analytics';
 import { offlineDataManager } from '@client/infrastructure/storage/offline-data-manager';
-import { onNetworkStatusChange, getNetworkStatus } from '@client/infrastructure/workers/service-worker';
+import {
+  onNetworkStatusChange,
+  getNetworkStatus,
+} from '@client/infrastructure/workers/service-worker';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
@@ -106,23 +107,23 @@ export function useOfflineCapabilities(): OfflineCapabilities {
     try {
       // Trigger background sync
       await backgroundSyncManager.queueAction({
-         // Note: triggerSync was not found in BackgroundSyncManager, it uses queueAction and processQueue
-         // We might need to implement a dedicated sync method or call processQueue directly if exposed.
-         // Looking at BackgroundSyncManager, it has processQueue().
-         // But the original code called backgroundSyncManager.triggerSync().
-         // Let's assume processQueue is what we want.
-         // Actually, wait, backgroundSyncManager.processQueue() is public.
-         // So I should replace triggerSync with processQueue.
-         id: 'manual_sync_' + Date.now(),
-         type: 'SYNC',
-         endpoint: '/api/sync',
-         method: 'POST',
-         priority: 'high',
-         maxRetries: 3
+        // Note: triggerSync was not found in BackgroundSyncManager, it uses queueAction and processQueue
+        // We might need to implement a dedicated sync method or call processQueue directly if exposed.
+        // Looking at BackgroundSyncManager, it has processQueue().
+        // But the original code called backgroundSyncManager.triggerSync().
+        // Let's assume processQueue is what we want.
+        // Actually, wait, backgroundSyncManager.processQueue() is public.
+        // So I should replace triggerSync with processQueue.
+        id: 'manual_sync_' + Date.now(),
+        type: 'SYNC',
+        endpoint: '/api/sync',
+        method: 'POST',
+        priority: 'high',
+        maxRetries: 3,
       } as unknown); // Using 'as unknown' as a temporary workaround because the API is different.
       // Actually, looking at Step 506, processQueue is public.
       await backgroundSyncManager.processQueue();
-      
+
       // Invalidate React Query cache to force fresh data
       await queryClient.invalidateQueries();
 

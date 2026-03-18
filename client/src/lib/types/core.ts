@@ -22,14 +22,12 @@ import { Comment as CommunityComment, DiscussionThread } from './community/commu
 export type { Bill, BillAnalysis } from './bill/bill-base';
 // Compatibility alias if needed (BillAnalysis is already named correctly)
 
-
 // ============================================================================
 // USER TYPES
 // ============================================================================
 
 // Re-export from unified auth module
 export type { User } from './bill/auth-types';
-
 
 // ============================================================================
 // COMMENT & DISCUSSION TYPES (UNIFIED)
@@ -151,7 +149,6 @@ export interface UnifiedThread {
 }
 
 // DiscussionThread removed - use shared definition from community module
-
 
 // ============================================================================
 // MODERATION TYPES
@@ -573,7 +570,12 @@ export interface UserPersonaProfile {
 /**
  * Verification status
  */
-export type VerificationStatus = 'pending' | 'in_review' | 'approved' | 'rejected' | 'needs_revision';
+export type VerificationStatus =
+  | 'pending'
+  | 'in_review'
+  | 'approved'
+  | 'rejected'
+  | 'needs_revision';
 
 /**
  * Verification workflow

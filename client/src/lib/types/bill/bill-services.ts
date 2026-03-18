@@ -105,7 +105,6 @@ export interface ErrorResponse {
   readonly timestamp: string;
 }
 
-
 /**
  * Global bills statistics
  */
@@ -122,7 +121,12 @@ export interface BillsStats {
  * Bill update event type for tracking service
  */
 export interface BillUpdate {
-  readonly type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled' | 'sponsor_change';
+  readonly type:
+    | 'status_change'
+    | 'new_comment'
+    | 'amendment'
+    | 'voting_scheduled'
+    | 'sponsor_change';
   readonly data: {
     readonly billId: number;
     readonly title?: string;

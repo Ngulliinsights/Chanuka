@@ -9,8 +9,6 @@ import { useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 
 import {
-  // Actions
-  setCurrentPath,
   updateBreadcrumbs,
   updateRelatedPages,
   setCurrentSection,
@@ -25,9 +23,6 @@ import {
   addToRecentPages,
   addFavoritePage,
   removeFavoritePage,
-
-  // Selectors
-  selectCurrentPath,
   selectPreviousPath,
   selectBreadcrumbs,
   selectRelatedPages,

@@ -181,15 +181,17 @@ export interface WidgetMasonryProps extends DashboardComponentProps {
  * TypeScript will enforce that only valid props for the selected layout are provided.
  *
  * @example
- * const renderLayout = (props: WidgetLayoutProps) => {
- *   if (props.layout === 'grid') {
- *     return <GridLayout columns={props.columns} {...props} />;  // ✅ TypeScript knows about columns
+ *   // ✅ TypeScript knows about columns
  *   } else if (props.layout === 'stack') {
  *     return <StackLayout direction={props.direction} {...props} />;  // ✅ TypeScript knows about direction
  *   }
  * };
  */
-export type WidgetLayoutProps = WidgetGridProps | WidgetStackProps | WidgetTabsPropsLayout | WidgetMasonryProps;
+export type WidgetLayoutProps =
+  | WidgetGridProps
+  | WidgetStackProps
+  | WidgetTabsPropsLayout
+  | WidgetMasonryProps;
 
 // ============================================================================
 // Dashboard Structure Component Props

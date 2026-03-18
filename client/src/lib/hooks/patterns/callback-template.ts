@@ -73,21 +73,27 @@ export function useExampleCallback(input: ExampleInput) {
   }, [data, filters, options]);
 
   // 6. Create Memoized Callbacks
-  const handleFilterChange = useCallback((newFilters: Record<string, unknown>) => {
-    // This callback is memoized and will only change if dependencies change
-    return {
-      ...input,
-      filters: { ...filters, ...newFilters },
-    };
-  }, [filters, input]);
+  const handleFilterChange = useCallback(
+    (newFilters: Record<string, unknown>) => {
+      // This callback is memoized and will only change if dependencies change
+      return {
+        ...input,
+        filters: { ...filters, ...newFilters },
+      };
+    },
+    [filters, input]
+  );
 
-  const handleDataUpdate = useCallback((newData: unknown[]) => {
-    // Memoized callback for data updates
-    return {
-      ...input,
-      data: newData,
-    };
-  }, [data, input]);
+  const handleDataUpdate = useCallback(
+    (newData: unknown[]) => {
+      // Memoized callback for data updates
+      return {
+        ...input,
+        data: newData,
+      };
+    },
+    [data, input]
+  );
 
   const debouncedCallback = useCallback(
     (callback: () => void, delay: number = options.debounce || 300) => {
@@ -107,25 +113,31 @@ export function useExampleCallback(input: ExampleInput) {
   // 7. Create Cached Operations
   const cacheRef = useRef<Map<string, ExampleOutput>>(new Map());
 
-  const getCachedResult = useCallback((cacheKey: string): ExampleOutput | null => {
-    if (!options.cache) return null;
+  const getCachedResult = useCallback(
+    (cacheKey: string): ExampleOutput | null => {
+      if (!options.cache) return null;
 
-    return cacheRef.current.get(cacheKey) || null;
-  }, [options.cache]);
+      return cacheRef.current.get(cacheKey) || null;
+    },
+    [options.cache]
+  );
 
-  const setCachedResult = useCallback((cacheKey: string, result: ExampleOutput) => {
-    if (!options.cache) return;
+  const setCachedResult = useCallback(
+    (cacheKey: string, result: ExampleOutput) => {
+      if (!options.cache) return;
 
-    cacheRef.current.set(cacheKey, result);
+      cacheRef.current.set(cacheKey, result);
 
-    // Limit cache size
-    if (cacheRef.current.size > 100) {
-      const firstKey = cacheRef.current.keys().next().value;
-      if (firstKey) {
-        cacheRef.current.delete(firstKey);
+      // Limit cache size
+      if (cacheRef.current.size > 100) {
+        const firstKey = cacheRef.current.keys().next().value;
+        if (firstKey) {
+          cacheRef.current.delete(firstKey);
+        }
       }
-    }
-  }, [options.cache]);
+    },
+    [options.cache]
+  );
 
   // 8. Return Memoized Values and Callbacks
   return {

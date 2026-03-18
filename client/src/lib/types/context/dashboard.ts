@@ -256,26 +256,38 @@ export type WidgetManagementContextAction =
 // Type Guards for Dashboard Context Actions
 // ============================================================================
 
-export function isRefreshDashboardAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'REFRESH_DASHBOARD' }> {
+export function isRefreshDashboardAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'REFRESH_DASHBOARD' }> {
   return action.type === 'REFRESH_DASHBOARD';
 }
 
-export function isAddWidgetAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'ADD_WIDGET' }> {
+export function isAddWidgetAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'ADD_WIDGET' }> {
   return action.type === 'ADD_WIDGET';
 }
 
-export function isRemoveWidgetAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'REMOVE_WIDGET' }> {
+export function isRemoveWidgetAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'REMOVE_WIDGET' }> {
   return action.type === 'REMOVE_WIDGET';
 }
 
-export function isUpdateWidgetAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'UPDATE_WIDGET' }> {
+export function isUpdateWidgetAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'UPDATE_WIDGET' }> {
   return action.type === 'UPDATE_WIDGET';
 }
 
-export function isUpdateConfigAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'UPDATE_CONFIG' }> {
+export function isUpdateConfigAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'UPDATE_CONFIG' }> {
   return action.type === 'UPDATE_CONFIG';
 }
 
-export function isSetLayoutAction(action: DashboardContextAction): action is Extract<DashboardContextAction, { type: 'SET_LAYOUT' }> {
+export function isSetLayoutAction(
+  action: DashboardContextAction
+): action is Extract<DashboardContextAction, { type: 'SET_LAYOUT' }> {
   return action.type === 'SET_LAYOUT';
 }

@@ -1,0 +1,1528 @@
+src/features/admin/product-analytics/model/performance-benchmarking.ts(449,1): error TS1128: Declaration or statement expected.
+src/features/analysis/model/services/analysis-api.service.ts(174,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(67,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(68,3): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(68,4): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(73,3): error TS1434: Unexpected keyword or identifier.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(73,26): error TS1109: Expression expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(73,44): error TS1005: ';' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(73,60): error TS1011: An element access expression should take an argument.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(74,11): error TS1005: ':' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(74,22): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(74,46): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(74,56): error TS1109: Expression expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(86,3): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(86,4): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(91,3): error TS1434: Unexpected keyword or identifier.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(91,28): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(91,49): error TS1005: ';' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(92,11): error TS1005: ':' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(95,6): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(96,12): error TS1005: ':' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(96,25): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(102,9): error TS1005: ';' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(102,32): error TS1109: Expression expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(102,48): error TS1109: Expression expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(102,55): error TS1005: ';' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(103,11): error TS1005: ':' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(103,17): error TS1005: ',' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(103,42): error TS1005: '(' expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(103,44): error TS1136: Property assignment expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(116,3): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(116,4): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/api/pretext-detection-api.ts(117,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/CivicActionToolbox.tsx(186,3): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/CivicActionToolbox.tsx(187,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextDetectionPanel.tsx(255,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextDetectionPanel.tsx(255,2): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextWatchCard.tsx(17,1): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextWatchCard.tsx(19,5): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextWatchCard.tsx(138,3): error TS1128: Declaration or statement expected.
+src/features/analysis/pretext-detection/ui/PretextWatchCard.tsx(139,1): error TS1128: Declaration or statement expected.
+src/features/auth/pages/auth-page.tsx(128,3): error TS1128: Declaration or statement expected.
+src/features/auth/pages/auth-page.tsx(418,1): error TS1128: Declaration or statement expected.
+src/features/auth/pages/RegisterPage.tsx(78,5): error TS1128: Declaration or statement expected.
+src/features/auth/pages/RegisterPage.tsx(153,1): error TS1128: Declaration or statement expected.
+src/features/bills/BillList.tsx(429,1): error TS1128: Declaration or statement expected.
+src/features/bills/hooks/useComparisonCart.ts(75,1): error TS1128: Declaration or statement expected.
+src/features/bills/services/collections-service.ts(140,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(224,9): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(224,23): error TS1005: ';' expected.
+src/features/bills/ui/analysis/comments.tsx(226,7): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(226,22): error TS1005: ';' expected.
+src/features/bills/ui/analysis/comments.tsx(228,7): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(228,14): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(231,3): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/comments.tsx(655,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictNetworkVisualization.tsx(337,3): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/conflict-of-interest/ConflictNetworkVisualization.tsx(595,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/section.tsx(17,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/section.tsx(17,8): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/stats.tsx(91,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/timeline.tsx(16,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/analysis/timeline.tsx(16,8): error TS1128: Declaration or statement expected.
+src/features/bills/ui/bill-list.tsx(286,1): error TS1128: Declaration or statement expected.
+src/features/bills/ui/filter-panel.tsx(718,3): error TS1128: Declaration or statement expected.
+src/features/bills/ui/filter-panel.tsx(719,1): error TS1128: Declaration or statement expected.
+src/features/community/collaboration/services/activity-service.ts(61,1): error TS1128: Declaration or statement expected.
+src/features/community/collaboration/services/workspace-service.ts(130,1): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(8,1): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(8,8): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(10,1): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(10,8): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(12,1): error TS1128: Declaration or statement expected.
+src/features/market/hooks/useMarket.ts(12,8): error TS1128: Declaration or statement expected.
+src/features/market/services/market.ts(23,1): error TS1128: Declaration or statement expected.
+src/features/market/services/market.ts(24,3): error TS1128: Declaration or statement expected.
+src/features/market/services/market.ts(24,4): error TS1128: Declaration or statement expected.
+src/features/market/services/market.ts(26,3): error TS1434: Unexpected keyword or identifier.
+src/features/market/services/market.ts(26,28): error TS1005: ';' expected.
+src/features/market/services/market.ts(26,52): error TS1011: An element access expression should take an argument.
+src/features/market/services/market.ts(27,11): error TS1005: ':' expected.
+src/features/market/services/market.ts(27,71): error TS1005: ',' expected.
+src/features/market/services/market.ts(28,12): error TS1005: ':' expected.
+src/features/market/services/market.ts(28,25): error TS1005: ',' expected.
+src/features/market/services/market.ts(31,9): error TS1005: ';' expected.
+src/features/market/services/market.ts(31,31): error TS1005: ',' expected.
+src/features/market/services/market.ts(31,47): error TS1005: ',' expected.
+src/features/market/services/market.ts(31,62): error TS1005: ',' expected.
+src/features/market/services/market.ts(31,100): error TS1005: ';' expected.
+src/features/market/services/market.ts(31,114): error TS1109: Expression expected.
+src/features/market/services/market.ts(32,11): error TS1005: ',' expected.
+src/features/market/services/market.ts(32,26): error TS1005: ',' expected.
+src/features/market/services/market.ts(32,59): error TS1005: ',' expected.
+src/features/market/services/market.ts(35,9): error TS1005: ';' expected.
+src/features/market/services/market.ts(35,34): error TS1005: ',' expected.
+src/features/market/services/market.ts(35,74): error TS1005: ';' expected.
+src/features/market/services/market.ts(35,98): error TS1011: An element access expression should take an argument.
+src/features/market/services/market.ts(36,11): error TS1005: ':' expected.
+src/features/market/services/market.ts(36,96): error TS1005: ',' expected.
+src/features/market/services/market.ts(37,12): error TS1005: ':' expected.
+src/features/market/services/market.ts(37,25): error TS1005: ',' expected.
+src/features/market/services/market.ts(39,1): error TS1109: Expression expected.
+src/features/onboarding/hooks/useOnboarding.ts(8,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(8,8): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(10,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(10,8): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(12,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(19,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(21,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/hooks/useOnboarding.ts(28,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/pages/welcome-tour.tsx(362,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/services/onboarding.ts(23,1): error TS1128: Declaration or statement expected.
+src/features/onboarding/services/onboarding.ts(24,3): error TS1128: Declaration or statement expected.
+src/features/onboarding/services/onboarding.ts(24,4): error TS1128: Declaration or statement expected.
+src/features/onboarding/services/onboarding.ts(26,3): error TS1434: Unexpected keyword or identifier.
+src/features/onboarding/services/onboarding.ts(26,19): error TS1005: ';' expected.
+src/features/onboarding/services/onboarding.ts(26,44): error TS1011: An element access expression should take an argument.
+src/features/onboarding/services/onboarding.ts(27,11): error TS1005: ':' expected.
+src/features/onboarding/services/onboarding.ts(27,72): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(28,12): error TS1005: ':' expected.
+src/features/onboarding/services/onboarding.ts(28,25): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(31,9): error TS1005: ';' expected.
+src/features/onboarding/services/onboarding.ts(31,28): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(31,37): error TS1005: ';' expected.
+src/features/onboarding/services/onboarding.ts(31,51): error TS1109: Expression expected.
+src/features/onboarding/services/onboarding.ts(32,11): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(32,26): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(32,75): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(35,9): error TS1005: ';' expected.
+src/features/onboarding/services/onboarding.ts(35,25): error TS1005: ';' expected.
+src/features/onboarding/services/onboarding.ts(35,39): error TS1109: Expression expected.
+src/features/onboarding/services/onboarding.ts(36,11): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(36,26): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(36,55): error TS1005: ',' expected.
+src/features/onboarding/services/onboarding.ts(38,1): error TS1109: Expression expected.
+src/features/search/services/search-history-service.ts(124,1): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(110,9): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(110,23): error TS1005: ';' expected.
+src/features/search/ui/results/SearchResultCard.tsx(112,7): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(112,21): error TS1005: ';' expected.
+src/features/search/ui/results/SearchResultCard.tsx(116,7): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(116,14): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(119,3): error TS1128: Declaration or statement expected.
+src/features/search/ui/results/SearchResultCard.tsx(394,1): error TS1128: Declaration or statement expected.
+src/features/users/model/user-service.ts(908,3): error TS1128: Declaration or statement expected.
+src/features/users/model/user-service.ts(908,4): error TS1128: Declaration or statement expected.
+src/features/users/model/user-service.ts(909,20): error TS1005: ',' expected.
+src/features/users/model/user-service.ts(909,46): error TS1005: ';' expected.
+src/features/users/model/user-service.ts(913,4): error TS1128: Declaration or statement expected.
+src/features/users/model/user-service.ts(914,1): error TS1128: Declaration or statement expected.
+src/features/users/model/user-service.ts(914,2): error TS1128: Declaration or statement expected.
+src/features/users/services/achievements-service.ts(475,1): error TS1128: Declaration or statement expected.
+src/features/users/services/auth-service.ts(782,1): error TS1128: Declaration or statement expected.
+src/features/users/services/dashboard-service.ts(512,1): error TS1128: Declaration or statement expected.
+src/features/users/services/engagement-service.ts(490,1): error TS1128: Declaration or statement expected.
+src/features/users/services/profile-service.ts(663,1): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(30,1): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(31,3): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(31,4): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(33,3): error TS1434: Unexpected keyword or identifier.
+src/features/users/services/user-api.ts(33,22): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(33,37): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(34,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(34,90): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(35,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(35,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(38,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(38,17): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(38,31): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(39,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(39,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(39,51): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(42,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(42,35): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(42,44): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(43,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(45,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(46,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(46,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(49,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(49,25): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(50,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(50,69): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(51,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(51,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(55,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(55,32): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(55,41): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(56,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(56,86): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(57,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(57,74): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(58,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(58,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(61,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(61,27): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(61,47): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(62,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(62,88): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(63,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(63,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(66,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(66,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(66,33): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(67,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(67,36): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(68,13): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(68,36): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(70,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(78,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(79,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(79,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(82,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(82,24): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(82,38): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(83,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(83,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(83,55): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(87,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(87,25): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(88,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(88,90): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(89,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(89,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(92,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(92,31): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(92,55): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(93,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(93,96): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(94,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(94,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(98,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(98,32): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(99,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(99,94): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(100,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(100,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(103,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(103,32): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(103,54): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(104,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(104,36): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(106,13): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(106,23): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(106,25): error TS1136: Property assignment expected.
+src/features/users/services/user-api.ts(127,3): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(127,4): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(129,3): error TS1434: Unexpected keyword or identifier.
+src/features/users/services/user-api.ts(129,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(129,34): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(130,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(132,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(133,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(133,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(136,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(136,34): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(136,48): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(137,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(137,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(137,65): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(141,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(141,28): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(141,55): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(141,79): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(141,93): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(142,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(142,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(142,59): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(145,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(145,35): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(145,44): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(145,58): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(146,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(146,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(146,71): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(149,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(149,27): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(149,44): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(149,68): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(149,82): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(150,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(150,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(150,65): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(154,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(154,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(154,47): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(154,62): error TS1011: An element access expression should take an argument.
+src/features/users/services/user-api.ts(155,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(157,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(158,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(158,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(161,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(161,28): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(161,37): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(162,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(162,78): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(163,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(163,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(167,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(167,33): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(167,54): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(168,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(168,88): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(169,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(171,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(172,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(172,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(175,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(175,30): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(175,39): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(176,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(176,82): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(177,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(177,82): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(178,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(178,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(182,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(185,13): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(186,4): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(187,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(190,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(205,5): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(205,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(208,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(209,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(209,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(212,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(213,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(214,11): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(215,9): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(215,18): error TS1011: An element access expression should take an argument.
+src/features/users/services/user-api.ts(216,4): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(217,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(226,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(227,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(227,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(230,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(230,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(230,35): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(230,49): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(231,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(231,26): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(231,90): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(234,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(235,11): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(236,12): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(237,21): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(238,21): error TS1011: An element access expression should take an argument.
+src/features/users/services/user-api.ts(238,22): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(239,37): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(241,4): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(242,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(246,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(247,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(247,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(251,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(254,13): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(255,4): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(256,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(259,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(269,5): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(269,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(272,6): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(273,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(273,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(276,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(276,31): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(276,50): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(276,64): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(277,9): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(278,13): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(278,28): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(281,9): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(282,13): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(287,9): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(288,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(305,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(305,26): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(306,35): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(309,3): error TS1128: Declaration or statement expected.
+src/features/users/services/user-api.ts(309,4): error TS1109: Expression expected.
+src/features/users/services/user-api.ts(310,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(314,64): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(315,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(315,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(319,9): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(319,27): error TS1005: ';' expected.
+src/features/users/services/user-api.ts(320,11): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(323,7): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(324,12): error TS1005: ':' expected.
+src/features/users/services/user-api.ts(324,25): error TS1005: ',' expected.
+src/features/users/services/user-api.ts(326,1): error TS1109: Expression expected.
+src/features/users/ui/auth/AuthInput.tsx(129,1): error TS1128: Declaration or statement expected.
+src/features/users/ui/auth/AuthInput.tsx(130,1): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(173,7): error TS1005: 'try' expected.
+src/features/users/ui/settings/alert-preferences.tsx(179,3): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(186,5): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(186,7): error TS1005: 'try' expected.
+src/features/users/ui/settings/alert-preferences.tsx(189,3): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(196,5): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(196,7): error TS1005: 'try' expected.
+src/features/users/ui/settings/alert-preferences.tsx(199,3): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(206,5): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(206,7): error TS1005: 'try' expected.
+src/features/users/ui/settings/alert-preferences.tsx(209,3): error TS1128: Declaration or statement expected.
+src/features/users/ui/settings/alert-preferences.tsx(870,1): error TS1128: Declaration or statement expected.
+src/features/users/ui/verification/verification-list.tsx(207,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(82,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(97,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(100,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(100,14): error TS1109: Expression expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(101,7): error TS1109: Expression expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(102,8): error TS1109: Expression expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(103,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(103,2): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/hooks/use-web-vitals.ts(103,4): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/model/offline-analytics.ts(174,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/model/user-journey-tracker.ts(427,1): error TS1128: Declaration or statement expected.
+src/infrastructure/analytics/services/analytics.ts(785,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/auth.ts(930,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/auth.ts(930,8): error TS1128: Declaration or statement expected.
+src/infrastructure/api/cache-manager.ts(669,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/client.ts(928,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/client.ts(938,3): error TS1128: Declaration or statement expected.
+src/infrastructure/api/client.ts(939,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/client.ts(972,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/contract-client.ts(279,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/errors.ts(288,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/http/request-deduplicator.ts(95,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/interceptors.ts(176,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/interceptors.ts(176,12): error TS1128: Declaration or statement expected.
+src/infrastructure/api/interceptors.ts(190,3): error TS1128: Declaration or statement expected.
+src/infrastructure/api/interceptors.ts(191,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/notifications.ts(1081,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/performance.ts(548,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/privacy.ts(44,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/realtime/index.ts(55,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/realtime/index.ts(56,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/realtime/index.ts(57,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(28,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(28,10): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(28,11): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(33,3): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/api/services/bill.service.ts(33,23): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(33,32): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(34,12): error TS1005: ':' expected.
+src/infrastructure/api/services/bill.service.ts(38,6): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(44,9): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(45,11): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(46,12): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(47,4): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(48,12): error TS1005: ':' expected.
+src/infrastructure/api/services/bill.service.ts(52,6): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(58,9): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(58,20): error TS1109: Expression expected.
+src/infrastructure/api/services/bill.service.ts(58,39): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(59,12): error TS1005: ':' expected.
+src/infrastructure/api/services/bill.service.ts(62,6): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(68,9): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(68,22): error TS1005: ')' expected.
+src/infrastructure/api/services/bill.service.ts(68,24): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/api/services/bill.service.ts(68,30): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(68,31): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/bill.service.ts(69,12): error TS1005: ':' expected.
+src/infrastructure/api/services/bill.service.ts(73,6): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(79,9): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(79,29): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(79,38): error TS1005: ';' expected.
+src/infrastructure/api/services/bill.service.ts(80,12): error TS1005: ':' expected.
+src/infrastructure/api/services/bill.service.ts(84,6): error TS1005: ',' expected.
+src/infrastructure/api/services/bill.service.ts(86,1): error TS1109: Expression expected.
+src/infrastructure/api/services/user.service.ts(26,1): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/user.service.ts(26,10): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/user.service.ts(26,11): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/user.service.ts(31,3): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/api/services/user.service.ts(31,23): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(31,32): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(32,12): error TS1005: ':' expected.
+src/infrastructure/api/services/user.service.ts(36,6): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(42,9): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(43,11): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(44,12): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(45,4): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(46,12): error TS1005: ':' expected.
+src/infrastructure/api/services/user.service.ts(50,6): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(56,9): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(56,20): error TS1109: Expression expected.
+src/infrastructure/api/services/user.service.ts(56,39): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(57,12): error TS1005: ':' expected.
+src/infrastructure/api/services/user.service.ts(60,6): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(66,9): error TS1005: ';' expected.
+src/infrastructure/api/services/user.service.ts(66,22): error TS1005: ')' expected.
+src/infrastructure/api/services/user.service.ts(66,24): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/api/services/user.service.ts(66,30): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/user.service.ts(66,31): error TS1128: Declaration or statement expected.
+src/infrastructure/api/services/user.service.ts(67,12): error TS1005: ':' expected.
+src/infrastructure/api/services/user.service.ts(71,6): error TS1005: ',' expected.
+src/infrastructure/api/services/user.service.ts(73,1): error TS1109: Expression expected.
+src/infrastructure/api/system.ts(624,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(431,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(432,3): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(432,4): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(435,13): error TS1005: ',' expected.
+src/infrastructure/auth/initialization.ts(436,11): error TS1005: ',' expected.
+src/infrastructure/auth/initialization.ts(437,4): error TS1005: ';' expected.
+src/infrastructure/auth/initialization.ts(439,20): error TS1011: An element access expression should take an argument.
+src/infrastructure/auth/initialization.ts(467,4): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(469,32): error TS1005: ',' expected.
+src/infrastructure/auth/initialization.ts(469,46): error TS1005: ';' expected.
+src/infrastructure/auth/initialization.ts(469,48): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/auth/initialization.ts(478,4): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/initialization.ts(479,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/rbac.ts(606,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/services/auth-api-service.ts(607,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/services/auth-api-service.ts(607,10): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/services/auth-api-service.ts(607,11): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/services/auth-api-service.ts(608,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/store/auth-slice.ts(288,1): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/store/auth-slice.ts(289,5): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/store/auth-slice.ts(289,7): error TS1005: 'try' expected.
+src/infrastructure/auth/store/auth-slice.ts(295,3): error TS1128: Declaration or statement expected.
+src/infrastructure/auth/store/auth-slice.ts(296,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/browser-detector.ts(291,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/BrowserCompatibilityChecker.tsx(76,7): error TS1005: ',' expected.
+src/infrastructure/browser/BrowserCompatibilityChecker.tsx(85,3): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/BrowserCompatibilityChecker.tsx(208,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/BrowserCompatibilityReport.tsx(238,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/compatibility-manager.ts(256,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/feature-detector.ts(392,1): error TS1128: Declaration or statement expected.
+src/infrastructure/browser/polyfill-manager.ts(773,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(269,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(274,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(274,10): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(300,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(305,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(310,5): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(310,6): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(311,8): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/command-palette/commands.ts(312,3): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/commands.ts(313,1): error TS1128: Declaration or statement expected.
+src/infrastructure/command-palette/useCommandPalette.ts(73,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/components/CommunityErrorBoundary.tsx(281,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/core/handler.ts(217,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/error-rate-limiter.ts(101,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/error-rate-limiter.ts(101,8): error TS1128: Declaration or statement expected.
+src/infrastructure/error/messages/index.ts(156,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(495,1): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(496,7): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(496,8): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(496,9): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(496,11): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/error/monitoring.tsx(497,3): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(497,4): error TS1128: Declaration or statement expected.
+src/infrastructure/error/monitoring.tsx(509,1): error TS1109: Expression expected.
+src/infrastructure/integration-validator.ts(277,1): error TS1128: Declaration or statement expected.
+src/infrastructure/mobile/device-detector.ts(253,1): error TS1128: Declaration or statement expected.
+src/infrastructure/mobile/error-handler.ts(400,1): error TS1128: Declaration or statement expected.
+src/infrastructure/mobile/performance-optimizer.ts(234,1): error TS1128: Declaration or statement expected.
+src/infrastructure/mobile/responsive-utils.ts(174,1): error TS1128: Declaration or statement expected.
+src/infrastructure/mobile/touch-handler.ts(393,1): error TS1128: Declaration or statement expected.
+src/infrastructure/navigation/navigation-service.ts(82,1): error TS1128: Declaration or statement expected.
+src/infrastructure/navigation/route-preloading.ts(125,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(8,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(8,8): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(10,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(10,8): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(12,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(20,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(22,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/hooks/useNotifications.ts(29,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/model/notification-service.ts(341,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/services/notifications.ts(18,1): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/services/notifications.ts(19,3): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/services/notifications.ts(19,4): error TS1128: Declaration or statement expected.
+src/infrastructure/notifications/services/notifications.ts(21,3): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/notifications/services/notifications.ts(21,30): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(21,48): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(21,57): error TS1011: An element access expression should take an argument.
+src/infrastructure/notifications/services/notifications.ts(21,67): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(21,77): error TS1005: ';' expected.
+src/infrastructure/notifications/services/notifications.ts(21,91): error TS1109: Expression expected.
+src/infrastructure/notifications/services/notifications.ts(22,11): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(22,26): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(26,7): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(29,9): error TS1005: ';' expected.
+src/infrastructure/notifications/services/notifications.ts(29,34): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(29,43): error TS1005: ';' expected.
+src/infrastructure/notifications/services/notifications.ts(29,57): error TS1109: Expression expected.
+src/infrastructure/notifications/services/notifications.ts(30,11): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(30,26): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(30,77): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(33,9): error TS1005: ';' expected.
+src/infrastructure/notifications/services/notifications.ts(33,25): error TS1005: ';' expected.
+src/infrastructure/notifications/services/notifications.ts(34,11): error TS1005: ':' expected.
+src/infrastructure/notifications/services/notifications.ts(34,82): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(35,12): error TS1005: ':' expected.
+src/infrastructure/notifications/services/notifications.ts(35,31): error TS1005: ',' expected.
+src/infrastructure/notifications/services/notifications.ts(37,1): error TS1109: Expression expected.
+src/infrastructure/observability/analytics/index.ts(63,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/analytics/index.ts(71,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/analytics/index.ts(74,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/analytics/index.ts(74,10): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/analytics/index.ts(74,11): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/analytics/index.ts(76,11): error TS1005: ';' expected.
+src/infrastructure/observability/analytics/index.ts(77,1): error TS1109: Expression expected.
+src/infrastructure/observability/error-monitoring/index.ts(98,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/error-monitoring/index.ts(98,12): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/error-monitoring/index.ts(98,13): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/error-monitoring/index.ts(102,3): error TS1109: Expression expected.
+src/infrastructure/observability/error-monitoring/index.ts(102,4): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/error-monitoring/index.ts(103,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(60,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(61,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(61,8): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(62,3): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(63,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(72,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(73,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(75,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(76,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(78,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(79,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(84,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(84,8): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(84,15): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(84,22): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(84,29): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(85,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(100,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/performance/index.ts(104,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/personalization/persona-detector.ts(569,1): error TS1128: Declaration or statement expected.
+src/infrastructure/observability/personalization/persona-detector.ts(571,1): error TS1128: Declaration or statement expected.
+src/infrastructure/quality-optimizer.ts(258,1): error TS1128: Declaration or statement expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(19,1): error TS1128: Declaration or statement expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(20,3): error TS1128: Declaration or statement expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(20,4): error TS1128: Declaration or statement expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(25,3): error TS1434: Unexpected keyword or identifier.
+src/infrastructure/recommendation/api/recommendation-api.ts(25,31): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(25,46): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(25,59): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(26,11): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(29,6): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(30,12): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(30,25): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(36,9): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(36,25): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(36,44): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(36,58): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(37,11): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(40,6): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(41,12): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(41,25): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(47,9): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(47,31): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(47,45): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(48,11): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(51,6): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(52,12): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(52,25): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(58,9): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(58,32): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(58,60): error TS1005: ';' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(59,11): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(62,6): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(63,12): error TS1005: ':' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(63,25): error TS1005: ',' expected.
+src/infrastructure/recommendation/api/recommendation-api.ts(65,1): error TS1109: Expression expected.
+src/infrastructure/search/search-strategy-selector.ts(314,1): error TS1128: Declaration or statement expected.
+src/infrastructure/search/search-strategy-selector.ts(315,1): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(58,3): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(58,4): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(154,3): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(188,5): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(188,6): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(189,3): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(216,3): error TS1128: Declaration or statement expected.
+src/infrastructure/search/UnifiedSearchInterface.tsx(367,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/csp-config.ts(288,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/csp-nonce.ts(119,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/input-sanitizer.ts(610,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/rate-limiter.ts(489,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/rate-limiter.ts(491,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/security-utils.ts(317,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/dashboard/SecuritySettings.tsx(109,7): error TS1005: 'try' expected.
+src/infrastructure/security/ui/dashboard/SecuritySettings.tsx(112,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/dashboard/SecuritySettings.tsx(585,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(213,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(217,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(221,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/DataUsageReportDashboard.tsx(705,1): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(351,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(368,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(399,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(424,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(439,3): error TS1128: Declaration or statement expected.
+src/infrastructure/security/ui/privacy/GDPRComplianceManager.tsx(789,1): error TS1128: Declaration or statement expected.
+src/infrastructure/storage/sync/background-sync-manager.ts(129,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/middleware/navigationPersistenceMiddleware.ts(325,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(651,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(705,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(706,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(708,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(713,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(714,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(716,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(724,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(724,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(726,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(734,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/discussionSlice.ts(734,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/loadingSlice.ts(591,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/loadingSlice.ts(592,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/loadingSlice.ts(599,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,8): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,15): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,22): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,29): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(297,36): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/realTimeSlice.ts(312,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(269,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(296,5): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(296,7): error TS1005: 'try' expected.
+src/infrastructure/store/slices/sessionSlice.ts(301,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(302,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(358,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(378,5): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(378,7): error TS1005: 'try' expected.
+src/infrastructure/store/slices/sessionSlice.ts(383,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(384,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(389,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(389,14): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(419,5): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(419,7): error TS1005: 'try' expected.
+src/infrastructure/store/slices/sessionSlice.ts(430,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(431,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(704,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(704,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(722,3): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(722,4): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(726,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(726,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(728,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(729,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(729,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(731,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(732,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(736,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(742,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(742,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(750,1): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/sessionSlice.ts(750,2): error TS1128: Declaration or statement expected.
+src/infrastructure/store/slices/userDashboardSlice.ts(1,95): error TS1128: Declaration or statement expected.
+src/lib/components/performance/PerformanceMonitor.tsx(488,1): error TS1128: Declaration or statement expected.
+src/lib/config/api.ts(154,1): error TS1128: Declaration or statement expected.
+src/lib/config/api.ts(159,1): error TS1128: Declaration or statement expected.
+src/lib/config/api.ts(159,8): error TS1128: Declaration or statement expected.
+src/lib/config/api.ts(164,1): error TS1128: Declaration or statement expected.
+src/lib/config/api.ts(165,1): error TS1128: Declaration or statement expected.
+src/lib/config/development.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/config/feature-flags.ts(168,1): error TS1128: Declaration or statement expected.
+src/lib/config/feature-flags.ts(168,8): error TS1128: Declaration or statement expected.
+src/lib/config/feature-flags.ts(184,1): error TS1128: Declaration or statement expected.
+src/lib/config/gestures.ts(61,1): error TS1128: Declaration or statement expected.
+src/lib/config/mobile.ts(68,1): error TS1128: Declaration or statement expected.
+src/lib/config/mobile.ts(72,1): error TS1128: Declaration or statement expected.
+src/lib/config/mobile.ts(76,1): error TS1128: Declaration or statement expected.
+src/lib/config/navigation.ts(60,1): error TS1128: Declaration or statement expected.
+src/lib/config/navigation.ts(62,3): error TS1128: Declaration or statement expected.
+src/lib/config/navigation.ts(62,4): error TS1128: Declaration or statement expected.
+src/lib/config/navigation.ts(63,1): error TS1128: Declaration or statement expected.
+src/lib/config/onboarding.ts(3,1): error TS1128: Declaration or statement expected.
+src/lib/config/onboarding.ts(4,1): error TS1128: Declaration or statement expected.
+src/lib/config/onboarding.ts(5,1): error TS1128: Declaration or statement expected.
+src/lib/config/onboarding.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,15): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,22): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,29): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,36): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,43): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,50): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,57): error TS1128: Declaration or statement expected.
+src/lib/data/mock/analytics.ts(517,64): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(262,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(262,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(267,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(267,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(272,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(272,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/bills.ts(278,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,15): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,22): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,29): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,36): error TS1128: Declaration or statement expected.
+src/lib/data/mock/community.ts(433,43): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(175,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(193,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(234,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(234,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(236,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(248,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(250,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/discussions.ts(250,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(278,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(329,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(372,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(407,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(411,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(412,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(417,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(418,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(423,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/experts.ts(424,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(16,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(17,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(22,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(28,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(33,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(40,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(52,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(57,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(62,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(76,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(89,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(126,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(151,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(176,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(187,3): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(187,5): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(217,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(232,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(237,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(237,23): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(237,24): error TS1109: Expression expected.
+src/lib/data/mock/generators.ts(237,26): error TS1109: Expression expected.
+src/lib/data/mock/generators.ts(261,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(261,23): error TS1128: Declaration or statement expected.
+src/lib/data/mock/generators.ts(261,24): error TS1109: Expression expected.
+src/lib/data/mock/generators.ts(261,26): error TS1109: Expression expected.
+src/lib/data/mock/loaders.ts(23,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(139,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(139,9): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,12): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,24): error TS1005: '(' expected.
+src/lib/data/mock/real-kenya-data.ts(139,28): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(139,38): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(139,42): error TS1005: '(' expected.
+src/lib/data/mock/real-kenya-data.ts(139,63): error TS1005: ')' expected.
+src/lib/data/mock/real-kenya-data.ts(139,80): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,83): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,93): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,95): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,109): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,120): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,128): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,135): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,155): error TS1434: Unexpected keyword or identifier.
+src/lib/data/mock/real-kenya-data.ts(139,163): error TS1005: '(' expected.
+src/lib/data/mock/real-kenya-data.ts(139,173): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(139,182): error TS1003: Identifier expected.
+src/lib/data/mock/real-kenya-data.ts(139,184): error TS1002: Unterminated string literal.
+src/lib/data/mock/real-kenya-data.ts(140,5): error TS1005: ')' expected.
+src/lib/data/mock/real-kenya-data.ts(146,24): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(150,13): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(154,3): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(154,4): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(157,10): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(158,11): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(159,12): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(160,18): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(166,24): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(169,13): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(173,4): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(176,10): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(177,11): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(178,12): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(179,18): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(184,24): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(189,13): error TS1005: ';' expected.
+src/lib/data/mock/real-kenya-data.ts(194,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(200,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(202,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(202,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(205,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/real-kenya-data.ts(205,8): error TS1128: Declaration or statement expected.
+src/lib/data/mock/realtime.ts(528,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/realtime.ts(532,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/realtime.ts(536,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(150,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(188,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(293,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(297,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(298,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(303,1): error TS1128: Declaration or statement expected.
+src/lib/data/mock/users.ts(304,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/accessibility/focus.ts(50,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/accessibility/focus.ts(50,23): error TS1005: ';' expected.
+src/lib/design-system/accessibility/focus.ts(50,25): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/accessibility/focus.ts(105,1): error TS1160: Unterminated template literal.
+src/lib/design-system/accessibility/touch.ts(57,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/accessibility/touch.ts(57,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/accessibility/touch.ts(73,21): error TS1005: ';' expected.
+src/lib/design-system/accessibility/touch.ts(80,19): error TS1005: ';' expected.
+src/lib/design-system/accessibility/touch.ts(89,1): error TS1109: Expression expected.
+src/lib/design-system/accessibility/touch.ts(89,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/integration.ts(107,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(108,7): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(108,8): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(109,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(110,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(110,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/integration.ts(126,14): error TS1005: ';' expected.
+src/lib/design-system/integration.ts(131,1): error TS1109: Expression expected.
+src/lib/design-system/quality.ts(47,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/quality.ts(51,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/quality.ts(51,24): error TS1011: An element access expression should take an argument.
+src/lib/design-system/quality.ts(51,26): error TS1128: Declaration or statement expected.
+src/lib/design-system/quality.ts(51,28): error TS1128: Declaration or statement expected.
+src/lib/design-system/quality.ts(82,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/quality.ts(104,19): error TS1005: ';' expected.
+src/lib/design-system/quality.ts(118,1): error TS1109: Expression expected.
+src/lib/design-system/responsive.ts(172,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/responsive.ts(172,8): error TS1128: Declaration or statement expected.
+src/lib/design-system/responsive.ts(225,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(10,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(15,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(15,21): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(15,33): error TS1003: Identifier expected.
+src/lib/design-system/standards/brand-personality.ts(15,35): error TS1002: Unterminated string literal.
+src/lib/design-system/standards/brand-personality.ts(17,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(18,5): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(18,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(20,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(20,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(27,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(28,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(30,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(31,10): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(32,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(33,5): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(33,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(35,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(35,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(42,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(43,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(45,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(46,10): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(47,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(48,5): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(48,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(50,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(50,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(57,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(58,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(60,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(61,10): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(62,11): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(63,5): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(63,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(65,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(65,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(66,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(71,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(76,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(81,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(81,9): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/brand-personality.ts(81,17): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/brand-personality.ts(81,20): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/brand-personality.ts(81,38): error TS1005: ',' expected.
+src/lib/design-system/standards/brand-personality.ts(81,47): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(81,49): error TS1002: Unterminated string literal.
+src/lib/design-system/standards/brand-personality.ts(82,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(82,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(84,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(84,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(88,13): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(89,12): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(91,17): error TS1005: ';' expected.
+src/lib/design-system/standards/brand-personality.ts(92,5): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(92,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(94,3): error TS1109: Expression expected.
+src/lib/design-system/standards/brand-personality.ts(94,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(95,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(101,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(105,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(110,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/brand-personality.ts(114,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/button.ts(177,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/button.ts(185,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/button.ts(185,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/button.ts(218,24): error TS1005: ';' expected.
+src/lib/design-system/standards/button.ts(240,1): error TS1109: Expression expected.
+src/lib/design-system/standards/button.ts(240,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/card.ts(104,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/card.ts(106,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/card.ts(106,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/card.ts(128,1): error TS1109: Expression expected.
+src/lib/design-system/standards/card.ts(128,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/index.ts(90,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/index.ts(95,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/index.ts(99,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/input.ts(137,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/input.ts(139,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/input.ts(139,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/input.ts(161,1): error TS1109: Expression expected.
+src/lib/design-system/standards/input.ts(161,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/interactive-states.ts(158,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/interactive-states.ts(158,20): error TS1109: Expression expected.
+src/lib/design-system/standards/interactive-states.ts(159,14): error TS1109: Expression expected.
+src/lib/design-system/standards/interactive-states.ts(160,16): error TS1109: Expression expected.
+src/lib/design-system/standards/interactive-states.ts(161,15): error TS1109: Expression expected.
+src/lib/design-system/standards/interactive-states.ts(162,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/interactive-states.ts(162,7): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/interactive-states.ts(163,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/interactive-states.ts(163,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/interactive-states.ts(178,17): error TS1005: ';' expected.
+src/lib/design-system/standards/interactive-states.ts(198,14): error TS1005: ';' expected.
+src/lib/design-system/standards/interactive-states.ts(257,24): error TS1005: ';' expected.
+src/lib/design-system/standards/interactive-states.ts(286,1): error TS1109: Expression expected.
+src/lib/design-system/standards/interactive-states.ts(286,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(10,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(14,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(19,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(23,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(27,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(27,20): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(27,27): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(28,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(28,6): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(28,27): error TS1127: Invalid character.
+src/lib/design-system/standards/low-bandwidth.ts(28,28): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(28,29): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(28,29): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(28,61): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(28,61): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(28,66): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(28,66): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(31,5): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(31,23): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(31,67): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(31,72): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,6): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(32,25): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,29): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,30): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,30): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(32,30): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(32,34): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,34): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(32,45): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,60): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/low-bandwidth.ts(32,67): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(32,67): error TS1351: An identifier or keyword cannot immediately follow a numeric literal.
+src/lib/design-system/standards/low-bandwidth.ts(44,3): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(44,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(51,14): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(52,12): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(53,3): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(53,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(60,9): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(61,16): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(62,3): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(62,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(70,10): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(71,9): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(72,12): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(73,16): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(74,5): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(74,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(77,22): error TS1005: ';' expected.
+src/lib/design-system/standards/low-bandwidth.ts(78,5): error TS1109: Expression expected.
+src/lib/design-system/standards/low-bandwidth.ts(78,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(79,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(80,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(85,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/low-bandwidth.ts(160,1): error TS1160: Unterminated template literal.
+src/lib/design-system/standards/multilingual-support.ts(87,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/multilingual-support.ts(122,1): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/standards/multilingual-support.ts(123,41): error TS1011: An element access expression should take an argument.
+src/lib/design-system/standards/typography.ts(196,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/typography.ts(196,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/typography.ts(196,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/standards/typography.ts(208,16): error TS1005: ';' expected.
+src/lib/design-system/standards/typography.ts(215,14): error TS1005: ';' expected.
+src/lib/design-system/standards/typography.ts(304,1): error TS1109: Expression expected.
+src/lib/design-system/standards/typography.ts(304,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/strategy.ts(11,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/strategy.ts(15,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/strategy.ts(19,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/strategy.ts(23,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/strategy.ts(27,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/styles/index.ts(30,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/themes/dark.ts(8,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/themes/high-contrast.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/themes/high-contrast.ts(8,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/themes/light.ts(8,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/themes/themeProvider.ts(281,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/animations.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/borders.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/breakpoints.ts(48,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/breakpoints.ts(48,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/breakpoints.ts(48,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/breakpoints.ts(60,20): error TS1005: ';' expected.
+src/lib/design-system/tokens/breakpoints.ts(63,1): error TS1109: Expression expected.
+src/lib/design-system/tokens/breakpoints.ts(63,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/tokens/colors.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/shadows.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/spacing.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/typography.ts(335,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/typography.ts(335,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/typography.ts(335,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/typography.ts(353,23): error TS1005: ';' expected.
+src/lib/design-system/tokens/typography.ts(364,31): error TS1005: ';' expected.
+src/lib/design-system/tokens/typography.ts(375,1): error TS1109: Expression expected.
+src/lib/design-system/tokens/typography.ts(375,3): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/tokens/validation.ts(118,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/validation.ts(122,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/validation.ts(122,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/tokens/validation.ts(135,10): error TS1005: ';' expected.
+src/lib/design-system/tokens/validation.ts(142,16): error TS1005: ';' expected.
+src/lib/design-system/tokens/validation.ts(145,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(9,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(11,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(11,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(25,21): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(32,28): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(44,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(49,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(49,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(49,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(73,20): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(88,24): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(91,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(96,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(104,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(104,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(117,19): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(129,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(134,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(134,32): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(134,33): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(135,3): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(135,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(135,11): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(139,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(159,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(164,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(170,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(170,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(184,1): error TS1109: Expression expected.
+src/lib/design-system/utils/performance.ts(189,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(195,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(195,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/performance.ts(213,15): error TS1005: ';' expected.
+src/lib/design-system/utils/performance.ts(249,1): error TS1109: Expression expected.
+src/lib/design-system/utils/responsive.ts(109,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(123,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(123,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(128,25): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(128,63): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(128,65): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/utils/responsive.ts(130,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(135,24): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(135,26): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/utils/responsive.ts(137,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(138,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(143,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(143,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(143,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(148,27): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(148,65): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(148,67): error TS1434: Unexpected keyword or identifier.
+src/lib/design-system/utils/responsive.ts(150,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(155,30): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(155,39): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(156,19): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(156,23): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(162,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(162,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(163,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(168,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(168,10): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(168,11): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(173,26): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(173,59): error TS1005: ';' expected.
+src/lib/design-system/utils/responsive.ts(175,7): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(175,12): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(175,21): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(176,16): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(176,61): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(177,12): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(177,18): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(178,16): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(178,50): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(179,12): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(179,21): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(180,16): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(180,38): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(182,9): error TS1109: Expression expected.
+src/lib/design-system/utils/responsive.ts(182,16): error TS1005: ':' expected.
+src/lib/design-system/utils/responsive.ts(182,30): error TS1005: ',' expected.
+src/lib/design-system/utils/responsive.ts(184,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(184,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/responsive.ts(185,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(48,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(49,7): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(51,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(51,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(51,7): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(53,3): error TS1109: Expression expected.
+src/lib/design-system/utils/validation.ts(53,4): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(54,3): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(90,1): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(90,14): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(92,5): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(92,6): error TS1128: Declaration or statement expected.
+src/lib/design-system/utils/validation.ts(95,11): error TS1005: ';' expected.
+src/lib/design-system/utils/validation.ts(96,5): error TS1109: Expression expected.
+src/lib/design-system/utils/validation.ts(97,3): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(417,1): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(421,1): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(421,12): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(421,14): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(428,3): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(428,4): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(433,29): error TS1005: ',' expected.
+src/lib/services/dataRetentionService.ts(433,38): error TS1005: ';' expected.
+src/lib/services/dataRetentionService.ts(433,40): error TS1434: Unexpected keyword or identifier.
+src/lib/services/dataRetentionService.ts(438,4): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(443,33): error TS1005: ',' expected.
+src/lib/services/dataRetentionService.ts(443,70): error TS1005: ';' expected.
+src/lib/services/dataRetentionService.ts(443,72): error TS1434: Unexpected keyword or identifier.
+src/lib/services/dataRetentionService.ts(454,4): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(459,23): error TS1005: ',' expected.
+src/lib/services/dataRetentionService.ts(459,32): error TS1005: ';' expected.
+src/lib/services/dataRetentionService.ts(459,34): error TS1434: Unexpected keyword or identifier.
+src/lib/services/dataRetentionService.ts(470,4): error TS1128: Declaration or statement expected.
+src/lib/services/dataRetentionService.ts(471,1): error TS1128: Declaration or statement expected.
+src/lib/services/errors.ts(848,1): error TS1128: Declaration or statement expected.
+src/lib/services/errors.ts(848,8): error TS1128: Declaration or statement expected.
+src/lib/services/factory.ts(674,1): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(123,1): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(123,10): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(123,11): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(125,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(125,30): error TS1109: Expression expected.
+src/lib/services/index.ts(126,19): error TS1005: ',' expected.
+src/lib/services/index.ts(127,30): error TS1005: ',' expected.
+src/lib/services/index.ts(128,5): error TS1005: ';' expected.
+src/lib/services/index.ts(128,30): error TS1011: An element access expression should take an argument.
+src/lib/services/index.ts(129,12): error TS1005: ':' expected.
+src/lib/services/index.ts(132,6): error TS1005: ',' expected.
+src/lib/services/index.ts(135,9): error TS1005: ';' expected.
+src/lib/services/index.ts(135,30): error TS1109: Expression expected.
+src/lib/services/index.ts(135,49): error TS1005: ';' expected.
+src/lib/services/index.ts(135,72): error TS1011: An element access expression should take an argument.
+src/lib/services/index.ts(136,12): error TS1005: ':' expected.
+src/lib/services/index.ts(139,6): error TS1005: ',' expected.
+src/lib/services/index.ts(142,9): error TS1005: ';' expected.
+src/lib/services/index.ts(142,39): error TS1109: Expression expected.
+src/lib/services/index.ts(142,58): error TS1005: ';' expected.
+src/lib/services/index.ts(143,12): error TS1005: ':' expected.
+src/lib/services/index.ts(148,6): error TS1005: ',' expected.
+src/lib/services/index.ts(151,9): error TS1005: ';' expected.
+src/lib/services/index.ts(151,29): error TS1005: ';' expected.
+src/lib/services/index.ts(152,12): error TS1005: ':' expected.
+src/lib/services/index.ts(160,6): error TS1005: ',' expected.
+src/lib/services/index.ts(162,1): error TS1109: Expression expected.
+src/lib/services/index.ts(165,1): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(165,10): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(165,11): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(166,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(166,30): error TS1005: ',' expected.
+src/lib/services/index.ts(166,57): error TS1005: ';' expected.
+src/lib/services/index.ts(168,4): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(169,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(169,28): error TS1005: ',' expected.
+src/lib/services/index.ts(169,42): error TS1005: ',' expected.
+src/lib/services/index.ts(169,69): error TS1005: ';' expected.
+src/lib/services/index.ts(171,4): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(172,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(172,28): error TS1005: ';' expected.
+src/lib/services/index.ts(174,4): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(175,1): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(178,1): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(178,10): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(178,11): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(179,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(179,19): error TS1005: ';' expected.
+src/lib/services/index.ts(182,4): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(183,3): error TS1434: Unexpected keyword or identifier.
+src/lib/services/index.ts(183,23): error TS1005: ';' expected.
+src/lib/services/index.ts(185,4): error TS1128: Declaration or statement expected.
+src/lib/services/index.ts(186,1): error TS1128: Declaration or statement expected.
+src/lib/services/mockUserData.ts(472,1): error TS1128: Declaration or statement expected.
+src/lib/services/navigation.ts(23,1): error TS1128: Declaration or statement expected.
+src/lib/services/userService.ts(897,3): error TS1128: Declaration or statement expected.
+src/lib/services/userService.ts(897,4): error TS1128: Declaration or statement expected.
+src/lib/services/userService.ts(898,20): error TS1005: ',' expected.
+src/lib/services/userService.ts(898,46): error TS1005: ';' expected.
+src/lib/services/userService.ts(902,4): error TS1128: Declaration or statement expected.
+src/lib/services/userService.ts(903,1): error TS1128: Declaration or statement expected.
+src/lib/services/userService.ts(903,2): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-data.ts(335,1): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-data.ts(337,1): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(565,1): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(565,10): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(565,11): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(567,34): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(567,54): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(567,56): error TS1434: Unexpected keyword or identifier.
+src/lib/testing/mock-users.ts(569,4): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(571,26): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(571,37): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(571,44): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(571,63): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(571,74): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(571,76): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(573,4): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(575,30): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(575,41): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(575,50): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(575,59): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(575,70): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(575,72): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(577,4): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(579,28): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(579,39): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(579,41): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(579,52): error TS1011: An element access expression should take an argument.
+src/lib/testing/mock-users.ts(579,54): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(585,4): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(587,30): error TS1005: ',' expected.
+src/lib/testing/mock-users.ts(587,41): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(587,69): error TS1005: ';' expected.
+src/lib/testing/mock-users.ts(594,4): error TS1128: Declaration or statement expected.
+src/lib/testing/mock-users.ts(595,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/hooks/useDashboardLayout.ts(100,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/layout-components/DashboardContent.tsx(76,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/layout-components/DashboardFooter.tsx(194,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/layout-components/DashboardHeader.tsx(284,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/layout-components/DashboardSidebar.tsx(271,1): error TS1128: Declaration or statement expected.
+src/lib/ui/dashboard/utils/dashboard-constants.ts(8,1): error TS1128: Declaration or statement expected.
+src/lib/ui/education/EducationalTooltip.tsx(166,1): error TS1128: Declaration or statement expected.
+src/lib/ui/education/EducationalTooltip.tsx(167,1): error TS1128: Declaration or statement expected.
+src/lib/ui/education/EducationalTooltip.tsx(168,1): error TS1128: Declaration or statement expected.
+src/lib/ui/education/EducationalTooltip.tsx(169,1): error TS1128: Declaration or statement expected.
+src/lib/ui/integration/context/IntegrationContext.ts(9,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/constants.ts(63,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/constants.ts(64,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/constants.ts(65,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/hooks/index.ts(10,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/hooks/index.ts(11,1): error TS1128: Declaration or statement expected.
+src/lib/ui/loading/LoadingStates.tsx(177,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/constants.ts(8,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/constants.ts(11,13): error TS1005: ',' expected.
+src/lib/ui/mobile/constants.ts(12,16): error TS1005: ',' expected.
+src/lib/ui/mobile/constants.ts(13,25): error TS1005: ',' expected.
+src/lib/ui/mobile/constants.ts(14,17): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(16,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(16,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(16,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(17,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(17,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(17,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(23,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(23,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(23,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(24,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(24,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(24,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(30,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(30,16): error TS1109: Expression expected.
+src/lib/ui/mobile/fallbacks.tsx(31,7): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(31,16): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(32,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(32,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(32,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(39,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(39,18): error TS1109: Expression expected.
+src/lib/ui/mobile/fallbacks.tsx(40,7): error TS1109: Expression expected.
+src/lib/ui/mobile/fallbacks.tsx(41,7): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(41,16): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(42,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(42,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(42,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(50,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(50,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(50,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(51,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(51,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(51,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(57,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(57,21): error TS1109: Expression expected.
+src/lib/ui/mobile/fallbacks.tsx(58,16): error TS1109: Expression expected.
+src/lib/ui/mobile/fallbacks.tsx(59,7): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(59,16): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(60,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(60,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(60,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(68,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(69,7): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(69,16): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(70,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(70,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(70,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(78,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(78,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(78,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(79,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(79,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(79,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(85,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(85,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(85,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(86,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(86,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(86,4): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(92,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(92,14): error TS1005: ',' expected.
+src/lib/ui/mobile/fallbacks.tsx(92,23): error TS1005: ';' expected.
+src/lib/ui/mobile/fallbacks.tsx(93,1): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(93,2): error TS1128: Declaration or statement expected.
+src/lib/ui/mobile/fallbacks.tsx(93,4): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/core/roleGuard.ts(3,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/core/roleGuard.ts(7,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/hooks/useNav.ts(16,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/ui/NavSection.tsx(27,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/ui/NavSection.tsx(44,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(60,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(60,10): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(64,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(69,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(69,10): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(72,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(77,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(77,10): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(94,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(99,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(100,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(100,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(104,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(109,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(110,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(110,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(114,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(119,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(119,10): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(119,12): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/navigation-utils.ts(123,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(132,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(169,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(169,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/page-relationships.ts(174,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(179,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(242,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/page-relationships.ts(242,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/page-relationships.ts(247,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(42,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(88,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(88,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/route-access.ts(98,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(103,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(116,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(121,1): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(132,3): error TS1128: Declaration or statement expected.
+src/lib/ui/navigation/utils/route-access.ts(132,5): error TS1005: 'try' expected.
+src/lib/ui/navigation/utils/route-access.ts(136,1): error TS1128: Declaration or statement expected.
+src/lib/ui/privacy/controls/VisibilityControls.tsx(20,1): error TS1128: Declaration or statement expected.
+src/lib/ui/privacy/controls/VisibilityControls.tsx(20,8): error TS1128: Declaration or statement expected.
+src/lib/ui/privacy/controls/VisibilityControls.tsx(20,9): error TS1128: Declaration or statement expected.
+src/lib/ui/utils/error-handling.tsx(75,1): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(494,1): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(496,1): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(496,18): error TS1109: Expression expected.
+src/lib/utils/comprehensiveLoading.ts(496,28): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(497,3): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(497,5): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(503,4): error TS1128: Declaration or statement expected.
+src/lib/utils/comprehensiveLoading.ts(518,25): error TS1005: ';' expected.
+src/lib/utils/comprehensiveLoading.ts(530,23): error TS1005: ';' expected.
+src/lib/utils/comprehensiveLoading.ts(541,22): error TS1005: ';' expected.
+src/lib/utils/comprehensiveLoading.ts(555,20): error TS1005: ';' expected.
+src/lib/utils/comprehensiveLoading.ts(562,1): error TS1109: Expression expected.
+src/lib/utils/i18n.ts(47,1): error TS1128: Declaration or statement expected.
+src/lib/utils/i18n.ts(48,1): error TS1128: Declaration or statement expected.
+src/lib/utils/i18n.ts(50,1): error TS1128: Declaration or statement expected.
+src/lib/utils/i18n.ts(52,1): error TS1128: Declaration or statement expected.
+src/lib/utils/i18n.ts(52,8): error TS1128: Declaration or statement expected.
+src/lib/utils/i18n.ts(54,1): error TS1128: Declaration or statement expected.
+src/lib/utils/input-validation.ts(274,1): error TS1128: Declaration or statement expected.
+src/lib/utils/privacy-compliance.ts(33,1): error TS1128: Declaration or statement expected.
+src/lib/utils/privacy-compliance.ts(39,3): error TS1128: Declaration or statement expected.
+src/lib/utils/privacy-compliance.ts(39,4): error TS1128: Declaration or statement expected.
+src/lib/utils/privacy-compliance.ts(44,31): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(44,54): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(44,63): error TS1005: ';' expected.
+src/lib/utils/privacy-compliance.ts(44,65): error TS1434: Unexpected keyword or identifier.
+src/lib/utils/privacy-compliance.ts(48,4): error TS1128: Declaration or statement expected.
+src/lib/utils/privacy-compliance.ts(53,28): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(53,54): error TS1005: ';' expected.
+src/lib/utils/privacy-compliance.ts(54,11): error TS1005: ':' expected.
+src/lib/utils/privacy-compliance.ts(54,79): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(55,11): error TS1005: ':' expected.
+src/lib/utils/privacy-compliance.ts(55,34): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(57,10): error TS1359: Identifier expected. 'const' is a reserved word that cannot be used here.
+src/lib/utils/privacy-compliance.ts(57,16): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(57,22): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(57,25): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(63,5): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(63,12): error TS1005: ':' expected.
+src/lib/utils/privacy-compliance.ts(63,21): error TS1005: ',' expected.
+src/lib/utils/privacy-compliance.ts(65,1): error TS1109: Expression expected.
+src/lib/utils/privacy-compliance.ts(208,1): error TS1128: Declaration or statement expected.
+src/lib/utils/react-helpers.ts(11,1): error TS1128: Declaration or statement expected.
+src/lib/utils/react-helpers.ts(11,10): error TS1128: Declaration or statement expected.
+src/lib/utils/react-helpers.ts(11,11): error TS1128: Declaration or statement expected.
+src/lib/utils/security.ts(6,1): error TS1128: Declaration or statement expected.
+src/lib/utils/security.ts(6,10): error TS1128: Declaration or statement expected.
+src/lib/utils/security.ts(6,11): error TS1128: Declaration or statement expected.
+src/lib/utils/security.ts(12,15): error TS1005: ';' expected.
+src/lib/utils/security.ts(17,19): error TS1005: ';' expected.
+src/lib/utils/security.ts(20,1): error TS1109: Expression expected.

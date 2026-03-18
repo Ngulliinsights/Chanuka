@@ -13,17 +13,13 @@ faker.seed(12345);
 /**
  * Generate a random ID with optional prefix
  */
-export const generateId = (prefix?: string): string => {
-  const id = faker.string.uuid();
-  return prefix ? `${prefix}_${id}` : id;
+export   return prefix ? `${prefix}_${id}` : id;
 };
 
 /**
  * Generate a random date within a range
  */
-export const generateDateInRange = (startDays: number, endDays: number = 0): string => {
-  const start = new Date();
-  start.setDate(start.getDate() - startDays);
+export   start.setDate(start.getDate() - startDays);
 
   const end = new Date();
   end.setDate(end.getDate() - endDays);
@@ -34,9 +30,7 @@ export const generateDateInRange = (startDays: number, endDays: number = 0): str
 /**
  * Generate realistic engagement metrics
  */
-export const generateEngagementMetrics = (basePopularity: number = 1) => {
-  const multiplier = Math.max(0.1, basePopularity);
-
+export 
   return {
     viewCount: Math.floor(faker.number.int({ min: 50, max: 5000 }) * multiplier),
     saveCount: Math.floor(faker.number.int({ min: 5, max: 500 }) * multiplier),
@@ -48,9 +42,7 @@ export const generateEngagementMetrics = (basePopularity: number = 1) => {
 /**
  * Generate realistic voting metrics
  */
-export const generateVotingMetrics = () => {
-  const upvotes = faker.number.int({ min: 0, max: 150 });
-  const downvotes = faker.number.int({ min: 0, max: Math.floor(upvotes * 0.3) });
+export   const downvotes = faker.number.int({ min: 0, max: Math.floor(upvotes * 0.3) });
 
   return {
     upvotes,
@@ -62,9 +54,7 @@ export const generateVotingMetrics = () => {
 /**
  * Generate realistic quality scores
  */
-export const generateQualityMetrics = () => {
-  const qualityScore = faker.number.float({ min: 0.1, max: 1.0, fractionDigits: 2 });
-
+export 
   return {
     qualityScore,
     isHighQuality: qualityScore > 0.7,
@@ -74,9 +64,7 @@ export const generateQualityMetrics = () => {
 /**
  * Generate trending metrics
  */
-export const generateTrendingMetrics = () => {
-  const velocity = faker.number.float({ min: 0.1, max: 1.0, fractionDigits: 2 });
-  const diversity = faker.number.float({ min: 0.1, max: 1.0, fractionDigits: 2 });
+export   const diversity = faker.number.float({ min: 0.1, max: 1.0, fractionDigits: 2 });
   const substance = faker.number.float({ min: 0.1, max: 1.0, fractionDigits: 2 });
 
   return {
@@ -90,25 +78,7 @@ export const generateTrendingMetrics = () => {
 /**
  * Generate geographic location data
  */
-export const generateLocation = () => {
-  const states = [
-    'Nairobi',
-    'Mombasa',
-    'Kisumu',
-    'Nakuru',
-    'Uasin Gishu',
-    'Kiambu',
-    'Turkana',
-    'Kilifi',
-    'Kakamega',
-    'Meru',
-    'Machakos',
-    'Kisii',
-    'Kajiado',
-    'Murang\'a',
-    'Nyeri',
-  ];
-
+export 
   const state = faker.helpers.arrayElement(states);
 
   return {
@@ -151,29 +121,14 @@ export const generatePolicyAreas = (count: number = 2): string[] => {
 /**
  * Generate bill number in realistic format
  */
-export const generateBillNumber = (): string => {
-  const chamber = faker.helpers.arrayElement(['N.A.B.', 'Sen. Bill']);
-  const number = faker.number.int({ min: 1, max: 9999 });
+export   const number = faker.number.int({ min: 1, max: 9999 });
   return `${chamber} ${number}`;
 };
 
 /**
  * Generate realistic bill title
  */
-export const generateBillTitle = (): string => {
-  const actions = [
-    'To establish',
-    'To amend',
-    'To provide',
-    'To authorize',
-    'To improve',
-    'To strengthen',
-    'To enhance',
-    'To create',
-    'To reform',
-    'To modernize',
-  ];
-
+export 
   const subjects = [
     'healthcare access',
     'educational opportunities',
@@ -198,14 +153,7 @@ export const generateBillTitle = (): string => {
 /**
  * Generate realistic bill summary
  */
-export const generateBillSummary = (): string => {
-  const templates = [
-    'This bill establishes new requirements for {subject} and provides funding for implementation. The legislation includes provisions for oversight, reporting, and evaluation of program effectiveness.',
-    'The proposed legislation amends existing law to improve {subject} by expanding eligibility, increasing funding, and strengthening enforcement mechanisms.',
-    'This comprehensive bill addresses {subject} through a multi-faceted approach including regulatory reforms, funding increases, and new accountability measures.',
-    'The legislation creates a new framework for {subject} while maintaining existing protections and adding enhanced oversight provisions.',
-  ];
-
+export 
   const subjects = [
     'healthcare delivery systems',
     'educational funding mechanisms',
@@ -230,15 +178,7 @@ export const generateBillSummary = (): string => {
 /**
  * Generate realistic comment content
  */
-export const generateCommentContent = (isExpert: boolean = false): string => {
-  if (isExpert) {
-    const expertTemplates = [
-      'Based on my analysis of similar legislation, this bill addresses key concerns in {area}. The proposed framework aligns with established best practices and includes necessary safeguards.',
-      'From a policy perspective, this legislation represents a significant step forward in {area}. However, implementation will require careful coordination between national and county agencies.',
-      'The constitutional implications of this bill are generally sound, though Section {section} may face challenges under current precedent. I recommend reviewing the trade regulation analysis.',
-      "This bill's approach to {area} is well-researched and evidence-based. The funding mechanisms are realistic and the timeline for implementation is achievable.",
-    ];
-
+export 
     const template = faker.helpers.arrayElement(expertTemplates);
     const area = faker.helpers.arrayElement(generatePolicyAreas(1));
     const section = faker.number.int({ min: 1, max: 15 });
@@ -279,9 +219,7 @@ export const generateCommentContent = (isExpert: boolean = false): string => {
 /**
  * Generate weighted random selection based on probabilities
  */
-export const weightedRandom = <T>(items: T[], weights: number[]): T => {
-  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-  let random = faker.number.float({ min: 0, max: totalWeight });
+export   let random = faker.number.float({ min: 0, max: totalWeight });
 
   for (let i = 0; i < items.length; i++) {
     random -= weights[i];
@@ -296,11 +234,7 @@ export const weightedRandom = <T>(items: T[], weights: number[]): T => {
 /**
  * Generate time-series data for analytics
  */
-export const generateTimeSeriesData = (
-  days: number,
-  baseValue: number = 100,
-  volatility: number = 0.2
-): Array<{ date: string; value: number }> => {
+export  value: number }> => {
   const data = [];
   let currentValue = baseValue;
 
@@ -324,7 +258,7 @@ export const generateTimeSeriesData = (
 /**
  * Generate hourly data for real-time analytics
  */
-export const generateHourlyData = (hours: number = 24): Array<{ hour: number; value: number }> => {
+export  value: number }> => {
   const data = [];
 
   for (let i = 0; i < hours; i++) {

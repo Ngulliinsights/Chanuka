@@ -227,7 +227,9 @@ class WebSocketConsolidationValidator {
 
     console.log('\n🚀 Usage Examples:');
     console.log('  // Import the consolidated real-time service');
-    console.log("  import { realTimeService, useWebSocket } from '@client/infrastructure/api/realtime';");
+    console.log(
+      "  import { realTimeService, useWebSocket } from '@client/infrastructure/api/realtime';"
+    );
     console.log('');
     console.log('  // Initialize the service');
     console.log('  await realTimeService.initialize(token);');

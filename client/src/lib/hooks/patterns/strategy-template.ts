@@ -7,7 +7,7 @@
  * Follows the pattern used in useErrorRecovery.ts
  */
 
-import { useState, useCallback, useMemo, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
 // 1. Define Strategy Interface
 export interface Strategy<TContext, TResult> {
@@ -171,24 +171,28 @@ export function useStrategyManager<TContext, TResult>(
 
   // 7. Get Strategy Statistics
   const getStrategyStats = useCallback(() => {
-    const stats = strategies.reduce((acc, strategy) => {
-      const executions = executionHistory.filter(h => h.strategyId === strategy.id);
-      const successes = executions.filter(h => h.success);
+    const stats = strategies.reduce(
+      (acc, strategy) => {
+        const executions = executionHistory.filter(h => h.strategyId === strategy.id);
+        const successes = executions.filter(h => h.success);
 
-      return {
-        ...acc,
-        [strategy.id]: {
-          totalExecutions: executions.length,
-          successes: successes.length,
-          failures: executions.length - successes.length,
-          successRate: executions.length > 0 ? successes.length / executions.length : 0,
-          averageExecutionTime: executions.length > 0
-            ? executions.reduce((sum, h) => sum + h.executionTime, 0) / executions.length
-            : 0,
-          attempts: strategyAttemptsRef.current[strategy.id] || 0,
-        },
-      };
-    }, {} as Record<string, unknown>);
+        return {
+          ...acc,
+          [strategy.id]: {
+            totalExecutions: executions.length,
+            successes: successes.length,
+            failures: executions.length - successes.length,
+            successRate: executions.length > 0 ? successes.length / executions.length : 0,
+            averageExecutionTime:
+              executions.length > 0
+                ? executions.reduce((sum, h) => sum + h.executionTime, 0) / executions.length
+                : 0,
+            attempts: strategyAttemptsRef.current[strategy.id] || 0,
+          },
+        };
+      },
+      {} as Record<string, unknown>
+    );
 
     return stats;
   }, [strategies, executionHistory]);
@@ -250,11 +254,12 @@ export function useDynamicStrategyManager<TContext, TResult>() {
   }, []);
 
   // 12. Update Strategy
-  const updateStrategy = useCallback((strategyId: string, updates: Partial<Strategy<TContext, TResult>>) => {
-    setStrategies(prev => prev.map(s =>
-      s.id === strategyId ? { ...s, ...updates } : s
-    ));
-  }, []);
+  const updateStrategy = useCallback(
+    (strategyId: string, updates: Partial<Strategy<TContext, TResult>>) => {
+      setStrategies(prev => prev.map(s => (s.id === strategyId ? { ...s, ...updates } : s)));
+    },
+    []
+  );
 
   return {
     ...strategyManager,

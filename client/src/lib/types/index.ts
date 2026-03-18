@@ -83,20 +83,10 @@ export { BillStatus, UrgencyLevel } from '@shared/types';
 export type { BillStatusValue, UrgencyLevelValue } from '@shared/types';
 
 // Bill extended types from local bill module (client-specific extensions)
-export type {
-  Bill,
-  Sponsor,
-  BillAnalysis,
-  ExtendedBill,
-  BillsQueryParams,
-  User,
-} from './bill';
+export type { Bill, Sponsor, BillAnalysis, ExtendedBill, BillsQueryParams, User } from './bill';
 
 // Authentication types
-export type {
-  User as AuthUser,
-  VerificationStatus,
-} from '@shared/types/domains/authentication';
+export type { User as AuthUser, VerificationStatus } from '@shared/types/domains/authentication';
 
 // Security types
 export * from './security';
@@ -131,7 +121,11 @@ export * from './analytics';
 // - API types (network/REST types)
 
 // Re-export persona detector from core
-export { personaDetector, PersonaDetector, createPersonaDetector } from '../../infrastructure/personalization';
+export {
+  personaDetector,
+  PersonaDetector,
+  createPersonaDetector,
+} from '../../infrastructure/personalization';
 
 // Re-export UserRole from navigation for consistency
 export type { UserRole } from './navigation';

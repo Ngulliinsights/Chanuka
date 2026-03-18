@@ -20,7 +20,13 @@ export type ModalProps = {
 };
 
 // Toast utilities
-export type ToastPosition = 'top-left' | 'top-right' | 'top-center' | 'bottom-left' | 'bottom-right' | 'bottom-center';
+export type ToastPosition =
+  | 'top-left'
+  | 'top-right'
+  | 'top-center'
+  | 'bottom-left'
+  | 'bottom-right'
+  | 'bottom-center';
 export type ToastConfig = {
   position?: ToastPosition;
   duration?: number;

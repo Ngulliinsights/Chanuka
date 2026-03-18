@@ -261,7 +261,4 @@ export function runIntegrationDiagnostics(config?: IntegrationConfig): Integrati
  * Export singleton instances
  */
 export const integrationConfig = getIntegrationConfig();
-export const featureFlags = new FeatureFlags(integrationConfig);
-export const integrationDiagnostics = runIntegrationDiagnostics(integrationConfig);
-
 export default integrationConfig;

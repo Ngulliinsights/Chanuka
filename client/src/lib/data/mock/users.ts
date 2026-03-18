@@ -8,7 +8,6 @@
 import { faker } from '@faker-js/faker';
 
 import { User, PrivacySettings, SecurityEvent, ConsentRecord } from '@client/infrastructure/auth';
-import { UserRole } from '@client/lib/types';
 
 import { generateId, generateDateInRange, generateLocation } from './generators';
 
@@ -148,14 +147,7 @@ export const generateMockUser = (id?: string): User => {
 /**
  * Generate security events for a user
  */
-export const generateSecurityEvents = (userId: string, count: number = 10): SecurityEvent[] => {
-  const eventTypes: Array<'login' | 'logout' | 'password_change' | 'permission_change' | 'suspicious_activity'> = [
-    'login',
-    'logout',
-    'password_change',
-    'suspicious_activity',
-  ];
-
+export 
   return Array.from({ length: count }, () => {
     const eventType = faker.helpers.arrayElement(eventTypes);
     const location = generateLocation();
@@ -298,20 +290,15 @@ export const generateCurrentUser = (): User => {
 export const mockUsers = generateMockUsers(50);
 export const mockExpertUsers = generateMockExpertUsers(15);
 export const mockModeratorUsers = generateMockModeratorUsers(5);
-export const mockCurrentUser = generateCurrentUser();
-
+export 
 /**
  * Get user by ID
  */
-export const getMockUserById = (id: string): User | null => {
-  const allUsers = [...mockUsers, ...mockExpertUsers, ...mockModeratorUsers];
-  return allUsers.find(user => user.id === id) || null;
+export   return allUsers.find(user => user.id === id) || null;
 };
 
 /**
  * Get users by role
  */
-export const getMockUsersByRole = (role: string): User[] => {
-  const allUsers = [...mockUsers, ...mockExpertUsers, ...mockModeratorUsers];
-  return allUsers.filter(user => user.role === role);
+export   return allUsers.filter(user => user.role === role);
 };

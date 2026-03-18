@@ -134,7 +134,7 @@ export interface SearchMetrics {
 /**
  * Search validation result
  */
-export interface ValidationResult {
+export interface SearchValidationResult {
   isValid: boolean;
   errors?: string[];
   warnings?: string[];
