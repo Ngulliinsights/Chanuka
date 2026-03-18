@@ -11,14 +11,19 @@ export * from './endpoint';
 
 // Feature-specific contracts
 export * from './government-data.contracts';
-export * from './community.contracts';
 export * from './analytics.contracts';
 
-// Bills contracts (existing)
-// export * from './bills.contracts'; // TODO: Create when modernizing bills API contracts
+// Community contracts
+export * from './community.contracts';
 
-// Users contracts (existing)
+// New detailed contracts
+export * from './feature-flags.contracts';
+export * from './bills.contracts';
+export type { GetHealthCheckResponse, GetMonitoringDashboardResponse, GetMetricsResponse, GetAlertsResponse, Metric, Alert, MonitoringDashboard } from './monitoring-community.contracts';
+
+// Validation schemas (runtime validation)
+export * from './validation.schemas';
+
+// Legacy contracts (existing)
 // export * from './users.contracts'; // TODO: Create when modernizing users API contracts
-
-// Admin contracts (existing)  
 // export * from './admin.contracts'; // TODO: Create when modernizing admin API contracts
