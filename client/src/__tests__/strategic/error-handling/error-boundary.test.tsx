@@ -4,12 +4,10 @@
  */
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
-import { ErrorBoundary } from '../../../infrastructure/error/components/ErrorBoundary';
 import { RecoveryUI } from '../../../infrastructure/error/components/RecoveryUI';
 import { ServiceUnavailable } from '../../../infrastructure/error/components/ServiceUnavailable';
-import { ErrorBoundary } from '../../../infrastructure/error/components/ErrorBoundary';
 
 // Mock the error handler
 vi.mock('../../../core/error/handler', () => ({

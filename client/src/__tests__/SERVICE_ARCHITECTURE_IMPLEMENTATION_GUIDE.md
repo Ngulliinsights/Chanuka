@@ -15,7 +15,7 @@ Create the service architecture guidelines file:
 
 /**
  * Service Architecture Guidelines
- * 
+ *
  * This document defines the standards and patterns for service development
  * in the modernized architecture.
  */
@@ -27,12 +27,12 @@ export interface ServiceArchitectureGuidelines {
   dependencyInjection: boolean;
   errorHandling: boolean;
   cachingStrategy: boolean;
-  
+
   // Service Structure Requirements
   maxLinesPerService: number;
   maxDependenciesPerService: number;
   requiredInterfaces: string[];
-  
+
   // Testing Requirements
   minimumTestCoverage: number;
   requiredTestTypes: string[];
@@ -48,7 +48,7 @@ export const SERVICE_ARCHITECTURE_GUIDELINES: ServiceArchitectureGuidelines = {
   maxDependenciesPerService: 5,
   requiredInterfaces: ['IService', 'IServiceLifecycle'],
   minimumTestCoverage: 90,
-  requiredTestTypes: ['unit', 'integration', 'error-handling']
+  requiredTestTypes: ['unit', 'integration', 'error-handling'],
 };
 ```
 
@@ -61,7 +61,7 @@ Create the error handling framework:
 
 /**
  * Service Error Handling Framework
- * 
+ *
  * Provides consistent error handling patterns across all services.
  */
 
@@ -83,7 +83,10 @@ export class ValidationError extends ServiceError {
 }
 
 export class NetworkError extends ServiceError {
-  constructor(message: string, public readonly statusCode?: number) {
+  constructor(
+    message: string,
+    public readonly statusCode?: number
+  ) {
     super(`Network error: ${message}`, 'NETWORK_ERROR');
   }
 }
@@ -99,27 +102,27 @@ export class ServiceErrorHandler {
     if (error instanceof ServiceError) {
       return error;
     }
-    
+
     if (error instanceof Error) {
       return new ServiceError(
-        `Service error in ${context}: ${error.message}`, 
-        'SERVICE_ERROR', 
+        `Service error in ${context}: ${error.message}`,
+        'SERVICE_ERROR',
         error
       );
     }
-    
+
     return new ServiceError(`Unknown error in ${context}`, 'UNKNOWN_ERROR');
   }
-  
+
   static logServiceError(error: ServiceError, logger: any): void {
     logger.error('Service error occurred', {
       error: {
         name: error.name,
         message: error.message,
         code: error.code,
-        stack: error.stack
+        stack: error.stack,
       },
-      originalError: error.originalError
+      originalError: error.originalError,
     });
   }
 }
@@ -134,7 +137,7 @@ Create the caching framework:
 
 /**
  * Unified Cache Service
- * 
+ *
  * Provides consistent caching patterns across all services.
  */
 
@@ -170,12 +173,12 @@ export class CacheServiceImpl implements ICacheService {
   private readonly caches = new Map<string, CacheEntry<any>>();
   private readonly defaultConfig: CacheConfig = {
     ttl: 5 * 60 * 1000, // 5 minutes default
-    strategy: 'memory'
+    strategy: 'memory',
   };
-  
+
   private stats = {
     hits: 0,
-    misses: 0
+    misses: 0,
   };
 
   async get<T>(key: string): Promise<T | null> {
@@ -184,13 +187,13 @@ export class CacheServiceImpl implements ICacheService {
       this.stats.misses++;
       return null;
     }
-    
+
     if (Date.now() > entry.expiresAt) {
       this.caches.delete(key);
       this.stats.misses++;
       return null;
     }
-    
+
     this.stats.hits++;
     return entry.value as T;
   }
@@ -198,13 +201,13 @@ export class CacheServiceImpl implements ICacheService {
   async set<T>(key: string, value: T, config?: Partial<CacheConfig>): Promise<void> {
     const finalConfig = { ...this.defaultConfig, ...config };
     const expiresAt = Date.now() + finalConfig.ttl;
-    
-    this.caches.set(key, { 
-      value, 
-      expiresAt, 
-      createdAt: Date.now() 
+
+    this.caches.set(key, {
+      value,
+      expiresAt,
+      createdAt: Date.now(),
     });
-    
+
     this.cleanup();
   }
 
@@ -230,12 +233,12 @@ export class CacheServiceImpl implements ICacheService {
     const totalRequests = this.stats.hits + this.stats.misses;
     const hitRate = totalRequests > 0 ? this.stats.hits / totalRequests : 0;
     const missRate = totalRequests > 0 ? this.stats.misses / totalRequests : 0;
-    
+
     return {
       totalEntries: this.caches.size,
       memoryUsage: this.calculateMemoryUsage(),
       hitRate,
-      missRate
+      missRate,
     };
   }
 
@@ -283,12 +286,12 @@ export class AuthServiceImpl implements IAuthService {
     try {
       const response = await this.apiService.post('/auth/login', credentials);
       const session = response.data as AuthSession;
-      
+
       // Cache session
       await this.cacheService.set(`session:${session.user.id}`, session, {
-        ttl: session.tokens.expiresIn * 1000
+        ttl: session.tokens.expiresIn * 1000,
       });
-      
+
       this.logger.info('User logged in successfully', { userId: session.user.id });
       return session;
     } catch (error) {
@@ -316,7 +319,7 @@ export class AuthServiceImpl implements IAuthService {
       if (cachedSession) {
         return cachedSession.user;
       }
-      
+
       // Fallback to API
       const response = await this.apiService.get('/auth/me');
       return response.data as AuthUser;
@@ -331,14 +334,14 @@ export class AuthServiceImpl implements IAuthService {
       if (!session) {
         throw new ServiceError('No active session', 'NO_SESSION');
       }
-      
+
       const response = await this.apiService.post('/auth/refresh', {
-        refreshToken: session.tokens.refreshToken
+        refreshToken: session.tokens.refreshToken,
       });
-      
+
       const newSession = response.data as AuthSession;
       await this.cacheService.set(`session:${session.user.id}`, newSession, {
-        ttl: newSession.tokens.expiresIn * 1000
+        ttl: newSession.tokens.expiresIn * 1000,
       });
     } catch (error) {
       throw ServiceErrorHandler.handleServiceError(error, 'AuthService.refreshToken');
@@ -383,14 +386,14 @@ export class UserProfileServiceImpl implements IUserProfileService {
       if (cachedProfile) {
         return cachedProfile;
       }
-      
+
       // Fetch from API
       const response = await this.apiService.get(`/users/${userId}/profile`);
       const profile = response.data as UserProfile;
-      
+
       // Cache for 10 minutes
       await this.cacheService.set(`profile:${userId}`, profile, { ttl: 10 * 60 * 1000 });
-      
+
       return profile;
     } catch (error) {
       throw ServiceErrorHandler.handleServiceError(error, 'UserProfileService.getProfile');
@@ -401,10 +404,10 @@ export class UserProfileServiceImpl implements IUserProfileService {
     try {
       const response = await this.apiService.put(`/users/${userId}/profile`, updates);
       const updatedProfile = response.data as UserProfile;
-      
+
       // Update cache
       await this.cacheService.set(`profile:${userId}`, updatedProfile, { ttl: 10 * 60 * 1000 });
-      
+
       this.logger.info('Profile updated successfully', { userId });
       return updatedProfile;
     } catch (error) {
@@ -416,7 +419,7 @@ export class UserProfileServiceImpl implements IUserProfileService {
     try {
       await this.apiService.delete(`/users/${userId}/profile`);
       await this.cacheService.delete(`profile:${userId}`);
-      
+
       this.logger.info('Profile deleted successfully', { userId });
     } catch (error) {
       throw ServiceErrorHandler.handleServiceError(error, 'UserProfileService.deleteProfile');
@@ -427,20 +430,20 @@ export class UserProfileServiceImpl implements IUserProfileService {
     try {
       const formData = new FormData();
       formData.append('avatar', file);
-      
+
       const response = await this.apiService.post(`/users/${userId}/avatar`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
+        headers: { 'Content-Type': 'multipart/form-data' },
       });
-      
+
       const avatarUrl = response.data.url as string;
-      
+
       // Update cached profile
       const cachedProfile = await this.cacheService.get<UserProfile>(`profile:${userId}`);
       if (cachedProfile) {
         cachedProfile.avatar_url = avatarUrl;
         await this.cacheService.set(`profile:${userId}`, cachedProfile, { ttl: 10 * 60 * 1000 });
       }
-      
+
       return avatarUrl;
     } catch (error) {
       throw ServiceErrorHandler.handleServiceError(error, 'UserProfileService.uploadAvatar');
@@ -456,7 +459,7 @@ export class UserProfileServiceImpl implements IUserProfileService {
 
 /**
  * Service Factory for Dependency Injection
- * 
+ *
  * Provides centralized service instantiation with dependency injection.
  */
 
@@ -476,10 +479,10 @@ export class ServiceFactory {
       if (!factory) {
         throw new Error(`Service factory not registered for: ${name}`);
       }
-      
+
       this.instances.set(name, factory());
     }
-    
+
     return this.instances.get(name) as T;
   }
 
@@ -513,26 +516,42 @@ export class ServiceFactory {
 // Initialize service dependencies
 export function initializeServices(): void {
   ServiceFactory.registerDependency('cacheService', () => new CacheServiceImpl());
-  ServiceFactory.registerDependency('authService', () => new AuthServiceImpl(
-    ApiService.getInstance(),
-    ServiceFactory.getCacheService(),
-    Logger.getInstance()
-  ));
-  ServiceFactory.registerDependency('userProfileService', () => new UserProfileServiceImpl(
-    ApiService.getInstance(),
-    ServiceFactory.getCacheService(),
-    Logger.getInstance()
-  ));
-  ServiceFactory.registerDependency('dashboardService', () => new UserDashboardServiceImpl(
-    ApiService.getInstance(),
-    ServiceFactory.getCacheService(),
-    Logger.getInstance()
-  ));
-  ServiceFactory.registerDependency('engagementService', () => new UserEngagementServiceImpl(
-    ApiService.getInstance(),
-    ServiceFactory.getCacheService(),
-    Logger.getInstance()
-  ));
+  ServiceFactory.registerDependency(
+    'authService',
+    () =>
+      new AuthServiceImpl(
+        ApiService.getInstance(),
+        ServiceFactory.getCacheService(),
+        Logger.getInstance()
+      )
+  );
+  ServiceFactory.registerDependency(
+    'userProfileService',
+    () =>
+      new UserProfileServiceImpl(
+        ApiService.getInstance(),
+        ServiceFactory.getCacheService(),
+        Logger.getInstance()
+      )
+  );
+  ServiceFactory.registerDependency(
+    'dashboardService',
+    () =>
+      new UserDashboardServiceImpl(
+        ApiService.getInstance(),
+        ServiceFactory.getCacheService(),
+        Logger.getInstance()
+      )
+  );
+  ServiceFactory.registerDependency(
+    'engagementService',
+    () =>
+      new UserEngagementServiceImpl(
+        ApiService.getInstance(),
+        ServiceFactory.getCacheService(),
+        Logger.getInstance()
+      )
+  );
 }
 ```
 
@@ -545,7 +564,7 @@ export function initializeServices(): void {
 
 /**
  * Service Testing Utilities
- * 
+ *
  * Provides utilities for testing services with proper mocking.
  */
 
@@ -630,7 +649,7 @@ export abstract class ServiceTestBase<T> {
   ): Promise<void> {
     return expect(promise).rejects.toMatchObject({
       code: expectedCode,
-      ...(expectedMessage && { message: expect.stringContaining(expectedMessage) })
+      ...(expectedMessage && { message: expect.stringContaining(expectedMessage) }),
     });
   }
 }
@@ -677,11 +696,11 @@ describe('UserProfileService', () => {
     it('should return cached profile when available', async () => {
       const userId = 'user123';
       const cachedProfile = { id: userId, name: 'Test User', email: 'test@example.com' };
-      
+
       test.mocks.cacheService.get.mockResolvedValue(cachedProfile);
-      
+
       const result = await test.service.getProfile(userId);
-      
+
       expect(result).toEqual(cachedProfile);
       expect(test.mocks.cacheService.get).toHaveBeenCalledWith(`profile:${userId}`);
       expect(test.mocks.apiService.get).not.toHaveBeenCalled();
@@ -690,32 +709,26 @@ describe('UserProfileService', () => {
     it('should fetch from API and cache when not available', async () => {
       const userId = 'user123';
       const apiProfile = { id: userId, name: 'Test User', email: 'test@example.com' };
-      
+
       test.mocks.cacheService.get.mockResolvedValue(null);
       test.mocks.apiService.get.mockResolvedValue({ data: apiProfile });
-      
+
       const result = await test.service.getProfile(userId);
-      
+
       expect(result).toEqual(apiProfile);
       expect(test.mocks.apiService.get).toHaveBeenCalledWith(`/users/${userId}/profile`);
-      expect(test.mocks.cacheService.set).toHaveBeenCalledWith(
-        `profile:${userId}`, 
-        apiProfile, 
-        { ttl: 10 * 60 * 1000 }
-      );
+      expect(test.mocks.cacheService.set).toHaveBeenCalledWith(`profile:${userId}`, apiProfile, {
+        ttl: 10 * 60 * 1000,
+      });
     });
 
     it('should handle API errors gracefully', async () => {
       const userId = 'user123';
-      
+
       test.mocks.cacheService.get.mockResolvedValue(null);
       test.mocks.apiService.get.mockRejectedValue(new Error('API Error'));
-      
-      await test.expectServiceError(
-        test.service.getProfile(userId),
-        'SERVICE_ERROR',
-        'API Error'
-      );
+
+      await test.expectServiceError(test.service.getProfile(userId), 'SERVICE_ERROR', 'API Error');
     });
   });
 
@@ -724,11 +737,11 @@ describe('UserProfileService', () => {
       const userId = 'user123';
       const updates = { name: 'Updated Name' };
       const updatedProfile = { id: userId, name: 'Updated Name', email: 'test@example.com' };
-      
+
       test.mocks.apiService.put.mockResolvedValue({ data: updatedProfile });
-      
+
       const result = await test.service.updateProfile(userId, updates);
-      
+
       expect(result).toEqual(updatedProfile);
       expect(test.mocks.apiService.put).toHaveBeenCalledWith(`/users/${userId}/profile`, updates);
       expect(test.mocks.cacheService.set).toHaveBeenCalledWith(
@@ -750,7 +763,7 @@ describe('UserProfileService', () => {
 
 /**
  * Migration Utilities
- * 
+ *
  * Provides utilities for gradual migration from legacy to new services.
  */
 
@@ -820,7 +833,7 @@ export class LegacyUserServiceWrapper {
 
 /**
  * Feature Flags for Migration
- * 
+ *
  * Controls which services are used during migration.
  */
 
@@ -856,12 +869,14 @@ export class FeatureFlagService {
 ## Implementation Checklist
 
 ### Phase 1: Foundation (Week 1)
+
 - [ ] Create service architecture guidelines
 - [ ] Implement error handling framework
 - [ ] Implement unified caching strategy
 - [ ] Create testing utilities base classes
 
 ### Phase 2: Service Migration (Weeks 2-6)
+
 - [ ] Create Authentication Service
 - [ ] Create User Profile Service
 - [ ] Create User Dashboard Service
@@ -871,6 +886,7 @@ export class FeatureFlagService {
 - [ ] Create legacy compatibility wrappers
 
 ### Phase 3: Testing (Weeks 7-8)
+
 - [ ] Create comprehensive unit tests
 - [ ] Create integration tests
 - [ ] Create error handling tests
@@ -878,6 +894,7 @@ export class FeatureFlagService {
 - [ ] Validate test coverage > 90%
 
 ### Phase 4: Migration (Weeks 9-12)
+
 - [ ] Enable feature flags for new services
 - [ ] Gradually migrate consumers
 - [ ] Monitor performance and errors
@@ -887,16 +904,19 @@ export class FeatureFlagService {
 ## Success Criteria
 
 ### Performance Targets
+
 - Service response time: < 100ms (cached), < 500ms (API)
 - Memory usage: < 50MB additional overhead
 - Bundle size: No increase due to architecture
 
 ### Quality Targets
+
 - Test coverage: > 90% for all services
 - Error handling: 100% of methods have consistent error handling
 - Caching: 80% of read operations use appropriate caching
 
 ### Maintainability Targets
+
 - Service size: < 200 lines per service
 - Dependencies: < 5 per service
 - Interface coverage: 100% of services implement interfaces
@@ -932,16 +952,19 @@ export class ServicePerformanceMonitor {
     fn: () => Promise<T>
   ): Promise<T> {
     const startTime = performance.now();
-    
+
     try {
       const result = await fn();
       const duration = performance.now() - startTime;
-      
+
       console.log(`Service ${serviceName}.${operation}: ${duration.toFixed(2)}ms`);
       return result;
     } catch (error) {
       const duration = performance.now() - startTime;
-      console.error(`Service ${serviceName}.${operation} failed after ${duration.toFixed(2)}ms:`, error);
+      console.error(
+        `Service ${serviceName}.${operation} failed after ${duration.toFixed(2)}ms:`,
+        error
+      );
       throw error;
     }
   }

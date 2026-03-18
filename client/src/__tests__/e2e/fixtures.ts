@@ -4,7 +4,7 @@
  */
 
 import { test as base, expect } from '@playwright/test';
-import { injectAxe, checkA11y } from 'axe-playwright';
+import { injectAxe } from 'axe-playwright';
 
 type TestFixtures = {
   authenticatedPage: any;
@@ -16,15 +16,15 @@ export const test = base.extend<TestFixtures>({
   authenticatedPage: async ({ page }, use) => {
     // Navigate to login page
     await page.goto('/login');
-    
+
     // Perform login (adjust selectors based on your app)
     await page.fill('[name="email"]', 'test@example.com');
     await page.fill('[name="password"]', 'testpassword');
     await page.click('button[type="submit"]');
-    
+
     // Wait for navigation to complete
     await page.waitForURL('/dashboard', { timeout: 10000 });
-    
+
     await use(page);
   },
 

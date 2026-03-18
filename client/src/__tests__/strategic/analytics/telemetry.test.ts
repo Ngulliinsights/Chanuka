@@ -8,7 +8,7 @@
  * for business intelligence and user experience optimization.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock analytics services
 vi.mock('@client/infrastructure/observability/analytics', () => ({

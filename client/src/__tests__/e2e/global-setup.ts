@@ -14,7 +14,7 @@ async function globalSetup(config: FullConfig) {
 
   // Wait for the dev server to be ready
   const baseURL = config.projects[0]?.use?.baseURL || 'http://localhost:3000';
-  
+
   try {
     await page.goto(baseURL, { waitUntil: 'networkidle', timeout: 60000 });
     console.log('✅ Dev server is ready');

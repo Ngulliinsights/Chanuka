@@ -8,8 +8,8 @@
  * value for mobile-first users and responsive design requirements.
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { render } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock mobile detection services
 vi.mock('@client/infrastructure/mobile/detection', () => ({

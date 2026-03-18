@@ -81,27 +81,45 @@ describe('Network Retry Strategy', () => {
   });
 
   it('should recover network errors that are retryable', () => {
-    const networkError = new AppError('Network error', 'NETWORK_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryable: true,
-      retryCount: 0,
-    });
+    const networkError = new AppError(
+      'Network error',
+      'NETWORK_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryable: true,
+        retryCount: 0,
+      }
+    );
 
     expect(networkRetryStrategy.canRecover(networkError)).toBe(true);
   });
 
   it('should not recover network errors with too many retries', () => {
-    const networkError = new AppError('Network error', 'NETWORK_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryable: true,
-      retryCount: 3,
-    });
+    const networkError = new AppError(
+      'Network error',
+      'NETWORK_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryable: true,
+        retryCount: 3,
+      }
+    );
 
     expect(networkRetryStrategy.canRecover(networkError)).toBe(false);
   });
 
   it('should not recover non-network errors', () => {
-    const validationError = new AppError('Validation error', 'VALIDATION_ERROR', ErrorDomain.VALIDATION, ErrorSeverity.MEDIUM, {
-      retryable: true,
-    });
+    const validationError = new AppError(
+      'Validation error',
+      'VALIDATION_ERROR',
+      ErrorDomain.VALIDATION,
+      ErrorSeverity.MEDIUM,
+      {
+        retryable: true,
+      }
+    );
 
     expect(networkRetryStrategy.canRecover(validationError)).toBe(false);
   });
@@ -125,25 +143,43 @@ describe('Cache Clear Strategy', () => {
   });
 
   it('should recover critical errors that are recoverable', () => {
-    const criticalError = new AppError('Critical error', 'CRITICAL_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL, {
-      recoverable: true,
-    });
+    const criticalError = new AppError(
+      'Critical error',
+      'CRITICAL_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(cacheClearStrategy.canRecover(criticalError)).toBe(true);
   });
 
   it('should not recover non-critical errors', () => {
-    const mediumError = new AppError('Medium error', 'MEDIUM_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
-      recoverable: true,
-    });
+    const mediumError = new AppError(
+      'Medium error',
+      'MEDIUM_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(cacheClearStrategy.canRecover(mediumError)).toBe(false);
   });
 
   it('should clear caches and reload page on recovery', async () => {
-    const criticalError = new AppError('Critical error', 'CRITICAL_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL, {
-      recoverable: true,
-    });
+    const criticalError = new AppError(
+      'Critical error',
+      'CRITICAL_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL,
+      {
+        recoverable: true,
+      }
+    );
 
     const result = await cacheClearStrategy.recover(criticalError);
 
@@ -159,9 +195,15 @@ describe('Cache Clear Strategy', () => {
   it('should handle cache clear failures gracefully', async () => {
     mockWindow.caches.keys.mockRejectedValueOnce(new Error('Cache error'));
 
-    const criticalError = new AppError('Critical error', 'CRITICAL_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL, {
-      recoverable: true,
-    });
+    const criticalError = new AppError(
+      'Critical error',
+      'CRITICAL_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL,
+      {
+        recoverable: true,
+      }
+    );
 
     const result = await cacheClearStrategy.recover(criticalError);
 
@@ -180,25 +222,43 @@ describe('Page Reload Strategy', () => {
   });
 
   it('should recover high severity errors that are recoverable', () => {
-    const highError = new AppError('High error', 'HIGH_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.HIGH, {
-      recoverable: true,
-    });
+    const highError = new AppError(
+      'High error',
+      'HIGH_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(pageReloadStrategy.canRecover(highError)).toBe(true);
   });
 
   it('should recover critical errors', () => {
-    const criticalError = new AppError('Critical error', 'CRITICAL_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL, {
-      recoverable: true,
-    });
+    const criticalError = new AppError(
+      'Critical error',
+      'CRITICAL_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(pageReloadStrategy.canRecover(criticalError)).toBe(true);
   });
 
   it('should not recover medium or low severity errors', () => {
-    const mediumError = new AppError('Medium error', 'MEDIUM_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
-      recoverable: true,
-    });
+    const mediumError = new AppError(
+      'Medium error',
+      'MEDIUM_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM,
+      {
+        recoverable: true,
+      }
+    );
 
     const lowError = new AppError('Low error', 'LOW_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.LOW, {
       recoverable: true,
@@ -209,9 +269,15 @@ describe('Page Reload Strategy', () => {
   });
 
   it('should reload page on recovery', async () => {
-    const highError = new AppError('High error', 'HIGH_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.HIGH, {
-      recoverable: true,
-    });
+    const highError = new AppError(
+      'High error',
+      'HIGH_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      {
+        recoverable: true,
+      }
+    );
 
     const result = await pageReloadStrategy.recover(highError);
 
@@ -235,15 +301,21 @@ describe('Authentication Strategies', () => {
 
   describe('Auth Refresh Strategy', () => {
     it('should recover authentication errors that are recoverable', () => {
-      const authError = new AppError('Auth error', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        recoverable: true,
-      });
+      const authError = new AppError(
+        'Auth error',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          recoverable: true,
+        }
+      );
 
       expect(authRefreshStrategy.canRecover(authError)).toBe(true);
     });
 
     it('should attempt token refresh when refresh token exists', async () => {
-      mockStorage.getItem.mockImplementation((key) => {
+      mockStorage.getItem.mockImplementation(key => {
         if (key === 'refresh_token') return 'refresh-token-123';
         return null;
       });
@@ -256,9 +328,15 @@ describe('Authentication Strategies', () => {
         } as Response)
       );
 
-      const authError = new AppError('Auth error', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        recoverable: true,
-      });
+      const authError = new AppError(
+        'Auth error',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          recoverable: true,
+        }
+      );
 
       const result = await authRefreshStrategy.recover(authError);
 
@@ -270,9 +348,15 @@ describe('Authentication Strategies', () => {
     it('should redirect to login when no refresh token', async () => {
       mockStorage.getItem.mockReturnValue(null);
 
-      const authError = new AppError('Auth error', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        recoverable: true,
-      });
+      const authError = new AppError(
+        'Auth error',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          recoverable: true,
+        }
+      );
 
       const result = await authRefreshStrategy.recover(authError);
 
@@ -286,17 +370,29 @@ describe('Authentication Strategies', () => {
 
   describe('Auth Retry Strategy', () => {
     it('should recover on first retry for auth-related errors', () => {
-      const authError = new AppError('Token expired', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        retryCount: 0,
-      });
+      const authError = new AppError(
+        'Token expired',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 0,
+        }
+      );
 
       expect(authRetryStrategy.canRecover(authError)).toBe(true);
     });
 
     it('should not recover after multiple retries', () => {
-      const authError = new AppError('Token expired', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        retryCount: 2,
-      });
+      const authError = new AppError(
+        'Token expired',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 2,
+        }
+      );
 
       expect(authRetryStrategy.canRecover(authError)).toBe(false);
     });
@@ -304,9 +400,15 @@ describe('Authentication Strategies', () => {
     it('should wait and check for valid tokens', async () => {
       mockStorage.getItem.mockReturnValue('valid-token');
 
-      const authError = new AppError('Token expired', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        retryCount: 0,
-      });
+      const authError = new AppError(
+        'Token expired',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 0,
+        }
+      );
 
       const result = await authRetryStrategy.recover(authError);
 
@@ -316,17 +418,29 @@ describe('Authentication Strategies', () => {
 
   describe('Auth Logout Strategy', () => {
     it('should recover after multiple failed auth attempts', () => {
-      const authError = new AppError('Auth failed', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        retryCount: 2,
-      });
+      const authError = new AppError(
+        'Auth failed',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 2,
+        }
+      );
 
       expect(authLogoutStrategy.canRecover(authError)).toBe(true);
     });
 
     it('should clear tokens and redirect to login', async () => {
-      const authError = new AppError('Auth failed', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-        retryCount: 2,
-      });
+      const authError = new AppError(
+        'Auth failed',
+        'AUTH_ERROR',
+        ErrorDomain.AUTHENTICATION,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 2,
+        }
+      );
 
       const result = await authLogoutStrategy.recover(authError);
 
@@ -348,14 +462,24 @@ describe('Cache Fallback Strategies', () => {
 
   describe('Cache Fallback Strategy', () => {
     it('should recover network-related errors', () => {
-      const networkError = new AppError('Network offline', 'NETWORK_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const networkError = new AppError(
+        'Network offline',
+        'NETWORK_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
 
       expect(cacheFallbackStrategy.canRecover(networkError)).toBe(true);
     });
 
     it('should recover when offline', () => {
       mockNavigator.onLine = false;
-      const error = new AppError('Connection lost', 'CONNECTION_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const error = new AppError(
+        'Connection lost',
+        'CONNECTION_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
 
       expect(cacheFallbackStrategy.canRecover(error)).toBe(true);
       mockNavigator.onLine = true; // Reset
@@ -364,14 +488,16 @@ describe('Cache Fallback Strategies', () => {
     it('should check for cached API data', async () => {
       mockWindow.caches.keys.mockResolvedValue(['api-cache']);
       const mockCache = {
-        keys: vi.fn().mockResolvedValue([
-          new Request('/api/data'),
-          new Request('/api/users'),
-        ]),
+        keys: vi.fn().mockResolvedValue([new Request('/api/data'), new Request('/api/users')]),
       };
       mockWindow.caches.open = vi.fn().mockResolvedValue(mockCache);
 
-      const error = new AppError('Network error', 'NETWORK_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const error = new AppError(
+        'Network error',
+        'NETWORK_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
       const result = await cacheFallbackStrategy.recover(error);
 
       expect(result).toBe(true);
@@ -381,7 +507,12 @@ describe('Cache Fallback Strategies', () => {
 
   describe('Cache Recovery Strategy', () => {
     it('should recover network and timeout errors', () => {
-      const timeoutError = new AppError('Request timeout', 'TIMEOUT_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const timeoutError = new AppError(
+        'Request timeout',
+        'TIMEOUT_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
 
       expect(cacheRecoveryStrategy.canRecover(timeoutError)).toBe(true);
     });
@@ -398,7 +529,12 @@ describe('Cache Fallback Strategies', () => {
       };
       mockWindow.caches.open = vi.fn().mockResolvedValue(mockCache);
 
-      const error = new AppError('Server error', 'SERVER_ERROR', ErrorDomain.EXTERNAL_SERVICE, ErrorSeverity.MEDIUM);
+      const error = new AppError(
+        'Server error',
+        'SERVER_ERROR',
+        ErrorDomain.EXTERNAL_SERVICE,
+        ErrorSeverity.MEDIUM
+      );
       const result = await cacheRecoveryStrategy.recover(error);
 
       expect(result).toBe(true);
@@ -413,7 +549,12 @@ describe('Degradation Strategies', () => {
 
   describe('Graceful Degradation Strategy', () => {
     it('should always be available as last resort', () => {
-      const anyError = new AppError('Any error', 'ANY_ERROR', ErrorDomain.UNKNOWN, ErrorSeverity.LOW);
+      const anyError = new AppError(
+        'Any error',
+        'ANY_ERROR',
+        ErrorDomain.UNKNOWN,
+        ErrorSeverity.LOW
+      );
 
       expect(gracefulDegradationStrategy.canRecover(anyError)).toBe(true);
     });
@@ -425,7 +566,12 @@ describe('Degradation Strategies', () => {
         writable: true,
       });
 
-      const error = new AppError('Service error', 'SERVICE_ERROR', ErrorDomain.EXTERNAL_SERVICE, ErrorSeverity.HIGH);
+      const error = new AppError(
+        'Service error',
+        'SERVICE_ERROR',
+        ErrorDomain.EXTERNAL_SERVICE,
+        ErrorSeverity.HIGH
+      );
       const result = await gracefulDegradationStrategy.recover(error);
 
       expect(result).toBe(true);
@@ -435,7 +581,12 @@ describe('Degradation Strategies', () => {
   describe('Offline Mode Strategy', () => {
     it('should recover when offline', () => {
       mockNavigator.onLine = false;
-      const error = new AppError('Offline error', 'OFFLINE_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const error = new AppError(
+        'Offline error',
+        'OFFLINE_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
 
       expect(offlineModeStrategy.canRecover(error)).toBe(true);
       mockNavigator.onLine = true; // Reset
@@ -444,7 +595,12 @@ describe('Degradation Strategies', () => {
     it('should enable offline mode when cache is available', async () => {
       mockWindow.caches.keys.mockResolvedValue(['offline-cache']);
 
-      const error = new AppError('Connection error', 'CONNECTION_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM);
+      const error = new AppError(
+        'Connection error',
+        'CONNECTION_ERROR',
+        ErrorDomain.NETWORK,
+        ErrorSeverity.MEDIUM
+      );
       const result = await offlineModeStrategy.recover(error);
 
       expect(result).toBe(true);
@@ -454,17 +610,29 @@ describe('Degradation Strategies', () => {
 
   describe('Reduced Functionality Strategy', () => {
     it('should recover after multiple server failures', () => {
-      const error = new AppError('Server error', 'SERVER_ERROR', ErrorDomain.EXTERNAL_SERVICE, ErrorSeverity.HIGH, {
-        retryCount: 3,
-      });
+      const error = new AppError(
+        'Server error',
+        'SERVER_ERROR',
+        ErrorDomain.EXTERNAL_SERVICE,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 3,
+        }
+      );
 
       expect(reducedFunctionalityStrategy.canRecover(error)).toBe(true);
     });
 
     it('should enable reduced functionality mode', async () => {
-      const error = new AppError('API failure', 'API_ERROR', ErrorDomain.EXTERNAL_SERVICE, ErrorSeverity.HIGH, {
-        retryCount: 3,
-      });
+      const error = new AppError(
+        'API failure',
+        'API_ERROR',
+        ErrorDomain.EXTERNAL_SERVICE,
+        ErrorSeverity.HIGH,
+        {
+          retryCount: 3,
+        }
+      );
 
       const result = await reducedFunctionalityStrategy.recover(error);
 
@@ -481,18 +649,30 @@ describe('Connection-Aware Retry Strategy', () => {
 
   it('should recover on slow connections with few retries', () => {
     mockNavigator.connection.effectiveType = 'slow';
-    const error = new AppError('Slow connection', 'SLOW_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryCount: 0,
-    });
+    const error = new AppError(
+      'Slow connection',
+      'SLOW_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryCount: 0,
+      }
+    );
 
     expect(connectionAwareRetryStrategy.canRecover(error)).toBe(true);
   });
 
   it('should not recover after too many retries', () => {
     mockNavigator.connection.effectiveType = 'slow';
-    const error = new AppError('Slow connection', 'SLOW_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryCount: 2,
-    });
+    const error = new AppError(
+      'Slow connection',
+      'SLOW_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryCount: 2,
+      }
+    );
 
     expect(connectionAwareRetryStrategy.canRecover(error)).toBe(false);
   });
@@ -500,9 +680,15 @@ describe('Connection-Aware Retry Strategy', () => {
   it('should wait longer and check connection improvement', async () => {
     mockNavigator.connection.effectiveType = '4g';
 
-    const error = new AppError('Connection error', 'CONNECTION_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryCount: 0,
-    });
+    const error = new AppError(
+      'Connection error',
+      'CONNECTION_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryCount: 0,
+      }
+    );
 
     const result = await connectionAwareRetryStrategy.recover(error);
 
@@ -567,7 +753,9 @@ describe('Recovery Strategy Registration', () => {
   it('should register default recovery strategies', () => {
     registerDefaultRecoveryStrategies();
 
-    expect(coreErrorHandler.addRecoveryStrategy).toHaveBeenCalledTimes(defaultRecoveryStrategies.length);
+    expect(coreErrorHandler.addRecoveryStrategy).toHaveBeenCalledTimes(
+      defaultRecoveryStrategies.length
+    );
     defaultRecoveryStrategies.forEach(strategy => {
       expect(coreErrorHandler.addRecoveryStrategy).toHaveBeenCalledWith(strategy);
     });
@@ -593,23 +781,40 @@ describe('Recovery Strategy Registration', () => {
 
 describe('Error Recoverability Detection', () => {
   it('should detect recoverable network errors', () => {
-    const networkError = new AppError('Network error', 'NETWORK_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      recoverable: true,
-    });
+    const networkError = new AppError(
+      'Network error',
+      'NETWORK_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(isRecoverable(networkError)).toBe(true);
   });
 
   it('should detect recoverable auth errors', () => {
-    const authError = new AppError('Auth error', 'AUTH_ERROR', ErrorDomain.AUTHENTICATION, ErrorSeverity.HIGH, {
-      recoverable: true,
-    });
+    const authError = new AppError(
+      'Auth error',
+      'AUTH_ERROR',
+      ErrorDomain.AUTHENTICATION,
+      ErrorSeverity.HIGH,
+      {
+        recoverable: true,
+      }
+    );
 
     expect(isRecoverable(authError)).toBe(true);
   });
 
   it('should not recover critical errors', () => {
-    const criticalError = new AppError('Critical error', 'CRITICAL_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL);
+    const criticalError = new AppError(
+      'Critical error',
+      'CRITICAL_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL
+    );
 
     expect(isRecoverable(criticalError)).toBe(false);
   });

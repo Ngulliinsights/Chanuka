@@ -10,11 +10,4 @@ afterEach(() => {
 });
 
 // Global axe configuration
-export const axeConfig = {
-  rules: {
-    // Disable color contrast for now (will be fixed separately)
-    'color-contrast': { enabled: false },
-  },
-};
-
 export { axe };

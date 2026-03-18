@@ -8,7 +8,7 @@
  * and validate complete user workflows across the application.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock integration services
 vi.mock('@client/infrastructure/integration/coordinator', () => ({
@@ -27,7 +27,9 @@ describe('Integration Tests', () => {
 
   describe('Cross-System Functionality', () => {
     it('should orchestrate multi-system workflows', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const workflow = {
         steps: [
@@ -59,7 +61,9 @@ describe('Integration Tests', () => {
     });
 
     it('should validate system integration points', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const integrationPoints = [
         { system: 'auth', endpoint: '/api/auth', status: 'active' },
@@ -84,7 +88,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle cross-system error propagation', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const errorScenario = {
         sourceSystem: 'api',
@@ -110,7 +116,9 @@ describe('Integration Tests', () => {
     });
 
     it('should monitor system health across integrations', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const healthCheck = {
         systems: ['auth', 'api', 'analytics', 'ui'],
@@ -140,7 +148,9 @@ describe('Integration Tests', () => {
 
   describe('End-to-End Workflows', () => {
     it('should execute complete user registration workflow', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const registrationWorkflow = {
         steps: [
@@ -172,7 +182,9 @@ describe('Integration Tests', () => {
     });
 
     it('should execute complete bill tracking workflow', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const billWorkflow = {
         steps: [
@@ -204,7 +216,9 @@ describe('Integration Tests', () => {
     });
 
     it('should execute complete data export workflow', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const exportWorkflow = {
         steps: [
@@ -236,7 +250,9 @@ describe('Integration Tests', () => {
     });
 
     it('should execute complete security audit workflow', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const securityWorkflow = {
         steps: [
@@ -272,7 +288,9 @@ describe('Integration Tests', () => {
 
   describe('System Interoperability', () => {
     it('should handle API version compatibility', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const compatibilityCheck = {
         apiVersions: {
@@ -304,7 +322,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle data format transformations', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const transformation = {
         sourceFormat: 'json',
@@ -328,7 +348,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle system communication protocols', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const protocolConfig = {
         protocols: [
@@ -356,7 +378,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle system load balancing', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const loadConfig = {
         systems: [
@@ -386,7 +410,9 @@ describe('Integration Tests', () => {
 
   describe('Integration Recovery', () => {
     it('should handle integration failure recovery', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const failureScenario = {
         failedSystem: 'api',
@@ -412,7 +438,9 @@ describe('Integration Tests', () => {
     });
 
     it('should handle partial system failures', async () => {
-      const { integrationCoordinator } = await import('@client/infrastructure/integration/coordinator');
+      const { integrationCoordinator } = await import(
+        '@client/infrastructure/integration/coordinator'
+      );
 
       const partialFailure = {
         affectedSystems: ['analytics', 'notifications'],

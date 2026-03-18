@@ -21,13 +21,9 @@ import {
   NavigationValidationError,
   NavigationConfigurationError,
 } from '@client/infrastructure/error';
-import {
-  ErrorDomain,
-  ErrorSeverity,
-  RecoveryAction,
-} from '@client/infrastructure/error';
+import { ErrorDomain, ErrorSeverity, RecoveryAction } from '@client/infrastructure/error';
 import { coreErrorHandler } from '@client/infrastructure/error';
-import { AppError, ErrorContext, ErrorMetadata } from '@client/infrastructure/error/types';
+import { AppError, ErrorContext } from '@client/infrastructure/error/types';
 
 // Mock the error handler to avoid side effects in tests
 vi.mock('../../../core/error/handler', () => ({
@@ -71,7 +67,12 @@ describe('AppError Class', () => {
   });
 
   it('should create AppError with required parameters', () => {
-    const error = new AppError('Test error message', 'TEST_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM);
+    const error = new AppError(
+      'Test error message',
+      'TEST_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM
+    );
 
     expect(error.message).toBe('Test error message');
     expect(error.code).toBe('TEST_ERROR');
@@ -83,14 +84,16 @@ describe('AppError Class', () => {
   });
 
   it('should create AppError with optional parameters', () => {
-    const recoveryStrategies = [{
-      id: 'retry',
-      type: RecoveryAction.RETRY,
-      name: 'Retry',
-      description: 'Retry the operation',
-      automatic: true,
-      priority: 1,
-    }];
+    const recoveryStrategies = [
+      {
+        id: 'retry',
+        type: RecoveryAction.RETRY,
+        name: 'Retry',
+        description: 'Retry the operation',
+        automatic: true,
+        priority: 1,
+      },
+    ];
 
     const error = new AppError(
       'Test error with options',
@@ -128,11 +131,17 @@ describe('AppError Class', () => {
   });
 
   it('should serialize to JSON correctly', () => {
-    const error = new AppError('Test error', 'TEST_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
-      context: mockContext,
-      recoverable: true,
-      retryable: true,
-    });
+    const error = new AppError(
+      'Test error',
+      'TEST_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM,
+      {
+        context: mockContext,
+        recoverable: true,
+        retryable: true,
+      }
+    );
 
     const json = error.toJSON();
 
@@ -161,45 +170,72 @@ describe('AppError Class', () => {
   });
 
   it('should determine if error can recover', () => {
-    const recoverableError = new AppError('Recoverable error', 'RECOVERABLE', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      recoverable: true,
-      recoveryStrategies: [{
-        id: 'retry',
-        type: RecoveryAction.RETRY,
-        name: 'Retry',
-        description: 'Retry operation',
-        automatic: true,
-        priority: 1,
-      }],
-    });
+    const recoverableError = new AppError(
+      'Recoverable error',
+      'RECOVERABLE',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        recoverable: true,
+        recoveryStrategies: [
+          {
+            id: 'retry',
+            type: RecoveryAction.RETRY,
+            name: 'Retry',
+            description: 'Retry operation',
+            automatic: true,
+            priority: 1,
+          },
+        ],
+      }
+    );
 
-    const nonRecoverableError = new AppError('Non-recoverable error', 'NON_RECOVERABLE', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL);
+    const nonRecoverableError = new AppError(
+      'Non-recoverable error',
+      'NON_RECOVERABLE',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.CRITICAL
+    );
 
     expect(recoverableError.canRecover()).toBe(true);
     expect(nonRecoverableError.canRecover()).toBe(false);
   });
 
   it('should return recovery strategies', () => {
-    const strategies = [{
-      id: 'retry',
-      type: RecoveryAction.RETRY,
-      name: 'Retry',
-      description: 'Retry operation',
-      automatic: true,
-      priority: 1,
-    }];
+    const strategies = [
+      {
+        id: 'retry',
+        type: RecoveryAction.RETRY,
+        name: 'Retry',
+        description: 'Retry operation',
+        automatic: true,
+        priority: 1,
+      },
+    ];
 
-    const error = new AppError('Error with strategies', 'STRATEGY_ERROR', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      recoveryStrategies: strategies,
-    });
+    const error = new AppError(
+      'Error with strategies',
+      'STRATEGY_ERROR',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        recoveryStrategies: strategies,
+      }
+    );
 
     expect(error.getRecoveryStrategies()).toEqual(strategies);
   });
 
   it('should create new error with incremented retry count', () => {
-    const originalError = new AppError('Original error', 'ORIGINAL', ErrorDomain.NETWORK, ErrorSeverity.MEDIUM, {
-      retryCount: 1,
-    });
+    const originalError = new AppError(
+      'Original error',
+      'ORIGINAL',
+      ErrorDomain.NETWORK,
+      ErrorSeverity.MEDIUM,
+      {
+        retryCount: 1,
+      }
+    );
 
     const retriedError = originalError.withRetry();
 
@@ -442,15 +478,19 @@ describe('Navigation Error Classes', () => {
 
   describe('NavigationAccessDeniedError', () => {
     it('should create navigation access denied error', () => {
-      const error = new NavigationAccessDeniedError('/admin', 'Insufficient permissions', ['admin']);
+      const error = new NavigationAccessDeniedError('/admin', 'Insufficient permissions', [
+        'admin',
+      ]);
 
-      expect(error.message).toBe('Access denied to navigation path: /admin - Insufficient permissions');
+      expect(error.message).toBe(
+        'Access denied to navigation path: /admin - Insufficient permissions'
+      );
       expect(error.type).toBe('NAVIGATION_ACCESS_DENIED');
       expect(error.statusCode).toBe(403);
       expect(error.details).toEqual({
         path: '/admin',
         reason: 'Insufficient permissions',
-        requiredRole: ['admin']
+        requiredRole: ['admin'],
       });
     });
   });
@@ -518,7 +558,12 @@ describe('Error Handler Integration', () => {
   });
 
   it('should handle error through core error handler', () => {
-    const error = new AppError('Test error', 'TEST_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM);
+    const error = new AppError(
+      'Test error',
+      'TEST_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM
+    );
 
     coreErrorHandler.handleError(error);
 
@@ -634,7 +679,12 @@ describe('Error Factory Patterns', () => {
 
   it('should maintain error hierarchy', () => {
     const baseError = new BaseError('Base error');
-    const appError = new AppError('App error', 'APP_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM);
+    const appError = new AppError(
+      'App error',
+      'APP_ERROR',
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.MEDIUM
+    );
 
     expect(baseError).toBeInstanceOf(Error);
     expect(appError).toBeInstanceOf(Error);

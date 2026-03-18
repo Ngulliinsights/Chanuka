@@ -8,7 +8,7 @@
  * 80% of testing value with 20% of implementation effort.
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 // Mock bill tracking services
 vi.mock('@client/features/bills/tracking', () => ({
@@ -181,12 +181,6 @@ describe('Bill Tracking (Real-time)', () => {
 
     it('should manage notification timing', async () => {
       const { billTrackingService } = await import('@client/features/bills/tracking');
-
-      const timingConfig = {
-        immediate: ['status_change'],
-        batched: ['progress_update'],
-        scheduled: ['daily_summary'],
-      };
 
       billTrackingService.notifyBillUpdate.mockResolvedValue({
         notified: true,
