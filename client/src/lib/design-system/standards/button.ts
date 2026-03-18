@@ -174,18 +174,7 @@ export const buttonDesignStandards = {
 } as const;
 
 // Button utility functions
-export const buttonUtils = {
-  /**
-   * Generate button classes
-   */
-  getButtonClasses: (
-    variant: keyof typeof buttonDesignStandards.variants = 'primary',
-    size: keyof typeof buttonDesignStandards.sizes = 'md',
-    disabled: boolean = false,
-    loading: boolean = false
-  ): string => {
-    const classes = ['chanuka-btn'];
-
+export 
     classes.push(`chanuka-btn-${variant}`);
     classes.push(`chanuka-btn-${size}`);
 

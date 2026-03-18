@@ -1,9 +1,9 @@
 /**
  * Centralized Brand Assets Component
- * 
+ *
  * Provides optimized, accessible SVG components for all Chanuka brand assets
  * with intelligent sizing, theming, and responsive behavior.
- * 
+ *
  * Usage:
  * - Use specific variants for different contexts (hero, navigation, footer, etc.)
  * - All components support className for custom styling
@@ -23,11 +23,11 @@ interface BrandAssetProps {
  * Size mappings for consistent scaling - UPDATED for better visibility
  */
 const sizeMap = {
-  xs: 'w-8 h-8',      // 32px - Small icons
-  sm: 'w-16 h-16',    // 64px - Navigation mobile
-  md: 'w-32 h-32',    // 128px - Navigation desktop, cards
-  lg: 'w-48 h-48',    // 192px - Section headers
-  xl: 'w-64 h-64',    // 256px - Hero sections
+  xs: 'w-8 h-8', // 32px - Small icons
+  sm: 'w-16 h-16', // 64px - Navigation mobile
+  md: 'w-32 h-32', // 128px - Navigation desktop, cards
+  lg: 'w-48 h-48', // 192px - Section headers
+  xl: 'w-64 h-64', // 256px - Hero sections
   full: 'w-full h-auto', // Responsive full width
 };
 
@@ -191,10 +191,12 @@ export const HeroBrandElement: React.FC<{ className?: string }> = ({ className =
  * Floating Brand Accent
  * Decorative background element for visual interest
  */
-export const FloatingBrandAccent: React.FC<{
-  className?: string;
-  position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
-} & React.HTMLAttributes<HTMLDivElement>> = ({ className = '', position = 'top-right', style, ...props }) => {
+export const FloatingBrandAccent: React.FC<
+  {
+    className?: string;
+    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+  } & React.HTMLAttributes<HTMLDivElement>
+> = ({ className = '', position = 'top-right', style, ...props }) => {
   const positionClasses = {
     'top-left': 'top-0 left-0 -translate-x-1/2 -translate-y-1/2',
     'top-right': 'top-0 right-0 translate-x-1/2 -translate-y-1/2',

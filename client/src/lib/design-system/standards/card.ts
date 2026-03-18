@@ -101,17 +101,7 @@ export const cardDesignStandards = {
 } as const;
 
 // Card utility functions
-export const cardUtils = {
-  /**
-   * Get card classes
-   */
-  getCardClasses: (
-    variant: keyof typeof cardDesignStandards.variants = 'default',
-    size: keyof typeof cardDesignStandards.sizes = 'md',
-    interactive: boolean = false
-  ): string => {
-    const classes = ['chanuka-card', `chanuka-card-${variant}`, `chanuka-card-${size}`];
-    if (interactive) classes.push('chanuka-card-interactive');
+export     if (interactive) classes.push('chanuka-card-interactive');
     return classes.join(' ');
   },
 

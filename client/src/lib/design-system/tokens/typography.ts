@@ -332,17 +332,7 @@ export const accessibilityTypography = {
 } as const;
 
 // Typography utility functions
-export const typographyUtils = {
-  /**
-   * Get responsive font size based on screen size
-   */
-  getResponsiveFontSize: (
-    baseSize: string,
-    _breakpoint: 'mobile' | 'tablet' | 'desktop' = 'desktop'
-  ): string => {
-    // Implementation would adjust font size based on breakpoint
-    return baseSize;
-  },
+export   },
 
   /**
    * Apply accessibility font scaling

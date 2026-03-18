@@ -1,6 +1,6 @@
 /**
  * ChanukaIcons - Custom icon components for the Chanuka project
- * 
+ *
  * This file provides custom icons that are not available in lucide-react.
  * Note: Using lucide-react as the primary icon library.
  */
@@ -15,11 +15,7 @@ interface IconProps extends React.SVGProps<SVGSVGElement> {
 /**
  * GraduationCap icon for academic affiliations
  */
-export const GraduationCap: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const GraduationCap: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -41,11 +37,7 @@ export const GraduationCap: React.FC<IconProps> = ({
 /**
  * Globe icon for web links
  */
-export const Globe: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const Globe: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -68,11 +60,7 @@ export const Globe: React.FC<IconProps> = ({
 /**
  * ExternalLink icon for opening links in new tab
  */
-export const ExternalLink: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const ExternalLink: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -95,11 +83,7 @@ export const ExternalLink: React.FC<IconProps> = ({
 /**
  * Linkedin icon for LinkedIn profile links
  */
-export const Linkedin: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const Linkedin: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -122,11 +106,7 @@ export const Linkedin: React.FC<IconProps> = ({
 /**
  * Gavel icon for judicial affiliations
  */
-export const Gavel: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const Gavel: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -151,11 +131,7 @@ export const Gavel: React.FC<IconProps> = ({
 /**
  * Scale icon for justice/balance
  */
-export const Scale: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const Scale: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}
@@ -180,11 +156,7 @@ export const Scale: React.FC<IconProps> = ({
 /**
  * DataPrivacy icon for privacy-related features
  */
-export const DataPrivacy: React.FC<IconProps> = ({ 
-  className, 
-  size = 24, 
-  ...props 
-}) => (
+export const DataPrivacy: React.FC<IconProps> = ({ className, size = 24, ...props }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={size}

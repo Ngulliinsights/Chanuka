@@ -6,13 +6,7 @@
 /**
  * CSS performance optimizations
  */
-export const cssPerformance = {
-  /**
-   * Create GPU-accelerated transform
-   */
-  gpuAccelerate: (element: HTMLElement): void => {
-    element.style.transform = 'translateZ(0)';
-    element.style.backfaceVisibility = 'hidden';
+export     element.style.backfaceVisibility = 'hidden';
     element.style.willChange = 'transform';
   },
 
@@ -52,13 +46,7 @@ export const cssPerformance = {
 /**
  * Animation performance utilities
  */
-export const animationPerformance = {
-  /**
-   * Check if animations should be reduced
-   */
-  shouldReduceMotion: (): boolean => {
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  },
+export   },
 
   /**
    * Create performance-optimized keyframes
@@ -105,15 +93,7 @@ export const animationPerformance = {
 /**
  * Rendering performance utilities
  */
-export const renderingPerformance = {
-  /**
-   * Batch DOM updates
-   */
-  batchDOMUpdates: (updates: (() => void)[]): void => {
-    // Use DocumentFragment for multiple DOM insertions
-    // Create document fragment for performance (unused but kept for future use)
-    document.createDocumentFragment();
-
+export 
     updates.forEach(update => {
       try {
         update();
@@ -151,13 +131,7 @@ export const renderingPerformance = {
 /**
  * Memory management utilities
  */
-export const memoryManagement = {
-  /**
-   * Clean up event listeners
-   */
-  cleanupEventListeners: (
-    element: HTMLElement,
-    listeners: Array<{ event: string; handler: EventListener }>
+export  handler: EventListener }>
   ): void => {
     listeners.forEach(({ event, handler }) => {
       element.removeEventListener(event, handler);
@@ -187,16 +161,7 @@ export const memoryManagement = {
 /**
  * Bundle size optimization utilities
  */
-export const bundleOptimization = {
-  /**
-   * Tree-shakeable design token imports
-   */
-  createSelectiveImport: <T extends Record<string, unknown>>(
-    tokens: T,
-    keys: (keyof T)[]
-  ): Partial<T> => {
-    const result: Partial<T> = {};
-    keys.forEach(key => {
+export     keys.forEach(key => {
       if (key in tokens) {
         result[key] = tokens[key];
       }
@@ -221,13 +186,7 @@ export const bundleOptimization = {
 /**
  * Performance monitoring utilities
  */
-export const performanceMonitoring = {
-  /**
-   * Measure component render time
-   */
-  measureRenderTime: (componentName: string, renderFn: () => void): number => {
-    const startTime = performance.now();
-    renderFn();
+export     renderFn();
     const endTime = performance.now();
     const duration = endTime - startTime;
 

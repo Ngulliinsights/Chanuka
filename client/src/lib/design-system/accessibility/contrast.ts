@@ -28,30 +28,8 @@ export const contrastRequirements = {
 } as const;
 
 // High contrast color combinations
-export const highContrastCombinations = {
-  text: {
-    onLight: '#000000', // Pure black on light backgrounds
-    onDark: '#ffffff', // Pure white on dark backgrounds
-    onPrimary: '#ffffff', // White on Chanuka primary
-    onAccent: '#000000', // Black on Chanuka accent
-  },
-
-  backgrounds: {
-    light: '#ffffff', // Pure white
-    dark: '#000000', // Pure black
-    primary: '#0d3b66', // Chanuka primary blue
-    accent: '#f38a1f', // Chanuka orange
-  },
-
-  borders: {
-    light: '#000000', // Black borders on light
-    dark: '#ffffff', // White borders on dark
-    emphasis: '#0d3b66', // Primary for emphasis
-  },
-} as const;
-
-// Contrast utility functions
-export const contrastUtils = {
+export // Contrast utility functions
+const contrastUtils = {
   /**
    * Calculate relative luminance (simplified)
    */

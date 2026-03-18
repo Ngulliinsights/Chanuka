@@ -11,25 +11,23 @@ interface LogoProps {
   variant?: 'default' | 'white' | 'dark';
 }
 
-export const Logo = memo<LogoProps>(
-  ({ className = '', size = 'md', variant = 'default' }) => {
-    // Map legacy variant 'dark' to 'monochrome', default to 'brand'
-    const brandVariant = variant === 'dark' ? 'monochrome' : variant === 'white' ? 'white' : 'brand';
+export const Logo = memo<LogoProps>(({ className = '', size = 'md', variant = 'default' }) => {
+  // Map legacy variant 'dark' to 'monochrome', default to 'brand'
+  const brandVariant = variant === 'dark' ? 'monochrome' : variant === 'white' ? 'white' : 'brand';
 
-    const sizeMap: Record<string, number> = {
-      sm: 32,
-      md: 48,
-      lg: 64,
-      xl: 96,
-    };
+  const sizeMap: Record<string, number> = {
+    sm: 32,
+    md: 48,
+    lg: 64,
+    xl: 96,
+  };
 
-    return (
-      <div className={cn("flex items-center", className)}>
-        <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant} />
-      </div>
-    );
-  }
-);
+  return (
+    <div className={cn('flex items-center', className)}>
+      <ChanukaLogo size={typeof size === 'number' ? size : sizeMap[size]} variant={brandVariant} />
+    </div>
+  );
+});
 
 Logo.displayName = 'Logo';
 

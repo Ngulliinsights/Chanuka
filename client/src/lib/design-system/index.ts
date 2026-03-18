@@ -20,8 +20,7 @@
  *   import { Alert, Badge, Progress } from '@client/lib/design-system';
  *   import { Card, Text, Heading } from '@client/lib/design-system';
  *   import { Avatar, OptimizedImage } from '@client/lib/design-system';
- *   import { designTokens, themeProvider } from '@client/lib/design-system';
- */
+ *    */
 
 // ════════════════════════════════════════════════════════════════════════════
 // INTERACTIVE COMPONENTS (Form controls, navigation, selection)

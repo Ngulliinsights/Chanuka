@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 /**
  * Design System Test Page
  *

@@ -13,16 +13,15 @@ import {
   CSSProperties,
   ElementRef,
 } from 'react';
-import React from 'react';
 
 import { cn } from '@client/lib/design-system/utils/cn';
 import { useMobile } from '@client/lib/hooks/use-mobile';
 
 import { Button } from './Button';
 import { Input } from './Input';
-import { Separator } from './separator';
+import { Separator } from '../feedback/separator';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from './Sheet';
-import { Skeleton } from './skeleton';
+import { Skeleton } from '../feedback/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../feedback/Tooltip';
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state';
@@ -142,6 +141,7 @@ const SidebarProvider = forwardRef<
           {/* CSS variables are required for dynamic sidebar width */}
           {/* stylelint-disable-next-line */}
           {/* eslint-disable-next-line react/style-prop-object */}
+          {/* hint-disable-next-line no-inline-styles */}
           <div
             style={sidebarStyle}
             className={cn(
@@ -202,13 +202,12 @@ const Sidebar = forwardRef<
       } as CSSProperties;
 
       return (
-        <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+        <Sheet open={openMobile} onOpenChange={setOpenMobile}>
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
             className="w-[--sidebar-width] bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
             style={mobileStyle}
-            side={side}
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Sidebar</SheetTitle>

@@ -115,13 +115,7 @@ export {
 /**
  * Type-safe token access utilities
  */
-export const tokenUtils = {
-  /**
-   * Get color with fallback
-   */
-  getColor: (category: keyof typeof colorTokens, level?: string | number) => {
-    const cat = colorTokens[category];
-    if (typeof cat === 'object' && level) {
+export     if (typeof cat === 'object' && level) {
       return cat[level as keyof typeof cat] || 'transparent';
     }
     return cat;

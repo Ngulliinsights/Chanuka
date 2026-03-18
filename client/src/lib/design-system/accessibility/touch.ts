@@ -50,17 +50,7 @@ export const touchTargets = {
 } as const;
 
 // Touch utility functions
-export const touchUtils = {
-  /**
-   * Check if element meets touch target requirements
-   */
-  meetsTouchRequirements: (
-    width: number,
-    height: number,
-    level: 'minimum' | 'comfortable' | 'large' = 'minimum'
-  ): boolean => {
-    const requirements = touchTargets[level];
-    const minWidth = parseFloat(requirements.width);
+export     const minWidth = parseFloat(requirements.width);
     const minHeight = parseFloat(requirements.height);
 
     return width >= minWidth && height >= minHeight;

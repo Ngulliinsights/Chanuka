@@ -1,20 +1,21 @@
-/**
- * Design System Implementation Guide
- * ==================================
- *
- * Step-by-step guide for integrating Chanuka brand standards into components,
- * pages, and features. This ensures consistent application of political neutrality,
- * multilingual support, brand personality, and low-bandwidth design.
- */
+/\*\*
+
+- Design System Implementation Guide
+- ==================================
+-
+- Step-by-step guide for integrating Chanuka brand standards into components,
+- pages, and features. This ensures consistent application of political neutrality,
+- multilingual support, brand personality, and low-bandwidth design.
+  \*/
 
 export const IMPLEMENTATION_GUIDE = {
-  quickStart: {
-    step1_setupProviders: {
-      title: 'Set up design system providers in your app root',
-      file: 'app.tsx or main.tsx',
-      code: `
-        import { ChanukaProviders } from '@client/lib/design-system/contexts';
-        
+quickStart: {
+step1_setupProviders: {
+title: 'Set up design system providers in your app root',
+file: 'app.tsx or main.tsx',
+code: `
+import { ChanukaProviders } from '@client/lib/design-system/contexts';
+
         export function App() {
           return (
             <ChanukaProviders defaultLanguage="en">
@@ -33,10 +34,10 @@ export const IMPLEMENTATION_GUIDE = {
       file: 'components/BillSearch.tsx',
       code: `
         import { useBrandVoice } from '@client/lib/design-system/contexts';
-        
+
         export function BillSearch() {
           const { getMicrocopy } = useBrandVoice();
-          
+
           return (
             <div>
               <input
@@ -58,10 +59,10 @@ export const IMPLEMENTATION_GUIDE = {
       file: 'components/BillComparison.tsx',
       code: `
         import { PoliticalNeutralityPrinciples } from '@client/lib/design-system/standards';
-        
+
         export function BillComparison({ billA, billB }) {
           const layout = PoliticalNeutralityPrinciples.layoutPatterns.sideBySideComparison;
-          
+
           return (
             <div className="flex gap-4">
               {/* Bill A - Perspective 1 */}
@@ -69,7 +70,7 @@ export const IMPLEMENTATION_GUIDE = {
                 <h3 style={{ color: '#3b82f6' }}>● Perspective A</h3>
                 <p>{billA.content}</p>
               </article>
-              
+
               {/* Bill B - Perspective 2 */}
               <article className="flex-1">
                 <h3 style={{ color: '#a855f7' }}>● Perspective B</h3>
@@ -87,10 +88,10 @@ export const IMPLEMENTATION_GUIDE = {
       file: 'components/BillTitle.tsx',
       code: `
         import { useLanguage, FormattedDate } from '@client/lib/design-system/contexts';
-        
+
         export function BillTitle({ bill, translations }) {
           const { language } = useLanguage();
-          
+
           return (
             <div>
               <h1>{translations[language].title}</h1>
@@ -107,7 +108,7 @@ export const IMPLEMENTATION_GUIDE = {
       file: 'components/BillPreview.tsx',
       code: `
         import { useLowBandwidth, ConditionalBandwidth } from '@client/lib/design-system/contexts';
-        
+
         export function BillPreview({ bill }) {
           return (
             <ConditionalBandwidth
@@ -133,18 +134,18 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       note: 'Automatically shows simplified version on slow connections',
     },
-  },
 
-  byComponent: {
-    Button: {
-      before: `
-        <button onClick={handleSearch}>
+},
+
+byComponent: {
+Button: {
+before: `         <button onClick={handleSearch}>
           Search Bills
         </button>
       `,
-      after: `
-        import { useBrandVoice } from '@client/lib/design-system/contexts';
-        
+after: `
+import { useBrandVoice } from '@client/lib/design-system/contexts';
+
         <button onClick={handleSearch}>
           {useBrandVoice().getMicrocopy('buttons.primary.search')}
         </button>
@@ -160,7 +161,7 @@ export const IMPLEMENTATION_GUIDE = {
       after: `
         import { useBrandVoice } from '@client/lib/design-system/contexts';
         import { MultilingualTypographyScale } from '@client/lib/design-system/standards';
-        
+
         <input
           placeholder={getMicrocopy('formLabels.billNumber.placeholder')}
           title={getMicrocopy('formLabels.billNumber.help')}
@@ -179,10 +180,10 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { useBrandVoice } from '@client/lib/design-system/contexts';
-        
+
         const { getTone } = useBrandVoice();
         const errorTone = getTone('error');
-        
+
         <div>
           <h3>{errorTone.examples.title}</h3>
           <p>{errorTone.examples.body}</p>
@@ -198,10 +199,10 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { useBrandVoice } from '@client/lib/design-system/contexts';
-        
+
         const { getTone, getMicrocopy } = useBrandVoice();
         const emptyTone = getTone('empty');
-        
+
         <div>
           <h2>{getMicrocopy('emptyStates.noResults.title')}</h2>
           <p>{getMicrocopy('emptyStates.noResults.subtitle')}</p>
@@ -223,7 +224,7 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { PoliticalNeutralityPrinciples } from '@client/lib/design-system/standards';
-        
+
         <article className="perspective-card" data-perspective="A">
           <header>
             <h3 style={{ color: '#3b82f6' }}>
@@ -246,9 +247,9 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { useLowBandwidth } from '@client/lib/design-system/contexts';
-        
+
         const { isLowBandwidth } = useLowBandwidth();
-        
+
         {!isLowBandwidth && (
           <picture>
             <source srcSet={bill.coverImageWebp} type="image/webp" />
@@ -276,7 +277,7 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { FormattedNumber } from '@client/lib/design-system/contexts';
-        
+
         <span>
           Sponsors: <FormattedNumber value={bill.sponsorCount} />
         </span>
@@ -290,24 +291,25 @@ export const IMPLEMENTATION_GUIDE = {
       `,
       after: `
         import { FormattedDate } from '@client/lib/design-system/contexts';
-        
+
         <span>
           Introduced: <FormattedDate date={bill.dateIntroduced} />
         </span>
       `,
       standards: ['MultilingualSupport.LocalizationFormats'],
     },
-  },
 
-  testingChecklistByStandard: {
-    politicalNeutrality: [
-      '✓ Both perspectives have equal visual prominence',
-      '✓ No colors associated with good/bad',
-      '✓ Text size identical for all perspectives',
-      '✓ Language neutral (no "pro/con", "support/oppose")',
-      '✓ Color-blind users can distinguish perspectives',
-      '✓ Tested with users from diverse political backgrounds',
-    ],
+},
+
+testingChecklistByStandard: {
+politicalNeutrality: [
+'✓ Both perspectives have equal visual prominence',
+'✓ No colors associated with good/bad',
+'✓ Text size identical for all perspectives',
+'✓ Language neutral (no "pro/con", "support/oppose")',
+'✓ Color-blind users can distinguish perspectives',
+'✓ Tested with users from diverse political backgrounds',
+],
 
     multilingual: [
       '✓ No text overflow in any language',
@@ -335,16 +337,17 @@ export const IMPLEMENTATION_GUIDE = {
       '✓ Works on Slow 3G throttling',
       '✓ Offline content accessible via service worker',
     ],
-  },
 
-  commonPatterns: {
-    errorRecovery: `
-      // Pattern: Error + Why + Solution
-      import { useBrandVoice } from '@client/lib/design-system/contexts';
-      
+},
+
+commonPatterns: {
+errorRecovery: `
+// Pattern: Error + Why + Solution
+import { useBrandVoice } from '@client/lib/design-system/contexts';
+
       const { getTone, getMicrocopy } = useBrandVoice();
       const errorTone = getTone('error');
-      
+
       <div className="error-state">
         <h3>{errorTone.examples.title}</h3>
         <p>{errorTone.examples.body}</p>
@@ -357,10 +360,10 @@ export const IMPLEMENTATION_GUIDE = {
     educationalContent: `
       // Pattern: Break complexity into digestible pieces
       import { useBrandVoice } from '@client/lib/design-system/contexts';
-      
+
       const { getTone } = useBrandVoice();
       const educationalTone = getTone('educational');
-      
+
       <div className="educational">
         <h3>{educationalTone.examples.title}</h3>
         <details>
@@ -373,14 +376,14 @@ export const IMPLEMENTATION_GUIDE = {
     comparisonView: `
       // Pattern: Equal visual weight for two perspectives
       import { PoliticalNeutralityPrinciples } from '@client/lib/design-system/standards';
-      
+
       <div className="flex gap-4">
         {/* Perspective A */}
         <article className="flex-1 border">
           <h3 style={{ color: '#3b82f6' }}>● {perspective1Title}</h3>
           <p>{perspective1Content}</p>
         </article>
-        
+
         {/* Perspective B */}
         <article className="flex-1 border">
           <h3 style={{ color: '#a855f7' }}>● {perspective2Title}</h3>
@@ -393,12 +396,12 @@ export const IMPLEMENTATION_GUIDE = {
       // Pattern: HTML-first, JavaScript enhances
       // Low bandwidth: Form works without JS
       // Normal: JS adds live preview and instant updates
-      
+
       <form method="get" action="/search">
         <input name="q" placeholder="Search..." />
         <button type="submit">Search</button>
       </form>
-      
+
       {/* JS enhancement: Live preview appears below form */}
       {isJavaScriptLoaded && (
         <div id="preview">
@@ -406,38 +409,39 @@ export const IMPLEMENTATION_GUIDE = {
         </div>
       )}
     `,
-  },
 
-  fileStructure: {
-    description: 'Files implementing design standards',
-    standards: 'client/src/lib/design-system/standards/',
-    providers: 'client/src/lib/design-system/contexts/',
-    components: {
-      note: 'Components using the standards are in:',
-      paths: [
-        'client/src/lib/design-system/interactive/',
-        'client/src/lib/design-system/feedback/',
-        'client/src/lib/design-system/typography/',
-        'client/src/lib/design-system/media/',
-      ],
-    },
-  },
+},
 
-  deploymentChecklist: [
-    '☐ All providers imported at app root (ChanukaProviders)',
-    '☐ All hardcoded UI text replaced with MicrocopyLibrary',
-    '☐ Error messages use BrandPersonality.ToneMatrix.error',
-    '☐ Empty states use BrandPersonality.ToneMatrix.empty',
-    '☐ Perspective comparisons use PoliticalNeutrality layouts',
-    '☐ Numbers/dates use FormattedNumber/FormattedDate',
-    '☐ Images lazy-loaded with WebP fallback',
-    '☐ Bundle size < 200 KB (gzipped)',
-    '☐ Tested on Slow 3G throttling',
-    '☐ Tested with screen readers',
-    '☐ Tested with color blindness simulation',
-    '☐ Tested with Swahili language',
-    '☐ All tests passing',
-  ],
+fileStructure: {
+description: 'Files implementing design standards',
+standards: 'client/src/lib/design-system/standards/',
+providers: 'client/src/lib/design-system/contexts/',
+components: {
+note: 'Components using the standards are in:',
+paths: [
+'client/src/lib/design-system/interactive/',
+'client/src/lib/design-system/feedback/',
+'client/src/lib/design-system/typography/',
+'client/src/lib/design-system/media/',
+],
+},
+},
+
+deploymentChecklist: [
+'☐ All providers imported at app root (ChanukaProviders)',
+'☐ All hardcoded UI text replaced with MicrocopyLibrary',
+'☐ Error messages use BrandPersonality.ToneMatrix.error',
+'☐ Empty states use BrandPersonality.ToneMatrix.empty',
+'☐ Perspective comparisons use PoliticalNeutrality layouts',
+'☐ Numbers/dates use FormattedNumber/FormattedDate',
+'☐ Images lazy-loaded with WebP fallback',
+'☐ Bundle size < 200 KB (gzipped)',
+'☐ Tested on Slow 3G throttling',
+'☐ Tested with screen readers',
+'☐ Tested with color blindness simulation',
+'☐ Tested with Swahili language',
+'☐ All tests passing',
+],
 };
 
 export default IMPLEMENTATION_GUIDE;

@@ -11,19 +11,8 @@ import { UIValidationError, UIInputError, UIFormError, UIDateError } from './err
  * Base validation schemas
  */
 
-export const BaseUIPropsSchema = z.object({
-  id: z.string().optional(),
-  className: z.string().optional(),
-  disabled: z.boolean().optional(),
-  'data-testid': z.string().optional(),
-});
-
-export const ValidationStateSchema = z.object({
-  isValid: z.boolean(),
-  error: z.string().optional(),
-  touched: z.boolean(),
-});
-
+export 
+export 
 /**
  * Input validation schemas
  */
@@ -56,12 +45,7 @@ export const PhoneSchema = z
 
 export const URLSchema = z.string().url('Invalid URL format').max(2048, 'URL too long');
 
-export const NumberInputSchema = z
-  .union([
-    z.string().transform(val => {
-      if (/^\d*\.?\d*$/.test(val)) {
-        const num = parseFloat(val);
-        return isNaN(num) ? undefined : num;
+export         return isNaN(num) ? undefined : num;
       }
       return undefined;
     }),
@@ -79,54 +63,21 @@ export const NumberInputSchema = z
  * Form validation schemas
  */
 
-export const FormFieldSchema = z.object({
-  name: z.string().min(1, 'Field name is required'),
-  value: z.any(),
-  required: z.boolean().optional(),
-  disabled: z.boolean().optional(),
-  error: z.string().optional(),
-});
-
-export const FormValidationConfigSchema = z.object({
-  validateOnSubmit: z.boolean().optional(),
-  validateOnChange: z.boolean().optional(),
-  validateOnBlur: z.boolean().optional(),
-  showErrorSummary: z.boolean().optional(),
-  scrollToFirstError: z.boolean().optional(),
-});
-
+export 
+export 
 /**
  * Select validation schemas
  */
 
-export const SelectOptionSchema = z.object({
-  value: z.string(),
-  label: z.string(),
-  disabled: z.boolean().optional(),
-});
-
+export 
 export const SelectValueSchema = z.string().min(1, 'Please select an option');
 
 /**
  * Button validation schemas
  */
 
-export const ButtonStateSchema = z.object({
-  loading: z.boolean().optional(),
-  error: z.boolean().optional(),
-  success: z.boolean().optional(),
-});
-
-export const ButtonVariantSchema = z.enum([
-  'default',
-  'destructive',
-  'outline',
-  'secondary',
-  'ghost',
-  'link',
-]);
-export const ButtonSizeSchema = z.enum(['default', 'sm', 'lg', 'icon']);
-
+export 
+export export 
 /**
  * Date validation schemas
  */
@@ -136,16 +87,7 @@ export const DateSchema = z.date({
   invalid_type_error: 'Invalid date format',
 });
 
-export const DateRangeSchema = z
-  .object({
-    from: DateSchema.optional(),
-    to: DateSchema.optional(),
-  })
-  .refine(
-    data => {
-      if (data.from && data.to) {
-        return data.from <= data.to;
-      }
+export       }
       return true;
     },
     {
@@ -158,28 +100,14 @@ export const DateRangeSchema = z
  * Table validation schemas
  */
 
-export const TableColumnSchema = z.object({
-  key: z.string().min(1, 'Column key is required'),
-  header: z.string().min(1, 'Column header is required'),
-  validator: z.any().optional(), // ZodSchema
-  required: z.boolean().optional(),
-});
-
+export 
 export const TableDataSchema = z.array(z.record(z.any()));
 
 /**
  * Dialog validation schemas
  */
 
-export const DialogPropsSchema = z.object({
-  title: z.string().min(1, 'Dialog title is required'),
-  description: z.string().optional(),
-  confirmText: z.string().optional(),
-  cancelText: z.string().optional(),
-  loading: z.boolean().optional(),
-  error: z.string().optional(),
-});
-
+export 
 /**
  * Validation utility functions
  */
