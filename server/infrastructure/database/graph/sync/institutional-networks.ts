@@ -6,8 +6,7 @@ import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function getCommitteeNetwork(driver: Driver, committeeId: string): Promise<any> {
@@ -28,7 +27,8 @@ export async function getCommitteeNetwork(driver: Driver, committeeId: string): 
     
     if (result.records.length === 0) return null;
     
-    const record = result.records[0];
+    const record = result.records[0] as import('neo4j-driver').Record | undefined;
+    if (!record) return null;
     return {
       committee_id: record.get('committee_id'),
       name: record.get('name'),
@@ -55,7 +55,7 @@ export async function getPartyNetwork(driver: Driver, party: string, options: Pa
   
   try {
     const result = await executeCypherSafely(driver, query, { ...params, party }, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       id: r.get('id'),
       name: r.get('name'),
       bills_sponsored: Number(r.get('bills_sponsored'))

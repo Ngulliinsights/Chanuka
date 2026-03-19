@@ -7,7 +7,7 @@
  * @module utils/session-manager
  */
 
-import { Driver, Session, Transaction, Result } from 'neo4j-driver';
+import { Driver, Session, Transaction, QueryResult } from 'neo4j-driver';
 
 import { GraphErrorHandler } from './error-adapter';
 import { retryWithBackoff, RetryConfig, RETRY_PRESETS } from './retry-utils';
@@ -159,7 +159,7 @@ export async function executeCypherSafely(
     mode?: 'READ' | 'WRITE';
     retry?: boolean;
   } = {}
-): Promise<Result> {
+): Promise<QueryResult> {
   // Validate query doesn't use template literals
   validateCypherQuery(cypher);
 
@@ -264,10 +264,10 @@ export async function executeBatch<T>(
  * @returns Extracted value or null
  */
 export function extractSingleValue<T = unknown>(
-  result: Result,
+  result: QueryResult,
   key: string
 ): T | null {
-  if (result.records.length === 0) {
+  if (!result || result.records.length === 0 || !result.records[0]) {
     return null;
   }
   return result.records[0].get(key) as T;
@@ -281,7 +281,7 @@ export function extractSingleValue<T = unknown>(
  * @returns Array of extracted values
  */
 export function extractAllValues<T = unknown>(
-  result: Result,
+  result: QueryResult,
   key: string
 ): T[] {
   return result.records.map((record) => (record.get(key) as unknown) as T);
@@ -293,7 +293,7 @@ export function extractAllValues<T = unknown>(
  * @param result - Neo4j query result
  * @returns True if results exist
  */
-export function hasResults(result: Result): boolean {
+export function hasResults(result: QueryResult): boolean {
   return result.records.length > 0;
 }
 

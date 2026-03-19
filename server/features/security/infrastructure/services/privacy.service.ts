@@ -75,18 +75,18 @@ export class PrivacyService {
 
       // Export user profile data
       if (request.dataTypes.includes('profile')) {
-        const userRows: any = await ((readDatabase as any)
+        const userRows = await readDatabase
           .select()
           .from(users)
-          .where(eq(users.id, request.user_id as any))
-          .limit(1));
+          .where(eq(users.id, request.user_id))
+          .limit(1);
         const user = userRows[0];
 
-        const profileRows: any = await ((readDatabase as any)
+        const profileRows = await readDatabase
           .select()
           .from(user_profiles)
-          .where(eq(user_profiles.user_id, request.user_id as any))
-          .limit(1));
+          .where(eq(user_profiles.user_id, request.user_id))
+          .limit(1);
         const profile = profileRows[0];
 
         userData.userData.profile = user || null;

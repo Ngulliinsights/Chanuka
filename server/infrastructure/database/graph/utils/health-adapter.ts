@@ -4,7 +4,7 @@
  * Comprehensive health checks for Neo4j database with proper error handling.
  */
 import { Driver } from 'neo4j-driver';
-import { executeCypherSafely } from './utils/session-manager';
+import { executeCypherSafely } from './session-manager';
 import { logger } from '@server/infrastructure/observability';
 
 export interface HealthStatus {
@@ -28,8 +28,6 @@ export class HealthAdapter {
   constructor(private driver: Driver) {}
 
   async checkHealth(): Promise<HealthStatus> {
-    const start = Date.now();
-    
     const [database, connectivity, performance] = await Promise.allSettled([
       this.checkDatabase(),
       this.checkConnectivity(),
@@ -60,7 +58,7 @@ export class HealthAdapter {
     const start = Date.now();
     
     try {
-      const result = await executeCypherSafely(
+      await executeCypherSafely(
         this.driver,
         'RETURN 1 as health',
         {},
@@ -75,11 +73,12 @@ export class HealthAdapter {
         message: 'Database responding normally',
       };
     } catch (error) {
-      logger.error({ error: error.message }, 'Database health check failed');
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error({ error: msg }, 'Database health check failed');
       return {
         status: 'unhealthy',
         message: 'Database query failed',
-        details: { error: error.message },
+        details: { error: msg },
       };
     }
   }
@@ -93,11 +92,12 @@ export class HealthAdapter {
         message: 'Connection pool healthy',
       };
     } catch (error) {
-      logger.error({ error: error.message }, 'Connectivity check failed');
+      const msg = error instanceof Error ? error.message : String(error);
+      logger.error({ error: msg }, 'Connectivity check failed');
       return {
         status: 'unhealthy',
         message: 'Connection pool unhealthy',
-        details: { error: error.message },
+        details: { error: msg },
       };
     }
   }
@@ -132,7 +132,7 @@ export class HealthAdapter {
       return {
         status: 'unhealthy',
         message: 'Performance check failed',
-        details: { error: error.message },
+        details: { error: error instanceof Error ? error.message : String(error) },
       };
     }
   }

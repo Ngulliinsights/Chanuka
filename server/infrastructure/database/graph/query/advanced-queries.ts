@@ -2,7 +2,7 @@
  * Advanced Queries (REFACTORED)
  * IMPROVEMENTS: Added LIMIT clauses to all queries, pagination support
  */
-import type { Driver } from 'neo4j-driver';
+import type { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { executeCypherSafely } from '../utils/session-manager';
@@ -20,7 +20,7 @@ export async function aggregateBillsByStatus(driver: Driver): Promise<unknown[]>
       {},
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: Neo4jRecord) => ({
       status: r.get('status'),
       count: Number(r.get('count'))
     }));
@@ -45,7 +45,7 @@ export async function findRelatedBills(driver: Driver, billId: string, limit: nu
       { billId, limit },
       { mode: 'READ' }
     );
-    return result.records.map((r: unknown) => ({
+    return result.records.map((r: Neo4jRecord) => ({
       id: r.get('id'),
       title: r.get('title'),
       shared_topics: Number(r.get('shared_topics'))
@@ -69,7 +69,7 @@ export async function getNodeDegrees(driver: Driver, nodeType: string, options: 
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map((r: unknown) => ({
+    return result.records.map((r: Neo4jRecord) => ({
       id: r.get('id'),
       name: r.get('name'),
       degree: Number(r.get('degree'))

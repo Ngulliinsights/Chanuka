@@ -7,9 +7,11 @@
 import { sponsorConflictAnalysisService } from './application/sponsor-conflict-analysis.service';
 import { type SponsorAffiliationInput, sponsorService, type SponsorTransparencyInput } from './application/sponsor-service-direct';
 import { logger } from '@server/infrastructure/observability';
-import { sponsors } from '@server/infrastructure/schema';
+
 import express, { type Request, type Response, type Router } from 'express';
 import { asyncHandler } from '@server/middleware';
+
+import { sponsorsService as mySponsorsService } from './application/SponsorsService';
 
 export const router: Router = express.Router();
 
@@ -142,6 +144,23 @@ router.get('/:id/affiliations', asyncHandler(async (req: Request, res: Response)
 
   const affiliations = await sponsorService.listAffiliations(sponsor_id);
   res.json({ data: affiliations, count: affiliations.length });
+}));
+
+router.get('/:id/network', asyncHandler(async (req: Request, res: Response) => {
+  const logContext = { component: 'SponsorRoutes', operation: 'getSponsorNetwork' };
+  const sponsor_id = parseIntParam(req.params.id, 'id');
+  logger.info({ ...logContext, sponsor_id }, 'Getting sponsor network visualization');
+
+  const networkResult = await mySponsorsService.getSponsorNetwork(sponsor_id.toString());
+
+  if (!networkResult || networkResult.isErr()) {
+    const errorDetail = networkResult?.isErr() ? networkResult.error : undefined;
+    logger.warn({ ...logContext, sponsor_id, error: errorDetail }, 'Sponsor network unavailable');
+    res.status(503).json({ error: 'Graph database unavailable' });
+    return;
+  }
+
+  res.json({ data: networkResult.value });
 }));
 
 router.post('/:id/affiliations', asyncHandler(async (req: Request, res: Response) => {

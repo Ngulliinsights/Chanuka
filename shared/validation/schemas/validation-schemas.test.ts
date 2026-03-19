@@ -12,6 +12,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   UserSchema,
+  UserWithProfileSchema,
   UserRegistrationSchema,
   validateUser,
   validateUserRegistration,
@@ -26,7 +27,7 @@ import {
   CommentSchema,
   validateComment,
   COMMENT_VALIDATION_RULES,
-} from './comment.schema;
+} from './comment.schema';
 
 // ============================================================================
 // USER SCHEMA TESTS
@@ -116,10 +117,10 @@ describe('UserSchema', () => {
       const invalidUser = {
         email: 'test@example.com',
         username: 'testuser',
-        phone: 'abc-def-ghij',
+        phone_number: 'abc-def-ghij',
       };
 
-      const result = UserSchema.safeParse(invalidUser);
+      const result = UserWithProfileSchema.safeParse(invalidUser);
       expect(result.success).toBe(false);
     });
   });
@@ -172,7 +173,7 @@ describe('UserSchema', () => {
         bio: 'a'.repeat(501),
       };
 
-      const result = UserSchema.safeParse(invalidUser);
+      const result = UserWithProfileSchema.safeParse(invalidUser);
       expect(result.success).toBe(false);
     });
 
@@ -183,18 +184,18 @@ describe('UserSchema', () => {
         bio: 'a'.repeat(500),
       };
 
-      const result = UserSchema.safeParse(validUser);
+      const result = UserWithProfileSchema.safeParse(validUser);
       expect(result.success).toBe(true);
     });
 
-    it('should reject first_name longer than 50 characters', () => {
+    it('should reject first_name longer than 100 characters', () => {
       const invalidUser = {
         email: 'test@example.com',
         username: 'testuser',
-        first_name: 'a'.repeat(51),
+        first_name: 'a'.repeat(101), // Max length is 100 for user profiles
       };
 
-      const result = UserSchema.safeParse(invalidUser);
+      const result = UserWithProfileSchema.safeParse(invalidUser);
       expect(result.success).toBe(false);
     });
 
@@ -205,7 +206,7 @@ describe('UserSchema', () => {
         first_name: '',
       };
 
-      const result = UserSchema.safeParse(invalidUser);
+      const result = UserWithProfileSchema.safeParse(invalidUser);
       expect(result.success).toBe(false);
     });
   });
@@ -379,8 +380,9 @@ describe('BillSchema', () => {
     it('should accept valid bill with all required fields', () => {
       const validBill = {
         title: 'Infrastructure Investment Act',
-        summary: 'This bill provides funding for infrastructure improvements.',
-        content: 'Section 1: This act shall be known as the Infrastructure Investment Act. Section 2: Funding provisions...',
+        bill_number: 'H.123',
+        status: 'first_reading',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -392,12 +394,10 @@ describe('BillSchema', () => {
         title: 'Healthcare Reform Bill',
         short_title: 'Healthcare Act',
         summary: 'Comprehensive healthcare reform legislation.',
-        content: 'Section 1: Purpose and scope of healthcare reform. Section 2: Implementation details...',
+        full_text: 'Section 1: Purpose and scope of healthcare reform. Section 2: Implementation details...',
         bill_number: 'H.1234',
-        status: 'introduced',
-        chamber: 'house',
-        type: 'bill',
-        priority: 'high',
+        status: 'first_reading',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -409,19 +409,21 @@ describe('BillSchema', () => {
     it('should reject title shorter than 10 characters', () => {
       const invalidBill = {
         title: 'Short',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        bill_number: 'H.123',
+        status: 'first_reading',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(invalidBill);
       expect(result.success).toBe(false);
     });
 
-    it('should reject title longer than 200 characters', () => {
+    it('should reject title longer than 500 characters', () => {
       const invalidBill = {
-        title: 'a'.repeat(201),
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        title: 'a'.repeat(501),
+        bill_number: 'H.123',
+        status: 'first_reading',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(invalidBill);
@@ -431,19 +433,21 @@ describe('BillSchema', () => {
     it('should reject summary shorter than 20 characters', () => {
       const invalidBill = {
         title: 'Valid Bill Title',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
         summary: 'Too short',
-        content: 'This is valid content that meets the minimum length requirement.',
       };
 
       const result = BillSchema.safeParse(invalidBill);
       expect(result.success).toBe(false);
     });
 
-    it('should reject content shorter than 50 characters', () => {
+    it('should reject full_text shorter than 50 characters', () => {
       const invalidBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'Too short',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
+        full_text: 'Too short',
       };
 
       const result = BillSchema.safeParse(invalidBill);
@@ -453,8 +457,7 @@ describe('BillSchema', () => {
     it('should reject invalid bill number format', () => {
       const invalidBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        chamber: 'national_assembly',
         bill_number: 'INVALID123',
       };
 
@@ -465,8 +468,8 @@ describe('BillSchema', () => {
     it('should reject invalid status', () => {
       const invalidBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
         status: 'invalid_status',
       };
 
@@ -479,19 +482,19 @@ describe('BillSchema', () => {
     it('should accept title exactly 10 characters', () => {
       const validBill = {
         title: 'a'.repeat(10),
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(validBill);
       expect(result.success).toBe(true);
     });
 
-    it('should accept title exactly 200 characters', () => {
+    it('should accept title exactly 500 characters', () => {
       const validBill = {
-        title: 'a'.repeat(200),
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        title: 'a'.repeat(500),
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -501,8 +504,9 @@ describe('BillSchema', () => {
     it('should accept summary exactly 20 characters', () => {
       const validBill = {
         title: 'Valid Bill Title',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
         summary: 'a'.repeat(20),
-        content: 'This is valid content that meets the minimum length requirement.',
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -512,8 +516,9 @@ describe('BillSchema', () => {
     it('should accept summary exactly 1000 characters', () => {
       const validBill = {
         title: 'Valid Bill Title',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
         summary: 'a'.repeat(1000),
-        content: 'This is valid content that meets the minimum length requirement.',
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -523,19 +528,21 @@ describe('BillSchema', () => {
     it('should reject summary longer than 1000 characters', () => {
       const invalidBill = {
         title: 'Valid Bill Title',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
         summary: 'a'.repeat(1001),
-        content: 'This is valid content that meets the minimum length requirement.',
       };
 
       const result = BillSchema.safeParse(invalidBill);
       expect(result.success).toBe(false);
     });
 
-    it('should accept content exactly 50 characters', () => {
+    it('should accept full_text exactly 50 characters', () => {
       const validBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'a'.repeat(50),
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
+        full_text: 'a'.repeat(50),
       };
 
       const result = BillSchema.safeParse(validBill);
@@ -545,8 +552,7 @@ describe('BillSchema', () => {
     it('should accept bill number with H prefix', () => {
       const validBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        chamber: 'national_assembly',
         bill_number: 'H.123',
       };
 
@@ -557,8 +563,7 @@ describe('BillSchema', () => {
     it('should accept bill number with S prefix', () => {
       const validBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        chamber: 'national_assembly',
         bill_number: 'S456',
       };
 
@@ -568,17 +573,15 @@ describe('BillSchema', () => {
 
     it('should accept all valid status values', () => {
       const statuses = [
-        'draft', 'introduced', 'committee_review', 'floor_debate',
-        'amendment', 'vote_scheduled', 'passed_chamber', 'conference',
-        'passed_both_chambers', 'presidential_action', 'enacted', 'vetoed',
-        'failed', 'withdrawn', 'archived'
+        'draft', 'first_reading', 'second_reading', 'committee',
+        'third_reading', 'passed', 'rejected', 'assented', 'enacted'
       ];
 
       statuses.forEach(status => {
         const validBill = {
           title: 'Valid Bill Title',
-          summary: 'This is a valid summary.',
-          content: 'This is valid content that meets the minimum length requirement.',
+          bill_number: 'H.123',
+          chamber: 'national_assembly',
           status,
         };
 
@@ -592,8 +595,8 @@ describe('BillSchema', () => {
     it('should return valid: true for valid bill', () => {
       const validBill = {
         title: 'Valid Bill Title',
-        summary: 'This is a valid summary.',
-        content: 'This is valid content that meets the minimum length requirement.',
+        bill_number: 'H.123',
+        chamber: 'national_assembly',
       };
 
       const result = validateBill(validBill);
@@ -604,8 +607,8 @@ describe('BillSchema', () => {
     it('should return errors for invalid bill', () => {
       const invalidBill = {
         title: 'Short',
-        summary: 'Too short',
-        content: 'Too short',
+        bill_number: '',
+        chamber: 'invalid',
       };
 
       const result = validateBill(invalidBill);
@@ -624,8 +627,9 @@ describe('CommentSchema', () => {
   describe('Valid inputs', () => {
     it('should accept valid comment with all required fields', () => {
       const validComment = {
-        content: 'This is a valid comment.',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'This is a valid comment.',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
@@ -634,23 +638,22 @@ describe('CommentSchema', () => {
 
     it('should accept valid comment with optional fields', () => {
       const validComment = {
-        content: 'This is a valid comment with all fields.',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'This is a valid comment with all fields.',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
         bill_id: '223e4567-e89b-12d3-a456-426614174000',
-        argument_id: '323e4567-e89b-12d3-a456-426614174000',
-        parent_id: '423e4567-e89b-12d3-a456-426614174000',
-        is_edited: true,
+        parent_comment_id: '423e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
       expect(result.success).toBe(true);
     });
 
-    it('should accept comment with parent_id as null', () => {
+    it('should accept comment with parent_comment_id as null', () => {
       const validComment = {
-        content: 'This is a valid comment.',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
-        parent_id: null,
+        comment_text: 'This is a valid comment.',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
+        parent_comment_id: null,
       };
 
       const result = CommentSchema.safeParse(validComment);
@@ -659,40 +662,44 @@ describe('CommentSchema', () => {
   });
 
   describe('Invalid inputs', () => {
-    it('should reject content shorter than 5 characters', () => {
+    it('should reject comment_text shorter than 5 characters', () => {
       const invalidComment = {
-        content: 'Hi',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'Hi',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(invalidComment);
       expect(result.success).toBe(false);
     });
 
-    it('should reject content longer than 5000 characters', () => {
+    it('should reject comment_text longer than 5000 characters', () => {
       const invalidComment = {
-        content: 'a'.repeat(5001),
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'a'.repeat(5001),
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(invalidComment);
       expect(result.success).toBe(false);
     });
 
-    it('should reject content with less than 2 words', () => {
+    it('should reject comment_text with less than 2 words', () => {
       const invalidComment = {
-        content: 'Hello',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'Hello',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(invalidComment);
       expect(result.success).toBe(false);
     });
 
-    it('should reject invalid author_id format', () => {
+    it('should reject invalid user_id format', () => {
       const invalidComment = {
-        content: 'This is a valid comment.',
-        author_id: 'not-a-uuid',
+        comment_text: 'This is a valid comment.',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
+        user_id: 'not-a-uuid',
       };
 
       const result = CommentSchema.safeParse(invalidComment);
@@ -701,8 +708,8 @@ describe('CommentSchema', () => {
 
     it('should reject invalid bill_id format', () => {
       const invalidComment = {
-        content: 'This is a valid comment.',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'This is a valid comment.',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
         bill_id: 'invalid-uuid',
       };
 
@@ -712,50 +719,55 @@ describe('CommentSchema', () => {
   });
 
   describe('Edge cases and boundary conditions', () => {
-    it('should accept content exactly 5 characters with 2 words', () => {
+    it('should accept comment_text exactly 5 characters with 2 words', () => {
       const validComment = {
-        content: 'Hi yo',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'Hi yo',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
       expect(result.success).toBe(true);
     });
 
-    it('should accept content exactly 5000 characters', () => {
+    it('should accept comment_text exactly 5000 characters', () => {
       const validComment = {
-        content: 'word '.repeat(1000), // Creates 5000 characters with many words
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'word '.repeat(1000), // Creates 5000 characters with many words
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
       expect(result.success).toBe(true);
     });
 
-    it('should accept content with exactly 2 words', () => {
+    it('should accept comment_text with exactly 2 words', () => {
       const validComment = {
-        content: 'Hello world',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'Hello world',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
       expect(result.success).toBe(true);
     });
 
-    it('should handle content with extra whitespace', () => {
+    it('should handle comment_text with extra whitespace', () => {
       const validComment = {
-        content: '  Hello   world  ',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: '  Hello   world  ',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(validComment);
       expect(result.success).toBe(true);
     });
 
-    it('should reject content with only whitespace', () => {
+    it('should reject comment_text with only whitespace', () => {
       const invalidComment = {
-        content: '     ',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: '     ',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = CommentSchema.safeParse(invalidComment);
@@ -766,8 +778,9 @@ describe('CommentSchema', () => {
   describe('validateComment helper function', () => {
     it('should return valid: true for valid comment', () => {
       const validComment = {
-        content: 'This is a valid comment.',
-        author_id: '123e4567-e89b-12d3-a456-426614174000',
+        comment_text: 'This is a valid comment.',
+        user_id: '123e4567-e89b-12d3-a456-426614174000',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = validateComment(validComment);
@@ -777,8 +790,9 @@ describe('CommentSchema', () => {
 
     it('should return errors for invalid comment', () => {
       const invalidComment = {
-        content: 'Hi',
-        author_id: 'not-a-uuid',
+        comment_text: 'Hi',
+        user_id: 'not-a-uuid',
+        bill_id: '223e4567-e89b-12d3-a456-426614174000',
       };
 
       const result = validateComment(invalidComment);

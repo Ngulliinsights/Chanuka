@@ -78,9 +78,7 @@ export class ProvisionMatcherService {
   ): ProvisionMatch {
     const content = billContent.toLowerCase();
     const title = billTitle?.toLowerCase() || '';
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    const provisionText = provision.full_text?.toLowerCase() || '';
+    const provisionText = ((provision as unknown as Record<string, unknown>).full_text as string | undefined)?.toLowerCase() || '';
     
     let relevanceScore = 0;
     const matchReasons: string[] = [];
@@ -106,9 +104,7 @@ export class ProvisionMatcherService {
     }
 
     // 2. Rights category matching
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (provision.is_fundamental_right) {
+    if ((provision as unknown as Record<string, unknown>).is_fundamental_right) {
       const categoryScore = this.analyzeFundamentalRightsRelevance(content, title);
       if (categoryScore > 0) {
         relevanceScore += categoryScore;

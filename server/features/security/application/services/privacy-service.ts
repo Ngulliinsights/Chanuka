@@ -2,22 +2,23 @@ import { and, eq, lt, sql } from 'drizzle-orm';
 import { logger } from '@server/infrastructure/observability';
 import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import { db, readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
-import { setCache, getCache, cacheKeys, CACHE_TTL } from '@server/infrastructure/cache'; // Assuming standard caching exports
+import { cacheService, cacheKeys, CACHE_TTL } from '@server/infrastructure/cache';
 import {
   users,
   user_profiles,
   comments,
   bill_engagement,
-  user_interest,
-  notification,
-  userSocialProfile,
-  user_progress,
-  social_share,
+} from '@server/infrastructure/schema/foundation';
+import {
+  user_interests,
+  notifications,
   comment_votes,
-  securityAuditLog,
-  session,
-  content_report,
-} from '@server/infrastructure/schema';
+  sessions,
+} from '@server/infrastructure/schema/citizen_participation';
+import {
+  system_audit_log,
+  content_reports,
+} from '@server/infrastructure/schema/integrity_operations';
 
 // ==================== Type Definitions ====================
 
@@ -75,29 +76,6 @@ export interface UserDataExport {
     relatedBillId: number | string | null;
     is_read: boolean | null;
     created_at: Date | null;
-  }>;
-  socialProfiles: Array<{
-    provider: string;
-    username: string | null;
-    display_name: string | null;
-    created_at: Date | null;
-  }>;
-  progress: Array<{
-    achievement_type: string;
-    achievement_value: number;
-    level: number | null;
-    badge: string | null;
-    description: string | null;
-    unlocked_at: Date | null;
-  }>;
-  social_shares: Array<{
-    bill_id: number | string;
-    platform: string;
-    metadata: any;
-    shareDate: Date | null;
-    likes: number | null;
-    shares: number | null;
-    comments: number | null;
   }>;
   comment_votes: Array<{
     comment_id: number | string;
@@ -282,7 +260,6 @@ export class PrivacyService {
 
   async exportUserData(user_id: string, requestedBy: string) {
     return safeAsync(async () => {
-      // @ts-expect-error - readDatabase structure simplification
       const [userRecord] = await readDatabase
         .select()
         .from(users)
@@ -293,14 +270,14 @@ export class PrivacyService {
         throw new Error('User not found');
       }
 
-      // @ts-expect-error
+
       const [profile] = await readDatabase
         .select()
         .from(user_profiles)
         .where(eq(user_profiles.user_id, user_id))
         .limit(1);
 
-      // @ts-expect-error
+
       const commentsData = await readDatabase
         .select({
           id: comments.id,
@@ -317,7 +294,7 @@ export class PrivacyService {
         .from(comments)
         .where(eq(comments.user_id, user_id));
 
-      // @ts-expect-error
+
       const engagement = await readDatabase
         .select({
           bill_id: bill_engagement.bill_id,
@@ -331,51 +308,20 @@ export class PrivacyService {
         .from(bill_engagement)
         .where(eq(bill_engagement.user_id, user_id));
 
-      // @ts-expect-error
-      const interestsResult = await readDatabase
-        .select({ interest: user_interest.interest })
-        .from(user_interest)
-        .where(eq(user_interest.user_id, user_id));
-      const interests = interestsResult.map(i => i.interest);
 
-      // @ts-expect-error
+      const interestsResult = await readDatabase
+        .select({ interest: user_interests.interest })
+        .from(user_interests)
+        .where(eq(user_interests.user_id, user_id));
+      const interests = interestsResult.map((i: { interest: string }) => i.interest);
+
+
       const notificationsData = await readDatabase
         .select()
-        .from(notification)
-        .where(eq(notification.user_id, user_id));
+        .from(notifications)
+        .where(eq(notifications.user_id, user_id));
 
-      // @ts-expect-error
-      const socialProfiles = await readDatabase
-        .select({
-          provider: userSocialProfile.provider,
-          username: userSocialProfile.username,
-          display_name: userSocialProfile.display_name,
-          created_at: userSocialProfile.created_at
-        })
-        .from(userSocialProfile)
-        .where(eq(userSocialProfile.user_id, user_id));
 
-      // @ts-expect-error
-      const progress = await readDatabase
-        .select()
-        .from(user_progress)
-        .where(eq(user_progress.user_id, user_id));
-
-      // @ts-expect-error
-      const social_sharesData = await readDatabase
-        .select({
-          bill_id: social_share.bill_id,
-          platform: social_share.platform,
-          metadata: social_share.metadata,
-          shareDate: social_share.shared_at,
-          likes: social_share.likes,
-          shares: social_share.shares,
-          comments: social_share.comments
-        })
-        .from(social_share)
-        .where(eq(social_share.user_id, user_id));
-
-      // @ts-expect-error
       const comment_votesData = await readDatabase
         .select()
         .from(comment_votes)
@@ -384,21 +330,21 @@ export class PrivacyService {
       const ninetyDaysAgo = new Date();
       ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
-      // @ts-expect-error
+
       const auditLogs = await readDatabase
         .select({
-          event_type: securityAuditLog.event_type,
-          resource: securityAuditLog.resource,
-          action: securityAuditLog.action,
-          result: securityAuditLog.result,
-          severity: securityAuditLog.severity,
-          created_at: securityAuditLog.created_at
+          event_type: system_audit_log.event_type,
+          resource: system_audit_log.resource,
+          action: system_audit_log.action,
+          result: system_audit_log.result,
+          severity: system_audit_log.severity,
+          created_at: system_audit_log.created_at
         })
-        .from(securityAuditLog)
+        .from(system_audit_log)
         .where(
           and(
-            eq(securityAuditLog.user_id, user_id),
-            sql`${securityAuditLog.created_at} >= ${ninetyDaysAgo}`
+            eq(system_audit_log.user_id, user_id),
+            sql`${system_audit_log.created_at} >= ${ninetyDaysAgo}`
           )
         );
 
@@ -409,33 +355,24 @@ export class PrivacyService {
         engagement.length +
         interests.length +
         notificationsData.length +
-        socialProfiles.length +
-        progress.length +
-        social_sharesData.length +
         comment_votesData.length +
         auditLogs.length;
 
       const exportData: UserDataExport = {
-        // @ts-expect-error
+  
         user: userRecord,
-        // @ts-expect-error
+  
         profile: profile || undefined,
-        // @ts-expect-error
+  
         comments: commentsData,
-        // @ts-expect-error
+  
         engagement,
         interests,
-        // @ts-expect-error
+  
         notifications: notificationsData,
-        // @ts-expect-error
-        socialProfiles,
-        // @ts-expect-error
-        progress,
-        // @ts-expect-error
-        social_shares: social_sharesData,
-        // @ts-expect-error
+  
         comment_votes: comment_votesData,
-        // @ts-expect-error
+  
         auditLogs,
         exportMetadata: {
           exportedAt: new Date(),
@@ -451,7 +388,7 @@ export class PrivacyService {
       );
 
       return exportData;
-    }, { service: 'PrivacyService', operation: 'exportUserData', user_id });
+    }, { service: 'PrivacyService', operation: 'exportUserData', userId: user_id });
   }
 
   async deleteUserData(user_id: string, requestedBy: string, keepAuditTrail: boolean = true) {
@@ -460,9 +397,9 @@ export class PrivacyService {
 
       await withTransaction(async (tx: any) => {
         const deletedInterests = await tx
-          .delete(user_interest)
-          .where(eq(user_interest.user_id, user_id))
-          .returning({ id: user_interest.id });
+          .delete(user_interests)
+          .where(eq(user_interests.user_id, user_id))
+          .returning({ id: user_interests.id });
         deletedRecords.interests = deletedInterests.length;
 
         const deletedVotes = await tx
@@ -471,34 +408,16 @@ export class PrivacyService {
           .returning({ id: comment_votes.id });
         deletedRecords.comment_votes = deletedVotes.length;
 
-        const deletedShares = await tx
-          .delete(social_share)
-          .where(eq(social_share.user_id, user_id))
-          .returning({ id: social_share.id });
-        deletedRecords.social_shares = deletedShares.length;
-
-        const deletedProgress = await tx
-          .delete(user_progress)
-          .where(eq(user_progress.user_id, user_id))
-          .returning({ id: user_progress.id });
-        deletedRecords.progress = deletedProgress.length;
-
-        const deletedSocialProfiles = await tx
-          .delete(userSocialProfile)
-          .where(eq(userSocialProfile.user_id, user_id))
-          .returning({ id: userSocialProfile.id });
-        deletedRecords.socialProfiles = deletedSocialProfiles.length;
-
         const deletedSessions = await tx
-          .delete(session)
-          .where(eq(session.user_id, user_id))
-          .returning({ id: session.id });
+          .delete(sessions)
+          .where(eq(sessions.user_id, user_id))
+          .returning({ id: sessions.id });
         deletedRecords.sessions = deletedSessions.length;
 
         const deletedNotifications = await tx
-          .delete(notification)
-          .where(eq(notification.user_id, user_id))
-          .returning({ id: notification.id });
+          .delete(notifications)
+          .where(eq(notifications.user_id, user_id))
+          .returning({ id: notifications.id });
         deletedRecords.notifications = deletedNotifications.length;
 
         const deletedEngagement = await tx
@@ -525,9 +444,9 @@ export class PrivacyService {
         deletedRecords.profiles = deletedProfiles.length;
 
         const deletedFlags = await tx
-          .delete(content_report)
-          .where(eq(content_report.reportedBy, user_id))
-          .returning({ id: content_report.id });
+          .delete(content_reports)
+          .where(eq(content_reports.reportedBy, user_id))
+          .returning({ id: content_reports.id });
         deletedRecords.moderationFlags = deletedFlags.length;
 
         const deletedUsers = await tx
@@ -538,9 +457,9 @@ export class PrivacyService {
 
         if (!keepAuditTrail) {
           const deletedAuditLogs = await tx
-            .delete(securityAuditLog)
-            .where(eq(securityAuditLog.user_id, user_id))
-            .returning({ id: securityAuditLog.id });
+            .delete(system_audit_log)
+            .where(eq(system_audit_log.user_id, user_id))
+            .returning({ id: system_audit_log.id });
           deletedRecords.auditLogs = deletedAuditLogs.length;
         }
       });
@@ -556,8 +475,8 @@ export class PrivacyService {
       );
 
       // Invalidate privacy cache (ADR-013)
-      if (typeof setCache === 'function' && typeof cacheKeys !== 'undefined') {
-          await setCache(cacheKeys.entity?.('privacy_consent', user_id) ?? `privacy_consent:${user_id}`, null, 0);
+      if (cacheService && typeof cacheKeys !== 'undefined') {
+          await cacheService.set(cacheKeys.entity?.('privacy_consent', user_id) ?? `privacy_consent:${user_id}`, null, 0);
       }
 
       return {
@@ -565,19 +484,19 @@ export class PrivacyService {
         deletedRecords,
         auditTrailKept: keepAuditTrail
       };
-    }, { service: 'PrivacyService', operation: 'deleteUserData', user_id });
+    }, { service: 'PrivacyService', operation: 'deleteUserData', userId: user_id });
   }
 
   async getPrivacyPreferences(user_id: string) {
     return safeAsync(async () => {
       // Check cache first (ADR-013)
-      if (typeof getCache === 'function' && typeof cacheKeys !== 'undefined') {
+      if (cacheService && typeof cacheKeys !== 'undefined') {
         const cacheKey = cacheKeys.entity?.('privacy_consent', user_id) ?? `privacy_consent:${user_id}`;
-        const cached = await getCache<PrivacyPreferences>(cacheKey);
+        const cached = await cacheService.get<PrivacyPreferences>(cacheKey);
         if (cached) return cached;
       }
 
-      // @ts-expect-error
+
       const [userRecord] = await readDatabase
         .select({ preferences: users.preferences })
         .from(users)
@@ -615,13 +534,13 @@ export class PrivacyService {
       };
 
       // Set cache if available
-      if (typeof setCache === 'function' && typeof cacheKeys !== 'undefined') {
+      if (cacheService && typeof cacheKeys !== 'undefined') {
         const cacheKey = cacheKeys.entity?.('privacy_consent', user_id) ?? `privacy_consent:${user_id}`;
-        await setCache(cacheKey, computedPrefs, CACHE_TTL?.FIFTEEN_MINUTES ?? 900);
+        await cacheService.set(cacheKey, computedPrefs, CACHE_TTL?.LONG ?? 900);
       }
 
       return computedPrefs;
-    }, { service: 'PrivacyService', operation: 'getPrivacyPreferences', user_id });
+    }, { service: 'PrivacyService', operation: 'getPrivacyPreferences', userId: user_id });
   }
 
   async updatePrivacyPreferences(user_id: string, preferences: Partial<PrivacyPreferences>) {
@@ -645,7 +564,7 @@ export class PrivacyService {
         }
       };
 
-      // @ts-expect-error
+
       const [userRecord] = await readDatabase
         .select({ preferences: users.preferences })
         .from(users)
@@ -654,7 +573,7 @@ export class PrivacyService {
 
       const currentUserPrefs = (userRecord?.preferences as unknown as Record<string, unknown>) || {};
 
-      // @ts-expect-error
+
       await writeDatabase
         .update(users)
         .set({
@@ -672,13 +591,13 @@ export class PrivacyService {
       );
 
       // Re-cache (ADR-013)
-      if (typeof setCache === 'function' && typeof cacheKeys !== 'undefined') {
+      if (cacheService && typeof cacheKeys !== 'undefined') {
         const cacheKey = cacheKeys.entity?.('privacy_consent', user_id) ?? `privacy_consent:${user_id}`;
-        await setCache(cacheKey, updatedPrefs, CACHE_TTL?.FIFTEEN_MINUTES ?? 900);
+        await cacheService.set(cacheKey, updatedPrefs, CACHE_TTL?.LONG ?? 900);
       }
 
       return updatedPrefs;
-    }, { service: 'PrivacyService', operation: 'updatePrivacyPreferences', user_id });
+    }, { service: 'PrivacyService', operation: 'updatePrivacyPreferences', userId: user_id });
   }
 
   async runDataCleanup() {
@@ -700,53 +619,53 @@ export class PrivacyService {
 
           switch (policy.dataType) {
             case 'notifications':
-              // @ts-expect-error
+        
               const deletedNotifications = await writeDatabase
-                .delete(notification)
+                .delete(notifications)
                 .where(
                   and(
-                    eq(notification.is_read, true),
-                    lt(notification.created_at, cutoffDate)
+                    eq(notifications.is_read, true),
+                    lt(notifications.created_at, cutoffDate)
                   )
                 )
-                .returning({ id: notification.id });
+                .returning({ id: notifications.id });
               recordsDeleted = deletedNotifications.length;
               break;
 
             case 'audit_logs':
-              // @ts-expect-error
+        
               const deletedAuditLogs = await writeDatabase
-                .delete(securityAuditLog)
-                .where(lt(securityAuditLog.created_at, cutoffDate))
-                .returning({ id: securityAuditLog.id });
+                .delete(system_audit_log)
+                .where(lt(system_audit_log.created_at, cutoffDate))
+                .returning({ id: system_audit_log.id });
               recordsDeleted = deletedAuditLogs.length;
               break;
 
             case 'sessions':
-              // @ts-expect-error
+        
               const deletedSessions = await writeDatabase
-                .delete(session)
+                .delete(sessions)
                 .where(
                   and(
-                    eq(session.is_active, false),
-                    lt(session.created_at, cutoffDate)
+                    eq(sessions.is_active, false),
+                    lt(sessions.created_at, cutoffDate)
                   )
                 )
-                .returning({ id: session.id });
+                .returning({ id: sessions.id });
               recordsDeleted = deletedSessions.length;
               break;
 
             case 'moderation_flags':
-              // @ts-expect-error
+        
               const deletedFlags = await writeDatabase
-                .delete(content_report)
+                .delete(content_reports)
                 .where(
                   and(
-                    sql`${content_report.status} IN ('resolved', 'dismissed')`,
-                    lt(content_report.created_at, cutoffDate)
+                    sql`${content_reports.status} IN ('resolved', 'dismissed')`,
+                    lt(content_reports.created_at, cutoffDate)
                   )
                 )
-                .returning({ id: content_report.id });
+                .returning({ id: content_reports.id });
               recordsDeleted = deletedFlags.length;
               break;
           }
@@ -775,7 +694,7 @@ export class PrivacyService {
 
   async generateGDPRComplianceReport(user_id: string) {
     return safeAsync(async () => {
-      // @ts-expect-error
+
       const [userRecord] = await readDatabase
         .select()
         .from(users)
@@ -895,7 +814,7 @@ export class PrivacyService {
         overallComplianceScore,
         recommendations
       };
-    }, { service: 'PrivacyService', operation: 'generateGDPRComplianceReport', user_id });
+    }, { service: 'PrivacyService', operation: 'generateGDPRComplianceReport', userId: user_id });
   }
 
   getDataRetentionPolicies() {

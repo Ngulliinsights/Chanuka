@@ -9,6 +9,7 @@ import { MemoryAdapter } from './adapters/memory-adapter';
 import { RedisCacheAdapter } from './adapters/redis-adapter';
 import { MultiTierAdapter } from './adapters/multi-tier-adapter';
 import type { CacheService, CacheConfig } from './core/interfaces';
+import { isDestroyable } from './interfaces';
 
 /**
  * CacheManager - Provides high-level cache management operations
@@ -355,8 +356,9 @@ export function initializeDefaultCache(config: CacheConfig): CacheService {
  * ```
  */
 export function resetDefaultCache(): void {
-  if (defaultCacheInstance && typeof (defaultCacheInstance as any).destroy === 'function') {
-    (defaultCacheInstance as any).destroy();
+  if (defaultCacheInstance && isDestroyable(defaultCacheInstance)) {
+    void defaultCacheInstance.destroy();
+    // Await if necessary, or just fire and forget if no strict await context
   }
   defaultCacheInstance = null;
 }
@@ -502,8 +504,8 @@ export class SimpleCacheFactory {
   async shutdown(): Promise<void> {
     const caches = Array.from(this.caches.values());
     for (const cache of caches) {
-      if (typeof (cache as any).destroy === 'function') {
-        await (cache as any).destroy();
+      if (isDestroyable(cache)) {
+        await cache.destroy();
       }
     }
     this.caches.clear();

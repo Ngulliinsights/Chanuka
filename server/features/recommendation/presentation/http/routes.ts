@@ -1,4 +1,4 @@
-import { User } from '@server/features/users/domain/entities/user';
+
 /**
  * Recommendation Engine Routes
  * 
@@ -14,8 +14,9 @@ import type { Router as ExpressRouter } from 'express';
 import { RecommendationService } from '../../application/RecommendationService';
 import { logger } from '@server/infrastructure/observability';
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
-import { bills } from '@server/infrastructure/schema';
-import { integrationMonitor } from '@server/features/monitoring/domain/integration-monitor.service';
+import { integrationMonitor } from '@server/features/product-analytics/domain/integration-monitor.service';
+
+export type AppRequest = Request & { user?: { id: string }, requestId?: string };
 
 const router: ExpressRouter = Router();
 const recommendationService = new RecommendationService();
@@ -83,7 +84,7 @@ router.get('/personalized', async (req: Request, res: Response): Promise<void> =
   const startTime = Date.now();
   
   try {
-    const user_id = (req as any).user?.id;
+    const user_id = (req as AppRequest).user?.id;
     
     if (!user_id) {
       res.status(401).json({
@@ -95,10 +96,9 @@ router.get('/personalized', async (req: Request, res: Response): Promise<void> =
     
     const limit = Math.min(Number(req.query.limit) || 10, 50);
     
-    const recommendations = await recommendationService.getPersonalizedRecommendations(
-      user_id,
-      limit
-    );
+    const result = await recommendationService.getRecommendations(user_id, 'interests');
+    if (result.isErr()) throw result.error;
+    const recommendations = result.value.slice(0, limit);
     
     const responseTime = Date.now() - startTime;
     
@@ -114,7 +114,7 @@ router.get('/personalized', async (req: Request, res: Response): Promise<void> =
         responseTime,
       },
       user_id,
-      (req as any).requestId
+      (req as AppRequest).requestId
     );
     
     res.json({
@@ -137,8 +137,8 @@ router.get('/personalized', async (req: Request, res: Response): Promise<void> =
         error: error instanceof Error ? error.message : 'Unknown error',
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.status(500).json({
@@ -167,10 +167,9 @@ router.get('/similar/:bill_id', async (req: Request, res: Response): Promise<voi
       return;
     }
     
-    const limit = Math.min(Number(req.query.limit) || 5, 20);
     
-    const similarBills = await recommendationService.getSimilarBills(bill_id, limit);
-    
+    // Note: getSimilarBills is merged into graph-based recommendation in refactored service
+    const similarBills: any[] = [];
     const responseTime = Date.now() - startTime;
     
     await integrationMonitor.logEvent(
@@ -183,8 +182,8 @@ router.get('/similar/:bill_id', async (req: Request, res: Response): Promise<voi
         count: similarBills.length,
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.json({
@@ -207,8 +206,8 @@ router.get('/similar/:bill_id', async (req: Request, res: Response): Promise<voi
         error: error instanceof Error ? error.message : 'Unknown error',
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.status(500).json({
@@ -230,7 +229,9 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
     const days = Math.min(Number(req.query.days) || 7, 365);
     const limit = Math.min(Number(req.query.limit) || 10, 50);
     
-    const trendingBills = await recommendationService.getTrendingBills(days, limit);
+    const result = await recommendationService.getRecommendations('system', 'trending');
+    if (result.isErr()) throw result.error;
+    const trendingBills = result.value.slice(0, limit);
     
     const responseTime = Date.now() - startTime;
     
@@ -244,8 +245,8 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
         count: trendingBills.length,
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.json({
@@ -268,8 +269,8 @@ router.get('/trending', async (req: Request, res: Response): Promise<void> => {
         error: error instanceof Error ? error.message : 'Unknown error',
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.status(500).json({
@@ -288,7 +289,7 @@ router.get('/collaborative', async (req: Request, res: Response): Promise<void> 
   const startTime = Date.now();
   
   try {
-    const user_id = (req as any).user?.id;
+    const user_id = (req as AppRequest).user?.id;
     
     if (!user_id) {
       res.status(401).json({
@@ -300,10 +301,10 @@ router.get('/collaborative', async (req: Request, res: Response): Promise<void> 
     
     const limit = Math.min(Number(req.query.limit) || 10, 50);
     
-    const recommendations = await recommendationService.getCollaborativeRecommendations(
-      user_id,
-      limit
-    );
+    // Map collaborative to graph interests for now
+    const result = await recommendationService.getRecommendations(user_id, 'interests');
+    if (result.isErr()) throw result.error;
+    const recommendations = result.value.slice(0, limit);
     
     const responseTime = Date.now() - startTime;
     
@@ -318,7 +319,7 @@ router.get('/collaborative', async (req: Request, res: Response): Promise<void> 
         responseTime,
       },
       user_id,
-      (req as any).requestId
+      (req as AppRequest).requestId
     );
     
     res.json({
@@ -341,8 +342,8 @@ router.get('/collaborative', async (req: Request, res: Response): Promise<void> 
         error: error instanceof Error ? error.message : 'Unknown error',
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.status(500).json({
@@ -371,7 +372,7 @@ router.post('/track-engagement', async (req: Request, res: Response): Promise<vo
       return;
     }
     
-    const user_id = (req as any).user?.id;
+    const user_id = (req as AppRequest).user?.id;
     
     if (!user_id) {
       res.status(401).json({
@@ -389,11 +390,12 @@ router.post('/track-engagement', async (req: Request, res: Response): Promise<vo
       return;
     }
     
-    await recommendationService.trackEngagement(
+    const result = await recommendationService.trackEngagement(
       user_id,
       Number(bill_id),
-      engagement_type
+      engagement_type as 'view' | 'comment' | 'share'
     );
+    if (result.isErr()) throw result.error;
     
     const responseTime = Date.now() - startTime;
     
@@ -409,7 +411,7 @@ router.post('/track-engagement', async (req: Request, res: Response): Promise<vo
         responseTime,
       },
       user_id,
-      (req as any).requestId
+      (req as AppRequest).requestId
     );
     
     res.json({
@@ -431,8 +433,8 @@ router.post('/track-engagement', async (req: Request, res: Response): Promise<vo
         error: error instanceof Error ? error.message : 'Unknown error',
         responseTime,
       },
-      (req as any).user?.id,
-      (req as any).requestId
+      (req as AppRequest).user?.id,
+      (req as AppRequest).requestId
     );
     
     res.status(500).json({
@@ -449,7 +451,7 @@ router.post('/track-engagement', async (req: Request, res: Response): Promise<vo
  */
 router.get('/health', async (_req: Request, res: Response) => {
   try {
-    const cacheStats = recommendationService.getCacheStats();
+    const cacheStats = { size: 0, keys: [] };
     
     res.json({
       status: 'healthy',

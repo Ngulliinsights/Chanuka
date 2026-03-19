@@ -36,11 +36,14 @@ if (typeof process !== 'undefined' && process.versions?.node) {
  * @param correlationId - The correlation ID to set
  */
 export function setCurrentCorrelationId(correlationId: string): void {
+  // Always update fallback for synchronous test execution
+  currentCorrelationId = correlationId;
+
   if (asyncLocalStorage) {
-    const store = asyncLocalStorage.getStore() || {};
-    store.correlationId = correlationId;
-  } else {
-    currentCorrelationId = correlationId;
+    const store = asyncLocalStorage.getStore();
+    if (store) {
+      store.correlationId = correlationId;
+    }
   }
 }
 
@@ -52,22 +55,24 @@ export function setCurrentCorrelationId(correlationId: string): void {
 export function getCurrentCorrelationId(): string | null {
   if (asyncLocalStorage) {
     const store = asyncLocalStorage.getStore();
-    return store?.correlationId || null;
+    if (store && store.correlationId !== undefined) {
+      return store.correlationId;
+    }
   }
-  return currentCorrelationId;
+  return currentCorrelationId ?? null;
 }
 
 /**
  * Clear the current correlation ID
  */
 export function clearCurrentCorrelationId(): void {
+  currentCorrelationId = null;
+
   if (asyncLocalStorage) {
     const store = asyncLocalStorage.getStore();
     if (store) {
       delete store.correlationId;
     }
-  } else {
-    currentCorrelationId = null;
   }
 }
 

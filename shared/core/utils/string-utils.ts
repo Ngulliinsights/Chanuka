@@ -79,7 +79,7 @@ export class StringUtils {
    * Validates string length within bounds
    */
   static hasValidLength(value: string, min: number, max: number): boolean {
-    if (!value || typeof min !== 'number' || typeof max !== 'number') return false;
+    if (typeof value !== 'string' || typeof min !== 'number' || typeof max !== 'number') return false;
     if (min < 0 || max < min) return false;
     const length = value.length;
     return length >= min && length <= max;
@@ -342,8 +342,8 @@ export class StringUtils {
    */
   static isValidUrl(value: string): boolean {
     try {
-      new URL(value);
-      return true;
+      const url = new URL(value);
+      return url.protocol === 'http:' || url.protocol === 'https:';
     } catch {
       return false;
     }

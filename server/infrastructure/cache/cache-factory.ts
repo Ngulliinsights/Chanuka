@@ -13,6 +13,7 @@ import type {
   CacheHealthStatus
 } from './core/interfaces';
 import { Result, ok, err } from '@shared/core/primitives/types/result';
+import { isDestroyable, isTagInvalidatable, isCustomHealthCheckable } from './interfaces';
 
 import { BrowserAdapter } from './adapters/browser-adapter';
 import { MemoryAdapter } from './adapters/memory-adapter';
@@ -230,8 +231,8 @@ export class UnifiedCacheFactory extends EventEmitter {
     }
 
     try {
-      if (typeof (cache as any).destroy === 'function') {
-        await (cache as any).destroy();
+      if (isDestroyable(cache)) {
+        await cache.destroy();
       }
 
       this.cacheInstances.delete(name);
@@ -313,8 +314,8 @@ export class UnifiedCacheFactory extends EventEmitter {
       let totalInvalidated = 0;
 
       for (const [, cache] of this.cacheInstances) {
-        if (typeof (cache as any).invalidateByTags === 'function') {
-          const count = await (cache as any).invalidateByTags(tags);
+        if (isTagInvalidatable(cache)) {
+          const count = await cache.invalidateByTags(tags);
           totalInvalidated += count;
         }
       }
@@ -337,8 +338,8 @@ export class UnifiedCacheFactory extends EventEmitter {
     const cacheHealth: Record<string, CacheHealthStatus> = {};
 
     for (const [name, cache] of this.cacheInstances) {
-      if (typeof (cache as any).getHealth === 'function') {
-        cacheHealth[name] = await (cache as any).getHealth();
+      if (isCustomHealthCheckable(cache)) {
+        cacheHealth[name] = await cache.getHealth() as CacheHealthStatus;
       }
     }
 

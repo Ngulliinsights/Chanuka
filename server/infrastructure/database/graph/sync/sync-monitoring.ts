@@ -5,8 +5,7 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export interface SyncMetrics {
@@ -31,7 +30,7 @@ export async function getSyncMetrics(driver: Driver): Promise<SyncMetrics> {
       { mode: 'READ' }
     );
     
-    const record = result.records[0];
+    const record = result.records[0] as import('neo4j-driver').Record | undefined;
     return {
       total_entities: Number(record?.get('total')) || 0,
       synced_entities: Number(record?.get('synced')) || 0,

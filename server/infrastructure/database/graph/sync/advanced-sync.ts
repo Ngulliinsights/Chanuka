@@ -3,12 +3,11 @@
  * IMPROVEMENTS: Parallel processing, error handling, progress tracking
  */
 import { Driver } from 'neo4j-driver';
-import { executeBatch } from '../utils/session-manager';
-import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
+// Removed unused executeBatch
 import { parallelLimit } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
 
-const errorHandler = new GraphErrorHandler();
+// Removed unused error imports and handler
 
 export async function syncInParallel<T>(
   driver: Driver,
@@ -46,7 +45,9 @@ export async function syncWithProgress<T>(
   onProgress?: (current: number, total: number) => void
 ): Promise<void> {
   for (let i = 0; i < items.length; i++) {
-    await syncOperation(driver, items[i]);
+    const item = items[i];
+    if (item === undefined) continue;
+    await syncOperation(driver, item);
     
     if (onProgress) {
       onProgress(i + 1, items.length);

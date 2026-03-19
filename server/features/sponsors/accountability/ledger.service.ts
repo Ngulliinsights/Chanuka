@@ -37,10 +37,11 @@ export class LedgerService {
     // Ensure evidence is an array for the JSONB column
     const evidenceLinks = Array.isArray(details.evidence) ? details.evidence : [];
 
+    type ViolationType = typeof shadow_ledger_entries.$inferInsert.violation_type;
     const result = await writeDatabase.insert(shadow_ledger_entries).values({
       entry_number: entryNumber,
       entity_name: actor,
-      violation_type: (action as any) || 'bribery', // Cast to enum type needed if not validating strict enums upstream
+      violation_type: (action as ViolationType) || 'bribery', // Cast to enum type needed if not validating strict enums upstream
       description: resource,
       estimated_loss_amount: estimatedLoss,
       evidence_links: evidenceLinks,
@@ -63,7 +64,8 @@ export class LedgerService {
 
     if (filters.action) {
       // Cast action to match the enum type expected by Drizzle
-      conditions.push(eq(shadow_ledger_entries.violation_type, filters.action as any));
+      type ViolationType = typeof shadow_ledger_entries.$inferSelect.violation_type;
+      conditions.push(eq(shadow_ledger_entries.violation_type, filters.action as ViolationType));
     }
 
     if (filters.startDate) {

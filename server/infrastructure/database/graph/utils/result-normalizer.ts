@@ -26,7 +26,8 @@ export function extractValue<T = any>(record: Neo4jRecord, key: string, defaultV
     const value = record.get(key);
     return normalizeValue(value) as T;
   } catch (error) {
-    logger.warn({ key, error: error.message }, 'Failed to extract value');
+    const msg = error instanceof Error ? error.message : String(error);
+    logger.warn({ key, error: msg }, 'Failed to extract value');
     return defaultValue !== undefined ? defaultValue : null;
   }
 }
@@ -38,7 +39,8 @@ export function extractRecord(record: Neo4jRecord): Record<string, unknown> {
   const result: Record<string, unknown> = {};
 
   record.keys.forEach(key => {
-    result[key] = extractValue(record, key);
+    const stringKey = String(key);
+    result[stringKey] = extractValue(record, stringKey);
   });
 
   return result;
@@ -84,7 +86,7 @@ export function normalizeValue(value: unknown): unknown {
 
   // Object
   if (typeof value === 'object') {
-    return normalizeObject(value);
+    return normalizeObject(value as Record<string, unknown>);
   }
 
   return value;
@@ -142,15 +144,15 @@ function normalizeObject(obj: Record<string, unknown>): Record<string, unknown> 
  * Type guards
  */
 function isNode(value: unknown): value is Node {
-  return value && typeof value === 'object' && 'labels' in value && 'properties' in value;
+  return !!(value && typeof value === 'object' && 'labels' in value && 'properties' in value);
 }
 
 function isRelationship(value: unknown): value is Relationship {
-  return value && typeof value === 'object' && 'type' in value && 'start' in value && 'end' in value;
+  return !!(value && typeof value === 'object' && 'type' in value && 'start' in value && 'end' in value);
 }
 
 function isPath(value: unknown): value is Path {
-  return value && typeof value === 'object' && 'segments' in value && 'length' in value;
+  return !!(value && typeof value === 'object' && 'segments' in value && 'length' in value);
 }
 
 /**
@@ -166,7 +168,7 @@ export function extractArray<T = any>(records: Neo4jRecord[], key: string): T[] 
  * Extract single value from first record.
  */
 export function extractSingle<T = any>(records: Neo4jRecord[], key: string, defaultValue?: T): T | null {
-  if (records.length === 0) {
+  if (records.length === 0 || !records[0]) {
     return defaultValue !== undefined ? defaultValue : null;
   }
 
@@ -197,7 +199,7 @@ export function extractNodeProperties(record: Neo4jRecord, key: string): Record<
     return normalizeObject(value.properties);
   }
 
-  return value && typeof value === 'object' ? normalizeObject(value) : null;
+  return value && typeof value === 'object' ? normalizeObject(value as Record<string, unknown>) : null;
 }
 
 /**

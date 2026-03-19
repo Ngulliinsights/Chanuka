@@ -6,8 +6,7 @@ import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function calculateInfluenceScore(driver: Driver, personId: string): Promise<number> {
@@ -47,7 +46,7 @@ export async function getInfluencers(driver: Driver, options: PaginationOptions 
   
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map(r => ({ id: r.get('id'), name: r.get('name'), connections: r.get('connections') }));
+    return result.records.map((r: import('neo4j-driver').Record) => ({ id: r.get('id'), name: r.get('name'), connections: r.get('connections') }));
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'getInfluencers' });
     throw new GraphError({ code: GraphErrorCode.QUERY_FAILED, message: 'Failed to get influencers', cause: error as Error });

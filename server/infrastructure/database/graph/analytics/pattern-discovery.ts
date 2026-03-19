@@ -5,9 +5,8 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused retry-utils import
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function detectVotingPatterns(driver: Driver, billId: string): Promise<any> {
@@ -22,7 +21,7 @@ export async function detectVotingPatterns(driver: Driver, billId: string): Prom
       { billId },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       position: r.get('position'),
       count: r.get('count'),
       parties: r.get('parties')
@@ -46,7 +45,7 @@ export async function findInfluentialNodes(driver: Driver, limit: number = 20): 
       { limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({ id: r.get('id'), name: r.get('name'), influence: r.get('influence') }));
+    return result.records.map((r: import('neo4j-driver').Record) => ({ id: r.get('id'), name: r.get('name'), influence: r.get('influence') }));
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'findInfluentialNodes' });
     throw new GraphError({ code: GraphErrorCode.QUERY_FAILED, message: 'Influence analysis failed', cause: error as Error });

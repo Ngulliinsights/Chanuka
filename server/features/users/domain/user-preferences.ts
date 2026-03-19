@@ -1,7 +1,7 @@
 /* eslint-disable simple-import-sort/imports */
 import { eq } from 'drizzle-orm';
 
-import { readDatabase } from '@server/infrastructure/database';
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
 import { user_profiles } from '@server/infrastructure/schema';
 import type { BillTrackingPreferences } from '@shared/types';
@@ -74,6 +74,11 @@ export class UserPreferencesService {
     return readDatabase;
   }
 
+  /** Use the primary node for all writes. */
+  private get writeDb() {
+    return writeDatabase;
+  }
+
   // -------------------------------------------------------------------------
   // Public API
   // -------------------------------------------------------------------------
@@ -96,8 +101,7 @@ export class UserPreferencesService {
     logger.debug(logContext, 'Fetching global user preferences from DB');
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const queryResult = await (this.db as any)
+      const queryResult = await this.db
         .select({ preferences: user_profiles.preferences })
         .from(user_profiles)
         .where(eq(user_profiles.user_id, user_id))
@@ -140,8 +144,7 @@ export class UserPreferencesService {
 
     try {
       // 1. Read current state to avoid race-condition overwrites.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const currentQueryResult = await (this.db as any)
+      const currentQueryResult = await this.db
         .select({ preferences: user_profiles.preferences })
         .from(user_profiles)
         .where(eq(user_profiles.user_id, user_id))
@@ -161,8 +164,7 @@ export class UserPreferencesService {
       const updated = this.deepMerge(currentWithDefaults, preferences as Record<string, unknown>);
 
       // 3. Persist.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const updateResult = await (this.db as any)
+      const updateResult = await this.writeDb
         .update(user_profiles)
         .set({ preferences: updated, updated_at: new Date() })
         .where(eq(user_profiles.user_id, user_id))
@@ -266,8 +268,7 @@ export class UserPreferencesService {
     logger.info(logContext, 'Calculating global preference statistics.');
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const statsResult = await (this.db as any)
+      const statsResult = await this.db
         .select({ preferences: user_profiles.preferences })
         .from(user_profiles);
       const allUsersPrefs = (statsResult as Array<{ preferences: unknown }>);

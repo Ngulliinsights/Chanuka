@@ -6,7 +6,7 @@ import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-hand
 import { InputSanitizationService, securityAuditService } from '@server/features/security';
 import { cacheService } from '@server/infrastructure/cache';
 import { cacheKeys, CACHE_TTL } from '@server/infrastructure/cache/cache-keys';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { withTransaction } from '@server/infrastructure/database';
 import { notifications } from '@server/infrastructure/schema';
 import { db } from '@server/infrastructure/database';
 import { eq, desc } from 'drizzle-orm';
@@ -22,10 +22,10 @@ export class NotificationsService {
       await withTransaction(async (tx) => {
         await tx.insert(notifications).values({
           user_id: sanitizedUserId,
-          notification_type: type as any,
+          notification_type: type,
           title: 'Notification',
           message: sanitizedContent,
-          priority: 'normal' as any,
+          priority: 'normal',
           is_read: false,
         });
       });
@@ -51,10 +51,9 @@ export class NotificationsService {
       const sanitizedUserId = this.inputSanitizer.sanitizeString(userId);
 
       const cacheKey = cacheKeys.user(sanitizedUserId, 'notifications');
-      const cached = await cacheService.get<any[]>(cacheKey);
+      const cached = await cacheService.get<unknown[]>(cacheKey);
       if (cached) return cached;
 
-      // @ts-ignore - Drizzle ORM type inference issue with notifications schema
       const result = await db
         .select()
         .from(notifications)
@@ -62,7 +61,7 @@ export class NotificationsService {
         .orderBy(desc(notifications.created_at))
         .limit(50);
 
-      const userNotifications = result as any[];
+      const userNotifications = result;
 
       await cacheService.set(cacheKey, userNotifications, CACHE_TTL.HALF_HOUR);
       return userNotifications;

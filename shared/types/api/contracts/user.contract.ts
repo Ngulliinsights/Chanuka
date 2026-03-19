@@ -3,8 +3,15 @@
  * Type-safe API contracts for user-related endpoints
  */
 
-import { UserId } from '../../core/branded';
+import { z } from 'zod';
 import { User } from '../../domains/authentication';
+import {
+  CreateUserRequestSchema,
+  UpdateUserRequestSchema,
+  GetUserParamsSchema,
+  ListUsersQuerySchema,
+  DeleteUserParamsSchema,
+} from './user.schemas';
 
 // ============================================================================
 // Request Types
@@ -13,56 +20,27 @@ import { User } from '../../domains/authentication';
 /**
  * Create User Request
  */
-export interface CreateUserRequest {
-  email: string;
-  username: string;
-  password: string;
-  role?: string;
-}
+export type CreateUserRequest = z.infer<typeof CreateUserRequestSchema>;
 
 /**
  * Update User Request
  */
-export interface UpdateUserRequest {
-  email?: string;
-  username?: string;
-  role?: string;
-  status?: string;
-  profile?: {
-    displayName?: string;
-    firstName?: string;
-    lastName?: string;
-    bio?: string;
-    avatarUrl?: string;
-  };
-}
+export type UpdateUserRequest = z.infer<typeof UpdateUserRequestSchema>;
 
 /**
  * Get User Request (path params)
  */
-export interface GetUserRequest {
-  id: UserId;
-}
+export type GetUserRequest = z.infer<typeof GetUserParamsSchema>;
 
 /**
  * List Users Request (query params)
  */
-export interface ListUsersRequest {
-  page?: number;
-  limit?: number;
-  role?: string;
-  status?: string;
-  search?: string;
-}
+export type ListUsersRequest = z.infer<typeof ListUsersQuerySchema>;
 
 /**
  * Delete User Request (path params)
  */
-export interface DeleteUserRequest {
-  id: UserId;
-}
-
-// ============================================================================
+export type DeleteUserRequest = z.infer<typeof DeleteUserParamsSchema>;
 // Response Types
 // ============================================================================
 

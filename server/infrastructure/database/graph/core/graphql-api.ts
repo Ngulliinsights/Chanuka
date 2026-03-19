@@ -14,7 +14,7 @@
 
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
-import { withPagination, PaginationOptions } from '../utils/query-builder';
+import { withPagination } from '../utils/query-builder';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { QUERY_CONFIG } from '../config/graph-config';
 import { logger } from '@server/infrastructure/observability';
@@ -56,10 +56,10 @@ export const Query = {
    * Get bill by ID
    */
   async bill(
-    _: any,
+    _: unknown,
     { id }: { id: string },
     { driver }: GraphQLContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     if (!id) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -76,11 +76,12 @@ export const Query = {
         { mode: 'READ' }
       );
 
-      if (result.records.length === 0) {
+      const record = result.records[0];
+      if (!record) {
         return null;
       }
 
-      return result.records[0].get('b').properties;
+      return record.get('b').properties;
     } catch (error) {
       errorHandler.handle(error as Error, { operation: 'getBill', id });
       throw new GraphError({
@@ -95,7 +96,7 @@ export const Query = {
    * Get all bills with filters and pagination
    */
   async bills(
-    _: any,
+    _: unknown,
     { filters, pagination }: { filters?: BillFilters; pagination?: PaginationInput },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -136,10 +137,10 @@ export const Query = {
    * Get person by ID
    */
   async person(
-    _: any,
+    _: unknown,
     { id }: { id: string },
     { driver }: GraphQLContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     if (!id) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -156,11 +157,12 @@ export const Query = {
         { mode: 'READ' }
       );
 
-      if (result.records.length === 0) {
+      const record = result.records[0];
+      if (!record) {
         return null;
       }
 
-      return result.records[0].get('p').properties;
+      return record.get('p').properties;
     } catch (error) {
       errorHandler.handle(error as Error, { operation: 'getPerson', id });
       throw new GraphError({
@@ -175,7 +177,7 @@ export const Query = {
    * Get all persons with filters and pagination
    */
   async persons(
-    _: any,
+    _: unknown,
     { filters, pagination }: { filters?: PersonFilters; pagination?: PaginationInput },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -216,7 +218,7 @@ export const Query = {
    * Search bills by title
    */
   async searchBills(
-    _: any,
+    _: unknown,
     { searchTerm, limit }: { searchTerm: string; limit?: number },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -255,7 +257,7 @@ export const Query = {
    * Get bill sponsors
    */
   async billSponsors(
-    _: any,
+    _: unknown,
     { billId }: { billId: string },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -290,10 +292,10 @@ export const Query = {
    * Get voting statistics for a bill
    */
   async billVotingStats(
-    _: any,
+    _: unknown,
     { billId }: { billId: string },
     { driver }: GraphQLContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     if (!billId) {
       throw new GraphError({
         code: GraphErrorCode.INVALID_INPUT,
@@ -316,11 +318,11 @@ export const Query = {
         { mode: 'READ' }
       );
 
-      if (result.records.length === 0) {
+      const r = result.records[0];
+      if (!r) {
         return { yesVotes: 0, noVotes: 0, abstainVotes: 0, totalVotes: 0 };
       }
 
-      const r = result.records[0];
       return {
         yesVotes: Number(r.get('yesVotes')),
         noVotes: Number(r.get('noVotes')),
@@ -341,7 +343,7 @@ export const Query = {
    * Get trending bills
    */
   async trendingBills(
-    _: any,
+    _: unknown,
     { limit }: { limit?: number },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -371,7 +373,7 @@ export const Query = {
    * Get user recommendations
    */
   async recommendedBills(
-    _: any,
+    _: unknown,
     { userId, limit }: { userId: string; limit?: number },
     { driver }: GraphQLContext
   ): Promise<unknown[]> {
@@ -417,7 +419,7 @@ export const Mutation = {
    * Record user vote
    */
   async recordVote(
-    _: any,
+    _: unknown,
     { userId, billId, voteType }: { userId: string; billId: string; voteType: string },
     { driver }: GraphQLContext
   ): Promise<boolean> {
@@ -454,7 +456,7 @@ export const Mutation = {
    * Add comment to bill
    */
   async addComment(
-    _: any,
+    _: unknown,
     { userId, billId, text }: { userId: string; billId: string; text: string },
     { driver }: GraphQLContext
   ): Promise<boolean> {
@@ -496,18 +498,23 @@ export const Mutation = {
 // FIELD RESOLVERS
 // ============================================================================
 
+interface GraphEntity {
+  id: string;
+  [key: string]: unknown;
+}
+
 export const Bill = {
-  async sponsors(bill: unknown, _: unknown, { driver }: GraphQLContext): Promise<unknown[]> {
+  async sponsors(bill: GraphEntity, _: unknown, { driver }: GraphQLContext): Promise<unknown[]> {
     return Query.billSponsors(null, { billId: bill.id }, { driver });
   },
 
-  async votingStats(bill: unknown, _: unknown, { driver }: GraphQLContext): Promise<any> {
+  async votingStats(bill: GraphEntity, _: unknown, { driver }: GraphQLContext): Promise<unknown> {
     return Query.billVotingStats(null, { billId: bill.id }, { driver });
   },
 };
 
 export const Person = {
-  async sponsoredBills(person: unknown, { limit }: { limit?: number }, { driver }: GraphQLContext): Promise<unknown[]> {
+  async sponsoredBills(person: GraphEntity, { limit }: { limit?: number }, { driver }: GraphQLContext): Promise<unknown[]> {
     try {
       const result = await executeCypherSafely(
         driver,

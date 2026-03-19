@@ -16,7 +16,7 @@ import {
   getCurrentCorrelationId,
   clearCurrentCorrelationId,
   withCorrelationId,
-} from './errors/correlation-id';
+} from './correlation-id';
 import {
   dateToStringTransformer,
   optionalDateToStringTransformer,
@@ -291,7 +291,7 @@ describe('Shared Utilities Unit Tests', () => {
 
         expect(outerIds[0]).toBe('outer-id');
         expect(innerIds[0]).toBe('inner-id');
-        expect(outerIds[1]).toBeNull(); // Cleared after inner context
+        expect(outerIds[1]).toBe('outer-id'); // Restored correctly by AsyncLocalStorage
       });
     });
   });

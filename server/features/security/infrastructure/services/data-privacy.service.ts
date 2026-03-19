@@ -188,7 +188,7 @@ export class DataPrivacyService {
     try {
       await securityAuditService.logDataAccess(
         resource,
-        action as any,
+        action as 'read' | 'write' | 'delete' | 'export',
         undefined,
         user_id,
         undefined,
@@ -429,7 +429,7 @@ export class DataPrivacyService {
     
     numericFields.forEach(field => {
       if (!excludeFields.includes(field)) {
-        const values = items.map(item => (item as any)[field]).filter(v => typeof v === 'number');
+        const values = items.map(item => (item as Record<string, unknown>)[field]).filter(v => typeof v === 'number');
         if (values.length > 0) {
           aggregated[`${field}_avg`] = values.reduce((a, b) => a + b, 0) / values.length;
           aggregated[`${field}_min`] = Math.min(...values);
@@ -448,7 +448,7 @@ export class DataPrivacyService {
     const result: any = {};
     const excludeFields = [...this.SENSITIVE_FIELDS, ...additionalExcludes];
     
-    Object.entries(item as any).forEach(([key, value]) => {
+    Object.entries(item as Record<string, unknown>).forEach(([key, value]) => {
       if (!excludeFields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
         result[key] = value;
       }

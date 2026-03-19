@@ -168,14 +168,15 @@ export class PoolManager {
       application_name: this.config.application_name || `chanuka_${this.config.name}`,
     }) as EnhancedPool;
 
-    // Add enhanced methods
-    (pool as any).name = this.config.name;
-    (pool as any).getMetrics = () => this.getMetrics();
-    (pool as any).resetMetrics = () => this.resetMetrics();
-    (pool as any).trackQuery = (duration: number) => this.trackQuery(duration);
-    (pool as any).getHealth = () => this.getHealth();
+    const enhancedPool = Object.assign(pool, {
+      name: this.config.name,
+      getMetrics: () => this.getMetrics(),
+      resetMetrics: () => this.resetMetrics(),
+      trackQuery: (duration: number) => this.trackQuery(duration),
+      getHealth: () => this.getHealth()
+    }) as EnhancedPool;
 
-    return pool;
+    return enhancedPool;
   }
 
   /**

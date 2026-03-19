@@ -1,0 +1,160 @@
+infrastructure/database/graph/analytics/influence-service.ts(9,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/analytics/network-discovery.ts(8,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/analytics/pattern-discovery.ts(8,1): error TS6192: All imports in import declaration are unused.
+infrastructure/database/graph/analytics/pattern-discovery.ts(9,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/analytics/recommendation-engine.ts(8,1): error TS6133: 'RECOMMENDATION_CONFIG' is declared but its value is never read.
+infrastructure/database/graph/analytics/recommendation-engine.ts(8,10): error TS2614: Module '"../config/graph-config"' has no exported member 'RECOMMENDATION_CONFIG'. Did you mean to use 'import RECOMMENDATION_CONFIG from "../config/graph-config"' instead?
+infrastructure/database/graph/config/graph-config.ts(432,5): error TS2561: Object literal may only specify known properties, but 'minConnectionPoolSize' does not exist in type 'Config'. Did you mean to write 'maxConnectionPoolSize'?
+infrastructure/database/graph/config/index.ts(30,3): error TS2614: Module '"./graph-config"' has no exported member 'PERFORMANCE_CONFIG'. Did you mean to use 'import PERFORMANCE_CONFIG from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(31,3): error TS2614: Module '"./graph-config"' has no exported member 'MONITORING_CONFIG'. Did you mean to use 'import MONITORING_CONFIG from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(32,3): error TS2614: Module '"./graph-config"' has no exported member 'SECURITY_CONFIG'. Did you mean to use 'import SECURITY_CONFIG from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(33,3): error TS2614: Module '"./graph-config"' has no exported member 'FEATURE_FLAGS'. Did you mean to use 'import FEATURE_FLAGS from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(34,3): error TS2614: Module '"./graph-config"' has no exported member 'CONSISTENCY_CONFIG'. Did you mean to use 'import CONSISTENCY_CONFIG from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(35,3): error TS2614: Module '"./graph-config"' has no exported member 'RECOMMENDATION_CONFIG'. Did you mean to use 'import RECOMMENDATION_CONFIG from "./graph-config"' instead?
+infrastructure/database/graph/config/index.ts(36,3): error TS2614: Module '"./graph-config"' has no exported member 'getConfigSummary'. Did you mean to use 'import getConfigSummary from "./graph-config"' instead?
+infrastructure/database/graph/core/app-init.ts(7,60): error TS2307: Cannot find module './core/sync-executor' or its corresponding type declarations.
+infrastructure/database/graph/core/app-init.ts(8,39): error TS2307: Cannot find module './core/schema' or its corresponding type declarations.
+infrastructure/database/graph/core/app-init.ts(22,29): error TS2339: Property 'driver' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/core/app-init.ts(24,19): error TS2339: Property 'auth' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/core/app-init.ts(33,11): error TS18047: 'appDriver' is possibly 'null'.
+infrastructure/database/graph/core/app-init.ts(52,5): error TS2322: Type 'Driver | null' is not assignable to type 'Driver'.
+infrastructure/database/graph/core/app-init.ts(54,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/core/app-init.ts(72,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/core/batch-sync-runner.ts(47,41): error TS2769: No overload matches this call.
+infrastructure/database/graph/core/graphql-api.ts(17,26): error TS6133: 'PaginationOptions' is declared but its value is never read.
+infrastructure/database/graph/core/graphql-api.ts(83,14): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(163,14): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(325,26): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(326,25): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(327,30): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(328,28): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/core/graphql-api.ts(501,47): error TS18046: 'bill' is of type 'unknown'.
+infrastructure/database/graph/core/graphql-api.ts(505,50): error TS18046: 'bill' is of type 'unknown'.
+infrastructure/database/graph/core/graphql-api.ts(518,21): error TS18046: 'person' is of type 'unknown'.
+infrastructure/database/graph/core/graphql-api.ts(524,87): error TS18046: 'person' is of type 'unknown'.
+infrastructure/database/graph/core/idempotency-ledger.ts(281,16): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/core/neo4j-client.ts(36,21): error TS2344: Type 'T' does not satisfy the constraint 'RecordShape'.
+infrastructure/database/graph/core/neo4j-client.ts(37,5): error TS2322: Type 'QueryResult<unknown>' is not assignable to type 'QueryResult<T>'.
+infrastructure/database/graph/core/neo4j-client.ts(46,21): error TS2344: Type 'T' does not satisfy the constraint 'RecordShape'.
+infrastructure/database/graph/core/neo4j-client.ts(47,5): error TS2322: Type 'QueryResult<unknown>' is not assignable to type 'QueryResult<T>'.
+infrastructure/database/graph/core/neo4j-client.ts(57,21): error TS2344: Type 'T' does not satisfy the constraint 'RecordShape'.
+infrastructure/database/graph/core/neo4j-client.ts(78,34): error TS2344: Type 'T' does not satisfy the constraint 'RecordShape'.
+infrastructure/database/graph/core/neo4j-client.ts(158,54): error TS2769: No overload matches this call.
+infrastructure/database/graph/core/neo4j-client.ts(159,61): error TS2769: No overload matches this call.
+infrastructure/database/graph/core/sync-executor.ts(117,23): error TS2554: Expected 1 arguments, but got 0.
+infrastructure/database/graph/core/sync-executor.ts(217,7): error TS2554: Expected 0-1 arguments, but got 2.
+infrastructure/database/graph/core/sync-executor.ts(220,40): error TS2769: No overload matches this call.
+infrastructure/database/graph/core/sync-executor.ts(356,30): error TS2339: Property 'driver' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/core/sync-executor.ts(358,17): error TS2339: Property 'auth' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/core/sync-executor.ts(406,9): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/core/sync-executor.ts(410,9): error TS2322: Type 'unknown' is not assignable to type 'Error | undefined'.
+infrastructure/database/graph/core/sync-executor.ts(473,11): error TS6133: 'oneDayAgo' is declared but its value is never read.
+infrastructure/database/graph/core/sync-executor.ts(477,53): error TS2769: No overload matches this call.
+infrastructure/database/graph/core/sync-executor.ts(686,16): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/index.ts(12,1): error TS2308: Module './core' has already exported a member named 'resolveConflict'. Consider explicitly re-exporting to resolve the ambiguity.
+infrastructure/database/graph/query/advanced-queries.ts(49,11): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/advanced-queries.ts(50,14): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/advanced-queries.ts(51,29): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/advanced-queries.ts(73,11): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/advanced-queries.ts(74,13): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/advanced-queries.ts(75,22): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/engagement-queries.ts(27,11): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/engagement-queries.ts(28,14): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/engagement-queries.ts(29,32): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/network-queries.ts(27,11): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/network-queries.ts(28,26): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/network-queries.ts(29,18): error TS18046: 'r' is of type 'unknown'.
+infrastructure/database/graph/query/network-queries.ts(56,13): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/query/network-queries.ts(57,22): error TS2532: Object is possibly 'undefined'.
+infrastructure/database/graph/sync/advanced-sync.ts(6,1): error TS6133: 'executeBatch' is declared but its value is never read.
+infrastructure/database/graph/sync/advanced-sync.ts(7,29): error TS6133: 'GraphErrorCode' is declared but its value is never read.
+infrastructure/database/graph/sync/advanced-sync.ts(7,45): error TS6133: 'GraphError' is declared but its value is never read.
+infrastructure/database/graph/sync/advanced-sync.ts(11,7): error TS6133: 'errorHandler' is declared but its value is never read.
+infrastructure/database/graph/sync/advanced-sync.ts(49,33): error TS2345: Argument of type 'T | undefined' is not assignable to parameter of type 'T'.
+infrastructure/database/graph/sync/conflict-resolver.ts(17,40): error TS6133: 'executeCypherSafely' is declared but its value is never read.
+infrastructure/database/graph/sync/conflict-resolver.ts(146,28): error TS18048: 'graphRecord' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(147,26): error TS18048: 'graphRecord' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(220,22): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(221,20): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(222,24): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(223,24): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(224,21): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(225,30): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(226,28): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(429,32): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(430,33): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(431,34): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/conflict-resolver.ts(432,37): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-networks.ts(6,31): error TS6133: 'executeBatch' is declared but its value is never read.
+infrastructure/database/graph/sync/engagement-sync.ts(166,39): error TS2339: Property 'VOTE_POINTS' does not exist on type '{}'.
+infrastructure/database/graph/sync/engagement-sync.ts(171,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(239,42): error TS2339: Property 'COMMENT_POINTS' does not exist on type '{}'.
+infrastructure/database/graph/sync/engagement-sync.ts(244,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(299,43): error TS2339: Property 'BOOKMARK_POINTS' does not exist on type '{}'.
+infrastructure/database/graph/sync/engagement-sync.ts(304,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(376,41): error TS2339: Property 'FOLLOW_POINTS' does not exist on type '{}'.
+infrastructure/database/graph/sync/engagement-sync.ts(381,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(440,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(503,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(575,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(609,3): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(665,11): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(671,7): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(679,3): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/engagement-sync.ts(742,29): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(743,32): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(744,33): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(745,27): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(746,27): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(747,34): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/engagement-sync.ts(812,5): error TS2304: Cannot find name 'logger'.
+infrastructure/database/graph/sync/institutional-networks.ts(9,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/sync/institutional-networks.ts(33,21): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/institutional-networks.ts(34,13): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/institutional-networks.ts(35,16): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/institutional-networks.ts(36,14): error TS18048: 'record' is possibly 'undefined'.
+infrastructure/database/graph/sync/parliamentary-networks.ts(9,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/sync/parliamentary-networks.ts(31,11): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/sync/parliamentary-networks.ts(32,26): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/sync/parliamentary-networks.ts(33,23): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/sync/parliamentary-networks.ts(34,19): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/sync/parliamentary-networks.ts(35,18): error TS18048: 'r' is possibly 'undefined'.
+infrastructure/database/graph/sync/safeguards-networks.ts(8,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/sync/sync-monitoring.ts(8,1): error TS6133: 'logger' is declared but its value is never read.
+infrastructure/database/graph/utils/cache-adapter.ts(7,30): error TS2307: Cannot find module './config/graph-config' or its corresponding type declarations.
+infrastructure/database/graph/utils/error-adapter.ts(56,19): error TS4114: This member must have an 'override' modifier because it overrides a member in the base class 'Error'.
+infrastructure/database/graph/utils/error-adapter.ts(98,45): error TS2769: No overload matches this call.
+infrastructure/database/graph/utils/error-adapter.ts(155,23): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/error-adapter.ts(174,16): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/error-adapter.ts(175,7): error TS2322: Type 'unknown' is not assignable to type 'Error | undefined'.
+infrastructure/database/graph/utils/health-adapter.ts(7,37): error TS2307: Cannot find module './utils/session-manager' or its corresponding type declarations.
+infrastructure/database/graph/utils/health-adapter.ts(31,11): error TS6133: 'start' is declared but its value is never read.
+infrastructure/database/graph/utils/health-adapter.ts(63,13): error TS6133: 'result' is declared but its value is never read.
+infrastructure/database/graph/utils/health-adapter.ts(78,29): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/health-adapter.ts(82,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/health-adapter.ts(96,29): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/health-adapter.ts(100,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/health-adapter.ts(135,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/result-normalizer.ts(29,31): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/result-normalizer.ts(41,12): error TS2538: Type 'symbol' cannot be used as an index type.
+infrastructure/database/graph/utils/result-normalizer.ts(41,40): error TS2345: Argument of type 'PropertyKey' is not assignable to parameter of type 'string'.
+infrastructure/database/graph/utils/result-normalizer.ts(87,28): error TS2345: Argument of type 'object' is not assignable to parameter of type 'Record<string, unknown>'.
+infrastructure/database/graph/utils/result-normalizer.ts(145,3): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+infrastructure/database/graph/utils/result-normalizer.ts(149,3): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+infrastructure/database/graph/utils/result-normalizer.ts(153,3): error TS2322: Type 'unknown' is not assignable to type 'boolean'.
+infrastructure/database/graph/utils/result-normalizer.ts(173,26): error TS2345: Argument of type 'Record<RecordShape<PropertyKey, any>, PropertyKey, RecordShape<PropertyKey, number>> | undefined' is not assignable to parameter of type 'Record<RecordShape<PropertyKey, any>, PropertyKey, RecordShape<PropertyKey, number>>'.
+infrastructure/database/graph/utils/session-manager.ts(270,14): error TS2339: Property 'records' does not exist on type 'Result<RecordShape>'.
+infrastructure/database/graph/utils/session-manager.ts(273,17): error TS2339: Property 'records' does not exist on type 'Result<RecordShape>'.
+infrastructure/database/graph/utils/session-manager.ts(287,17): error TS2339: Property 'records' does not exist on type 'Result<RecordShape>'.
+infrastructure/database/graph/utils/session-manager.ts(287,30): error TS7006: Parameter 'record' implicitly has an 'any' type.
+infrastructure/database/graph/utils/session-manager.ts(297,17): error TS2339: Property 'records' does not exist on type 'Result<RecordShape>'.
+infrastructure/database/graph/utils/test-harness.ts(6,29): error TS2307: Cannot find module './utils/session-manager' or its corresponding type declarations.
+infrastructure/database/graph/utils/test-harness.ts(19,28): error TS2339: Property 'driver' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/utils/test-harness.ts(21,17): error TS2339: Property 'auth' does not exist on type '(url: string, authToken?: AuthToken | AuthTokenManager | undefined, config?: Config | undefined) => Driver'.
+infrastructure/database/graph/utils/test-harness.ts(27,9): error TS18047: 'testDriver' is possibly 'null'.
+infrastructure/database/graph/utils/test-harness.ts(29,3): error TS2322: Type 'Driver | null' is not assignable to type 'Driver'.
+infrastructure/database/graph/utils/test-harness.ts(36,42): error TS7006: Parameter 'session' implicitly has an 'any' type.
+infrastructure/database/graph/utils/test-harness.ts(44,27): error TS18046: 'error' is of type 'unknown'.
+infrastructure/database/graph/utils/test-harness.ts(49,36): error TS7006: Parameter 'session' implicitly has an 'any' type.
+infrastructure/database/graph/utils/test-harness.ts(50,24): error TS18046: 'data' is of type 'unknown'.
+infrastructure/database/graph/utils/test-harness.ts(57,23): error TS18046: 'data' is of type 'unknown'.

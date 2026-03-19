@@ -13,11 +13,7 @@ import {
   getClassificationFromErrorCode,
   type StandardError,
 } from '../../types/core/errors';
-// import { generateCorrelationId, getCurrentCorrelationId } from './correlation-id';
-
-// Temporary stubs until correlation-id is implemented
-const generateCorrelationId = () => `corr-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-const getCurrentCorrelationId = () => undefined;
+import { generateCorrelationId, getCurrentCorrelationId } from '../correlation-id';
 
 /**
  * Type guard for PostgreSQL error
@@ -39,9 +35,6 @@ function isPostgresError(error: unknown): error is PostgresError {
   );
 }
 
-/**
- * Type guard for HTTP status error
- */
 interface HttpStatusError {
   status: number;
   statusText?: string;

@@ -39,7 +39,6 @@ export {
   getSyncServiceStatus,
   verifyDataConsistency,
   detectConflicts,
-  resolveConflict,
   isServiceInitialized,
   getServiceConfig,
   getNeo4jDriver,

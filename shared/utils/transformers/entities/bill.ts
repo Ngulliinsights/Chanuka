@@ -88,8 +88,8 @@ export const billDbToDomain: Transformer<BillTable, Bill> = {
       metadata: dbBill.metadata ?? undefined,
       createdAt: dbBill.created_at,
       updatedAt: dbBill.updated_at,
-      createdBy: (dbBill.created_by as string) ?? '',
-      updatedBy: (dbBill.updated_by as string) ?? '',
+      createdBy: (dbBill.created_by as string) ?? undefined,
+      updatedBy: (dbBill.updated_by as string) ?? undefined,
     };
   },
 

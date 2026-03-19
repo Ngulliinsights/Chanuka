@@ -48,7 +48,47 @@ export const CACHE_CONFIG = {
 };
 
 export const ENGAGEMENT_CONFIG = {
-  // Configuration for engagement operations
+  VOTE_POINTS: 10,
+  COMMENT_POINTS: 5,
+  BOOKMARK_POINTS: 3,
+  FOLLOW_POINTS: 7,
+};
+
+export const PERFORMANCE_CONFIG = {
+  QUERY_TIMEOUT_MS: 30000,
+  BATCH_SIZE: 500,
+  MAX_CONCURRENT_OPERATIONS: 10,
+};
+
+export const MONITORING_CONFIG = {
+  HEALTH_CHECK_INTERVAL_MS: 60000,
+  METRICS_FLUSH_INTERVAL_MS: 30000,
+  SLOW_QUERY_THRESHOLD_MS: 1000,
+};
+
+export const SECURITY_CONFIG = {
+  ENABLE_QUERY_VALIDATION: true,
+  MAX_QUERY_LENGTH: 10000,
+  BLOCKED_OPERATIONS: ['DROP', 'DELETE DATABASE'],
+};
+
+export const FEATURE_FLAGS = {
+  ENABLE_GRAPH_SYNC: true,
+  ENABLE_GRAPH_ANALYTICS: true,
+  ENABLE_GRAPH_RECOMMENDATIONS: true,
+  ENABLE_GRAPH_CACHING: false,
+};
+
+export const CONSISTENCY_CONFIG = {
+  STALE_DATA_THRESHOLD_MS: 24 * 60 * 60 * 1000,
+  CONSISTENCY_CHECK_INTERVAL_MS: 300000,
+  MAX_RETRY_COUNT: 3,
+};
+
+export const RECOMMENDATION_CONFIG = {
+  MAX_RECOMMENDATIONS: 20,
+  MIN_RELEVANCE_SCORE: 0.3,
+  REFRESH_INTERVAL_MS: 3600000,
 };
 
 export function validateConfig(): void {
@@ -61,6 +101,21 @@ export function validateConfig(): void {
   if (!NEO4J_CONFIG.PASSWORD) {
     throw new Error('NEO4J_PASSWORD environment variable is required');
   }
+}
+
+export function getConfigSummary(): Record<string, unknown> {
+  return {
+    neo4j: {
+      uri: NEO4J_CONFIG.URI,
+      maxPoolSize: NEO4J_CONFIG.MAX_CONNECTION_POOL_SIZE,
+    },
+    sync: {
+      intervalMs: SYNC_CONFIG.INTERVAL_MS,
+      batchSize: SYNC_CONFIG.BATCH_SIZE,
+      autoSync: SYNC_CONFIG.ENABLE_AUTO_SYNC,
+    },
+    features: FEATURE_FLAGS,
+  };
 }
 
 // ============================================================================
@@ -194,32 +249,15 @@ const TEST_CONFIG: GraphEnvironment = {
 // CONFIGURATION MANAGER
 // ============================================================================
 
-/**
- * Manages graph database configuration and feature flags.
- *
- * Provides centralized access to all graph-related settings,
- * ensuring consistency across the application.
- */
 export class GraphConfigManager {
   private environment: GraphEnvironment;
   private connectionConfig: Neo4jConnectionConfig | null = null;
 
-  /**
-   * Create a new GraphConfigManager.
-   *
-   * @param env - Environment name (defaults to process.env.NODE_ENV)
-   */
   constructor(env?: string) {
     const nodeEnv = env ?? process.env.NODE_ENV ?? 'development';
     this.environment = this.loadConfig(nodeEnv);
   }
 
-  /**
-   * Load configuration based on environment.
-   *
-   * @param env - Environment name
-   * @returns Configuration object
-   */
   private loadConfig(env: string): GraphEnvironment {
     switch (env) {
       case 'staging':
@@ -234,139 +272,62 @@ export class GraphConfigManager {
     }
   }
 
-  /**
-   * Get the current environment configuration.
-   *
-   * @returns Environment configuration object
-   */
   getEnvironment(): GraphEnvironment {
     return this.environment;
   }
 
-  /**
-   * Get the current environment name.
-   *
-   * @returns Environment name
-   */
   getEnvironmentName(): string {
     return this.environment.environment;
   }
 
-  /**
-   * Get the current log level.
-   *
-   * @returns Log level
-   */
   getLogLevel(): string {
     return this.environment.logLevel;
   }
 
-  /**
-   * Get feature flags.
-   *
-   * @returns Feature flags object
-   */
   getFeatures(): GraphFeatureFlags {
     return this.environment.features;
   }
 
-  /**
-   * Check if a specific feature is enabled.
-   *
-   * @param feature - Feature name
-   * @returns True if enabled
-   */
   isFeatureEnabled(feature: keyof GraphFeatureFlags): boolean {
     return this.environment.features[feature];
   }
 
-  /**
-   * Get connection pool configuration.
-   *
-   * @returns Connection pool settings
-   */
   getConnectionPool(): GraphEnvironment['connectionPool'] {
     return this.environment.connectionPool;
   }
 
-  /**
-   * Get query defaults.
-   *
-   * @returns Query default settings
-   */
   getQueryDefaults(): GraphEnvironment['queryDefaults'] {
     return this.environment.queryDefaults;
   }
 
-  /**
-   * Set Neo4j connection configuration.
-   *
-   * @param config - Connection configuration
-   */
   setConnectionConfig(config: Neo4jConnectionConfig): void {
     this.connectionConfig = config;
   }
 
-  /**
-   * Get Neo4j connection configuration.
-   *
-   * @returns Connection configuration or null
-   */
   getConnectionConfig(): Neo4jConnectionConfig | null {
     return this.connectionConfig;
   }
 
-  /**
-   * Override a feature flag.
-   *
-   * @param feature - Feature name
-   * @param enabled - Enable or disable
-   */
   setFeatureEnabled(feature: keyof GraphFeatureFlags, enabled: boolean): void {
     this.environment.features[feature] = enabled;
   }
 
-  /**
-   * Override the log level.
-   *
-   * @param level - New log level
-   */
   setLogLevel(level: GraphEnvironment['logLevel']): void {
     this.environment.logLevel = level;
   }
 
-  /**
-   * Get the full configuration as a plain object.
-   *
-   * @returns Configuration object
-   */
   getFullConfig(): GraphEnvironment {
     return JSON.parse(JSON.stringify(this.environment));
   }
 
-  /**
-   * Check if running in production.
-   *
-   * @returns True if production environment
-   */
   isProduction(): boolean {
     return this.environment.environment === 'production';
   }
 
-  /**
-   * Check if running in development.
-   *
-   * @returns True if development environment
-   */
   isDevelopment(): boolean {
     return this.environment.environment === 'development';
   }
 
-  /**
-   * Check if running in test.
-   *
-   * @returns True if test environment
-   */
   isTest(): boolean {
     return this.environment.environment === 'test';
   }
@@ -376,17 +337,8 @@ export class GraphConfigManager {
 // SINGLETON INSTANCE
 // ============================================================================
 
-/**
- * Global configuration manager instance.
- * Used as the default configuration manager for the graph module.
- */
 let globalConfigManager: GraphConfigManager | null = null;
 
-/**
- * Get or create the global configuration manager.
- *
- * @returns Global GraphConfigManager instance
- */
 export function getGraphConfig(): GraphConfigManager {
   if (!globalConfigManager) {
     globalConfigManager = new GraphConfigManager();
@@ -394,21 +346,11 @@ export function getGraphConfig(): GraphConfigManager {
   return globalConfigManager;
 }
 
-/**
- * Initialize the global configuration manager with a specific environment.
- *
- * @param env - Environment name
- * @returns Configured GraphConfigManager instance
- */
 export function initializeGraphConfig(env?: string): GraphConfigManager {
   globalConfigManager = new GraphConfigManager(env);
   return globalConfigManager;
 }
 
-/**
- * Reset the global configuration manager.
- * Useful for testing.
- */
 export function resetGraphConfig(): void {
   globalConfigManager = null;
 }
@@ -417,35 +359,20 @@ export function resetGraphConfig(): void {
 // HELPER FUNCTIONS
 // ============================================================================
 
-/**
- * Create a Neo4j driver configuration object.
- *
- * @param baseConfig - Base configuration
- * @returns Complete driver configuration
- */
 export function createDriverConfig(baseConfig: Partial<Config> = {}): Config {
   const config = getGraphConfig();
   const pool = config.getConnectionPool();
 
   return {
     maxConnectionPoolSize: pool.max,
-    minConnectionPoolSize: pool.min,
-    maxConnectionLifetimeSeconds: pool.maxLifetimeSeconds,
-    maxConnectionIdleTimeSeconds: pool.maxIdleTimeSeconds,
-    connectionAcquisitionTimeoutMs: 60000,
+    maxConnectionLifetime: pool.maxLifetimeSeconds,
+    connectionAcquisitionTimeout: 60000,
     ...baseConfig,
   };
 }
 
-/**
- * Validate a connection URI format.
- *
- * @param uri - Connection URI
- * @returns True if valid
- */
 export function validateConnectionUri(uri: string): boolean {
   try {
-    // Check for neo4j://, neo4j+s://, or neo4j+ssc:// schemes
     const urlRegex = /^neo4j(\+[a-z]+)?:\/\/.*$/i;
     return urlRegex.test(uri);
   } catch {

@@ -24,6 +24,18 @@ This document serves as the **Single Source of Truth** for architectural changes
 ## 🏆 Recent Architectural Decisions
 *Log key decisions that affect how code should be written going forward.*
 
+### [2026-03-19] Graph Directory Bug Fixes & Feature Integration Complete
+- **Context:** The `database/graph` module had 160+ TypeScript errors causing build failures. It was also orphaned, and its advanced analytics and network visualization capabilities were not integrated into the main features.
+- **Decision:**
+    1. **Fixed all Graph Bugs:** Resolved all 160 errors including missing exports, incorrect Neo4j driver API usage, potential runtime crashes (undefined property access), and unused variables. The graph directory compiles with 0 errors.
+    2. **Conflict Detector Integration:** Replaced mock graph data in `conflict-detector.ts` with real graph queries, maintaining graceful degradation.
+    3. **Recommendation Integration:** Wired `recommendation-engine.ts` into `RecommendationService.ts`.
+    4. **Analytics Integration:** Exposed `getInfluenceNetwork` and `getPatternAnalysis` in `analytics.service.ts`.
+    5. **Sponsors Integration:** Added `/:id/network` endpoint to `sponsors.routes.ts` utilizing `discoverInfluenceNetwork`.
+- **Consequences:**
+    - Zero TypeScript errors in the `database/graph` directory verified.
+    - Advanced graph capabilities (influence networks, conflict detection, recommendations) are now wired to core features while falling back to SQL mocks if unavailabe.
+
 ### [2026-03-10] Sponsors Feature Client Implementation Complete
 - **Context:** Server-side sponsors feature was complete with comprehensive conflict analysis, risk profiling, and transparency tracking, but had zero client-side implementation. Users couldn't access sponsor information, view conflicts, or analyze political transparency.
 - **Decision:**

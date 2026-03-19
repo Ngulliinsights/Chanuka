@@ -3,8 +3,17 @@
  * Type-safe API contracts for bill-related endpoints
  */
 
-import { BillId, UserId } from '../../core/branded';
+
+import { z } from 'zod';
 import { Bill, BillEngagementMetrics } from '../../domains/legislative';
+import {
+  CreateBillRequestSchema,
+  UpdateBillRequestSchema,
+  GetBillParamsSchema,
+  ListBillsQuerySchema,
+  DeleteBillParamsSchema,
+  GetBillEngagementParamsSchema
+} from './bill.schemas';
 
 // ============================================================================
 // Request Types
@@ -13,60 +22,32 @@ import { Bill, BillEngagementMetrics } from '../../domains/legislative';
 /**
  * Create Bill Request
  */
-export interface CreateBillRequest {
-  billNumber: string;
-  title: string;
-  summary: string;
-  status: string;
-  chamber: string;
-  billType: string;
-  sponsorId: UserId;
-}
+export type CreateBillRequest = z.infer<typeof CreateBillRequestSchema>;
 
 /**
  * Update Bill Request
  */
-export interface UpdateBillRequest {
-  title?: string;
-  summary?: string;
-  status?: string;
-  detailedSummary?: string;
-}
+export type UpdateBillRequest = z.infer<typeof UpdateBillRequestSchema>;
 
 /**
  * Get Bill Request (path params)
  */
-export interface GetBillRequest {
-  id: BillId;
-}
+export type GetBillRequest = z.infer<typeof GetBillParamsSchema>;
 
 /**
  * List Bills Request (query params)
  */
-export interface ListBillsRequest {
-  page?: number;
-  limit?: number;
-  status?: string;
-  chamber?: string;
-  sponsorId?: UserId;
-  search?: string;
-  sortBy?: 'date' | 'title' | 'status';
-  sortOrder?: 'asc' | 'desc';
-}
+export type ListBillsRequest = z.infer<typeof ListBillsQuerySchema>;
 
 /**
  * Delete Bill Request (path params)
  */
-export interface DeleteBillRequest {
-  id: BillId;
-}
+export type DeleteBillRequest = z.infer<typeof DeleteBillParamsSchema>;
 
 /**
  * Get Bill Engagement Request (path params)
  */
-export interface GetBillEngagementRequest {
-  id: BillId;
-}
+export type GetBillEngagementRequest = z.infer<typeof GetBillEngagementParamsSchema>;
 
 // ============================================================================
 // Response Types

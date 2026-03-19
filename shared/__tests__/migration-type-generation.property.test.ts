@@ -46,15 +46,18 @@ interface TypeField {
  * Check if type generation script exists
  */
 function typeGenerationScriptExists(): boolean {
-  const scriptPath = join(process.cwd(), 'scripts', 'database', 'generate-types.ts');
-  return existsSync(scriptPath);
+  // Try relative to __dirname (shared/__tests__) => SimpleTool/scripts
+  const scriptPath1 = join(__dirname, '..', '..', 'scripts', 'database', 'generate-types-simple.ts');
+  // Try another fallback
+  const scriptPath2 = join(__dirname, '..', '..', '..', 'scripts', 'database', 'generate-types-simple.ts');
+  return existsSync(scriptPath1) || existsSync(scriptPath2);
 }
 
 /**
  * Check if generated types directory exists
  */
 function generatedTypesDirectoryExists(): boolean {
-  const typesDir = join(process.cwd(), 'shared', 'types', 'database');
+  const typesDir = join(__dirname, '..', 'types', 'database');
   return existsSync(typesDir);
 }
 
@@ -87,15 +90,17 @@ function extractTablesFromMigration(migrationContent: string): string[] {
  * Check if a type definition exists for a table
  */
 function typeDefinitionExists(tableName: string): boolean {
-  const typesPath = join(process.cwd(), 'shared', 'types', 'database', 'tables.ts');
+  const typesPath = join(__dirname, '..', 'types', 'database', 'tables.ts');
   
   if (!existsSync(typesPath)) {
     return false;
   }
   
   const content = readFileSync(typesPath, 'utf-8');
-  const expectedTypeName = toPascalCase(tableName) + 'Table';
-  
+  const singularTable = tableName.endsWith('ies') ? tableName.slice(0, -3) + 'y' : 
+                        tableName.endsWith('s') ? tableName.slice(0, -1) : tableName;
+  const expectedTypeName = toPascalCase(singularTable) + 'Table';
+
   return content.includes(`interface ${expectedTypeName}`);
 }
 
@@ -153,7 +158,7 @@ describe('Feature: full-stack-integration, Property 6: Migration Type Generation
         fc.record({
           tableName: fc.constantFrom('users', 'bills', 'comments', 'sponsors'),
           operation: fc.constantFrom('CREATE', 'ALTER', 'DROP'),
-          fieldName: fc.string({ minLength: 1, maxLength: 50 }),
+          fieldName: fc.stringMatching(/^[a-z][a-z0-9_]{0,28}[a-z0-9]$/),
           fieldType: fc.constantFrom('VARCHAR', 'INTEGER', 'TIMESTAMP', 'BOOLEAN'),
         }),
         (migration) => {

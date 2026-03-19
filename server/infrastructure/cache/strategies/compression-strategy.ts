@@ -6,6 +6,7 @@
  */
 
 import { CacheCompressor } from '../compression/cache-compressor';
+import { isStatsProvider } from '../interfaces';
 
 export interface CompressionStrategyConfig {
   threshold?: number; // Minimum size in bytes to trigger compression
@@ -37,7 +38,7 @@ export class CompressionStrategy {
    */
   async compress<T>(value: T): Promise<T> {
     try {
-      return await this.compressor.compress(value);
+      return (await this.compressor.compress(value)) as T;
     } catch (error) {
       console.warn('Compression failed, returning original value:', error);
       return value;
@@ -52,7 +53,7 @@ export class CompressionStrategy {
    */
   async decompress<T>(value: T): Promise<T> {
     try {
-      return await this.compressor.decompress(value);
+      return (await this.compressor.decompress(value)) as T;
     } catch (error) {
       console.warn('Decompression failed, returning original value:', error);
       return value;
@@ -66,8 +67,8 @@ export class CompressionStrategy {
    * @returns True if the value should be compressed
    */
   shouldCompress<T>(value: T): boolean {
-    if (typeof this.compressor.shouldCompress === 'function') {
-      return this.compressor.shouldCompress(value);
+    if ('shouldCompress' in this.compressor && typeof (this.compressor as Record<string, unknown>).shouldCompress === 'function') {
+      return ((this.compressor as Record<string, unknown>).shouldCompress as (v: T) => boolean)(value);
     }
     return false;
   }
@@ -82,8 +83,12 @@ export class CompressionStrategy {
     totalCompressed: number;
     totalDecompressed: number;
   } | null {
-    if (typeof (this.compressor as any).getStats === 'function') {
-      return (this.compressor as any).getStats();
+    if (isStatsProvider(this.compressor)) {
+      return this.compressor.getStats() as unknown as {
+        compressionRatio: number;
+        totalCompressed: number;
+        totalDecompressed: number;
+      };
     }
     return null;
   }

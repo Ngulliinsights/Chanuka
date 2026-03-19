@@ -73,11 +73,11 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -174,11 +174,11 @@ router.post('/admin/rebuild-index', authenticateToken, requireRole(['admin']), a
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -223,11 +223,11 @@ router.get('/stream', asyncHandler(async (req: Request, res: Response) => {
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -280,11 +280,11 @@ router.delete('/cancel/:searchId', asyncHandler(async (req: Request, res: Respon
 
   if (!searchId) {
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: 'Search ID is required',
       userMessage: 'Search ID parameter is required',
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -344,11 +344,11 @@ router.get('/postgresql', asyncHandler(async (req: Request, res: Response) => {
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -455,7 +455,7 @@ router.get('/live', asyncHandler(async (req: Request, res: Response) => {
  */
 router.get('/recent', asyncHandler(async (req: Request, res: Response) => {
   const limit = Math.min(Number(req.query.limit) || 5, 20);
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getRecentSearches(limit, userId);
   res.json(results);
 }));
@@ -465,7 +465,7 @@ router.get('/recent', asyncHandler(async (req: Request, res: Response) => {
  */
 router.get('/history', asyncHandler(async (req: Request, res: Response) => {
   const limit = Math.min(Number(req.query.limit) || 20, 100);
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getHistory(userId, limit);
   res.json(results);
 }));
@@ -474,7 +474,7 @@ router.get('/history', asyncHandler(async (req: Request, res: Response) => {
  * DELETE /search/history - Clear search history
  */
 router.delete('/history', asyncHandler(async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   await searchRepository.clearHistory(userId);
   res.json({ success: true });
 }));
@@ -488,7 +488,7 @@ router.delete('/history', asyncHandler(async (req: Request, res: Response) => {
  */
 router.post('/saved', asyncHandler(async (req: Request, res: Response) => {
   const { name, query, description, is_public, tags } = req.body;
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
 
   const saved = await searchRepository.saveSearch({
     userId,
@@ -506,7 +506,7 @@ router.post('/saved', asyncHandler(async (req: Request, res: Response) => {
  * GET /search/saved - Get saved searches
  */
 router.get('/saved', asyncHandler(async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getSavedSearches(userId);
   res.json(results);
 }));
@@ -518,11 +518,11 @@ router.delete('/saved/:id', asyncHandler(async (req: Request, res: Response) => 
   const { id } = req.params;
   if (!id) {
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: 'Search ID is required',
       userMessage: 'Search ID parameter is required',
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -531,7 +531,7 @@ router.delete('/saved/:id', asyncHandler(async (req: Request, res: Response) => 
       },
     });
   }
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const deleted = await searchRepository.deleteSavedSearch(id, userId ?? 'anonymous');
   res.json({ success: deleted });
 }));
@@ -543,11 +543,11 @@ router.post('/saved/:id/execute', asyncHandler(async (req: Request, res: Respons
   const { id } = req.params;
   if (!id) {
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: 'Search ID is required',
       userMessage: 'Search ID parameter is required',
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -556,17 +556,17 @@ router.post('/saved/:id/execute', asyncHandler(async (req: Request, res: Respons
       },
     });
   }
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
 
   const query = await searchRepository.getAndUpdateSavedSearch(id, userId ?? 'anonymous');
 
   if (!query) {
     throw boomFromStandardized({
-      category: 'BUSINESS' as any,
+      category: 'BUSINESS',
       code: 'NOT_FOUND',
       message: `Saved search '${id}' not found`,
       userMessage: `Saved search not found`,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -628,11 +628,11 @@ router.get('/result/:type/:id', asyncHandler(async (req: Request, res: Response)
 
   if (!result) {
     throw boomFromStandardized({
-      category: 'BUSINESS' as any,
+      category: 'BUSINESS',
       code: 'NOT_FOUND',
       message: `${type} '${id}' not found`,
       userMessage: `Search result not found`,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
@@ -654,11 +654,11 @@ router.post('/export', asyncHandler(async (req: Request, res: Response) => {
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',

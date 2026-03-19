@@ -1,5 +1,5 @@
 
-import { Driver, Transaction, Result, SessionConfig } from 'neo4j-driver';
+import { Driver, QueryResult } from 'neo4j-driver';
 
 import { logger } from '../../../observability';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
@@ -30,40 +30,35 @@ export class Neo4jClient {
   /**
    * Execute a read query with automatic session management.
    */
-  async executeRead<T = unknown>(
+  async executeRead(
     cypher: string,
     params: Record<string, unknown> = {}
-  ): Promise<Result<T>> {
+  ): Promise<QueryResult> {
     return this.execute(cypher, params, 'READ');
   }
 
   /**
    * Execute a write query with automatic session management and retry.
    */
-  async executeWrite<T = unknown>(
+  async executeWrite(
     cypher: string,
     params: Record<string, unknown> = {}
-  ): Promise<Result<T>> {
+  ): Promise<QueryResult> {
     return this.execute(cypher, params, 'WRITE');
   }
 
   /**
    * Execute a query with automatic session management.
    */
-  private async execute<T = unknown>(
+  private async execute(
     cypher: string,
     params: Record<string, unknown>,
     mode: 'READ' | 'WRITE'
-  ): Promise<Result<T>> {
-    const sessionConfig: SessionConfig = {
+  ): Promise<QueryResult> {
+    const session = this.driver.session({
       defaultAccessMode: mode === 'READ' ? 'READ' : 'WRITE',
-    };
-
-    if (this.config.defaultDatabase) {
-      sessionConfig.database = this.config.defaultDatabase;
-    }
-
-    const session = this.driver.session(sessionConfig);
+      ...(this.config.defaultDatabase ? { database: this.config.defaultDatabase } : {}),
+    });
 
     try {
       if (this.config.logQueries) {
@@ -75,7 +70,7 @@ export class Neo4jClient {
       }
 
       const executeQuery = async () => {
-        return await session.run<T>(cypher, params);
+        return await session.run(cypher, params);
       };
 
       if (mode === 'WRITE') {
@@ -107,7 +102,7 @@ export class Neo4jClient {
    * Execute multiple operations in a transaction.
    */
   async executeTransaction<T>(
-    operations: (tx: Transaction) => Promise<T>
+    operations: (tx: any) => Promise<T>
   ): Promise<T> {
     const session = this.driver.session();
     const tx = session.beginTransaction();
@@ -154,9 +149,12 @@ export class Neo4jClient {
       const nodeResult = await this.executeRead('MATCH (n) RETURN count(n) as count');
       const relResult = await this.executeRead('MATCH ()-[r]->() RETURN count(r) as count');
 
+      const nodeRecord = nodeResult.records[0];
+      const relRecord = relResult.records[0];
+
       return {
-        nodeCount: Number(nodeResult.records[0]?.get('count')) || 0,
-        relationshipCount: Number(relResult.records[0]?.get('count')) || 0,
+        nodeCount: nodeRecord ? Number(nodeRecord.get('count')) : 0,
+        relationshipCount: relRecord ? Number(relRecord.get('count')) : 0,
       };
     } catch (error) {
       logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to get stats');

@@ -18,7 +18,7 @@ import {
   setCurrentCorrelationId,
   clearCurrentCorrelationId,
   generateCorrelationId,
-} from '@shared/utils/errors/correlation-id';
+} from '@shared/utils/correlation-id';
 import { ERROR_CODES } from '@shared/constants';
 import { ErrorClassification } from '@shared/types/core/errors';
 

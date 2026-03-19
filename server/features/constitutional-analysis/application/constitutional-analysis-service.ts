@@ -1,5 +1,5 @@
 import { logger } from '@server/infrastructure/observability';
-import { db, readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
+import { db, withTransaction } from '@server/infrastructure/database';
 import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import { inputSanitizationService } from '@server/features/security';
 import {
@@ -8,15 +8,13 @@ import {
   constitutional_provisions,
   expert_review_queue,
   legal_precedents
-} from '@server/infrastructure/schema';
-import { and, asc, desc, eq, like, or, sql } from 'drizzle-orm';
+} from '@server/infrastructure/schema/constitutional_intelligence';
+import { and, asc, desc, eq, like, or, sql, type SQL } from 'drizzle-orm';
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-type ConstitutionalProvision = typeof constitutional_provisions.$inferSelect;
-type LegalPrecedent = typeof legal_precedents.$inferSelect;
 type ConstitutionalAnalysis = typeof constitutional_analyses.$inferSelect;
 
 export interface QueueItemRequest {
@@ -70,7 +68,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .limit(1);
 
       return rows[0] || null;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findProvisionById', id });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findProvisionById', metadata: { id } });
   }
 
   async searchProvisions(options: ProvisionSearchOptions) {
@@ -80,8 +78,8 @@ export class ConstitutionalAnalysisServiceComplete {
       const sanitizedSearchTerm = searchTerm ? inputSanitizationService.sanitizeString(searchTerm) : undefined;
       const sanitizedLimit = Math.min(Math.max(1, limit), 500); // Bounds
 
-      let query = db.select().from(constitutional_provisions);
-      const conditions = [];
+      let query = db.select().from(constitutional_provisions).$dynamic();
+      const conditions: (SQL | undefined)[] = [];
 
       if (sanitizedSearchTerm) {
         conditions.push(
@@ -107,8 +105,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       if (conditions.length > 0) {
-        // @ts-expect-error dynamic query building
-        query = query.where(and(...conditions));
+        query = query.where(and(...conditions) as SQL);
       }
 
       const results = await query
@@ -117,7 +114,7 @@ export class ConstitutionalAnalysisServiceComplete {
 
       logger.info({ count: results.length, searchTerm: sanitizedSearchTerm }, 'Searched constitutional provisions');
       return results;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'searchProvisions', options });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'searchProvisions', metadata: { options } });
   }
 
   async findProvisionsByArticle(article: string) {
@@ -141,7 +138,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .orderBy(asc(constitutional_provisions.section_number));
 
       return results;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findProvisionsByArticle', article });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findProvisionsByArticle', metadata: { article } });
   }
 
   // ============================================================================
@@ -159,7 +156,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .limit(1);
 
       return rows[0] || null;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findPrecedentById', id });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findPrecedentById', metadata: { id } });
   }
 
   async searchPrecedents(options: PrecedentSearchOptions) {
@@ -176,8 +173,8 @@ export class ConstitutionalAnalysisServiceComplete {
       const sanitizedProvisionIds = provisionIds.map(id => inputSanitizationService.sanitizeString(id)).filter(Boolean);
       const sanitizedLimit = Math.min(Math.max(1, limit), 500);
 
-      let query = db.select().from(legal_precedents);
-      const conditions = [];
+      let query = db.select().from(legal_precedents).$dynamic();
+      const conditions: (SQL | undefined)[] = [];
 
       if (sanitizedProvisionIds.length > 0) {
         const provisionArray = sql.join(
@@ -219,8 +216,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       if (conditions.length > 0) {
-        // @ts-expect-error dynamic query building
-        query = query.where(and(...conditions));
+        query = query.where(and(...conditions) as SQL);
       }
 
       const results = await query
@@ -228,7 +224,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .limit(sanitizedLimit);
 
       return results;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'searchPrecedents', options });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'searchPrecedents', metadata: { options } });
   }
 
   async findHighRelevanceBindingPrecedents(minRelevanceScore: number = 0.8) {
@@ -245,10 +241,15 @@ export class ConstitutionalAnalysisServiceComplete {
   async saveAnalysis(analysis: ConstitutionalAnalysis) {
     return safeAsync(async () => {
       const sanitizedBillId = inputSanitizationService.sanitizeString(analysis.bill_id);
-      const sanitizedProvisionId = inputSanitizationService.sanitizeString(analysis.provision_id);
       const sanitizedType = inputSanitizationService.sanitizeString(analysis.analysis_type);
+      
+      // If there are specific provisions being analyzed, check against the first one for this basic query
+      const provisionId = Array.isArray(analysis.constitutional_provisions_cited) && analysis.constitutional_provisions_cited.length > 0 
+        ? analysis.constitutional_provisions_cited[0] : null;
 
-      const existing = await this.findExistingAnalysis(sanitizedBillId, sanitizedProvisionId, sanitizedType);
+      const existing = provisionId 
+        ? await this.findExistingAnalysis(sanitizedBillId, provisionId, sanitizedType)
+        : null;
 
       let savedAnalysis: ConstitutionalAnalysis;
 
@@ -256,25 +257,28 @@ export class ConstitutionalAnalysisServiceComplete {
         await this.markAsSuperseded(existing.id, analysis.id);
         savedAnalysis = await this.insertNewAnalysis(analysis);
 
+        const newConfidence = parseFloat(analysis.confidence_score || '0');
+        const oldConfidence = parseFloat(existing.confidence_score || '0');
+
         await this.logAuditTrail(analysis.id, 'updated', {
           superseded_analysis_id: existing.id,
-          confidence_change: analysis.confidence_score - existing.confidence_score,
-          risk_change: {
-            from: existing.risk_level,
-            to: analysis.risk_level
+          confidence_change: newConfidence - oldConfidence,
+          alignment_change: {
+            from: existing.constitutional_alignment,
+            to: analysis.constitutional_alignment
           }
         });
 
         logger.info({
           analysis_id: savedAnalysis.id,
-          confidence_delta: analysis.confidence_score - existing.confidence_score
+          confidence_delta: newConfidence - oldConfidence
         }, 'Updated constitutional analysis');
       } else {
         savedAnalysis = await this.insertNewAnalysis(analysis);
 
         await this.logAuditTrail(analysis.id, 'created', {
           initial_confidence: analysis.confidence_score,
-          initial_risk: analysis.risk_level
+          initial_alignment: analysis.constitutional_alignment
         });
 
         logger.info({
@@ -284,7 +288,7 @@ export class ConstitutionalAnalysisServiceComplete {
       }
 
       return savedAnalysis;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'saveAnalysis', bill_id: analysis.bill_id });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'saveAnalysis', metadata: { bill_id: analysis.bill_id } });
   }
 
   async findAnalysesByBillId(bill_id: string) {
@@ -297,7 +301,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .where(
           and(
             eq(constitutional_analyses.bill_id, sanitizedBillId),
-            eq(constitutional_analyses.is_superseded, false)
+            sql`${constitutional_analyses.superseded_by} IS NULL`
           )
         )
         .orderBy(
@@ -306,7 +310,7 @@ export class ConstitutionalAnalysisServiceComplete {
         );
 
       return analyses;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findAnalysesByBillId', bill_id });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findAnalysesByBillId', metadata: { bill_id } });
   }
 
   async findAnalysisById(id: string) {
@@ -320,7 +324,7 @@ export class ConstitutionalAnalysisServiceComplete {
         .limit(1);
 
       return analysis || null;
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findAnalysisById', id });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'findAnalysisById', metadata: { id } });
   }
 
   // ============================================================================
@@ -370,7 +374,7 @@ export class ConstitutionalAnalysisServiceComplete {
         due_date,
         uncertaintyFlagCount: request.uncertainty_flags.length
       }, 'Queued analysis for expert review');
-    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'queueForExpertReview', request });
+    }, { service: 'ConstitutionalAnalysisServiceComplete', operation: 'queueForExpertReview', metadata: { request } });
   }
 
   async getExpertReviewQueueStatus() {
@@ -410,9 +414,9 @@ export class ConstitutionalAnalysisServiceComplete {
       .where(
         and(
           eq(constitutional_analyses.bill_id, bill_id),
-          eq(constitutional_analyses.provision_id, provisionId),
+          sql`${provisionId} = ANY(${constitutional_analyses.constitutional_provisions_cited})`,
           eq(constitutional_analyses.analysis_type, analysisType),
-          eq(constitutional_analyses.is_superseded, false)
+          sql`${constitutional_analyses.superseded_by} IS NULL`
         )
       )
       .limit(1);

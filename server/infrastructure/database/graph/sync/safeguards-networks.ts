@@ -5,8 +5,7 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function detectConflictOfInterest(driver: Driver, personId: string, billId: string): Promise<boolean> {
@@ -44,7 +43,7 @@ export async function getFinancialDisclosures(driver: Driver, personId: string):
       { personId },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       org_id: r.get('org_id'),
       org_name: r.get('org_name'),
       interest_type: r.get('interest_type'),

@@ -1,4 +1,4 @@
-import { User } from '@server/features/users/domain/entities/user';
+
 /**
  * Search Performance Monitor
  * 
@@ -6,17 +6,28 @@ import { User } from '@server/features/users/domain/entities/user';
  * relevance measurement, and automated alerting for search system validation.
  */
 
-import { searchBills } from '../application/SearchService';
+import { enhancedSearchService } from '../application/SearchService';
 
 const searchService = {
   async search(opts: { query: string; pagination: { page: number; limit: number } }) {
-    const dto = await searchBills({ text: opts.query, pagination: opts.pagination });
+    const dtoResult = await enhancedSearchService.billSearch({ 
+        query: opts.query, 
+        sort: 'relevance',
+        page: opts.pagination.page, 
+        limit: opts.pagination.limit 
+    });
+    
+    if (dtoResult.isErr()) {
+      throw dtoResult.error;
+    }
+    
+    const dto = dtoResult.value;
     return { 
-      results: (dto.results ?? []).map((r) => ({ 
+      results: (dto.results ?? []).map((r: any) => ({ 
         ...r, 
-        relevanceScore: (r as any).relevanceScore ?? 0 
+        relevanceScore: typeof r.relevance_score === 'number' ? r.relevance_score : 0
       })), 
-      totalCount: dto.pagination?.total ?? 0 
+      totalCount: dto.total ?? 0 
     };
   }
 };
@@ -492,7 +503,7 @@ export class SearchPerformanceMonitor {
 
         logger.debug(`Relevance test "${testCase.query}": ${relevanceScore.toFixed(3)}`);
       } catch (error) {
-        logger.error(error as any, `Relevance test failed for "${testCase.query}":`);
+        logger.error(error instanceof Error ? error : new Error(String(error)), `Relevance test failed for "${testCase.query}":`);
         
         // Record error metrics
         await this.recordSearchMetrics(

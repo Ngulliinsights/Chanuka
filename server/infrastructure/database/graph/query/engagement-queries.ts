@@ -2,7 +2,7 @@
  * Engagement Queries (REFACTORED)
  * IMPROVEMENTS: Fixed missing LIMIT clauses, added pagination, error handling
  */
-import type { Driver } from 'neo4j-driver';
+import type { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { QUERY_CONFIG } from '../config/graph-config';
@@ -23,7 +23,7 @@ export async function getMostEngagedUsers(driver: Driver, options: PaginationOpt
 
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map((r: unknown) => ({
+    return result.records.map((r: Neo4jRecord) => ({
       id: r.get('id'),
       email: r.get('email'),
       engagement_score: Number(r.get('engagement_score'))
@@ -47,7 +47,7 @@ export async function getTrendingBills(driver: Driver, limit: number = QUERY_CON
       { limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: Neo4jRecord) => ({
       id: r.get('id'),
       title: r.get('title'),
       trending_score: Number(r.get('trending_score')),
@@ -79,7 +79,7 @@ export async function getUserActivity(driver: Driver, userId: string): Promise<a
 
     if (result.records.length === 0) return null;
 
-    const r: any = result.records[0];
+    const r = result.records[0] as Neo4jRecord;
     return {
       votes: Number(r.get('votes')),
       comments: Number(r.get('comments')),

@@ -66,11 +66,11 @@ router.get('/verification/bills/:bill_id', asyncHandler(async (req, res: Respons
   if (!paramValidation.success) {
     const error = paramValidation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
@@ -100,11 +100,11 @@ router.post('/verification', asyncHandler(async (req, res: Response) => {
   if (!validation.success) {
     const error = validation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
@@ -134,11 +134,11 @@ router.put('/verification/:id', asyncHandler(async (req, res: Response) => {
   if (!paramValidation.success) {
     const error = paramValidation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
@@ -153,11 +153,11 @@ router.put('/verification/:id', asyncHandler(async (req, res: Response) => {
   if (!bodyValidation.success) {
     const error = bodyValidation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
@@ -203,11 +203,11 @@ router.get('/verification/user/:citizen_id', asyncHandler(async (req, res: Respo
   if (!paramValidation.success) {
     const error = paramValidation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
@@ -237,11 +237,11 @@ router.delete('/verification/:id', asyncHandler(async (req, res: Response) => {
   if (!paramValidation.success) {
     const error = paramValidation.error.errors[0];
     throw boomFromStandardized({
-      category: 'VALIDATION' as any,
+      category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
       message: error.message,
       userMessage: error.message,
-      severity: 'LOW' as any,
+      severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',

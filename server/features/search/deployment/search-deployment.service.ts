@@ -5,19 +5,30 @@
  * detailed A/B testing framework, performance monitoring, and rollback capabilities.
  */
 
-import { searchBills } from '@server/features/search/application/SearchService';
+import { enhancedSearchService } from '@server/features/search/application/SearchService';
 import { logger } from '@server/infrastructure/observability';
 import { featureFlagsService } from '@server/infrastructure/migration/feature-flags.service';
 
 const searchService = {
   async search(opts: { query: string; pagination: { page: number; limit: number } }) {
-    const dto = await searchBills({ text: opts.query, pagination: opts.pagination });
+    const dtoResult = await enhancedSearchService.billSearch({ 
+        query: opts.query, 
+        sort: 'relevance',
+        page: opts.pagination.page, 
+        limit: opts.pagination.limit 
+    });
+
+    if (dtoResult.isErr()) {
+        throw dtoResult.error;
+    }
+
+    const dto = dtoResult.value;
     return {
-      results: (dto.results ?? []).map((r) => ({
+      results: (dto.results ?? []).map((r: any) => ({
         ...r,
-        relevanceScore: (r as any).relevanceScore ?? 0
+        relevanceScore: typeof r.relevance_score === 'number' ? r.relevance_score : 0
       })),
-      totalCount: (dto as any).total ?? (dto as any).totalResults ?? dto.results?.length ?? 0
+      totalCount: dto.total ?? 0
     };
   }
 };
@@ -405,7 +416,7 @@ export class SearchDeploymentService {
 
           if (results.results.length > 0) {
             const avgRelevance = results.results.reduce(
-              (sum, r) => sum + r.relevanceScore, 0
+              (sum: number, r: { relevanceScore: number }) => sum + r.relevanceScore, 0
             ) / results.results.length;
             relevanceScores.push(avgRelevance);
           }

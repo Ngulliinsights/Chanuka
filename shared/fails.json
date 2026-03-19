@@ -1,0 +1,38 @@
+[
+  {
+    "title": "should use existing correlation ID when available",
+    "err": "AssertionError: expected 'corr-1773904740906-a3gndqp53' to be 'test-correlation-123' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:136:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/node_modules/.pn"
+  },
+  {
+    "title": "should use existing correlation ID when available",
+    "err": "AssertionError: expected 'corr-1773904740935-dazfzcrbr' to be 'test-correlation-456' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:254:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/node_modules/.pn"
+  },
+  {
+    "title": "should use existing correlation ID when available",
+    "err": "AssertionError: expected 'corr-1773904740939-avzxu8bqb' to be 'test-correlation-789' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:325:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/node_modules/.pn"
+  },
+  {
+    "title": "should use existing correlation ID when available",
+    "err": "AssertionError: expected 'corr-1773904740948-0bzsvoy9r' to be 'test-correlation-create' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:489:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/node_modules/"
+  },
+  {
+    "title": "should propagate correlation ID through database error transformation",
+    "err": "AssertionError: expected 'corr-1773904740954-uf0oyfv8l' to be 'edf9045f-297c-4a58-81a8-0222511c8958' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:501:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/"
+  },
+  {
+    "title": "should propagate correlation ID through validation error transformation",
+    "err": "AssertionError: expected 'corr-1773904740957-nj9tdp0rb' to be '46df5b87-2edc-450a-9e5d-72f16f34d806' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:518:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/"
+  },
+  {
+    "title": "should propagate correlation ID through network error transformation",
+    "err": "AssertionError: expected 'corr-1773904740959-uz4ncd6q6' to be '75a51524-862b-417c-95e8-1a8c73ef7067' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:528:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/"
+  },
+  {
+    "title": "should propagate correlation ID through toStandardError",
+    "err": "AssertionError: expected 'corr-1773904740960-1q7xuc8nq' to be '0309c357-f977-4e6f-a27d-eeddb0e92704' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:538:36\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/"
+  },
+  {
+    "title": "should maintain same correlation ID across multiple transformations",
+    "err": "AssertionError: expected 'corr-1773904740964-u4evgtuyv' to be 'd31d718a-22ac-4e09-ad25-b03803c8968d' // Object.is equality\n    at C:\\Users\\Access Granted\\Downloads\\projects\\SimpleTool\\shared\\utils\\errors\\transform.test.ts:556:37\n    at file:///C:/Users/Access%20Granted/Downloads/projects/SimpleTool/"
+  }
+]

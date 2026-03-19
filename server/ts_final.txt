@@ -1,0 +1,2 @@
+features/analytics/application/analytics.service.ts(232,47): error TS1005: ',' expected.
+features/analytics/application/analytics.service.ts(235,36): error TS1005: ',' expected.

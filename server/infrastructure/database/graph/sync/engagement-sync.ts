@@ -24,6 +24,7 @@ import { withWriteSession, withReadSession, executeCypherSafely } from '../utils
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { ENGAGEMENT_CONFIG } from '../config/graph-config';
+import { logger } from '@server/infrastructure/observability';
 
 const errorHandler = new GraphErrorHandler();
 
@@ -738,6 +739,16 @@ export async function getEngagementStats(
       }
 
       const record = result.records[0];
+      if (!record) {
+        return {
+          total_votes: 0,
+          total_comments: 0,
+          total_bookmarks: 0,
+          followers: 0,
+          following: 0,
+          engagement_score: 0,
+        };
+      }
       return {
         total_votes: Number(record.get('votes')) || 0,
         total_comments: Number(record.get('comments')) || 0,

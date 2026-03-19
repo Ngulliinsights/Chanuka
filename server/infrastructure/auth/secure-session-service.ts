@@ -1,13 +1,13 @@
 import { encryptionService, securityAuditService } from '@server/features/security';
 import { logger } from '@server/infrastructure/observability';
-import { getLegacyDatabase } from '@server/infrastructure/database';
+import { db } from '@server/infrastructure/database';
 import { sessions, users } from '@server/infrastructure/schema';
 import crypto from 'crypto';
-import { and, eq, gt,lt } from 'drizzle-orm';
+import { and, eq, gt, lt, count } from 'drizzle-orm';
 import { Request, Response } from 'express';
 
-// Get database instance lazily to avoid initialization issues in tests
-const getDb = () => getLegacyDatabase();
+// Use the Drizzle ORM instance directly for full type inference
+const getDb = () => db;
 
 export interface SecureSessionOptions {
   maxAge: number; // in milliseconds
@@ -18,7 +18,8 @@ export interface SecureSessionOptions {
   path: string;
 }
 
-export interface SessionData { user_id: string;
+export interface SessionData {
+  user_id: string;
   email: string;
   role: string;
   loginTime: Date;
@@ -59,10 +60,11 @@ export class SecureSessionService {
     req: Request,
     res: Response,
     options: Partial<SecureSessionOptions> = {}
-  ): Promise<{ session_id: string; csrfToken: string }> { try {
+  ): Promise<{ session_id: string; csrfToken: string }> {
+    try {
       // Generate session ID and CSRF token
       const session_id = crypto.randomUUID();
-      const csrfToken = encryptionService.generateCSRFToken();
+      const csrfToken = encryptionService.generateSecureToken(32);
       
       // Create session fingerprint
       const fingerprint = this.createSessionFingerprint(req);
@@ -77,7 +79,7 @@ export class SecureSessionService {
       // Create session data
       const sessionData: SessionData = {
         user_id,
-        email: '', // Will be filled from user data
+        email: undefined, // Will be filled from user data
         role: '',  // Will be filled from user data
         loginTime: new Date(),
         lastActivity: new Date(),
@@ -85,18 +87,19 @@ export class SecureSessionService {
         user_agent,
         csrfToken,
         fingerprint
-       };
+      };
 
       // Get user data
-      const user = await getDb()
-        .select()
+      const userResult = await getDb()
+        .select({ email: users.email, role: users.role })
         .from(users)
         .where(eq(users.id, user_id))
         .limit(1);
 
-      if (user.length > 0) {
-        sessionData.email = user[0].email;
-        sessionData.role = user[0].role;
+      const foundUser = userResult[0];
+      if (foundUser) {
+        sessionData.email = foundUser.email ?? undefined;
+        sessionData.role = foundUser.role;
       }
 
       // Encrypt session data
@@ -106,11 +109,12 @@ export class SecureSessionService {
       );
 
       // Store session in database
-      await getDb().insert(sessions).values({ id: session_id,
+      await getDb().insert(sessions).values({
+        id: session_id,
         user_id,
         expires_at: new Date(Date.now() + (options.maxAge || this.defaultOptions.maxAge)),
-        data: { encryptedSessionData }
-       });
+        metadata: { encryptedSessionData }
+      });
 
       // Set secure cookie
       const cookieOptions = { ...this.defaultOptions, ...options };
@@ -152,7 +156,7 @@ export class SecureSessionService {
       }
 
       // Get session from database
-      const sessionRecord = await getDb()
+      const sessionRecords = await getDb()
         .select()
         .from(sessions)
         .where(and(
@@ -161,11 +165,14 @@ export class SecureSessionService {
         ))
         .limit(1);
 
-      if (sessionRecord.length === 0) {
+      if (sessionRecords.length === 0) {
         return { isValid: false, error: 'Session not found' };
       }
 
-      const session = sessionRecord[0];
+      const session = sessionRecords[0];
+      if (!session) {
+        return { isValid: false, error: 'Session not found' };
+      }
 
       // Check if session is expired
       if (new Date() > session.expires_at) {
@@ -175,8 +182,12 @@ export class SecureSessionService {
 
       // Decrypt session data
       let sessionData: SessionData;
+      if (!session || !session.metadata || !session.metadata.encryptedSessionData) {
+        return { isValid: false, error: 'Invalid session data structure' };
+      }
+
       try {
-        const decryptedData = await encryptionService.decryptData(session.token!);
+        const decryptedData = await encryptionService.decryptData(session.metadata.encryptedSessionData as string);
         sessionData = JSON.parse(decryptedData);
       } catch (error) {
         await this.invalidateSession(session_id);
@@ -185,7 +196,8 @@ export class SecureSessionService {
 
       // Validate session fingerprint
       const currentFingerprint = this.createSessionFingerprint(req);
-      if (sessionData.fingerprint !== currentFingerprint) { await this.invalidateSession(session_id);
+      if (sessionData.fingerprint !== currentFingerprint) {
+        await this.invalidateSession(session_id);
         await securityAuditService.logSecurityEvent({
           event_type: 'session_hijack_attempt',
           severity: 'high',
@@ -205,14 +217,17 @@ export class SecureSessionService {
 
       // Validate CSRF token for state-changing requests
       if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
-        if (!csrfToken || !encryptionService.verifyCSRFToken(csrfToken, sessionData.csrfToken)) {
+        // 4. Verify CSRF token
+        if (!csrfToken || csrfToken !== sessionData.csrfToken) {
+          logger.warn({ component: 'Chanuka', session_id }, 'CSRF token mismatch');
           return { isValid: false, error: 'Invalid CSRF token' };
         }
       }
 
       // Check for suspicious activity
       const ip_address = this.getClientIP(req);
-      if (sessionData.ip_address !== ip_address) { await securityAuditService.logSecurityEvent({
+      if (sessionData.ip_address !== ip_address) {
+        await securityAuditService.logSecurityEvent({
           event_type: 'session_ip_change',
           severity: 'medium',
           user_id: sessionData.user_id,
@@ -249,7 +264,7 @@ export class SecureSessionService {
       await getDb()
         .update(sessions)
         .set({ 
-          token: updatedSessionData,
+          metadata: { encryptedSessionData: updatedSessionData }, // Corrected to update metadata
           updated_at: new Date()
         })
         .where(eq(sessions.id, session_id));
@@ -317,7 +332,8 @@ export class SecureSessionService {
   /**
    * Clean up old sessions for a user (keep only the most recent ones)
    */
-  private async cleanupUserSessions(user_id: string): Promise<void> { try {
+  private async cleanupUserSessions(user_id: string): Promise<void> {
+    try {
       // Get all active sessions for user, ordered by creation time
       const userSessions = await getDb()
         .select()
@@ -334,7 +350,7 @@ export class SecureSessionService {
         
         for (const session of sessionsToDeactivate) {
           await this.invalidateSession(session.id);
-         }
+        }
       }
     } catch (error) {
       logger.error('User session cleanup failed:', { component: 'Chanuka' }, error);
@@ -396,23 +412,31 @@ export class SecureSessionService {
     topUserAgents: Array<{ user_agent: string; count: number }>;
   }> {
     try {
-      // This would need proper SQL aggregation in production
-      const activeSessions = await getDb()
-        .select()
+      const now = new Date();
+      
+      const [{ activeCount }] = await getDb()
+        .select({ activeCount: count() })
         .from(sessions)
-        .where(gt(sessions.expires_at, new Date()));
+        .where(gt(sessions.expires_at, now));
 
       const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const recentSessions = activeSessions.filter((s: unknown) => s.created_at! > last24h);
+      
+      const [{ recentCount }] = await getDb()
+        .select({ recentCount: count() })
+        .from(sessions)
+        .where(and(
+          gt(sessions.expires_at, now),
+          gt(sessions.created_at, last24h)
+        ));
 
       return {
-        totalActiveSessions: activeSessions.length,
-        sessionsLast24h: recentSessions.length,
+        totalActiveSessions: activeCount,
+        sessionsLast24h: recentCount,
         averageSessionDuration: 0, // Would calculate from session data
         topUserAgents: [] // Would aggregate from session data
       };
     } catch (error) {
-      logger.error('Failed to get session stats:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Failed to get session stats');
       return {
         totalActiveSessions: 0,
         sessionsLast24h: 0,

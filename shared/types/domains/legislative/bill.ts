@@ -324,3 +324,20 @@ export interface ExtendedBill extends Bill {
   readonly amendments: readonly BillAmendment[];
   readonly relatedBills: readonly RelatedBill[];
 }
+
+/**
+ * Bill Details with populated relationships (for GetBillResponse)
+ */
+export interface BillDetails extends Bill {
+  fullText?: string;
+  cosponsors?: Array<{
+    id: string;
+    name: string;
+    joinedAt: string;
+  }>;
+  commitments?: Array<{
+    id: string;
+    name: string;
+  }>;
+  relatedBills?: readonly RelatedBill[];
+}

@@ -53,7 +53,7 @@ export interface GraphErrorOptions {
 
 export class GraphError extends Error {
   public readonly code: GraphErrorCode;
-  public readonly cause?: Error;
+  public override readonly cause?: Error;
   public readonly context?: Record<string, unknown>;
   public readonly retryable: boolean;
   public readonly timestamp: Date;
@@ -95,13 +95,13 @@ export class GraphErrorHandler {
    */
   handle(error: Error, context?: Record<string, unknown>): void {
     if (error instanceof GraphError) {
-      logger.error('Graph operation error', {
+      logger.error({
         code: error.code,
         message: error.message,
         retryable: error.retryable,
         context: { ...error.context, ...context },
         cause: error.cause?.message,
-      });
+      }, 'Graph operation error');
     } else {
       logger.error({
         message: error.message,
@@ -151,8 +151,9 @@ export class GraphErrorHandler {
    * Create error from Neo4j error.
    */
   fromNeo4jError(error: unknown, context?: Record<string, unknown>): GraphError {
+    const err = error as Error & { code?: string };
     // Neo4j error codes start with "Neo."
-    const neo4jCode = error.code || '';
+    const neo4jCode = err.code || '';
     
     let code: GraphErrorCode = GraphErrorCode.UNKNOWN_ERROR;
     let retryable = false;
@@ -171,8 +172,8 @@ export class GraphErrorHandler {
 
     return new GraphError({
       code,
-      message: error.message || 'Neo4j error occurred',
-      cause: error,
+      message: err.message || 'Neo4j error occurred',
+      cause: err,
       context: { ...context, neo4jCode },
       retryable,
     });

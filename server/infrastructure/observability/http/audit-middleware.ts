@@ -12,6 +12,12 @@
 
 import type { NextFunction, Request, Response } from 'express';
 import { logger } from '../core/logger';
+
+interface AuditRequest extends Request {
+  user?: { id: string; [key: string]: unknown };
+  session?: { id: string; [key: string]: unknown };
+  correlationId?: string;
+}
 import type { AuditLogEntry } from '../core/types';
 import { classifyRisk, classifySecurityEventType, isSensitiveEndpoint } from '../../../features/security/infrastructure/policies/security-policy';
 import { emitSecurityEvent } from '../../../features/security/infrastructure/observability/security-event-logger';
@@ -36,9 +42,11 @@ export function auditMiddleware(req: Request, res: Response, next: NextFunction)
     const statusCode = res.statusCode;
     const riskLevel  = classifyRisk(req, statusCode);
 
+    const auditReq = req as AuditRequest;
+
     const entry: AuditLogEntry = {
       timestamp:     new Date(),
-      user_id:       (req as any).user?.id,
+      user_id:       auditReq.user?.id,
       action:        `${req.method} ${req.path}`,
       resource:      req.path,
       ip:            req.ip ?? req.socket.remoteAddress ?? 'unknown',
@@ -47,8 +55,8 @@ export function auditMiddleware(req: Request, res: Response, next: NextFunction)
       path:          req.path,
       statusCode,
       duration,
-      session_id:    (req as any).session?.id,
-      correlationId: (req as any).correlationId ?? '',
+      session_id:    auditReq.session?.id,
+      correlationId: auditReq.correlationId ?? '',
       sensitive:     isSensitiveEndpoint(req.path, req.method),
       risk_level:    riskLevel,
       response_size: chunk ? Buffer.byteLength(chunk as string | Buffer) : 0,
@@ -83,7 +91,9 @@ export function auditMiddleware(req: Request, res: Response, next: NextFunction)
       });
     }
 
-    return originalEnd(chunk as any, encoding as any);
+    type EndChunk = Buffer | string | Uint8Array;
+    type EndEncoding = BufferEncoding;
+    return originalEnd(chunk as EndChunk, encoding as EndEncoding);
   };
 
   next();

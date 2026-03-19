@@ -88,12 +88,6 @@ function toError(value: unknown): Error & { code?: string; status?: number } {
   return new Error(String(value));
 }
 
-// ---------------------------------------------------------------------------
-// Utility: cast Drizzle query results to any[] to work around type inference issues
-// ---------------------------------------------------------------------------
-function asAnyArray<T>(promise: Promise<T>): Promise<any[]> {
-  return promise as unknown as Promise<any[]>;
-}
 
 // ---------------------------------------------------------------------------
 // Logger helper: pino's overloads only accept a single string argument.
@@ -203,11 +197,11 @@ export class DataSynchronizationService extends EventEmitter {
   /** Get sync job status by ID. */
   async getSyncJobStatus(jobId: string): Promise<SyncJob | null> {
     try {
-      const rows = await asAnyArray(db
+      const rows = await db
         .select()
         .from(syncJobs)
         .where(eq(syncJobs.id, jobId))
-        .limit(1));
+        .limit(1);
 
       if (rows.length === 0) return null;
       
@@ -375,11 +369,11 @@ export class DataSynchronizationService extends EventEmitter {
   }
 
   private async processBillRecord(syncJob: SyncJob, billData: BillData): Promise<void> {
-    const existing = await asAnyArray(db
+    const existing = await db
       .select()
       .from(bills)
       .where(eq(bills.bill_number, billData.bill_number))
-      .limit(1));
+      .limit(1);
 
     if (existing.length > 0) {
       const existingBill: any = existing[0];
@@ -410,11 +404,11 @@ export class DataSynchronizationService extends EventEmitter {
   }
 
   private async processSponsorRecord(syncJob: SyncJob, sponsorData: SponsorData): Promise<void> {
-    const existing = await asAnyArray(db
+    const existing = await db
       .select()
       .from(sponsors)
       .where(eq(sponsors.name, sponsorData.name))
-      .limit(1));
+      .limit(1);
 
     if (existing.length > 0) {
       const existingSponsor: any = existing[0];
@@ -451,7 +445,7 @@ export class DataSynchronizationService extends EventEmitter {
     endpointId: string,
   ): Promise<Date | undefined> {
     try {
-      const rows = await asAnyArray(db
+      const rows = await db
         .select()
         .from(syncJobs)
         .where(
@@ -462,7 +456,7 @@ export class DataSynchronizationService extends EventEmitter {
           ),
         )
         .orderBy(desc(syncJobs.completed_at))
-        .limit(1));
+        .limit(1);
 
       if (rows.length === 0) return undefined;
       const row: any = rows[0];
@@ -474,7 +468,7 @@ export class DataSynchronizationService extends EventEmitter {
   }
 
   private async storeSyncJob(syncJob: SyncJob): Promise<void> {
-    await (db.insert(syncJobs) as any).values({
+    await db.insert(syncJobs).values({
       id: syncJob.id,
       data_source_id: syncJob.dataSourceId,
       job_name: syncJob.endpointId,
@@ -490,8 +484,8 @@ export class DataSynchronizationService extends EventEmitter {
   }
 
   private async updateSyncJob(syncJob: SyncJob): Promise<void> {
-    await (db
-      .update(syncJobs) as any)
+    await db
+      .update(syncJobs)
       .set({
         status: syncJob.status,
         started_at: syncJob.startTime,

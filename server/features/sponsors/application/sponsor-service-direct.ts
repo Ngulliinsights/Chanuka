@@ -2,10 +2,9 @@ import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import {
   bill_sponsorships,
-  type Sponsor,
-  sponsors
+  sponsors,
+  type Sponsor
 } from '@server/infrastructure/schema';
-import { sponsors } from '@server/infrastructure/schema';
 import { and, asc, count, desc, eq, inArray, isNotNull, like, or } from 'drizzle-orm';
 
 // ============================================================================
@@ -99,7 +98,7 @@ export class SponsorService {
             ...sponsorData,
             created_at: now,
             updated_at: now
-          } as any)
+          })
           .returning();
       });
 
@@ -129,7 +128,7 @@ export class SponsorService {
           .set({
             ...updateData,
             updated_at: new Date()
-          } as any)
+          })
           .where(eq(sponsors.id, id))
           .returning();
       });
@@ -161,7 +160,7 @@ export class SponsorService {
     };
     logger.info(logContext, "Setting sponsor active status");
 
-    return this.update(id, { is_active } as any);
+    return this.update(id, { is_active });
   }
 
   async deactivate(id: number): Promise<Sponsor | null> {
@@ -180,30 +179,23 @@ export class SponsorService {
     logger.debug(logContext, "Listing sponsors");
 
     try {
-      let query = readDatabase.select().from(sponsors) as any;
-
       const conditions = [];
       if (options.party) conditions.push(eq(sponsors.party, options.party));
       if (options.role) conditions.push(eq(sponsors.role, options.role));
       if (options.constituency) conditions.push(eq(sponsors.constituency, options.constituency));
       if (options.is_active !== undefined) conditions.push(eq(sponsors.is_active, options.is_active));
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
-
       const sortBy = options.sortBy || 'name';
       const sortOrder = options.sortOrder || 'asc';
-      const sortColumn = sponsors[sortBy as keyof typeof sponsors];
+      const sortColumn = sponsors[sortBy];
 
-      if (sortColumn) {
-        query = query.orderBy(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn));
-      }
-
-      if (options.limit) query = query.limit(options.limit);
-      if (options.offset) query = query.offset(options.offset);
-
-      const results = await query;
+      const results = await readDatabase
+        .select()
+        .from(sponsors)
+        .where(conditions.length > 0 ? and(...conditions) : undefined)
+        .orderBy(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn))
+        .limit(options.limit ?? 1000)
+        .offset(options.offset ?? 0);
 
       logger.debug({ ...logContext, count: results.length }, "✅ Sponsors listed successfully");
 
@@ -220,39 +212,30 @@ export class SponsorService {
 
     try {
       const searchPattern = `%${query}%`;
-      const searchConditions = [
-        like(sponsors.name, searchPattern),
-        like(sponsors.party, searchPattern),
-        like(sponsors.constituency, searchPattern)
+      const additionalConditions = [
+        or(
+          like(sponsors.name, searchPattern),
+          like(sponsors.party, searchPattern),
+          like(sponsors.constituency, searchPattern)
+        )
       ];
 
-      let dbQuery = readDatabase
-        .select()
-        .from(sponsors)
-        .where(or(...searchConditions)) as any;
-
-      const additionalConditions = [];
       if (options.party) additionalConditions.push(eq(sponsors.party, options.party));
       if (options.role) additionalConditions.push(eq(sponsors.role, options.role));
       if (options.constituency) additionalConditions.push(eq(sponsors.constituency, options.constituency));
       if (options.is_active !== undefined) additionalConditions.push(eq(sponsors.is_active, options.is_active));
 
-      if (additionalConditions.length > 0) {
-        dbQuery = dbQuery.where(and(or(...searchConditions), ...additionalConditions));
-      }
-
       const sortBy = options.sortBy || 'name';
       const sortOrder = options.sortOrder || 'asc';
-      const sortColumn = sponsors[sortBy as keyof typeof sponsors];
+      const sortColumn = sponsors[sortBy];
 
-      if (sortColumn) {
-        dbQuery = dbQuery.orderBy(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn));
-      }
-
-      if (options.limit) dbQuery = dbQuery.limit(options.limit);
-      if (options.offset) dbQuery = dbQuery.offset(options.offset);
-
-      const results = await dbQuery;
+      const results = await readDatabase
+        .select()
+        .from(sponsors)
+        .where(and(...additionalConditions))
+        .orderBy(sortOrder === 'desc' ? desc(sortColumn) : asc(sortColumn))
+        .limit(options.limit ?? 1000)
+        .offset(options.offset ?? 0);
 
       logger.debug({ ...logContext, count: results.length }, "✅ Sponsor search completed");
 
@@ -317,17 +300,18 @@ export class SponsorService {
 
     try {
       const results = await readDatabase
-        .selectDistinct({ party: sponsors.party })
+        .select({ party: sponsors.party })
         .from(sponsors)
         .where(and(
           eq(sponsors.is_active, true),
           isNotNull(sponsors.party)
         ))
+        .groupBy(sponsors.party)
         .orderBy(asc(sponsors.party));
 
       const parties = results
-        .map(r => r.party)
-        .filter((party): party is string => Boolean(party));
+        .map((r: { party: string | null }) => r.party)
+        .filter((party: string | null): party is string => Boolean(party));
 
       logger.debug({ ...logContext, count: parties.length }, "✅ Unique parties retrieved");
 
@@ -343,18 +327,19 @@ export class SponsorService {
     logger.debug(logContext, "Fetching unique constituencies");
 
     try {
-      const results = await this.database
-        .selectDistinct({ constituency: sponsors.constituency })
+      const results = await readDatabase
+        .select({ constituency: sponsors.constituency })
         .from(sponsors)
         .where(and(
           eq(sponsors.is_active, true),
           isNotNull(sponsors.constituency)
         ))
+        .groupBy(sponsors.constituency)
         .orderBy(asc(sponsors.constituency));
 
       const constituencies = results
         .map(r => r.constituency)
-        .filter((constituency): constituency is string => Boolean(constituency));
+        .filter((constituency: string | null): constituency is string => Boolean(constituency));
 
       logger.debug({ ...logContext, count: constituencies.length }, "✅ Unique constituencies retrieved");
 
@@ -420,16 +405,15 @@ export class SponsorService {
     logger.debug(logContext, "Fetching bill sponsorships initiated by sponsor");
 
     try {
-      let query = readDatabase
+      const results = await readDatabase
         .select()
         .from(bill_sponsorships)
-        .where(eq(bill_sponsorships.sponsor_id, sponsor_id)) as any;
-
-      if (activeOnly) {
-        query = query.where(eq(bill_sponsorships.is_active, true));
-      }
-
-      const results = await query.orderBy(desc(bill_sponsorships.sponsorship_date));
+        .where(
+          activeOnly
+            ? and(eq(bill_sponsorships.sponsor_id, sponsor_id), eq(bill_sponsorships.is_active, true))
+            : eq(bill_sponsorships.sponsor_id, sponsor_id)
+        )
+        .orderBy(desc(bill_sponsorships.sponsorship_date));
 
       logger.debug({ ...logContext, count: results.length }, "✅ Bill sponsorships retrieved");
       return results;
@@ -449,16 +433,15 @@ export class SponsorService {
     logger.debug(logContext, "Fetching all sponsors for a bill");
 
     try {
-      let query = readDatabase
+      const results = await readDatabase
         .select()
         .from(bill_sponsorships)
-        .where(eq(bill_sponsorships.bill_id, bill_id)) as any;
-
-      if (activeOnly) {
-        query = query.where(eq(bill_sponsorships.is_active, true));
-      }
-
-      const results = await query.orderBy(asc(bill_sponsorships.sponsorship_date));
+        .where(
+          activeOnly
+            ? and(eq(bill_sponsorships.bill_id, bill_id), eq(bill_sponsorships.is_active, true))
+            : eq(bill_sponsorships.bill_id, bill_id)
+        )
+        .orderBy(asc(bill_sponsorships.sponsorship_date));
 
       logger.debug({ ...logContext, count: results.length }, "✅ Bill sponsors retrieved");
       return results;
@@ -496,7 +479,7 @@ export class SponsorService {
             is_active: true,
             created_at: now,
             updated_at: now
-          } as any)
+          })
           .returning();
       });
 

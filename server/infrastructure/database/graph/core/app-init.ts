@@ -2,10 +2,10 @@
  * Application Initialization (REFACTORED)
  * IMPROVEMENTS: Proper error handling, validation, logging
  */
-import { Driver, driver as neo4jDriver } from 'neo4j-driver';
+import neo4j, { Driver } from 'neo4j-driver';
 
-import { initializeSyncService, shutdownSyncService } from './core/sync-executor';
-import { initializeGraphSchema } from './core/schema';
+import { initializeSyncService, shutdownSyncService } from './sync-executor';
+import { initializeGraphSchema } from './schema';
 import { NEO4J_CONFIG, SYNC_CONFIG, validateConfig } from '../config/graph-config';
 import { logger } from '@server/infrastructure/observability';
 
@@ -19,9 +19,9 @@ export async function initializeGraphDatabase(): Promise<Driver> {
     validateConfig();
 
     // Create driver
-    appDriver = neo4jDriver.driver(
+    appDriver = neo4j.driver(
       NEO4J_CONFIG.URI,
-      neo4jDriver.auth.basic(NEO4J_CONFIG.USER, NEO4J_CONFIG.PASSWORD),
+      neo4j.auth.basic(NEO4J_CONFIG.USER, NEO4J_CONFIG.PASSWORD),
       {
         maxConnectionPoolSize: NEO4J_CONFIG.MAX_CONNECTION_POOL_SIZE,
         connectionTimeout: NEO4J_CONFIG.CONNECTION_TIMEOUT_MS,
@@ -51,7 +51,7 @@ export async function initializeGraphDatabase(): Promise<Driver> {
     logger.info('Graph database initialized successfully');
     return appDriver;
   } catch (error) {
-    logger.error({ error: error.message }, 'Failed to initialize graph database');
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to initialize graph database');
     throw error;
   }
 }
@@ -69,7 +69,7 @@ export async function shutdownGraphDatabase(): Promise<void> {
 
     logger.info('Graph database shut down successfully');
   } catch (error) {
-    logger.error({ error: error.message }, 'Error during shutdown');
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error during shutdown');
   }
 }
 

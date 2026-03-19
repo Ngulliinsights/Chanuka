@@ -2,8 +2,8 @@
  * Test Harness (REFACTORED)
  * IMPROVEMENTS: Fixed session leaks, proper cleanup, error handling
  */
-import { Driver, driver as neo4jDriver } from 'neo4j-driver';
-import { withSession } from './utils/session-manager';
+import neo4j, { Driver } from 'neo4j-driver';
+import { withSession } from './session-manager';
 import { logger } from '@server/infrastructure/observability';
 
 let testDriver: Driver | null = null;
@@ -16,9 +16,9 @@ export async function setupGraphTestEnvironment(): Promise<Driver> {
     return 'neo4j'; // Test environment only
   })();
   
-  testDriver = neo4jDriver.driver(
+  testDriver = neo4j.driver(
     process.env.NEO4J_TEST_URI || 'bolt://localhost:7687',
-    neo4jDriver.auth.basic(
+    neo4j.auth.basic(
       process.env.NEO4J_TEST_USER || 'neo4j',
       testPassword
     )
@@ -41,11 +41,11 @@ export async function teardownGraphTestEnvironment(): Promise<void> {
     testDriver = null;
     logger.info('Test environment cleaned up');
   } catch (error) {
-    logger.error({ error: error.message }, 'Test cleanup failed');
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Test cleanup failed');
   }
 }
 
-export async function createTestData(driver: Driver, data: unknown): Promise<void> {
+export async function createTestData(driver: Driver, data: { nodes?: any[], relationships?: any[] }): Promise<void> {
   await withSession(driver, async (session) => {
     for (const item of data.nodes || []) {
       await session.run(

@@ -94,6 +94,12 @@ export function sanitizeHtml(input: string, options: SanitizationOptions = {}): 
 
   let sanitized = input;
 
+  // Remove script and event handlers completely first
+  sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  sanitized = sanitized.replace(/on\w+="[^"]*"/gi, '');
+  sanitized = sanitized.replace(/on\w+='[^']*'/gi, '');
+  sanitized = sanitized.replace(/javascript:/gi, '');
+
   // Remove potentially dangerous HTML
   if (!options.allowHtml) {
     sanitized = sanitized.replace(/<[^>]*>/g, '');
@@ -125,11 +131,7 @@ export function sanitizeHtml(input: string, options: SanitizationOptions = {}): 
     );
   }
 
-  // Remove script and event handlers
-  sanitized = sanitized.replace(/<script[^>]*>.*?<\/script>/gi, '');
-  sanitized = sanitized.replace(/on\w+="[^"]*"/gi, '');
-  sanitized = sanitized.replace(/on\w+='[^']*'/gi, '');
-  sanitized = sanitized.replace(/javascript:/gi, '');
+  // Event handlers already removed above
 
   // Trim and limit length
   sanitized = sanitized.trim();
@@ -387,7 +389,13 @@ export function validateEmail(email: string): SecurityValidationResult {
   }
 
   // Check for suspicious patterns
-  if (email.includes('..') || email.startsWith('.') || email.endsWith('.')) {
+  if (
+    email.includes('..') || 
+    email.startsWith('.') || 
+    email.endsWith('.') ||
+    email.includes('.@') ||
+    email.includes('@.')
+  ) {
     errors.push('Invalid email format');
   }
 

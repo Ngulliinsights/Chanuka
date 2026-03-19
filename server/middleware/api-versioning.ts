@@ -12,6 +12,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '@server/infrastructure/observability';
 
+/** Express Request extended with the resolved API version. */
+interface VersionedRequest extends Request {
+  apiVersion?: string;
+}
+
 export interface ApiVersionConfig {
   /**
    * Current API version (default version for unversioned requests)
@@ -119,7 +124,7 @@ export function createApiVersioningMiddleware(config: Partial<ApiVersionConfig> 
     }
 
     // Attach version to request
-    (req as any).apiVersion = effectiveVersion;
+    (req as VersionedRequest).apiVersion = effectiveVersion;
 
     // Add version header to response
     res.setHeader('X-API-Version', effectiveVersion);
@@ -206,7 +211,7 @@ export function createApiVersioningMiddleware(config: Partial<ApiVersionConfig> 
  */
 export function versionedHandler(handlers: Record<string, (req: Request, res: Response, next: NextFunction) => void | Promise<void>>) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const version = (req as any).apiVersion || 'v1';
+    const version = (req as VersionedRequest).apiVersion || 'v1';
     const handler = handlers[version];
 
     if (!handler) {
@@ -234,7 +239,7 @@ export function versionedHandler(handlers: Record<string, (req: Request, res: Re
  */
 export function requireVersion(requiredVersion: string) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const version = (req as any).apiVersion;
+    const version = (req as VersionedRequest).apiVersion;
 
     if (version !== requiredVersion) {
       logger.warn(
@@ -257,7 +262,7 @@ export function requireVersion(requiredVersion: string) {
  * Get API version from request
  */
 export function getApiVersion(req: Request): string {
-  return (req as any).apiVersion || 'v1';
+  return (req as VersionedRequest).apiVersion || 'v1';
 }
 
 /**

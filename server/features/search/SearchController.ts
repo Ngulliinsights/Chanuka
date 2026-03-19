@@ -559,7 +559,7 @@ router.get('/live', asyncHandler(async (req: Request, res: Response) => {
  */
 router.get('/recent', asyncHandler(async (req: Request, res: Response) => {
   const limit = Math.min(Number(req.query.limit) || 5, 20);
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getRecentSearches(limit, userId);
   res.json(results);
 }));
@@ -569,7 +569,7 @@ router.get('/recent', asyncHandler(async (req: Request, res: Response) => {
  */
 router.get('/history', asyncHandler(async (req: Request, res: Response) => {
   const limit = Math.min(Number(req.query.limit) || 20, 100);
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getHistory(userId, limit);
   res.json(results);
 }));
@@ -578,7 +578,7 @@ router.get('/history', asyncHandler(async (req: Request, res: Response) => {
  * DELETE /search/history - Clear search history
  */
 router.delete('/history', asyncHandler(async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   await searchRepository.clearHistory(userId);
   res.json({ success: true });
 }));
@@ -588,7 +588,7 @@ router.delete('/history', asyncHandler(async (req: Request, res: Response) => {
  */
 router.post('/saved', asyncHandler(async (req: Request, res: Response) => {
   const { name, query, description, is_public, tags } = req.body;
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
 
   const saved = await searchRepository.saveSearch({
     userId,
@@ -606,7 +606,7 @@ router.post('/saved', asyncHandler(async (req: Request, res: Response) => {
  * GET /search/saved - Get saved searches
  */
 router.get('/saved', asyncHandler(async (req: Request, res: Response) => {
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const results = await searchRepository.getSavedSearches(userId);
   res.json(results);
 }));
@@ -619,7 +619,7 @@ router.delete('/saved/:id', asyncHandler(async (req: Request, res: Response) => 
   if (!id) {
     throw new ValidationError('Search ID is required');
   }
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
   const deleted = await searchRepository.deleteSavedSearch(id, userId ?? 'anonymous');
   res.json({ success: deleted });
 }));
@@ -633,7 +633,7 @@ router.post('/saved/:id/execute', asyncHandler(async (req: Request, res: Respons
   if (!id) {
     throw new ValidationError('Search ID is required');
   }
-  const userId = (req as any).user?.id;
+  const userId = (req).user?.id;
 
   const query = await searchRepository.getAndUpdateSavedSearch(id, userId ?? 'anonymous');
 

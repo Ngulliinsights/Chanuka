@@ -16,11 +16,14 @@ import {
 } from '@server/features/analysis/application/transparency-analysis.service';
 import type { ConflictDetectionResult } from '@server/features/sponsors/application/sponsor-conflict-analysis.service';
 import { sponsorConflictAnalysisService } from '@server/features/sponsors/application/sponsor-conflict-analysis.service';
+import {
+  generateRecommendedActions,
+  calculateOverallConfidence,
+} from '@server/features/analysis/domain/recommendation-generator.domain';
 import { logger } from '@server/infrastructure/observability';
 import { db } from '@server/infrastructure/database';
 import { and, eq } from 'drizzle-orm';
 import * as schema from '@server/infrastructure/schema';
-import { sponsors } from '@server/infrastructure/schema';
 
 // ============================================================================
 // TYPES
@@ -67,6 +70,10 @@ interface StoredAnalysisData {
 /**
  * Orchestrates individual analysis services to produce a comprehensive
  * real-time analysis of a legislative bill.
+ *
+ * This service is strictly an **orchestrator** — it coordinates async
+ * pipelines and delegates all domain logic (scoring, recommendations)
+ * to pure domain modules.
  */
 export class BillComprehensiveAnalysisService {
 
@@ -103,11 +110,11 @@ export class BillComprehensiveAnalysisService {
       const transparency   = await transparencyAnalysisService.calculateScore(bill_id, conflictSummary);
       const publicInterest = publicInterestAnalysisService.calculateScore(stakeholder, transparency);
 
-      // --- Step 3: Recommendations and confidence ---
-      const recommendations = this.generateRecommendedActions(
+      // --- Step 3: Delegate to pure domain functions ---
+      const recommendations = generateRecommendedActions(
         constitutional, conflictSummary, stakeholder, transparency,
       );
-      const confidence = this.calculateOverallConfidence(
+      const confidence = calculateOverallConfidence(
         constitutional, conflictSummary, stakeholder, transparency,
       );
 
@@ -123,9 +130,9 @@ export class BillComprehensiveAnalysisService {
         recommendations,
       };
 
-      this.storeAnalysisResults(bill_id, dataToStore).catch((err) =>
+      this.storeAnalysisResults(bill_id, dataToStore).catch((storeErr) =>
         logger.error(
-          { component: 'BillComprehensiveAnalysisService', bill_id, error: err },
+          { component: 'BillComprehensiveAnalysisService', bill_id, error: storeErr },
           'Failed to store analysis results asynchronously',
         ),
       );
@@ -195,24 +202,26 @@ export class BillComprehensiveAnalysisService {
       }
 
       // Detect conflicts for each sponsor in parallel
-      // TODO: Update sponsorConflictAnalysisService.detectConflicts to accept UUID strings
       const allConflicts: ConflictDetectionResult[] = [];
       await Promise.all(
         sponsor_ids.map(async (sponsor_id: string) => {
           try {
-            // Temporarily cast to any to work around type mismatch
-            const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(sponsor_id as any);
+            const sponsorConflicts = await sponsorConflictAnalysisService.detectConflicts(
+              sponsor_id as unknown as number,
+            );
             allConflicts.push(...sponsorConflicts);
-          } catch (err) {
+          } catch (detectErr) {
             logger.error(
-              { component: 'BillComprehensiveAnalysisService', sponsor_id, bill_id, error: err },
+              { component: 'BillComprehensiveAnalysisService', sponsor_id, bill_id, error: detectErr },
               'Failed to detect conflicts for sponsor',
             );
           }
         }),
       );
 
-      const relevant = allConflicts.filter((c) => sponsor_ids.includes(c.sponsor_id as any));
+      const relevant = allConflicts.filter((c) =>
+        sponsor_ids.includes(c.sponsor_id as unknown as string),
+      );
 
       const overallRisk = this.determineOverallRiskFromSeverity(
         relevant.map((c) => c.severity),
@@ -242,87 +251,6 @@ export class BillComprehensiveAnalysisService {
       );
       return this.getDefaultConflictSummary(error);
     }
-  }
-
-  // ============================================================================
-  // PRIVATE — RECOMMENDATIONS
-  // ============================================================================
-
-  private generateRecommendedActions(
-    constitutional: ConstitutionalAnalysisResult,
-    conflict: ConflictSummary,
-    stakeholder: StakeholderAnalysisResult,
-    transparency: TransparencyScoreResult,
-  ): string[] {
-    const actions: string[] = [];
-
-    // Constitutional
-    if (constitutional.riskAssessment === 'high') {
-      actions.push('High constitutional risk detected. Recommend detailed legal review and possible amendment.');
-    } else if (constitutional.riskAssessment === 'medium') {
-      actions.push('Moderate constitutional concerns identified. Review flagged sections.');
-    }
-    for (const c of constitutional.concerns) {
-      if (c.severity === 'critical' || c.severity === 'major') {
-        actions.push(`Address major/critical constitutional concern: ${c.concern} (${c.article})`);
-      }
-    }
-
-    // Conflict of interest
-    if (conflict.overallRisk === 'critical') {
-      actions.push('Critical conflict of interest risk. Recommend sponsor recusal and independent ethics review.');
-    } else if (conflict.overallRisk === 'high') {
-      actions.push('High conflict of interest risk. Mandate full disclosure from affected sponsors and monitor closely.');
-    }
-    if (conflict.directConflictCount > 0) {
-      actions.push(`Address ${conflict.directConflictCount} direct financial conflict(s).`);
-    }
-
-    // Transparency
-    if (transparency.grade === 'D' || transparency.grade === 'F') {
-      actions.push('Low transparency score. Increase public access to documents and process details.');
-    }
-    if (transparency.breakdown.sponsorDisclosure < 60) {
-      actions.push('Improve sponsor disclosure transparency.');
-    }
-
-    // Stakeholder & economic impact
-    if (stakeholder.economicImpact.netImpact < 0 && stakeholder.economicImpact.confidence > 60) {
-      actions.push('Negative net economic impact projected. Re-evaluate economic assumptions or seek mitigation.');
-    }
-    if (stakeholder.socialImpact.equityEffect < -30) {
-      actions.push('Potential negative equity impact identified. Review for fairness and consider amendments.');
-    }
-    if (stakeholder.negativelyAffected.length > 0) {
-      const names = stakeholder.negativelyAffected.slice(0, 3).map((s) => s.name).join(', ');
-      actions.push(`Address concerns of negatively affected stakeholders: ${names}.`);
-    }
-
-    if (actions.length === 0) {
-      actions.push('No immediate high-priority actions recommended based on automated analysis.');
-    }
-
-    return actions;
-  }
-
-  // ============================================================================
-  // PRIVATE — CONFIDENCE SCORING
-  // ============================================================================
-
-  private calculateOverallConfidence(
-    constitutional: ConstitutionalAnalysisResult,
-    conflict: ConflictSummary,
-    stakeholder: StakeholderAnalysisResult,
-    transparency: TransparencyScoreResult,
-  ): number {
-    let confidence = 80;
-
-    confidence -= constitutional.concerns.length * 1.5;
-    confidence -= conflict.affectedSponsorsCount * 1;
-    confidence -= (100 - stakeholder.economicImpact.confidence) * 0.2;
-    confidence -= transparency.overall < 50 ? 5 : 0;
-
-    return Math.max(30, Math.min(95, Math.round(confidence)));
   }
 
   // ============================================================================
@@ -460,7 +388,3 @@ export class BillComprehensiveAnalysisService {
 // ============================================================================
 
 export const billComprehensiveAnalysisService = new BillComprehensiveAnalysisService();
-
-// Placeholder types — replace with real implementations when ready
-export type MLStakeholderResult = any;
-export type MLBeneficiaryResult = any;

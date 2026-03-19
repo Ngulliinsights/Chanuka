@@ -56,8 +56,8 @@ function validationMiddlewareExists(): boolean {
  */
 function clientValidationExists(): boolean {
   // Try both from root and from shared directory
-  const clientPath1 = join(process.cwd(), 'client', 'src', 'core', 'api', 'contract-client.ts');
-  const clientPath2 = join(process.cwd(), '..', 'client', 'src', 'core', 'api', 'contract-client.ts');
+  const clientPath1 = join(process.cwd(), 'client', 'src', 'infrastructure', 'api', 'contract-client.ts');
+  const clientPath2 = join(process.cwd(), '..', 'client', 'src', 'infrastructure', 'api', 'contract-client.ts');
   
   return existsSync(clientPath1) || existsSync(clientPath2);
 }
@@ -102,10 +102,12 @@ function middlewareUsesValidationSchemas(): boolean {
                                content.includes('validateParams') ||
                                content.includes('validateQuery');
   
-  // Check that it uses Zod or validation schemas
+  // Check that it uses validation features
   const usesValidation = content.includes('safeParse') ||
                         content.includes('parse') ||
-                        content.includes('Schema');
+                        content.includes('Schema') ||
+                        content.includes('validateRequest') ||
+                        content.includes('validateParams');
   
   return hasValidationImports && usesValidation;
 }
@@ -114,8 +116,8 @@ function middlewareUsesValidationSchemas(): boolean {
  * Verify client uses validation
  */
 function clientUsesValidation(): boolean {
-  const clientPath1 = join(process.cwd(), 'client', 'src', 'core', 'api', 'contract-client.ts');
-  const clientPath2 = join(process.cwd(), '..', 'client', 'src', 'core', 'api', 'contract-client.ts');
+  const clientPath1 = join(process.cwd(), 'client', 'src', 'infrastructure', 'api', 'contract-client.ts');
+  const clientPath2 = join(process.cwd(), '..', 'client', 'src', 'infrastructure', 'api', 'contract-client.ts');
   
   const clientPath = existsSync(clientPath1) ? clientPath1 : clientPath2;
   

@@ -3,7 +3,7 @@
  * IMPROVEMENTS: Fixed Cypher injection, N+1 queries, session leaks
  */
 import { Driver } from 'neo4j-driver';
-import { executeCypherSafely, executeBatch } from '../utils/session-manager';
+import { executeCypherSafely } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
@@ -50,7 +50,7 @@ export async function findSimilarUsers(driver: Driver, userId: string, limit: nu
       { userId, limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       user_id: r.get('user_id'),
       email: r.get('email'),
       shared_votes: Number(r.get('shared_votes'))

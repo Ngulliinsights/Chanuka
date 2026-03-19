@@ -5,8 +5,7 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely, withReadSession } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function discoverInfluenceNetwork(driver: Driver, personId: string, maxDepth: number = 2): Promise<unknown[]> {
@@ -19,7 +18,7 @@ export async function discoverInfluenceNetwork(driver: Driver, personId: string,
          RETURN path LIMIT 100`,
         { personId, maxDepth }
       );
-      return result.records.map(r => r.get('path'));
+      return result.records.map((r: import('neo4j-driver').Record) => r.get('path'));
     });
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'discoverInfluenceNetwork', personId });
@@ -39,7 +38,7 @@ export async function findCommunities(driver: Driver, threshold: number = 0.7): 
       { threshold },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({ person1: r.get('person1'), person2: r.get('person2'), votes: r.get('shared_votes') }));
+    return result.records.map((r: import('neo4j-driver').Record) => ({ person1: r.get('person1'), person2: r.get('person2'), votes: r.get('shared_votes') }));
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'findCommunities' });
     throw new GraphError({ code: GraphErrorCode.QUERY_FAILED, message: 'Community detection failed', cause: error as Error });

@@ -6,8 +6,7 @@ import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { withPagination, PaginationOptions } from '../utils/query-builder';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { logger } from '@server/infrastructure/observability';
-
+// Removed unused logger import
 const errorHandler = new GraphErrorHandler();
 
 export async function getParliamentarySession(driver: Driver, sessionId: string): Promise<any> {
@@ -26,7 +25,8 @@ export async function getParliamentarySession(driver: Driver, sessionId: string)
     
     if (result.records.length === 0) return null;
     
-    const r = result.records[0];
+    const r = result.records[0] as import('neo4j-driver').Record | undefined;
+    if (!r) return null;
     return {
       id: r.get('id'),
       parliament_number: r.get('parliament_number'),
@@ -52,7 +52,7 @@ export async function getActiveMPs(driver: Driver, options: PaginationOptions = 
   
   try {
     const result = await executeCypherSafely(driver, query, params, { mode: 'READ' });
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       id: r.get('id'),
       name: r.get('name'),
       constituency: r.get('constituency'),

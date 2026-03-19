@@ -2,7 +2,7 @@
  * Network Queries (REFACTORED)
  * IMPROVEMENTS: Added LIMIT clauses, pagination, proper error handling
  */
-import type { Driver } from 'neo4j-driver';
+import type { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { executeCypherSafely } from '../utils/session-manager';
@@ -23,7 +23,7 @@ export async function getConnectedNodes(driver: Driver, nodeId: string, options:
 
   try {
     const result = await executeCypherSafely(driver, query, { ...params, nodeId }, { mode: 'READ' });
-    return result.records.map((r: unknown) => ({
+    return result.records.map((r: Neo4jRecord) => ({
       id: r.get('id'),
       relationship_type: r.get('relationship_type'),
       node_type: r.get('node_type')
@@ -52,9 +52,12 @@ export async function findShortestPath(driver: Driver, fromId: string, toId: str
 
     if (result.records.length === 0) return null;
 
+    const r = result.records[0] as Neo4jRecord | undefined;
+    if (!r) return null;
+
     return {
-      path: result.records[0].get('path'),
-      length: Number(result.records[0].get('pathLength'))
+      path: r.get('path'),
+      length: Number(r.get('pathLength'))
     };
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'findShortestPath', fromId, toId });

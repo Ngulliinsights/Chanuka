@@ -5,7 +5,6 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { validateData } from '@server/infrastructure/validation/validation-helpers';
 import { createValidationError } from '@server/infrastructure/error-handling';
 import {
   GlobalSearchSchema,
@@ -18,76 +17,82 @@ import {
   GetPopularSearchesSchema,
 } from '../../application/search-validation.schemas';
 
-export async function validateGlobalSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateGlobalSearch(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(GlobalSearchSchema, req.query);
+    const validation = await GlobalSearchSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid search parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateBillSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateBillSearch(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(BillSearchSchema, req.query);
+    const validation = await BillSearchSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid bill search parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateUserSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateUserSearch(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(UserSearchSchema, req.query);
+    const validation = await UserSearchSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid user search parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateCommentSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateCommentSearch(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(CommentSearchSchema, req.query);
+    const validation = await CommentSearchSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid comment search parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateAutocomplete(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateAutocomplete(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(AutocompleteSchema, req.query);
+    const validation = await AutocompleteSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid autocomplete parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateSaveSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateSaveSearch(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(SaveSearchSchema, req.body);
+    const validation = await SaveSearchSchema.safeParseAsync(req.body);
     if (!validation.success) {
-      return next(createValidationError('Invalid save search data', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
     req.body = validation.data;
     next();
@@ -96,29 +101,31 @@ export async function validateSaveSearch(req: Request, res: Response, next: Next
   }
 }
 
-export async function validateGetSearchHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateGetSearchHistory(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(GetSearchHistorySchema, {
+    const validation = await GetSearchHistorySchema.safeParseAsync({
       ...req.query,
       user_id: req.params.userId || req.query.user_id,
     });
     if (!validation.success) {
-      return next(createValidationError('Invalid search history parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-export async function validateGetPopularSearches(req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function validateGetPopularSearches(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
-    const validation = await validateData(GetPopularSearchesSchema, req.query);
+    const validation = await GetPopularSearchesSchema.safeParseAsync(req.query);
     if (!validation.success) {
-      return next(createValidationError('Invalid popular searches parameters', validation.errors));
+      const errors = validation.error.errors.map(err => ({ field: err.path.join('.'), message: err.message }));
+      return next(createValidationError(errors, { service: 'search-validation' }));
     }
-    req.query = validation.data as any;
+    req.query = validation.data as unknown as Request['query'];
     next();
   } catch (error) {
     next(error);

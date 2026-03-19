@@ -5,8 +5,7 @@
 import { Driver } from 'neo4j-driver';
 import { executeCypherSafely } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
-import { RECOMMENDATION_CONFIG } from '../config/graph-config';
-
+// Removed unused config import
 const errorHandler = new GraphErrorHandler();
 
 export async function recommendBills(driver: Driver, userId: string, limit: number = 10): Promise<unknown[]> {
@@ -25,7 +24,7 @@ export async function recommendBills(driver: Driver, userId: string, limit: numb
       { userId, limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       id: r.get('id'),
       title: r.get('title'),
       score: Number(r.get('score'))
@@ -51,7 +50,7 @@ export async function recommendUsers(driver: Driver, userId: string, limit: numb
       { userId, limit },
       { mode: 'READ' }
     );
-    return result.records.map(r => ({
+    return result.records.map((r: import('neo4j-driver').Record) => ({
       id: r.get('id'),
       email: r.get('email'),
       score: Number(r.get('score'))

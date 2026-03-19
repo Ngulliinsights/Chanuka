@@ -4,7 +4,7 @@
  * In-memory cache with type safety, error handling, and TTL support.
  */
 import { logger } from '@server/infrastructure/observability';
-import { CACHE_CONFIG } from './config/graph-config';
+import { CACHE_CONFIG } from '../config/graph-config';
 
 export interface CacheEntry<T> {
   value: T;

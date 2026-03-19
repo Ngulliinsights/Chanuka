@@ -8,6 +8,7 @@
  */
 
 import { logger as _logger } from '../observability';
+import { isDestroyable } from './interfaces';
 
 import type {
   CacheService,
@@ -748,13 +749,13 @@ export class SingleFlightCache implements CacheService {
   /**
    * Cleanup resources
    */
-  destroy(): void {
+  async destroy(): Promise<void> {
     this.pending.clear();
     this.circuitBreakers.clear();
     this.fallbackCache.clear();
     
-    if (this.adapter && typeof (this.adapter as any).destroy === 'function') {
-      (this.adapter as any).destroy();
+    if (this.adapter && isDestroyable(this.adapter)) {
+      await this.adapter.destroy();
     }
   }
 }

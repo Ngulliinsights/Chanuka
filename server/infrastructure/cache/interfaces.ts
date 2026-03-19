@@ -631,8 +631,7 @@ export interface MultiTierCacheConfig extends BaseCacheConfig {
  *     case 'multi-tier':
  *       // config is narrowed to MultiTierCacheConfig
  *       return new MultiTierCacheAdapter(config);
- *     default:
- *       throw new Error(`Unsupported cache type: ${(config as any).type}`);
+ *       throw new Error(`Unsupported cache type: ${String((config as Record<string, unknown>).type)}`);
  *   }
  * }
  * ```
@@ -787,5 +786,60 @@ export interface CacheStatistics {
   };
 }
 
+/**
+ * Interface for components that require explicit cleanup.
+ */
+export interface Destroyable {
+  destroy(): Promise<void> | void;
+}
+
+/**
+ * Type guard to check if an object implements Destroyable.
+ */
+export function isDestroyable(obj: unknown): obj is Destroyable {
+  return typeof obj === 'object' && obj !== null && typeof (obj as Record<string, unknown>).destroy === 'function';
+}
+
+/**
+ * Interface for cache adapters that support tag-based invalidation.
+ */
+export interface TagInvalidatable {
+  invalidateByTags(tags: string[]): Promise<number>;
+}
+
+/**
+ * Type guard for tag invalidation support.
+ */
+export function isTagInvalidatable(obj: unknown): obj is TagInvalidatable {
+  return typeof obj === 'object' && obj !== null && typeof (obj as Record<string, unknown>).invalidateByTags === 'function';
+}
+
+/**
+ * Interface for adapters that return custom health models.
+ */
+export interface CustomHealthCheckable {
+  getHealth(): Promise<Record<string, unknown>>;
+}
+
+/**
+ * Type guard for custom health checks.
+ */
+export function isCustomHealthCheckable(obj: unknown): obj is CustomHealthCheckable {
+  return typeof obj === 'object' && obj !== null && typeof (obj as Record<string, unknown>).getHealth === 'function';
+}
+
+/**
+ * Interface for cache strategy statistics.
+ */
+export interface StatsProvider {
+  getStats(): Record<string, unknown>;
+}
+
+/**
+ * Type guard for statistics reporting.
+ */
+export function isStatsProvider(obj: unknown): obj is StatsProvider {
+  return typeof obj === 'object' && obj !== null && typeof (obj as Record<string, unknown>).getStats === 'function';
+}
 
 

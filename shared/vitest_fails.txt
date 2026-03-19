@@ -1,0 +1,17 @@
+utils/shared-utilities.test.ts :: should handle empty string correlation ID :: AssertionError: expected null to be '' // Object.is equality
+utils/shared-utilities.test.ts :: should handle nested correlation ID contexts :: AssertionError: expected 'outer-id' to be null
+__tests__/migration-type-generation.property.test.ts :: should have type generation infrastructure in place :: AssertionError: expected false to be true // Object.is equality
+__tests__/migration-type-generation.property.test.ts :: should generate types for all core tables :: AssertionError: expected 0 to be greater than 0
+utils/errors/transform.test.ts :: should use existing correlation ID when available :: AssertionError: expected 'corr-1773899372704-nsnx255o8' to be 'test-correlation-123' // Object.is equality
+utils/errors/transform.test.ts :: should use existing correlation ID when available :: AssertionError: expected 'corr-1773899372746-v1yinsaze' to be 'test-correlation-456' // Object.is equality
+utils/errors/transform.test.ts :: should use existing correlation ID when available :: AssertionError: expected 'corr-1773899372755-n0mljhrjz' to be 'test-correlation-789' // Object.is equality
+utils/errors/transform.test.ts :: should use existing correlation ID when available :: AssertionError: expected 'corr-1773899372769-noh9iqqm4' to be 'test-correlation-create' // Object.is equality
+utils/errors/transform.test.ts :: should propagate correlation ID through database error transformation :: AssertionError: expected 'corr-1773899372777-g6wwyb5t6' to be 'f8d32445-9e11-46b2-a974-b02db351864b' // Object.is equality
+utils/errors/transform.test.ts :: should propagate correlation ID through validation error transformation :: AssertionError: expected 'corr-1773899372782-jnlls5mtk' to be '694ece24-9b2a-4365-96c9-c4aaf8a965b9' // Object.is equality
+utils/errors/transform.test.ts :: should propagate correlation ID through network error transformation :: AssertionError: expected 'corr-1773899372785-lngynfpvj' to be '72b2b654-19b4-4854-ba2f-38afbe1d57ad' // Object.is equality
+utils/errors/transform.test.ts :: should propagate correlation ID through toStandardError :: AssertionError: expected 'corr-1773899372791-38l2yk3c7' to be '5421a4b6-4744-426d-bbb4-6b1816de6f35' // Object.is equality
+utils/errors/transform.test.ts :: should maintain same correlation ID across multiple transformations :: AssertionError: expected 'corr-1773899372796-vswkwr7i9' to be 'f7cdecee-10d7-427b-b892-3d81fbb6ab96' // Object.is equality
+validation/schemas/validation-schemas.test.ts :: should reject invalid phone format :: AssertionError: expected true to be false // Object.is equality
+validation/schemas/validation-schemas.test.ts :: should reject bio longer than 500 characters :: AssertionError: expected true to be false // Object.is equality
+validation/schemas/validation-schemas.test.ts :: should reject first_name longer than 50 characters :: AssertionError: expected true to be false // Object.is equality
+validation/schemas/validation-schemas.test.ts :: should reject empty first_name :: AssertionError: expected true to be false // Object.is equality

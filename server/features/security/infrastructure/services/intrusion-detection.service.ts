@@ -200,7 +200,7 @@ export class IntrusionDetectionService {
         source: 'internal_firewall',
         occurrences: 1,
         blocked: true,
-        metadata: { path: req.path, method: req.method } as any
+        metadata: { path: req.path, method: req.method } as unknown as Record<string, unknown>
       });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -259,7 +259,7 @@ export class IntrusionDetectionService {
         .from(threatIntelligence)
         .where(gt(threatIntelligence.created_at, fromDate))
         .groupBy(threatIntelligence.threatType, threatIntelligence.severity)
-        .orderBy(desc(sql`count(*)`)) as any;
+        .orderBy(desc(sql`count(*)`)) as unknown as IntrusionStats[];
 
       return {
         generatedAt: new Date(),

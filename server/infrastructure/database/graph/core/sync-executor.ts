@@ -14,7 +14,7 @@
  * - ✅ Extracted configuration
  */
 
-import { driver as neo4jDriver, Driver } from 'neo4j-driver';
+import neo4j, { Driver } from 'neo4j-driver';
 import { db } from '../../index.js';
 import {
   graph_sync_status,
@@ -114,7 +114,7 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
     }
 
     // Initialize Neo4j schema (constraints, indexes)
-    await neo4jSchema.initializeGraphSchema();
+    await neo4jSchema.initializeGraphSchema(neoDriver!);
     logger.info('Neo4j schema initialized');
 
     // Create sync tables if not exist
@@ -213,11 +213,10 @@ export async function triggerFullSync(): Promise<any> {
 
   try {
     const stats = await runBatchSync(
-      serviceConfig?.batchSizeLimit || SYNC_CONFIG.BATCH_SIZE,
-      serviceConfig?.syncTimeoutMs || SYNC_CONFIG.TIMEOUT_MS
+      serviceConfig?.batchSizeLimit || SYNC_CONFIG.BATCH_SIZE
     );
 
-    logger.info('Full sync completed', stats);
+    logger.info({ stats }, 'Full sync completed');
     return stats;
   } catch (error) {
     logger.error({
@@ -353,9 +352,9 @@ function validateConfig(config: SyncServiceConfig): void {
  * @returns Neo4j driver instance
  */
 async function connectToNeo4j(config: SyncServiceConfig): Promise<Driver> {
-  const driver = neo4jDriver.driver(
+  const driver = neo4j(
     config.neo4jUri,
-    neo4jDriver.auth.basic(config.neo4jUser, config.neo4jPassword),
+    neo4j.auth.basic(config.neo4jUser, config.neo4jPassword),
     {
       maxConnectionPoolSize: NEO4J_CONFIG.MAX_CONNECTION_POOL_SIZE,
       connectionTimeout: NEO4J_CONFIG.CONNECTION_TIMEOUT_MS,
@@ -403,11 +402,11 @@ async function ensureSyncTablesExist(): Promise<void> {
     await db.select().from(graph_sync_status).limit(1);
     logger.debug('Sync tables verified');
   } catch (error: unknown) {
-    if (error.message?.includes('does not exist')) {
+    if (error instanceof Error && error.message?.includes('does not exist')) {
       throw new GraphError({
         code: GraphErrorCode.CONFIGURATION_ERROR,
         message: 'Sync tables not found. Run database migrations first.',
-        cause: error,
+        cause: error as Error,
       });
     }
     // Other errors are okay (e.g., empty table)
@@ -470,11 +469,10 @@ export async function verifyDataConsistency(): Promise<ConsistencyReport> {
     report.conflictCount = Number(conflictResult[0]?.count) || 0;
 
     // Check for stale data (>24h)
-    const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    // Note: Would need last_synced_at column to properly implement this
-    // For now, we'll skip this check
+    // Note: Stale data check requires last_synced_at column
+    // Skipping for now until migration adds it
 
-    logger.info('Data consistency check completed', report);
+    logger.info({ report }, 'Data consistency check completed');
     return report;
   } catch (error) {
     logger.error({
@@ -682,7 +680,7 @@ async function fetchNeo4jEntity(
         { id: entityId }
       );
 
-      if (result.records.length > 0) {
+      if (result.records.length > 0 && result.records[0]) {
         return result.records[0].get('props');
       }
       return null;

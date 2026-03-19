@@ -1,7 +1,7 @@
 import { logger } from '@server/infrastructure/observability';
-import { readDatabase } from '@server/infrastructure/database';
-import { searchAnalytics, searchQueries } from '@server/infrastructure/schema/advanced_discovery';
-import { users } from '@server/infrastructure/schema';
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
+import { searchAnalytics } from '@server/infrastructure/schema/advanced_discovery';
+import { searchQueries } from '@server/infrastructure/schema/search_system';
 import { sql, and, like, gte, desc, eq, lt } from 'drizzle-orm';
 
 import type { SearchQuery, SearchResponseDto } from './search.dto';
@@ -101,20 +101,20 @@ export class SearchAnalytics {
         .from(searchQueries)
         .where(
           and(
-            gte(searchQueries.createdAt, startDate),
-            lt(searchQueries.createdAt, endDate)
+            gte(searchQueries.created_at, startDate),
+            lt(searchQueries.created_at, endDate)
           )
         );
 
       // Get unique users
       const uniqueUsersResult = await readDatabase
-        .select({ count: sql<number>`COUNT(DISTINCT ${searchQueries.userId})` })
+        .select({ count: sql<number>`COUNT(DISTINCT ${searchQueries.user_id})` })
         .from(searchQueries)
         .where(
           and(
-            gte(searchQueries.createdAt, startDate),
-            lt(searchQueries.createdAt, endDate),
-            sql`${searchQueries.userId} IS NOT NULL`
+            gte(searchQueries.created_at, startDate),
+            lt(searchQueries.created_at, endDate),
+            sql`${searchQueries.user_id} IS NOT NULL`
           )
         );
 
@@ -122,48 +122,48 @@ export class SearchAnalytics {
       const avgSearchTimeResult = await readDatabase
         .select({ avg: sql<number>`AVG(${searchAnalytics.analyticsValue})` })
         .from(searchAnalytics)
-        .innerJoin(searchQueries, eq(searchAnalytics.queryId, searchQueries.id))
+        .innerJoin(searchQueries, eq(searchAnalytics.searchQueryId, searchQueries.id))
         .where(
           and(
             eq(searchAnalytics.analyticsType, 'search_performance'),
-            gte(searchQueries.createdAt, startDate),
-            lt(searchQueries.createdAt, endDate)
+            gte(searchQueries.created_at, startDate),
+            lt(searchQueries.created_at, endDate)
           )
         );
 
       // Get popular queries
       const popularQueriesResult = await readDatabase
         .select({
-          query: searchQueries.queryText,
+          query: searchQueries.query_text,
           count: sql<number>`COUNT(*)`,
-          averageResults: sql<number>`AVG(${searchQueries.resultsReturned})`,
+          averageResults: sql<number>`AVG(${searchQueries.total_results})`,
         })
         .from(searchQueries)
         .where(
           and(
-            gte(searchQueries.createdAt, startDate),
-            lt(searchQueries.createdAt, endDate)
+            gte(searchQueries.created_at, startDate),
+            lt(searchQueries.created_at, endDate)
           )
         )
-        .groupBy(searchQueries.queryText)
+        .groupBy(searchQueries.query_text)
         .orderBy(desc(sql`COUNT(*)`))
         .limit(10);
 
       // Get no-result queries
       const noResultQueriesResult = await readDatabase
         .select({
-          query: searchQueries.queryText,
+          query: searchQueries.query_text,
           count: sql<number>`COUNT(*)`,
         })
         .from(searchQueries)
         .where(
           and(
-            gte(searchQueries.createdAt, startDate),
-            lt(searchQueries.createdAt, endDate),
-            eq(searchQueries.resultsReturned, 0)
+            gte(searchQueries.created_at, startDate),
+            lt(searchQueries.created_at, endDate),
+            eq(searchQueries.total_results, 0)
           )
         )
-        .groupBy(searchQueries.queryText)
+        .groupBy(searchQueries.query_text)
         .orderBy(desc(sql`COUNT(*)`))
         .limit(10);
 
@@ -172,12 +172,12 @@ export class SearchAnalytics {
         uniqueUsers: uniqueUsersResult[0]?.count || 0,
         averageSearchTime: Math.round(avgSearchTimeResult[0]?.avg || 0),
         cacheHitRate: 0, // TODO: Implement cache hit rate tracking
-        popularQueries: popularQueriesResult.map(row => ({
+        popularQueries: popularQueriesResult.map((row: { query: string; count: number; averageResults: number }) => ({
           query: row.query,
           count: row.count,
           averageResults: Math.round(row.averageResults),
         })),
-        noResultQueries: noResultQueriesResult.map(row => ({
+        noResultQueries: noResultQueriesResult.map((row: { query: string; count: number }) => ({
           query: row.query,
           count: row.count,
         })),
@@ -242,27 +242,24 @@ export class SearchAnalytics {
   private static async storeEvent(event: SearchAnalyticsEvent): Promise<void> {
     try {
       // Insert search query
-      // @ts-ignore - Drizzle ORM type inference issue
-      const [queryRecord] = await readDatabase
+      const [queryRecord] = await writeDatabase
         .insert(searchQueries)
         .values({
-          userId: event.user_id,
-          queryText: event.query,
-          searchContext: event.filters,
-          filtersApplied: event.filters,
-          resultsReturned: event.resultCount,
-          sessionId: event.session_id,
-          userAgent: event.user_agent,
-          ipAddress: event.ip_address,
+          user_id: event.user_id,
+          query_text: event.query,
+          search_filters: event.filters,
+          total_results: event.resultCount,
+          session_id: event.session_id,
+          user_agent: event.user_agent,
+          user_ip_hash: event.ip_address,
         })
         .returning();
 
       // Insert analytics event
-      // @ts-ignore - Drizzle ORM type inference issue
-      await readDatabase
+      await writeDatabase
         .insert(searchAnalytics)
         .values({
-          queryId: queryRecord.id,
+          searchQueryId: queryRecord.id,
           analyticsType: 'search_performance',
           entityType: 'search',
           analyticsValue: event.searchTime,
@@ -287,7 +284,7 @@ export class SearchAnalytics {
   ): Promise<void> {
     try {
       // Update the search analytics with click information
-      await readDatabase
+      await writeDatabase
         .update(searchAnalytics)
         .set({
           analyticsMetadata: {
@@ -313,21 +310,21 @@ export class SearchAnalytics {
       // Query database for popular queries matching prefix
       const result = await readDatabase
         .select({
-          term: searchQueries.queryText,
+          term: searchQueries.query_text,
           frequency: sql<number>`COUNT(*)`,
         })
         .from(searchQueries)
         .where(
           and(
-            like(searchQueries.queryText, `${prefix}%`),
-            gte(searchQueries.createdAt, sql`NOW() - INTERVAL '30 days'`)
+            like(searchQueries.query_text, `${prefix}%`),
+            gte(searchQueries.created_at, sql`NOW() - INTERVAL '30 days'`)
           )
         )
-        .groupBy(searchQueries.queryText)
+        .groupBy(searchQueries.query_text)
         .orderBy(desc(sql`COUNT(*)`))
         .limit(limit);
 
-      return result.map(row => ({
+      return result.map((row: { term: string; frequency: number }) => ({
         term: row.term,
         frequency: row.frequency,
         type: 'popular' as const,
@@ -346,21 +343,21 @@ export class SearchAnalytics {
       // Query database for recent queries matching prefix
       const result = await readDatabase
         .select({
-          term: searchQueries.queryText,
+          term: searchQueries.query_text,
           frequency: sql<number>`COUNT(*)`,
         })
         .from(searchQueries)
         .where(
           and(
-            like(searchQueries.queryText, `${prefix}%`),
-            gte(searchQueries.createdAt, sql`NOW() - INTERVAL '24 hours'`)
+            like(searchQueries.query_text, `${prefix}%`),
+            gte(searchQueries.created_at, sql`NOW() - INTERVAL '24 hours'`)
           )
         )
-        .groupBy(searchQueries.queryText)
-        .orderBy(desc(searchQueries.createdAt))
+        .groupBy(searchQueries.query_text)
+        .orderBy(desc(searchQueries.created_at))
         .limit(limit);
 
-      return result.map(row => ({
+      return result.map((row: { term: string; frequency: number }) => ({
         term: row.term,
         frequency: row.frequency,
         type: 'recent' as const,
@@ -374,9 +371,9 @@ export class SearchAnalytics {
   private static async deleteEventsOlderThan(cutoffDate: Date): Promise<number> {
     try {
       // Delete old search queries and their analytics
-      const result = await readDatabase
+      const result = await writeDatabase
         .delete(searchQueries)
-        .where(lt(searchQueries.createdAt, cutoffDate))
+        .where(lt(searchQueries.created_at, cutoffDate))
         .returning({ id: searchQueries.id });
 
       const deletedCount = result.length;

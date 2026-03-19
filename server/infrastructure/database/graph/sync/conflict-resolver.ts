@@ -14,7 +14,7 @@
  */
 
 import { Driver } from 'neo4j-driver';
-import { withSession, withReadSession, executeCypherSafely } from '../utils/session-manager';
+import { withSession, withReadSession } from '../utils/session-manager';
 import { GraphErrorHandler, GraphErrorCode, GraphError } from '../utils/error-adapter';
 import { retryWithBackoff, RETRY_PRESETS } from '../utils/retry-utils';
 import { logger } from '@server/infrastructure/observability';
@@ -143,6 +143,7 @@ export async function detectDataDivergence(
       }
 
       const graphRecord = graphResult.records[0];
+      if (!graphRecord) return null;
       const graphVersion = graphRecord.get('graph_version');
       const graphProps = graphRecord.get('props');
 
@@ -215,6 +216,7 @@ export async function getConflictDetails(
       }
 
       const record = result.records[0];
+      if (!record) return null;
       return {
         conflict_id: conflictId,
         entity_type: record.get('entity_type'),
@@ -425,6 +427,17 @@ export async function getSyncHealthMetrics(driver: Driver): Promise<SyncHealthMe
       );
 
       const record = result.records[0];
+      if (!record) {
+        return {
+          total_entities: 0,
+          synced_entities: 0,
+          pending_entities: 0,
+          conflicted_entities: 0,
+          orphaned_entities: 0,
+          sync_lag_ms: 0,
+          last_sync_at: new Date(),
+        };
+      }
       return {
         total_entities: Number(record.get('total')) || 0,
         synced_entities: Number(record.get('synced')) || 0,
