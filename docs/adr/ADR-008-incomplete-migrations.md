@@ -1,4 +1,7 @@
-# Incomplete Migration Analysis - Systemic Issues
+# ADR-008: Incomplete Migrations
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 ## Root Cause
 

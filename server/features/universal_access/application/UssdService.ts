@@ -148,6 +148,3 @@ export class UssdService {
 }
 
 export const ussdService = new UssdService();
-
-
-export const ussdService = new UssdService();

@@ -1,4 +1,7 @@
-# ADR-016: Naming Convention Standardization
+# ADR-016: Naming Conventions
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Status:** Accepted  
 **Date:** 2026-03-01  

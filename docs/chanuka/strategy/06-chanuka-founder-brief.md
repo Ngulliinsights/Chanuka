@@ -65,14 +65,14 @@ Chanuka is not a civic information portal. It is an accountability engine. It in
 
 | Capability | Status |
 |---|---|
-| MP voting record tracking by constituency | Operational |
-| Parliamentary data ingestion pipeline | Operational |
-| Bill translation to plain language | Operational |
-| Constitutional violation detection | In development |
+| MP voting record tracking by constituency | Built (untested against live data) |
+| Parliamentary data ingestion pipeline | Built (untested against live sources) |
+| Bill translation to plain language | Mocked (hardcoded responses; OpenAI integration pending) |
+| Constitutional violation detection | Partially built (keyword matching works; RAG/LLM tiers are stubs) |
 | Trojan bill / hidden provision detection | In development |
-| MP accountability scorecard | In development |
+| MP accountability scorecard | Built (needs live voting + sentiment data) |
 | Citizen advocacy coordination | Planned |
-| USSD access for non-smartphone users | Planned |
+| USSD access for non-smartphone users | Session infrastructure built (no legislative content menus yet) |
 
 **On the USSD decision.** The complete feature-phone access layer is not a technical feature. It is a values statement. A parliamentary accountability platform that requires a smartphone answers the question *who is this for?* incorrectly. Chanuka is designed from the ground up to serve citizens across Kenya's digital divide — not the digitally affluent fraction. This decision was made first, before any technical architecture, because it is the most important design decision the platform makes.
 
@@ -80,7 +80,7 @@ Chanuka is not a civic information portal. It is an accountability engine. It in
 
 The platform is built on a production-grade TypeScript stack: React 18 frontend, Node.js/Express backend, PostgreSQL primary database, Neo4j graph database for parliamentary network analysis, Redis caching, and WebSocket real-time delivery. A parliamentary data scraping pipeline ingests bills, voting records, and Hansard division data from parliament.go.ke and the National Assembly Hansard repository. The scraper handles JavaScript-rendered pages, PDF extraction of voting tables, name normalisation across document variants, and a confidence-level system that ensures no unverified data appears on public-facing accountability scorecards.
 
-The codebase is a monorepo with domain-driven architecture. It has been independently audited and characterised as *"a visionary civic tech platform with production-grade features — the database schema is excellent, the security is thoughtful, the error handling is mature."*
+The codebase is a monorepo with domain-driven architecture. It has not yet been independently audited. The codebase is available for review and demonstrates thoughtful domain modelling, an extensive database schema (47 schema files), and structured error handling — but several services contain TypeScript suppressions and mock data that would need resolution before a production audit.
 
 ---
 

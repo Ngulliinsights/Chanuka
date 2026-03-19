@@ -6,7 +6,9 @@
  */
 
 import { logger } from '@server/infrastructure/observability';
-import { bills } from '@server/infrastructure/schema';
+import { db } from '@server/infrastructure/database';
+import { bills, mpProfiles } from '@server/infrastructure/schema';
+import { desc, ilike } from 'drizzle-orm';
 import type { USSDSession, USSDResponse, USSDRequest, USSDLanguage } from '../domain/ussd.types';
 import { USSD_CONFIG, USSD_MENUS } from './ussd.config';
 import { ussdCorruptionAnalysisService } from './ussd-corruption-analysis.service';
@@ -286,58 +288,206 @@ export class USSDService {
   }
 
   /**
-   * Get latest bills
+   * Get latest bills from the database
    */
   private async getLatestBills(session: USSDSession): Promise<USSDResponse> {
-    // TODO: Integrate with bills service
-    const message = this.translate('Latest Bills', session.language) + ':\n' +
-      '1. Finance Bill 2024\n' +
-      '2. Health Act Amendment\n' +
-      '3. Education Reform Bill\n\n' +
-      this.translate('Enter bill number for details or 0 to go back', session.language);
+    try {
+      const latestBills = await db
+        .select({ title: bills.title, billNumber: bills.billNumber, status: bills.status })
+        .from(bills)
+        .orderBy(desc(bills.lastScrapedAt))
+        .limit(5);
 
+      if (latestBills.length === 0) {
+        return {
+          message: 'END No bills available yet. The parliamentary data pipeline is being set up. Check back soon.',
+          continueSession: false,
+        };
+      }
+
+      const billsList = latestBills
+        .map((b, i) => `${i + 1}. ${this.truncateForUSSD(b.title, 40)}${b.status ? ` [${b.status}]` : ''}`)
+        .join('\n');
+
+      return {
+        message: `CON ${this.translate('Latest Bills', session.language)}:\n${billsList}\n\n0. Back`,
+        continueSession: true,
+      };
+    } catch {
+      return { message: 'END Bill data is not yet available. Check back soon.', continueSession: false };
+    }
+  }
+
+  /**
+   * Search bills by title
+   */
+  private async searchBill(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) {
+      return { message: 'END Please provide a search term.', continueSession: false };
+    }
+
+    try {
+      const results = await db
+        .select({ title: bills.title, billNumber: bills.billNumber, status: bills.status })
+        .from(bills)
+        .where(ilike(bills.title, `%${input}%`))
+        .limit(5);
+
+      if (results.length === 0) {
+        return {
+          message: `END No bills found matching "${this.truncateForUSSD(input, 30)}". Try different keywords.`,
+          continueSession: false,
+        };
+      }
+
+      const resultsList = results
+        .map((b, i) => `${i + 1}. ${this.truncateForUSSD(b.title, 40)}`)
+        .join('\n');
+
+      return {
+        message: `END Found ${results.length} bill(s):\n${resultsList}`,
+        continueSession: false,
+      };
+    } catch {
+      return { message: 'END Search is not yet available. Check back soon.', continueSession: false };
+    }
+  }
+
+  /**
+   * Analyze corruption risk for a bill
+   */
+  private async analyzeCorruptionRisk(_session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) return { message: 'END Bill ID required', continueSession: false };
+    try {
+      const analysis = await ussdCorruptionAnalysisService.analyzeCorruptionRisk(input);
+      return { message: `END ${analysis.message || analysis.riskLevel}`, continueSession: false };
+    } catch {
+      return { message: 'END Corruption analysis is not yet available.', continueSession: false };
+    }
+  }
+
+  /**
+   * Analyze market impact of a bill
+   */
+  private async analyzeMarketImpact(_session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) return { message: 'END Query required', continueSession: false };
+    try {
+      const analysis = await ussdMarketIntelligenceService.getMarketInsights(input);
+      return { message: `END ${analysis.insights}`, continueSession: false };
+    } catch {
+      return { message: 'END Market impact analysis is not yet available.', continueSession: false };
+    }
+  }
+
+  /**
+   * Find MP by constituency name
+   */
+  private async findMPByConstituency(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) {
+      return { message: 'END Please enter a constituency name.', continueSession: false };
+    }
+
+    try {
+      const results = await db
+        .select({ name: mpProfiles.name, constituency: mpProfiles.constituency, party: mpProfiles.party })
+        .from(mpProfiles)
+        .where(ilike(mpProfiles.constituency, `%${input}%`))
+        .limit(3);
+
+      if (results.length === 0) {
+        return {
+          message: `END No MP found for "${this.truncateForUSSD(input, 30)}". Try the full constituency name.`,
+          continueSession: false,
+        };
+      }
+
+      const mpList = results
+        .map(mp => `${mp.name} (${mp.constituency}) - ${mp.party}`)
+        .join('\n');
+
+      return { message: `END ${mpList}`, continueSession: false };
+    } catch {
+      return { message: 'END MP data is not yet available. Check back soon.', continueSession: false };
+    }
+  }
+
+  /**
+   * Find MP by name
+   */
+  private async findMPByName(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (!input) {
+      return { message: 'END Please enter an MP name.', continueSession: false };
+    }
+
+    try {
+      const results = await db
+        .select({ name: mpProfiles.name, constituency: mpProfiles.constituency, party: mpProfiles.party })
+        .from(mpProfiles)
+        .where(ilike(mpProfiles.name, `%${input}%`))
+        .limit(3);
+
+      if (results.length === 0) {
+        return {
+          message: `END No MP found matching "${this.truncateForUSSD(input, 30)}".`,
+          continueSession: false,
+        };
+      }
+
+      const mpList = results
+        .map(mp => `${mp.name} - ${mp.constituency} (${mp.party})`)
+        .join('\n');
+
+      return { message: `END ${mpList}`, continueSession: false };
+    } catch {
+      return { message: 'END MP data is not yet available. Check back soon.', continueSession: false };
+    }
+  }
+
+  /**
+   * Track a bill by its bill number
+   */
+  private async trackBillById(session: USSDSession, input?: string): Promise<USSDResponse> {
+    if (input === '0') return this.showMenu(session, 'main');
+    if (!input) return { message: 'END Please enter a bill number.', continueSession: false };
+
+    try {
+      const bill = await db
+        .select({ title: bills.title, billNumber: bills.billNumber, status: bills.status })
+        .from(bills)
+        .where(ilike(bills.billNumber, `%${input}%`))
+        .limit(1);
+
+      if (bill.length === 0) {
+        return { message: `END No bill found with number "${input}". Check the bill number and try again.`, continueSession: false };
+      }
+
+      // TODO: Store tracking preference in user_bill_tracking table
+      return {
+        message: `END Now tracking: ${this.truncateForUSSD(bill[0].title, 60)}\nStatus: ${bill[0].status || 'Unknown'}\nYou will receive SMS alerts for updates.`,
+        continueSession: false,
+      };
+    } catch {
+      return { message: 'END Bill tracking is not yet available. Check back soon.', continueSession: false };
+    }
+  }
+
+  /**
+   * Get user's tracked bills
+   */
+  private getMyTrackedBills(session: USSDSession): USSDResponse {
+    // TODO: Query user_bill_tracking table by phone number
     return {
-      message: `CON ${message}`,
-      continueSession: true
+      message: 'END Bill tracking is being set up. You will be able to track bills and receive SMS alerts soon.',
+      continueSession: false,
     };
   }
 
-  
-  private searchBill(session: USSDSession, input?: string): USSDResponse {
-    if (!input) {
-        return { message: 'END Invalid search criteria.', continueSession: false };
-    }
-    const message = `Found 2 matches for "${input}":\n1. Example Bill A\n2. Example Bill B`;
-    return { message: `END ${message}`, continueSession: false };
-  }
-
-  private async analyzeCorruptionRisk(session: USSDSession, input?: string): Promise<USSDResponse> {
-    if (!input) return { message: 'END Bill ID required', continueSession: false };
-    const analysis = await ussdCorruptionAnalysisService.analyzeCorruptionRisk(input);
-    return { message: `END ${analysis.message || analysis.riskLevel}`, continueSession: false };
-  }
-
-  private async analyzeMarketImpact(session: USSDSession, input?: string): Promise<USSDResponse> {
-    if (!input) return { message: 'END Query required', continueSession: false };
-    const analysis = await ussdMarketIntelligenceService.getMarketInsights(input);
-    return { message: `END ${analysis.insights}`, continueSession: false };
-  }
-
-  private findMPByConstituency(session: USSDSession, input?: string): USSDResponse {
-    return { message: `END MP for ${input || 'Unknown'}: Hon. Jane Doe`, continueSession: false };
-  }
-
-  private findMPByName(session: USSDSession, input?: string): USSDResponse {
-    return { message: `END Hon. ${input || 'Unknown'} represents Nairobi Central`, continueSession: false };
-  }
-
-  private trackBillById(session: USSDSession, input?: string): USSDResponse {
-    if (input === '0') return this.showMenu(session, 'main');
-    return { message: `END Now tracking Bill ${input || 'Unknown'}. You will receive SMS alerts.`, continueSession: false };
-  }
-
-  private getMyTrackedBills(session: USSDSession): USSDResponse {
-    return { message: `END Tracked Bills:\n1. Finance Bill (2nd Reading)`, continueSession: false };
+  /**
+   * Truncate text for USSD 160-character limit
+   */
+  private truncateForUSSD(text: string, maxLen: number): string {
+    if (text.length <= maxLen) return text;
+    return text.substring(0, maxLen - 3) + '...';
   }
 
   /**

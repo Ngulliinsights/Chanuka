@@ -6,8 +6,12 @@
 
 import { electoralAccountabilityService } from './electoral-accountability.service';
 import { db } from '@server/infrastructure/database';
-import { constituency_sentiment } from '@server/infrastructure/schema/electoral_accountability';
-import { eq, and } from 'drizzle-orm';
+import { 
+  constituency_sentiment, 
+  representative_gap_analysis, 
+  voting_records 
+} from '@server/infrastructure/schema/electoral_accountability';
+import { eq, and, isNull } from 'drizzle-orm';
 import { logger } from '@server/infrastructure/observability';
 import type { VotingRecord } from '@server/infrastructure/schema/electoral_accountability';
 
@@ -84,8 +88,57 @@ export class GapCalculationAutomationService {
 
     try {
       // Get voting records without gap analysis
-      // TODO: Add query to find records without gaps
-      // For now, this is a placeholder
+      const conditions: any[] = [isNull(representative_gap_analysis.id)];
+      if (options?.constituency) {
+        conditions.push(eq(voting_records.constituency, options.constituency));
+      }
+
+      const query = db
+        .select({
+          id: voting_records.id,
+          bill_id: voting_records.bill_id,
+          constituency: voting_records.constituency,
+        })
+        .from(voting_records)
+        .leftJoin(
+          representative_gap_analysis,
+          eq(voting_records.id, representative_gap_analysis.voting_record_id)
+        )
+        .where(and(...conditions));
+
+      if (options?.limit) {
+        query.limit(options.limit);
+      }
+
+      const recordsToProcess = await query;
+      stats.processed = recordsToProcess.length;
+
+      for (const record of recordsToProcess) {
+        try {
+          // Find matching sentiment
+          const sentiment = await db.query.constituency_sentiment.findFirst({
+            where: and(
+              eq(constituency_sentiment.bill_id, record.bill_id),
+              eq(constituency_sentiment.constituency, record.constituency)
+            ),
+          });
+
+          if (!sentiment) {
+            stats.skipped++;
+            continue;
+          }
+
+          // Calculate gap
+          await electoralAccountabilityService.calculateRepresentativeGap(
+            record.id,
+            sentiment.id
+          );
+          stats.calculated++;
+        } catch (err) {
+          logger.error({ error: err, votingRecordId: record.id }, 'Error calculating gap during backfill');
+          stats.errors++;
+        }
+      }
 
       logger.info(stats, 'Gap backfill process completed');
     } catch (error) {
@@ -113,10 +166,24 @@ export class GapCalculationAutomationService {
         return;
       }
 
-      // TODO: Find all voting records and recalculate gaps
-      // This would require querying voting_records and updating gap_analysis
+      const records = await db
+        .select({ id: voting_records.id })
+        .from(voting_records)
+        .where(
+          and(
+            eq(voting_records.bill_id, sentiment.bill_id),
+            eq(voting_records.constituency, sentiment.constituency)
+          )
+        );
 
-      logger.info({ sentimentId }, 'Gap recalculation completed');
+      for (const record of records) {
+        await electoralAccountabilityService.calculateRepresentativeGap(
+          record.id,
+          sentiment.id
+        );
+      }
+
+      logger.info({ sentimentId, recordsRecalculated: records.length }, 'Gap recalculation completed');
     } catch (error) {
       logger.error({ error, sentimentId }, 'Failed to recalculate gaps');
       // Don't throw - this is a background process

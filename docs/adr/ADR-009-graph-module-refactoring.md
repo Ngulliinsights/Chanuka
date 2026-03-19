@@ -1,5 +1,8 @@
 # ADR-009: Graph Module Refactoring
 
+**Status**: Accepted
+**Date**: 2026-03-19
+
 **Date:** February 20, 2026  
 **Status:** ✓ COMPLETE - Task 2.2 Complete  
 **Decision:** Adopt structured subdirectory layout for graph module

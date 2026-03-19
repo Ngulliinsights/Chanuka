@@ -1,4 +1,7 @@
-# ADR-019: Orphaned Infrastructure Component Cleanup
+# ADR-019: Orphaned Infrastructure Cleanup
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Status:** Accepted  
 **Date:** 2026-03-01  

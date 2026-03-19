@@ -132,99 +132,46 @@ export class ConstitutionalAnalyzer extends BaseAnalyzer<
 
   /**
    * Tier 2: ChromaDB + sentence-transformers RAG
-   * Vector similarity search for relevant constitutional provisions
+   * Vector similarity search for relevant constitutional provisions.
+   *
+   * NOT YET IMPLEMENTED — requires:
+   * - ChromaDB instance with Kenya Constitution 2010 embedded
+   * - sentence-transformers model for bill text embedding
+   * - Vector similarity search query
+   *
+   * Until implemented, the base analyzer's fallback system will
+   * catch this error and return Tier 1 (keyword matching) results.
    */
   private async analyzeTier2(
-    input: ConstitutionalAnalysisInput
+    _input: ConstitutionalAnalysisInput
   ): Promise<ConstitutionalAnalysisResult> {
-    // TODO: Implement ChromaDB vector search
-    console.log('Tier 2: Querying ChromaDB for constitutional provisions...');
-
-    // Simulate vector search
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // Mock response (replace with actual ChromaDB query)
-    const relevantArticles: ConstitutionalArticle[] = [
-      {
-        article: '43(1)(a)',
-        ...CONSTITUTIONAL_ARTICLES['43(1)(a)'],
-        similarity: 0.92,
-      },
-      {
-        article: '27',
-        ...CONSTITUTIONAL_ARTICLES['27'],
-        similarity: 0.85,
-      },
-    ];
-
-    const riskScore = 0.7;
-
-    return {
-      relevantArticles,
-      summary: 'Vector search found 2 highly relevant constitutional provisions',
-      riskLevel: this.calculateRiskLevel(riskScore),
-      riskScore,
-      citations: relevantArticles.map(a => a.article),
-    };
+    throw new Error(
+      'Tier 2 (ChromaDB RAG) not yet implemented. '
+      + 'Requires ChromaDB with Kenya Constitution 2010 embeddings. '
+      + 'Falling back to Tier 1 keyword matching.'
+    );
   }
 
   /**
    * Tier 3: Ollama + focused constitutional prompt
-   * Deep analysis with local LLM
+   * Deep analysis with local LLM.
+   *
+   * NOT YET IMPLEMENTED — requires:
+   * - Running Ollama instance with a suitable model (e.g. Mistral, Llama 3)
+   * - RAG results from Tier 2 as prompt context
+   * - JSON response parsing and validation
+   *
+   * Until implemented, the base analyzer's fallback system will
+   * catch this error and return Tier 1 (keyword matching) results.
    */
   private async analyzeTier3(
-    input: ConstitutionalAnalysisInput
+    _input: ConstitutionalAnalysisInput
   ): Promise<ConstitutionalAnalysisResult> {
-    // TODO: Implement Ollama API call
-    console.log('Tier 3: Calling Ollama for constitutional analysis...');
-
-    const prompt = `You are a Kenyan constitutional law expert. Analyze this bill section against the Constitution of Kenya 2010.
-
-Bill Section:
-"${input.billSection}"
-
-Relevant Constitutional Articles (from RAG):
-${this.formatArticlesForPrompt(input)}
-
-Provide:
-1. Which articles are most relevant (with similarity scores)
-2. Risk assessment (low/medium/high/critical)
-3. Plain-English summary for citizens
-4. Specific citations
-
-Respond in JSON format.`;
-
-    // Simulate Ollama call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    // Mock response (replace with actual Ollama call)
-    const relevantArticles: ConstitutionalArticle[] = [
-      {
-        article: '43(1)(a)',
-        ...CONSTITUTIONAL_ARTICLES['43(1)(a)'],
-        similarity: 0.95,
-      },
-      {
-        article: '27',
-        ...CONSTITUTIONAL_ARTICLES['27'],
-        similarity: 0.88,
-      },
-      {
-        article: '28',
-        ...CONSTITUTIONAL_ARTICLES['28'],
-        similarity: 0.82,
-      },
-    ];
-
-    const riskScore = 0.85;
-
-    return {
-      relevantArticles,
-      summary: 'This bill section potentially conflicts with Article 43(1)(a) on the right to health. The provision may create barriers to accessing healthcare services, which could violate constitutional protections.',
-      riskLevel: this.calculateRiskLevel(riskScore),
-      riskScore,
-      citations: relevantArticles.map(a => a.article),
-    };
+    throw new Error(
+      'Tier 3 (Ollama LLM) not yet implemented. '
+      + 'Requires local Ollama instance with constitutional analysis model. '
+      + 'Falling back to Tier 1 keyword matching.'
+    );
   }
 
   /**

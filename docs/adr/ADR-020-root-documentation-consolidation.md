@@ -1,5 +1,8 @@
 # ADR-020: Root Documentation Consolidation
 
+**Status**: Accepted
+**Date**: 2026-03-19
+
 **Date:** March 9, 2026  
 **Status:** Accepted  
 **Context:** Documentation sprawl cleanup and design decision extraction

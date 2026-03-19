@@ -1,4 +1,4 @@
-# ADR-013: Centralized Caching Strategy
+# ADR-013: Caching Strategy
 
 **Date:** February 27, 2026  
 **Status:** ✅ ACCEPTED - Implemented  

@@ -1,4 +1,7 @@
-# Feature Structure Analysis: DDD vs Flat Modules
+# ADR-004: Feature Structure Convention
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Date:** February 18, 2026  
 **Status:** Analysis Complete

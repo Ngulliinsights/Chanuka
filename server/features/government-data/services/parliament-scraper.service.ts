@@ -1,4 +1,4 @@
-import { bills } from '@server/infrastructure/schema';
+// Duplicate import removed — bills imported from ../infrastructure/schema below
 /**
  * CHANUKA PLATFORM — PARLIAMENTARY DATA SCRAPER
  * Full TypeScript implementation for Kenyan parliament.go.ke
@@ -10,8 +10,7 @@ import { bills } from '@server/infrastructure/schema';
 
 import puppeteer, { Browser, Page } from "puppeteer";
 import * as cheerio from "cheerio";
-// FIXME: axios not installed - use node-fetch
-// import axios, { AxiosInstance } from "axios";
+// Using native fetch (Node 18+) — no external HTTP client dependency needed
 import pdfParse from "pdf-parse";
 import Fuse from "fuse.js";
 import pino from "pino";
@@ -231,17 +230,14 @@ async function respectRateLimit(url: string): Promise<void> {
   domainLastRequest[domain] = Date.now();
 }
 
-const httpClient: AxiosInstance = axios.create({
-  timeout: 20000,
-  headers: {
-    "User-Agent": "Chanuka-Civic-Platform/1.0 (civic transparency research; contact@chanuka.ke)",
-    "Accept": "text/html,application/xhtml+xml,application/pdf",
-  },
-});
+const HTTP_HEADERS = {
+  "User-Agent": "Chanuka-Civic-Platform/1.0 (civic transparency research; contact@chanuka.ke)",
+  "Accept": "text/html,application/xhtml+xml,application/pdf",
+};
 
 /**
  * Fetches a URL with rate limiting, retries, and backoff.
- * Returns null on permanent failure (do not retry).
+ * Uses native fetch (Node 18+). Returns null on permanent failure.
  */
 export async function fetchWithRetry(
   url: string,
@@ -250,22 +246,36 @@ export async function fetchWithRetry(
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     await respectRateLimit(url);
     try {
-      const res = await httpClient.get(url, {
-        responseType: options.responseType ?? "text",
+      const controller = new AbortController();
+      const timeoutId = globalThis.setTimeout(() => controller.abort(), 20000);
+
+      const res = await fetch(url, {
+        headers: HTTP_HEADERS,
+        signal: controller.signal,
       });
-      const data = res.data as string | Buffer;
+
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const status = res.status;
+        if (status === 429 || status === 503) {
+          domainBackoffUntil[getDomain(url)] = Date.now() + DOMAIN_BACKOFF_MS;
+          logger.warn({ url, status }, "Rate limited — entering domain backoff");
+          break;
+        }
+        if (status === 404) {
+          logger.warn({ url }, "404 — skipping");
+          return null;
+        }
+        throw new Error(`HTTP ${status}`);
+      }
+
+      const data = options.responseType === "arraybuffer"
+        ? Buffer.from(await res.arrayBuffer())
+        : await res.text();
+
       return { data };
     } catch (err: any) {
-      const status = err?.response?.status;
-      if (status === 429 || status === 503) {
-        domainBackoffUntil[getDomain(url)] = Date.now() + DOMAIN_BACKOFF_MS;
-        logger.warn({ url, status }, "Rate limited — entering domain backoff");
-        break; // don't retry immediately
-      }
-      if (status === 404) {
-        logger.warn({ url }, "404 — skipping");
-        return null; // permanent failure
-      }
       if (attempt < MAX_RETRIES - 1) {
         const delay = RETRY_DELAYS_MS[attempt];
         logger.warn({ url, attempt, delay }, "Fetch failed, retrying");

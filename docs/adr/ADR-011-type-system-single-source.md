@@ -1,4 +1,7 @@
-# ADR-011: Type System Single Source of Truth
+# ADR-011: Type System Single Source
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 ## Status
 Accepted - Implementation in Progress

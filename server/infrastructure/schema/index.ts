@@ -16,6 +16,9 @@ export * from './foundation';
 // DOMAIN SCHEMAS - Feature-specific tables
 // ============================================================================
 
+// Keyna Gazette Notices
+export * from './gazette';
+
 // Citizen Participation
 export * from './citizen_participation';
 

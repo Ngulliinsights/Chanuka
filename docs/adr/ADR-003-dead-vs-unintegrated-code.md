@@ -1,4 +1,6 @@
-# Dead vs Unintegrated Code Analysis
+# ADR-003: Dead vs Unintegrated Code
+
+**Date**: 2026-03-19
 
 **Date:** February 18, 2026  
 **Status:** Corrected Classification

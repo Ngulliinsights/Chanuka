@@ -1,4 +1,7 @@
-# ADR-010: Government Data Service Consolidation
+# ADR-010: Government Data Consolidation
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Date:** February 20, 2026  
 **Status:** ✓ COMPLETE - Task 2.3 Complete  

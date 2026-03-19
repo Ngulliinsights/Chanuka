@@ -1,5 +1,8 @@
 # ADR-017: Repository Pattern Standardization
 
+**Status**: Accepted
+**Date**: 2026-03-19
+
 **Status:** Accepted  
 **Date:** 2026-03-01  
 **Context:** Infrastructure Integration & Modernization

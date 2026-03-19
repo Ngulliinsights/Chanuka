@@ -1,4 +1,7 @@
-# ADR-021: Secure Query Pipeline Usage Guide
+# ADR-021: Query Pipeline Usage Guide
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Date:** March 12, 2026  
 **Status:** ✅ ACCEPTED  

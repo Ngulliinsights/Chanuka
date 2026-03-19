@@ -1,4 +1,7 @@
-# Security CSP Manager Duplication Analysis
+# ADR-005: CSP Manager Consolidation
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Date:** February 18, 2026  
 **Status:** ✓ RESOLVED - Task 1.3 Complete (February 20, 2026)  

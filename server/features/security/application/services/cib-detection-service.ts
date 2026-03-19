@@ -1,7 +1,7 @@
 import { and, desc, eq, lte, sql } from 'drizzle-orm';
 import { logger } from '@server/infrastructure/observability';
 import { safeAsync } from '@server/infrastructure/error-handling/result-types';
-import { readDatabase } from '@server/infrastructure/database/connection';
+import { db } from '@server/infrastructure/database';
 import {
   behavioralAnomalies,
   cibDetections,
@@ -215,8 +215,7 @@ export class CIBDetectionService {
         requires_manual_review: context.requiresManualReview ?? false,
       };
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .insert(suspiciousActivityLogs)
         .values(activity)
         .returning();
@@ -237,8 +236,7 @@ export class CIBDetectionService {
     return safeAsync(async () => {
       if (!userId) throw new Error('User ID is required');
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .select()
         .from(suspiciousActivityLogs)
         .where(eq(suspiciousActivityLogs.user_id, userId))
@@ -258,8 +256,7 @@ export class CIBDetectionService {
       );
       const offset = params.offset ?? 0;
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .select()
         .from(suspiciousActivityLogs)
         .where(eq(suspiciousActivityLogs.requires_manual_review, true))
@@ -307,8 +304,7 @@ export class CIBDetectionService {
         } as unknown,
       };
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .insert(behavioralAnomalies)
         .values(anomaly)
         .returning();
@@ -333,8 +329,7 @@ export class CIBDetectionService {
       );
       const offset = params.offset ?? 0;
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .select()
         .from(behavioralAnomalies)
         .where(
@@ -363,8 +358,7 @@ export class CIBDetectionService {
     return safeAsync(async () => {
       if (!userId) throw new Error('User ID is required');
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .select()
         .from(behavioralAnomalies)
         .where(
@@ -408,8 +402,7 @@ export class CIBDetectionService {
         } as unknown,
       };
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .insert(cibDetections)
         .values(detection)
         .returning();
@@ -434,8 +427,7 @@ export class CIBDetectionService {
       );
       const offset = params.offset ?? 0;
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .select()
         .from(cibDetections)
         .where(
@@ -461,8 +453,7 @@ export class CIBDetectionService {
     return safeAsync(async () => {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .delete(suspiciousActivityLogs)
         .where(
           and(
@@ -483,8 +474,7 @@ export class CIBDetectionService {
     return safeAsync(async () => {
       const cutoffDate = new Date(Date.now() - daysOld * 24 * 60 * 60 * 1000);
 
-      // @ts-expect-error
-      const result: any = await readDatabase
+      const result = await db
         .delete(behavioralAnomalies)
         .where(
           and(

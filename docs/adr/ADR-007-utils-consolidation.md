@@ -1,4 +1,7 @@
-# Utils Folders Consolidation Analysis
+# ADR-007: Utils Consolidation
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 ## Overview
 

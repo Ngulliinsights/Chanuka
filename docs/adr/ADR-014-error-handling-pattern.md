@@ -1,4 +1,4 @@
-# ADR-014: Result Type Error Handling Pattern
+# ADR-014: Error Handling Pattern
 
 **Date:** February 27, 2026  
 **Status:** ✅ ACCEPTED - Implemented  

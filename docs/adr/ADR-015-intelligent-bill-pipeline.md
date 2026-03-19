@@ -1,4 +1,6 @@
-# ADR-015: Intelligent Bill Pipeline Architecture
+# ADR-015: Intelligent Bill Pipeline
+
+**Date**: 2026-03-19
 
 **Date:** February 27, 2026  
 **Status:** 📋 PROPOSED  

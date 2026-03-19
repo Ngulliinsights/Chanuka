@@ -12,6 +12,8 @@
  */
 
 import { logger } from '../../../infrastructure/observability';
+import { db } from '../../../infrastructure/database';
+import { gazette_notices } from '../../../infrastructure/schema/gazette';
 
 // ============================================================================
 // TYPES AND INTERFACES
@@ -50,7 +52,8 @@ export class KenyaGazetteScraper {
    */
   async scrapeGazetteNotices(
     category?: 'bill' | 'appointment' | 'land' | 'general',
-    dateRange?: { start: string; end: string }
+    dateRange?: { start: string; end: string },
+    limit?: number
   ): Promise<ScrapingResult<GazetteNotice>> {
     const result: ScrapingResult<GazetteNotice> = {
       success: false,
@@ -123,13 +126,29 @@ export class KenyaGazetteScraper {
         return matchesCategory && matchesDateRange;
       });
 
-      logger.info({ component: 'GazetteScraper' }, `Found ${filteredLinks.length} gazette notices`);
+      const linksToProcess = limit ? filteredLinks.slice(0, limit) : filteredLinks;
+
+      logger.info({ component: 'GazetteScraper' }, `Processing ${linksToProcess.length} gazette notices`);
 
       // Process each notice
-      for (const link of filteredLinks.slice(0, 20)) { // Limit to 20 for demo
+      for (const link of linksToProcess) {
         try {
+          // Rate limiting to be respectful to the origin server
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
           const notice = await this.extractGazetteContent(link);
           if (notice) {
+            // Persist to database
+            await db.insert(gazette_notices).values({
+              notice_number: notice.notice_number,
+              publication_date: notice.publication_date,
+              category: notice.category,
+              title: notice.title,
+              content: notice.content,
+              source_url: notice.source_url,
+              pdf_url: notice.pdf_url,
+            }).onConflictDoNothing({ target: gazette_notices.notice_number });
+
             result.data.push(notice);
           }
         } catch (error) {

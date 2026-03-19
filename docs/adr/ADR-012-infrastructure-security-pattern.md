@@ -1,4 +1,4 @@
-# ADR-012: Infrastructure Security Integration Pattern
+# ADR-012: Infrastructure Security Pattern
 
 **Date:** February 27, 2026  
 **Status:** ✅ ACCEPTED - Implemented  

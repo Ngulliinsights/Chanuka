@@ -1,4 +1,6 @@
-# Validation Architecture Analysis
+# ADR-006: Validation Single Source
+
+**Date**: 2026-03-19
 
 **Date:** February 18, 2026  
 **Status:** ✓ RESOLVED - Phase 3 Complete (February 20, 2026)  

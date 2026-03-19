@@ -1,4 +1,7 @@
-# ADR-022: API Integration Standardization Strategy
+# ADR-022: API Integration Standardization
+
+**Status**: Accepted
+**Date**: 2026-03-19
 
 **Status:** RECOMMENDED  
 **Date:** March 19, 2026  
