@@ -286,3 +286,5 @@ export { ErrorDomain, ErrorSeverity } from '../error';
 
 // Legacy API export (for code that uses `api` instead of `globalApiClient`)
 export { globalApiClient as api };
+// Support both naming conventions
+export { globalApiClient as apiClient };

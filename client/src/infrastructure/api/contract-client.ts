@@ -102,13 +102,14 @@ export async function callEndpoint<TRequest, TResponse>(
       error,
     });
 
+    const errorObj = error as any;
     return {
       success: false,
-      status: error.status || error.statusCode || 500,
+      status: errorObj?.status || errorObj?.statusCode || 500,
       error: {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'An unexpected error occurred',
-        details: error.details,
+        code: errorObj?.code || 'UNKNOWN_ERROR',
+        message: errorObj?.message || 'An unexpected error occurred',
+        details: errorObj?.details,
       },
     };
   }
@@ -150,13 +151,14 @@ export async function callEndpointWithParams<TRequest, TResponse, TParams>(
       error,
     });
 
+    const errorObj = error as any;
     return {
       success: false,
-      status: error.status || error.statusCode || 500,
+      status: errorObj?.status || errorObj?.statusCode || 500,
       error: {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'An unexpected error occurred',
-        details: error.details,
+        code: errorObj?.code || 'UNKNOWN_ERROR',
+        message: errorObj?.message || 'An unexpected error occurred',
+        details: errorObj?.details,
       },
     };
   }
@@ -195,13 +197,14 @@ export async function callEndpointWithQuery<TRequest, TResponse, TQuery>(
       error,
     });
 
+    const errorObj = error as any;
     return {
       success: false,
-      status: error.status || error.statusCode || 500,
+      status: errorObj?.status || errorObj?.statusCode || 500,
       error: {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'An unexpected error occurred',
-        details: error.details,
+        code: errorObj?.code || 'UNKNOWN_ERROR',
+        message: errorObj?.message || 'An unexpected error occurred',
+        details: errorObj?.details,
       },
     };
   }
@@ -256,13 +259,14 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
       error,
     });
 
+    const errorObj = error as any;
     return {
       success: false,
-      status: error.status || error.statusCode || 500,
+      status: errorObj?.status || errorObj?.statusCode || 500,
       error: {
-        code: error.code || 'UNKNOWN_ERROR',
-        message: error.message || 'An unexpected error occurred',
-        details: error.details,
+        code: errorObj?.code || 'UNKNOWN_ERROR',
+        message: errorObj?.message || 'An unexpected error occurred',
+        details: errorObj?.details,
       },
     };
   }
