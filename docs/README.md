@@ -2,15 +2,17 @@
 
 Welcome to the Chanuka Platform documentation. This directory contains comprehensive documentation for developers, contributors, and stakeholders.
 
-## 🚀 Quick Navigation
+## 🚀 Getting Started
 
-**New to Chanuka?** Start here:
-1. [Platform README](../README.md) — Overview and quick start
-2. [Architecture](../ARCHITECTURE.md) — System design
-3. [Setup Guide](./guides/setup.md) — Detailed setup instructions
-4. [Developer Onboarding](./DEVELOPER_ONBOARDING.md) — Onboarding workflow
+**👉 [START HERE: Getting Started Guide](./GETTING_STARTED.md)** — Find the right path based on your role (New Developer, Architect, Contributor, etc.)
 
-**Looking for something specific?** See the [Documentation Index](../DOCUMENTATION_INDEX.md) — complete map of all documentation.
+**Quick Links:**
+- **New Developer?** → [Getting Started Guide](./GETTING_STARTED.md) → Developer path
+- **Need Architecture?** → [Getting Started Guide](./GETTING_STARTED.md) → Architect path  
+- **Ready to Code?** → [Getting Started Guide](./GETTING_STARTED.md) → Contributor path
+- **Infrastructure?** → [Getting Started Guide](./GETTING_STARTED.md) → DevOps path
+
+**Looking for something specific?** See [Documentation Navigation](./DOCUMENTATION_NAVIGATION.md) — complete index of all documentation.
 
 ## 📁 Documentation Structure
 

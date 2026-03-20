@@ -2103,8 +2103,8 @@
 │   │   ├── BILL_COMPARISON_FEATURE_COMPLETE.md
 │   │   ├── BILLS_FEATURE_COMPLETE.md
 │   │   ├── CLEANUP_PLAN.md
+│   │   ├── CONTRIBUTION_STANDARDS.md
 │   │   ├── CORE_FEATURES.md
-│   │   ├── DEVELOPMENT_WORKFLOW.md
 │   │   ├── EXTRACTION_COMPLETE.md
 │   │   ├── INDEX.md
 │   │   ├── LANDING_PAGES_STRATEGIC_ANALYSIS.md
@@ -2256,7 +2256,6 @@
 │   ├── PORT_CONFIGURATION.md
 │   ├── project-structure.md
 │   ├── README.md
-│   ├── SECURITY_AUDIT_CRITICAL_FIXES.md
 │   ├── STRATEGIC_INSIGHTS.md
 │   └── SYSTEMS_ENGINEERING_READINESS.md
 ├── drizzle/
