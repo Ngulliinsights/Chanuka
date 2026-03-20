@@ -171,4 +171,4 @@ export class ResponsiveUtils {
 }
 
 // Singleton instance
-export 
+export const responsiveUtils = ResponsiveUtils.getInstance();

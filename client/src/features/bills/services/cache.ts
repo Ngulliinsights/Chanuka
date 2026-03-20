@@ -66,7 +66,7 @@ class BillsCacheService {
   private config: CacheConfig;
   private db: IDBDatabase | null = null;
   private cleanupTimer: NodeJS.Timeout | null = null;
-  private _offlineQueue: OfflineQueueItem[] = [];
+  private offlineQueue: OfflineQueueItem[] = [];
 
   // Cache statistics
   private stats = {
@@ -162,7 +162,7 @@ class BillsCacheService {
   /**
    * Cache bills data with intelligent key generation
    */
-  async cacheBills(bills: Bill[], searchParams?: Record<string, any>): Promise<void> {
+  async cacheBills(bills: Bill[], searchParams?: unknown): Promise<void> {
     const key = this.generateBillsKey(searchParams);
     await this.set(key, bills, 10 * 60 * 1000); // 10 minutes TTL for bills list
   }
@@ -170,7 +170,7 @@ class BillsCacheService {
   /**
    * Get cached bills data
    */
-  async getCachedBills(searchParams?: Record<string, any>): Promise<Bill[] | null> {
+  async getCachedBills(searchParams?: unknown): Promise<Bill[] | null> {
     const key = this.generateBillsKey(searchParams);
     return await this.get<Bill[]>(key);
   }
@@ -222,7 +222,7 @@ class BillsCacheService {
           key: key.substring(0, 50) + '...',
           age: Date.now() - memoryEntry.timestamp,
         });
-        return this.decompressData(memoryEntry.data) as T;
+        return this.decompressData(memoryEntry.data);
       }
 
       if (this.config.enablePersistence && this.db) {
@@ -235,7 +235,7 @@ class BillsCacheService {
             key: key.substring(0, 50) + '...',
             age: Date.now() - persistentEntry.timestamp,
           });
-          return this.decompressData(persistentEntry.data) as T;
+          return this.decompressData(persistentEntry.data);
         }
       }
 
@@ -258,7 +258,7 @@ class BillsCacheService {
   async set<T = any>(key: string, data: T, ttl?: number): Promise<void> {
     try {
       const entry: CacheEntry<T> = {
-        data: this.compressData(data) as unknown as T,
+        data: this.compressData(data),
         timestamp: Date.now(),
         ttl: ttl || this.config.defaultTTL,
         version: '1.0',
@@ -335,7 +335,7 @@ class BillsCacheService {
   // Private Helper Methods
   // ============================================================================
 
-  private generateBillsKey(searchParams?: Record<string, any>): string {
+  private generateBillsKey(searchParams?: unknown): string {
     if (!searchParams) return 'bills:all';
 
     const normalized = {
@@ -455,18 +455,18 @@ class BillsCacheService {
   }
 
   // IndexedDB helper methods (simplified for brevity)
-  private async getFromIndexedDB<T>(_key: string): Promise<CacheEntry<T> | null> {
+  private async getFromIndexedDB<T>(key: string): Promise<CacheEntry<T> | null> {
     if (!this.db) return null;
     // Implementation would go here
     return null;
   }
 
-  private async setInIndexedDB<T>(_key: string, _entry: CacheEntry<T>): Promise<void> {
+  private async setInIndexedDB<T>(key: string, entry: CacheEntry<T>): Promise<void> {
     if (!this.db) return;
     // Implementation would go here
   }
 
-  private async deleteFromIndexedDB(_key: string): Promise<void> {
+  private async deleteFromIndexedDB(key: string): Promise<void> {
     if (!this.db) return;
     // Implementation would go here
   }
@@ -490,7 +490,7 @@ class BillsCacheService {
     }
 
     this.memoryCache.clear();
-    this._offlineQueue = [];
+    this.offlineQueue = [];
 
     logger.info('Bills Cache Service cleaned up', {
       component: 'BillsCacheService',

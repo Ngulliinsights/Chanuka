@@ -59,4 +59,5 @@ export class PrivacyAnalyticsService {
   }
 }
 
+export const privacyAnalyticsService = new PrivacyAnalyticsService();
 export default PrivacyAnalyticsService;

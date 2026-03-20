@@ -8,12 +8,7 @@
 
 import type { ReactNode } from 'react';
 
-import type {
-  WidgetConfig,
-  DashboardLayout,
-  DashboardPreferences,
-  DashboardState,
-} from './dashboard-base';
+import type { WidgetConfig, DashboardLayout, DashboardPreferences, DashboardState } from './dashboard-base';
 import type { AnalyticsMetrics } from './dashboard-metrics';
 
 /**

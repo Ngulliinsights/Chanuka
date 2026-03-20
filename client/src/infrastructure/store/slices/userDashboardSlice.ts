@@ -1,1 +1,1 @@
-export const userDashboardSlice = { reducer: {} }; export default userDashboardSlice.reducer; export 
+export const userDashboardSlice = { reducer: {} }; export default userDashboardSlice.reducer; export const useUserDashboardStore = () => ({});

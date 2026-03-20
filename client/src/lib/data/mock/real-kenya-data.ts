@@ -136,7 +136,12 @@ export const KENYA_CASE_LAW = {
 // 3. Real Recent/Relevant Bills
 // ============================================================================
 
-export  to provide for the framework for provision of digital health services; to establish a comprehensive integrated digital health information system; and for connected purposes.",
+export const REAL_BILLS = [
+  {
+    id: "bill-dh-001",
+    title: "The Digital Health Bill, 2023",
+    number: "N.A.B. No. 57 of 2023",
+    summary: "An Act of Parliament to establish the Digital Health Agency; to provide for the framework for provision of digital health services; to establish a comprehensive integrated digital health information system; and for connected purposes.",
     keyProvisions: [
       "Establishment of the Digital Health Agency",
       "Creation of an Integrated Digital Health Information System",
@@ -197,9 +202,44 @@ export  to provide for the framework for provision of digital health services; t
 // 4. Realistic Expert Profiles
 // ============================================================================
 
-export 
+export const EXPERT_PROFILES = [
+  {
+    id: 'expert-ke-001',
+    name: 'Prof. Githu Muigai',
+    credentials: [
+      { type: 'education', title: 'PhD in Law', institution: 'University of Nairobi' },
+      { type: 'experience', title: 'Former Attorney General', institution: 'Republic of Kenya' }
+    ],
+    specialization: 'Constitutional Law',
+    bio: 'Distinguished legal scholar and practitioner with extensive experience in constitutional interpretation and state law.'
+  },
+  {
+    id: 'expert-ke-002',
+    name: 'Dr. PLO Lumumba',
+    credentials: [
+      { type: 'education', title: 'PhD in Law of the Sea', institution: 'University of Ghent' },
+      { type: 'experience', title: 'Former Director', institution: 'Kenya School of Law' }
+    ],
+    specialization: 'Governance & Ethics',
+    bio: 'Renowned constitutional lawyer and advocate for good governance and pan-Africanism.'
+  },
+  {
+    id: 'expert-ke-003',
+    name: 'Wanjiru Gikonyo',
+    credentials: [
+      { type: 'experience', title: 'National Coordinator', institution: 'The Institute for Social Accountability (TISA)' }
+    ],
+    specialization: 'Devolution & Public Finance',
+    bio: 'Leading expert on devolution implementation and public accountability mechanisms in Kenya.'
+  }
+];
+
 // Helper to get formatted constitutional article text
-export };
+export const getConstitutionalArticle = (articleNumber: number) => {
+  return KENYA_CONSTITUTION.articles[articleNumber as keyof typeof KENYA_CONSTITUTION.articles];
+};
 
 // Helper to get case law by category
-export };
+export const getCaseLaw = (category: 'health' | 'devolution') => {
+  return KENYA_CASE_LAW[category];
+};

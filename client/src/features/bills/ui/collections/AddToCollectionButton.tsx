@@ -18,11 +18,7 @@ interface AddToCollectionButtonProps {
   size?: 'default' | 'sm' | 'lg';
 }
 
-export function AddToCollectionButton({
-  billId,
-  variant = 'outline',
-  size = 'sm',
-}: AddToCollectionButtonProps) {
+export function AddToCollectionButton({ billId, variant = 'outline', size = 'sm' }: AddToCollectionButtonProps) {
   const [collections, setCollections] = useState(collectionsService.getCollections());
   const { toast } = useToast();
 
@@ -61,9 +57,11 @@ export function AddToCollectionButton({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         {collections.length === 0 ? (
-          <div className="px-2 py-4 text-sm text-gray-500 text-center">No collections yet</div>
+          <div className="px-2 py-4 text-sm text-gray-500 text-center">
+            No collections yet
+          </div>
         ) : (
-          collections.map(collection => {
+          collections.map((collection) => {
             const inCollection = isInCollection(collection.id);
             return (
               <DropdownMenuItem

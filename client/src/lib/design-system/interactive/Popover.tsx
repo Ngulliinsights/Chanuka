@@ -2,7 +2,8 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 import { AlertCircle } from 'lucide-react';
 import * as React from 'react';
 
-import { cn, UIComponentError, attemptUIRecovery } from '../utils';
+import { cn } from '../lib/utils';
+import { UIComponentError, attemptUIRecovery } from '../utils';
 
 const Popover = PopoverPrimitive.Root;
 

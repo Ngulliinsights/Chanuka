@@ -1,11 +1,8 @@
 import { useAuth } from '@client/infrastructure/auth';
-import {
-  NavigationValidationError,
-  NavigationAccessDeniedError,
-} from '@client/infrastructure/error';
+import { NavigationValidationError, NavigationAccessDeniedError } from '@client/infrastructure/error';
 import { useUnifiedNavigation } from '@client/infrastructure/navigation/hooks/use-unified-navigation';
 import { getRecoverySuggestions } from '../recovery';
-import { validateNavigationPath } from '../validation';
+import { validateNavigationPath, validateUserRole } from '../validation';
 import type { UserRole, AccessDenialReason } from '@client/lib/types';
 
 import { checkRouteAccess } from '../utils/route-access';

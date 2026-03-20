@@ -1,5 +1,6 @@
 import {
   User,
+  MapPin,
   Calendar,
   Mail,
   ChevronDown,
@@ -21,15 +22,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import { Expert, ExpertCredential, ExpertAffiliation } from '@client/lib/types';
 
-import {
-  Globe,
-  ExternalLink,
-  Linkedin,
-  GraduationCap,
-} from '@client/lib/design-system/icons/ChanukaIcons';
+import { Globe, ExternalLink, Linkedin, GraduationCap } from '../icons/ChanukaIcons';
 
 import { CredibilityIndicator } from './CredibilityScoring';
 import { ExpertBadge } from './ExpertBadge';

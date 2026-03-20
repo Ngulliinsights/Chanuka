@@ -123,8 +123,7 @@ function generateMockConflictAnalysis(billId: number, sponsorId: number): Confli
       lastUpdated: new Date().toISOString(),
     },
     riskLevel: 'high',
-    summary:
-      'Significant financial interests in affected industries with high correlation to voting patterns',
+    summary: 'Significant financial interests in affected industries with high correlation to voting patterns',
   };
 }
 

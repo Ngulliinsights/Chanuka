@@ -1,3 +1,5 @@
+ 
+
 /**
  * Low-Bandwidth Provider
  * ====================
@@ -15,6 +17,7 @@
  */
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React from 'react';
 
 import { LowBandwidthConfig, defaultLowBandwidthConfig } from '../standards/low-bandwidth';
 

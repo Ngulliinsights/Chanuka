@@ -4,11 +4,15 @@ import {
   CheckCircle,
   XCircle,
   Info,
+  TrendingUp,
   Users,
+  BookOpen,
   ChevronDown,
   ChevronUp,
+  Shield,
   Gavel,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';
@@ -20,6 +24,7 @@ import {
   CardTitle,
 } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import { Separator } from '@client/lib/design-system';
 import type { Bill } from '@client/lib/types';
 
@@ -73,7 +78,11 @@ interface ConstitutionalAnalysisPanelProps {
  * ConstitutionalAnalysisPanel - Main constitutional analysis overview
  * Features: Severity indicators, expert analysis display, constitutional compatibility assessment
  */
-import { KENYA_CASE_LAW, getConstitutionalArticle } from '@client/lib/data/mock/real-kenya-data';
+import {
+  KENYA_CONSTITUTION,
+  KENYA_CASE_LAW,
+  getConstitutionalArticle,
+} from '@client/lib/data/mock/real-kenya-data';
 
 // ... (component definition starts)
 
@@ -84,7 +93,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
   const devolutionArticle = getConstitutionalArticle(189);
   const equalityArticle = getConstitutionalArticle(27);
   const healthArticle = getConstitutionalArticle(43);
-
+  
   // Use real precedents
   const devolutionCases = KENYA_CASE_LAW.devolution;
   const healthCases = KENYA_CASE_LAW.health;
@@ -121,10 +130,7 @@ export function ConstitutionalAnalysisPanel({ bill }: ConstitutionalAnalysisPane
         title: 'Equal Protection Implementation',
         description: 'Income-based eligibility criteria requires Art. 27 analysis',
         article: `Article ${equalityArticle.number}: ${equalityArticle.title}`,
-        precedents: [
-          'FIDA-Kenya v Attorney General',
-          'Coalition for Reform and Democracy v Republic',
-        ],
+        precedents: ['FIDA-Kenya v Attorney General', 'Coalition for Reform and Democracy v Republic'],
         recommendation: 'Ensure clear, objective criteria for eligibility determinations',
       },
     ],

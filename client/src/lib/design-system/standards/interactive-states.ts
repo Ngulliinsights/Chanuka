@@ -155,7 +155,15 @@ export const interactiveStates = {
 } as const;
 
 // Interactive state utility functions
-export       focus?: boolean;
+export const interactiveStateUtils = {
+  /**
+   * Get interactive state classes
+   */
+  getStateClasses: (
+    component: 'button' | 'card' | 'input' | 'link' | 'default' = 'default',
+    states: {
+      hover?: boolean;
+      focus?: boolean;
       active?: boolean;
       disabled?: boolean;
       loading?: boolean;

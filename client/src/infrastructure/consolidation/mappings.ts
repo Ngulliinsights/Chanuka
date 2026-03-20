@@ -1,12 +1,16 @@
 /**
  * Consolidation mappings for infrastructure modules
- *
+ * 
  * This module defines the specific mappings for consolidating
  * 31 infrastructure modules down to ~20 modules.
  */
 
 import type { ConsolidationMapping, ConsolidationPlan } from './types';
-import { ConsolidationStrategy, ImpactLevel, MigrationType } from './types';
+import {
+  ConsolidationStrategy,
+  ImpactLevel,
+  MigrationType,
+} from './types';
 
 /**
  * Mapping for consolidating observability modules
@@ -48,7 +52,8 @@ export const observabilityMapping: ConsolidationMapping = {
   ],
   breakingChanges: [
     {
-      description: 'Import paths changed from individual modules to unified observability module',
+      description:
+        'Import paths changed from individual modules to unified observability module',
       impact: ImpactLevel.MEDIUM,
       mitigation:
         'Use automated migration script to update all import paths. All functionality remains accessible through new paths.',
@@ -104,14 +109,16 @@ export const stateManagementMapping: ConsolidationMapping = {
   ],
   breakingChanges: [
     {
-      description: 'State management consolidated into Redux store with slices',
+      description:
+        'State management consolidated into Redux store with slices',
       impact: ImpactLevel.HIGH,
       mitigation:
         'Replace custom hooks with Redux hooks. Use useAppSelector() with slice selectors instead of module-specific hooks.',
       affectedFiles: [],
     },
     {
-      description: 'State structure changed from separate modules to unified RootState',
+      description:
+        'State structure changed from separate modules to unified RootState',
       impact: ImpactLevel.MEDIUM,
       mitigation:
         'Update state access patterns to use store.getState().dashboard, store.getState().navigation, etc.',
@@ -153,14 +160,16 @@ export const apiMapping: ConsolidationMapping = {
   ],
   breakingChanges: [
     {
-      description: 'API modules consolidated under unified api module',
+      description:
+        'API modules consolidated under unified api module',
       impact: ImpactLevel.MEDIUM,
       mitigation:
         'Use automated migration script to update import paths. All functionality remains accessible through new paths.',
       affectedFiles: [],
     },
     {
-      description: 'API client now provides unified interface for HTTP, WebSocket, and realtime',
+      description:
+        'API client now provides unified interface for HTTP, WebSocket, and realtime',
       impact: ImpactLevel.LOW,
       mitigation:
         'Access clients through api.http, api.websocket, api.realtime instead of separate imports.',
@@ -173,7 +182,11 @@ export const apiMapping: ConsolidationMapping = {
  * Complete consolidation plan
  */
 export const consolidationPlan: ConsolidationPlan = {
-  mappings: [observabilityMapping, stateManagementMapping, apiMapping],
+  mappings: [
+    observabilityMapping,
+    stateManagementMapping,
+    apiMapping,
+  ],
   timelineWeeks: 10,
   moduleCountBefore: 31,
   moduleCountAfter: 20,
@@ -183,26 +196,34 @@ export const consolidationPlan: ConsolidationPlan = {
  * Get all source modules being consolidated
  */
 export function getAllSourceModules(): string[] {
-  return consolidationPlan.mappings.flatMap(m => m.sourceModules);
+  return consolidationPlan.mappings.flatMap((m) => m.sourceModules);
 }
 
 /**
  * Get all target modules after consolidation
  */
 export function getAllTargetModules(): string[] {
-  return consolidationPlan.mappings.map(m => m.targetModule);
+  return consolidationPlan.mappings.map((m) => m.targetModule);
 }
 
 /**
  * Find mapping for a source module
  */
-export function findMappingForSourceModule(sourceModule: string): ConsolidationMapping | undefined {
-  return consolidationPlan.mappings.find(m => m.sourceModules.includes(sourceModule));
+export function findMappingForSourceModule(
+  sourceModule: string
+): ConsolidationMapping | undefined {
+  return consolidationPlan.mappings.find((m) =>
+    m.sourceModules.includes(sourceModule)
+  );
 }
 
 /**
  * Find mapping for a target module
  */
-export function findMappingForTargetModule(targetModule: string): ConsolidationMapping | undefined {
-  return consolidationPlan.mappings.find(m => m.targetModule === targetModule);
+export function findMappingForTargetModule(
+  targetModule: string
+): ConsolidationMapping | undefined {
+  return consolidationPlan.mappings.find(
+    (m) => m.targetModule === targetModule
+  );
 }

@@ -1,4 +1,5 @@
 import { Calendar, Clock, Users, Eye, Bookmark, MessageCircle, Share2 } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import type { Bill } from '@client/lib/types';
@@ -85,18 +86,12 @@ export function BillHeader({ bill }: BillHeaderProps) {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                <span>
-                  Introduced:{' '}
-                  {bill.introducedDate ? new Date(bill.introducedDate).toLocaleDateString() : 'N/A'}
-                </span>
+                <span>Introduced: {bill.introducedDate ? new Date(bill.introducedDate).toLocaleDateString() : 'N/A'}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
-                <span>
-                  Updated:{' '}
-                  {bill.lastUpdated ? new Date(bill.lastUpdated).toLocaleDateString() : 'N/A'}
-                </span>
+                <span>Updated: {bill.lastUpdated ? new Date(bill.lastUpdated).toLocaleDateString() : 'N/A'}</span>
               </div>
 
               <div className="flex items-center gap-2">

@@ -3,13 +3,25 @@
  * Displays security system status and metrics
  */
 
-import { getSecuritySystem, VulnerabilityReport } from '@core/security';
-import type {
-  ExtendedSecurityMetrics,
+import {
+  getSecuritySystem,
+  VulnerabilityReport,
+} from '@core/security';
+import type { 
+  ExtendedSecurityMetrics, 
   SecurityAlert,
-  ExtendedSecurityEvent,
+  ExtendedSecurityEvent 
 } from '@client/infrastructure/security/security-monitor';
-import { Shield, AlertTriangle, CheckCircle, XCircle, Activity, Eye, Lock } from 'lucide-react';
+import {
+  Shield,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Activity,
+  Eye,
+  Lock,
+  Zap,
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import { Alert, AlertDescription } from '@client/lib/design-system';

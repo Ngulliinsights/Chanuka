@@ -1,9 +1,9 @@
 /**
  * ArgumentsTab Component
- *
+ * 
  * Displays all arguments on a bill grouped by position (support/oppose/neutral)
  * Integrates with argument-intelligence feature
- *
+ * 
  * Features:
  * - Filter by position
  * - Sort by strength/confidence
@@ -33,9 +33,7 @@ interface ArgumentsTabProps {
 
 export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   const { data: argumentsList, isLoading, error } = useArgumentsForBill(billId);
-  const [positionFilter, setPositionFilter] = useState<'all' | 'support' | 'oppose' | 'neutral'>(
-    'all'
-  );
+  const [positionFilter, setPositionFilter] = useState<'all' | 'support' | 'oppose' | 'neutral'>('all');
   const [sortBy, setSortBy] = useState<'strength' | 'confidence' | 'newest'>('strength');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -66,7 +64,7 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
 
   // Filter arguments
   let filtered = argumentsList;
-
+  
   if (positionFilter !== 'all') {
     filtered = filtered.filter((arg: unknown) => (arg.position || arg.type) === positionFilter);
   }
@@ -81,20 +79,11 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
   const sorted = [...filtered].sort((a: unknown, b: unknown) => {
     switch (sortBy) {
       case 'strength':
-        return (
-          ((b.strengthScore ?? b.strength_score) || 0) -
-          ((a.strengthScore ?? a.strength_score) || 0)
-        );
+        return ((b.strengthScore ?? b.strength_score) || 0) - ((a.strengthScore ?? a.strength_score) || 0);
       case 'confidence':
-        return (
-          ((b.confidenceScore ?? b.confidence_score) || 0) -
-          ((a.confidenceScore ?? a.confidence_score) || 0)
-        );
+        return ((b.confidenceScore ?? b.confidence_score) || 0) - ((a.confidenceScore ?? a.confidence_score) || 0);
       case 'newest':
-        return (
-          new Date((b.createdAt ?? b.created_at) || 0).getTime() -
-          new Date((a.createdAt ?? a.created_at) || 0).getTime()
-        );
+        return new Date((b.createdAt ?? b.created_at) || 0).getTime() - new Date((a.createdAt ?? a.created_at) || 0).getTime();
       default:
         return 0;
     }
@@ -113,21 +102,15 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-green-700">{supportCount}</div>
-          <div className="text-sm text-green-600">
-            Support ({Math.round((supportCount / total) * 100)}%)
-          </div>
+          <div className="text-sm text-green-600">Support ({Math.round(supportCount/total*100)}%)</div>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-red-700">{opposeCount}</div>
-          <div className="text-sm text-red-600">
-            Oppose ({Math.round((opposeCount / total) * 100)}%)
-          </div>
+          <div className="text-sm text-red-600">Oppose ({Math.round(opposeCount/total*100)}%)</div>
         </div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
           <div className="text-2xl font-bold text-gray-700">{neutralCount}</div>
-          <div className="text-sm text-gray-600">
-            Neutral ({Math.round((neutralCount / total) * 100)}%)
-          </div>
+          <div className="text-sm text-gray-600">Neutral ({Math.round(neutralCount/total*100)}%)</div>
         </div>
       </div>
 
@@ -137,20 +120,18 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
           type="text"
           placeholder="Search arguments..."
           value={searchTerm}
-          onChange={e => setSearchTerm(e.target.value)}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-
+        
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="filter-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Filter
-            </label>
+            <label htmlFor="filter-select" className="block text-sm font-medium text-gray-700 mb-2">Filter</label>
             <select
               id="filter-select"
               title="Filter arguments by position"
               value={positionFilter}
-              onChange={e => {
+              onChange={(e) => {
                 const value = e.target.value as 'all' | 'support' | 'oppose' | 'neutral';
                 setPositionFilter(value);
               }}
@@ -162,16 +143,14 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
               <option value="neutral">Neutral ({neutralCount})</option>
             </select>
           </div>
-
+          
           <div>
-            <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-2">
-              Sort By
-            </label>
+            <label htmlFor="sort-select" className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
             <select
               id="sort-select"
               title="Sort arguments by metric"
               value={sortBy}
-              onChange={e => {
+              onChange={(e) => {
                 const value = e.target.value as 'strength' | 'confidence' | 'newest';
                 setSortBy(value);
               }}
@@ -188,9 +167,11 @@ export function ArgumentsTab({ billId }: ArgumentsTabProps) {
       {/* Arguments List */}
       <div className="space-y-4">
         {sorted.length === 0 ? (
-          <div className="text-center py-8 text-gray-600">No arguments match your filters</div>
+          <div className="text-center py-8 text-gray-600">
+            No arguments match your filters
+          </div>
         ) : (
-          sorted.map(arg => (
+          sorted.map((arg) => (
             <ArgumentCard key={arg.id} argument={arg as unknown as BillArgument} billId={billId} />
           ))
         )}
@@ -209,36 +190,33 @@ function ArgumentCard({ argument, billId }: { argument: BillArgument; billId: st
     support: 'bg-green-50 border-green-200',
     oppose: 'bg-red-50 border-red-200',
     neutral: 'bg-gray-50 border-gray-200',
-    conditional: 'bg-blue-50 border-blue-200',
+    conditional: 'bg-blue-50 border-blue-200'
   };
 
   const positionBadgeColors: Record<ArgumentPosition, string> = {
     support: 'bg-green-100 text-green-800',
     oppose: 'bg-red-100 text-red-800',
     neutral: 'bg-gray-100 text-gray-800',
-    conditional: 'bg-blue-100 text-blue-800',
+    conditional: 'bg-blue-100 text-blue-800'
   };
 
   const positionLabel: Record<ArgumentPosition, string> = {
     support: '✓ Support',
     oppose: '✗ Oppose',
     neutral: '○ Neutral',
-    conditional: '≈ Conditional',
+    conditional: '≈ Conditional'
   };
 
   const position: ArgumentPosition = argument.position || 'neutral';
-
+  
   return (
-    <div
-      className={`border rounded-lg p-4 cursor-pointer transition ${positionColors[position]}`}
-      onClick={() => setExpanded(!expanded)}
-    >
+    <div className={`border rounded-lg p-4 cursor-pointer transition ${positionColors[position]}`}
+         onClick={() => setExpanded(!expanded)}>
+      
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <span
-              className={`px-2 py-1 rounded text-xs font-medium ${positionBadgeColors[position]}`}
-            >
+            <span className={`px-2 py-1 rounded text-xs font-medium ${positionBadgeColors[position]}`}>
               {positionLabel[position]}
             </span>
             <span className="text-xs text-gray-600">
@@ -248,8 +226,10 @@ function ArgumentCard({ argument, billId }: { argument: BillArgument; billId: st
               Confidence: {Math.round((argument.confidenceScore || 0) * 100)}%
             </span>
           </div>
-
-          <p className="text-gray-800 font-medium line-clamp-2">{argument.argumentText}</p>
+          
+          <p className="text-gray-800 font-medium line-clamp-2">
+            {argument.argumentText}
+          </p>
         </div>
 
         <button className="ml-4 text-gray-600 hover:text-gray-800 text-xl">
@@ -261,13 +241,17 @@ function ArgumentCard({ argument, billId }: { argument: BillArgument; billId: st
         <div className="mt-4 space-y-4 border-t pt-4">
           <div>
             <h4 className="font-semibold text-sm text-gray-700 mb-2">Full Argument</h4>
-            <p className="text-gray-700 text-sm leading-relaxed">{argument.argumentText}</p>
+            <p className="text-gray-700 text-sm leading-relaxed">
+              {argument.argumentText}
+            </p>
           </div>
 
           {argument.summary && (
             <div>
               <h4 className="font-semibold text-sm text-gray-700 mb-2">Summary</h4>
-              <p className="text-gray-600 text-sm">{argument.summary}</p>
+              <p className="text-gray-600 text-sm">
+                {argument.summary}
+              </p>
             </div>
           )}
 

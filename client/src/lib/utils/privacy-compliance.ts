@@ -30,7 +30,14 @@ interface DataProcessingRecord {
 // PRIVACY UTILITIES
 // ============================================================================
 
-export     for (let i = 0; i < value.length; i++) {
+export const privacyUtils = {
+  /**
+   * Hashes a value for anonymization
+   */
+  hashValue(value: string): string {
+    // Simple hash for demo - in production use crypto.subtle.digest
+    let hash = 0;
+    for (let i = 0; i < value.length; i++) {
       const char = value.charCodeAt(i);
       hash = (hash << 5) - hash + char;
       hash = hash & hash; // Convert to 32-bit integer
@@ -205,4 +212,4 @@ class PrivacyComplianceManager {
 }
 
 // Export singleton instance
-export 
+export const privacyCompliance = new PrivacyComplianceManager();

@@ -193,7 +193,16 @@ export const typographyDesignStandards = {
 } as const;
 
 // Typography utility functions
-export   },
+export const typographyUtils = {
+  /**
+   * Get typography classes
+   */
+  getTypographyClasses: (
+    type: 'heading' | 'body' | 'specialized' | 'link',
+    variant: string
+  ): string => {
+    return `chanuka-typography chanuka-${type}-${variant}`;
+  },
 
   /**
    * Get heading styles

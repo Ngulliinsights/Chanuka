@@ -1,12 +1,12 @@
 /**
  * Unit Tests: Observability Module
- *
+ * 
  * Tests for the unified observability module covering:
  * - Error tracking with various error contexts
  * - Performance metric collection
  * - Analytics event tracking
  * - Telemetry data aggregation
- *
+ * 
  * Requirements: 10.1, 10.2, 11.1, 11.2, 11.3, 11.4, 11.5
  */
 
@@ -133,7 +133,7 @@ describe('Observability Module', () => {
     it('should handle performance tracking errors gracefully', () => {
       // Arrange
       vi.mocked(performance.trackPerformance).mockRejectedValueOnce(new Error('Tracking failed'));
-
+      
       const metric: PerformanceMetric = {
         name: 'test-metric',
         value: 100,
@@ -244,7 +244,7 @@ describe('Observability Module', () => {
     it('should handle telemetry send failures', async () => {
       // Arrange
       vi.mocked(telemetry.sendTelemetry).mockRejectedValueOnce(new Error('Network error'));
-
+      
       const data: TelemetryData = {
         type: 'test_data',
         payload: { test: true },
@@ -265,17 +265,17 @@ describe('Observability Module', () => {
       expect(metrics).toHaveProperty('performance');
       expect(metrics).toHaveProperty('analytics');
       expect(metrics).toHaveProperty('telemetry');
-
+      
       expect(metrics.errors).toHaveProperty('total');
       expect(metrics.errors).toHaveProperty('byComponent');
       expect(metrics.errors).toHaveProperty('recent');
-
+      
       expect(metrics.performance).toHaveProperty('averages');
       expect(metrics.performance).toHaveProperty('recent');
-
+      
       expect(metrics.analytics).toHaveProperty('eventCount');
       expect(metrics.analytics).toHaveProperty('recentEvents');
-
+      
       expect(metrics.telemetry).toHaveProperty('dataPointsSent');
     });
   });

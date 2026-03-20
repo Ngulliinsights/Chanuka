@@ -60,16 +60,7 @@ export interface SearchHighlight {
 
 export interface SearchResult {
   id: string;
-  type:
-    | 'bill'
-    | 'legislator'
-    | 'committee'
-    | 'comment'
-    | 'user'
-    | 'expert'
-    | 'thread'
-    | 'sponsor'
-    | 'insight';
+  type: 'bill' | 'legislator' | 'committee' | 'comment' | 'user' | 'expert' | 'thread' | 'sponsor' | 'insight';
   title: string;
   description?: string; // Unified: use this for body/excerpt
   content?: string; // Full content if available
@@ -155,16 +146,7 @@ export interface SearchHistory {
 export interface SearchSuggestion {
   text: string;
   term?: string; // Alias for text for backward compatibility
-  type:
-    | 'query'
-    | 'filter'
-    | 'entity'
-    | 'completion'
-    | 'correction'
-    | 'related'
-    | 'recent'
-    | 'popular'
-    | 'bill_title';
+  type: 'query' | 'filter' | 'entity' | 'completion' | 'correction' | 'related' | 'recent' | 'popular' | 'bill_title';
   category?: string;
   count?: number;
   score?: number;

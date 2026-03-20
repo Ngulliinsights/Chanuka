@@ -25,7 +25,13 @@ import type { EndpointCallResult } from '@shared/types/api/contracts';
  * Bill API Service
  * Provides type-safe methods for bill-related API calls
  */
-export   },
+export const billApiService = {
+  /**
+   * Create a new bill
+   */
+  async create(request: CreateBillRequest): Promise<EndpointCallResult<CreateBillResponse>> {
+    return contractApiClient.call(BillEndpoints.create, request);
+  },
 
   /**
    * Get bill by ID

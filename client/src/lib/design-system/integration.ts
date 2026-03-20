@@ -104,7 +104,16 @@ export const designSystemIntegration: DesignSystemIntegration = {
 /**
  * Export integration utilities
  */
-export         return designSystemIntegration.performance.trackComponentRender(componentName, duration);
+export const integrationUtils = {
+  /**
+   * Register performance monitoring for a component
+   */
+  registerComponentPerformance: (componentName: string) => {
+    return {
+      startMeasure: () => performance.now(),
+      endMeasure: (startTime: number) => {
+        const duration = performance.now() - startTime;
+        return designSystemIntegration.performance.trackComponentRender(componentName, duration);
       },
     };
   },

@@ -39,7 +39,11 @@ export type {
   WidgetTypeDef,
 } from './dashboard-base';
 
-export { isWidgetConfig, isDashboardLayout, isDashboardConfig } from './dashboard-base';
+export {
+  isWidgetConfig,
+  isDashboardLayout,
+  isDashboardConfig,
+} from './dashboard-base';
 
 // ============================================================================
 // Legacy Dashboard Application Types (from original dashboard.ts)
@@ -75,7 +79,10 @@ export type {
   KPIDefinition,
 } from './dashboard-metrics';
 
-export { isTimeSeries, isAnalyticsMetrics } from './dashboard-metrics';
+export {
+  isTimeSeries,
+  isAnalyticsMetrics,
+} from './dashboard-metrics';
 
 // ============================================================================
 // Component Props Types
@@ -128,7 +135,11 @@ export type {
   DashboardEventFilter,
 } from './dashboard-events';
 
-export { isWidgetEvent, isDashboardEvent, isErrorEvent } from './dashboard-events';
+export {
+  isWidgetEvent,
+  isDashboardEvent,
+  isErrorEvent,
+} from './dashboard-events';
 
 // ============================================================================
 // Preset Configurations and Constants
@@ -224,26 +235,46 @@ export const DEFAULT_PREFERENCES: DashboardPreferences = {
  * import { WIDGET_TYPES } from '@client/lib/types/dashboard';
  * const type = WIDGET_TYPES.CHART;
  */
-export /**
+export const WIDGET_TYPES = {
+  CHART: 'chart',
+  METRIC: 'metric',
+  TABLE: 'table',
+  LIST: 'list',
+  CARD: 'card',
+  GAUGE: 'gauge',
+  TIMELINE: 'timeline',
+  HEATMAP: 'heatmap',
+  MAP: 'map',
+  CUSTOM: 'custom',
+} as const;
+
+/**
  * Dashboard layout types
  *
  * @example
  * import { LAYOUT_TYPES } from '@client/lib/types/dashboard';
  * const layout = LAYOUT_TYPES.GRID;
  */
-const /**
-   * Widget size presets
-   *
-   * @example
-   * import { WIDGET_SIZES } from '@client/lib/types/dashboard';
-   * const size = WIDGET_SIZES.MEDIUM;
-   */
-  WIDGET_SIZES = {
-    SMALL: { width: 50, height: 30 },
-    MEDIUM: { width: 100, height: 50 },
-    LARGE: { width: 150, height: 75 },
-    FULL: { width: 100, height: 100 },
-  } as const;
+export const LAYOUT_TYPES = {
+  GRID: 'grid',
+  FLEX: 'flex',
+  MASONRY: 'masonry',
+  CUSTOM: 'custom',
+} as const;
+
+/**
+ * Widget size presets
+ *
+ * @example
+ * import { WIDGET_SIZES } from '@client/lib/types/dashboard';
+ * const size = WIDGET_SIZES.MEDIUM;
+ */
+export const WIDGET_SIZES = {
+  SMALL: { width: 50, height: 30 },
+  MEDIUM: { width: 100, height: 50 },
+  LARGE: { width: 150, height: 75 },
+  FULL: { width: 100, height: 100 },
+} as const;
 
 // Internal imports for utility functions
 import type { DashboardPreferences, DashboardConfig, WidgetConfig } from './dashboard-base';

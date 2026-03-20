@@ -1,7 +1,10 @@
 import { Bell, AlertCircle, Info, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
+import React from 'react';
+
 import { cn } from '@client/lib/utils/cn';
+
 
 interface RealTimeNotificationsProps {
   className?: string;
@@ -19,7 +22,7 @@ export function RealTimeNotifications({
 
   // Mock WebSocket functionality
   const isConnected = false;
-  //  // Unused variable
+  // const addMessageHandler = () => () => {}; // Unused variable
 
   // Handle incoming WebSocket messages
   useEffect(() => {

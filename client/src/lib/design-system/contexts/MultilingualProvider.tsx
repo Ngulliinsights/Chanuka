@@ -1,3 +1,5 @@
+ 
+
 /**
  * Multilingual Provider
  * ===================
@@ -12,7 +14,7 @@
  *
  *   // In components:
  *   const { language, setLanguage, format } = useLanguage();
- *    // "1,234" or "1234" depending on locale
+ *   const formatted = format.number(1234); // "1,234" or "1234" depending on locale
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';

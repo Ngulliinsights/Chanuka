@@ -5,12 +5,12 @@
 
 async function globalTeardown() {
   console.log('🧹 Starting E2E test global teardown...');
-
+  
   // Cleanup tasks if needed
   // - Clear test data
   // - Reset database state
   // - Clean up temporary files
-
+  
   console.log('✅ Global teardown complete');
 }
 

@@ -4,7 +4,7 @@
  * React hooks for Electoral Accountability data fetching with React Query
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, type UseQueryOptions } from '@tanstack/react-query';
 import { electoralAccountabilityApi } from '../services/electoral-accountability-api';
 import type {
   VotingRecord,

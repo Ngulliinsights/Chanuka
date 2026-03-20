@@ -252,7 +252,9 @@ export class CommunityErrorBoundary extends Component<
  * Hook for creating incremental error boundaries that can handle partial failures
  * Note: Exported as const to avoid fast-refresh issues
  */
-export 
+export const useIncrementalErrorBoundary = () => {
+  const [failedSections, setFailedSections] = React.useState<Set<string>>(new Set());
+
   const markSectionFailed = React.useCallback((sectionId: string) => {
     setFailedSections(prev => new Set(prev).add(sectionId));
   }, []);

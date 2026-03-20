@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Realtime Client
- *
+ * 
  * Tests topic subscriptions, event publishing, message routing,
  * and subscription management.
  */
@@ -124,7 +124,9 @@ describe('UnifiedRealtimeClient', () => {
       const subscriptions = client.getSubscriptions();
 
       expect(subscriptions).toHaveLength(2);
-      expect(subscriptions.map(s => s.topic)).toEqual(expect.arrayContaining(['topic1', 'topic2']));
+      expect(subscriptions.map(s => s.topic)).toEqual(
+        expect.arrayContaining(['topic1', 'topic2'])
+      );
     });
 
     it('should unsubscribe from a topic', () => {
@@ -212,7 +214,9 @@ describe('UnifiedRealtimeClient', () => {
       client.subscribe('test-topic', handler);
 
       // Get the message handler registered with WebSocket client
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -235,7 +239,9 @@ describe('UnifiedRealtimeClient', () => {
       client.subscribe('test-topic', handler1);
       client.subscribe('test-topic', handler2);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -258,7 +264,9 @@ describe('UnifiedRealtimeClient', () => {
 
       client.unsubscribe(subscription);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -277,7 +285,9 @@ describe('UnifiedRealtimeClient', () => {
     it('should handle messages without topic', () => {
       const { logger } = require('@client/lib/utils/logger');
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -297,7 +307,9 @@ describe('UnifiedRealtimeClient', () => {
       const handler: EventHandler = vi.fn();
       client.subscribe('test', handler);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -314,7 +326,9 @@ describe('UnifiedRealtimeClient', () => {
       const handler: EventHandler = vi.fn();
       client.subscribe('test-topic', handler);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       // Format 1: data.payload
       messageHandler({
@@ -369,7 +383,9 @@ describe('UnifiedRealtimeClient', () => {
       client.subscribe('test-topic', errorHandler);
       client.subscribe('test-topic', normalHandler);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -397,7 +413,9 @@ describe('UnifiedRealtimeClient', () => {
 
       client.subscribe('test-topic', errorHandler);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',
@@ -474,7 +492,9 @@ describe('UnifiedRealtimeClient', () => {
 
       client.subscribe('test-topic', slowHandler);
 
-      const messageHandler = mockWsClient.on.mock.calls.find(call => call[0] === 'message')?.[1];
+      const messageHandler = mockWsClient.on.mock.calls.find(
+        call => call[0] === 'message'
+      )?.[1];
 
       const message: WebSocketMessage = {
         type: 'test',

@@ -113,26 +113,12 @@ export interface UseLoadingOptions {
   showTimeoutWarning?: boolean;
   timeoutWarningThreshold?: number;
   priority?: 'high' | 'medium' | 'low';
-  type?:
-    | 'page'
-    | 'component'
-    | 'api'
-    | 'asset'
-    | 'progressive'
-    | 'form'
-    | 'navigation'
-    | 'data'
-    | 'network'
-    | 'inline'
-    | 'network-aware'
-    | 'timeout-aware';
+  type?: 'page' | 'component' | 'api' | 'asset' | 'progressive' | 'form' | 'navigation' | 'data' | 'network' | 'inline' | 'network-aware' | 'timeout-aware';
   message?: string;
   metadata?: Readonly<Record<string, unknown>>;
   onError?: (error: Error) => void;
   onSuccess?: () => void;
-  onStateChange?: (
-    state: 'idle' | 'loading' | 'success' | 'error' | 'timeout' | 'cancelled'
-  ) => void;
+  onStateChange?: (state: 'idle' | 'loading' | 'success' | 'error' | 'timeout' | 'cancelled') => void;
 }
 
 /**

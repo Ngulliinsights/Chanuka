@@ -17,6 +17,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';

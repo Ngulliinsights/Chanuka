@@ -38,9 +38,9 @@ export * from './event-bus';
  * eventBus.emit('data:updated', { id: 1, value: 'new' });
  * ```
  */
-export {
-  eventBus,
-  EventBus,
+export { 
+  eventBus, 
+  EventBus, 
   /**
    * Subscribe to an event. Returns an unsubscribe function.
    *
@@ -54,7 +54,7 @@ export {
    * });
    * ```
    */
-  on,
+  on, 
   /**
    * Subscribe to an event that fires only once, then automatically unsubscribes.
    *
@@ -68,7 +68,7 @@ export {
    * });
    * ```
    */
-  once,
+  once, 
   /**
    * Emit an event with optional data payload.
    *
@@ -79,7 +79,7 @@ export {
    * emit('user:logout', { userId: '123', reason: 'manual' });
    * ```
    */
-  emit,
+  emit, 
   /**
    * Unsubscribe from an event.
    *
@@ -90,5 +90,5 @@ export {
    * off('user:login', loginHandler);
    * ```
    */
-  off,
+  off 
 } from './event-bus';

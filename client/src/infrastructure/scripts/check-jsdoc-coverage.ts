@@ -36,9 +36,7 @@ function checkJSDocInFile(filePath: string): ExportInfo[] {
     }
 
     // Check for export statements
-    const exportMatch = line.match(
-      /^export\s+(function|class|interface|type|const|let|var)\s+(\w+)/
-    );
+    const exportMatch = line.match(/^export\s+(function|class|interface|type|const|let|var)\s+(\w+)/);
     if (exportMatch) {
       const [, type, name] = exportMatch;
 

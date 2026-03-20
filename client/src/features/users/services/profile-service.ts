@@ -660,4 +660,4 @@ export class UserProfileService implements IProfileService, ServiceLifecycleInte
 }
 
 // Export singleton instance
-export 
+export const userProfileService = new UserProfileService();

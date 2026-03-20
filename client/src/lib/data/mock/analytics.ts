@@ -514,4 +514,18 @@ export const generateEngagementTrends = (periods: string[]): EngagementTrend[] =
 /**
  * Default mock analytics datasets
  */
-export export export export export export export export export export 
+export const mockLiveEngagementMetrics = generateLiveEngagementMetrics();
+export const mockPersonalEngagementScore = generatePersonalEngagementScore('current-user');
+export const mockCommunitysentimentAnalysis = generateCommunitysentimentAnalysis();
+export const mockExpertVerificationMetrics = generateExpertVerificationMetrics();
+export const mockEngagementStatistics = generateEngagementStatistics();
+export const mockTemporalAnalyticsData = generateTemporalAnalyticsData();
+export const mockUserEngagementProfile = generateUserEngagementProfile('current-user');
+export const mockCivicEngagementGoals = generateCivicEngagementGoals(6);
+export const mockEngagementNotifications = generateEngagementNotifications(15);
+export const mockEngagementTrends = generateEngagementTrends([
+  'This Week',
+  'Last Week',
+  'This Month',
+  'Last Month',
+]);

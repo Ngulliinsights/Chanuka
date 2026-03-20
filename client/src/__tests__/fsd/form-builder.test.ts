@@ -37,9 +37,7 @@ describe('Form Builder FSD', () => {
 
   describe('Form Builder Factories', () => {
     it('should create login form builder', () => {
-      const {
-        createLoginFormBuilder,
-      } = require('@lib/form-builder/factories/form-builder.factory');
+      const { createLoginFormBuilder } = require('@lib/form-builder/factories/form-builder.factory');
 
       const formBuilder = createLoginFormBuilder();
       expect(formBuilder).toBeDefined();
@@ -47,9 +45,7 @@ describe('Form Builder FSD', () => {
     });
 
     it('should create registration form builder', () => {
-      const {
-        createRegistrationFormBuilder,
-      } = require('@lib/form-builder/factories/form-builder.factory');
+      const { createRegistrationFormBuilder } = require('@lib/form-builder/factories/form-builder.factory');
 
       const formBuilder = createRegistrationFormBuilder();
       expect(formBuilder).toBeDefined();
@@ -102,6 +98,27 @@ describe('Form Builder FSD', () => {
   describe('Form Builder Components', () => {
     it('should render dynamic form', () => {
       const { DynamicForm } = require('@lib/form-builder/components/DynamicForm');
+
+      const config = {
+        fields: [
+          {
+            name: 'email',
+            type: 'email',
+            label: 'Email Address',
+            required: true,
+          },
+          {
+            name: 'password',
+            type: 'password',
+            label: 'Password',
+            required: true,
+          },
+        ],
+        submitText: 'Create Account',
+        resetText: 'Clear Form',
+      };
+
+      const onSubmit = vi.fn();
 
       expect(DynamicForm).toBeDefined();
       expect(typeof DynamicForm).toBe('function');

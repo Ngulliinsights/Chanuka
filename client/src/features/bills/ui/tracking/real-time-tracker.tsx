@@ -14,12 +14,7 @@ import {
   SelectValue,
 } from '@client/lib/design-system/interactive/Select';
 import { Switch } from '@client/lib/design-system/interactive/Switch';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system/typography/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
 import { logger } from '@client/lib/utils/logger';
 
 interface RealTimeBillTrackerProps {
@@ -66,7 +61,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
   // Effect to process recent activity into bill updates
   useEffect(() => {
     if (!getRecentActivity) return;
-
+    
     const activity = getRecentActivity();
     const updates = activity
       .filter(a => a.type === 'bill_updated' && (!billId || a.bill_id === String(billId)))
@@ -75,7 +70,7 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
         timestamp: a.timestamp,
         data: {
           billId: a.bill_id ? parseInt(a.bill_id) : undefined,
-        },
+        }
       }));
     setBillUpdates(updates);
   }, [getRecentActivity, billId, notifications]); // Re-run when notifications change as a proxy for activity updates
@@ -90,16 +85,16 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
     notificationChannels: {
       inApp: true,
       email: true,
-      push: false,
+      push: false
     },
-    trackedBills: [],
+    trackedBills: []
   });
 
   const updatePreferences = (prefs: BillTrackingPreferences) => {
     // In a real app, this would verify with backend
     logger.info('Updating preferences', prefs);
   };
-
+    
   // Helper to get updates for specific bill
   const getBillUpdates = (id: number) => {
     return billUpdates.filter(u => u.data?.billId === id);
@@ -117,10 +112,13 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
       try {
         connect();
       } catch (error) {
-        logger.error('Failed to connect to WebSocket:', {
-          component: 'RealTimeBillTracker',
-          error: error instanceof Error ? error.message : String(error),
-        });
+        logger.error(
+          'Failed to connect to WebSocket:',
+          {
+            component: 'RealTimeBillTracker',
+            error: error instanceof Error ? error.message : String(error)
+          }
+        );
         toast.error('Failed to connect to real-time updates');
       }
     }
@@ -154,18 +152,18 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
     toast.success('Preferences updated successfully');
   }, [preferences, updatePreferences]);
 
-  const handlePreferenceChange = useCallback(
-    (key: keyof BillTrackingPreferences, value: boolean | UpdateFrequency) => {
-      setPreferences(prev => ({
-        ...prev,
-        [key]: value,
-      }));
-    },
-    []
-  );
+  const handlePreferenceChange = useCallback((key: keyof BillTrackingPreferences, value: boolean | UpdateFrequency) => {
+    setPreferences(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  }, []);
 
   const handleNotificationChannelChange = useCallback(
-    (channel: keyof BillTrackingPreferences['notificationChannels'], value: boolean) => {
+    (
+      channel: keyof BillTrackingPreferences['notificationChannels'],
+      value: boolean
+    ) => {
       setPreferences(prev => ({
         ...prev,
         notificationChannels: {
@@ -257,36 +255,28 @@ export function RealTimeBillTracker({ billId }: RealTimeBillTrackerProps) {
                     <label className="text-sm">Status Changes</label>
                     <Switch
                       checked={preferences.statusChanges}
-                      onCheckedChange={(checked: boolean) =>
-                        handlePreferenceChange('statusChanges', checked)
-                      }
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('statusChanges', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">New Comments</label>
                     <Switch
                       checked={preferences.newComments}
-                      onCheckedChange={(checked: boolean) =>
-                        handlePreferenceChange('newComments', checked)
-                      }
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('newComments', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">Voting Schedule</label>
                     <Switch
                       checked={preferences.votingSchedule}
-                      onCheckedChange={(checked: boolean) =>
-                        handlePreferenceChange('votingSchedule', checked)
-                      }
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('votingSchedule', checked)}
                     />
                   </div>
                   <div className="flex items-center justify-between">
                     <label className="text-sm">Amendments</label>
                     <Switch
                       checked={preferences.amendments}
-                      onCheckedChange={(checked: boolean) =>
-                        handlePreferenceChange('amendments', checked)
-                      }
+                      onCheckedChange={(checked: boolean) => handlePreferenceChange('amendments', checked)}
                     />
                   </div>
                 </div>

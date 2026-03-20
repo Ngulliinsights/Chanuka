@@ -38,7 +38,7 @@
  *
  * Step 1.4: Check Pattern Consistency
  *   - Error handling: Use AppError and coreErrorHandler
- *   - API calls: Use globalApiClient with createAuthRequestInterceptor (NOT AuthenticatedApiClient - deprecated)
+ *   - API calls: Use AuthenticatedApiClient or SafeApiClient
  *   - Loading states: Use LoadingStateManager
  *   - Authentication: Use TokenManager + SessionManager
  *

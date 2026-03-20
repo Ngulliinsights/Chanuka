@@ -1,15 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
 import { TrendingUp, Star } from 'lucide-react';
+import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { TrackedBill, BillRecommendation } from '@client/lib/types/user-dashboard';
 
 interface BillsSectionProps {

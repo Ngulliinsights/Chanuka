@@ -8,7 +8,8 @@
  * value for enhanced user experience and component reliability.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock UI component services
 vi.mock('@client/lib/components', () => ({

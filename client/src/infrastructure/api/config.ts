@@ -298,7 +298,9 @@ export class ConfigurationService {
     const isDevelopment =
       window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-    return isDevelopment ? '/api' : `${window.location.protocol}//${window.location.host}/api`;
+    return isDevelopment
+      ? '/api'
+      : `${window.location.protocol}//${window.location.host}/api`;
   }
 
   /**

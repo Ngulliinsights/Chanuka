@@ -15,9 +15,9 @@ import type {
   AuthUser,
   AuthTokens,
   UserPreferences,
-  DataExportRequest as DataExportResponse,
-  DataDeletionRequest as DataDeletionResponse,
-} from '../auth/types';
+  DataExportResponse,
+  DataDeletionResponse,
+} from './types/auth-types';
 
 // Re-export types for convenience
 export type {
@@ -927,7 +927,9 @@ export class AuthApiService {
  * Factory function to create AuthApiService with API client dependency.
  * This breaks the circular dependency by allowing late binding.
  */
-export };
+export const createAuthApiService = (apiClient: UnifiedApiClient): AuthApiService => {
+  return new AuthApiService(apiClient);
+};
 
 /**
  * Global instance of the authentication API service.

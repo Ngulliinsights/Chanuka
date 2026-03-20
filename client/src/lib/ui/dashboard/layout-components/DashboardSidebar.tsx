@@ -268,4 +268,4 @@ DashboardSidebarComponent.propTypes = {
 
 DashboardSidebarComponent.displayName = 'DashboardSidebar';
 
-export 
+export const DashboardSidebar = React.memo(DashboardSidebarComponent);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';
+import { Button } from '@client/lib/design-system';
 import {
   Card,
   CardContent,
@@ -320,8 +321,8 @@ export function ExpertVerificationDemo() {
               </CardHeader>
               <CardContent>
                 {mockCredibilityMetrics.components && (
-                  <CredibilityBreakdown
-                    components={mockCredibilityMetrics.components}
+                  <CredibilityBreakdown 
+                    components={mockCredibilityMetrics.components} 
                     methodology={mockCredibilityMetrics.methodology}
                   />
                 )}
@@ -393,9 +394,7 @@ export function ExpertVerificationDemo() {
                   <h4 className="text-sm font-medium mb-2">Different Validation Scores</h4>
                   <div className="space-y-2">
                     {/* ValidationSummary component not yet implemented */}
-                    <p className="text-sm text-muted-foreground">
-                      Validation summary components coming soon
-                    </p>
+                    <p className="text-sm text-muted-foreground">Validation summary components coming soon</p>
                   </div>
                 </div>
 

@@ -6,11 +6,16 @@
  */
 
 import * as d3 from 'd3';
-import { Network, Table, ZoomIn, ZoomOut, RotateCcw} from 'lucide-react';
+import { Network, Table, Eye, EyeOff, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 import {
-  NetworkData, NetworkNode, NetworkLink, AccessibilityFallbackData, } from '@client/features/analysis/types';
+  NetworkData,
+  NetworkNode,
+  NetworkLink,
+  ConflictVisualizationProps,
+  AccessibilityFallbackData,
+} from '@client/features/analysis/types';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {
@@ -120,7 +125,15 @@ export function ConflictNetworkVisualization({
     }, [conflictAnalysis])
 
   // Get color for organization type
-      return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
+  const getOrganizationColor = (type: string): string => {
+    const colors = {
+      corporation: 'hsl(var(--status-high))',
+      nonprofit: 'hsl(var(--civic-expert))',
+      lobbyist: 'hsl(var(--status-critical))',
+      trade_association: 'hsl(var(--status-moderate))',
+      government: 'hsl(var(--civic-constitutional))',
+    };
+    return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
   };
 
   // Initialize D3 visualization
@@ -333,7 +346,14 @@ export function ConflictNetworkVisualization({
   ]);
 
   // Get link color based on type
-      return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
+  const getLinkColor = (type: string): string => {
+    const colors = {
+      financial: 'hsl(var(--civic-transparency))',
+      organizational: 'hsl(var(--civic-community))',
+      voting: 'hsl(var(--civic-constitutional))',
+      industry: 'hsl(var(--status-moderate))',
+    };
+    return colors[type as keyof typeof colors] || 'hsl(var(--muted-foreground))';
   };
 
   // Zoom controls

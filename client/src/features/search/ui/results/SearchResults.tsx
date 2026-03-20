@@ -510,7 +510,10 @@ export function SearchResults({
           )}
 
           {/* Sort criteria selector */}
-          <Select value={sortBy} onValueChange={value => setSortBy(value as SortOption)}>
+          <Select
+            value={sortBy}
+            onValueChange={value => setSortBy(value as SortOption)}
+          >
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Relevance" />
             </SelectTrigger>

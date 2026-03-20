@@ -366,7 +366,9 @@ export function IntelligentAutocomplete({
               {(() => {
                 const description = suggestion.metadata?.description;
                 return description && typeof description === 'string' ? (
-                  <div className="text-xs text-muted-foreground truncate mt-0.5">{description}</div>
+                  <div className="text-xs text-muted-foreground truncate mt-0.5">
+                    {description}
+                  </div>
                 ) : null;
               })()}
             </div>

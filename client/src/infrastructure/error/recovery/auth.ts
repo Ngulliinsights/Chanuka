@@ -1,6 +1,6 @@
 /**
  * Authentication Recovery Strategies (Strategic)
- *
+ * 
  * React Query doesn't handle auth-specific recovery:
  * - Token refresh
  * - Session management
@@ -47,14 +47,10 @@ export async function authRefreshStrategy(): Promise<boolean> {
 
     return false;
   } catch (refreshError) {
-    logger.error(
-      'Auth refresh failed',
-      {
-        component: 'AuthRecovery',
-        operation: 'authRefreshStrategy',
-      },
-      refreshError
-    );
+    logger.error('Auth refresh failed', {
+      component: 'AuthRecovery',
+      operation: 'authRefreshStrategy',
+    }, refreshError);
     setTimeout(() => (window.location.href = '/auth/login'), 1000);
     return false;
   }
@@ -68,7 +64,8 @@ export async function authRetryStrategy(): Promise<boolean> {
   await new Promise(resolve => setTimeout(resolve, 500));
 
   // Check if we now have valid tokens
-  const accessToken = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const accessToken =
+    localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   return !!accessToken;
 }
 
@@ -97,14 +94,10 @@ export async function authLogoutStrategy(): Promise<boolean> {
     window.location.href = '/auth/login';
     return true;
   } catch (logoutError) {
-    logger.error(
-      'Auth logout failed',
-      {
-        component: 'AuthRecovery',
-        operation: 'authLogoutStrategy',
-      },
-      logoutError
-    );
+    logger.error('Auth logout failed', {
+      component: 'AuthRecovery',
+      operation: 'authLogoutStrategy',
+    }, logoutError);
     return false;
   }
 }

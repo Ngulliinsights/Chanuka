@@ -211,7 +211,7 @@ const IMPORT_MAPPINGS = {
   '@client/lib/components/search': '@client/features/search/ui',
   '@client/lib/components/auth': '@client/features/users/ui/auth',
   '@client/lib/components/user': '@client/features/users/ui/profile',
-  '@client/lib/components/analytics': '@client/infrastructure/analytics/ui',
+  '@client/lib/components/analytics': '@client/features/analytics/ui',
 };
 
 /**
@@ -394,18 +394,24 @@ client/src/
   const examples = {
     'Feature-specific component': `
 // ✅ Good: Bill-specific component in bills feature
+import { BillCard } from '@client/features/bills/ui';
 
 // ❌ Bad: Importing from another feature
+import { UserProfile } from '@client/features/users/ui';
     `,
     'Shared component usage': `
 // ✅ Good: Using shared UI component
+import { LoadingSpinner } from '@client/lib/ui';
 
 // ✅ Good: Using design system primitive
+import { Button } from '@client/lib/design-system';
     `,
     'Cross-feature communication': `
 // ✅ Good: Using shared API or events
+import { userApi } from '@client/lib/api';
 
 // ❌ Bad: Direct feature-to-feature import
+import { userService } from '@client/features/users/api';
     `,
   };
 

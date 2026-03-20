@@ -115,7 +115,9 @@ export function validateFormForRHF<T extends Record<string, unknown>>(
 /**
  * Convert validation errors to field error map
  */
-export function errorsToFieldMap(errors: ValidationFieldError[]): Record<string, string> {
+export function errorsToFieldMap(
+  errors: ValidationFieldError[]
+): Record<string, string> {
   const fieldMap: Record<string, string> = {};
 
   errors.forEach(error => {
@@ -237,7 +239,9 @@ export interface FormState<T> {
 /**
  * Create initial form state
  */
-export function createFormState<T extends Record<string, unknown>>(initialData: T): FormState<T> {
+export function createFormState<T extends Record<string, unknown>>(
+  initialData: T
+): FormState<T> {
   return {
     data: initialData,
     errors: {},
@@ -312,7 +316,9 @@ export function clearFormErrors<T extends Record<string, unknown>>(
 /**
  * Reset form to initial state
  */
-export function resetForm<T extends Record<string, unknown>>(initialData: T): FormState<T> {
+export function resetForm<T extends Record<string, unknown>>(
+  initialData: T
+): FormState<T> {
   return createFormState(initialData);
 }
 

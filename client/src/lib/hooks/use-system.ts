@@ -3,7 +3,7 @@
  * Provides system-level information and health monitoring
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 import { globalApiClient } from '@client/infrastructure/api';
 import { logger } from '@client/lib/utils/logger';
@@ -171,10 +171,7 @@ export function useSystemEnvironment(options?: SystemQueryOptions) {
         const response = await globalApiClient.get<SystemEnvironment>('/system/environment');
         return response.data;
       } catch (error) {
-        logger.error('Failed to fetch system environment', {
-          error,
-          component: 'useSystemEnvironment',
-        });
+        logger.error('Failed to fetch system environment', { error, component: 'useSystemEnvironment' });
         throw error;
       }
     },
@@ -201,14 +198,8 @@ export function useSystemOverview(options?: SystemQueryOptions) {
     activity: activity.data,
     schema: schema.data,
     environment: environment.data,
-    isLoading:
-      health.isLoading ||
-      stats.isLoading ||
-      activity.isLoading ||
-      schema.isLoading ||
-      environment.isLoading,
-    isError:
-      health.isError || stats.isError || activity.isError || schema.isError || environment.isError,
+    isLoading: health.isLoading || stats.isLoading || activity.isLoading || schema.isLoading || environment.isLoading,
+    isError: health.isError || stats.isError || activity.isError || schema.isError || environment.isError,
     error: health.error || stats.error || activity.error || schema.error || environment.error,
   };
 }

@@ -13,9 +13,10 @@ import { ProtectedRoute, AdminRoute, VerifiedUserRoute } from './ProtectedRoute'
  * This wrapper ensures that transient network errors don't permanently
  * break the application by providing a fallback UI with retry capability.
  */
-
+ 
 const createLazyComponent = (importFn: () => Promise<any>, componentName: string) => {
   return lazy(() =>
+     
     importFn().catch((error: unknown) => {
       logger.error(`Failed to load ${componentName}:`, { component: 'AppRouter' }, error);
 
@@ -45,7 +46,10 @@ const createLazyComponent = (importFn: () => Promise<any>, componentName: string
 };
 
 // Lazy-loaded page components with enhanced error handling
-const HomePage = createLazyComponent(() => import('@client/features/home/pages/home'), 'Home Page');
+const HomePage = createLazyComponent(
+  () => import('@client/features/home/pages/home'),
+  'Home Page'
+);
 const BillsPortal = createLazyComponent(
   () => import('@client/features/bills/pages/BillsPortalPage'),
   'Bills Portal'
@@ -54,17 +58,13 @@ const BillDetail = createLazyComponent(
   () => import('@client/features/bills/pages/bill-detail'),
   'Bill Detail'
 );
-const BillComparisonPage = createLazyComponent(
-  () => import('@client/features/bills/pages/BillComparisonPage'),
-  'Bill Comparison'
-);
 
 const CommunityHub = createLazyComponent(
   () => import('@client/features/community/pages/community-input'),
   'Community Hub'
 );
 const ExpertVerificationPage = createLazyComponent(
-  () => import('@client/features/community/expert/pages/expert-verification'),
+  () => import('@client/features/expert/pages/expert-verification'),
   'Expert Verification'
 );
 const UniversalSearchPage = createLazyComponent(
@@ -75,71 +75,26 @@ const AuthPage = createLazyComponent(
   () => import('@client/features/auth/pages/auth-page'),
   'Authentication'
 );
-const Onboarding = createLazyComponent(
-  () => import('@client/features/onboarding/pages/onboarding'),
-  'Onboarding'
-);
-const WelcomeTour = createLazyComponent(
-  () => import('@client/features/onboarding/pages/welcome-tour'),
-  'Welcome Tour'
-);
+const Onboarding = createLazyComponent(() => import('@client/features/onboarding/pages/onboarding'), 'Onboarding');
+const WelcomeTour = createLazyComponent(() => import('@client/features/onboarding/pages/welcome-tour'), 'Welcome Tour');
 const TermsPage = createLazyComponent(() => import('@client/features/legal/pages/terms'), 'Terms');
-const PrivacyPage = createLazyComponent(
-  () => import('@client/features/legal/pages/privacy'),
-  'Privacy'
-);
-const SupportPage = createLazyComponent(
-  () => import('@client/features/home/pages/support'),
-  'Support'
-);
-const DocumentationPage = createLazyComponent(
-  () => import('@client/features/legal/pages/documentation'),
-  'Documentation'
-);
-const ContactPage = createLazyComponent(
-  () => import('@client/features/home/pages/contact'),
-  'Contact'
-);
+const PrivacyPage = createLazyComponent(() => import('@client/features/legal/pages/privacy'), 'Privacy');
+const SupportPage = createLazyComponent(() => import('@client/features/home/pages/support'), 'Support');
+const DocumentationPage = createLazyComponent(() => import('@client/features/legal/pages/documentation'), 'Documentation');
+const ContactPage = createLazyComponent(() => import('@client/features/home/pages/contact'), 'Contact');
 const AboutPage = createLazyComponent(() => import('@client/features/home/pages/about'), 'About');
-const CareersPage = createLazyComponent(
-  () => import('@client/features/home/pages/careers'),
-  'Careers'
-);
+const CareersPage = createLazyComponent(() => import('@client/features/home/pages/careers'), 'Careers');
 const PressPage = createLazyComponent(() => import('@client/features/home/pages/press'), 'Press');
 const BlogPage = createLazyComponent(() => import('@client/features/home/pages/blog'), 'Blog');
-const CookiePolicyPage = createLazyComponent(
-  () => import('@client/features/legal/pages/cookie-policy'),
-  'Cookie Policy'
-);
-const AccessibilityPage = createLazyComponent(
-  () => import('@client/features/legal/pages/accessibility-statement'),
-  'Accessibility Statement'
-);
-const CivicEducationPage = createLazyComponent(
-  () => import('@client/features/onboarding/pages/civic-education'),
-  'Civic Education'
-);
-const AnalysisToolsPage = createLazyComponent(
-  () => import('@client/features/analysis/pages/analysis-tools'),
-  'Analysis Tools'
-);
-const ExpertInsightsPage = createLazyComponent(
-  () => import('@client/features/community/expert/pages/expert-insights'),
-  'Expert Insights'
-);
-const ApiAccessPage = createLazyComponent(() => import('@client/lib/api/api-access'), 'API Access');
-const SystemStatusPage = createLazyComponent(
-  () => import('@client/features/admin/pages/system-status'),
-  'System Status'
-);
-const SitemapPage = createLazyComponent(
-  () => import('@client/features/legal/pages/sitemap'),
-  'Sitemap'
-);
-const SecurityPage = createLazyComponent(
-  () => import('@client/features/legal/pages/security'),
-  'Security'
-);
+const CookiePolicyPage = createLazyComponent(() => import('@client/features/legal/pages/cookie-policy'), 'Cookie Policy');
+const AccessibilityPage = createLazyComponent(() => import('@client/features/legal/pages/accessibility-statement'), 'Accessibility Statement');
+const CivicEducationPage = createLazyComponent(() => import('@client/features/onboarding/pages/civic-education'), 'Civic Education');
+const AnalysisToolsPage = createLazyComponent(() => import('@client/features/analysis/pages/analysis-tools'), 'Analysis Tools');
+const ExpertInsightsPage = createLazyComponent(() => import('@client/features/expert/pages/expert-insights'), 'Expert Insights');
+const ApiAccessPage = createLazyComponent(() => import('@client/features/api/pages/api-access'), 'API Access');
+const SystemStatusPage = createLazyComponent(() => import('@client/features/status/pages/system-status'), 'System Status');
+const SitemapPage = createLazyComponent(() => import('@client/features/sitemap/pages/sitemap'), 'Sitemap');
+const SecurityPage = createLazyComponent(() => import('@client/features/legal/pages/security'), 'Security');
 const UserProfile = createLazyComponent(
   () => import('@client/features/users/pages/user-account'),
   'User Account'
@@ -162,15 +117,15 @@ const WorkaroundAnalysisPage = createLazyComponent(
   'Workaround Analysis'
 );
 const PretextDetectionPage = createLazyComponent(
-  () => import('@client/features/analysis/pretext-detection/pages/pretext-detection'),
+  () => import('@client/features/pretext-detection/pages/pretext-detection'),
   'Pretext Detection'
 );
 const FeatureFlagManager = createLazyComponent(
-  () => import('@client/features/admin/feature-flags/pages/FeatureFlagManagerPage'),
+  () => import('@client/features/feature-flags/pages/FeatureFlagManagerPage'),
   'Feature Flag Manager'
 );
 const IntegrationMonitoringDashboard = createLazyComponent(
-  () => import('@client/features/admin/monitoring/pages/integration-monitoring'),
+  () => import('@client/features/monitoring/pages/integration-monitoring'),
   'Integration Monitoring'
 );
 const PerformanceDashboard = createLazyComponent(
@@ -178,7 +133,7 @@ const PerformanceDashboard = createLazyComponent(
   'Performance Dashboard'
 );
 const ArgumentIntelligencePage = createLazyComponent(
-  () => import('@client/features/analysis/argument-intelligence/pages/argument-intelligence'),
+  () => import('@client/features/argument-intelligence/pages/argument-intelligence'),
   'Argument Intelligence'
 );
 const CollectionsPage = createLazyComponent(
@@ -186,16 +141,12 @@ const CollectionsPage = createLazyComponent(
   'Collections'
 );
 const WorkspacesPage = createLazyComponent(
-  () => import('@client/features/community/collaboration/pages/WorkspacesPage'),
+  () => import('@client/features/collaboration/pages/WorkspacesPage'),
   'Workspaces'
 );
 const WorkspaceDetailPage = createLazyComponent(
-  () => import('@client/features/community/collaboration/pages/WorkspaceDetailPage'),
+  () => import('@client/features/collaboration/pages/WorkspaceDetailPage'),
   'Workspace Detail'
-);
-const ElectoralAccountabilityDashboard = createLazyComponent(
-  () => import('@client/features/accountability/pages/ElectoralAccountabilityDashboard'),
-  'Electoral Accountability Dashboard'
 );
 
 interface RouteConfig {
@@ -211,7 +162,7 @@ interface RouteConfig {
 /**
  * Route loading fallback component with consistent styling
  */
-
+ 
 const RouteLoadingFallback = React.memo<{ routeName?: string }>(({ routeName }) => {
   return (
     <LoadingStateManager
@@ -229,7 +180,8 @@ RouteLoadingFallback.displayName = 'RouteLoadingFallback';
 /**
  * Route error fallback component with recovery options
  */
-
+ 
+ 
 const RouteErrorFallback = React.memo<{
   error: Error;
   resetErrorBoundary: () => void;
@@ -278,7 +230,8 @@ RouteErrorFallback.displayName = 'RouteErrorFallback';
  * Wrapper component for individual routes with error boundaries.
  * Memoized to prevent unnecessary re-renders when parent updates.
  */
-
+ 
+ 
 const RouteWrapper = React.memo<{
   children: React.ReactNode;
   routeName: string;
@@ -336,11 +289,6 @@ const routes: RouteConfig[] = [
     id: 'bill-detail',
     path: '/bills/:id',
     element: <BillDetail />,
-  },
-  {
-    id: 'bill-comparison',
-    path: '/analysis/compare',
-    element: <BillComparisonPage />,
   },
   {
     id: 'bill-analysis',
@@ -607,18 +555,6 @@ const routes: RouteConfig[] = [
     id: 'pretext-detection',
     path: '/analysis/pretext-detection',
     element: <PretextDetectionPage />,
-  },
-
-  // Electoral Accountability routes
-  {
-    id: 'electoral-accountability',
-    path: '/accountability',
-    element: <ElectoralAccountabilityDashboard />,
-  },
-  {
-    id: 'electoral-accountability-mp',
-    path: '/accountability/mp/:sponsorId',
-    element: <ElectoralAccountabilityDashboard />,
   },
 
   // Legacy redirects - preserve old links for backward compatibility

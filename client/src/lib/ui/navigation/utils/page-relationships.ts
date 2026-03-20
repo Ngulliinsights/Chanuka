@@ -129,7 +129,16 @@ export const calculateRelevanceScore = (
 /**
  * Gets page relationships for a given path
  */
-export     validateUserRole(user_role);
+export const getPageRelationships = (
+  currentPath: string,
+  user_role: UserRole,
+  user: unknown | null,
+  preferences: any
+): RelatedPage[] => {
+  try {
+    // Validate inputs
+    validateNavigationPath(currentPath);
+    validateUserRole(user_role);
 
     const relationships = PAGE_RELATIONSHIPS[currentPath] || [];
 
@@ -176,7 +185,15 @@ export     validateUserRole(user_role);
 /**
  * Generates breadcrumb relationships for a path
  */
-export     validateUserRole(user_role);
+export const generateBreadcrumbRelationships = (
+  currentPath: string,
+  user_role: UserRole,
+  _user: unknown | null
+): RelatedPage[] => {
+  try {
+    // Validate inputs
+    validateNavigationPath(currentPath);
+    validateUserRole(user_role);
 
     const breadcrumbs: RelatedPage[] = [];
     const pathSegments = currentPath.split('/').filter(Boolean);

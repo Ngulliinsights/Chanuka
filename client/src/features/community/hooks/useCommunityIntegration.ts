@@ -1,7 +1,7 @@
 /**
  * Community Integration Hooks
  *
- * Connects the community API service with React Query and Redux store
+ * Connects the community API service with React Query and Zustand store
  * Provides unified hooks for all community features
  */
 
@@ -121,8 +121,8 @@ export function useReportContent() {
       const apiReason = data.violationType === 'off_topic' ? 'other' : data.violationType;
       return communityApiService.reportComment({
         commentId: parseInt(data.commentId, 10),
-        reason: apiReason as 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'other',
-        details: data.reason,
+        reason: apiReason as 'spam' | 'harassment' | 'misinformation' | 'offensive' | 'other', 
+        details: data.reason
       });
     },
     onSuccess: () => {

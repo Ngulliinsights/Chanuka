@@ -1,6 +1,7 @@
 /**
  * Real-time Slice for Redux Toolkit
  *
+ * Migrated from Zustand to Redux Toolkit for unified state management.
  * Manages WebSocket connections, subscriptions, and real-time updates across all domains.
  */
 
@@ -58,27 +59,6 @@ const initialState: RealTimeState = {
   showNotifications: false,
   notificationCount: 0,
   lastUpdateTimestamp: null,
-};
-
-// Helper function for safe timestamp conversion
-const safeTimestampToString = (timestamp: string | Date | unknown): string | null => {
-  try {
-    if (typeof timestamp === 'string') {
-      const parsed = new Date(timestamp);
-      if (isNaN(parsed.getTime())) {
-        return new Date().toISOString();
-      }
-      return timestamp;
-    } else if (timestamp instanceof Date) {
-      return timestamp.toISOString();
-    } else if (timestamp && typeof timestamp === 'object' && 'toISOString' in timestamp) {
-      return (timestamp as Date).toISOString();
-    }
-    return new Date().toISOString();
-  } catch (error) {
-    console.warn('Failed to convert timestamp:', timestamp, error);
-    return new Date().toISOString();
-  }
 };
 
 export const realTimeSlice = createSlice({
@@ -178,8 +158,11 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-50);
       state.billUpdates[billId] = updates;
 
-      const timestamp = update.timestamp;
-      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
+        ? update.timestamp 
+        : update.timestamp instanceof Date 
+          ? update.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     addCommunityUpdate: (state, action: PayloadAction<CommunityRealTimeUpdate>) => {
@@ -191,23 +174,28 @@ export const realTimeSlice = createSlice({
       const updates = [...existing, update].slice(-100);
       state.communityUpdates[discussionId] = updates;
 
-      const timestamp = update.timestamp;
-      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
+      state.lastUpdateTimestamp = typeof update.timestamp === 'string' 
+        ? update.timestamp 
+        : update.timestamp instanceof Date 
+          ? update.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     updateEngagementMetrics: (state, action: PayloadAction<EngagementMetricsUpdate>) => {
       const metrics = action.payload;
       state.engagementMetrics[metrics.bill_id] = metrics;
-      
-      const timestamp = metrics.timestamp;
-      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
+      state.lastUpdateTimestamp = typeof metrics.timestamp === 'string' 
+        ? metrics.timestamp 
+        : metrics.timestamp instanceof Date 
+          ? metrics.timestamp.toISOString() 
+          : new Date().toISOString();
     },
 
     addExpertActivity: (state, action: PayloadAction<ExpertActivityUpdate>) => {
       // Keep only last 200 expert activities
       state.expertActivities = [...state.expertActivities, action.payload].slice(-200);
       const timestamp = action.payload.timestamp;
-      state.lastUpdateTimestamp = safeTimestampToString(timestamp);
+      state.lastUpdateTimestamp = timestamp instanceof Date ? timestamp.toISOString() : timestamp;
     },
 
     addNotification: (state, action: PayloadAction<RealTimeNotification>) => {
@@ -219,7 +207,11 @@ export const realTimeSlice = createSlice({
       state.notificationCount = state.notifications.filter(n => !n.read).length;
 
       const createdAt = notification.created_at;
-      state.lastUpdateTimestamp = safeTimestampToString(createdAt);
+      state.lastUpdateTimestamp = typeof createdAt === 'string' 
+        ? createdAt 
+        : (createdAt && typeof createdAt === 'object' && 'toISOString' in createdAt)
+          ? (createdAt as Date).toISOString() 
+          : new Date().toISOString();
     },
 
     // Notification management
@@ -250,6 +242,12 @@ export const realTimeSlice = createSlice({
       delete state.communityUpdates[action.payload];
     },
 
+    // Migration utilities
+    migrateFromZustand: (state, action: PayloadAction<Partial<RealTimeState>>) => {
+      // Merge migrated state from Zustand store
+      Object.assign(state, action.payload);
+    },
+
     resetRealTimeState: () => initialState,
   },
 });
@@ -271,30 +269,24 @@ export const {
   toggleNotifications,
   clearBillUpdates,
   clearCommunityUpdates,
+  migrateFromZustand,
   resetRealTimeState,
 } = realTimeSlice.actions;
 
-// Helper function for safe timestamp parsing
-const safeParseTimestamp = (timestamp: string | Date): number => {
-  try {
-    if (typeof timestamp === 'string') {
-      const parsed = new Date(timestamp);
-      if (isNaN(parsed.getTime())) {
-        return 0; // Invalid date, treat as oldest
-      }
-      return parsed.getTime();
-    } else if (timestamp instanceof Date) {
-      return timestamp.getTime();
-    }
-    return 0;
-  } catch (error) {
-    console.warn('Failed to parse timestamp:', timestamp, error);
-    return 0;
-  }
-};
-
 // Selectors
-export export export export export export 
+export const selectConnectionState = (state: { realTime: RealTimeState }) =>
+  state.realTime.connection;
+export const selectBillUpdates = (billId: number) => (state: { realTime: RealTimeState }) =>
+  state.realTime.billUpdates[billId] || [];
+export const selectEngagementMetrics = (billId: number) => (state: { realTime: RealTimeState }) =>
+  state.realTime.engagementMetrics[billId];
+export const selectUnreadNotifications = (state: { realTime: RealTimeState }) =>
+  state.realTime.notifications.filter(n => !n.read);
+export const selectNotificationCount = (state: { realTime: RealTimeState }) =>
+  state.realTime.notificationCount;
+export const selectRecentActivity = (state: { realTime: RealTimeState }) => {
+  const allUpdates: (BillRealTimeUpdate | CommunityRealTimeUpdate)[] = [];
+
   // Collect all bill updates
   Object.values(state.realTime.billUpdates).forEach(updates => {
     allUpdates.push(...updates);
@@ -307,7 +299,7 @@ export export export export export export
 
   // Sort by timestamp and return recent ones
   return allUpdates
-    .sort((a, b) => safeParseTimestamp(b.timestamp) - safeParseTimestamp(a.timestamp))
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 20);
 };
 

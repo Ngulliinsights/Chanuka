@@ -53,8 +53,21 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   }, [config]);
 
   // Search hooks for different strategies
-  
-      },
+  const intelligentSearchHook = useIntelligentSearch({
+    debounceMs: 300,
+    enableAutoSearch: false,
+  });
+
+  const streamingSearchHook = useStreamingSearch({
+    onProgress: progress => {
+      onProgress?.({
+        loaded: progress.loaded,
+        total: progress.total,
+        percentage: progress.percentage,
+        currentStrategy: 'streaming',
+        searchTime: progress.searchTime,
+      });
+    },
   });
 
   /**
@@ -139,7 +152,17 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   /**
    * Execute intelligent search
    */
-  
+  const executeIntelligentSearch = async (
+    query: UnifiedSearchQuery,
+    startTime: number
+  ): Promise<UnifiedSearchResult> => {
+    const response = await intelligentSearch.search({
+      q: query.q,
+      limit: query.limit,
+      offset: query.offset,
+      filters: query.filters,
+    });
+
     return {
       results: response.results,
       metadata: {
@@ -156,7 +179,13 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   /**
    * Execute streaming search
    */
-  
+  const executeStreamingSearch = async (
+    query: UnifiedSearchQuery,
+    startTime: number
+  ): Promise<UnifiedSearchResult> => {
+    return new Promise((resolve, reject) => {
+      const results: unknown[] = [];
+
       streamingSearchService.startStreamingSearch(
         {
           q: query.q,
@@ -191,7 +220,17 @@ export const UnifiedSearchInterface: React.FC<UnifiedSearchInterfaceProps> = ({
   /**
    * Execute API search
    */
-  
+  const executeApiSearch = async (
+    query: UnifiedSearchQuery,
+    startTime: number
+  ): Promise<UnifiedSearchResult> => {
+    const response = await searchApiClient.search({
+      q: query.q,
+      limit: query.limit,
+      offset: query.offset,
+      filters: query.filters,
+    });
+
     const mappedResults: unknown[] = response.results.map((item: unknown) => ({
       id: item.id,
       type: item.type,

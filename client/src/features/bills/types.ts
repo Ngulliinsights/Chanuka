@@ -3,15 +3,14 @@
  * Consolidated type definitions for the bills feature
  */
 
-import {
-  Bill,
+import { 
+  Bill, 
   BillStatus,
   UrgencyLevel,
   BillAnalysis as SharedBillAnalysis,
   Sponsor as SharedSponsor,
-  BillsQueryParams as SharedBillsQueryParams,
+  BillsQueryParams as SharedBillsQueryParams
 } from '@client/lib/types';
-import type { StakeholderImpact } from '@shared/validation/schemas/analytics.schema';
 
 // Re-export shared types
 export type { Bill, BillStatus, UrgencyLevel };
@@ -51,15 +50,7 @@ export interface BillsQueryParams extends Omit<SharedBillsQueryParams, 'sortBy' 
   constitutionalFlags?: boolean;
   controversyLevels?: string[];
   // Extended sort fields for UI - combines SortField plus additional UI options
-  sortBy?:
-    | 'date'
-    | 'title'
-    | 'status'
-    | 'urgency'
-    | 'engagement'
-    | 'relevance'
-    | 'complexity'
-    | 'score';
+  sortBy?: 'date' | 'title' | 'status' | 'urgency' | 'engagement' | 'relevance' | 'complexity' | 'score';
   // Allow string IDs for sponsors (matching Sponsor.id)
   sponsors?: (string | number)[];
 }

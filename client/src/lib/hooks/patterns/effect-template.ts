@@ -122,27 +122,27 @@ export function useExampleEffect(config: EffectConfig = {}) {
   }, [enabled, immediate, executeEffect, performCleanup, ...dependencies]);
 
   // 7. Event Listener Management
-  const addEventListener = useCallback(
-    (
-      target: EventTarget,
-      eventType: string,
-      listener: EventListener,
-      options?: AddEventListenerOptions
-    ) => {
-      if (!mountedRef.current) return;
+  const addEventListener = useCallback((
+    target: EventTarget,
+    eventType: string,
+    listener: EventListener,
+    options?: AddEventListenerOptions
+  ) => {
+    if (!mountedRef.current) return;
 
-      target.addEventListener(eventType, listener, options);
+    target.addEventListener(eventType, listener, options);
 
-      // Add cleanup function
-      cleanupRef.current.push(() => {
-        target.removeEventListener(eventType, listener, options);
-      });
-    },
-    []
-  );
+    // Add cleanup function
+    cleanupRef.current.push(() => {
+      target.removeEventListener(eventType, listener, options);
+    });
+  }, []);
 
   // 8. Resource Management
-  const manageResource = useCallback((resource: any, cleanupFn: () => void) => {
+  const manageResource = useCallback((
+    resource: any,
+    cleanupFn: () => void
+  ) => {
     if (!mountedRef.current) return;
 
     // Add cleanup function for resource
@@ -182,32 +182,66 @@ export function useAdvancedEffect(
   const { parallel = true, sequential = false, retry = false } = options;
 
   const [effectStates, setEffectStates] = useState<Record<string, EffectState>>(
-    effects.reduce(
-      (acc, effect) => ({
-        ...acc,
-        [effect.id]: {
-          isRunning: false,
-          lastExecution: 0,
-          error: null,
-          retries: 0,
-        },
-      }),
-      {}
-    )
+    effects.reduce((acc, effect) => ({
+      ...acc,
+      [effect.id]: {
+        isRunning: false,
+        lastExecution: 0,
+        error: null,
+        retries: 0,
+      },
+    }), {})
   );
 
   const mountedRef = useRef(true);
 
   // Execute effects based on configuration
-  useEffect(
-    () => {
-      mountedRef.current = true;
+  useEffect(() => {
+    mountedRef.current = true;
 
-      const executeEffects = async () => {
-        if (sequential) {
-          // Execute effects sequentially
-          for (const effect of effects) {
-            if (!effect.enabled || !mountedRef.current) continue;
+    const executeEffects = async () => {
+      if (sequential) {
+        // Execute effects sequentially
+        for (const effect of effects) {
+          if (!effect.enabled || !mountedRef.current) continue;
+
+          try {
+            setEffectStates(prev => ({
+              ...prev,
+              [effect.id]: { ...prev[effect.id], isRunning: true },
+            }));
+
+            const cleanup = effect.effect();
+
+            setEffectStates(prev => ({
+              ...prev,
+              [effect.id]: {
+                ...prev[effect.id],
+                isRunning: false,
+                lastExecution: Date.now(),
+              },
+            }));
+
+            // Handle cleanup
+            if (cleanup && typeof cleanup === 'function') {
+              return cleanup;
+            }
+          } catch (error) {
+            setEffectStates(prev => ({
+              ...prev,
+              [effect.id]: {
+                ...prev[effect.id],
+                isRunning: false,
+                error: error as Error,
+              },
+            }));
+          }
+        }
+      } else if (parallel) {
+        // Execute effects in parallel
+        await Promise.allSettled(
+          effects.map(async (effect) => {
+            if (!effect.enabled || !mountedRef.current) return;
 
             try {
               setEffectStates(prev => ({
@@ -226,10 +260,7 @@ export function useAdvancedEffect(
                 },
               }));
 
-              // Handle cleanup
-              if (cleanup && typeof cleanup === 'function') {
-                return cleanup;
-              }
+              return cleanup;
             } catch (error) {
               setEffectStates(prev => ({
                 ...prev,
@@ -240,54 +271,17 @@ export function useAdvancedEffect(
                 },
               }));
             }
-          }
-        } else if (parallel) {
-          // Execute effects in parallel
-          await Promise.allSettled(
-            effects.map(async effect => {
-              if (!effect.enabled || !mountedRef.current) return;
+          })
+        );
+      }
+    };
 
-              try {
-                setEffectStates(prev => ({
-                  ...prev,
-                  [effect.id]: { ...prev[effect.id], isRunning: true },
-                }));
+    executeEffects();
 
-                const cleanup = effect.effect();
-
-                setEffectStates(prev => ({
-                  ...prev,
-                  [effect.id]: {
-                    ...prev[effect.id],
-                    isRunning: false,
-                    lastExecution: Date.now(),
-                  },
-                }));
-
-                return cleanup;
-              } catch (error) {
-                setEffectStates(prev => ({
-                  ...prev,
-                  [effect.id]: {
-                    ...prev[effect.id],
-                    isRunning: false,
-                    error: error as Error,
-                  },
-                }));
-              }
-            })
-          );
-        }
-      };
-
-      executeEffects();
-
-      return () => {
-        mountedRef.current = false;
-      };
-    },
-    effects.map(e => e.dependencies).flat()
-  );
+    return () => {
+      mountedRef.current = false;
+    };
+  }, effects.map(e => e.dependencies).flat());
 
   return effectStates;
 }

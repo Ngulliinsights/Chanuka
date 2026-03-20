@@ -14,7 +14,9 @@ interface UseCommandPaletteOptions {
   onCommandExecute?: (command: Command) => void;
 }
 
-export   const [isOpen, setIsOpen] = useState(false);
+export const useCommandPalette = (options: UseCommandPaletteOptions = {}) => {
+  const { config, customCommands, onCommandExecute } = options;
+  const [isOpen, setIsOpen] = useState(false);
 
   // Handle keyboard shortcut (⌘K / Ctrl+K)
   useEffect(() => {

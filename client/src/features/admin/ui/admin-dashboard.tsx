@@ -1,5 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Users, FileText, Shield, Settings, Database, Activity } from 'lucide-react';
+import {
+  Users,
+  FileText,
+  MessageSquare as MessageCircle,
+  Shield,
+  Settings,
+  Database,
+  Activity,
+} from 'lucide-react';
 import { useState } from 'react';
 
 import { globalApiClient } from '@client/infrastructure/api';

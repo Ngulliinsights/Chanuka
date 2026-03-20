@@ -10,7 +10,7 @@
  */
 
 import { CacheService } from './cache';
-import { ServiceLifecycleInterface, ServiceConfig } from './factory';
+import { ServiceError, ServiceLifecycleInterface, ServiceConfig } from './factory';
 
 // ============================================================================
 // CORE SERVICE INTERFACES
@@ -205,14 +205,11 @@ export interface UserProfileService extends BaseService {
   /** Get user achievements */
   getUserAchievements(userId?: string): Promise<UserAchievement[]>;
   /** Get user activity history */
-  getActivityHistory(
-    userId?: string,
-    options?: {
-      page?: number;
-      limit?: number;
-      filters?: Record<string, unknown>;
-    }
-  ): Promise<{
+  getActivityHistory(userId?: string, options?: {
+    page?: number;
+    limit?: number;
+    filters?: Record<string, unknown>;
+  }): Promise<{
     history: UserEngagementHistory[];
     total: number;
     page: number;
@@ -407,10 +404,7 @@ export interface AchievementService extends BaseService {
     next_milestones: AchievementDefinition[];
   }>;
   /** Check achievement progress */
-  checkAchievementProgress(
-    achievementId: string,
-    userId?: string
-  ): Promise<UserAchievementProgress>;
+  checkAchievementProgress(achievementId: string, userId?: string): Promise<UserAchievementProgress>;
   /** Award achievement to user */
   awardAchievement(achievementId: string, userId?: string): Promise<UserAchievement>;
   /** Get achievement statistics */
@@ -421,17 +415,12 @@ export interface AchievementService extends BaseService {
     top_categories: Array<{ category: string; count: number }>;
   }>;
   /** Get leaderboard */
-  getLeaderboard(
-    category?: string,
-    limit?: number
-  ): Promise<
-    Array<{
-      user_id: string;
-      username: string;
-      total_points: number;
-      rank: number;
-    }>
-  >;
+  getLeaderboard(category?: string, limit?: number): Promise<Array<{
+    user_id: string;
+    username: string;
+    total_points: number;
+    rank: number;
+  }>>;
 }
 
 // ============================================================================
@@ -468,7 +457,11 @@ export interface SavedBillFilters {
 
 export interface SavedBillsService extends BaseService {
   /** Get saved bills */
-  getSavedBills(options?: { page?: number; limit?: number; filters?: SavedBillFilters }): Promise<{
+  getSavedBills(options?: {
+    page?: number;
+    limit?: number;
+    filters?: SavedBillFilters;
+  }): Promise<{
     bills: SavedBill[];
     total: number;
     page: number;
@@ -480,14 +473,11 @@ export interface SavedBillsService extends BaseService {
   /** Remove saved bill */
   unsaveBill(billId: string): Promise<void>;
   /** Update saved bill */
-  updateSavedBill(
-    billId: string,
-    updates: {
-      notes?: string;
-      tags?: string[];
-      notification_enabled?: boolean;
-    }
-  ): Promise<SavedBill>;
+  updateSavedBill(billId: string, updates: {
+    notes?: string;
+    tags?: string[];
+    notification_enabled?: boolean;
+  }): Promise<SavedBill>;
   /** Get bill tags */
   getBillTags(billId: string): Promise<string[]>;
   /** Add tag to bill */
@@ -538,15 +528,12 @@ export interface NotificationService extends BaseService {
   }): Promise<string>;
 
   /** Get user notifications */
-  getUserNotifications(
-    userId?: string,
-    options?: {
-      page?: number;
-      limit?: number;
-      unread_only?: boolean;
-      types?: string[];
-    }
-  ): Promise<Notification[]>;
+  getUserNotifications(userId?: string, options?: {
+    page?: number;
+    limit?: number;
+    unread_only?: boolean;
+    types?: string[];
+  }): Promise<Notification[]>;
 
   /** Mark notification as read */
   markAsRead(notificationId: string, userId?: string): Promise<void>;
@@ -557,19 +544,13 @@ export interface NotificationService extends BaseService {
   /** Get notification settings */
   getNotificationSettings(userId?: string): Promise<NotificationPreferences>;
   /** Update notification settings */
-  updateNotificationSettings(
-    settings: Partial<NotificationPreferences>,
-    userId?: string
-  ): Promise<NotificationPreferences>;
+  updateNotificationSettings(settings: Partial<NotificationPreferences>, userId?: string): Promise<NotificationPreferences>;
   /** Get notification templates */
   getNotificationTemplates(): Promise<NotificationTemplate[]>;
   /** Create notification template */
   createNotificationTemplate(template: NotificationTemplate): Promise<NotificationTemplate>;
   /** Update notification template */
-  updateNotificationTemplate(
-    id: string,
-    template: Partial<NotificationTemplate>
-  ): Promise<NotificationTemplate>;
+  updateNotificationTemplate(id: string, template: Partial<NotificationTemplate>): Promise<NotificationTemplate>;
   /** Delete notification template */
   deleteNotificationTemplate(id: string): Promise<void>;
 }
@@ -701,27 +682,19 @@ export interface HealthCheckService extends BaseService {
     endpoints: string[];
   }>;
   /** Update health check configuration */
-  updateHealthCheckConfig(
-    serviceId: string,
-    config: Partial<{
-      interval: number;
-      timeout: number;
-      retries: number;
-      endpoints: string[];
-    }>
-  ): Promise<void>;
+  updateHealthCheckConfig(serviceId: string, config: Partial<{
+    interval: number;
+    timeout: number;
+    retries: number;
+    endpoints: string[];
+  }>): Promise<void>;
   /** Get health check history */
-  getHealthCheckHistory(
-    serviceId: string,
-    limit?: number
-  ): Promise<
-    Array<{
-      timestamp: string;
-      status: 'healthy' | 'unhealthy' | 'degraded';
-      responseTime: number;
-      error: string | null;
-    }>
-  >;
+  getHealthCheckHistory(serviceId: string, limit?: number): Promise<Array<{
+    timestamp: string;
+    status: 'healthy' | 'unhealthy' | 'degraded';
+    responseTime: number;
+    error: string | null;
+  }>>;
 }
 
 // ============================================================================
@@ -754,33 +727,22 @@ export interface ConfigurationService extends BaseService {
   /** Get service configuration */
   getConfiguration(serviceId: string): Promise<ServiceConfiguration>;
   /** Update service configuration */
-  updateConfiguration(
-    serviceId: string,
-    config: Partial<ServiceConfiguration>
-  ): Promise<ServiceConfiguration>;
+  updateConfiguration(serviceId: string, config: Partial<ServiceConfiguration>): Promise<ServiceConfiguration>;
   /** Get configuration schema */
   getConfigurationSchema(serviceId: string): Promise<Record<string, unknown>>;
   /** Validate configuration */
-  validateConfiguration(
-    serviceId: string,
-    config: Partial<ServiceConfiguration>
-  ): Promise<{
+  validateConfiguration(serviceId: string, config: Partial<ServiceConfiguration>): Promise<{
     valid: boolean;
     errors: string[];
     warnings: string[];
   }>;
   /** Get configuration history */
-  getConfigurationHistory(
-    serviceId: string,
-    limit?: number
-  ): Promise<
-    Array<{
-      timestamp: string;
-      config: ServiceConfiguration;
-      changedBy: string;
-      reason: string;
-    }>
-  >;
+  getConfigurationHistory(serviceId: string, limit?: number): Promise<Array<{
+    timestamp: string;
+    config: ServiceConfiguration;
+    changedBy: string;
+    reason: string;
+  }>>;
   /** Rollback configuration */
   rollbackConfiguration(serviceId: string, version: string): Promise<ServiceConfiguration>;
 }

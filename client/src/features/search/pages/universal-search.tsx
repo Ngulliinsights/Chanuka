@@ -24,7 +24,10 @@ import type {
   SearchResult,
 } from '@client/features/search/types';
 import { SearchFilters } from '@client/features/search/ui/filters/SearchFilters';
-import { AdvancedSearchInterface } from '@client/features/search/ui/interface/AdvancedSearch';
+import {
+  AdvancedSearchInterface,
+  type SearchConfig,
+} from '@client/features/search/ui/interface/AdvancedSearch';
 import { IntelligentAutocomplete } from '@client/features/search/ui/interface/IntelligentAutocomplete';
 import { SavedSearches } from '@client/features/search/ui/interface/SavedSearches';
 import { SearchAnalyticsDashboard } from '@client/features/search/ui/interface/SearchAnalyticsDashboard';

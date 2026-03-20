@@ -1,5 +1,6 @@
 import { Loader2, Network, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { useMemo, useState, useEffect, memo } from 'react';
+import React from 'react';
 
 import { cn } from '@client/lib/utils/cn';
 import { logger } from '@client/lib/utils/logger';

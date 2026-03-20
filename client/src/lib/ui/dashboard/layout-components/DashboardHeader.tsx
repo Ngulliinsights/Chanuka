@@ -281,4 +281,4 @@ const DashboardHeaderComponent = ({
 };
 
  
-export 
+export const DashboardHeader = React.memo(DashboardHeaderComponent);

@@ -278,4 +278,4 @@ export class ThemeProvider {
 }
 
 // Singleton instance
-export 
+export const themeProvider = new ThemeProvider();

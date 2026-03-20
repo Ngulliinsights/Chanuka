@@ -18,11 +18,11 @@ import {
   Settings,
   Eye,
 } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import { useComprehensiveAnalytics } from '@client/infrastructure/observability/analytics';
-import { userJourneyTracker } from '@client/infrastructure/analytics/model/user-journey-tracker';
-import { AnalyticsDashboard } from '@client/infrastructure/analytics/ui/dashboard/AnalyticsDashboard';
+import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
+import { AnalyticsDashboard } from '@client/features/analytics/ui/dashboard/AnalyticsDashboard';
 import {
   Card,
   CardContent,
@@ -44,8 +44,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
   const [journeyAnalytics, setJourneyAnalytics] = useState<any>(null);
 
-  const { getAnalyticsDashboard, getMetrics, exportData, clearData, setEnabled, tracker } =
-    useComprehensiveAnalytics();
+  const { getMetrics, exportData, clearData, setEnabled } = useComprehensiveAnalytics();
 
   const journeyTracker = userJourneyTracker;
 
@@ -136,8 +135,8 @@ export const AnalyticsDashboardPage: React.FC = () => {
     loadJourneyAnalytics();
   }, []);
 
-  const currentMetrics = getMetrics();
-  const isTrackingEnabled = currentMetrics.isEnabled;
+  const currentMetrics = getMetrics() as any;
+  const isTrackingEnabled = currentMetrics?.isEnabled ?? false;
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-6">
@@ -206,7 +205,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{currentMetrics.eventCount.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{(currentMetrics?.eventCount ?? 0).toLocaleString()}</div>
             <p className="text-xs text-muted-foreground">Events tracked in current session</p>
           </CardContent>
         </Card>
@@ -218,7 +217,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentMetrics.userEngagementCount.toLocaleString()}
+              {(currentMetrics?.userEngagementCount ?? 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Active user sessions</p>
           </CardContent>
@@ -231,7 +230,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {currentMetrics.pageMetricsCount.toLocaleString()}
+              {(currentMetrics?.pageMetricsCount ?? 0).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">Pages with performance data</p>
           </CardContent>
@@ -316,25 +315,23 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Popular User Paths</h3>
                     <div className="space-y-2">
-                      {journeyAnalytics.popularPaths
-                        .slice(0, 5)
-                        .map((path: unknown, index: number) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between p-3 bg-gray-50 rounded"
-                          >
-                            <div className="flex-1">
-                              <div className="font-medium">{path.path.join(' → ')}</div>
-                              <div className="text-sm text-muted-foreground">
-                                {path.frequency} users • {(path.completionRate * 100).toFixed(1)}%
-                                completion
-                              </div>
+                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: any, index: number) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded"
+                        >
+                          <div className="flex-1">
+                            <div className="font-medium">{(path?.path as string[])?.join(' → ') || 'N/A'}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {path?.frequency ?? 0} users • {((path?.completionRate ?? 0) * 100).toFixed(1)}%
+                              completion
                             </div>
-                            <Badge variant="outline">
-                              {Math.round(path.averageCompletionTime / 1000 / 60)}m avg
-                            </Badge>
                           </div>
-                        ))}
+                          <Badge variant="outline">
+                            {Math.round((path?.averageCompletionTime ?? 0) / 1000 / 60)}m avg
+                          </Badge>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
@@ -344,20 +341,20 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <div className="space-y-2">
                       {journeyAnalytics.dropOffPoints
                         .slice(0, 5)
-                        .map((dropOff: unknown, index: number) => (
+                        .map((dropOff: any, index: number) => (
                           <div
                             key={index}
                             className="flex items-center justify-between p-3 bg-red-50 rounded"
                           >
                             <div className="flex-1">
-                              <div className="font-medium">{dropOff.pageId}</div>
+                              <div className="font-medium">{dropOff?.pageId || 'Unknown'}</div>
                               <div className="text-sm text-muted-foreground">
-                                {(dropOff.dropOffRate * 100).toFixed(1)}% drop-off rate
+                                {((dropOff?.dropOffRate ?? 0) * 100).toFixed(1)}% drop-off rate
                               </div>
                             </div>
                             <div className="text-right">
                               <div className="text-sm font-medium">
-                                {Math.round(dropOff.averageTimeBeforeExit / 1000)}s avg time
+                                {Math.round((dropOff?.averageTimeBeforeExit ?? 0) / 1000)}s avg time
                               </div>
                               <div className="text-xs text-muted-foreground">before exit</div>
                             </div>
@@ -370,17 +367,17 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Conversion Funnels</h3>
                     <div className="space-y-4">
-                      {journeyAnalytics.conversionFunnels.map((funnel: unknown, index: number) => (
+                      {journeyAnalytics.conversionFunnels.map((funnel: any, index: number) => (
                         <Card key={index}>
                           <CardHeader>
-                            <CardTitle className="text-base">{funnel.name}</CardTitle>
+                            <CardTitle className="text-base">{funnel?.name || 'Funnel'}</CardTitle>
                             <CardDescription>
-                              {funnel.totalConversions} total conversions
+                              {funnel?.totalConversions ?? 0} total conversions
                             </CardDescription>
                           </CardHeader>
                           <CardContent>
                             <div className="space-y-2">
-                              {funnel.steps.map((step: string, stepIndex: number) => (
+                              {(funnel?.steps ?? []).map((step: string, stepIndex: number) => (
                                 <div key={stepIndex} className="flex items-center justify-between">
                                   <span className="text-sm">{step}</span>
                                   <div className="flex items-center space-x-2">
@@ -388,12 +385,12 @@ export const AnalyticsDashboardPage: React.FC = () => {
                                       <div
                                         className="bg-blue-600 h-2 rounded-full"
                                         style={{
-                                          width: `${(funnel.conversionRates[stepIndex] || 0) * 100}%`,
+                                          width: `${((funnel?.conversionRates?.[stepIndex] as number) ?? 0) * 100}%`,
                                         }}
                                       ></div>
                                     </div>
                                     <span className="text-sm font-medium">
-                                      {((funnel.conversionRates[stepIndex] || 0) * 100).toFixed(1)}%
+                                      {(((funnel?.conversionRates?.[stepIndex] as number) ?? 0) * 100).toFixed(1)}%
                                     </span>
                                   </div>
                                 </div>
@@ -470,8 +467,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <strong>Current Session:</strong> {currentMetrics.eventCount} events tracked
                   </p>
                   <p>
-                    <strong>Status:</strong>{' '}
-                    {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}
+                    <strong>Status:</strong> {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}
                   </p>
                 </div>
               </div>

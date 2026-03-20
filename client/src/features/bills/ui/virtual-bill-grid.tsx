@@ -1,3 +1,5 @@
+import React from 'react';
+
 import { cn } from '@lib/utils';
 
 import BillCard from './list/BillCard';
@@ -81,3 +83,4 @@ export function VirtualBillGrid({
   );
 }
 export default VirtualBillGrid;
+

@@ -24,7 +24,9 @@ interface Props {
   items: NavigationItem[];
 }
 
-export 
+export const NavSection = ({ section, items }: Props) => {
+  if (!items.length) return null;
+
   return (
     <div className="mb-6">
       <h3 className="chanuka-nav-section-title">{SECTION_TITLES[section]}</h3>

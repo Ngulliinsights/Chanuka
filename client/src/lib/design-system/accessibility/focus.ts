@@ -47,7 +47,16 @@ export const focusTokens = {
 } as const;
 
 // Focus management utilities
-export  outline-offset: ${offset};`;
+export const focusUtils = {
+  /**
+   * Create focus ring styles
+   */
+  createFocusRing: (
+    color: string = focusTokens.ring.color,
+    width: string = focusTokens.ring.width,
+    offset: string = focusTokens.ring.offset
+  ): string => {
+    return `outline: ${width} ${focusTokens.ring.style} ${color}; outline-offset: ${offset};`;
   },
 
   /**

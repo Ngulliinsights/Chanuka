@@ -1,6 +1,6 @@
 /**
  * React-specific utility types
- *
+ * 
  * Note: madge reports a false positive circular dependency for this file.
  * This is a known issue with madge and TypeScript type re-exports.
  * The file has no actual circular dependencies - verified by TypeScript compiler.

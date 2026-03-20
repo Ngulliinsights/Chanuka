@@ -23,6 +23,7 @@ import {
   Eye,
   Calendar,
 } from 'lucide-react';
+import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
@@ -52,6 +53,7 @@ export function IntermediateDashboardLayout({
   const isHidden = (widgetId: string) => hiddenWidgets.has(widgetId);
 
   // Use preferences and onSectionToggle if needed
+  const _ = { preferences, onSectionToggle };
 
   return (
     <div className="intermediate-dashboard-layout">

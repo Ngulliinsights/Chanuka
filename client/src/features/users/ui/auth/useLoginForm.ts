@@ -3,7 +3,8 @@
  * Manages login form state, validation, and submission
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { validatePassword } from '@client/lib/utils/input-validation';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 import { useAuth } from '@client/infrastructure/auth';
 import { validateEmail } from '@client/lib/utils/input-validation';

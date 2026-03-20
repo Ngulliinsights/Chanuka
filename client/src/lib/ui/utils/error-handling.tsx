@@ -21,7 +21,9 @@ import {
 // React Hook for UI Error Handling (extending core)
 // ============================================================================
 
-export 
+export const useUIErrorHandler = (componentName?: string): UseUIErrorHandlerResult => {
+  const [error, setError] = useState<Error | null>(null);
+
   // Memoize error handler to prevent recreation on every render
   const errorHandler = useMemo(() => createUIErrorHandler(componentName), [componentName]);
 

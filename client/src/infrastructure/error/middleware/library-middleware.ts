@@ -175,7 +175,7 @@ class ServiceRetryHandler {
     operation: () => Promise<T>,
     serviceName: string,
     maxRetries: number,
-    backoffStrategy: (attempt: number) => number = attempt => Math.pow(2, attempt) * 1000
+    backoffStrategy: (attempt: number) => number = (attempt) => Math.pow(2, attempt) * 1000
   ): Promise<T> {
     const operationKey = `${serviceName}:${Date.now()}`;
     let lastError: Error;
@@ -319,6 +319,7 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
       }
 
       return await Promise.race([operation(), timeoutPromise]);
+
     } catch (error) {
       const serviceError = this.createServiceError(error as Error, serviceName, {
         responseTime: Date.now() - startTime,
@@ -381,16 +382,22 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const serviceContext = this.extractServiceContext(error);
     const recoveryStrategies = this.getServiceRecoveryStrategies(error, serviceContext);
 
-    return new AppError(error.message, error.code, error.type, error.severity, {
-      ...error,
-      context: {
-        ...error.context,
-        ...serviceContext,
-      },
-      recoveryStrategies,
-      recoverable: this.isRecoverableServiceError(error),
-      retryable: this.isRetryableServiceError(error),
-    });
+    return new AppError(
+      error.message,
+      error.code,
+      error.type,
+      error.severity,
+      {
+        ...error,
+        context: {
+          ...error.context,
+          ...serviceContext,
+        },
+        recoveryStrategies,
+        recoverable: this.isRecoverableServiceError(error),
+        retryable: this.isRetryableServiceError(error),
+      }
+    );
   }
 
   /**
@@ -418,8 +425,7 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
       requestId: error.context?.requestId as string,
       responseTime: error.context?.responseTime as number,
       retryCount: error.context?.retryCount as number,
-      circuitBreakerState: error.context
-        ?.circuitBreakerState as ServiceErrorContext['circuitBreakerState'],
+      circuitBreakerState: error.context?.circuitBreakerState as ServiceErrorContext['circuitBreakerState'],
       cacheHit: error.context?.cacheHit as boolean,
       fallbackUsed: error.context?.fallbackUsed as boolean,
       serviceVersion: error.context?.serviceVersion as string,
@@ -441,15 +447,21 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const errorCode = this.determineServiceErrorCode(error);
     const severity = this.determineServiceErrorSeverity(errorCode);
 
-    return new AppError(error.message, errorCode, ErrorDomain.NETWORK, severity, {
-      context: {
-        serviceName,
-        ...additionalContext,
-      },
-      cause: error,
-      recoverable: true,
-      retryable: this.isRetryableServiceErrorCode(errorCode),
-    });
+    return new AppError(
+      error.message,
+      errorCode,
+      ErrorDomain.NETWORK,
+      severity,
+      {
+        context: {
+          serviceName,
+          ...additionalContext,
+        },
+        cause: error,
+        recoverable: true,
+        retryable: this.isRetryableServiceErrorCode(errorCode),
+      }
+    );
   }
 
   /**
@@ -624,7 +636,10 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
   /**
    * Monitor service health
    */
-  private async monitorServiceHealth(error: AppError, context: ServiceErrorContext): Promise<void> {
+  private async monitorServiceHealth(
+    error: AppError,
+    context: ServiceErrorContext
+  ): Promise<void> {
     if (!context.serviceName) return;
 
     // Check circuit breaker state
@@ -656,8 +671,7 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
   ): Promise<void> {
     if (!context.serviceName || !context.loadMetrics?.errorRate) return;
 
-    if (context.loadMetrics.errorRate > 0.5) {
-      // 50% error rate
+    if (context.loadMetrics.errorRate > 0.5) { // 50% error rate
       const degradationError = new AppError(
         `Service degradation detected for: ${context.serviceName}`,
         LibraryErrorCode.SERVICE_DEGRADATION,
@@ -715,10 +729,8 @@ export class LibraryErrorMiddleware implements ErrorReporter, ErrorTransformer {
 }
 
 // Export singleton instance
-export type {
-  // Export types and classes
-  ServiceErrorContext,
-  LibraryMiddlewareConfig,
-  CircuitBreakerConfig,
-};
+export const libraryErrorMiddleware = new LibraryErrorMiddleware();
+
+// Export types and classes
+export type { ServiceErrorContext, LibraryMiddlewareConfig, CircuitBreakerConfig };
 export { CircuitBreaker, ServiceRetryHandler };

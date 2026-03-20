@@ -5,7 +5,12 @@
  * bill provisions and their relationship to financial interests.
  */
 
-import { AlertTriangle, FileText, Calendar, Target } from 'lucide-react';
+import {
+  AlertTriangle,
+  FileText,
+  Calendar,
+  Target,
+} from 'lucide-react';
 import { useMemo } from 'react';
 import {
   BarChart,
@@ -106,9 +111,7 @@ export function ImplementationWorkaroundsTracker({
     // Group by effectiveness levels
     const effectivenessGroups = {
       high: allWorkarounds.filter(w => (w.effectiveness || 0) >= 0.7),
-      medium: allWorkarounds.filter(
-        w => (w.effectiveness || 0) >= 0.4 && (w.effectiveness || 0) < 0.7
-      ),
+      medium: allWorkarounds.filter(w => (w.effectiveness || 0) >= 0.4 && (w.effectiveness || 0) < 0.7),
       low: allWorkarounds.filter(w => (w.effectiveness || 0) < 0.4),
     };
 
@@ -140,7 +143,7 @@ export function ImplementationWorkaroundsTracker({
     );
 
     // Calculate average effectiveness by interest
-    Object.values(interestGroups).forEach(group => {
+    Object.values(interestGroups).forEach((group) => {
       group.avgEffectiveness =
         group.workarounds.reduce(
           (sum: number, w: WorkaroundDisplay) => sum + (w.effectiveness || 0),
@@ -569,7 +572,7 @@ export function ImplementationWorkaroundsTracker({
               <div className="space-y-4">
                 {allWorkarounds
                   .sort((a, b) => (b.effectiveness ?? 0) - (a.effectiveness ?? 0))
-                  .map(workaround => (
+                  .map((workaround) => (
                     <div key={workaround.id} className="p-4 border rounded-lg">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">

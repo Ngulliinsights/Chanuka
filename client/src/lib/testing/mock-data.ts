@@ -332,7 +332,11 @@ export const mockDataService = new MockDataService();
 /**
  * Initialize mock data service with custom configuration
  */
-export   await service.initialize();
+export const initializeMockDataService = async (
+  config?: Partial<MockDataServiceConfig>
+): Promise<void> => {
+  const service = new MockDataService(config);
+  await service.initialize();
   return;
 };
 

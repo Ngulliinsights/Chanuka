@@ -770,4 +770,4 @@ export class PolyfillManager {
   }
 }
 
-export 
+export const polyfillManager = PolyfillManager.getInstance();

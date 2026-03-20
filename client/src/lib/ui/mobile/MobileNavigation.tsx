@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, FileText, User, Scale } from 'lucide-react';
+import { Home, Search, FileText, User, Menu } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '@client/lib/design-system/utils/cn';
 
@@ -13,7 +13,6 @@ const navItems: NavItem[] = [
   { icon: <Home className="h-5 w-5" />, label: 'Home', path: '/' },
   { icon: <Search className="h-5 w-5" />, label: 'Search', path: '/search' },
   { icon: <FileText className="h-5 w-5" />, label: 'Bills', path: '/bills' },
-  { icon: <Scale className="h-5 w-5" />, label: 'Accountability', path: '/accountability' },
   { icon: <User className="h-5 w-5" />, label: 'Profile', path: '/profile' },
 ];
 
@@ -28,7 +27,7 @@ export function MobileNavigation() {
       aria-label="Mobile navigation"
     >
       <div className="flex items-center justify-around h-16">
-        {navItems.map(item => {
+        {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           return (
             <button
@@ -36,7 +35,9 @@ export function MobileNavigation() {
               onClick={() => navigate(item.path)}
               className={cn(
                 'flex flex-col items-center justify-center flex-1 h-full transition-colors',
-                isActive ? 'text-blue-600' : 'text-gray-600 hover:text-gray-900'
+                isActive
+                  ? 'text-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
               )}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}

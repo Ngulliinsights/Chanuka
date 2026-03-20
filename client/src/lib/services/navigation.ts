@@ -20,4 +20,4 @@ export const navigationUtils = {
 export default navigationUtils;
 
 
-export 
+export const navigationService = navigationUtils;

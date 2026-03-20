@@ -397,4 +397,4 @@ export class MobileErrorHandler {
 }
 
 // Singleton instance
-export 
+export const mobileErrorHandler = MobileErrorHandler.getInstance();

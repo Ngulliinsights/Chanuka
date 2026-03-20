@@ -20,4 +20,4 @@ export const mockDataLoaders = {
 export default mockDataLoaders;
 
 
-export 
+export const dataLoaders = mockDataLoaders;

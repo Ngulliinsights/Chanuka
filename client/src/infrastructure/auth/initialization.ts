@@ -428,7 +428,10 @@ class AuthServiceInitializer {
 export const authServiceInitializer = new AuthServiceInitializer();
 
 // Export utility functions
-export     return emailRegex.test(email);
+export const authUtils = {
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   },
 
   validatePassword(

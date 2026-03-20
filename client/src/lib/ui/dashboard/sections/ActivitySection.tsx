@@ -1,14 +1,15 @@
 import { formatDistanceToNow, format } from 'date-fns';
-import { Activity, Eye, MessageSquare } from 'lucide-react';
+import {
+  Activity,
+  Eye,
+  MessageSquare,
+  ThumbsUp as Vote, // Using ThumbsUp as Vote replacement
+  Star,
+} from 'lucide-react';
+import React from 'react';
 
 import { Button } from '@client/lib/design-system';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { EngagementHistoryItem } from '@client/lib/types/user-dashboard';
 
 interface ActivitySectionProps {

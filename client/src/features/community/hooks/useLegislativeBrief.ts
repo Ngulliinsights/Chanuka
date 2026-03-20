@@ -1,6 +1,6 @@
 /**
  * Hook: useLegislativeBrief
- *
+ * 
  * Fetches the AI-generated legislative brief synthesizing all arguments on a bill
  * Part of argument-intelligence feature integration with community
  */
@@ -24,7 +24,7 @@ export function useLegislativeBrief(billId: string) {
       if (!response.ok) throw new Error('Failed to fetch legislative brief');
       const data = await response.json();
       const brief = data.brief as LegislativeBrief;
-
+      
       // Transform to include convenience properties
       const briefWithCounts: LegislativeBriefWithCounts = {
         ...brief,
@@ -35,10 +35,10 @@ export function useLegislativeBrief(billId: string) {
         topSupportingArguments: brief.keyArguments?.support || [],
         topOpposingArguments: brief.keyArguments?.oppose || [],
       };
-
+      
       return briefWithCounts;
     },
     enabled: !!billId,
-    staleTime: 15 * 60 * 1000, // 15 minutes
+    staleTime: 15 * 60 * 1000 // 15 minutes
   });
 }

@@ -38,9 +38,7 @@ export function usePerformanceMonitor(name: string, enabled: boolean = true) {
     metricsRef.current.renderCount++;
 
     if ('memory' in performance) {
-      metricsRef.current.memoryUsage = (
-        performance as unknown as Record<string, unknown>
-      ).memory.usedJSHeapSize;
+      metricsRef.current.memoryUsage = (performance as unknown as Record<string, unknown>).memory.usedJSHeapSize;
     }
   }, [enabled]);
 
@@ -92,43 +90,34 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => any>(
   const lastThisRef = useRef<any>(null);
   const resultRef = useRef<ReturnType<T>>();
 
-  const shouldInvoke = useCallback(
-    (time: number) => {
-      const timeSinceLastCall = time - lastCallTimeRef.current;
-      const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
+  const shouldInvoke = useCallback((time: number) => {
+    const timeSinceLastCall = time - lastCallTimeRef.current;
+    const timeSinceLastInvoke = time - lastInvokeTimeRef.current;
 
-      return (
-        lastCallTimeRef.current === undefined ||
-        timeSinceLastCall >= delay ||
-        timeSinceLastCall < 0 ||
-        (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
-      );
-    },
-    [delay, maxWait]
-  );
+    return (
+      lastCallTimeRef.current === undefined ||
+      timeSinceLastCall >= delay ||
+      timeSinceLastCall < 0 ||
+      (maxWait !== undefined && timeSinceLastInvoke >= maxWait)
+    );
+  }, [delay, maxWait]);
 
-  const leadingEdge = useCallback(
-    (time: number) => {
-      lastInvokeTimeRef.current = time;
-      timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
-      return leading ? invokeFunc(time) : resultRef.current;
-    },
-    [delay, leading]
-  );
+  const leadingEdge = useCallback((time: number) => {
+    lastInvokeTimeRef.current = time;
+    timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
+    return leading ? invokeFunc(time) : resultRef.current;
+  }, [delay, leading]);
 
-  const trailingEdge = useCallback(
-    (time: number) => {
-      timeoutRef.current = null;
+  const trailingEdge = useCallback((time: number) => {
+    timeoutRef.current = null;
 
-      if (trailing && lastArgsRef.current) {
-        return invokeFunc(time);
-      }
-      lastArgsRef.current = [];
-      lastThisRef.current = null;
-      return resultRef.current;
-    },
-    [trailing]
-  );
+    if (trailing && lastArgsRef.current) {
+      return invokeFunc(time);
+    }
+    lastArgsRef.current = [];
+    lastThisRef.current = null;
+    return resultRef.current;
+  }, [trailing]);
 
   const timerExpired = useCallback(() => {
     const time = Date.now();
@@ -140,45 +129,39 @@ export function useDebouncedCallback<T extends (...args: unknown[]) => any>(
     timeoutRef.current = setTimeout(timerExpired, remainingWait) as unknown;
   }, [shouldInvoke, trailingEdge]);
 
-  const invokeFunc = useCallback(
-    (time: number) => {
-      const args = lastArgsRef.current;
-      const thisArg = lastThisRef.current;
+  const invokeFunc = useCallback((time: number) => {
+    const args = lastArgsRef.current;
+    const thisArg = lastThisRef.current;
 
-      lastArgsRef.current = [] as unknown;
-      lastThisRef.current = null;
-      lastInvokeTimeRef.current = time;
-      resultRef.current = callback.apply(thisArg, args!);
-      return resultRef.current;
-    },
-    [callback]
-  );
+    lastArgsRef.current = [] as unknown;
+    lastThisRef.current = null;
+    lastInvokeTimeRef.current = time;
+    resultRef.current = callback.apply(thisArg, args!);
+    return resultRef.current;
+  }, [callback]);
 
-  const debounced = useCallback(
-    (...args: Parameters<T>) => {
-      const time = Date.now();
-      const isInvoking = shouldInvoke(time);
+  const debounced = useCallback((...args: Parameters<T>) => {
+    const time = Date.now();
+    const isInvoking = shouldInvoke(time);
 
-      lastArgsRef.current = args;
-      lastThisRef.current = null;
-      lastCallTimeRef.current = time;
+    lastArgsRef.current = args;
+    lastThisRef.current = null;
+    lastCallTimeRef.current = time;
 
-      if (isInvoking) {
-        if (timeoutRef.current === null) {
-          return leadingEdge(lastCallTimeRef.current);
-        }
-        if (maxWait !== undefined) {
-          timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
-          return invokeFunc(lastCallTimeRef.current);
-        }
-      }
+    if (isInvoking) {
       if (timeoutRef.current === null) {
-        timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
+        return leadingEdge(lastCallTimeRef.current);
       }
-      return resultRef.current;
-    },
-    [shouldInvoke, leadingEdge, timerExpired, invokeFunc, delay, maxWait]
-  ) as unknown;
+      if (maxWait !== undefined) {
+        timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
+        return invokeFunc(lastCallTimeRef.current);
+      }
+    }
+    if (timeoutRef.current === null) {
+      timeoutRef.current = setTimeout(timerExpired, delay) as unknown;
+    }
+    return resultRef.current;
+  }, [shouldInvoke, leadingEdge, timerExpired, invokeFunc, delay, maxWait]) as unknown;
 
   // Cancel method
   debounced.cancel = useCallback(() => {
@@ -217,41 +200,38 @@ export function useThrottledCallback<T extends (...args: unknown[]) => any>(
   const lastThisRef = useRef<any>(null);
   const resultRef = useRef<ReturnType<T>>();
 
-  const throttled = useCallback(
-    (...args: Parameters<T>) => {
-      const time = Date.now();
-      const timeSinceLastCall = time - lastCallTimeRef.current;
+  const throttled = useCallback((...args: Parameters<T>) => {
+    const time = Date.now();
+    const timeSinceLastCall = time - lastCallTimeRef.current;
 
-      lastArgsRef.current = args;
-      lastThisRef.current = null;
+    lastArgsRef.current = args;
+    lastThisRef.current = null;
 
-      if (lastCallTimeRef.current === 0 && !leading) {
-        lastCallTimeRef.current = time;
+    if (lastCallTimeRef.current === 0 && !leading) {
+      lastCallTimeRef.current = time;
+    }
+
+    if (timeSinceLastCall >= delay) {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
       }
-
-      if (timeSinceLastCall >= delay) {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-        lastCallTimeRef.current = time;
+      lastCallTimeRef.current = time;
+      resultRef.current = callback.apply(null, lastArgsRef.current);
+      lastArgsRef.current = [];
+      lastThisRef.current = null;
+    } else if (!timeoutRef.current && trailing) {
+      timeoutRef.current = setTimeout(() => {
+        lastCallTimeRef.current = leading ? Date.now() : 0;
+        timeoutRef.current = null;
         resultRef.current = callback.apply(null, lastArgsRef.current);
         lastArgsRef.current = [];
         lastThisRef.current = null;
-      } else if (!timeoutRef.current && trailing) {
-        timeoutRef.current = setTimeout(() => {
-          lastCallTimeRef.current = leading ? Date.now() : 0;
-          timeoutRef.current = null;
-          resultRef.current = callback.apply(null, lastArgsRef.current);
-          lastArgsRef.current = [];
-          lastThisRef.current = null;
-        }, delay - timeSinceLastCall);
-      }
+      }, delay - timeSinceLastCall);
+    }
 
-      return resultRef.current;
-    },
-    [callback, delay, leading, trailing]
-  );
+    return resultRef.current;
+  }, [callback, delay, leading, trailing]);
 
   // Cancel method
   (throttled as any).cancel = useCallback(() => {

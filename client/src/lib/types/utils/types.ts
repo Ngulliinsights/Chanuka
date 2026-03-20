@@ -27,21 +27,15 @@ export type OptionalKeys<T> = {
 }[keyof T];
 
 // Function utilities
-export type Parameters<T extends (...args: unknown) => any> = T extends (...args: infer P) => any
-  ? P
-  : never;
-export type ReturnType<T extends (...args: unknown) => any> = T extends (
-  ...args: unknown
-) => infer R
-  ? R
-  : unknown;
+export type Parameters<T extends (...args: unknown) => any> = T extends (...args: infer P) => any ? P : never;
+export type ReturnType<T extends (...args: unknown) => any> = T extends (...args: unknown) => infer R ? R : unknown;
 
 // Array utilities
 export type ArrayElement<T> = T extends readonly (infer U)[] ? U : never;
 export type NonEmptyArray<T> = [T, ...T[]];
 
 // String utilities
-export type StringLiteral<T> = T extends string ? (string extends T ? never : T) : never;
+export type StringLiteral<T> = T extends string ? string extends T ? never : T : never;
 
 // Conditional utilities
 export type NonNullable<T> = T extends null | undefined ? never : T;

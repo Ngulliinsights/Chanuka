@@ -250,4 +250,4 @@ export class DeviceDetector {
 }
 
 // Singleton instance
-export 
+export const deviceDetector = DeviceDetector.getInstance();

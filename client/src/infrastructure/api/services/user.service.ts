@@ -23,7 +23,13 @@ import type { EndpointCallResult } from '@shared/types/api/contracts';
  * User API Service
  * Provides type-safe methods for user-related API calls
  */
-export   },
+export const userApiService = {
+  /**
+   * Create a new user
+   */
+  async create(request: CreateUserRequest): Promise<EndpointCallResult<CreateUserResponse>> {
+    return contractApiClient.call(UserEndpoints.create, request);
+  },
 
   /**
    * Get user by ID

@@ -4,6 +4,7 @@
  */
 
 import { logger } from '@client/lib/utils/logger';
+import { privacyCompliance } from '@client/lib/utils/privacy-compliance';
 
 interface RetentionPolicy {
   id: string;
@@ -414,11 +415,19 @@ class DataRetentionService {
 }
 
 // Export singleton instance
-export 
+export const dataRetentionService = new DataRetentionService();
+
 /**
  * Utility functions for data retention
  */
-export     } else if (days < 365) {
+export const retentionUtils = {
+  /**
+   * Formats retention period for display
+   */
+  formatRetentionPeriod(days: number): string {
+    if (days < 30) {
+      return `${days} days`;
+    } else if (days < 365) {
       const months = Math.round(days / 30);
       return `${months} month${months > 1 ? 's' : ''}`;
     } else {

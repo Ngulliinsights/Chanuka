@@ -158,7 +158,9 @@ export function WelcomeTour() {
     navigate('/');
   };
 
-      
+  const handleComplete = () => {
+    const completionTime = Date.now() - startTime;
+    
     // Save onboarding completion to localStorage
     localStorage.setItem('chanuka_onboarding_completed', 'true');
     localStorage.setItem('chanuka_onboarding_version', '2.0.0');

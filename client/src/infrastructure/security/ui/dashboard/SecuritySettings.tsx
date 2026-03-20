@@ -4,6 +4,7 @@
  */
 
 import { Shield, Lock, Eye, Zap, AlertTriangle, CheckCircle, Settings } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { getSecuritySystem } from '@core/security';
@@ -103,7 +104,11 @@ export function SecuritySettings({ className = '' }: SecuritySettingsProps) {
     loadCurrentConfig();
   }, []);
 
-        if (savedConfig) {
+  const loadCurrentConfig = async () => {
+    try {
+      // In a real implementation, this would load from backend or local storage
+      const savedConfig = localStorage.getItem('security-config');
+      if (savedConfig) {
         setConfig(JSON.parse(savedConfig));
       }
     } catch (error) {

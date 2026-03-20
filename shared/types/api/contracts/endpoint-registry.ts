@@ -44,7 +44,7 @@ import type {
   GetUserAnalyticsResponse,
   TrackEventRequest,
   TrackEventResponse,
-} from './analytics.contract';
+} from './analytics.contracts';
 import {
   GetAnalyticsMetricsRequestSchema,
   GetAnalyticsMetricsResponseSchema,

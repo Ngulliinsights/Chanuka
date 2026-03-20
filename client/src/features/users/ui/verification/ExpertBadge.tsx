@@ -1,4 +1,5 @@
 import { Shield, Award, CheckCircle, User, Star, Building } from 'lucide-react';
+import React from 'react';
 
 import {
   Tooltip,
@@ -10,7 +11,7 @@ import { Badge } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
 import { ExpertVerificationType } from '@client/lib/types';
 
-import { GraduationCap } from '@client/lib/design-system/icons/ChanukaIcons';
+import { GraduationCap } from '../icons/ChanukaIcons';
 
 interface ExpertBadgeProps {
   verificationType?: ExpertVerificationType;

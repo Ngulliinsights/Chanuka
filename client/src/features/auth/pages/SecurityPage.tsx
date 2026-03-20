@@ -4,6 +4,7 @@
  */
 
 import { Shield, Lock, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
 import { Alert, AlertDescription } from '@client/lib/design-system';
 import {

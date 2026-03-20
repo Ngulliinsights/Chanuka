@@ -31,7 +31,19 @@ interface UseDashboardLayoutReturn {
 /**
  * useDashboardLayout Hook
  */
-export 
+export const useDashboardLayout = (
+  initialConfig: DashboardLayout,
+  options: UseDashboardLayoutOptions = {}
+): UseDashboardLayoutReturn => {
+  const {
+    initialLayout,
+    breakpoints = {
+      mobile: 768,
+      tablet: 1024,
+      desktop: 1280,
+    },
+  } = options;
+
   // Layout state
   const [layout, setLayout] = useState<DashboardLayout>({
     ...initialConfig,

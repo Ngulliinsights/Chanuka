@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { BaseError } from '@client/infrastructure/error';
 import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
 import { coreErrorHandler } from '@client/infrastructure/error';
-import { AppError, ErrorContext } from '@client/infrastructure/error/types';
+import { AppError, ErrorContext, ErrorMetadata } from '@client/infrastructure/error/types';
 
 // Mock the error handler
 vi.mock('../../../core/error/handler', () => ({
@@ -46,15 +46,9 @@ describe('Error Context Management', () => {
   });
 
   it('should create error with comprehensive context', () => {
-    const error = new AppError(
-      'Test error',
-      'TEST_ERROR',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      {
-        context: baseContext,
-      }
-    );
+    const error = new AppError('Test error', 'TEST_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
+      context: baseContext,
+    });
 
     expect(error.context).toEqual(baseContext);
     expect(error.context?.component).toBe('TestComponent');
@@ -100,26 +94,15 @@ describe('Error Context Management', () => {
   });
 
   it('should handle empty context gracefully', () => {
-    const error = new AppError(
-      'No context error',
-      'NO_CONTEXT',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.LOW
-    );
+    const error = new AppError('No context error', 'NO_CONTEXT', ErrorDomain.SYSTEM, ErrorSeverity.LOW);
 
     expect(error.context).toBeUndefined();
   });
 
   it('should serialize context in error JSON', () => {
-    const error = new AppError(
-      'Context error',
-      'CONTEXT_ERROR',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      {
-        context: baseContext,
-      }
-    );
+    const error = new AppError('Context error', 'CONTEXT_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
+      context: baseContext,
+    });
 
     const json = error.toJSON();
 
@@ -150,19 +133,9 @@ describe('Error Severity Levels', () => {
 
   it('should create errors with different severity levels', () => {
     const lowError = new AppError('Low severity', 'LOW', ErrorDomain.SYSTEM, ErrorSeverity.LOW);
-    const mediumError = new AppError(
-      'Medium severity',
-      'MEDIUM',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM
-    );
+    const mediumError = new AppError('Medium severity', 'MEDIUM', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM);
     const highError = new AppError('High severity', 'HIGH', ErrorDomain.SYSTEM, ErrorSeverity.HIGH);
-    const criticalError = new AppError(
-      'Critical severity',
-      'CRITICAL',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.CRITICAL
-    );
+    const criticalError = new AppError('Critical severity', 'CRITICAL', ErrorDomain.SYSTEM, ErrorSeverity.CRITICAL);
 
     expect(lowError.severity).toBe(ErrorSeverity.LOW);
     expect(mediumError.severity).toBe(ErrorSeverity.MEDIUM);
@@ -291,15 +264,9 @@ describe('Error Correlation and Tracking', () => {
 
   it('should use provided correlation ID', () => {
     const customId = 'custom-correlation-123';
-    const error = new AppError(
-      'Custom ID error',
-      'CUSTOM_ID',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      {
-        correlationId: customId,
-      }
-    );
+    const error = new AppError('Custom ID error', 'CUSTOM_ID', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
+      correlationId: customId,
+    });
 
     expect(error.correlationId).toBe(customId);
     expect(error.id).toBe(customId);
@@ -315,28 +282,16 @@ describe('Error Correlation and Tracking', () => {
   });
 
   it('should track error relationships through context', () => {
-    const parentError = new AppError(
-      'Parent error',
-      'PARENT',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      {
-        correlationId: 'parent-123',
-      }
-    );
+    const parentError = new AppError('Parent error', 'PARENT', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
+      correlationId: 'parent-123',
+    });
 
-    const childError = new AppError(
-      'Child error',
-      'CHILD',
-      ErrorDomain.VALIDATION,
-      ErrorSeverity.LOW,
-      {
-        context: {
-          parentCorrelationId: parentError.correlationId,
-          component: 'ChildComponent',
-        },
-      }
-    );
+    const childError = new AppError('Child error', 'CHILD', ErrorDomain.VALIDATION, ErrorSeverity.LOW, {
+      context: {
+        parentCorrelationId: parentError.correlationId,
+        component: 'ChildComponent',
+      },
+    });
 
     expect(childError.context?.parentCorrelationId).toBe(parentError.correlationId);
     expect(childError.correlationId).not.toBe(parentError.correlationId);
@@ -436,15 +391,9 @@ describe('Error Context Validation', () => {
       timestamp: Date.now(),
     };
 
-    const error = new AppError(
-      'Validation test',
-      'VALIDATION_TEST',
-      ErrorDomain.SYSTEM,
-      ErrorSeverity.MEDIUM,
-      {
-        context: validContext,
-      }
-    );
+    const error = new AppError('Validation test', 'VALIDATION_TEST', ErrorDomain.SYSTEM, ErrorSeverity.MEDIUM, {
+      context: validContext,
+    });
 
     expect(error.context).toEqual(validContext);
   });
@@ -538,35 +487,23 @@ describe('Metadata Consistency Across Systems', () => {
 describe('Cross-System Context Propagation', () => {
   it('should propagate context through error chains', () => {
     // Simulate error propagation across system boundaries
-    const securityError = new AppError(
-      'Security error',
-      'SEC_ERROR',
-      ErrorDomain.SECURITY,
-      ErrorSeverity.HIGH,
-      {
-        context: {
-          component: 'SecurityService',
-          operation: 'authenticate',
-          userId: 'user123',
-        },
-      }
-    );
+    const securityError = new AppError('Security error', 'SEC_ERROR', ErrorDomain.SECURITY, ErrorSeverity.HIGH, {
+      context: {
+        component: 'SecurityService',
+        operation: 'authenticate',
+        userId: 'user123',
+      },
+    });
 
-    const serviceError = new AppError(
-      'Service error',
-      'SVC_ERROR',
-      ErrorDomain.EXTERNAL_SERVICE,
-      ErrorSeverity.MEDIUM,
-      {
-        context: {
-          component: 'ApiService',
-          operation: 'callExternalApi',
-          requestId: 'req456',
-          parentCorrelationId: securityError.correlationId,
-        },
-        cause: securityError,
-      }
-    );
+    const serviceError = new AppError('Service error', 'SVC_ERROR', ErrorDomain.EXTERNAL_SERVICE, ErrorSeverity.MEDIUM, {
+      context: {
+        component: 'ApiService',
+        operation: 'callExternalApi',
+        requestId: 'req456',
+        parentCorrelationId: securityError.correlationId,
+      },
+      cause: securityError,
+    });
 
     const uiError = new AppError('UI error', 'UI_ERROR', ErrorDomain.SYSTEM, ErrorSeverity.LOW, {
       context: {

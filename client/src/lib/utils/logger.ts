@@ -404,5 +404,7 @@ class UnifiedLogger implements ExtendedLogger {
 export const logger = new UnifiedLogger();
 
 // Export individual components for flexibility
-export default // Backward compatibility exports
-logger;
+export const coreLogger = new CoreLogger();
+
+// Backward compatibility exports
+export default logger;

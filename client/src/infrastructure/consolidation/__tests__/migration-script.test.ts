@@ -29,7 +29,9 @@ describe('migration-script', () => {
         `import { func1 } from '@/infrastructure/monitoring';`
       );
       
-      `
+      const file2 = project.createSourceFile(
+        'file2.ts',
+        `import { func2 } from '@/infrastructure/performance';`
       );
       
       const file3 = project.createSourceFile(
@@ -223,7 +225,10 @@ describe('migration-script', () => {
       const file = project.createSourceFile(
         'test.ts',
         `
-                                `
+        import { func1 } from '@/infrastructure/monitoring';
+        import { func2 } from '@/infrastructure/monitoring/errors';
+        import { func3 } from '@/infrastructure/other';
+        `
       );
       
       const count = replaceImportPath(

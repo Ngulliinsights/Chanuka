@@ -1,6 +1,12 @@
 import { UserRole } from '@shared/types/core/enums';
 
-export type NavigationSection = 'legislative' | 'community' | 'user' | 'admin' | 'tools' | 'system';
+export type NavigationSection =
+  | 'legislative'
+  | 'community'
+  | 'user'
+  | 'admin'
+  | 'tools'
+  | 'system';
 
 // Re-export UserRole for convenience
 export { UserRole };
@@ -41,7 +47,7 @@ export interface NavigationItem extends BaseNavigationItem {
 
   // State
   isActive?: boolean;
-
+  
   // Optional metadata
   description?: string;
 }
@@ -62,7 +68,12 @@ export interface BreadcrumbItem {
 
 export type PageRelationType = 'parent' | 'child' | 'sibling' | 'related';
 
-export type PageCategory = 'legislative' | 'community' | 'user' | 'admin' | 'tools';
+export type PageCategory =
+  | 'legislative'
+  | 'community'
+  | 'user'
+  | 'admin'
+  | 'tools';
 
 export interface RelatedPage {
   pageId: string;
@@ -78,14 +89,11 @@ export interface RelatedPage {
 
 export interface PageRelationship {
   pageId: string;
-  relatedPages: Record<
-    string,
-    {
-      type: PageRelationType;
-      weight: number;
-      context: string;
-    }
-  >;
+  relatedPages: Record<string, {
+    type: PageRelationType;
+    weight: number;
+    context: string;
+  }>;
 }
 
 // ============================================================================
@@ -176,7 +184,11 @@ export interface ResponsiveNavigationContextValue extends ResponsiveNavigationSt
 // Analytics & Tracking
 // ============================================================================
 
-export type NavigationEventType = 'page_view' | 'navigation_click' | 'search' | 'command_palette';
+export type NavigationEventType =
+  | 'page_view'
+  | 'navigation_click'
+  | 'search'
+  | 'command_palette';
 
 export interface NavigationAnalyticsEvent {
   event: NavigationEventType;
@@ -214,7 +226,7 @@ export interface AccessDenial {
 export function hasRole(userRole: UserRole, allowedRoles: UserRole[]): boolean {
   // Handle 'user' and 'citizen' as aliases
   const normalizedUserRole = userRole === UserRole.Citizen ? UserRole.Citizen : userRole;
-  const normalizedAllowed = allowedRoles.map(r => (r === UserRole.Citizen ? UserRole.Citizen : r));
+  const normalizedAllowed = allowedRoles.map(r => r === UserRole.Citizen ? UserRole.Citizen : r);
 
   return normalizedAllowed.includes(normalizedUserRole);
 }
@@ -234,7 +246,11 @@ export function requiresAuthentication(item: NavigationItem): boolean {
 /**
  * Check if user can access navigation item
  */
-export function canAccessItem(item: NavigationItem, userRole: UserRole, user: unknown): boolean {
+export function canAccessItem(
+  item: NavigationItem,
+  userRole: UserRole,
+  user: unknown
+): boolean {
   // Admin-only check
   if (item.adminOnly && userRole !== UserRole.Admin) {
     return false;

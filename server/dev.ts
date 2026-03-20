@@ -9,6 +9,7 @@ import { pathToFileURL } from 'url';
 import { resolve } from 'path';
 
 // Register tsx for TypeScript support
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const unregister = register();
 
 // Import and start the server

@@ -16,14 +16,12 @@ Unified mobile utilities providing comprehensive support for mobile devices incl
 ## Public Exports
 
 ### Classes
-
 - `DeviceDetector` - Device detection and capabilities
 - `ResponsiveUtils` - Responsive layout utilities
 - `MobileErrorHandler` - Mobile error handling
 - `MobilePerformanceOptimizer` - Performance optimization
 
 ### Functions
-
 - `isMobileDevice()` - Check if mobile phone
 - `isTabletDevice()` - Check if tablet
 - `hasTouch()` - Check touch support

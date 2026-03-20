@@ -17,7 +17,7 @@ import {
   SystemHealth,
   AppError,
   ErrorDomain,
-  ErrorSeverity,
+  ErrorSeverity
 } from '../../infrastructure/observability/error-monitoring/index';
 
 // Type definitions for internal state management
@@ -103,20 +103,15 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   }
 
   async getErrorAnalytics(timeRange?: { start: number; end: number }): Promise<ErrorAnalytics[]> {
-    const systemErrors = this.aggregationService.getSystemErrors(
-      ClientSystem.LIBRARY_SERVICES,
-      timeRange
-    );
+    const systemErrors = this.aggregationService.getSystemErrors(ClientSystem.LIBRARY_SERVICES, timeRange);
     const serviceGroups = this.groupErrorsByService(systemErrors);
-
+    
     return this.calculateAnalytics(serviceGroups);
   }
 
   async getSystemHealth(): Promise<SystemHealth> {
     const analytics = await this.getCrossSystemAnalytics();
-    const servicesHealth = analytics.systems.find(
-      (s: unknown) => s.system === ClientSystem.LIBRARY_SERVICES
-    );
+    const servicesHealth = analytics.systems.find((s: unknown) => s.system === ClientSystem.LIBRARY_SERVICES);
 
     return servicesHealth || this.calculateFallbackHealth();
   }
@@ -125,27 +120,26 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
     this.errorPatterns.set(pattern, {
       threshold,
       count: 0,
-      lastTriggered: 0,
+      lastTriggered: 0
     });
   }
 
   setMonitoringEnabled(enabled: boolean, operations?: string[]): void {
     this.monitoringEnabled = enabled;
-    this.enabledOperations = operations ? new Set(operations) : new Set(['*']);
+    this.enabledOperations = operations 
+      ? new Set(operations) 
+      : new Set(['*']);
   }
 
   async getAggregatedMetrics(period: 'hour' | 'day' | 'week'): Promise<AggregatedMetrics> {
     const timeRange = this.getTimeRange(period);
-    const errors = this.aggregationService.getSystemErrors(
-      ClientSystem.LIBRARY_SERVICES,
-      timeRange
-    );
+    const errors = this.aggregationService.getSystemErrors(ClientSystem.LIBRARY_SERVICES, timeRange);
 
     return {
       totalErrors: errors.length,
       errorRate: this.calculateErrorRate(errors.length, period),
       topErrors: this.getTopErrors(errors),
-      performanceImpact: 100 - this.calculateAverageServicePerformance(),
+      performanceImpact: 100 - this.calculateAverageServicePerformance()
     };
   }
 
@@ -161,7 +155,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
       totalCalls: stats.totalCalls,
       errors: stats.errors,
       avgExecutionTime: stats.avgExecutionTime,
-      errorRate: this.calculateServiceErrorRate(stats),
+      errorRate: this.calculateServiceErrorRate(stats)
     }));
   }
 
@@ -176,15 +170,20 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   // Private helper methods
   private ensureAppError(error: AppError | Error, context: ErrorContext): AppError {
     if (error instanceof Error && !(error as unknown as Record<string, unknown>).type) {
-      return createError(ErrorDomain.SYSTEM, ErrorSeverity.HIGH, error.message, {
-        details: { originalError: error, serviceName: context.operation },
-        context: {
-          component: context.component,
-          operation: context.operation,
-          userId: context.userId,
-          sessionId: context.sessionId,
-        },
-      });
+      return createError(
+        ErrorDomain.SYSTEM,
+        ErrorSeverity.HIGH,
+        error.message,
+        {
+          details: { originalError: error, serviceName: context.operation },
+          context: {
+            component: context.component,
+            operation: context.operation,
+            userId: context.userId,
+            sessionId: context.sessionId
+          }
+        }
+      );
     }
     return error as AppError;
   }
@@ -194,15 +193,13 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
       ...context,
       system: ClientSystem.LIBRARY_SERVICES,
       serviceComponent: context.component || 'unknown',
-      serviceName: context.operation,
+      serviceName: context.operation
     };
   }
 
   private isSlowServiceCall(metrics: PerformanceMetrics): boolean {
-    return (
-      metrics.duration > LibraryServicesMonitoring.SLOW_THRESHOLD_MS &&
-      metrics.operation.includes('Service')
-    );
+    return metrics.duration > LibraryServicesMonitoring.SLOW_THRESHOLD_MS 
+      && metrics.operation.includes('Service');
   }
 
   private async reportSlowServiceCall(metrics: PerformanceMetrics): Promise<void> {
@@ -214,15 +211,15 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
         details: { ...metrics },
         context: {
           component: 'LibraryServicesMonitoring',
-          operation: 'service_performance_tracking',
-        },
+          operation: 'service_performance_tracking'
+        }
       }
     );
 
     await this.reportError(perfError, {
       system: ClientSystem.LIBRARY_SERVICES,
       component: 'LibraryServicesMonitoring',
-      operation: metrics.operation,
+      operation: metrics.operation
     });
   }
 
@@ -233,10 +230,13 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
 
   private updateServiceStats(serviceName: string, duration: number, success: boolean): void {
     const stats = this.getOrCreateServiceStats(serviceName);
-
+    
     stats.totalCalls++;
     stats.lastExecutionTime = duration;
-    stats.avgExecutionTime = this.calculateRollingAverage(stats.avgExecutionTime, duration);
+    stats.avgExecutionTime = this.calculateRollingAverage(
+      stats.avgExecutionTime, 
+      duration
+    );
   }
 
   private getOrCreateServiceStats(serviceName: string): ServiceStats {
@@ -245,17 +245,15 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
         totalCalls: 0,
         errors: 0,
         avgExecutionTime: 0,
-        lastExecutionTime: 0,
+        lastExecutionTime: 0
       });
     }
     return this.serviceCallStats.get(serviceName)!;
   }
 
   private calculateRollingAverage(current: number, newValue: number): number {
-    return (
-      current * (1 - LibraryServicesMonitoring.SMOOTHING_FACTOR) +
-      newValue * LibraryServicesMonitoring.SMOOTHING_FACTOR
-    );
+    return current * (1 - LibraryServicesMonitoring.SMOOTHING_FACTOR) 
+      + newValue * LibraryServicesMonitoring.SMOOTHING_FACTOR;
   }
 
   private groupErrorsByService(
@@ -268,7 +266,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
       const group = serviceGroups.get(serviceName) || {
         errors: [],
         recoveryCount: 0,
-        totalImpact: 0,
+        totalImpact: 0
       };
 
       group.errors.push(err);
@@ -302,7 +300,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
         trend: this.calculateTrend(recentErrors.length, olderErrors.length),
         impact: Math.min(100, (group.totalImpact / group.errors.length) * 10),
         recoveryRate: this.calculateRecoveryRate(group),
-        affectedUsers: this.countAffectedUsers(group.errors),
+        affectedUsers: this.countAffectedUsers(group.errors)
       });
     });
 
@@ -310,18 +308,22 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   }
 
   private calculateRecoveryRate(group: ServiceGroup): number {
-    return group.errors.length > 0 ? (group.recoveryCount / group.errors.length) * 100 : 0;
+    return group.errors.length > 0 
+      ? (group.recoveryCount / group.errors.length) * 100 
+      : 0;
   }
 
   private countAffectedUsers(errors: Array<{ context: ErrorContext }>): number {
-    return new Set(errors.map(e => e.context.userId).filter(Boolean)).size;
+    return new Set(
+      errors.map(e => e.context.userId).filter(Boolean)
+    ).size;
   }
 
   private calculateFallbackHealth(): SystemHealth {
-    const recentErrors = this.aggregationService.getSystemErrors(ClientSystem.LIBRARY_SERVICES, {
-      start: Date.now() - 60 * 60 * 1000,
-      end: Date.now(),
-    });
+    const recentErrors = this.aggregationService.getSystemErrors(
+      ClientSystem.LIBRARY_SERVICES,
+      { start: Date.now() - 60 * 60 * 1000, end: Date.now() }
+    );
 
     const errorRate = recentErrors.length;
     const performanceScore = this.calculateAverageServicePerformance();
@@ -331,12 +333,12 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
       status: this.determineHealthStatus(errorRate, performanceScore),
       errorRate,
       performanceScore,
-      lastUpdated: Date.now(),
+      lastUpdated: Date.now()
     };
   }
 
   private determineHealthStatus(
-    errorRate: number,
+    errorRate: number, 
     performanceScore: number
   ): 'healthy' | 'degraded' | 'critical' {
     if (errorRate > 10 || performanceScore < 70) return 'critical';
@@ -351,8 +353,8 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
     const avgExecutionTime = this.calculateAverageExecutionTime(serviceStats);
     const avgErrorRate = this.calculateAverageErrorRate(serviceStats);
 
-    const timeScore = Math.max(0, 100 - avgExecutionTime / 10);
-    const errorScore = Math.max(0, 100 - avgErrorRate * 1000);
+    const timeScore = Math.max(0, 100 - (avgExecutionTime / 10));
+    const errorScore = Math.max(0, 100 - (avgErrorRate * 1000));
 
     return (timeScore + errorScore) / 2;
   }
@@ -362,12 +364,10 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   }
 
   private calculateAverageErrorRate(stats: ServiceStats[]): number {
-    return (
-      stats.reduce(
-        (sum, stat) => sum + (stat.totalCalls > 0 ? stat.errors / stat.totalCalls : 0),
-        0
-      ) / stats.length
-    );
+    return stats.reduce(
+      (sum, stat) => sum + (stat.totalCalls > 0 ? stat.errors / stat.totalCalls : 0), 
+      0
+    ) / stats.length;
   }
 
   private async getCrossSystemAnalytics() {
@@ -390,9 +390,9 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   }
 
   private processPatternMatch(
-    pattern: string,
-    patternData: ErrorPatternData,
-    error: AppError,
+    pattern: string, 
+    patternData: ErrorPatternData, 
+    error: AppError, 
     now: number
   ): void {
     patternData.count++;
@@ -419,19 +419,19 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
           pattern,
           count,
           threshold: this.errorPatterns.get(pattern)?.threshold,
-          lastError: error.message,
+          lastError: error.message
         },
         context: {
           component: 'LibraryServicesMonitoring',
-          operation: 'error_pattern_alert',
-        },
+          operation: 'error_pattern_alert'
+        }
       }
     );
 
     this.reportError(alertError, {
       system: ClientSystem.LIBRARY_SERVICES,
       component: 'LibraryServicesMonitoring',
-      operation: 'error_pattern_monitoring',
+      operation: 'error_pattern_monitoring'
     });
   }
 
@@ -449,17 +449,14 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
       medium: 2,
       high: 3,
       critical: 4,
-      blocker: 5,
+      blocker: 5
     };
     return impactMap[error.severity] ?? 2;
   }
 
-  private calculateTrend(
-    current: number,
-    previous: number
-  ): 'increasing' | 'decreasing' | 'stable' {
+  private calculateTrend(current: number, previous: number): 'increasing' | 'decreasing' | 'stable' {
     if (previous === 0) return current > 0 ? 'increasing' : 'stable';
-
+    
     const change = (current - previous) / previous;
     if (change > 0.1) return 'increasing';
     if (change < -0.1) return 'decreasing';
@@ -470,18 +467,18 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
     const periodMs: Record<typeof period, number> = {
       hour: 60 * 60 * 1000,
       day: 24 * 60 * 60 * 1000,
-      week: 7 * 24 * 60 * 60 * 1000,
+      week: 7 * 24 * 60 * 60 * 1000
     };
 
     return {
       start: Date.now() - periodMs[period],
-      end: Date.now(),
+      end: Date.now()
     };
   }
 
   private calculateErrorRate(errorCount: number, period: 'hour' | 'day' | 'week'): number {
     if (period === 'hour') return errorCount;
-
+    
     const periodHours = period === 'day' ? 24 : 168;
     return errorCount / periodHours;
   }
@@ -490,7 +487,7 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
     errors: Array<{ error: AppError }>
   ): Array<{ message: string; count: number }> {
     const errorCounts = new Map<string, number>();
-
+    
     errors.forEach(({ error }) => {
       const msg = error.message;
       errorCounts.set(msg, (errorCounts.get(msg) || 0) + 1);
@@ -503,7 +500,9 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
   }
 
   private calculateServiceErrorRate(stats: ServiceStats): number {
-    return stats.totalCalls > 0 ? (stats.errors / stats.totalCalls) * 100 : 0;
+    return stats.totalCalls > 0 
+      ? (stats.errors / stats.totalCalls) * 100 
+      : 0;
   }
 
   private reportFailedServiceCall(serviceName: string, executionTime: number): void {
@@ -515,15 +514,15 @@ class LibraryServicesMonitoring implements UnifiedErrorMonitoring {
         details: { executionTime, serviceName },
         context: {
           component: 'LibraryServicesMonitoring',
-          operation: serviceName,
-        },
+          operation: serviceName
+        }
       }
     );
 
     this.reportError(error, {
       system: ClientSystem.LIBRARY_SERVICES,
       component: 'ServiceCallMonitor',
-      operation: serviceName,
+      operation: serviceName
     });
   }
 }
@@ -574,19 +573,19 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
           duration,
           success,
           timestamp: Date.now(),
-          context: { ...context, operation },
+          context: { ...context, operation }
         });
-      },
+      }
     };
   }
 
   private handleAsyncResult<T>(
-    result: Promise<T>,
-    startTime: number,
+    result: Promise<T>, 
+    startTime: number, 
     context: ErrorContext
   ): Promise<T> {
     return result
-      .then(value => {
+      .then((value) => {
         this.trackSuccessfulExecution(startTime, context);
         return value;
       })
@@ -603,7 +602,7 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
       duration,
       success: true,
       timestamp: Date.now(),
-      context,
+      context
     });
   }
 
@@ -614,7 +613,7 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
       duration,
       success: false,
       timestamp: Date.now(),
-      context,
+      context
     });
 
     this.monitoring.reportError(error, context);
@@ -622,14 +621,14 @@ class LibraryServicesMonitoringMiddleware implements ErrorMonitoringMiddleware {
 
   private isOperationEnabled(operation: string): boolean {
     const monitoring = LibraryServicesMonitoring.getInstance() as unknown;
-    return monitoring.enabledOperations.has('*') || monitoring.enabledOperations.has(operation);
+    return monitoring.enabledOperations.has('*') 
+      || monitoring.enabledOperations.has(operation);
   }
 }
 
 // Export instances
 export const libraryServicesMonitoring = LibraryServicesMonitoring.getInstance();
-export {
-  // Export classes for testing
-  LibraryServicesMonitoring,
-  LibraryServicesMonitoringMiddleware,
-};
+export const libraryServicesMonitoringMiddleware = new LibraryServicesMonitoringMiddleware();
+
+// Export classes for testing
+export { LibraryServicesMonitoring, LibraryServicesMonitoringMiddleware };

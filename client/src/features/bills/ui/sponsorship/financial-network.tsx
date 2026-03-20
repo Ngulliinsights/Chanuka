@@ -8,6 +8,7 @@ import {
   BarChart3,
   Share2,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -36,10 +37,7 @@ interface NetworkData {
   }>;
 }
 
-export default function FinancialNetworkAnalysis({
-  bill_id,
-  isEmbedded = false,
-}: FinancialNetworkProps) {
+export default function FinancialNetworkAnalysis({ bill_id, isEmbedded = false }: FinancialNetworkProps) {
   const [networkData, setNetworkData] = useState<NetworkData | null>(null);
   const [loading, setLoading] = useState(true);
 

@@ -5,7 +5,7 @@
 
 import { BaseComponentProps, ErrorInfo } from '../../types';
 
-import { WidgetConfig } from './core';
+import { WidgetConfig, WidgetType } from './core';
 
 export interface WidgetProps extends BaseComponentProps {
   config: WidgetConfig;

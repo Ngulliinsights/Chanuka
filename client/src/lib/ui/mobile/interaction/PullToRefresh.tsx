@@ -35,10 +35,10 @@ export function PullToRefresh({
   const isDragging = useRef(false);
 
   const config = useMemo(
-    () => ({
+    () => ({ 
       threshold: customConfig?.threshold || gestureConfig.pullToRefreshThreshold,
       maxDistance: customConfig?.maxDistance || 120,
-      ...customConfig,
+      ...customConfig 
     }),
     [customConfig]
   );
@@ -143,7 +143,7 @@ export function PullToRefresh({
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       // Dynamic styles required for animation (cannot be moved to CSS)
-
+       
       style={pullStyle}
     >
       {/* Hidden live region for screen reader announcements */}
@@ -159,7 +159,7 @@ export function PullToRefresh({
           'z-10 pointer-events-none'
         )}
         // Dynamic styles required for animation (cannot be moved to CSS)
-
+         
         style={indicatorStyle}
         role="status"
         aria-label={state === 'refreshing' ? 'Refreshing content' : 'Pull to refresh'}

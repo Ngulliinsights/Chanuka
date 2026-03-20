@@ -1,6 +1,6 @@
 /**
  * Logging Sub-module (Observability)
- *
+ * 
  * Re-exports the core logging utility for infrastructure-wide use.
  * This facade allows for future enhancements (e.g., logging to external services)
  * without changing consumer code.

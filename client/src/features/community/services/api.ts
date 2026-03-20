@@ -997,7 +997,11 @@ export class CommunityApiService {
  * import { communityApiService } from './api/community';
  *
  * // Fetch comments for a bill
- *  *
+ * const comments = await communityApiService.getBillComments(12345, {
+ *   sort: 'most_voted',
+ *   expertOnly: true
+ * });
+ *
  * // Add a new comment
  * const newComment = await communityApiService.addComment({
  *   billId: 12345,
@@ -1009,5 +1013,4 @@ export class CommunityApiService {
  * await communityApiService.voteComment(newComment.id, 'up');
  * ```
  */
-
 export const communityApiService = new CommunityApiService();

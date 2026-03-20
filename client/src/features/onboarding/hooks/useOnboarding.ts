@@ -5,11 +5,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { onboardingService } from '../services/onboarding';
 
-export };
+export const useOnboardingProgress = () => {
+  return useQuery({
+    queryKey: ['onboarding-progress'],
+    queryFn: () => onboardingService.fetchProgress(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+};
 
-export };
+export const useOnboardingSteps = () => {
+  return useQuery({
+    queryKey: ['onboarding-steps'],
+    queryFn: () => onboardingService.getSteps(),
+    staleTime: 1000 * 60 * 60, // 1 hour
+  });
+};
 
-export 
+export const useCompleteOnboardingStep = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (stepId: string) => onboardingService.completeStep(stepId),
     onSuccess: () => {
@@ -18,7 +32,9 @@ export
   });
 };
 
-export 
+export const useSkipOnboarding = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: () => onboardingService.skipOnboarding(),
     onSuccess: () => {

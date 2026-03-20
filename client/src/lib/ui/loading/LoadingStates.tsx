@@ -1,5 +1,6 @@
 // Remove unused React import
 import { Loader2 } from 'lucide-react';
+import React from 'react';
 
 interface LoadingStateManagerProps {
   type: 'page' | 'component' | 'data';
@@ -174,4 +175,6 @@ export function LazyLoadPlaceholder() {
   );
 }
 
-export 
+export const LoadingStates = {
+  PageLoading: PageLoader,
+};

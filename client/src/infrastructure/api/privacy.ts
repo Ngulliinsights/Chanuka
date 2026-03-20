@@ -41,4 +41,4 @@ export class PrivacyAnalyticsApiService {
   }
 }
 
-export 
+export const privacyAnalyticsApiService = new PrivacyAnalyticsApiService();

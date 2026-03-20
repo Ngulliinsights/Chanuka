@@ -255,11 +255,7 @@ function AdminPanel() {
 ### Error Handling
 
 ```typescript
-import {
-  isAuthenticationError,
-  isAuthorizationError,
-  isSessionExpiredError,
-} from '@/infrastructure/auth';
+import { isAuthenticationError, isAuthorizationError, isSessionExpiredError } from '@/infrastructure/auth';
 
 try {
   await someAuthOperation();

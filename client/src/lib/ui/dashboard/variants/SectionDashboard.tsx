@@ -1,15 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
 import { BarChart3, Target, Award, Star } from 'lucide-react';
+import React from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
 import { ActivitySection } from '../sections/ActivitySection';

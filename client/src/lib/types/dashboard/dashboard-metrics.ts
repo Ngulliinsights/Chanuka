@@ -296,7 +296,11 @@ export interface KPIDefinition {
 export function isTimeSeries(value: unknown): value is TimeSeries {
   if (!value || typeof value !== 'object') return false;
   const obj = value as Record<string, unknown>;
-  return typeof obj.id === 'string' && typeof obj.label === 'string' && Array.isArray(obj.points);
+  return (
+    typeof obj.id === 'string' &&
+    typeof obj.label === 'string' &&
+    Array.isArray(obj.points)
+  );
 }
 
 /**

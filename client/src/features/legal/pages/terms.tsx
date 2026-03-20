@@ -1,5 +1,6 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { FileText, AlertCircle } from 'lucide-react';
+import { Shield, FileText, AlertCircle } from 'lucide-react';
 
 export default function TermsPage() {
   const lastUpdated = 'January 15, 2024';
@@ -14,13 +15,16 @@ export default function TermsPage() {
               <FileText className="w-8 h-8" aria-hidden="true" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Terms of Service</h1>
-            <p className="text-xl text-blue-100">Last updated: {lastUpdated}</p>
+            <p className="text-xl text-blue-100">
+              Last updated: {lastUpdated}
+            </p>
           </div>
         </div>
       </section>
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
+
           {/* TL;DR Summary */}
           <div className="bg-[#f29b06]/10 border border-[#f29b06]/30 rounded-xl p-6 mb-8">
             <h2 className="text-xl font-bold mb-3 flex items-center gap-2">
@@ -58,32 +62,28 @@ export default function TermsPage() {
             <div className="prose prose-lg dark:prose-invert max-w-none">
               <h2>1. Acceptance of Terms</h2>
               <p>
-                By accessing or using the Chanuka platform ("Service"), you agree to comply with and
-                be bound by these Terms of Service ("Terms"). If you do not agree to these Terms,
-                please do not use our Service.
+                By accessing or using the Chanuka platform ("Service"), you agree to comply with and be bound by these
+                Terms of Service ("Terms"). If you do not agree to these Terms, please do not use our Service.
               </p>
 
               <h2>2. Description of Service</h2>
               <p>
-                Chanuka provides a platform for accessing Kenyan legislative information, tracking
-                bills from the National Assembly, Senate, and County Assemblies, and engaging in
-                civic discourse. We aggregate publicly available legislative data from Kenya's 47
-                counties and provide tools for analysis and community engagement in accordance with
-                the Constitution of Kenya 2010.
+                Chanuka provides a platform for accessing Kenyan legislative information, tracking bills from the
+                National Assembly, Senate, and County Assemblies, and engaging in civic discourse. We aggregate
+                publicly available legislative data from Kenya's 47 counties and provide tools for analysis and
+                community engagement in accordance with the Constitution of Kenya 2010.
               </p>
 
               <h2>3. User Accounts</h2>
               <h3>3.1 Account Creation</h3>
               <p>
-                To access certain features, you may need to create an account. You must provide
-                accurate, current, and complete information during registration and keep your
-                account information updated.
+                To access certain features, you may need to create an account. You must provide accurate, current, and
+                complete information during registration and keep your account information updated.
               </p>
               <h3>3.2 Account Security</h3>
               <p>
-                You are responsible for maintaining the confidentiality of your account credentials
-                and for all activities that occur under your account. Notify us immediately of any
-                unauthorized use.
+                You are responsible for maintaining the confidentiality of your account credentials and for all
+                activities that occur under your account. Notify us immediately of any unauthorized use.
               </p>
 
               <h2>4. User Conduct</h2>
@@ -100,25 +100,23 @@ export default function TermsPage() {
               <h2>5. Content and Intellectual Property</h2>
               <h3>5.1 Our Content</h3>
               <p>
-                The Service and its original content, features, and functionality are owned by
-                Chanuka and are protected by international copyright, trademark, and other
-                intellectual property laws.
+                The Service and its original content, features, and functionality are owned by Chanuka and are
+                protected by international copyright, trademark, and other intellectual property laws.
               </p>
               <h3>5.2 User Content</h3>
               <p>
-                You retain ownership of content you post on the Service. By posting content, you
-                grant us a non-exclusive, worldwide, royalty-free license to use, display, and
-                distribute your content in connection with the Service.
+                You retain ownership of content you post on the Service. By posting content, you grant us a
+                non-exclusive, worldwide, royalty-free license to use, display, and distribute your content in
+                connection with the Service.
               </p>
 
               <h2>6. Legislative Data</h2>
               <p>
-                Legislative information provided through our Service is sourced from publicly
-                available Kenyan government databases, including the National Assembly, Senate, and
-                County Assembly records. While we strive for accuracy, we do not guarantee the
-                completeness or accuracy of this information. Always verify critical information
-                with official government sources such as the Kenya Law Reports (eKLR) and official
-                parliamentary websites.
+                Legislative information provided through our Service is sourced from publicly available Kenyan
+                government databases, including the National Assembly, Senate, and County Assembly records. While we
+                strive for accuracy, we do not guarantee the completeness or accuracy of this information. Always
+                verify critical information with official government sources such as the Kenya Law Reports (eKLR) and
+                official parliamentary websites.
               </p>
 
               <h2>7. Privacy</h2>
@@ -132,51 +130,42 @@ export default function TermsPage() {
 
               <h2>8. Disclaimers</h2>
               <p>
-                THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND,
-                EITHER EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED,
-                SECURE, OR ERROR-FREE.
+                THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR
+                IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE.
               </p>
 
               <h2>9. Limitation of Liability</h2>
               <p>
-                TO THE MAXIMUM EXTENT PERMITTED BY LAW, CHANUKA SHALL NOT BE LIABLE FOR ANY
-                INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR
-                RELATED TO YOUR USE OF THE SERVICE.
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, CHANUKA SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL,
+                SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE.
               </p>
 
               <h2>10. Termination</h2>
               <p>
-                We reserve the right to suspend or terminate your account and access to the Service
-                at our sole discretion, without notice, for conduct that we believe violates these
-                Terms or is harmful to other users, us, or third parties, or for any other reason.
+                We reserve the right to suspend or terminate your account and access to the Service at our sole
+                discretion, without notice, for conduct that we believe violates these Terms or is harmful to other
+                users, us, or third parties, or for any other reason.
               </p>
 
               <h2>11. Changes to Terms</h2>
               <p>
-                We may modify these Terms at any time. We will notify users of material changes via
-                email or through the Service. Your continued use of the Service after changes
-                constitutes acceptance of the modified Terms.
+                We may modify these Terms at any time. We will notify users of material changes via email or through
+                the Service. Your continued use of the Service after changes constitutes acceptance of the modified
+                Terms.
               </p>
 
               <h2>12. Governing Law and Jurisdiction</h2>
               <p>
-                These Terms shall be governed by and construed in accordance with the Laws of Kenya,
-                including but not limited to the Constitution of Kenya 2010 and the Kenya Data
-                Protection Act 2019. Any disputes arising from these Terms shall be subject to the
-                exclusive jurisdiction of the courts of Kenya.
+                These Terms shall be governed by and construed in accordance with the Laws of Kenya, including but not
+                limited to the Constitution of Kenya 2010 and the Kenya Data Protection Act 2019. Any disputes arising
+                from these Terms shall be subject to the exclusive jurisdiction of the courts of Kenya.
               </p>
 
               <h2>13. Data Protection Compliance</h2>
               <p>
-                We are committed to compliance with the Kenya Data Protection Act 2019. For data
-                protection inquiries, you may contact the Office of the Data Protection Commissioner
-                at{' '}
-                <a
-                  href="https://www.odpc.go.ke"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
+                We are committed to compliance with the Kenya Data Protection Act 2019. For data protection inquiries,
+                you may contact the Office of the Data Protection Commissioner at{' '}
+                <a href="https://www.odpc.go.ke" className="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
                   www.odpc.go.ke
                 </a>
               </p>
@@ -184,31 +173,17 @@ export default function TermsPage() {
               <h2>14. Contact Information</h2>
               <p>
                 For questions about these Terms, please contact us at:{' '}
-                <a
-                  href="mailto:legal@chanuka.org"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
+                <a href="mailto:legal@chanuka.org" className="text-blue-600 dark:text-blue-400 hover:underline">
                   legal@chanuka.org
                 </a>
               </p>
               <p className="mt-4">
-                Or write to us at:
-                <br />
-                Chanuka Platform
-                <br />
-                Westlands, Nairobi
-                <br />
-                Kenya
-                <br />
-                P.O. Box 12345-00100
-                <br />
-                Phone:{' '}
-                <a
-                  href="tel:+254712345678"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  +254 712 345 678
-                </a>
+                Or write to us at:<br />
+                Chanuka Platform<br />
+                Westlands, Nairobi<br />
+                Kenya<br />
+                P.O. Box 12345-00100<br />
+                Phone: <a href="tel:+254712345678" className="text-blue-600 dark:text-blue-400 hover:underline">+254 712 345 678</a>
               </p>
             </div>
           </div>
@@ -222,10 +197,7 @@ export default function TermsPage() {
               <Link to="/cookies" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Cookie Policy
               </Link>
-              <Link
-                to="/accessibility"
-                className="text-blue-600 dark:text-blue-400 hover:underline"
-              >
+              <Link to="/accessibility" className="text-blue-600 dark:text-blue-400 hover:underline">
                 Accessibility
               </Link>
               <Link to="/contact" className="text-blue-600 dark:text-blue-400 hover:underline">

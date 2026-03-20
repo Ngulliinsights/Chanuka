@@ -1,4 +1,4 @@
-import { Send, AlertCircle, CheckCircle, MessageSquare, Eye, EyeOff } from 'lucide-react';
+import { Send, AlertCircle, CheckCircle, X, MessageSquare, Eye, EyeOff } from 'lucide-react';
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 
 import { cn } from '@client/lib/design-system';

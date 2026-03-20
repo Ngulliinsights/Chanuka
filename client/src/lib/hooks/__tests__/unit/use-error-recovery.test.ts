@@ -78,6 +78,8 @@ describe('useErrorRecovery', () => {
   it('should handle recovery with network error', async () => {
     const { result } = renderHook(() => useErrorRecovery('test-operation'));
 
+    const networkError = new Error('Network error');
+
     let recoveryResult: boolean;
 
     act(() => {
@@ -92,6 +94,7 @@ describe('useErrorRecovery', () => {
     const { result } = renderHook(() => useErrorRecovery('test-operation'));
 
     // Simulate an error state
+    const networkError = new Error('Network error');
 
     // The hook should provide suggestions based on error type
     expect(Array.isArray(result.current.recoveryState.suggestions)).toBe(true);
@@ -100,14 +103,16 @@ describe('useErrorRecovery', () => {
 
 describe('useAutoRecovery', () => {
   it('should auto-recover on network errors', async () => {
-    const { result } = renderHook(() =>
-      useAutoRecovery('test-operation', {
-        autoRecover: true,
-        recoveryDelay: 100,
-        maxAutoAttempts: 2,
-        triggerConditions: [error => error.message.includes('network')],
-      })
-    );
+    const { result } = renderHook(() => useAutoRecovery('test-operation', {
+      autoRecover: true,
+      recoveryDelay: 100,
+      maxAutoAttempts: 2,
+      triggerConditions: [
+        error => error.message.includes('network'),
+      ],
+    }));
+
+    const networkError = new Error('Network error');
 
     // Simulate error
     // In a real scenario, this would be triggered by the loading system
@@ -116,11 +121,9 @@ describe('useAutoRecovery', () => {
   });
 
   it('should not auto-recover if disabled', () => {
-    const { result } = renderHook(() =>
-      useAutoRecovery('test-operation', {
-        autoRecover: false,
-      })
-    );
+    const { result } = renderHook(() => useAutoRecovery('test-operation', {
+      autoRecover: false,
+    }));
 
     expect(result.current.autoAttempts).toBe(0);
   });

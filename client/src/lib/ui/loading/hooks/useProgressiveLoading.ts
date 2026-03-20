@@ -375,7 +375,8 @@ export interface MultiProgressiveLoadingResult {
  * ```tsx
  * const operation1 = useProgressiveLoading(config1);
  * const operation2 = useProgressiveLoading(config2);
- *  * ```
+ * const multiOps = combineProgressiveLoadings({ op1: operation1, op2: operation2 });
+ * ```
  */
 export function combineProgressiveLoadings(
   operations: Record<string, UseProgressiveLoadingResult>

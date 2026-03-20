@@ -4,10 +4,7 @@
  * Individual notification display with actions and metadata
  */
 
-import {
-  Notification,
-  NotificationType,
-} from '@client/infrastructure/notifications/model/notification-service';
+import { Notification, NotificationType } from '@client/lib/services/notification-service';
 import { formatDistanceToNow } from 'date-fns';
 import {
   MessageCircle,
@@ -26,6 +23,7 @@ import React from 'react';
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
 import { Checkbox } from '@client/lib/design-system/interactive/Checkbox';
+
 
 interface NotificationItemProps {
   notification: Notification;

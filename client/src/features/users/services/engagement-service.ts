@@ -487,4 +487,4 @@ export class EngagementService implements IEngagementService, ServiceLifecycleIn
 }
 
 // Export singleton instance
-export 
+export const engagementService = new EngagementService();

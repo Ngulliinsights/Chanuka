@@ -10,18 +10,7 @@ export type SortConfig<T = any> = {
   direction: SortDirection;
 };
 
-export type FilterOperator =
-  | 'equals'
-  | 'notEquals'
-  | 'contains'
-  | 'startsWith'
-  | 'endsWith'
-  | 'gt'
-  | 'gte'
-  | 'lt'
-  | 'lte'
-  | 'in'
-  | 'notIn';
+export type FilterOperator = 'equals' | 'notEquals' | 'contains' | 'startsWith' | 'endsWith' | 'gt' | 'gte' | 'lt' | 'lte' | 'in' | 'notIn';
 
 export type FilterConfig<T = any> = {
   key: keyof T;

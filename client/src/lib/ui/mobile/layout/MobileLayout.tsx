@@ -3,6 +3,7 @@
  * Composes modular components to provide complete mobile UX shell
  */
 
+
 import type { NavigationItem } from '@client/lib/config/navigation';
 import React from 'react';
 

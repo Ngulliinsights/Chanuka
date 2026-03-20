@@ -6,7 +6,12 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-import { notificationService } from '@client/infrastructure/notifications/model/notification-service';
+import {
+  notificationService,
+  type Notification as NotificationData, // Renamed to avoid conflict with browser Notification API
+  type NotificationPreferences,
+  type NotificationType,
+} from '@client/lib/services/notification-service';
 import { logger } from '@client/lib/utils/logger';
 
 /**

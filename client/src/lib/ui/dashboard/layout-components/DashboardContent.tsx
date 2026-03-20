@@ -73,4 +73,4 @@ DashboardContentComponent.propTypes = {
 /**
  * Dashboard Content Component with memo optimization
  */
-export 
+export const DashboardContent = React.memo(DashboardContentComponent);

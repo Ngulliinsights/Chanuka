@@ -102,14 +102,13 @@ export async function callEndpoint<TRequest, TResponse>(
       error,
     });
 
-    const apiError = error as any;
     return {
       success: false,
-      status: apiError?.status || apiError?.statusCode || 500,
+      status: error.status || error.statusCode || 500,
       error: {
-        code: apiError?.code || 'UNKNOWN_ERROR',
-        message: apiError?.message || 'An unexpected error occurred',
-        details: apiError?.details,
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unexpected error occurred',
+        details: error.details,
       },
     };
   }
@@ -151,14 +150,13 @@ export async function callEndpointWithParams<TRequest, TResponse, TParams>(
       error,
     });
 
-    const apiError = error as any;
     return {
       success: false,
-      status: apiError?.status || apiError?.statusCode || 500,
+      status: error.status || error.statusCode || 500,
       error: {
-        code: apiError?.code || 'UNKNOWN_ERROR',
-        message: apiError?.message || 'An unexpected error occurred',
-        details: apiError?.details,
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unexpected error occurred',
+        details: error.details,
       },
     };
   }
@@ -197,14 +195,13 @@ export async function callEndpointWithQuery<TRequest, TResponse, TQuery>(
       error,
     });
 
-    const apiError = error as any;
     return {
       success: false,
-      status: apiError?.status || apiError?.statusCode || 500,
+      status: error.status || error.statusCode || 500,
       error: {
-        code: apiError?.code || 'UNKNOWN_ERROR',
-        message: apiError?.message || 'An unexpected error occurred',
-        details: apiError?.details,
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unexpected error occurred',
+        details: error.details,
       },
     };
   }
@@ -259,14 +256,13 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
       error,
     });
 
-    const apiError = error as any;
     return {
       success: false,
-      status: apiError?.status || apiError?.statusCode || 500,
+      status: error.status || error.statusCode || 500,
       error: {
-        code: apiError?.code || 'UNKNOWN_ERROR',
-        message: apiError?.message || 'An unexpected error occurred',
-        details: apiError?.details,
+        code: error.code || 'UNKNOWN_ERROR',
+        message: error.message || 'An unexpected error occurred',
+        details: error.details,
       },
     };
   }
@@ -276,4 +272,24 @@ export async function callEndpointWithParamsAndQuery<TRequest, TResponse, TParam
  * Contract-based API client
  * Provides type-safe methods for calling API endpoints
  */
-export 
+export const contractApiClient = {
+  /**
+   * Call an endpoint with just a request body
+   */
+  call: callEndpoint,
+
+  /**
+   * Call an endpoint with path parameters
+   */
+  callWithParams: callEndpointWithParams,
+
+  /**
+   * Call an endpoint with query parameters
+   */
+  callWithQuery: callEndpointWithQuery,
+
+  /**
+   * Call an endpoint with both path and query parameters
+   */
+  callWithParamsAndQuery: callEndpointWithParamsAndQuery,
+};

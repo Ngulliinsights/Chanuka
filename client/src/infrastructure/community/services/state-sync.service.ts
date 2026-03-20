@@ -9,6 +9,8 @@ import { QueryClient } from '@tanstack/react-query';
 
 import type { UnifiedComment, UnifiedModeration, UnifiedThread } from '../types';
 
+import { type WebSocketManager } from '@client/infrastructure/api';
+
 // ============================================================================
 // SYNCABLE COMMENT
 //
@@ -35,7 +37,10 @@ interface SyncableComment extends UnifiedComment {
 }
 
 export class StateSyncService {
-  constructor(private queryClient: QueryClient) {}
+  constructor(
+    private queryClient: QueryClient,
+    private wsManager: WebSocketManager | null
+  ) {}
 
   /**
    * Sync comment creation across React Query cache and WebSocket
@@ -55,6 +60,10 @@ export class StateSyncService {
       threadId,
     };
     this.updateCommentsCache(billId, comments => [normalizedComment, ...comments]);
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('comment:new', comment);
+    }
 
     this.updateThreadCommentCount(comment.threadId, 1);
   }
@@ -80,6 +89,10 @@ export class StateSyncService {
     this.updateCommentsCache(billId, comments =>
       comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('comment:updated', normalizedComment);
+    }
   }
 
   /**
@@ -108,6 +121,10 @@ export class StateSyncService {
       );
       this.updateThreadCommentCount(threadId, -1);
     }
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('comment:deleted', { id: parseInt(commentId, 10) });
+    }
   }
 
   /**
@@ -131,6 +148,14 @@ export class StateSyncService {
     this.updateCommentsCache(billId, comments =>
       comments.map(c => (c.id === normalizedComment.id ? normalizedComment : c))
     );
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('comment:voted', {
+        id: normalizedComment.id,
+        upvotes: normalizedComment.votes.up,
+        downvotes: normalizedComment.votes.down,
+      });
+    }
   }
 
   /**
@@ -141,6 +166,10 @@ export class StateSyncService {
       thread,
       ...old,
     ]);
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('thread:created', thread);
+    }
   }
 
   /**
@@ -150,6 +179,10 @@ export class StateSyncService {
     this.queryClient.setQueryData(['threads', thread.billId], (old: UnifiedThread[] = []) =>
       old.map(t => (t.id === thread.id ? thread : t))
     );
+
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('thread:updated', thread);
+    }
   }
 
   /**
@@ -160,10 +193,11 @@ export class StateSyncService {
    * react (e.g. hide the comment immediately) and then invalidate the relevant
    * comment cache so the next read reflects the new moderation status.
    */
-  syncModerationAction(_moderation: UnifiedModeration, billId: number): void {
-    // Note: StateSyncService no longer broadcasts moderation actions locally via websocket
-    // as it created redundant data flows. We rely on React Query cache invalidation here,
-    // and the server will broadcast the action to other clients.
+  syncModerationAction(moderation: UnifiedModeration, billId: number): void {
+    // Broadcast to other connected clients
+    if (this.wsManager?.isConnected()) {
+      this.wsManager.emit('moderation:action', moderation);
+    }
 
     // Invalidate the comment cache for this bill so any hidden/removed
     // comments are re-fetched with their updated moderation status.
@@ -239,7 +273,8 @@ export class StateSyncService {
         // When a peer broadcasts a moderation action, invalidate local comment
         // cache so the UI reflects the updated moderation status on next read.
         this.queryClient.invalidateQueries({
-          predicate: query => Array.isArray(query.queryKey) && query.queryKey[0] === 'comments',
+          predicate: query =>
+            Array.isArray(query.queryKey) && query.queryKey[0] === 'comments',
         });
         break;
       }

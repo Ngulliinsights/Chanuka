@@ -134,7 +134,17 @@ export const inputDesignStandards = {
 } as const;
 
 // Input utility functions
-export     if (state) classes.push(`chanuka-input-${state}`);
+export const inputUtils = {
+  /**
+   * Get input classes
+   */
+  getInputClasses: (
+    variant: keyof typeof inputDesignStandards.variants = 'default',
+    size: keyof typeof inputDesignStandards.sizes = 'md',
+    state?: keyof typeof inputDesignStandards.states
+  ): string => {
+    const classes = ['chanuka-input', `chanuka-input-${variant}`, `chanuka-input-${size}`];
+    if (state) classes.push(`chanuka-input-${state}`);
     return classes.join(' ');
   },
 

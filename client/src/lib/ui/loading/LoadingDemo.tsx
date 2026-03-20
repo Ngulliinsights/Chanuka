@@ -1,18 +1,8 @@
 import React, { useState } from 'react';
 
 import { Button } from '@client/lib/design-system/interactive/Button';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@client/lib/design-system/interactive/Tabs';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system/typography/Card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system/interactive/Tabs';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
 
 import { useProgressiveLoading, useTimeoutAwareLoading } from './hooks';
 import { LoadingStateManager, PageLoader, ComponentLoader, ConnectionAwareLoader } from './ui';
@@ -40,9 +30,12 @@ export const LoadingDemo: React.FC = () => {
   );
 
   // Loading context hooks with required IDs
-  //  // Commented out as it's not used
+  // const loadingHook = useLoading(); // Commented out as it's not used
 
-  //   //   },
+  // const apiLoading = { // Commented out as it's not used
+  //   startApiLoading: (id: string, message?: string) => {
+  //     setDemoState('loading');
+  //   },
   //   completeApiLoading: (id: string, success: boolean = true, error?: Error) => {
   //     setDemoState(success ? 'success' : 'error');
   //   },

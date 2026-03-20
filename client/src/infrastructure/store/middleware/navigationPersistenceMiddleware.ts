@@ -215,6 +215,20 @@ function loadNavigationState(): Partial<NavigationState> | null {
 
     // Validate and assign user role
     if (typeof parsed.userRole === 'string') {
+      const validRoles = [
+        UserRole.Public,
+        UserRole.Citizen,
+        UserRole.Expert,
+        UserRole.Admin,
+        UserRole.Journalist,
+        UserRole.Ambassador,
+        UserRole.VerifiedCitizen,
+        UserRole.ExpertVerifier,
+        UserRole.MpStaff,
+        UserRole.Clerk,
+        UserRole.Moderator,
+        UserRole.Auditor,
+      ];
       // Check if the string value matches any enum value
       if (Object.values(UserRole).includes(parsed.userRole as UserRole)) {
         safeState.userRole = parsed.userRole as UserRole;
@@ -322,4 +336,10 @@ export const navigationPersistenceMiddleware: Middleware = store => next => (act
  * Utility functions for external use
  * Export these for testing or manual state management
  */
-export 
+export const navigationPersistenceUtils = {
+  loadNavigationState,
+  saveNavigationState,
+  clearNavigationState,
+  sanitizePreferences,
+  sanitizeRecentPage,
+};

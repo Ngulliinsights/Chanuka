@@ -352,8 +352,7 @@ export function useLoading(options: UseLoadingOptions = {}): LoadingResult {
       if (!operation || !operation.error) return;
 
       // Build recovery context with all relevant information
-      const errorMessage =
-        typeof operation.error === 'string' ? operation.error : operation.error.message;
+      const errorMessage = typeof operation.error === 'string' ? operation.error : operation.error.message;
       const context = createRecoveryContext(
         operationId,
         new LoadingError(errorMessage || 'Unknown error'),
@@ -449,8 +448,7 @@ export function useLoading(options: UseLoadingOptions = {}): LoadingResult {
       : null;
 
   // Create Error object from error string for recovery checks
-  const currentErrorMessage =
-    typeof currentError === 'string' ? currentError : currentError?.message || 'Unknown error';
+  const currentErrorMessage = typeof currentError === 'string' ? currentError : currentError?.message || 'Unknown error';
   const currentErrorObject = currentError ? new LoadingError(currentErrorMessage) : null;
 
   // Check if the current error is recoverable based on retry count and max retries
@@ -459,7 +457,9 @@ export function useLoading(options: UseLoadingOptions = {}): LoadingResult {
     : false;
 
   // Get user-friendly suggestions for resolving the current error
-  const suggestions = currentErrorObject ? recovery.getSuggestions(currentErrorObject) : [];
+  const suggestions = currentErrorObject
+    ? recovery.getSuggestions(currentErrorObject)
+    : [];
 
   /**
    * Attempts to recover all failed operations

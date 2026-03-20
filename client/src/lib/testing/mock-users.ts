@@ -562,7 +562,10 @@ class MockUserDataService {
 export const mockUserDataService = new MockUserDataService();
 
 // Export utility functions
-export   },
+export const mockUserUtils = {
+  generateRandomUserId(): string {
+    return crypto.randomUUID();
+  },
 
   createUserFromTemplate(template: Partial<MockUser>): MockUser {
     return mockUserDataService.generateMockUser(template);

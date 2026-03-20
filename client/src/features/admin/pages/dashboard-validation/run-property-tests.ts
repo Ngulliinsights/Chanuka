@@ -4,7 +4,7 @@
  */
 
 import fc from 'fast-check';
-import { validateDashboardConfig } from './config';
+import { validateDashboardConfig, type WidgetType } from './config';
 
 console.log('=== Dashboard Config Property Tests ===\n');
 
@@ -30,16 +30,15 @@ const layoutArb = (widgetIds: string[]) =>
   fc.record({
     columns: fc.integer({ min: 1, max: 12 }),
     rows: fc.integer({ min: 1, max: 12 }),
-    positions: fc.array(widgetPositionArb(widgetIds), {
-      minLength: 0,
-      maxLength: widgetIds.length,
-    }),
+    positions: fc.array(widgetPositionArb(widgetIds), { minLength: 0, maxLength: widgetIds.length }),
   });
 
 const validDashboardConfigArb = fc
   .array(widgetArb, { minLength: 1, maxLength: 10 })
   .chain(widgets => {
-    const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
+    const uniqueWidgets = Array.from(
+      new Map(widgets.map(w => [w.id, w])).values()
+    );
     const widgetIds = uniqueWidgets.map(w => w.id);
 
     return fc.record({
@@ -54,7 +53,7 @@ const validDashboardConfigArb = fc
 console.log('Test 1: Valid configurations should be accepted');
 try {
   fc.assert(
-    fc.property(validDashboardConfigArb, config => {
+    fc.property(validDashboardConfigArb, (config) => {
       validateDashboardConfig(config);
       return true;
     }),
@@ -68,27 +67,31 @@ try {
 
 // Test 2: Invalid widget types
 console.log('Test 2: Invalid widget types should be rejected');
-const invalidWidgetTypeArb = fc.array(widgetArb, { minLength: 1, maxLength: 5 }).chain(widgets => {
-  const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
-  const widgetIds = uniqueWidgets.map(w => w.id);
+const invalidWidgetTypeArb = fc
+  .array(widgetArb, { minLength: 1, maxLength: 5 })
+  .chain(widgets => {
+    const uniqueWidgets = Array.from(
+      new Map(widgets.map(w => [w.id, w])).values()
+    );
+    const widgetIds = uniqueWidgets.map(w => w.id);
 
-  const invalidWidgets = [...uniqueWidgets];
-  if (invalidWidgets.length > 0) {
-    invalidWidgets[0] = {
-      ...invalidWidgets[0],
-      type: 'invalid-type' as unknown,
-    };
-  }
+    const invalidWidgets = [...uniqueWidgets];
+    if (invalidWidgets.length > 0) {
+      invalidWidgets[0] = {
+        ...invalidWidgets[0],
+        type: 'invalid-type' as unknown,
+      };
+    }
 
-  return fc.record({
-    widgets: fc.constant(invalidWidgets),
-    layout: layoutArb(widgetIds),
+    return fc.record({
+      widgets: fc.constant(invalidWidgets),
+      layout: layoutArb(widgetIds),
+    });
   });
-});
 
 try {
   fc.assert(
-    fc.property(invalidWidgetTypeArb, config => {
+    fc.property(invalidWidgetTypeArb, (config) => {
       try {
         validateDashboardConfig(config);
         return false; // Should have thrown
@@ -109,7 +112,9 @@ console.log('Test 3: Invalid layout columns should be rejected');
 const invalidLayoutColumnsArb = fc
   .array(widgetArb, { minLength: 1, maxLength: 5 })
   .chain(widgets => {
-    const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
+    const uniqueWidgets = Array.from(
+      new Map(widgets.map(w => [w.id, w])).values()
+    );
     const widgetIds = uniqueWidgets.map(w => w.id);
 
     return fc.record({
@@ -124,7 +129,7 @@ const invalidLayoutColumnsArb = fc
 
 try {
   fc.assert(
-    fc.property(invalidLayoutColumnsArb, config => {
+    fc.property(invalidLayoutColumnsArb, (config) => {
       try {
         validateDashboardConfig(config);
         return false;
@@ -142,41 +147,42 @@ try {
 
 // Test 4: Non-existent widget references
 console.log('Test 4: Non-existent widget references should be rejected');
-const invalidPositionRefArb = fc.array(widgetArb, { minLength: 1, maxLength: 5 }).chain(widgets => {
-  const uniqueWidgets = Array.from(new Map(widgets.map(w => [w.id, w])).values());
+const invalidPositionRefArb = fc
+  .array(widgetArb, { minLength: 1, maxLength: 5 })
+  .chain(widgets => {
+    const uniqueWidgets = Array.from(
+      new Map(widgets.map(w => [w.id, w])).values()
+    );
 
-  const nonExistentId = 'non-existent-widget-' + Math.random();
+    const nonExistentId = 'non-existent-widget-' + Math.random();
 
-  return fc.record({
-    widgets: fc.constant(uniqueWidgets),
-    layout: fc.record({
-      columns: fc.integer({ min: 1, max: 12 }),
-      rows: fc.integer({ min: 1, max: 12 }),
-      positions: fc.array(
-        fc.record({
-          widgetId: fc.constant(nonExistentId),
-          x: fc.nat({ max: 100 }),
-          y: fc.nat({ max: 100 }),
-          width: fc.integer({ min: 1, max: 10 }),
-          height: fc.integer({ min: 1, max: 10 }),
-        }),
-        { minLength: 1, maxLength: 1 }
-      ),
-    }),
+    return fc.record({
+      widgets: fc.constant(uniqueWidgets),
+      layout: fc.record({
+        columns: fc.integer({ min: 1, max: 12 }),
+        rows: fc.integer({ min: 1, max: 12 }),
+        positions: fc.array(
+          fc.record({
+            widgetId: fc.constant(nonExistentId),
+            x: fc.nat({ max: 100 }),
+            y: fc.nat({ max: 100 }),
+            width: fc.integer({ min: 1, max: 10 }),
+            height: fc.integer({ min: 1, max: 10 }),
+          }),
+          { minLength: 1, maxLength: 1 }
+        ),
+      }),
+    });
   });
-});
 
 try {
   fc.assert(
-    fc.property(invalidPositionRefArb, config => {
+    fc.property(invalidPositionRefArb, (config) => {
       try {
         validateDashboardConfig(config);
         return false;
       } catch (error) {
-        return (
-          error instanceof Error &&
-          /Widget position references non-existent widget/.test(error.message)
-        );
+        return error instanceof Error && /Widget position references non-existent widget/.test(error.message);
       }
     }),
     { numRuns: 50 }

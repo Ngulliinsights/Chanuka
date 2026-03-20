@@ -10,6 +10,7 @@ import {
   CheckCircle,
   Info,
 } from 'lucide-react';
+import React from 'react';
 import { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system/feedback/Badge';

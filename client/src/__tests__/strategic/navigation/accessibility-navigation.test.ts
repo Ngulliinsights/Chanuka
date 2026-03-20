@@ -8,7 +8,7 @@
  * 80% of testing value with 20% of implementation effort.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock accessibility services
 vi.mock('@client/infrastructure/accessibility/service', () => ({

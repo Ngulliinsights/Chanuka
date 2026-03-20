@@ -52,6 +52,19 @@ export const realTimeService = createRealtimeClient({
 });
 
 // Hooks (stubs for now, to be moved to separate files if needed)
-export 
-export 
-export 
+export const useWebSocket = () => ({
+  connected: realTimeService.isConnected(),
+  error: null,
+  send: (data: unknown) => realTimeService.publish('default', data),
+  subscribe: (topic: string, handler: EventHandler) => realTimeService.subscribe(topic, handler),
+});
+
+export const useBillTracking = () => ({
+  isTracking: false,
+  updates: [],
+});
+
+export const useCommunityRealTime = () => ({
+  onlineUsers: 0,
+  activeTopics: [],
+});

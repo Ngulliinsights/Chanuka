@@ -194,6 +194,7 @@ export function findBrokenLinks(
   routes: RouteDefinition[],
   links: typeof navigationLinks
 ): string[] {
+  const validPaths = new Set(routes.filter(r => r.is_active).map(r => r.path));
   const brokenLinks: string[] = [];
 
   links.forEach(link => {

@@ -43,44 +43,41 @@ export function EnhancedUXIntegration({ children }: EnhancedUXIntegrationProps) 
   }, []);
 
   // Keyboard navigation handler
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      // Skip to main content (Alt + M)
-      if (event.altKey && event.key === 'm') {
-        event.preventDefault();
-        const main = document.querySelector('main');
-        if (main) {
-          (main as HTMLElement).focus();
-          announceToScreenReader('Skipped to main content');
-        }
+  const handleKeyDown = useCallback((event: KeyboardEvent) => {
+    // Skip to main content (Alt + M)
+    if (event.altKey && event.key === 'm') {
+      event.preventDefault();
+      const main = document.querySelector('main');
+      if (main) {
+        (main as HTMLElement).focus();
+        announceToScreenReader('Skipped to main content');
       }
+    }
 
-      // Open search (Alt + S)
-      if (event.altKey && event.key === 's') {
-        event.preventDefault();
-        const searchInput = document.querySelector(
-          'input[type="search"], input[placeholder*="search" i]'
-        ) as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
-          announceToScreenReader('Search focused');
-        }
+    // Open search (Alt + S)
+    if (event.altKey && event.key === 's') {
+      event.preventDefault();
+      const searchInput = document.querySelector(
+        'input[type="search"], input[placeholder*="search" i]'
+      ) as HTMLInputElement;
+      if (searchInput) {
+        searchInput.focus();
+        announceToScreenReader('Search focused');
       }
+    }
 
-      // Open navigation (Alt + N)
-      if (event.altKey && event.key === 'n') {
-        event.preventDefault();
-        const navButton = document.querySelector(
-          '[aria-label*="navigation" i], [aria-label*="menu" i]'
-        ) as HTMLButtonElement;
-        if (navButton) {
-          navButton.click();
-          announceToScreenReader('Navigation opened');
-        }
+    // Open navigation (Alt + N)
+    if (event.altKey && event.key === 'n') {
+      event.preventDefault();
+      const navButton = document.querySelector(
+        '[aria-label*="navigation" i], [aria-label*="menu" i]'
+      ) as HTMLButtonElement;
+      if (navButton) {
+        navButton.click();
+        announceToScreenReader('Navigation opened');
       }
-    },
-    [announceToScreenReader]
-  );
+    }
+  }, [announceToScreenReader]);
 
   // Error handlers
   const handleUnhandledRejection = useCallback((event: PromiseRejectionEvent) => {

@@ -4,10 +4,12 @@ import {
   Clock,
   AlertCircle,
   Eye,
+  MessageSquare,
   User,
   FileText,
   RotateCcw,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useCallback } from 'react';
 
 import { Avatar, AvatarFallback } from '@client/lib/design-system';
@@ -22,15 +24,13 @@ import {
 } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 import { cn } from '@lib/utils';
-import { VerificationWorkflowType } from '@client/lib/types';
+import {
+  VerificationWorkflowType,
+} from '@client/lib/types';
 
 interface VerificationWorkflowProps {
   workflow: VerificationWorkflowType;
-  onReview?: (
-    workflowId: string,
-    status: VerificationWorkflowType['status'],
-    notes: string
-  ) => Promise<void>;
+  onReview?: (workflowId: string, status: VerificationWorkflowType['status'], notes: string) => Promise<void>;
   onCommunityFeedback?: (
     workflowId: string,
     feedback: string,
@@ -216,9 +216,7 @@ export function VerificationWorkflow({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Last Updated:</span>
             {/* Keeping Last Updated empty or removing if not available, usually workflow.reviewedAt or submittedAt */}
-            <span className="font-medium">
-              {formatDate(workflow.reviewedAt || workflow.submittedAt)}
-            </span>
+             <span className="font-medium">{formatDate(workflow.reviewedAt || workflow.submittedAt)}</span>
           </div>
 
           {/* Review Notes */}
@@ -246,7 +244,7 @@ export function VerificationWorkflow({
               <Textarea
                 placeholder="Add review notes (required)..."
                 value={reviewNotes}
-                onChange={e => setReviewNotes(e.target.value)}
+                onChange={(e) => setReviewNotes(e.target.value)}
                 className="min-h-[100px] text-sm bg-white"
                 maxLength={1000}
               />
@@ -316,8 +314,8 @@ export function VerificationWorkflow({
                               feedback.vote === 'approve'
                                 ? 'default'
                                 : feedback.vote === 'reject'
-                                  ? 'destructive'
-                                  : 'secondary'
+                                ? 'destructive'
+                                : 'secondary'
                             }
                             className="text-xs"
                           >
@@ -372,7 +370,7 @@ export function VerificationWorkflow({
                   <Textarea
                     placeholder="Explain your feedback..."
                     value={communityFeedback}
-                    onChange={e => setCommunityFeedback(e.target.value)}
+                    onChange={(e) => setCommunityFeedback(e.target.value)}
                     className="min-h-[80px] text-sm"
                     maxLength={500}
                   />

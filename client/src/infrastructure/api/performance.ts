@@ -232,10 +232,11 @@ export class PerformanceApiService {
    */
   async reportMetrics(payload: MetricsPayload): Promise<void> {
     if (!payload?.sessionId) {
-      throw ErrorFactory.createValidationError(
-        [{ field: 'sessionId', message: 'Session ID is required' }],
-        { component: 'PerformanceApi', operation: 'reportMetrics' }
-      );
+      throw ErrorFactory.createValidationError('Session ID is required to report metrics', {
+        payload,
+        component: 'PerformanceApi',
+        operation: 'reportMetrics',
+      });
     }
 
     try {
@@ -257,14 +258,12 @@ export class PerformanceApiService {
         error,
       });
 
-      throw ErrorFactory.createNetworkError('Failed to send performance metrics to the server', 0, {
+      throw ErrorFactory.createNetworkError('Failed to send performance metrics to the server', {
         sessionId: payload.sessionId,
+        metricsCount: payload.metrics.length,
+        originalError: error,
         component: 'PerformanceApi',
         operation: 'reportMetrics',
-        metadata: {
-          metricsCount: payload.metrics.length,
-          originalError: error,
-        }
       });
     }
   }
@@ -305,17 +304,20 @@ export class PerformanceApiService {
     dateRange?: { start: string; end: string }
   ): Promise<PerformanceAnalytics> {
     if (!userId?.trim()) {
-      throw ErrorFactory.createValidationError(
-        [{ field: 'userId', message: 'User ID is required to retrieve analytics' }],
-        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
-      );
+      throw ErrorFactory.createValidationError('User ID is required to retrieve analytics', {
+        userId,
+        component: 'PerformanceApi',
+        operation: 'getUserAnalytics',
+      });
     }
 
     if (dateRange && (!dateRange.start || !dateRange.end)) {
-      throw ErrorFactory.createValidationError(
-        [{ field: 'dateRange', message: 'Date range must include both start and end' }],
-        { component: 'PerformanceApi', operation: 'getUserAnalytics' }
-      );
+      throw ErrorFactory.createValidationError('Date range must include both start and end dates', {
+        userId,
+        dateRange,
+        component: 'PerformanceApi',
+        operation: 'getUserAnalytics',
+      });
     }
 
     try {
@@ -341,14 +343,12 @@ export class PerformanceApiService {
         error,
       });
 
-      throw ErrorFactory.createNetworkError('Failed to retrieve user performance analytics', 0, {
+      throw ErrorFactory.createNetworkError('Failed to retrieve user performance analytics', {
         userId,
+        dateRange,
+        originalError: error,
         component: 'PerformanceApi',
         operation: 'getUserAnalytics',
-        metadata: {
-          dateRange,
-          originalError: error,
-        }
       });
     }
   }
@@ -369,8 +369,8 @@ export class PerformanceApiService {
    * @example
    * ```typescript
    * const benchmarks = await service.getBenchmarks();
-   *  // 2500ms
-   *  // 4000ms
+   * const lcpGood = benchmarks.webVitals.LCP.good; // 2500ms
+   * const lcpPoor = benchmarks.webVitals.LCP.poor; // 4000ms
    * ```
    */
   async getBenchmarks(): Promise<PerformanceBenchmarks> {
@@ -386,12 +386,10 @@ export class PerformanceApiService {
         error,
       });
 
-      throw ErrorFactory.createNetworkError('Failed to retrieve performance benchmarks', 0, {
+      throw ErrorFactory.createNetworkError('Failed to retrieve performance benchmarks', {
+        originalError: error,
         component: 'PerformanceApi',
         operation: 'getBenchmarks',
-        metadata: {
-          originalError: error,
-        }
       });
     }
   }
@@ -429,15 +427,15 @@ export class PerformanceApiService {
   async reportIssue(issue: PerformanceIssue): Promise<void> {
     if (!issue?.sessionId) {
       throw ErrorFactory.createValidationError(
-        [{ field: 'sessionId', message: 'Session ID is required' }],
-        { component: 'PerformanceApi', operation: 'reportIssue' }
+        'Session ID is required to report performance issue',
+        { issue, component: 'PerformanceApi', operation: 'reportIssue' }
       );
     }
 
     if (!issue.type || !issue.severity || !issue.description) {
       throw ErrorFactory.createValidationError(
-        [{ field: 'issue', message: 'Type, severity, and description are required' }],
-        { component: 'PerformanceApi', operation: 'reportIssue' }
+        'Type, severity, and description are required fields',
+        { issue, component: 'PerformanceApi', operation: 'reportIssue' }
       );
     }
 
@@ -458,13 +456,11 @@ export class PerformanceApiService {
         error,
       });
 
-      throw ErrorFactory.createNetworkError('Failed to report performance issue', 0, {
+      throw ErrorFactory.createNetworkError('Failed to report performance issue', {
+        issue,
+        originalError: error,
         component: 'PerformanceApi',
         operation: 'reportIssue',
-        metadata: {
-          issue,
-          originalError: error,
-        }
       });
     }
   }
@@ -499,8 +495,8 @@ export class PerformanceApiService {
   async getRecommendations(sessionId: string): Promise<PerformanceRecommendation[]> {
     if (!sessionId?.trim()) {
       throw ErrorFactory.createValidationError(
-        [{ field: 'sessionId', message: 'Session ID is required' }],
-        { component: 'PerformanceApi', operation: 'getRecommendations' }
+        'Session ID is required to retrieve recommendations',
+        { sessionId, component: 'PerformanceApi', operation: 'getRecommendations' }
       );
     }
 
@@ -517,13 +513,11 @@ export class PerformanceApiService {
         error,
       });
 
-      throw ErrorFactory.createNetworkError('Failed to retrieve performance recommendations', 0, {
+      throw ErrorFactory.createNetworkError('Failed to retrieve performance recommendations', {
         sessionId,
+        originalError: error,
         component: 'PerformanceApi',
         operation: 'getRecommendations',
-        metadata: {
-          originalError: error,
-        }
       });
     }
   }
@@ -545,4 +539,4 @@ export class PerformanceApiService {
  * await performanceApiService.reportMetrics(metricsPayload);
  * ```
  */
-export 
+export const performanceApiService = new PerformanceApiService();

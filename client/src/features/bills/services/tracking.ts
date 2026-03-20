@@ -11,10 +11,11 @@ import { Bill, BillStatus } from '@client/lib/types/bill';
 import type {
   BillUpdate,
   BillEngagementMetrics as EngagementMetrics,
-  BillEngagement,
+  BillEngagement
 } from '@client/lib/types/bill';
 import type { BillTrackingPreferences } from '@client/infrastructure/api/types/preferences';
 import { logger } from '@client/lib/utils/logger';
+
 
 export class BillTrackingService {
   private preferences: BillTrackingPreferences = {
@@ -101,13 +102,9 @@ export class BillTrackingService {
     }
 
     // Handle engagement metrics - update the engagement object
-    if (
-      data.viewCount !== undefined ||
-      data.commentCount !== undefined ||
-      data.shareCount !== undefined
-    ) {
+    if (data.viewCount !== undefined || data.commentCount !== undefined || data.shareCount !== undefined) {
       const engagement: Partial<BillEngagement> = {};
-
+      
       if (data.viewCount !== undefined) {
         engagement.views = data.viewCount;
       }
@@ -117,7 +114,7 @@ export class BillTrackingService {
       if (data.shareCount !== undefined) {
         engagement.shares = data.shareCount;
       }
-
+      
       updates.engagement = engagement as BillEngagement;
     }
 

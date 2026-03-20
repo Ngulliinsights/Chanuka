@@ -1,9 +1,9 @@
 /**
  * Infrastructure consolidation utilities
- *
+ * 
  * This module provides tools for planning and executing the consolidation
  * of infrastructure modules from 31 to ~20 modules.
- *
+ * 
  * @module consolidation
  */
 

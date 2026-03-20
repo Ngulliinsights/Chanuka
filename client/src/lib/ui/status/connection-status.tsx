@@ -6,6 +6,7 @@
 
 import { Wifi, WifiOff, AlertCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 
@@ -20,10 +21,7 @@ interface NavigatorWithConnection extends Navigator {
   };
 }
 
-export default function ConnectionStatus({
-  className = '',
-  showDetails = false,
-}: ConnectionStatusProps) {
+export default function ConnectionStatus({ className = '', showDetails = false }: ConnectionStatusProps) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionType, setConnectionType] = useState<string>('unknown');
 

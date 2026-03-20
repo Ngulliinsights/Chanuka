@@ -165,12 +165,16 @@ function getSessionId(): string {
 /**
  * Get all feature flags
  */
-export };
+export const getAllFeatureFlags = () => {
+  return { ...FEATURE_FLAGS };
+};
 
 /**
  * Get rollout status for all features for current user
  */
-export   const rolloutStatus: Record<string, boolean> = {};
+export const getFeatureRolloutStatus = (userGroup?: UserGroup, userId?: string) => {
+  const currentUserGroup = userGroup || getCurrentUserGroup();
+  const rolloutStatus: Record<string, boolean> = {};
 
   Object.keys(ROLLOUT_CONFIG).forEach(flag => {
     rolloutStatus[flag] = isFeatureEnabledForUser(

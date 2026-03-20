@@ -1,6 +1,6 @@
 /**
  * Circuit Breaker Core Implementation
- *
+ * 
  * Extracted to prevent circular dependencies.
  * This module contains the core circuit breaker logic.
  */

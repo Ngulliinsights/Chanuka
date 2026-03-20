@@ -11,6 +11,7 @@ import {
   Target,
 } from 'lucide-react';
 import { useState, useCallback, useEffect, useRef } from 'react';
+import React from 'react';
 
 // Enhanced types for progressive disclosure
 interface SimpleSection {
@@ -185,7 +186,9 @@ const ReadingPathGuidance = ({
   const nextRecommended = recommendedPath.find(s => !s.isCompleted);
 
   // Use currentIndex for navigation if needed
-  //   //
+  // const _canGoNext = currentIndex < sections.length - 1;
+  // const _canGoPrevious = currentIndex > 0;
+
   return (
     <div className="reading-path-card mb-6">
       <div className="flex items-center gap-2 mb-4">

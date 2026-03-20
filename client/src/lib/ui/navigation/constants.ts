@@ -28,14 +28,6 @@ export const DEFAULT_NAVIGATION_MAP: NavigationItem[] = [
     section: 'legislative',
   },
   {
-    id: 'electoral-accountability',
-    label: 'Electoral Accountability',
-    path: '/accountability',
-    href: '/accountability',
-    icon: 'Scale',
-    section: 'legislative',
-  },
-  {
     id: 'community',
     label: 'Community Input',
     path: '/community',

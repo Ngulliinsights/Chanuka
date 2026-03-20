@@ -1,10 +1,10 @@
 /**
  * Dependency Injection Container
- *
+ * 
  * This module provides a dependency injection container that manages service
  * instantiation and dependency resolution. It supports three-phase initialization
  * (core → foundation → business services) to eliminate circular dependencies.
- *
+ * 
  * Requirements: 6.1, 6.2, 6.3, 6.4, 6.5
  */
 
@@ -36,7 +36,7 @@ export interface ServiceFactory<T = any> {
 export interface IDIContainer {
   /**
    * Register a service with the container
-   *
+   * 
    * @param token - Service token to register
    * @param factory - Factory function to create the service
    */
@@ -44,7 +44,7 @@ export interface IDIContainer {
 
   /**
    * Resolve a service from the container
-   *
+   * 
    * @param token - Service token to resolve
    * @returns The service instance
    * @throws Error if service is not registered or has circular dependencies
@@ -53,7 +53,7 @@ export interface IDIContainer {
 
   /**
    * Resolve all services registered with a given name pattern
-   *
+   * 
    * @param pattern - Pattern to match service names (supports wildcards)
    * @returns Array of service instances
    */
@@ -66,7 +66,7 @@ export interface IDIContainer {
 
   /**
    * Check if a service is registered
-   *
+   * 
    * @param token - Service token to check
    * @returns True if the service is registered
    */
@@ -74,7 +74,7 @@ export interface IDIContainer {
 
   /**
    * Get all registered service names
-   *
+   * 
    * @returns Array of service names
    */
   getServiceNames(): string[];
@@ -273,10 +273,7 @@ export class ServiceRegistry {
 /**
  * Helper function to create a service token
  */
-export function createServiceToken<T>(
-  name: string,
-  type?: new (...args: any[]) => T
-): ServiceToken<T> {
+export function createServiceToken<T>(name: string, type?: new (...args: any[]) => T): ServiceToken<T> {
   return { name, type };
 }
 
@@ -301,10 +298,10 @@ export function createServiceFactory<T>(
 
 /**
  * Three-phase initialization helper
- *
+ * 
  * This function initializes services in three phases to ensure proper
  * dependency order and eliminate circular dependencies:
- *
+ * 
  * 1. Core: Services with no dependencies (EventBus, Storage)
  * 2. Foundation: Services that depend on core (Logger, Cache, Observability)
  * 3. Business: Services that depend on foundation (ErrorHandler, APIClient, Store)
@@ -316,10 +313,9 @@ export function initializeInThreePhases(
   const registry = new ServiceRegistry();
 
   // Phase 1: Core services
-  const coreServices = Array.from(factories.entries()).filter(
-    ([_, factory]) => factory.phase === ServicePhase.CORE
-  );
-
+  const coreServices = Array.from(factories.entries())
+    .filter(([_, factory]) => factory.phase === ServicePhase.CORE);
+  
   for (const [name, factory] of coreServices) {
     const token = createServiceToken(name);
     container.register(token, factory);
@@ -328,10 +324,9 @@ export function initializeInThreePhases(
   }
 
   // Phase 2: Foundation services
-  const foundationServices = Array.from(factories.entries()).filter(
-    ([_, factory]) => factory.phase === ServicePhase.FOUNDATION
-  );
-
+  const foundationServices = Array.from(factories.entries())
+    .filter(([_, factory]) => factory.phase === ServicePhase.FOUNDATION);
+  
   for (const [name, factory] of foundationServices) {
     const token = createServiceToken(name);
     container.register(token, factory);
@@ -340,10 +335,9 @@ export function initializeInThreePhases(
   }
 
   // Phase 3: Business services
-  const businessServices = Array.from(factories.entries()).filter(
-    ([_, factory]) => factory.phase === ServicePhase.BUSINESS
-  );
-
+  const businessServices = Array.from(factories.entries())
+    .filter(([_, factory]) => factory.phase === ServicePhase.BUSINESS);
+  
   for (const [name, factory] of businessServices) {
     const token = createServiceToken(name);
     container.register(token, factory);
@@ -356,7 +350,7 @@ export function initializeInThreePhases(
 
 /**
  * Validates that a set of service factories has no circular dependencies
- *
+ * 
  * @param factories - Map of service factories to validate
  * @throws CircularDependencyError if circular dependencies are detected
  */

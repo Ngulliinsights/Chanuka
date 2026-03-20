@@ -15,16 +15,12 @@ import {
   CheckCircle,
   AlertTriangle,
 } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 
 import { Badge } from '@client/lib/design-system/feedback/Badge';
 import { Button } from '@client/lib/design-system/interactive/Button';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system/typography/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system/typography/Card';
 import { cn } from '@client/lib/utils/cn';
 
 interface RealTimeDashboardProps {

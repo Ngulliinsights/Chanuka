@@ -3,11 +3,7 @@
  * Implements unified error monitoring for the Service Architecture system
  */
 
-import {
-  createError,
-  ErrorDomain as CoreErrorDomain,
-  ErrorSeverity as CoreErrorSeverity,
-} from '@client/infrastructure/error';
+import { createError, ErrorDomain as CoreErrorDomain, ErrorSeverity as CoreErrorSeverity } from '@client/infrastructure/error';
 import { CrossSystemErrorAnalytics } from '@client/infrastructure/observability/error-monitoring/index';
 import { ErrorAggregationService } from '@client/infrastructure/observability/error-monitoring/index';
 import {
@@ -19,24 +15,20 @@ import {
   ErrorAnalytics,
   SystemHealth,
   AppError,
-  ErrorSeverity,
+  ErrorSeverity
 } from '@client/infrastructure/observability/error-monitoring/index';
 
 class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
   private static instance: ServiceArchitectureMonitoring;
   private aggregationService: ErrorAggregationService;
   private analyticsService: CrossSystemErrorAnalytics;
-  private coreOperationStats: Map<
-    string,
-    {
-      totalCalls: number;
-      errors: number;
-      avgExecutionTime: number;
-      lastExecutionTime: number;
-    }
-  > = new Map();
-  private errorPatterns: Map<string, { threshold: number; count: number; lastTriggered: number }> =
-    new Map();
+  private coreOperationStats: Map<string, {
+    totalCalls: number;
+    errors: number;
+    avgExecutionTime: number;
+    lastExecutionTime: number;
+  }> = new Map();
+  private errorPatterns: Map<string, { threshold: number; count: number; lastTriggered: number }> = new Map();
   private monitoringEnabled: boolean = true;
   private enabledOperations: Set<string> = new Set(['*']);
 
@@ -55,36 +47,36 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
   async reportError(error: AppError | Error, context: ErrorContext): Promise<void> {
     if (!this.monitoringEnabled) return;
 
-    const appError =
-      error instanceof Error && !(error as any).type
-        ? createError(CoreErrorDomain.SYSTEM, CoreErrorSeverity.HIGH, error.message, {
+    const appError = error instanceof Error && !(error as any).type
+      ? createError(
+          CoreErrorDomain.SYSTEM,
+          CoreErrorSeverity.HIGH,
+          error.message,
+          {
             details: { originalError: error, coreOperation: context.operation },
             context: {
               component: context.component,
               operation: context.operation,
               userId: context.userId,
-              sessionId: context.sessionId,
-            },
-          })
-        : (error as AppError);
+              sessionId: context.sessionId
+            }
+          }
+        )
+      : error as AppError;
 
     // Add system-specific context
     const enhancedContext = {
       ...context,
       system: ClientSystem.SERVICE_ARCHITECTURE,
       coreComponent: context.component || 'unknown',
-      coreOperation: context.operation,
+      coreOperation: context.operation
     };
 
     // Track core-specific error
     this.trackCoreError(context.operation || 'unknown', appError as AppError);
 
     // Report to aggregation service
-    this.aggregationService.addError(
-      ClientSystem.SERVICE_ARCHITECTURE,
-      appError as AppError,
-      enhancedContext
-    );
+    this.aggregationService.addError(ClientSystem.SERVICE_ARCHITECTURE, appError as AppError, enhancedContext);
 
     // Check error patterns
     this.checkErrorPatterns(appError);
@@ -105,10 +97,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     this.updateCoreStats(metrics.operation, metrics.duration, metrics.success);
 
     // Check for performance issues specific to core operations
-    if (
-      metrics.duration > 1000 &&
-      (metrics.operation.includes('API') || metrics.operation.includes('State'))
-    ) {
+    if (metrics.duration > 1000 && (metrics.operation.includes('API') || metrics.operation.includes('State'))) {
       const perfError = createError(
         CoreErrorDomain.PERFORMANCE,
         CoreErrorSeverity.MEDIUM,
@@ -117,41 +106,35 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
           details: { ...metrics },
           context: {
             component: 'ServiceArchitectureMonitoring',
-            operation: 'core_performance_tracking',
-          },
+            operation: 'core_performance_tracking'
+          }
         }
       );
 
       await this.reportError(perfError, {
         system: ClientSystem.SERVICE_ARCHITECTURE,
         component: 'ServiceArchitectureMonitoring',
-        operation: metrics.operation,
+        operation: metrics.operation
       });
     }
   }
 
   async getErrorAnalytics(timeRange?: { start: number; end: number }): Promise<ErrorAnalytics[]> {
-    const systemErrors = this.aggregationService.getSystemErrors(
-      ClientSystem.SERVICE_ARCHITECTURE,
-      timeRange
-    );
+    const systemErrors = this.aggregationService.getSystemErrors(ClientSystem.SERVICE_ARCHITECTURE, timeRange);
 
     // Group errors by core operation
-    const operationGroups: Map<
-      string,
-      {
-        errors: typeof systemErrors;
-        recoveryCount: number;
-        totalImpact: number;
-      }
-    > = new Map();
+    const operationGroups: Map<string, {
+      errors: typeof systemErrors;
+      recoveryCount: number;
+      totalImpact: number;
+    }> = new Map();
 
     systemErrors.forEach(err => {
       const operationName = err.context.operation || 'unknown';
       const existing = operationGroups.get(operationName) || {
         errors: [],
         recoveryCount: 0,
-        totalImpact: 0,
+        totalImpact: 0
       };
 
       existing.errors.push(err);
@@ -169,9 +152,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
 
     operationGroups.forEach((group, operationName) => {
       const recentErrors = group.errors.filter(e => e.timestamp > oneDayAgo);
-      const olderErrors = group.errors.filter(
-        e => e.timestamp <= oneDayAgo && e.timestamp > oneDayAgo - 24 * 60 * 60 * 1000
-      );
+      const olderErrors = group.errors.filter(e => e.timestamp <= oneDayAgo && e.timestamp > oneDayAgo - 24 * 60 * 60 * 1000);
 
       const trend = this.calculateTrend(recentErrors.length, olderErrors.length);
 
@@ -181,9 +162,8 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
         frequency: group.errors.length,
         trend,
         impact: Math.min(100, (group.totalImpact / group.errors.length) * 10),
-        recoveryRate:
-          group.errors.length > 0 ? (group.recoveryCount / group.errors.length) * 100 : 0,
-        affectedUsers: new Set(group.errors.map(e => e.context.userId).filter(Boolean)).size,
+        recoveryRate: group.errors.length > 0 ? (group.recoveryCount / group.errors.length) * 100 : 0,
+        affectedUsers: new Set(group.errors.map(e => e.context.userId).filter(Boolean)).size
       });
     });
 
@@ -216,7 +196,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       status,
       errorRate,
       performanceScore,
-      lastUpdated: Date.now(),
+      lastUpdated: Date.now()
     };
   }
 
@@ -224,7 +204,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     this.errorPatterns.set(pattern, {
       threshold,
       count: 0,
-      lastTriggered: 0,
+      lastTriggered: 0
     });
   }
 
@@ -246,13 +226,13 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     const periodMs = {
       hour: 60 * 60 * 1000,
       day: 24 * 60 * 60 * 1000,
-      week: 7 * 24 * 60 * 60 * 1000,
+      week: 7 * 24 * 60 * 60 * 1000
     };
 
     const startTime = Date.now() - periodMs[period];
     const errors = this.aggregationService.getSystemErrors(ClientSystem.SERVICE_ARCHITECTURE, {
       start: startTime,
-      end: Date.now(),
+      end: Date.now()
     });
 
     const totalErrors = errors.length;
@@ -279,7 +259,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       totalErrors,
       errorRate,
       topErrors,
-      performanceImpact,
+      performanceImpact
     };
   }
 
@@ -288,7 +268,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       totalCalls: 0,
       errors: 0,
       avgExecutionTime: 0,
-      lastExecutionTime: 0,
+      lastExecutionTime: 0
     };
 
     stats.errors++;
@@ -300,7 +280,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       totalCalls: 0,
       errors: 0,
       avgExecutionTime: 0,
-      lastExecutionTime: 0,
+      lastExecutionTime: 0
     };
 
     stats.totalCalls++;
@@ -317,17 +297,15 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
     const operationStats = Array.from(this.coreOperationStats.values());
     if (operationStats.length === 0) return 100;
 
-    const avgExecutionTime =
-      operationStats.reduce((sum, stat) => sum + stat.avgExecutionTime, 0) / operationStats.length;
-    const errorRate =
-      operationStats.reduce(
-        (sum, stat) => sum + (stat.totalCalls > 0 ? stat.errors / stat.totalCalls : 0),
-        0
-      ) / operationStats.length;
+    const avgExecutionTime = operationStats.reduce((sum, stat) => sum + stat.avgExecutionTime, 0) / operationStats.length;
+    const errorRate = operationStats.reduce(
+      (sum, stat) => sum + (stat.totalCalls > 0 ? stat.errors / stat.totalCalls : 0),
+      0
+    ) / operationStats.length;
 
     // Performance score based on execution time and error rate
-    const timeScore = Math.max(0, 100 - avgExecutionTime / 5); // Penalize slow core operations
-    const errorScore = Math.max(0, 100 - errorRate * 1000); // Penalize high error rates
+    const timeScore = Math.max(0, 100 - (avgExecutionTime / 5)); // Penalize slow core operations
+    const errorScore = Math.max(0, 100 - (errorRate * 1000)); // Penalize high error rates
 
     return (timeScore + errorScore) / 2;
   }
@@ -371,19 +349,19 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
           pattern,
           count,
           threshold: this.errorPatterns.get(pattern)?.threshold,
-          lastError: error.message,
+          lastError: error.message
         },
         context: {
           component: 'ServiceArchitectureMonitoring',
-          operation: 'error_pattern_alert',
-        },
+          operation: 'error_pattern_alert'
+        }
       }
     );
 
     this.reportError(alertError, {
       system: ClientSystem.SERVICE_ARCHITECTURE,
       component: 'ServiceArchitectureMonitoring',
-      operation: 'error_pattern_monitoring',
+      operation: 'error_pattern_monitoring'
     });
   }
 
@@ -401,16 +379,13 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       [ErrorSeverity.MEDIUM]: 2,
       [ErrorSeverity.HIGH]: 3,
       [ErrorSeverity.CRITICAL]: 4,
-      [ErrorSeverity.BLOCKER]: 5,
+      [ErrorSeverity.BLOCKER]: 5
     };
 
     return severityMultiplier[error.severity as string] || 1;
   }
 
-  private calculateTrend(
-    current: number,
-    previous: number
-  ): 'increasing' | 'decreasing' | 'stable' {
+  private calculateTrend(current: number, previous: number): 'increasing' | 'decreasing' | 'stable' {
     if (previous === 0) return current > 0 ? 'increasing' : 'stable';
     const change = (current - previous) / previous;
     if (change > 0.1) return 'increasing';
@@ -431,7 +406,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       totalCalls: stats.totalCalls,
       errors: stats.errors,
       avgExecutionTime: stats.avgExecutionTime,
-      errorRate: stats.totalCalls > 0 ? (stats.errors / stats.totalCalls) * 100 : 0,
+      errorRate: stats.totalCalls > 0 ? (stats.errors / stats.totalCalls) * 100 : 0
     }));
   }
 
@@ -447,15 +422,15 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
           details: { executionTime, operationName },
           context: {
             component: 'ServiceArchitectureMonitoring',
-            operation: operationName,
-          },
+            operation: operationName
+          }
         }
       );
 
       this.reportError(error, {
         system: ClientSystem.SERVICE_ARCHITECTURE,
         component: 'CoreOperationMonitor',
-        operation: operationName,
+        operation: operationName
       });
     }
   }
@@ -487,7 +462,7 @@ class ServiceArchitectureMonitoring implements UnifiedErrorMonitoring {
       stateManagement: performance > 80,
       errorHandling: errorRate < 5,
       performance,
-      overallHealth,
+      overallHealth
     };
   }
 }
@@ -513,25 +488,25 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
         // Handle promises (core operations are often async)
         if (result instanceof Promise) {
           return result
-            .then(value => {
+            .then((value) => {
               const duration = performance.now() - startTime;
               this.monitoring.trackPerformance({
                 operation: context.operation || 'unknown',
                 duration,
                 success: true,
                 timestamp: Date.now(),
-                context,
+                context
               });
               return value;
             })
-            .catch(error => {
+            .catch((error) => {
               const duration = performance.now() - startTime;
               this.monitoring.trackPerformance({
                 operation: context.operation || 'unknown',
                 duration,
                 success: false,
                 timestamp: Date.now(),
-                context,
+                context
               });
 
               this.monitoring.reportError(error as Error, context);
@@ -546,7 +521,7 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
           duration,
           success: true,
           timestamp: Date.now(),
-          context,
+          context
         });
 
         return result;
@@ -557,7 +532,7 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
           duration,
           success: false,
           timestamp: Date.now(),
-          context,
+          context
         });
 
         this.monitoring.reportError(error as Error, context);
@@ -581,25 +556,21 @@ class ServiceArchitectureMonitoringMiddleware implements ErrorMonitoringMiddlewa
           duration,
           success,
           timestamp: Date.now(),
-          context: { ...context, operation },
+          context: { ...context, operation }
         });
-      },
+      }
     };
   }
 
   private isOperationEnabled(operation: string): boolean {
     const monitoring = ServiceArchitectureMonitoring.getInstance();
-    return (
-      (monitoring as any).enabledOperations.has('*') ||
-      (monitoring as any).enabledOperations.has(operation)
-    );
+    return (monitoring as any).enabledOperations.has('*') || (monitoring as any).enabledOperations.has(operation);
   }
 }
 
 // Export instances
 export const serviceArchitectureMonitoring = ServiceArchitectureMonitoring.getInstance();
-export {
-  // Export classes for testing
-  ServiceArchitectureMonitoring,
-  ServiceArchitectureMonitoringMiddleware,
-};
+export const serviceArchitectureMonitoringMiddleware = new ServiceArchitectureMonitoringMiddleware();
+
+// Export classes for testing
+export { ServiceArchitectureMonitoring, ServiceArchitectureMonitoringMiddleware };

@@ -1,3 +1,5 @@
+ 
+
 /**
  * Brand Voice Provider
  * ==================
@@ -12,7 +14,8 @@
  *
  *   // In components:
  *   const { getMicrocopy, getTone } = useBrandVoice();
- *    */
+ *   const buttonLabel = getMicrocopy('buttons.primary.search');
+ */
 
 import React, { createContext, useContext, ReactNode } from 'react';
 

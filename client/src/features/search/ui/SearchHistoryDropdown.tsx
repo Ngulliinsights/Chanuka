@@ -1,10 +1,7 @@
 import React from 'react';
 import { Clock, X } from 'lucide-react';
 import { Button } from '@client/lib/design-system';
-import {
-  searchHistoryService,
-  SearchHistoryItem,
-} from '@client/features/search/services/search-history-service';
+import { searchHistoryService, SearchHistoryItem } from '@client/features/search/services/search-history-service';
 
 interface SearchHistoryDropdownProps {
   onSelect: (query: string) => void;
@@ -36,7 +33,7 @@ export function SearchHistoryDropdown({ onSelect, visible }: SearchHistoryDropdo
         </Button>
       </div>
       <div className="py-2">
-        {history.map(item => (
+        {history.map((item) => (
           <button
             key={item.id}
             onClick={() => onSelect(item.query)}

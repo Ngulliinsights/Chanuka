@@ -27,5 +27,5 @@ export type {
   Notification,
   UserBadge,
   UserAchievement,
-  ActivitySummary,
+  ActivitySummary
 } from '@client/lib/services/interfaces';

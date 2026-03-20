@@ -19,7 +19,7 @@ import {
   Tooltip,
 } from 'recharts';
 
-import { ConflictAnalysis } from '@client/features/analysis/types';
+import { TransparencyScore, ConflictAnalysis } from '@client/features/analysis/types';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import {
@@ -45,15 +45,9 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
       conflictAnalysis;
 
     // Normalize transparencyScore to object format
-    const scoreObj =
-      typeof transparencyScore === 'number'
-        ? {
-            overall: transparencyScore,
-            financialDisclosure: 0,
-            votingHistory: 0,
-            industryConnections: 0,
-          }
-        : transparencyScore;
+    const scoreObj = typeof transparencyScore === 'number' 
+      ? { overall: transparencyScore, financialDisclosure: 0, votingHistory: 0, industryConnections: 0 }
+      : transparencyScore;
 
     // Financial Disclosure Score (0-100)
     const financialScore = {
@@ -89,8 +83,7 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Detail Level',
           score: Math.min(
             100,
-            ((financialInterests?.filter(f => f.description && f.description.length > 20).length ??
-              0) /
+            ((financialInterests?.filter(f => f.description && f.description.length > 20).length ?? 0) /
               Math.max(1, financialInterests?.length ?? 1)) *
               100
           ),
@@ -108,8 +101,7 @@ export function TransparencyScoring({ conflictAnalysis }: TransparencyScoringPro
           name: 'Vote Consistency',
           score: Math.min(
             100,
-            ((votingPatterns?.filter(v => Math.abs(v.financialCorrelation ?? 0) < 0.3).length ??
-              0) /
+            ((votingPatterns?.filter(v => Math.abs(v.financialCorrelation ?? 0) < 0.3).length ?? 0) /
               Math.max(1, votingPatterns?.length ?? 1)) *
               100
           ),

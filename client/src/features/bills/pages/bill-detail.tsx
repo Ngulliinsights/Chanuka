@@ -1,5 +1,6 @@
 import { ArrowLeft, AlertTriangle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import React from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 
 // Feature Imports
@@ -14,18 +15,18 @@ import { BriefViewer } from '@client/features/bills/ui/legislative-brief';
 import { ActionPromptCard } from '@client/features/bills/ui/action-prompts';
 import { PlainLanguageView } from '@client/features/bills/ui/translation';
 import { ImpactCalculator } from '@client/features/bills/ui/impact';
-import { SimilarBillsWidget } from '@client/infrastructure/recommendation';
-import { ConstitutionalIntelligenceTab } from '@client/features/analysis/constitutional';
+import { SimilarBillsWidget } from '@client/features/recommendation';
+import { ConstitutionalIntelligenceTab } from '@client/features/constitutional-intelligence';
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@client/infrastructure/api';
+import { globalApiClient } from '@client/infrastructure/api';
 
 export default function BillDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
+  
   // Initialize tab from URL or default to overview
   const initialTab = searchParams.get('tab') || 'overview';
   const [activeTab, setActiveTab] = useState(initialTab);
@@ -43,7 +44,7 @@ export default function BillDetail() {
   const { data: actionPrompts } = useQuery({
     queryKey: ['action-prompts', id],
     queryFn: async () => {
-      const response = await api.get(`/api/bills/${id}/action-prompts`);
+      const response = await globalApiClient.get(`/api/bills/${id}/action-prompts`);
       return response.data;
     },
     enabled: !!id,
@@ -189,7 +190,7 @@ export default function BillDetail() {
 
       {/* Similar Bills Widget */}
       <div className="mt-8">
-        <SimilarBillsWidget billId={Number(bill.id)} limit={5} />
+        <SimilarBillsWidget billId={bill.id} limit={5} />
       </div>
     </div>
   );

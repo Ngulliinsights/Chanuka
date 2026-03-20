@@ -7,7 +7,12 @@
 
 import React, { useState, useEffect } from 'react';
 
-import { getCompatibilityWarnings, getBrowserInfo } from '@client/infrastructure/browser';
+import {
+  getBrowserCompatibilityStatus,
+  getCompatibilityWarnings,
+  getBrowserInfo,
+} from '@client/infrastructure/browser';
+import { logger } from '@client/lib/utils/logger';
 
 interface CompatibilityTestResult {
   name: string;

@@ -22,7 +22,7 @@
     "dev:server": "nx serve server",
     "dev:client": "nx serve client",
     "dev:safe": "npm run dev",
-    "build": "nx run-many --target=build --projects=shared,client,server",
+    "build": "nx run-many --target=build --projects=shared,client",
     "build:client": "nx build client && npm run performance:check-runtime:safe",
     "build:server": "nx build server",
     "build:shared": "nx build shared",

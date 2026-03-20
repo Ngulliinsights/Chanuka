@@ -1,13 +1,8 @@
 import { Settings, Download, RefreshCw, Eye, EyeOff } from 'lucide-react';
+import React from 'react';
 
 import { Button } from '@client/lib/design-system';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@client/lib/design-system';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 
 import { ActivitySection } from '../sections/ActivitySection';

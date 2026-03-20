@@ -4,11 +4,21 @@
  */
 
 import { renderHook, act } from '@testing-library/react';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { useAuth } from '../../../infrastructure/auth/hooks/use-auth';
 
 // Mock the auth service
+const mockAuthService = {
+  login: vi.fn(),
+  logout: vi.fn(),
+  refreshToken: vi.fn(),
+  getCurrentUser: vi.fn(),
+  isAuthenticated: vi.fn(),
+  hasPermission: vi.fn(),
+  getRoles: vi.fn(),
+  checkSession: vi.fn(),
+};
 
 // Mock the auth context
 const mockAuthContext = {
@@ -235,6 +245,11 @@ describe('useAuth Hook', () => {
       const { result } = renderHook(() => useAuth());
 
       // Simulate profile update
+      const updatedProfile = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@example.com',
+      };
 
       // This would typically trigger a state update
       expect(result.current.user).toBeNull();
@@ -246,6 +261,7 @@ describe('useAuth Hook', () => {
       const { result } = renderHook(() => useAuth());
 
       // Mock token expiration check
+      const mockToken = 'expired-token';
 
       expect(result.current.isAuthenticated).toBe(false);
     });
@@ -259,6 +275,8 @@ describe('useAuth Hook', () => {
 
     it('should sanitize user input', () => {
       const { result } = renderHook(() => useAuth());
+
+      const maliciousInput = '<script>alert("xss")</script>';
 
       // Input sanitization would be handled internally
       expect(typeof result.current.login).toBe('function');

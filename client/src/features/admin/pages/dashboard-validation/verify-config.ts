@@ -26,7 +26,7 @@ try {
     theme: 'light',
     refreshInterval: 30000,
   };
-
+  
   const result = validateDashboardConfig(validConfig);
   console.log('✅ PASS: Valid configuration accepted');
   console.log('Result:', JSON.stringify(result, null, 2));
@@ -44,7 +44,7 @@ try {
       positions: [],
     },
   };
-
+  
   validateDashboardConfig(invalidConfig);
   console.log('❌ FAIL: Should have rejected configuration');
 } catch (error) {
@@ -56,14 +56,18 @@ try {
 console.log('\nTest 3: Invalid widget type (Requirement 15.2)');
 try {
   const invalidConfig = {
-    widgets: [{ id: 'widget1', type: 'invalid-type', config: {} }],
+    widgets: [
+      { id: 'widget1', type: 'invalid-type', config: {} },
+    ],
     layout: {
       columns: 1,
       rows: 1,
-      positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
+      positions: [
+        { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
+      ],
     },
   };
-
+  
   validateDashboardConfig(invalidConfig);
   console.log('❌ FAIL: Should have rejected configuration');
 } catch (error) {
@@ -75,14 +79,18 @@ try {
 console.log('\nTest 4: Invalid layout - negative columns (Requirement 15.3)');
 try {
   const invalidConfig = {
-    widgets: [{ id: 'widget1', type: 'chart' as const, config: {} }],
+    widgets: [
+      { id: 'widget1', type: 'chart' as const, config: {} },
+    ],
     layout: {
       columns: 0,
       rows: 1,
-      positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
+      positions: [
+        { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
+      ],
     },
   };
-
+  
   validateDashboardConfig(invalidConfig);
   console.log('❌ FAIL: Should have rejected configuration');
 } catch (error) {
@@ -94,7 +102,9 @@ try {
 console.log('\nTest 5: Widget position references non-existent widget (Requirement 15.5)');
 try {
   const invalidConfig = {
-    widgets: [{ id: 'widget1', type: 'chart' as const, config: {} }],
+    widgets: [
+      { id: 'widget1', type: 'chart' as const, config: {} },
+    ],
     layout: {
       columns: 2,
       rows: 1,
@@ -104,7 +114,7 @@ try {
       ],
     },
   };
-
+  
   validateDashboardConfig(invalidConfig);
   console.log('❌ FAIL: Should have rejected configuration');
 } catch (error) {
@@ -115,11 +125,15 @@ try {
 // Test 6: Safe validation with valid config
 console.log('\nTest 6: Safe validation with valid config');
 const validConfig = {
-  widgets: [{ id: 'widget1', type: 'metric' as const, config: { value: 42 } }],
+  widgets: [
+    { id: 'widget1', type: 'metric' as const, config: { value: 42 } },
+  ],
   layout: {
     columns: 1,
     rows: 1,
-    positions: [{ widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 }],
+    positions: [
+      { widgetId: 'widget1', x: 0, y: 0, width: 1, height: 1 },
+    ],
   },
 };
 

@@ -46,7 +46,7 @@ export async function transformFetchError(response: Response): Promise<StandardE
       return {
         code: data.error.code || ERROR_CODES.INTERNAL_SERVER_ERROR,
         message: data.error.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        classification: data.error.classification || ('server' as ErrorClassification),
+        classification: data.error.classification || 'server' as ErrorClassification,
         correlationId,
         timestamp: new Date(data.error.timestamp || Date.now()),
         details: data.error.details,
@@ -114,10 +114,7 @@ export function transformNetworkError(error: unknown): StandardError {
   const correlationId = generateClientCorrelationId();
 
   // Timeout error
-  if (
-    error instanceof Error &&
-    (error.name === 'AbortError' || error.message.includes('timeout'))
-  ) {
+  if (error instanceof Error && (error.name === 'AbortError' || error.message.includes('timeout'))) {
     return {
       code: ERROR_CODES.TIMEOUT,
       message: ERROR_MESSAGES.TIMEOUT,
@@ -231,7 +228,10 @@ export function displayError(error: StandardError, displayFn?: (message: string)
 /**
  * Enhanced fetch wrapper with automatic error handling
  */
-export async function apiFetch<T = unknown>(url: string, options?: RequestInit): Promise<T> {
+export async function apiFetch<T = unknown>(
+  url: string,
+  options?: RequestInit
+): Promise<T> {
   try {
     const response = await fetch(url, {
       ...options,

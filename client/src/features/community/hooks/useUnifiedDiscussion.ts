@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { globalApiClient } from '@client/infrastructure/api/client';
 import { StateSyncService } from '@client/infrastructure/community/services/state-sync.service';
-import { realTimeService } from '@client/infrastructure/api/realtime';
+import { WebSocketManager } from '@client/infrastructure/api';
 import type {
   CreateCommentRequest,
   CreateThreadRequest,
@@ -112,7 +112,15 @@ export function useUnifiedDiscussion({
     enableTypingIndicators,
   });
 
-  const stateSyncService = useMemo(() => new StateSyncService(queryClient), [queryClient]);
+  const wsManager = useMemo(
+    () => (enableRealtime ? WebSocketManager.getInstance() : null),
+    [enableRealtime]
+  );
+
+  const stateSyncService = useMemo(
+    () => new StateSyncService(queryClient, wsManager),
+    [queryClient, wsManager]
+  );
 
   const commentsQueryKey = useMemo(
     () => ['comments', billId, discussionState.sortBy, discussionState.filterBy] as const,
@@ -169,18 +177,20 @@ export function useUnifiedDiscussion({
 
   const prependComment = useCallback(
     (newComment: EnrichedComment) => {
-      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) => [
-        newComment,
-        ...old,
-      ]);
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) => [newComment, ...old]
+      );
     },
     [queryClient, commentsQueryKey]
   );
 
   const replaceComment = useCallback(
     (updated: EnrichedComment) => {
-      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) =>
-        old.map(c => (c.id === updated.id ? updated : c))
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) =>
+          old.map(c => (c.id === updated.id ? updated : c))
       );
     },
     [queryClient, commentsQueryKey]
@@ -188,8 +198,10 @@ export function useUnifiedDiscussion({
 
   const removeComment = useCallback(
     (commentId: string) => {
-      queryClient.setQueryData(commentsQueryKey, (old: EnrichedComment[] = []) =>
-        old.filter(c => String(c.id) !== String(commentId))
+      queryClient.setQueryData(
+        commentsQueryKey,
+        (old: EnrichedComment[] = []) =>
+          old.filter(c => String(c.id) !== String(commentId))
       );
     },
     [queryClient, commentsQueryKey]
@@ -278,10 +290,10 @@ export function useUnifiedDiscussion({
       return response.data as UnifiedThread;
     },
     onSuccess: newThread => {
-      queryClient.setQueryData(['threads', billId], (old: UnifiedThread[] = []) => [
-        newThread,
-        ...old,
-      ]);
+      queryClient.setQueryData(
+        ['threads', billId],
+        (old: UnifiedThread[] = []) => [newThread, ...old]
+      );
       setDiscussionState(prev => ({ ...prev, currentThreadId: newThread.id }));
       stateSyncService.syncThreadCreated(newThread);
     },
@@ -321,29 +333,29 @@ export function useUnifiedDiscussion({
   const [activeUsers, setActiveUsers] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!enableRealtime) return;
+    if (!wsManager || !enableRealtime) return;
 
-    const subs = [
-      realTimeService.subscribe('comment:new', (payload: unknown) => {
+    const unsubscribers = [
+      wsManager.on('comment:new', (payload: unknown) => {
         const comment = payload as WsCommentPayload;
         if (String(comment.billId) === String(billId)) {
           prependComment(comment);
         }
       }),
 
-      realTimeService.subscribe('comment:updated', (payload: unknown) => {
+      wsManager.on('comment:updated', (payload: unknown) => {
         const updatedComment = payload as WsCommentPayload;
         if (String(updatedComment.billId) === String(billId)) {
           replaceComment(updatedComment);
         }
       }),
 
-      realTimeService.subscribe('comment:deleted', (payload: unknown) => {
+      wsManager.on('comment:deleted', (payload: unknown) => {
         const { id } = payload as WsCommentDeletedPayload;
         removeComment(id);
       }),
 
-      realTimeService.subscribe('typing:indicator', (payload: unknown) => {
+      wsManager.on('typing:indicator', (payload: unknown) => {
         const data = payload as WsTypingPayload;
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -352,7 +364,7 @@ export function useUnifiedDiscussion({
       }),
 
       // Clear the typing indicator immediately when a peer explicitly stops.
-      realTimeService.subscribe('typing:stop', (payload: unknown) => {
+      wsManager.on('typing:stop', (payload: unknown) => {
         const data = payload as WsTypingStopPayload;
         if (enableTypingIndicators && data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -360,7 +372,7 @@ export function useUnifiedDiscussion({
         }
       }),
 
-      realTimeService.subscribe('presence:update', (payload: unknown) => {
+      wsManager.on('presence:update', (payload: unknown) => {
         const data = payload as WsPresencePayload;
         if (data.threadId === discussionState.currentThreadId) {
           const userIdStr = String(data.userId);
@@ -371,18 +383,22 @@ export function useUnifiedDiscussion({
           }
         }
       }),
-
-      realTimeService.subscribe(`bill:${billId}`, () => {}),
     ];
 
+    wsManager.joinRoom(`bill:${billId}`);
     if (discussionState.currentThreadId) {
-      subs.push(realTimeService.subscribe(`thread:${discussionState.currentThreadId}`, () => {}));
+      wsManager.joinRoom(`thread:${discussionState.currentThreadId}`);
     }
 
     return () => {
-      subs.forEach(sub => sub.unsubscribe());
+      unsubscribers.forEach(unsub => unsub());
+      wsManager.leaveRoom(`bill:${billId}`);
+      if (discussionState.currentThreadId) {
+        wsManager.leaveRoom(`thread:${discussionState.currentThreadId}`);
+      }
     };
   }, [
+    wsManager,
     billId,
     discussionState.currentThreadId,
     enableRealtime,
@@ -423,7 +439,8 @@ export function useUnifiedDiscussion({
   );
 
   const createThread = useCallback(
-    (data: CreateThreadRequest): Promise<UnifiedThread> => createThreadMutation.mutateAsync(data),
+    (data: CreateThreadRequest): Promise<UnifiedThread> =>
+      createThreadMutation.mutateAsync(data),
     [createThreadMutation]
   );
 
@@ -455,27 +472,27 @@ export function useUnifiedDiscussion({
   }, [stateSyncService, billId]);
 
   const startTyping = useCallback(() => {
-    if (enableTypingIndicators && discussionState.currentThreadId) {
-      realTimeService.publish('typing:indicator', {
+    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
+      wsManager.emit('typing:indicator', {
         threadId: discussionState.currentThreadId,
         userId: CURRENT_USER_ID,
         userName: 'Current User', // Replace with real auth context when available
       } satisfies WsTypingPayload);
     }
-  }, [enableTypingIndicators, discussionState.currentThreadId]);
+  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   /**
    * Emit an explicit stop signal so peers clear the typing indicator
    * immediately rather than waiting for the server-side timeout.
    */
   const stopTyping = useCallback(() => {
-    if (enableTypingIndicators && discussionState.currentThreadId) {
-      realTimeService.publish('typing:stop', {
+    if (wsManager && enableTypingIndicators && discussionState.currentThreadId) {
+      wsManager.emit('typing:stop', {
         threadId: discussionState.currentThreadId,
         userId: CURRENT_USER_ID,
       } satisfies WsTypingStopPayload);
     }
-  }, [enableTypingIndicators, discussionState.currentThreadId]);
+  }, [wsManager, enableTypingIndicators, discussionState.currentThreadId]);
 
   // ============================================================================
   // RETURN INTERFACE

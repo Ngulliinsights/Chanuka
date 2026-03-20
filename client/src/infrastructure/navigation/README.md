@@ -18,13 +18,11 @@ The Navigation module provides comprehensive navigation functionality for the Ch
 ## Public Exports
 
 ### Validation
-
 - `validateNavigationItem()` - Validate navigation item structure
 - `validateNavigationItems()` - Validate multiple items
 - `isValidNavigationPath()` - Check path validity
 
 ### Access Control
-
 - `hasRouteAccess()` - Check user access to route
 - `filterNavigationByAccess()` - Filter items by permissions
 - `requiresAuthentication()` - Check if route requires auth
@@ -32,24 +30,20 @@ The Navigation module provides comprehensive navigation functionality for the Ch
 - `getNavigationMenuItems()` - Get accessible menu items
 
 ### Breadcrumbs
-
 - `generateBreadcrumbs()` - Generate breadcrumb trail
 - `findRelatedPages()` - Find related navigation items
 - `calculateRelatedPages()` - Calculate page relationships
 
 ### Search
-
 - `searchNavigationItems()` - Search navigation with fuzzy matching
 - `fuzzyMatchScore()` - Calculate fuzzy match score
 
 ### Analytics
-
 - `trackNavigationEvent()` - Track navigation events
 - `getNavigationAnalytics()` - Get navigation metrics
 - `clearNavigationAnalytics()` - Clear analytics data
 
 ### Preferences
-
 - `getNavigationPreferences()` - Get user preferences
 - `saveNavigationPreferences()` - Save preferences
 - `addToRecentPages()` - Add to recent pages
@@ -58,7 +52,6 @@ The Navigation module provides comprehensive navigation functionality for the Ch
 - `isPageFavorite()` - Check if page is favorited
 
 ### Lookup
-
 - `findNavigationItemByPath()` - Find item by path
 - `findNavigationItemById()` - Find item by ID
 - `getNavigationItemsBySection()` - Get items by section

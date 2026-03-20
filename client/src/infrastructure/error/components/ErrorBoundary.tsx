@@ -13,6 +13,7 @@ import { browserDetector } from '@client/infrastructure/browser/browser-detector
 import { ErrorDomain, ErrorSeverity, createError } from '@client/infrastructure/error';
 import { BaseError } from '@client/infrastructure/error/classes';
 
+
 /**
  * Represents a recovery option for error handling
  */
@@ -183,23 +184,28 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     // });
 
     // Use unified error handler for comprehensive error processing
-    const appError = createError(ErrorDomain.SYSTEM, ErrorSeverity.HIGH, error.message, {
-      details: {
-        name: error.name,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack,
-        reactErrorInfo: errorInfo,
-      },
-      context: {
-        component: this.props.context || 'ErrorBoundary',
-        metadata: {
-          url: window.location.href,
-          userAgent: navigator.userAgent,
+    const appError = createError(
+      ErrorDomain.SYSTEM,
+      ErrorSeverity.HIGH,
+      error.message,
+      {
+        details: {
+          name: error.name,
+          stack: error.stack,
+          componentStack: errorInfo.componentStack,
+          reactErrorInfo: errorInfo,
         },
-      },
-      recoverable: this.props.enableRecovery !== false,
-      retryable: false,
-    });
+        context: {
+          component: this.props.context || 'ErrorBoundary',
+          metadata: {
+            url: window.location.href,
+            userAgent: navigator.userAgent,
+          },
+        },
+        recoverable: this.props.enableRecovery !== false,
+        retryable: false,
+      }
+    );
 
     // Update state with unified error data using shared BaseError system
     this.setState({
@@ -285,13 +291,14 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     if (this.props.onMetricsCollected) {
       this.props.onMetricsCollected(metrics);
     }
-    // Finish trace with outcome
-    // try {
-    //   const result = this.recoveryAttempts > 0 ? 'success' : 'error';
-    //   finishTrace(trace, result);
-    // } catch (e) {
-    //   logger.debug('Trace finish failed in ErrorBoundary', { error: e });
-    // }
+// Finish trace with outcome
+// try {
+//   const result = this.recoveryAttempts > 0 ? 'success' : 'error';
+//   finishTrace(trace, result);
+// } catch (e) {
+//   logger.debug('Trace finish failed in ErrorBoundary', { error: e });
+// }
+
   }
 
   /**
@@ -808,37 +815,6 @@ function EnhancedErrorFallback(props: ErrorFallbackProps & { showTechnicalDetail
       </div>
     </div>
   );
-}
-
-/**
- * HOC wrapper for functional components that need error boundary protection.
- * Merged from lib/ui/error-boundary for consolidation.
- */
-export function withErrorBoundary<P extends object>(
-  WrappedComponent: React.ComponentType<P>,
-  errorBoundaryProps?: Omit<ErrorBoundaryProps, 'children'>
-): React.ComponentType<P> {
-  const WithErrorBoundary = (props: P) => (
-    <ErrorBoundary {...errorBoundaryProps}>
-      <WrappedComponent {...props} />
-    </ErrorBoundary>
-  );
-
-  WithErrorBoundary.displayName = `withErrorBoundary(${WrappedComponent.displayName || WrappedComponent.name || 'Component'})`;
-
-  return WithErrorBoundary;
-}
-
-/**
- * Factory to create a pre-configured error boundary component.
- * Merged from lib/ui/error-boundary for consolidation.
- */
-export function createErrorBoundary(
-  config: Omit<ErrorBoundaryProps, 'children'>
-): React.ComponentType<{ children: ReactNode }> {
-  return function ConfiguredErrorBoundary({ children }: { children: ReactNode }) {
-    return <ErrorBoundary {...config}>{children}</ErrorBoundary>;
-  };
 }
 
 // Default export for convenience

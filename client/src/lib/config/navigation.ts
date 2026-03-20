@@ -57,7 +57,10 @@ export const navigationItems: NavigationItem[] = [
   }
 ];
 
-export     if (item.roles && !item.roles.includes(userRole || '')) return false;
+export const getNavigationForUser = (userRole?: string): NavigationItem[] => {
+  return navigationItems.filter(item => {
+    if (item.requiresAuth && !userRole) return false;
+    if (item.roles && !item.roles.includes(userRole || '')) return false;
     return true;
   });
 };

@@ -3,14 +3,15 @@
  *
  * Central export point for all feature modules
  * Follows Feature-Sliced Design (FSD) architecture
- *
+ * 
  * Note: Using selective exports to avoid naming conflicts
  */
 
-// Analytics Features moved to infrastructure
+// Analytics Features
+export * from './analytics';
 
 // Bills Features - selective exports to avoid conflicts
-export {
+export { 
   BillCard,
   BillList,
   BillHeader,
@@ -21,7 +22,8 @@ export {
 // Community Features
 export * from './community';
 
-// Pretext Detection moved to analysis
+// Pretext Detection Features
+export * from './pretext-detection';
 
 // Search Features
 export * from './search';
@@ -30,8 +32,11 @@ export * from './search';
 export * from './security';
 
 // Users Features - selective exports to avoid conflicts
+export type {
+  UserProfile,
+} from './users';
 export {
-  useProfile,
+  useUserProfile,
   useUpdateUserProfile,
   // NotificationPreferences, UserSettings excluded due to conflicts or missing exports
 } from './users';
@@ -40,11 +45,10 @@ export {
 export * from './admin';
 
 // Monitoring Features
-// Monitoring Features moved to admin
+export * from './monitoring';
 
-// Notifications Features moved to infrastructure
+// Notifications Features
+export * from './notifications';
 
-// Realtime Features moved or don't exist
-
-// Accountability Features
-export * from './accountability';
+// Realtime Features
+export * from './realtime';

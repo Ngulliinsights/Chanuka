@@ -6,6 +6,7 @@
 
 import { Database, AlertCircle, CheckCircle, X as XCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import React from 'react';
 
 import { Badge } from '@client/lib/design-system';
 

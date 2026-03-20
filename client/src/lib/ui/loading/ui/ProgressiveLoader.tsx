@@ -5,7 +5,7 @@
 
 import React from 'react';
 
-import { cn } from '@client/lib/design-system/utils/cn';
+import { cn } from '@client/lib/design-system/lib/utils';
 
 import { ProgressiveLoaderProps } from '../types';
 

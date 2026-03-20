@@ -275,7 +275,18 @@ export const generateMockExpert = (id?: string): Expert => {
 /**
  * Generate expert contributions
  */
-export 
+export const generateExpertContributions = (
+  expertId: string,
+  billIds: number[],
+  count: number = 5
+): ExpertContribution[] => {
+  const contributionTypes: Array<'analysis' | 'comment' | 'review' | 'amendment_suggestion'> = [
+    'analysis',
+    'comment',
+    'review',
+    'amendment_suggestion',
+  ];
+
   return Array.from({ length: count }, () => {
     const billId = faker.helpers.arrayElement(billIds);
     const type = faker.helpers.arrayElement(contributionTypes);
@@ -331,7 +342,9 @@ export
 /**
  * Generate expert consensus data
  */
-export   const agreementLevel = faker.number.float({ min: 0.3, max: 0.95, fractionDigits: 2 });
+export const generateExpertConsensus = (billId: string, topic: string): ExpertConsensus => {
+  const totalExperts = faker.number.int({ min: 5, max: 25 });
+  const agreementLevel = faker.number.float({ min: 0.3, max: 0.95, fractionDigits: 2 });
 
   const positions = [
     'Supports with modifications',
@@ -404,21 +417,32 @@ export const mockOfficialExperts = generateMockOfficialExperts(8);
 /**
  * Generate credibility metrics for all experts
  */
-export 
+export const mockExpertCredibilityMetrics = [...mockExperts, ...mockOfficialExperts].map(expert =>
+  generateCredibilityMetrics(String(expert.id))
+);
+
 /**
  * Get expert by ID
  */
-export   return allExperts.find(expert => expert.id === id) || null;
+export const getMockExpertById = (id: string): Expert | null => {
+  const allExperts = [...mockExperts, ...mockOfficialExperts];
+  return allExperts.find(expert => expert.id === id) || null;
 };
 
 /**
  * Get experts by specialization
  */
-export   return allExperts.filter(expert => expert.specializations?.includes(specialization) ?? false);
+export const getMockExpertsBySpecialization = (specialization: string): Expert[] => {
+  const allExperts = [...mockExperts, ...mockOfficialExperts];
+  return allExperts.filter(expert => expert.specializations?.includes(specialization) ?? false);
 };
 
 /**
  * Get experts by verification type
  */
-export   return allExperts.filter(expert => expert.verificationType === type);
+export const getMockExpertsByVerificationType = (
+  type: 'official' | 'domain' | 'identity'
+): Expert[] => {
+  const allExperts = [...mockExperts, ...mockOfficialExperts];
+  return allExperts.filter(expert => expert.verificationType === type);
 };

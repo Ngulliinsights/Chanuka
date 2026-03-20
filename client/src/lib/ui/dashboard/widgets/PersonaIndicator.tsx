@@ -8,6 +8,7 @@
 import type { PersonaClassification } from '@client/infrastructure/observability/personalization';
 import { User, TrendingUp, Award, HelpCircle, ChevronDown, ChevronUp, Info } from 'lucide-react';
 import { useState } from 'react';
+import React from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';

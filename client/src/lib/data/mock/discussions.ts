@@ -172,8 +172,24 @@ export const generateDiscussionThread = (billId: number): MockDiscussionThread =
 /**
  * Generate comment reports
  */
-export 
-  //   // CommentReport defines 'reason' as literal union. 
+export const generateCommentReports = (
+  commentIds: string[],
+  count: number = 10
+): unknown[] => {
+  const violationTypes = [
+    'spam',
+    'harassment',
+    'misinformation',
+    'off_topic',
+    'inappropriate_language',
+    'personal_attack',
+    'duplicate_content',
+    'copyright_violation',
+    'other',
+  ] as const;
+
+  // const statuses = ['pending', 'under_review', 'resolved', 'dismissed'] as const;
+  // CommentReport defines 'reason' as literal union. 
   // We need to match CommentReportData interface? 
   // CommentReport is likely NOT exported or different. 
   // Let's coerce to any for now to avoid specific enum mismatches if types are tight.
@@ -224,16 +240,21 @@ export const extractAllComments = (
 
 const billIds = Array.from({ length: 20 }, (_, i) => i + 1);
 export const mockDiscussionThreads = generateDiscussionThreads(billIds);
-export 
+export const mockComments = extractAllComments(mockDiscussionThreads);
+
 // Stubbing other exports to prevent build breakage
 export const mockCommentReports: unknown[] = [];
 export const mockModerationActions: unknown[] = [];
 export const mockModerationFlags: unknown[] = [];
 export const mockTypingIndicators: unknown[] = [];
 
-export };
+export const getMockDiscussionThread = (billId: number): any => {
+  return mockDiscussionThreads[billId] || null;
+};
 
-export   if (!thread) return [];
+export const getMockCommentsByBill = (billId: number): Comment[] => {
+  const thread = mockDiscussionThreads[billId];
+  if (!thread) return [];
 
   const allComments: Comment[] = [];
   const collectComments = (commentList: NestedComment[]) => {
@@ -247,4 +268,12 @@ export   if (!thread) return [];
   return allComments;
 };
 
-export };
+export const getMockModerationStats = () => {
+  return {
+    totalReports: 0,
+    pendingReports: 0,
+    resolvedReports: 0,
+    totalActions: 0,
+    totalFlags: 0,
+  };
+};

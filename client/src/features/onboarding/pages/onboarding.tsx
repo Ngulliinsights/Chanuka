@@ -1,3 +1,4 @@
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { OnboardingService } from '@client/features/users/services/onboarding-service';

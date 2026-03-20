@@ -607,4 +607,11 @@ export class InputSanitizer {
 }
 
 // Export singleton instance
-export 
+export const inputSanitizer = new InputSanitizer({
+  enabled: true,
+  allowedTags: ['p', 'b', 'i', 'em', 'strong', 'br', 'a', 'img'],
+  allowedAttributes: {
+    a: ['href', 'target'],
+    img: ['src', 'alt'],
+  },
+});

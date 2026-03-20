@@ -15,70 +15,64 @@ interface BlogPost {
 const blogPosts: BlogPost[] = [
   {
     id: '1',
-    title: "Understanding the Legislative Process: A Citizen's Guide",
-    excerpt:
-      'Learn how bills become laws and how you can participate in the democratic process at every stage.',
+    title: 'Understanding the Legislative Process: A Citizen\'s Guide',
+    excerpt: 'Learn how bills become laws and how you can participate in the democratic process at every stage.',
     author: 'Sarah Johnson',
     date: '2024-01-20',
     category: 'Education',
     readTime: '8 min read',
-    image: 'legislative-process',
+    image: 'legislative-process'
   },
   {
     id: '2',
     title: 'How to Track Bills That Matter to You',
-    excerpt:
-      'Discover effective strategies for monitoring legislation and staying informed about issues you care about.',
+    excerpt: 'Discover effective strategies for monitoring legislation and staying informed about issues you care about.',
     author: 'Michael Chen',
     date: '2024-01-15',
     category: 'How-To',
     readTime: '6 min read',
-    image: 'bill-tracking',
+    image: 'bill-tracking'
   },
   {
     id: '3',
     title: 'The Impact of Civic Technology on Democracy',
-    excerpt:
-      'Exploring how digital tools are transforming citizen engagement and government transparency.',
+    excerpt: 'Exploring how digital tools are transforming citizen engagement and government transparency.',
     author: 'Dr. Emily Rodriguez',
     date: '2024-01-10',
     category: 'Analysis',
     readTime: '10 min read',
-    image: 'civic-tech',
+    image: 'civic-tech'
   },
   {
     id: '4',
     title: 'Community Spotlight: Expert Verification Success Stories',
-    excerpt:
-      'Meet the verified experts helping citizens understand complex legislation through our platform.',
+    excerpt: 'Meet the verified experts helping citizens understand complex legislation through our platform.',
     author: 'David Park',
     date: '2024-01-05',
     category: 'Community',
     readTime: '7 min read',
-    image: 'community',
+    image: 'community'
   },
   {
     id: '5',
     title: 'New Features: Enhanced Search and Analysis Tools',
-    excerpt:
-      'Announcing powerful new capabilities to help you find and analyze legislative information faster.',
+    excerpt: 'Announcing powerful new capabilities to help you find and analyze legislative information faster.',
     author: 'Product Team',
     date: '2023-12-28',
     category: 'Product Updates',
     readTime: '5 min read',
-    image: 'features',
+    image: 'features'
   },
   {
     id: '6',
     title: 'Building Trust Through Transparency: Our Approach',
-    excerpt:
-      'How we ensure accuracy, neutrality, and reliability in presenting legislative information.',
+    excerpt: 'How we ensure accuracy, neutrality, and reliability in presenting legislative information.',
     author: 'Sarah Johnson',
     date: '2023-12-20',
     category: 'Company',
     readTime: '9 min read',
-    image: 'transparency',
-  },
+    image: 'transparency'
+  }
 ];
 
 export default function BlogPage() {
@@ -88,9 +82,8 @@ export default function BlogPage() {
   const categories = ['all', ...Array.from(new Set(blogPosts.map(post => post.category)))];
 
   const filteredPosts = blogPosts.filter(post => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -105,7 +98,7 @@ export default function BlogPage() {
             <p className="text-xl text-blue-100 mb-8">
               Insights on civic engagement, legislative transparency, and democratic participation.
             </p>
-
+            
             {/* Search */}
             <div className="max-w-2xl mx-auto">
               <div className="relative">
@@ -114,7 +107,7 @@ export default function BlogPage() {
                   type="text"
                   placeholder="Search articles..."
                   value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 rounded-lg text-gray-900 dark:text-white bg-white dark:bg-gray-800 border-0 focus:ring-2 focus:ring-white"
                 />
               </div>
@@ -197,7 +190,7 @@ export default function BlogPage() {
                           {new Date(post.date).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
-                            year: 'numeric',
+                            year: 'numeric'
                           })}
                         </span>
                       </div>
@@ -225,8 +218,7 @@ export default function BlogPage() {
           <div className="max-w-2xl mx-auto text-center text-white">
             <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
             <p className="text-blue-100 mb-6">
-              Subscribe to our newsletter for the latest articles, product updates, and civic
-              engagement insights.
+              Subscribe to our newsletter for the latest articles, product updates, and civic engagement insights.
             </p>
             <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <input

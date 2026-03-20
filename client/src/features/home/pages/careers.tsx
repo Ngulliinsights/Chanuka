@@ -20,14 +20,13 @@ const jobListings: JobListing[] = [
     location: 'Nairobi (Hybrid)',
     type: 'Full-time',
     salary: 'KES 180,000 - 250,000',
-    description:
-      'Build scalable features for our civic engagement platform using React, Node.js, and PostgreSQL.',
+    description: 'Build scalable features for our civic engagement platform using React, Node.js, and PostgreSQL.',
     requirements: [
       '5+ years of full-stack development experience',
       'Strong proficiency in TypeScript, React, and Node.js',
       'Experience with PostgreSQL and database design',
-      'Passion for civic technology and democratic transparency',
-    ],
+      'Passion for civic technology and democratic transparency'
+    ]
   },
   {
     id: '2',
@@ -36,14 +35,13 @@ const jobListings: JobListing[] = [
     location: 'Nairobi (Hybrid)',
     type: 'Full-time',
     salary: 'KES 150,000 - 200,000',
-    description:
-      'Design intuitive interfaces that make complex legislative information accessible to all Kenyan citizens.',
+    description: 'Design intuitive interfaces that make complex legislative information accessible to all Kenyan citizens.',
     requirements: [
       '4+ years of product design experience',
       'Strong portfolio demonstrating UX/UI skills',
       'Experience with Figma and design systems',
-      'Understanding of accessibility standards (WCAG 2.1)',
-    ],
+      'Understanding of accessibility standards (WCAG 2.1)'
+    ]
   },
   {
     id: '3',
@@ -52,14 +50,13 @@ const jobListings: JobListing[] = [
     location: 'Nairobi',
     type: 'Full-time',
     salary: 'KES 100,000 - 130,000',
-    description:
-      'Analyze Kenyan legislation, create summaries, and ensure our platform provides accurate policy information.',
+    description: 'Analyze Kenyan legislation, create summaries, and ensure our platform provides accurate policy information.',
     requirements: [
       'Degree in Political Science, Public Policy, Law, or related field',
       '2+ years of policy research experience',
       'Strong analytical and writing skills',
-      'Familiarity with Kenyan legislative processes',
-    ],
+      'Familiarity with Kenyan legislative processes'
+    ]
   },
   {
     id: '4',
@@ -68,26 +65,24 @@ const jobListings: JobListing[] = [
     location: 'Remote (Kenya)',
     type: 'Full-time',
     salary: 'KES 170,000 - 220,000',
-    description:
-      'Build and maintain our infrastructure, ensuring reliability and security for our users across Kenya.',
+    description: 'Build and maintain our infrastructure, ensuring reliability and security for our users across Kenya.',
     requirements: [
       '3+ years of DevOps experience',
       'Experience with AWS, Docker, and Kubernetes',
       'Strong understanding of CI/CD pipelines',
-      'Security-first mindset',
-    ],
-  },
+      'Security-first mindset'
+    ]
+  }
 ];
 
 export default function CareersPage() {
   const [selectedDepartment, setSelectedDepartment] = useState<string>('all');
 
   const departments = ['all', ...Array.from(new Set(jobListings.map(job => job.department)))];
-
-  const filteredJobs =
-    selectedDepartment === 'all'
-      ? jobListings
-      : jobListings.filter(job => job.department === selectedDepartment);
+  
+  const filteredJobs = selectedDepartment === 'all' 
+    ? jobListings 
+    : jobListings.filter(job => job.department === selectedDepartment);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -128,8 +123,7 @@ export default function CareersPage() {
               </div>
               <h3 className="font-semibold mb-2">Flexible Work Culture</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Hybrid work options in Nairobi with flexible hours. Remote opportunities available
-                for select roles across Kenya.
+                Hybrid work options in Nairobi with flexible hours. Remote opportunities available for select roles across Kenya.
               </p>
             </div>
 
@@ -139,8 +133,7 @@ export default function CareersPage() {
               </div>
               <h3 className="font-semibold mb-2">Health & Wellness</h3>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Comprehensive health insurance (NHIF), dental, vision, plus mental health support
-                and wellness programs.
+                Comprehensive health insurance (NHIF), dental, vision, plus mental health support and wellness programs.
               </p>
             </div>
 
@@ -173,13 +166,11 @@ export default function CareersPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
             <h2 className="text-3xl font-bold mb-4 md:mb-0">Open Positions</h2>
             <div className="flex items-center space-x-2">
-              <label htmlFor="department" className="text-sm font-medium">
-                Filter:
-              </label>
+              <label htmlFor="department" className="text-sm font-medium">Filter:</label>
               <select
                 id="department"
                 value={selectedDepartment}
-                onChange={e => setSelectedDepartment(e.target.value)}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
                 className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-800"
               >
                 {departments.map(dept => (
@@ -284,7 +275,9 @@ export default function CareersPage() {
                   4
                 </div>
                 <h3 className="font-semibold mb-2">Offer</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Welcome to the team!</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Welcome to the team!
+                </p>
               </div>
             </div>
           </div>
@@ -296,8 +289,8 @@ export default function CareersPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Don't See a Perfect Fit?</h2>
           <p className="text-gray-700 dark:text-gray-300 mb-6">
-            We're always interested in hearing from talented people who share our mission. Send us
-            your resume and tell us how you'd like to contribute.
+            We're always interested in hearing from talented people who share our mission.
+            Send us your resume and tell us how you'd like to contribute.
           </p>
           <a
             href="/contact"

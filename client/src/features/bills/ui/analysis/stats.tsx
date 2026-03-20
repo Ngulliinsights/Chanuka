@@ -1,5 +1,8 @@
+import React from 'react';
 
 import { Card, CardContent, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface Bill {
   supportPercentage?: number;
@@ -13,7 +16,9 @@ interface BillStatsProps {
   bill: Bill;
 }
 
-export   const oppositionPercentage = 100 - supportPercentage;
+export const BillStats = ({ bill }: BillStatsProps) => {
+  const supportPercentage = bill.supportPercentage || 0;
+  const oppositionPercentage = 100 - supportPercentage;
 
   return (
     <Card className="sticky top-6">

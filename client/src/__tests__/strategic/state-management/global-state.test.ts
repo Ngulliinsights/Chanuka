@@ -8,7 +8,7 @@
  * for data consistency and user experience reliability.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock state management services
 vi.mock('@client/infrastructure/state/store', () => ({

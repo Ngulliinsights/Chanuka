@@ -178,14 +178,20 @@ class ErrorNormalizer {
       message = 'Server error';
     }
 
-    return new AppError(message, errorCode, ErrorDomain.NETWORK, severity, {
-      context: {
-        ...context,
-        statusCode,
-      },
-      recoverable: statusCode >= 500 || statusCode === 408 || statusCode === 429,
-      retryable: statusCode >= 500 || statusCode === 408 || statusCode === 429,
-    });
+    return new AppError(
+      message,
+      errorCode,
+      ErrorDomain.NETWORK,
+      severity,
+      {
+        context: {
+          ...context,
+          statusCode,
+        },
+        recoverable: statusCode >= 500 || statusCode === 408 || statusCode === 429,
+        retryable: statusCode >= 500 || statusCode === 408 || statusCode === 429,
+      }
+    );
   }
 
   private normalizeGenericError(error: Error, context: ServiceErrorContext): AppError {
@@ -310,10 +316,9 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
       const response = await Promise.race([requestFn(), timeoutPromise]);
 
       // Transform response if enabled
-      const transformedResponse =
-        skipTransformation || !this.config.enableResponseTransformation
-          ? response
-          : this.responseTransformer.transform(serviceName, response);
+      const transformedResponse = skipTransformation || !this.config.enableResponseTransformation
+        ? response
+        : this.responseTransformer.transform(serviceName, response);
 
       // Update context with response metrics
       context.responseTime = Date.now() - startTime;
@@ -325,14 +330,14 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
       }
 
       return transformedResponse as T;
+
     } catch (error) {
       context.responseTime = Date.now() - startTime;
 
       // Normalize error if enabled
-      const normalizedError =
-        skipNormalization || !this.config.enableErrorNormalization
-          ? this.createGenericServiceError(error as Error, context)
-          : this.errorNormalizer.normalize(serviceName, error, context);
+      const normalizedError = skipNormalization || !this.config.enableErrorNormalization
+        ? this.createGenericServiceError(error as Error, context)
+        : this.errorNormalizer.normalize(serviceName, error, context);
 
       // Log failed request if enabled
       if (this.config.enableRequestLogging) {
@@ -387,16 +392,22 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
     const serviceContext = this.extractServiceContext(error);
     const recoveryStrategies = this.getServiceRecoveryStrategies(error, serviceContext);
 
-    return new AppError(error.message, error.code, error.type, error.severity, {
-      ...error,
-      context: {
-        ...error.context,
-        ...serviceContext,
-      },
-      recoveryStrategies,
-      recoverable: this.isRecoverableServiceError(error),
-      retryable: this.isRetryableServiceError(error),
-    });
+    return new AppError(
+      error.message,
+      error.code,
+      error.type,
+      error.severity,
+      {
+        ...error,
+        context: {
+          ...error.context,
+          ...serviceContext,
+        },
+        recoveryStrategies,
+        recoverable: this.isRecoverableServiceError(error),
+        retryable: this.isRetryableServiceError(error),
+      }
+    );
   }
 
   /**
@@ -604,14 +615,12 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
     if (!context.serviceName) return;
 
     // Simple degradation detection based on error frequency
-    const serviceErrors = Array.from(this.serviceMetrics.values()).filter(
-      m => m.serviceName === context.serviceName && m.responseTime
-    );
+    const serviceErrors = Array.from(this.serviceMetrics.values())
+      .filter(m => m.serviceName === context.serviceName && m.responseTime);
 
     const errorRate = serviceErrors.length > 0 ? 1 / serviceErrors.length : 0;
 
-    if (errorRate > 0.5) {
-      // More than 50% errors
+    if (errorRate > 0.5) { // More than 50% errors
       const degradationError = new AppError(
         `Service degradation detected for: ${context.serviceName}`,
         ServiceErrorCode.EXTERNAL_SERVICE_ERROR,
@@ -656,13 +665,11 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
       status,
       responseTime: context.responseTime,
       statusCode: context.statusCode,
-      error: error
-        ? {
-            code: error.code,
-            message: error.message,
-            severity: error.severity,
-          }
-        : undefined,
+      error: error ? {
+        code: error.code,
+        message: error.message,
+        severity: error.severity,
+      } : undefined,
     };
 
     console.log(`[Service ${status.toUpperCase()}]`, logEntry);
@@ -671,10 +678,7 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
   /**
    * Register response transformer for a service
    */
-  registerResponseTransformer(
-    serviceName: string,
-    transformer: (response: unknown) => unknown
-  ): void {
+  registerResponseTransformer(serviceName: string, transformer: (response: unknown) => unknown): void {
     this.responseTransformer.registerTransformer(serviceName, transformer);
   }
 
@@ -712,9 +716,8 @@ export class ServiceErrorMiddleware implements ErrorReporter, ErrorTransformer {
 }
 
 // Export singleton instance
-export type {
-  // Export types and classes
-  ServiceErrorContext,
-  ServiceMiddlewareConfig,
-};
+export const serviceErrorMiddleware = new ServiceErrorMiddleware();
+
+// Export types and classes
+export type { ServiceErrorContext, ServiceMiddlewareConfig };
 export { ResponseTransformer, ErrorNormalizer };

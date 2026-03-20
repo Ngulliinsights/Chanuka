@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { cn } from '@client/lib/design-system/utils/cn';
+import { cn } from '@client/lib/design-system/lib/utils';
+
 
 interface AvatarSkeletonProps {
   className?: string;

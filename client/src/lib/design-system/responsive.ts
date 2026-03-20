@@ -10,7 +10,14 @@
 import React from 'react';
 
 // Civic Color Constants (HSL values matching CSS custom properties)
-export 
+export const civicColors = {
+  urgent: '0 84% 60%',
+  constitutional: '45 93% 47%',
+  expert: '217 91% 60%',
+  community: '142 76% 36%',
+  transparency: '262 83% 58%',
+} as const;
+
 // Breakpoint definitions following mobile-first approach
 export const breakpoints = {
   // Mobile devices (default, no prefix needed)
@@ -78,17 +85,186 @@ export const mediaQueries = {
 } as const;
 
 // Container max-widths for different breakpoints
-export 
+export const containerSizes = {
+  mobile: '100%',
+  'mobile-sm': '100%',
+  'mobile-lg': '100%',
+  tablet: '640px',
+  'tablet-lg': '768px',
+  laptop: '1024px',
+  'laptop-lg': '1280px',
+  desktop: '1440px',
+  'desktop-xl': '1920px',
+} as const;
+
 // Spacing scale that adapts to screen size
-export 
+export const responsiveSpacing = {
+  // Base spacing (mobile)
+  xs: {
+    mobile: '0.25rem', // 4px
+    tablet: '0.375rem', // 6px
+    laptop: '0.5rem', // 8px
+  },
+  sm: {
+    mobile: '0.5rem', // 8px
+    tablet: '0.75rem', // 12px
+    laptop: '1rem', // 16px
+  },
+  md: {
+    mobile: '1rem', // 16px
+    tablet: '1.25rem', // 20px
+    laptop: '1.5rem', // 24px
+  },
+  lg: {
+    mobile: '1.5rem', // 24px
+    tablet: '2rem', // 32px
+    laptop: '2.5rem', // 40px
+  },
+  xl: {
+    mobile: '2rem', // 32px
+    tablet: '3rem', // 48px
+    laptop: '4rem', // 64px
+  },
+  '2xl': {
+    mobile: '3rem', // 48px
+    tablet: '4rem', // 64px
+    laptop: '6rem', // 96px
+  },
+} as const;
+
 // Typography scale that adapts to screen size
-export 
+export const responsiveTypography = {
+  'text-xs': {
+    mobile: { fontSize: '0.75rem', lineHeight: '1rem' }, // 12px
+    tablet: { fontSize: '0.8125rem', lineHeight: '1.125rem' }, // 13px
+    laptop: { fontSize: '0.875rem', lineHeight: '1.25rem' }, // 14px
+  },
+  'text-sm': {
+    mobile: { fontSize: '0.875rem', lineHeight: '1.25rem' }, // 14px
+    tablet: { fontSize: '0.9375rem', lineHeight: '1.375rem' }, // 15px
+    laptop: { fontSize: '1rem', lineHeight: '1.5rem' }, // 16px
+  },
+  'text-base': {
+    mobile: { fontSize: '1rem', lineHeight: '1.5rem' }, // 16px
+    tablet: { fontSize: '1.0625rem', lineHeight: '1.625rem' }, // 17px
+    laptop: { fontSize: '1.125rem', lineHeight: '1.75rem' }, // 18px
+  },
+  'text-lg': {
+    mobile: { fontSize: '1.125rem', lineHeight: '1.75rem' }, // 18px
+    tablet: { fontSize: '1.25rem', lineHeight: '1.875rem' }, // 20px
+    laptop: { fontSize: '1.375rem', lineHeight: '2rem' }, // 22px
+  },
+  'text-xl': {
+    mobile: { fontSize: '1.25rem', lineHeight: '1.75rem' }, // 20px
+    tablet: { fontSize: '1.5rem', lineHeight: '2rem' }, // 24px
+    laptop: { fontSize: '1.75rem', lineHeight: '2.25rem' }, // 28px
+  },
+  'text-2xl': {
+    mobile: { fontSize: '1.5rem', lineHeight: '2rem' }, // 24px
+    tablet: { fontSize: '1.875rem', lineHeight: '2.25rem' }, // 30px
+    laptop: { fontSize: '2.25rem', lineHeight: '2.5rem' }, // 36px
+  },
+  'text-3xl': {
+    mobile: { fontSize: '1.875rem', lineHeight: '2.25rem' }, // 30px
+    tablet: { fontSize: '2.25rem', lineHeight: '2.5rem' }, // 36px
+    laptop: { fontSize: '3rem', lineHeight: '1' }, // 48px
+  },
+  'text-4xl': {
+    mobile: { fontSize: '2.25rem', lineHeight: '2.5rem' }, // 36px
+    tablet: { fontSize: '3rem', lineHeight: '1' }, // 48px
+    laptop: { fontSize: '3.75rem', lineHeight: '1' }, // 60px
+  },
+} as const;
+
 // Touch-friendly minimum sizes
-export 
+export const touchTargets = {
+  // Minimum touch target size (44px recommended by Apple, 48px by Google)
+  minSize: '44px',
+  recommendedSize: '48px',
+
+  // Touch target spacing
+  minSpacing: '8px',
+  recommendedSpacing: '12px',
+
+  // Button sizes
+  button: {
+    small: { minHeight: '36px', minWidth: '36px', padding: '0.5rem 0.75rem' },
+    medium: { minHeight: '44px', minWidth: '44px', padding: '0.75rem 1rem' },
+    large: { minHeight: '48px', minWidth: '48px', padding: '1rem 1.5rem' },
+  },
+
+  // Form control sizes
+  input: {
+    small: { minHeight: '36px', padding: '0.5rem 0.75rem' },
+    medium: { minHeight: '44px', padding: '0.75rem 1rem' },
+    large: { minHeight: '48px', padding: '1rem 1.25rem' },
+  },
+} as const;
+
 // Grid system configuration
-export 
+export const gridSystem = {
+  // Column counts for different breakpoints
+  columns: {
+    mobile: 1,
+    'mobile-lg': 2,
+    tablet: 2,
+    'tablet-lg': 3,
+    laptop: 4,
+    'laptop-lg': 6,
+    desktop: 8,
+    'desktop-xl': 12,
+  },
+
+  // Gap sizes
+  gaps: {
+    mobile: '1rem',
+    tablet: '1.5rem',
+    laptop: '2rem',
+    desktop: '2.5rem',
+  },
+
+  // Container padding
+  containerPadding: {
+    mobile: '1rem',
+    tablet: '1.5rem',
+    laptop: '2rem',
+    desktop: '2.5rem',
+  },
+} as const;
+
 // Layout patterns for common components
-export 
+export const layoutPatterns = {
+  // Stack layout (vertical)
+  stack: {
+    mobile: { flexDirection: 'column', gap: '1rem' },
+    tablet: { flexDirection: 'column', gap: '1.5rem' },
+    laptop: { flexDirection: 'column', gap: '2rem' },
+  },
+
+  // Inline layout (horizontal)
+  inline: {
+    mobile: { flexDirection: 'column', gap: '0.5rem' },
+    tablet: { flexDirection: 'row', gap: '1rem' },
+    laptop: { flexDirection: 'row', gap: '1.5rem' },
+  },
+
+  // Sidebar layout
+  sidebar: {
+    mobile: { flexDirection: 'column' },
+    tablet: { flexDirection: 'row', gap: '1.5rem' },
+    laptop: { flexDirection: 'row', gap: '2rem' },
+  },
+
+  // Card grid
+  cardGrid: {
+    mobile: { gridTemplateColumns: '1fr', gap: '1rem' },
+    'mobile-lg': { gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' },
+    tablet: { gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' },
+    'tablet-lg': { gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' },
+    laptop: { gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem' },
+  },
+} as const;
+
 // Utility functions for responsive design
 export const responsiveUtils = {
   // Check if current viewport matches a breakpoint
@@ -169,10 +345,17 @@ export const responsiveUtils = {
 } as const;
 
 // CSS-in-JS helper for responsive styles
-export };
+export const createResponsiveStyles = (
+  styles: Partial<Record<keyof typeof breakpoints, React.CSSProperties>>
+): React.CSSProperties => {
+  return responsiveUtils.getResponsiveValue(styles) || {};
+};
 
 // Hook for responsive behavior
-export   const [isTouchDevice, setIsTouchDevice] = React.useState(false);
+export const useResponsive = () => {
+  const [currentBreakpoint, setCurrentBreakpoint] =
+    React.useState<keyof typeof breakpoints>('mobile');
+  const [isTouchDevice, setIsTouchDevice] = React.useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = React.useState(false);
 
   React.useEffect(() => {

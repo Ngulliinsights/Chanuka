@@ -37,8 +37,6 @@ import { cn } from '@client/lib/design-system/utils/cn';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { useToast } from '@client/lib/hooks/use-toast';
 import { logger } from '@client/lib/utils/logger';
-import { useComparisonCart } from '@client/features/bills/hooks/useComparisonCart';
-import { ComparisonFloatingBar } from '@client/features/bills/ui/comparison/ComparisonFloatingBar';
 
 // Types for the portal
 interface BillsPortalFilters {
@@ -81,13 +79,12 @@ export default function BillsPortalPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { isMobile } = useDeviceInfo();
   const { toast } = useToast();
-  const { billIds, clearCart } = useComparisonCart();
 
   // Extract current filters from URL params
   const currentFilters = useMemo<BillsPortalFilters>(
     () => ({
       searchQuery: searchParams.get('search') || '',
-      status: (searchParams.get('status')?.split(',') as BillStatus[] | undefined) || undefined,
+      status: searchParams.get('status')?.split(',') as BillStatus[] | undefined || undefined,
       sortBy: (searchParams.get('sortBy') as BillsPortalFilters['sortBy']) || 'date',
       sortOrder: (searchParams.get('sortOrder') as BillsPortalFilters['sortOrder']) || 'desc',
       viewMode: (searchParams.get('view') as BillsPortalFilters['viewMode']) || 'grid',
@@ -116,16 +113,12 @@ export default function BillsPortalPage() {
 
     return {
       total: totalBills,
-      active: bills.filter(
-        bill => bill.status !== BillStatus.Lost && bill.status !== BillStatus.Withdrawn
-      ).length,
+      active: bills.filter(bill => bill.status !== BillStatus.Lost && bill.status !== BillStatus.Withdrawn).length,
       urgent: bills.filter(bill => {
         const urgency = bill.urgency;
         return urgency === UrgencyLevel.High || urgency === UrgencyLevel.Critical;
       }).length,
-      trending: bills.filter(
-        bill => bill.engagement && bill.engagement.views && bill.engagement.views > 1000
-      ).length,
+      trending: bills.filter(bill => bill.engagement && bill.engagement.views && bill.engagement.views > 1000).length,
       saved: bills.filter(bill => bill.trackingCount && bill.trackingCount > 0).length,
     };
   }, [bills, totalBills]);
@@ -312,13 +305,7 @@ export default function BillsPortalPage() {
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold p-8 rounded-2xl text-white shadow-xl relative overflow-hidden">
         {/* Subtle noise overlay for texture */}
-        <div
-          className="absolute inset-0 opacity-10 mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-          }}
-        ></div>
+        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
         <div className="relative z-10">
           <h1 className="text-4xl font-bold tracking-tight mb-2 drop-shadow-md">Bills Portal</h1>
           <p className="text-white/90 text-lg font-medium">
@@ -341,10 +328,10 @@ export default function BillsPortalPage() {
             Refresh
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleExport}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleExport} 
             disabled={bills.length === 0}
             className="bg-white/10 hover:bg-white/20 border-white/30 text-white backdrop-blur-sm disabled:opacity-50"
           >
@@ -486,9 +473,7 @@ export default function BillsPortalPage() {
           <CardContent className="p-4">
             <FilterPanel
               filters={currentFilters as Record<string, unknown>}
-              onFiltersChange={newFilters =>
-                updateFilters(newFilters as Partial<BillsPortalFilters>)
-              }
+              onFiltersChange={newFilters => updateFilters(newFilters as Partial<BillsPortalFilters>)}
               resultCount={bills.length}
               totalCount={totalBills}
             />
@@ -497,10 +482,7 @@ export default function BillsPortalPage() {
       )}
 
       {/* Category Tabs */}
-      <Tabs
-        value={currentFilters.category || 'all'}
-        onValueChange={value => handleCategoryChange(value as BillsPortalFilters['category'])}
-      >
+      <Tabs value={currentFilters.category || 'all'} onValueChange={(value) => handleCategoryChange(value as BillsPortalFilters['category'])}>
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="all">All Bills</TabsTrigger>
           <TabsTrigger value="urgent">Urgent</TabsTrigger>
@@ -539,7 +521,12 @@ export default function BillsPortalPage() {
                   </CardContent>
                 </Card>
               ) : (
-                bills.map(bill => <BillCard key={bill.id} bill={bill} />)
+                bills.map(bill => (
+                  <BillCard
+                    key={bill.id}
+                    bill={bill}
+                  />
+                ))
               )}
             </div>
           )}
@@ -584,13 +571,6 @@ export default function BillsPortalPage() {
           </div>
         </div>
       )}
-
-      {/* Comparison Floating Bar */}
-      <ComparisonFloatingBar
-        selectedCount={billIds.length}
-        onCompare={() => navigate(`/analysis/compare?bills=${billIds.join(',')}`)}
-        onClear={clearCart}
-      />
     </div>
   );
 }

@@ -5,6 +5,7 @@
  */
 
 import { Settings, Shield, BarChart3, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 
 // Type definitions for better type safety

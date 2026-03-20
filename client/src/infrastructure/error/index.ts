@@ -173,10 +173,7 @@ export {
   getRecoveryStrategy as getDashboardRecoveryStrategy,
   executeRecovery as executeDashboardRecovery,
 } from './dashboard-errors';
-export type {
-  RecoveryContext as DashboardRecoveryContext,
-  RecoveryStrategy as DashboardRecoveryStrategy,
-} from './dashboard-errors';
+export type { RecoveryContext as DashboardRecoveryContext, RecoveryStrategy as DashboardRecoveryStrategy } from './dashboard-errors';
 
 // ============================================================================
 // Core Services (Legacy - use new core exports instead)
@@ -186,14 +183,18 @@ export type {
 export { errorHandler as coreErrorHandler } from './core/handler';
 
 // Legacy convenience functions (use ErrorFactory instead)
-export function // ============================================================================
+export const createNetworkError = ErrorFactory.createNetworkError;
+export const createValidationError = ErrorFactory.createValidationError;
+export const createAuthError = ErrorFactory.createAuthenticationError;
+
+// ============================================================================
 // Reporter Integration Methods
 // ============================================================================
 
 /**
  * Add an error reporter to the core error handler
  */
-addErrorReporter(reporter: ErrorReporter): void {
+export function addErrorReporter(reporter: ErrorReporter): void {
   coreErrorHandler.addReporter(reporter);
 }
 
@@ -339,12 +340,11 @@ export {
 
 import { useCallback } from 'react';
 
+import { errorHandler as coreErrorHandler } from './core/handler';
 import { registerDefaultRecoveryStrategies } from './recovery';
 import type {
   AppError,
   ErrorContext,
-  ErrorDomain,
-  ErrorSeverity,
   ErrorListener,
   ErrorStats,
   ErrorHandlerConfig,

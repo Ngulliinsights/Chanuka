@@ -92,4 +92,4 @@ export class RequestDeduplicator {
 }
 
 // Export singleton instance
-export 
+export const requestDeduplicator = new RequestDeduplicator();

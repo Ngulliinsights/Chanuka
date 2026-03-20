@@ -10,11 +10,7 @@ import { useCallback, useMemo } from 'react';
 import { AppError } from '../types';
 
 // Import directly from source files to avoid circular dependency with index.ts
-import {
-  formatErrorMessage,
-  formatErrorForDisplay,
-  formatErrorForHTML,
-} from './error-message-formatter';
+import { formatErrorMessage, formatErrorForDisplay, formatErrorForHTML } from './error-message-formatter';
 import { getRecoverySuggestions } from './error-recovery-suggestions';
 import { getLocalizedMessage } from './error-message-templates';
 import type { FormatOptions } from './error-message-formatter';
@@ -35,15 +31,12 @@ export function useErrorMessages() {
   const currentLocale = 'en-US'; // i18n.language || 'en-US';
 
   // Format error message with current locale
-  const formatError = useCallback(
-    (error: AppError | Error, options = {}) => {
-      return formatErrorMessage(error, {
-        locale: currentLocale,
-        ...options,
-      });
-    },
-    [currentLocale]
-  );
+  const formatError = useCallback((error: AppError | Error, options = {}) => {
+    return formatErrorMessage(error, {
+      locale: currentLocale,
+      ...options
+    });
+  }, [currentLocale]);
 
   // Get recovery suggestions
   const getSuggestions = useCallback((error: AppError, maxSuggestions = 3) => {
@@ -51,93 +44,65 @@ export function useErrorMessages() {
   }, []);
 
   // Create enhanced error message
-  const createEnhancedMessage = useCallback(
-    (
-      error: AppError | Error,
-      options: FormatOptions & { maxSuggestions?: number } = {}
-    ): EnhancedErrorMessage => {
-      const { maxSuggestions = 3, ...formatOptions } = options;
+  const createEnhancedMessage = useCallback((error: AppError | Error, options: FormatOptions & { maxSuggestions?: number } = {}): EnhancedErrorMessage => {
+    const { maxSuggestions = 3, ...formatOptions } = options;
+    
+    // Import getBestMatchTemplate dynamically to avoid circular dependency
+    const { getBestMatchTemplate } = require('./error-message-templates');
+    const { ErrorDomain, ErrorSeverity } = require('../constants');
+    
+    const template = getBestMatchTemplate(
+      error instanceof AppError ? error.type : ErrorDomain.SYSTEM,
+      error instanceof AppError ? error.severity : ErrorSeverity.MEDIUM,
+      error instanceof AppError ? error.code : undefined
+    );
 
-      // Import getBestMatchTemplate dynamically to avoid circular dependency
-      const { getBestMatchTemplate } = require('./error-message-templates');
-      const { ErrorDomain, ErrorSeverity } = require('../constants');
-
-      const template = getBestMatchTemplate(
-        error instanceof AppError ? error.type : ErrorDomain.SYSTEM,
-        error instanceof AppError ? error.severity : ErrorSeverity.MEDIUM,
-        error instanceof AppError ? error.code : undefined
-      );
-
-      return {
-        formattedMessage: formatErrorMessage(error, { locale: currentLocale, ...formatOptions }),
-        template,
-        recoverySuggestions: getRecoverySuggestions(
-          error instanceof AppError
-            ? error
-            : new AppError(
-                error.message || 'Unknown error',
-                error.name || 'UNKNOWN_ERROR',
-                ErrorDomain.SYSTEM,
-                ErrorSeverity.MEDIUM
-              ),
-          {},
-          maxSuggestions
+    return {
+      formattedMessage: formatErrorMessage(error, { locale: currentLocale, ...formatOptions }),
+      template,
+      recoverySuggestions: getRecoverySuggestions(
+        error instanceof AppError ? error : new AppError(
+          error.message || 'Unknown error',
+          error.name || 'UNKNOWN_ERROR',
+          ErrorDomain.SYSTEM,
+          ErrorSeverity.MEDIUM
         ),
-      };
-    },
-    [currentLocale]
-  );
+        {},
+        maxSuggestions
+      ),
+    };
+  }, [currentLocale]);
 
   // Get localized message by template ID
-  const getMessage = useCallback(
-    (templateId: string) => {
-      return getLocalizedMessage(templateId, currentLocale);
-    },
-    [currentLocale]
-  );
+  const getMessage = useCallback((templateId: string) => {
+    return getLocalizedMessage(templateId, currentLocale);
+  }, [currentLocale]);
 
   // Format error for display (text)
-  const formatForDisplay = useCallback(
-    (error: AppError | Error, options = {}) => {
-      return formatErrorForDisplay(error, {
-        locale: currentLocale,
-        ...options,
-      });
-    },
-    [currentLocale]
-  );
+  const formatForDisplay = useCallback((error: AppError | Error, options = {}) => {
+    return formatErrorForDisplay(error, {
+      locale: currentLocale,
+      ...options
+    });
+  }, [currentLocale]);
 
   // Format error for HTML
-  const formatForHTML = useCallback(
-    (error: AppError | Error, options = {}) => {
-      return formatErrorForHTML(error, {
-        locale: currentLocale,
-        ...options,
-      });
-    },
-    [currentLocale]
-  );
+  const formatForHTML = useCallback((error: AppError | Error, options = {}) => {
+    return formatErrorForHTML(error, {
+      locale: currentLocale,
+      ...options
+    });
+  }, [currentLocale]);
 
-  return useMemo(
-    () => ({
-      formatError,
-      getSuggestions,
-      createEnhancedMessage,
-      getMessage,
-      formatForDisplay,
-      formatForHTML,
-      currentLocale,
-    }),
-    [
-      formatError,
-      getSuggestions,
-      createEnhancedMessage,
-      getMessage,
-      formatForDisplay,
-      formatForHTML,
-      currentLocale,
-    ]
-  );
+  return useMemo(() => ({
+    formatError,
+    getSuggestions,
+    createEnhancedMessage,
+    getMessage,
+    formatForDisplay,
+    formatForHTML,
+    currentLocale,
+  }), [formatError, getSuggestions, createEnhancedMessage, getMessage, formatForDisplay, formatForHTML, currentLocale]);
 }
 
 // ============================================================================
@@ -242,17 +207,18 @@ const ErrorMessageContext = createContext<ErrorMessageContextValue | null>(null)
 export function ErrorMessageProvider({ children }: { children: React.ReactNode }) {
   const { formatError, getSuggestions, getMessage, currentLocale } = useErrorMessages();
 
-  const contextValue = useMemo(
-    () => ({
-      formatError,
-      getSuggestions,
-      getMessage,
-      currentLocale,
-    }),
-    [formatError, getSuggestions, getMessage, currentLocale]
-  );
+  const contextValue = useMemo(() => ({
+    formatError,
+    getSuggestions,
+    getMessage,
+    currentLocale,
+  }), [formatError, getSuggestions, getMessage, currentLocale]);
 
-  return React.createElement(ErrorMessageContext.Provider, { value: contextValue }, children);
+  return React.createElement(
+    ErrorMessageContext.Provider,
+    { value: contextValue },
+    children
+  );
 }
 
 export function useErrorMessageContext() {

@@ -8,7 +8,7 @@
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { SliceState} from '@workspace/types/domains/redux';
+import { SliceState, ThunkResult } from '@workspace/types/domains/redux';
 import { createSelector } from 'reselect';
 
 import { logger } from '@lib/utils/logger';
@@ -285,7 +285,12 @@ export const terminateSession = createAsyncThunk(
 );
 
 // Terminate all sessions thunk
-export       await authService.terminateAllOtherSessions();
+export const terminateAllSessions = createAsyncThunk(
+  'auth/terminateAllSessions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const authService = getAuthApiService();
+      await authService.terminateAllOtherSessions();
     } catch (error) {
       logger.error('Terminate all sessions failed', { error });
       return rejectWithValue(
@@ -733,9 +738,12 @@ export const selectIsAuthenticated = createSelector(
 
 export const selectIsLoading = createSelector([selectAuthState], auth => auth.isLoading);
 
-export 
-export 
-export 
+export const selectAuthError = createSelector([selectAuthState], auth => auth.error);
+
+export const selectSessionExpiry = createSelector([selectAuthState], auth => auth.sessionExpiry);
+
+export const selectIsInitialized = createSelector([selectAuthState], auth => auth.isInitialized);
+
 export const selectTwoFactorRequired = createSelector(
   [selectAuthState],
   auth => auth.twoFactorRequired
@@ -747,7 +755,28 @@ export const selectAuthSliceStatus = createSelector(
 );
 
 // Composite selectors
-export 
-export 
+export const selectAuthStatus = createSelector(
+  [selectIsAuthenticated, selectIsLoading, selectTwoFactorRequired, selectAuthSliceStatus],
+  (isAuthenticated, isLoading, twoFactorRequired, status) => ({
+    isAuthenticated,
+    isLoading,
+    twoFactorRequired,
+    needsTwoFactor: isAuthenticated && twoFactorRequired,
+    status
+  })
+);
+
+export const selectUserProfile = createSelector([selectUser], user =>
+  user
+    ? {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        twoFactorEnabled: user.twoFactorEnabled,
+      }
+    : null
+);
+
 // Export reducer
 export default authSlice.reducer;

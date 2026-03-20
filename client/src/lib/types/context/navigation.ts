@@ -11,13 +11,7 @@
  * - Type-safe navigation state management
  */
 
-import type {
-  NavigationItem,
-  BreadcrumbItem,
-  UserRole,
-  NavigationPreferences,
-  RecentPage,
-} from '../navigation';
+import type { NavigationItem, BreadcrumbItem, UserRole, NavigationPreferences, RecentPage } from '../navigation';
 
 // ============================================================================
 // Navigation Context Value (Standardized)
@@ -46,19 +40,17 @@ export interface NavigationContextValue {
   // Navigation actions
   navigateTo: (path: string) => void;
   updateBreadcrumbs: (breadcrumbs: BreadcrumbItem[]) => void;
-  updateRelatedPages: (
-    pages: Array<{
-      pageId: string;
-      title: string;
-      path: string;
-      description: string;
-      category: 'legislative' | 'community' | 'user' | 'admin' | 'tools';
-      type?: 'parent' | 'child' | 'sibling' | 'related';
-      weight: number;
-      relevanceScore: number;
-      context?: string;
-    }>
-  ) => void;
+  updateRelatedPages: (pages: Array<{
+    pageId: string;
+    title: string;
+    path: string;
+    description: string;
+    category: 'legislative' | 'community' | 'user' | 'admin' | 'tools';
+    type?: 'parent' | 'child' | 'sibling' | 'related';
+    weight: number;
+    relevanceScore: number;
+    context?: string;
+  }>) => void;
   updateUserRole: (role: UserRole) => void;
   updatePreferences: (preferences: Partial<NavigationPreferences>) => void;
   addToRecentPages: (page: { path: string; title: string }) => void;
@@ -229,32 +221,22 @@ export type ResponsiveNavigationContextAction =
 // Type Guards for Navigation Context Actions
 // ============================================================================
 
-export function isNavigateAction(
-  action: NavigationContextAction
-): action is Extract<NavigationContextAction, { type: 'NAVIGATE' }> {
+export function isNavigateAction(action: NavigationContextAction): action is Extract<NavigationContextAction, { type: 'NAVIGATE' }> {
   return action.type === 'NAVIGATE';
 }
 
-export function isUpdateBreadcrumbsAction(
-  action: NavigationContextAction
-): action is Extract<NavigationContextAction, { type: 'UPDATE_BREADCRUMBS' }> {
+export function isUpdateBreadcrumbsAction(action: NavigationContextAction): action is Extract<NavigationContextAction, { type: 'UPDATE_BREADCRUMBS' }> {
   return action.type === 'UPDATE_BREADCRUMBS';
 }
 
-export function isUpdateUserRoleAction(
-  action: NavigationContextAction
-): action is Extract<NavigationContextAction, { type: 'UPDATE_USER_ROLE' }> {
+export function isUpdateUserRoleAction(action: NavigationContextAction): action is Extract<NavigationContextAction, { type: 'UPDATE_USER_ROLE' }> {
   return action.type === 'UPDATE_USER_ROLE';
 }
 
-export function isToggleSidebarAction(
-  action: NavigationContextAction
-): action is Extract<NavigationContextAction, { type: 'TOGGLE_SIDEBAR' }> {
+export function isToggleSidebarAction(action: NavigationContextAction): action is Extract<NavigationContextAction, { type: 'TOGGLE_SIDEBAR' }> {
   return action.type === 'TOGGLE_SIDEBAR';
 }
 
-export function isUpdatePreferencesAction(
-  action: NavigationContextAction
-): action is Extract<NavigationContextAction, { type: 'UPDATE_PREFERENCES' }> {
+export function isUpdatePreferencesAction(action: NavigationContextAction): action is Extract<NavigationContextAction, { type: 'UPDATE_PREFERENCES' }> {
   return action.type === 'UPDATE_PREFERENCES';
 }

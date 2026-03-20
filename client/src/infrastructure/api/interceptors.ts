@@ -14,8 +14,9 @@
 
 import { logger } from '@client/lib/utils/logger';
 
-import { ErrorFactory, ErrorDomain, ErrorSeverity } from '../error';
+import { BaseError, ErrorDomain, ErrorSeverity } from '../error';
 import { circuitBreaker, getCircuitBreakerStats } from './circuit-breaker/core';
+import type { CircuitBreakerState } from './circuit-breaker/types';
 
 // Define interceptor types locally since @client/lib/types is not available
 type RequestInterceptor = (
@@ -173,7 +174,12 @@ export const loggingInterceptor: RequestInterceptor = config => {
  * Adds AbortSignal-based timeout to requests if not already present.
  * This ensures all requests have a maximum execution time.
  */
-export     }
+export const timeoutInterceptor = (defaultTimeout: number = 10000): RequestInterceptor => {
+  return config => {
+    // Don't override existing signal
+    if (config.signal) {
+      return config;
+    }
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -252,24 +258,19 @@ export const circuitBreakerInterceptor: RequestInterceptor = config => {
       reason,
     });
 
-    // Throw an error with circuit breaker information
-    throw ErrorFactory.createClientError(
-      'CIRCUIT_BREAKER_OPEN' as any,
-      'Service temporarily unavailable',
-      ErrorDomain.NETWORK,
-      ErrorSeverity.HIGH,
-      {
-        statusCode: 503,
-        retryable: true,
-        context: {
-          metadata: {
-            url: config.url,
-            reason,
-            circuitBreakerStats: circuitBreaker.getStats(),
-          }
-        }
-      }
-    );
+    // Throw a BaseError with circuit breaker information
+    throw new BaseError('Service temporarily unavailable', {
+      statusCode: 503,
+      code: 'CIRCUIT_BREAKER_OPEN',
+      domain: ErrorDomain.NETWORK,
+      severity: ErrorSeverity.HIGH,
+      retryable: true,
+      context: {
+        url: config.url,
+        reason,
+        circuitBreakerStats: circuitBreaker.getStats(),
+      },
+    });
   }
 
   return config;

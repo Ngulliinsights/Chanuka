@@ -1,6 +1,6 @@
 /**
  * useConflicts Hook
- *
+ * 
  * Fetches all constitutional conflicts for a specific bill
  * Uses React Query for caching (10 minute TTL)
  */

@@ -462,3 +462,27 @@ export interface EngagementNotification {
   timestamp: string;
   read: boolean;
 }
+
+// Privacy and consent types - Import from shared schema for consistency
+export type {
+  AnalyticsEvent,
+  UserConsent,
+  AnalyticsMetrics as AnalyticsSystemMetrics,
+} from '@shared/validation/schemas/analytics.schema';
+
+export interface AnalyticsConfig {
+  enabled: boolean;
+  endpoint?: string;
+  batchSize?: number;
+  enabledCategories?: string[];
+  anonymizeData?: boolean;
+  respectDoNotTrack?: boolean;
+  consentRequired?: boolean;
+  retentionDays?: number;
+  flushInterval?: number;
+  maxQueueSize?: number;
+  maxRetries?: number;
+  retryBackoffMs?: number;
+  debounceMs?: number;
+  enableCircuitBreaker?: boolean;
+}

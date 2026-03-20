@@ -18,7 +18,6 @@ interface RootState {
 }
 
 // Base types (normally imported from @client/lib/types)
-import { Comment } from '@client/lib/types/community/community-base';
 
 interface DiscussionThread {
   id: number;
@@ -93,23 +92,12 @@ const logger = {
 };
 
 // Extended Comment type with computed properties for efficient tree operations
-interface ExtendedComment extends Omit<Comment, 'id' | 'parentId' | 'authorId' | 'threadId' | 'billId'> {
-  id: string;
-  parentId?: string;
-  authorId: string;
-  threadId?: string;
-  billId: string;
+interface ExtendedComment extends Comment {
   replies: string[]; // Store IDs instead of full objects for normalized state
   replyCount: number;
   userVote: 'up' | 'down' | null;
   isEdited?: boolean;
   editHistory?: Array<{ timestamp: string; content: string }>;
-  upvotes: number;
-  downvotes: number;
-  status?: string;
-  qualityScore?: number;
-  isExpertComment?: boolean;
-  updatedAt?: string;
 }
 
 // Extended DiscussionThread type optimized for normalized storage
@@ -164,27 +152,18 @@ const normalizeComments = (comments: Comment[]): Record<string, ExtendedComment>
 
   const processComment = (comment: Comment, parentId?: string): void => {
     const replies = (comment as Comment & { replies?: Comment[] }).replies || [];
-    const replyIds = replies.map((r: Comment) => String(r.id));
+    const replyIds = replies.map((r: Comment) => r.id);
 
-    normalized[String(comment.id)] = {
+    normalized[comment.id] = {
       ...comment,
-      id: String(comment.id),
-      billId: String(comment.billId),
-      authorId: String(comment.authorId),
-      parentId: parentId || (comment.parentId ? String(comment.parentId) : undefined),
-      threadId: comment.threadId ? String(comment.threadId) : undefined,
+      parentId: parentId || comment.parentId,
       replies: replyIds,
       replyCount: replies.length,
       userVote: (comment as Comment & { userVote?: 'up' | 'down' | null }).userVote || null,
-      upvotes: comment.votes?.up || 0,
-      downvotes: comment.votes?.down || 0,
-      status: 'active',
-      isExpertComment: comment.isAuthorExpert || false,
-      qualityScore: 0.5,
-    } as ExtendedComment;
+    };
 
     // Recursively process nested replies
-    replies.forEach((reply: Comment) => processComment(reply, String(comment.id)));
+    replies.forEach((reply: Comment) => processComment(reply, comment.id));
   };
 
   comments.forEach(comment => processComment(comment));
@@ -244,14 +223,13 @@ export const addCommentAsync = createAsyncThunk<ExtendedComment, CommentFormData
       const now = new Date().toISOString();
       const newComment: ExtendedComment = {
         id: `temp-${Date.now()}`, // Use temporary ID until backend responds
-        billId: String(data.billId),
+        billId: data.billId,
         content: data.content,
-        parentId: data.parentId ? String(data.parentId) : undefined,
+        parentId: data.parentId || undefined,
         authorId: 'current-user-id', // Should come from auth context
         authorName: 'Current User', // Should come from auth context
         createdAt: now,
         updatedAt: now,
-        votes: { up: 0, down: 0, userVote: null },
         upvotes: 0,
         downvotes: 0,
         replies: [],
@@ -335,7 +313,8 @@ export const reportCommentAsync = createAsyncThunk<
   async ({ commentId, violationType, reason, description }, { rejectWithValue }) => {
     try {
       // TODO: Replace with actual API call
-      // 
+      // const response = await api.comments.report({ commentId, violationType, reason, description });
+
       const report: CommentReport = {
         id: Date.now(),
         commentId,
@@ -466,26 +445,20 @@ const discussionSlice = createSlice({
       // Remove previous vote if exists
       if (previousVote === 'up') {
         comment.upvotes = Math.max(0, comment.upvotes - 1);
-        comment.votes.up = Math.max(0, comment.votes.up - 1);
       } else if (previousVote === 'down') {
         comment.downvotes = Math.max(0, comment.downvotes - 1);
-        comment.votes.down = Math.max(0, comment.votes.down - 1);
       }
 
       // Toggle or apply new vote
       if (previousVote === voteType) {
         comment.userVote = null;
-        comment.votes.userVote = null;
       } else {
         if (voteType === 'up') {
           comment.upvotes += 1;
-          comment.votes.up += 1;
         } else {
           comment.downvotes += 1;
-          comment.votes.down += 1;
         }
         comment.userVote = voteType;
-        comment.votes.userVote = voteType;
       }
     },
 
@@ -648,7 +621,16 @@ const buildCommentTree = (
   };
 };
 
-export     if (!thread) return [];
+export const selectThreadComments = createSelector(
+  [
+    selectDiscussionState,
+    (_: RootState, billId: number) => billId,
+    (_: RootState, __: number, sortBy?: CommentSortOption) => sortBy,
+    (_: RootState, __: number, ___?: CommentSortOption, filterBy?: CommentFilterOption) => filterBy,
+  ],
+  (discussion, billId, sortBy, filterBy) => {
+    const thread = discussion.threads[billId];
+    if (!thread) return [];
 
     const sort = sortBy || discussion.sortPreference;
     const filter = filterBy || discussion.filterPreference;
@@ -705,7 +687,11 @@ export     if (!thread) return [];
   }
 );
 
-export     if (!comment) return [];
+export const selectCommentReplies = createSelector(
+  [selectDiscussionState, (_: RootState, commentId: string) => commentId],
+  (discussion, commentId) => {
+    const comment = discussion.comments[commentId];
+    if (!comment) return [];
 
     return comment.replies
       .map((replyId: string) => buildCommentTree(replyId, discussion.comments))
@@ -713,7 +699,9 @@ export     if (!comment) return [];
   }
 );
 
-export   return {
+export const selectModerationStats = createSelector([selectDiscussionState], discussion => {
+  const reports = Object.values(discussion.reports);
+  return {
     totalReports: reports.length,
     pendingReports: discussion.pendingReports,
     resolvedReports: reports.filter((r: CommentReport) => r.status === 'resolved').length,
@@ -723,7 +711,9 @@ export   return {
   };
 });
 
-export 
+export const selectThreadStats = createSelector([selectThread], thread => {
+  if (!thread) return null;
+
   return {
     totalComments: thread.totalComments,
     participantCount: thread.participantCount,

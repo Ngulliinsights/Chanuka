@@ -7,6 +7,7 @@
 import { NavigationItem } from '@client/lib/types/navigation';
 import { logger } from '@client/lib/utils/logger';
 
+
 /**
  * Navigation event types for analytics tracking
  */

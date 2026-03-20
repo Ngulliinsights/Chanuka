@@ -1,6 +1,6 @@
 /**
  * Standard module structure definitions and validation
- *
+ * 
  * This module defines the standard structure that all infrastructure
  * modules must follow after consolidation.
  */
@@ -100,7 +100,7 @@ export const STANDARD_MODULE_STRUCTURE = {
 
 /**
  * Validates that a module follows the standard structure
- *
+ * 
  * @param modulePath - Path to the module directory
  * @param fs - File system interface for checking file existence
  * @returns Validation result
@@ -140,14 +140,16 @@ export function validateModuleStructure(
   const testsPath = `${modulePath}/${STANDARD_MODULE_STRUCTURE.TESTS_DIR}`;
   const hasTests = fs.existsSync(testsPath);
   if (!hasTests) {
-    warnings.push(`Missing test directory: ${STANDARD_MODULE_STRUCTURE.TESTS_DIR}/`);
+    warnings.push(
+      `Missing test directory: ${STANDARD_MODULE_STRUCTURE.TESTS_DIR}/`
+    );
   }
 
   // Find sub-modules (directories that don't start with __ or .)
   let subModules: string[] = [];
   try {
     const entries = fs.readdirSync(modulePath);
-    subModules = entries.filter(entry => {
+    subModules = entries.filter((entry) => {
       const entryPath = `${modulePath}/${entry}`;
       return (
         fs.existsSync(entryPath) &&
@@ -181,15 +183,13 @@ export function validateModuleStructure(
 
 /**
  * Validates module metadata
- *
+ * 
  * @param metadata - Module metadata to validate
  * @returns Validation result
  */
-export function validateModuleMetadata(metadata: ModuleMetadata): {
-  valid: boolean;
-  errors: string[];
-  warnings: string[];
-} {
+export function validateModuleMetadata(
+  metadata: ModuleMetadata
+): { valid: boolean; errors: string[]; warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];
 
@@ -202,14 +202,20 @@ export function validateModuleMetadata(metadata: ModuleMetadata): {
   // Validate version format (semver)
   const semverRegex = /^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$/;
   if (!semverRegex.test(metadata.version)) {
-    errors.push(`Module version "${metadata.version}" must follow semantic versioning`);
+    errors.push(
+      `Module version "${metadata.version}" must follow semantic versioning`
+    );
   }
 
   // Validate exports match public API
-  const apiNames = metadata.publicAPI.map(api => api.name);
-  const missingFromAPI = metadata.exports.filter(exp => !apiNames.includes(exp));
+  const apiNames = metadata.publicAPI.map((api) => api.name);
+  const missingFromAPI = metadata.exports.filter(
+    (exp) => !apiNames.includes(exp)
+  );
   if (missingFromAPI.length > 0) {
-    warnings.push(`Exports not documented in public API: ${missingFromAPI.join(', ')}`);
+    warnings.push(
+      `Exports not documented in public API: ${missingFromAPI.join(', ')}`
+    );
   }
 
   // Validate public API has descriptions
@@ -236,7 +242,7 @@ export function validateModuleMetadata(metadata: ModuleMetadata): {
 
 /**
  * Creates a template README.md content for a module
- *
+ * 
  * @param metadata - Module metadata
  * @returns README.md content
  */
@@ -291,7 +297,7 @@ export function createModuleReadmeTemplate(metadata: ModuleMetadata): string {
 
 /**
  * Creates a template index.ts content for a module
- *
+ * 
  * @param metadata - Module metadata
  * @returns index.ts content
  */
@@ -310,8 +316,8 @@ export function createModuleIndexTemplate(metadata: ModuleMetadata): string {
   content += `export * from './types';\n\n`;
 
   // Export sub-modules if any
-  const subModules = metadata.exports.filter(exp =>
-    metadata.publicAPI.some(api => api.name === exp && api.type === APIType.CLASS)
+  const subModules = metadata.exports.filter((exp) =>
+    metadata.publicAPI.some((api) => api.name === exp && api.type === APIType.CLASS)
   );
 
   if (subModules.length > 0) {

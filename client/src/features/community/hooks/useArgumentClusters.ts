@@ -1,6 +1,6 @@
 /**
  * Hook: useArgumentClusters
- *
+ * 
  * Fetches clustered/grouped arguments for a bill
  * Part of argument-intelligence feature integration with community
  */
@@ -19,6 +19,6 @@ export function useArgumentClusters(billId: string) {
       return data.clusters as ArgumentCluster[];
     },
     enabled: !!billId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000 // 10 minutes
   });
 }

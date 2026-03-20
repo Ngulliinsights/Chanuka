@@ -6,7 +6,19 @@
  */
 
 import {
-  Save, Share2, ExternalLink, Clock, User, MessageSquare, Eye, Star, ChevronDown, ChevronUp, Search, } from 'lucide-react';
+  Save,
+  Share2,
+  ExternalLink,
+  Clock,
+  User,
+  MessageSquare,
+  TrendingUp,
+  Eye,
+  Star,
+  ChevronDown,
+  ChevronUp,
+  Search,
+} from 'lucide-react';
 import React, { useState } from 'react';
 
 import { Badge } from '@client/lib/design-system';
@@ -107,7 +119,11 @@ export function SearchResultCard({
     });
   };
 
-        case 'sponsor':
+  const getResultUrl = () => {
+    switch (result.type) {
+      case 'bill':
+        return `/bills/${result.id}`;
+      case 'sponsor':
         return `/sponsors/${result.id}`;
       case 'comment':
         return result.metadata?.bill_id

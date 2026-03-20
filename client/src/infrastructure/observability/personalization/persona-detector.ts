@@ -566,6 +566,8 @@ export class PersonaDetector {
 }
 
 // Export singleton instance with default configuration
-export 
+export const personaDetector = new PersonaDetector();
+
 // Export factory function for custom configurations
-export 
+export const createPersonaDetector = (config?: Partial<PersonaDetectionConfig>) =>
+  new PersonaDetector(config);

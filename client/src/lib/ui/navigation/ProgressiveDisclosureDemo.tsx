@@ -1,4 +1,5 @@
 // Remove unused React import
+import React from 'react';
 
 import type { NavigationSection, ReadingPath } from '@client/lib/hooks/use-progressive-disclosure';
 

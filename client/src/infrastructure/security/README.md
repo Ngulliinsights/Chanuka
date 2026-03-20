@@ -16,7 +16,6 @@ The Security Infrastructure module provides comprehensive security functionality
 ## Public Exports
 
 ### Classes
-
 - `UnifiedCSPManager` - Content Security Policy management
 - `CSRFProtection` - CSRF token management
 - `UnifiedInputSanitizer` - Input sanitization
@@ -27,14 +26,12 @@ The Security Infrastructure module provides comprehensive security functionality
 - `SecurityErrorMiddleware` - Security error middleware
 
 ### Functions
-
 - `initializeSecurity()` - Initialize security system
 - `getSecuritySystem()` - Get security system instance
 - `getSecurityStatus()` - Get security status
 - `shutdownSecurity()` - Shutdown security system
 
 ### Utilities
-
 - `validatePasswordStrength()` - Validate password strength
 - `validateCSRFToken()` - Validate CSRF tokens
 - `hashData()` - Hash sensitive data
@@ -55,7 +52,7 @@ async function setupSecurity() {
     enableRateLimit: true,
     enableVulnerabilityScanning: true,
     enableInputSanitization: true,
-    scanInterval: 3600000, // 1 hour
+    scanInterval: 3600000 // 1 hour
   });
 }
 ```
@@ -68,7 +65,7 @@ import { UnifiedInputSanitizer } from '@/infrastructure/security';
 const sanitizer = new UnifiedInputSanitizer({
   enabled: true,
   mode: 'comprehensive',
-  allowedTags: ['b', 'i', 'em', 'strong', 'p'],
+  allowedTags: ['b', 'i', 'em', 'strong', 'p']
 });
 
 const cleanInput = sanitizer.sanitize(userInput);
@@ -82,7 +79,7 @@ import { CSRFProtection } from '@/infrastructure/security';
 const csrf = new CSRFProtection({
   enabled: true,
   tokenName: 'csrf-token',
-  headerName: 'X-CSRF-Token',
+  headerName: 'X-CSRF-Token'
 });
 
 // Generate token
@@ -100,7 +97,7 @@ import { UnifiedRateLimiter } from '@/infrastructure/security';
 const rateLimiter = new UnifiedRateLimiter({
   enabled: true,
   windowMs: 15 * 60 * 1000, // 15 minutes
-  maxRequests: 100,
+  maxRequests: 100
 });
 
 // Check if request is allowed

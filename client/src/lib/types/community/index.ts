@@ -38,6 +38,7 @@ export type {
   VoteType,
   VoteResponse,
   VoteRequest,
+
   Expert,
   Expert as CommunityExpert,
   ExpertDomain,
@@ -89,7 +90,11 @@ export type {
   ContributionType,
 } from './community-base';
 
-export { isDiscussionThread, isComment, isExpert } from './community-base';
+export {
+  isDiscussionThread,
+  isComment,
+  isExpert,
+} from './community-base';
 
 // ============================================================================
 // Community Hooks Types
@@ -170,13 +175,7 @@ export type {
 } from './community-base';
 
 // Internal imports for utility functions
-import type {
-  Comment,
-  DiscussionThread,
-  Expert as CommunityExpert,
-  ExpertDomain,
-  ActivityType,
-} from './community-base';
+import type { Comment, DiscussionThread, Expert as CommunityExpert, ExpertDomain, ActivityType } from './community-base';
 
 // ============================================================================
 // Utility Functions

@@ -62,7 +62,20 @@ export class IntegrationValidator {
 
     // Check 1: Core module should export all subsystems
     // Core subsystems (defined but not used in current implementation)
-    
+    const _coreSubsystems = [
+      'error',
+      'browser',
+      'auth',
+      'api',
+      'performance',
+      'loading',
+      'storage',
+      'mobile',
+      'community',
+      'dashboard',
+      'navigation',
+    ];
+
     // Check 2: Shared module should NOT import from features
     // Check 3: Features should be self-contained with model/ui/api layers
 
@@ -274,4 +287,4 @@ export class IntegrationValidator {
 }
 
 // Export singleton
-export 
+export const integrationValidator = new IntegrationValidator();

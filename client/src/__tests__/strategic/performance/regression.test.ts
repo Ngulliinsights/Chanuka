@@ -8,7 +8,7 @@
  * and validate performance benchmarks across releases.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 // Mock performance monitoring services
 vi.mock('@client/infrastructure/observability/performance/monitor', () => ({
@@ -29,9 +29,7 @@ describe('Performance Regression Tests', () => {
 
   describe('Performance Monitoring', () => {
     it('should measure page load performance', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const pageMetrics = {
         navigation: { domContentLoaded: 1500, loadComplete: 2500 },
@@ -56,9 +54,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should measure component render performance', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const renderMetrics = {
         component: 'Dashboard',
@@ -85,9 +81,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should measure API response performance', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const apiMetrics = {
         endpoint: '/api/dashboard',
@@ -114,9 +108,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should measure memory usage patterns', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const memoryMetrics = {
         heapUsed: 50000000,
@@ -145,9 +137,7 @@ describe('Performance Regression Tests', () => {
 
   describe('Benchmark Validation', () => {
     it('should validate performance benchmarks', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const benchmarks = {
         pageLoad: { target: 2000, actual: 1800, status: 'pass' },
@@ -174,9 +164,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should detect performance regressions', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const regressionData = {
         baseline: { pageLoad: 1500, renderTime: 100, apiResponse: 200 },
@@ -200,9 +188,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should validate load testing results', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const loadTestResults = {
         concurrentUsers: 1000,
@@ -229,9 +215,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should validate stress testing results', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const stressTestResults = {
         maxConcurrentUsers: 5000,
@@ -259,9 +243,7 @@ describe('Performance Regression Tests', () => {
 
   describe('Performance Reporting', () => {
     it('should generate performance reports', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const reportData = {
         period: 'last_24_hours',
@@ -294,9 +276,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should generate performance comparison reports', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const comparisonData = {
         baseline: { version: '1.0.0', metrics: { pageLoad: 2000 } },
@@ -321,9 +301,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should generate performance trend analysis', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const trendData = {
         timeRange: 'last_30_days',
@@ -354,9 +332,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should generate performance health reports', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const healthData = {
         overallHealth: 'excellent',
@@ -387,9 +363,7 @@ describe('Performance Regression Tests', () => {
 
   describe('Performance Optimization', () => {
     it('should identify performance bottlenecks', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const bottleneckAnalysis = {
         bottlenecks: [
@@ -417,9 +391,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should validate performance optimizations', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const optimizationValidation = {
         optimization: 'ImageCompression',
@@ -444,9 +416,7 @@ describe('Performance Regression Tests', () => {
     });
 
     it('should monitor performance over time', async () => {
-      const { performanceMonitor } = await import(
-        '@client/infrastructure/observability/performance/monitor'
-      );
+      const { performanceMonitor } = await import('@client/infrastructure/observability/performance/monitor');
 
       const monitoringData = {
         timeRange: 'last_7_days',

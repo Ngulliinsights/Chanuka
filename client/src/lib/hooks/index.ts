@@ -3,11 +3,7 @@
 // Following Feature-Sliced Design (FSD) principles with backward compatibility
 
 // Error Handling Utilities
-export {
-  useErrorHandler,
-  useGracefulErrorHandling,
-  useErrorBoundary,
-} from './utils/error-handling';
+export { useErrorHandler, useGracefulErrorHandling, useErrorBoundary } from './utils/error-handling';
 
 // Performance Optimization Utilities
 export {
@@ -23,16 +19,8 @@ export {
 // Hook Patterns - Templates and utilities for creating standardized hooks
 export { useExampleReducer, useAdvancedReducer } from './patterns/reducer-template';
 export { useExampleCallback, useAdvancedCallback } from './patterns/callback-template';
-export {
-  useExampleEffect,
-  useAdvancedEffect,
-  useDebouncedEffect,
-} from './patterns/effect-template';
-export {
-  useStrategyManager,
-  useDynamicStrategyManager,
-  useConditionalStrategy,
-} from './patterns/strategy-template';
+export { useExampleEffect, useAdvancedEffect, useDebouncedEffect } from './patterns/effect-template';
+export { useStrategyManager, useDynamicStrategyManager, useConditionalStrategy } from './patterns/strategy-template';
 
 // Core Hooks - Direct exports from this directory
 // export { useToast } from './use-toast';
@@ -41,29 +29,18 @@ export { useLoading } from './use-loading';
 export { useOfflineDetection } from './use-offline-detection';
 export { useOfflineCapabilities } from './use-offline-capabilities';
 // export { useSystem } from './use-system'; // Invalid
-export type {
-  SystemHealth,
-  SystemStats,
-  SystemActivity,
-  SystemSchema,
-  SystemEnvironment,
-} from './use-system';
-export {
-  useCleanup,
-  useResourceCleanup,
+export type { SystemHealth, SystemStats, SystemActivity, SystemSchema, SystemEnvironment } from './use-system';
+export { 
+  useCleanup, 
+  useResourceCleanup, 
   useEventListenerCleanup,
   useAbortController,
-  useAsyncOperation,
+  useAsyncOperation 
 } from './use-cleanup';
 export { useDebounce } from './use-debounce';
 export { useMediaQuery } from './use-media-query';
 export { useKeyboardFocus } from './use-keyboard-focus';
-export {
-  usePerformanceBudget,
-  useCoreWebVitals,
-  usePerformanceAlert,
-  useLazyLoading,
-} from './use-performance-monitor';
+export { usePerformanceBudget, useCoreWebVitals, usePerformanceAlert, useLazyLoading } from './use-performance-monitor';
 export { useArchitecturePerformance } from './use-architecture-performance';
 export { useSafeQuery } from './use-safe-query';
 export { useSafeEffect } from './use-safe-effect';
@@ -105,12 +82,7 @@ export { useSecurity, useSecureForm, useRateLimit } from './use-security';
 // Shared UI Hooks - Re-exports for convenience (excluding duplicates)
 export { useI18n, I18nProvider } from './use-i18n';
 export { useToast } from './use-toast';
-export {
-  useNavigationSlice,
-  useSidebar,
-  useMobileMenu,
-  useNavigationPreferences,
-} from './use-navigation-slice';
+export { useNavigationSlice, useSidebar, useMobileMenu, useNavigationPreferences } from './use-navigation-slice';
 export { useMobile, useTablet, useDesktop } from './use-mobile';
 export { useSystemOverview } from './use-system';
 // export { useSystem } from './use-system'; // Deprecated/Removed
@@ -118,7 +90,7 @@ export { useSystemOverview } from './use-system';
 // Analytics hooks - re-exported from features
 export * from './use-analytics';
 
-// Search hooks - re-exported from features
+// Search hooks - re-exported from features  
 export * from './use-search';
 
 // Notification history export

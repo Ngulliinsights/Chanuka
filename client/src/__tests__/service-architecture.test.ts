@@ -10,7 +10,7 @@
  * - Migration Compatibility
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import {
   AuthService,
@@ -18,8 +18,9 @@ import {
   DashboardService,
   EngagementService,
   AchievementService,
+  userService as legacyUserService
 } from '@client/features/users/services';
-import { CacheService } from '@client/lib/services/cache';
+import { CacheService, CacheServiceFactory } from '@client/lib/services/cache';
 import {
   ServiceError,
   AuthenticationError,
@@ -27,13 +28,20 @@ import {
   NetworkError,
   ApiError,
   CacheError,
+  CacheMissError,
+  CacheCorruptionError,
   BusinessLogicError,
   ResourceNotFoundError,
+  ConflictError,
   SystemError,
+  DependencyError,
+  ConfigurationError,
   ServiceErrorFactory,
   ErrorRecoveryManager,
+  globalErrorHandler,
+  errorRecoveryManager
 } from '@client/lib/services/errors';
-import { ServiceContainer, ServiceLifecycle } from '@client/lib/services/factory';
+import { ServiceFactory, ServiceContainer, ServiceLifecycle } from '@client/lib/services/factory';
 
 // ============================================================================
 // SERVICE ERROR HIERARCHY TESTS
@@ -60,13 +68,7 @@ describe('Service Error Hierarchy', () => {
   });
 
   it('should create validation errors with field information', () => {
-    const error = new ValidationError(
-      'Invalid email',
-      'UserService',
-      'register',
-      'email',
-      'invalid@email'
-    );
+    const error = new ValidationError('Invalid email', 'UserService', 'register', 'email', 'invalid@email');
 
     expect(error).toBeInstanceOf(ServiceError);
     expect(error.name).toBe('ValidationError');
@@ -139,11 +141,7 @@ describe('Service Error Factory', () => {
 
   it('should create validation errors', () => {
     const error = ServiceErrorFactory.createValidationError(
-      'email',
-      'test',
-      'Invalid email',
-      'UserService',
-      'register'
+      'email', 'test', 'Invalid email', 'UserService', 'register'
     );
 
     expect(error).toBeInstanceOf(ValidationError);
@@ -232,33 +230,21 @@ describe('Error Recovery Manager', () => {
   });
 
   it('should handle circuit breaker strategy', async () => {
-    const operation = vi
-      .fn()
-      .mockRejectedValue(new ServiceError('Service down', 'TestService', 'test'));
+    const operation = vi.fn().mockRejectedValue(new ServiceError('Service down', 'TestService', 'test'));
 
     // First few calls should fail and open circuit
-    await expect(
-      recoveryManager.executeWithRecovery(
-        operation,
-        {
-          strategy: ServiceErrorFactory.RecoveryStrategy.CIRCUIT_BREAKER,
-          circuitBreakerThreshold: 2,
-        },
-        'test-operation'
-      )
-    ).rejects.toThrow();
+    await expect(recoveryManager.executeWithRecovery(
+      operation,
+      { strategy: ServiceErrorFactory.RecoveryStrategy.CIRCUIT_BREAKER, circuitBreakerThreshold: 2 },
+      'test-operation'
+    )).rejects.toThrow();
 
     // Circuit should be open, subsequent calls should fail fast
-    await expect(
-      recoveryManager.executeWithRecovery(
-        operation,
-        {
-          strategy: ServiceErrorFactory.RecoveryStrategy.CIRCUIT_BREAKER,
-          circuitBreakerThreshold: 2,
-        },
-        'test-operation'
-      )
-    ).rejects.toThrow();
+    await expect(recoveryManager.executeWithRecovery(
+      operation,
+      { strategy: ServiceErrorFactory.RecoveryStrategy.CIRCUIT_BREAKER, circuitBreakerThreshold: 2 },
+      'test-operation'
+    )).rejects.toThrow();
   });
 });
 
@@ -273,7 +259,7 @@ describe('Cache Service', () => {
     cache = new CacheService({
       name: 'test-cache',
       defaultTTL: 1000,
-      storageBackend: 'memory',
+      storageBackend: 'memory'
     });
   });
 
@@ -369,7 +355,7 @@ describe('Service Factory', () => {
       id: 'test-service',
       factory: () => ({ name: 'test' }),
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: [],
+      dependencies: []
     };
 
     container.register(registration);
@@ -384,7 +370,7 @@ describe('Service Factory', () => {
       id: 'transient-service',
       factory: () => ({ id: ++instanceCount }),
       lifecycle: ServiceLifecycle.TRANSIENT,
-      dependencies: [],
+      dependencies: []
     };
 
     container.register(registration);
@@ -401,7 +387,7 @@ describe('Service Factory', () => {
       id: 'dependency-service',
       factory: () => ({ type: 'dependency' }),
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: [],
+      dependencies: []
     };
 
     const mainRegistration = {
@@ -411,7 +397,7 @@ describe('Service Factory', () => {
         return { type: 'main', dependency: dep };
       },
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: ['dependency-service'],
+      dependencies: ['dependency-service']
     };
 
     container.register(dependencyRegistration);
@@ -427,14 +413,14 @@ describe('Service Factory', () => {
       id: 'service-a',
       factory: () => ({}),
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: ['service-b'],
+      dependencies: ['service-b']
     };
 
     const serviceB = {
       id: 'service-b',
       factory: () => ({}),
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: ['service-a'],
+      dependencies: ['service-a']
     };
 
     container.register(serviceA);
@@ -447,7 +433,7 @@ describe('Service Factory', () => {
       id: 'test-service',
       factory: () => ({}),
       lifecycle: ServiceLifecycle.SINGLETON,
-      dependencies: [],
+      dependencies: []
     };
 
     container.register(registration);
@@ -575,6 +561,8 @@ describe('Migration Compatibility', () => {
 
   it('should delegate to new services', async () => {
     // Mock the new services
+    const mockAuth = { login: vi.fn().mockResolvedValue({ user: { id: '1' } }) };
+    const mockProfile = { getUserProfile: vi.fn().mockResolvedValue({ id: '1', name: 'Test' }) };
 
     // This test would need actual service mocking in a real implementation
     // For now, we just verify the structure exists
@@ -602,7 +590,7 @@ describe('Service Architecture Integration', () => {
       new UserProfileService(),
       new DashboardService(),
       new EngagementService(),
-      new AchievementService(),
+      new AchievementService()
     ];
 
     for (const service of services) {
@@ -619,7 +607,7 @@ describe('Service Architecture Integration', () => {
       new UserProfileService(),
       new DashboardService(),
       new EngagementService(),
-      new AchievementService(),
+      new AchievementService()
     ];
 
     for (const service of services) {
@@ -649,14 +637,18 @@ describe('Service Performance', () => {
     const cache = new CacheService({
       name: 'concurrent-test',
       defaultTTL: 1000,
-      storageBackend: 'memory',
+      storageBackend: 'memory'
     });
 
-    const operations = Array.from({ length: 100 }, (_, i) => cache.set(`key-${i}`, { value: i }));
+    const operations = Array.from({ length: 100 }, (_, i) =>
+      cache.set(`key-${i}`, { value: i })
+    );
 
     await Promise.all(operations);
 
-    const results = await Promise.all(Array.from({ length: 100 }, (_, i) => cache.get(`key-${i}`)));
+    const results = await Promise.all(
+      Array.from({ length: 100 }, (_, i) => cache.get(`key-${i}`))
+    );
 
     expect(results.length).toBe(100);
     results.forEach((result, i) => {

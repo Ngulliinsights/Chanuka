@@ -3,6 +3,7 @@ import {
   Search,
   CheckCircle,
   ChevronLeft,
+  Shield,
   Database,
   FileText,
   Users,
@@ -12,12 +13,15 @@ import {
   Cpu,
   AlertTriangle,
 } from 'lucide-react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';
+import { Progress } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface MethodologyProps {
   bill_id?: string;
@@ -181,8 +185,7 @@ export default function MethodologyPage({ bill_id }: MethodologyProps) {
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">
                           Systematically monitors financial disclosures, property records, business
-                          registrations, and other official government databases across national and
-                          county levels.
+                          registrations, and other official government databases across national and county levels.
                         </p>
                         <div className="text-xs text-blue-600">
                           Coverage: 1.2M+ entities | Update frequency: Daily | Accuracy rate: 98.7%

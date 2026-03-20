@@ -30,8 +30,12 @@
   "exclude": [
     "node_modules",
     "dist",
+    "demo/**",
+    "examples/**",
+    "tests/**",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.property.*"
   ]
 }
 

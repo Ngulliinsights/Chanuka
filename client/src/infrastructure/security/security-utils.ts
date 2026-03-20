@@ -5,28 +5,25 @@
  * CSRF protection, rate limiting, and security monitoring
  */
 
+import { logger } from '@client/lib/utils/logger';
 
 // ============================================================================
 // Core Security Types
 // ============================================================================
 
 export interface CSPDirectives {
-  'default-src'?: string[];
-  'script-src'?: string[];
-  'style-src'?: string[];
-  'img-src'?: string[];
-  'font-src'?: string[];
-  'connect-src'?: string[];
-  'media-src'?: string[];
-  'object-src'?: string[];
-  'child-src'?: string[];
-  'worker-src'?: string[];
-  'frame-src'?: string[];
-  'form-action'?: string[];
-  'frame-ancestors'?: string[];
-  'base-uri'?: string[];
-  'upgrade-insecure-requests'?: string[];
-  'block-all-mixed-content'?: string[];
+  'default-src': string[];
+  'script-src': string[];
+  'style-src': string[];
+  'img-src': string[];
+  'font-src': string[];
+  'connect-src': string[];
+  'media-src': string[];
+  'object-src': string[];
+  'child-src': string[];
+  'worker-src': string[];
+  'frame-src': string[];
+  'form-action': string[];
 }
 
 export interface SecurityConfig {
@@ -314,4 +311,17 @@ export class RateLimiter {
   }
 }
 
-export 
+export const securityUtils = {
+  generateCSPHeader,
+  sanitizeInput,
+  sanitizeHTML,
+  sanitizeUrl,
+  generateSecureToken,
+  hashData,
+  validateCSRFToken,
+  validatePasswordStrength,
+  isSecureContext,
+  RateLimiter,
+  SECURITY_HEADERS,
+  DEFAULT_CSP,
+};

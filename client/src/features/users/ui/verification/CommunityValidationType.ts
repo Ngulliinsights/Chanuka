@@ -13,6 +13,7 @@ export interface CommunityValidation {
 
 export default CommunityValidationType;
 
+
 export interface ValidationSummary {
   total: number;
   verified: number;

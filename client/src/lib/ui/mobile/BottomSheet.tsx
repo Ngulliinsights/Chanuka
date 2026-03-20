@@ -68,7 +68,9 @@ export function BottomSheet({
             </div>
           )}
 
-          <div className="overflow-y-auto h-full pb-20 px-4">{children}</div>
+          <div className="overflow-y-auto h-full pb-20 px-4">
+            {children}
+          </div>
         </div>
       </FocusTrap>
     </>

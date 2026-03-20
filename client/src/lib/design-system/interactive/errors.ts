@@ -1,6 +1,6 @@
 /**
  * UI Component Errors
- *
+ * 
  * MIGRATED: Now uses DashboardError from core error system instead of custom hierarchy.
  * Provides unified error handling for interactive UI components.
  */

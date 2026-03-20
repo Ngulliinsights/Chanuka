@@ -17,7 +17,7 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
       scrollTopRef.current = window.scrollY || document.documentElement.scrollTop;
-
+      
       if (scrollTopRef.current === 0) {
         touchStartRef.current = e.touches[0].clientY;
       }

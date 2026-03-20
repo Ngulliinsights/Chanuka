@@ -1,6 +1,6 @@
 /**
  * Branded Loading Screen Component
- *
+ * 
  * Uses Chanuka brand assets to create an engaging loading experience
  * that reinforces brand identity while content loads.
  */

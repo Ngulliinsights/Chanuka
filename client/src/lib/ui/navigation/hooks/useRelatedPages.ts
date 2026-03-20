@@ -2,7 +2,11 @@ import { useAuth } from '@client/infrastructure/auth';
 import { NavigationValidationError } from '@client/infrastructure/error';
 import { useUnifiedNavigation } from '@client/infrastructure/navigation/hooks/use-unified-navigation';
 import { getRecoverySuggestions } from '../recovery';
-import { validateNavigationPath, validateUseRelatedPagesOptions } from '../validation';
+import {
+  validateNavigationPath,
+  validateUserRole,
+  validateUseRelatedPagesOptions,
+} from '../validation';
 import type { RelatedPage, UserRole } from '@client/lib/types';
 
 import { getPageRelationships, generateBreadcrumbRelationships } from '../utils/page-relationships';

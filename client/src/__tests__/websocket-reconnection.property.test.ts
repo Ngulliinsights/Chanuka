@@ -1,16 +1,16 @@
 /**
  * Property-Based Tests: WebSocket Reconnection with Backoff
- *
+ * 
  * Feature: comprehensive-bug-fixes, Property 10: WebSocket Reconnection with Backoff
- *
+ * 
  * Tests that WebSocket manager implements proper reconnection logic with exponential backoff.
- *
+ * 
  * Requirements: 7.2, 13.1
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fc } from '@fast-check/vitest';
-import { WebSocketManagerImpl } from '../infrastructure/api/websocket/manager';
+import { WebSocketManagerImpl, type ReconnectionConfig } from '../infrastructure/api/websocket/manager';
 
 // Mock WebSocket
 class MockWebSocket {
@@ -98,7 +98,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
   /**
    * Property: Exponential backoff delays increase correctly
-   *
+   * 
    * For any valid reconnection config, the delay between reconnection attempts
    * should follow exponential backoff: delay = min(initialDelay * (multiplier ^ attempt), maxDelay)
    */
@@ -109,55 +109,52 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
       backoffMultiplier: fc.integer({ min: 2, max: 3 }),
       maxRetries: fc.integer({ min: 3, max: 10 }),
     }),
-  ])(
-    'should use exponential backoff for reconnection delays',
-    async (config: ReconnectionConfig) => {
-      const manager = new WebSocketManagerImpl(config);
-      const delays: number[] = [];
+  ])('should use exponential backoff for reconnection delays', async (config: ReconnectionConfig) => {
+    const manager = new WebSocketManagerImpl(config);
+    const delays: number[] = [];
 
-      // Track reconnection events to capture delays
-      manager.on('reconnecting', (data: any) => {
-        delays.push(data.delay);
-      });
+    // Track reconnection events to capture delays
+    manager.on('reconnecting', (data: any) => {
+      delays.push(data.delay);
+    });
 
-      // Start connection
-      const connectPromise = manager.connect('ws://test.example.com');
+    // Start connection
+    const connectPromise = manager.connect('ws://test.example.com');
+    
+    // Simulate initial connection failure
+    const firstWs = mockWebSocketInstances[0];
+    firstWs.simulateError();
+    firstWs.simulateClose(1006, 'Connection failed');
 
-      // Simulate initial connection failure
-      const firstWs = mockWebSocketInstances[0];
-      firstWs.simulateError();
-      firstWs.simulateClose(1006, 'Connection failed');
+    await expect(connectPromise).rejects.toThrow();
 
-      await expect(connectPromise).rejects.toThrow();
+    // Simulate multiple reconnection attempts
+    for (let attempt = 0; attempt < Math.min(config.maxRetries, 5); attempt++) {
+      // Fast-forward to trigger reconnection
+      await vi.runAllTimersAsync();
 
-      // Simulate multiple reconnection attempts
-      for (let attempt = 0; attempt < Math.min(config.maxRetries, 5); attempt++) {
-        // Fast-forward to trigger reconnection
-        await vi.runAllTimersAsync();
-
-        if (mockWebSocketInstances.length > attempt + 1) {
-          const ws = mockWebSocketInstances[attempt + 1];
-          ws.simulateError();
-          ws.simulateClose(1006, 'Connection failed');
-        }
+      if (mockWebSocketInstances.length > attempt + 1) {
+        const ws = mockWebSocketInstances[attempt + 1];
+        ws.simulateError();
+        ws.simulateClose(1006, 'Connection failed');
       }
-
-      // Verify exponential backoff
-      for (let i = 0; i < delays.length; i++) {
-        const expectedDelay = Math.min(
-          config.initialDelay * Math.pow(config.backoffMultiplier, i),
-          config.maxDelay
-        );
-        expect(delays[i]).toBe(expectedDelay);
-      }
-
-      manager.disconnect();
     }
-  );
+
+    // Verify exponential backoff
+    for (let i = 0; i < delays.length; i++) {
+      const expectedDelay = Math.min(
+        config.initialDelay * Math.pow(config.backoffMultiplier, i),
+        config.maxDelay
+      );
+      expect(delays[i]).toBe(expectedDelay);
+    }
+
+    manager.disconnect();
+  });
 
   /**
    * Property: Reconnection attempts respect maxRetries limit
-   *
+   * 
    * For any valid config, the manager should not attempt more than maxRetries reconnections
    */
   it.prop([
@@ -182,7 +179,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
     // Start connection
     const connectPromise = manager.connect('ws://test.example.com');
-
+    
     // Simulate initial connection failure
     const firstWs = mockWebSocketInstances[0];
     firstWs.simulateError();
@@ -203,7 +200,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
     // Should not exceed maxRetries
     expect(reconnectAttempts).toBeLessThanOrEqual(config.maxRetries);
-
+    
     // Should fire reconnect_failed event after maxRetries
     if (reconnectAttempts === config.maxRetries) {
       expect(failedEventFired).toBe(true);
@@ -214,7 +211,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
   /**
    * Property: Successful reconnection resets attempt counter
-   *
+   * 
    * After a successful reconnection, the attempt counter should reset to 0
    */
   it.prop([
@@ -225,61 +222,58 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
       maxRetries: fc.integer({ min: 3, max: 10 }),
     }),
     fc.integer({ min: 1, max: 3 }), // Number of failures before success
-  ])(
-    'should reset reconnection counter after successful connection',
-    async (config: ReconnectionConfig, failuresBeforeSuccess: number) => {
-      const manager = new WebSocketManagerImpl(config);
-      const delays: number[] = [];
+  ])('should reset reconnection counter after successful connection', async (config: ReconnectionConfig, failuresBeforeSuccess: number) => {
+    const manager = new WebSocketManagerImpl(config);
+    const delays: number[] = [];
 
-      manager.on('reconnecting', (data: any) => {
-        delays.push(data.delay);
-      });
+    manager.on('reconnecting', (data: any) => {
+      delays.push(data.delay);
+    });
 
-      // Start connection
-      const connectPromise = manager.connect('ws://test.example.com');
+    // Start connection
+    const connectPromise = manager.connect('ws://test.example.com');
+    
+    // Simulate initial connection failure
+    const firstWs = mockWebSocketInstances[0];
+    firstWs.simulateError();
+    firstWs.simulateClose(1006, 'Connection failed');
 
-      // Simulate initial connection failure
-      const firstWs = mockWebSocketInstances[0];
-      firstWs.simulateError();
-      firstWs.simulateClose(1006, 'Connection failed');
+    await expect(connectPromise).rejects.toThrow();
 
-      await expect(connectPromise).rejects.toThrow();
-
-      // Simulate some failures
-      for (let i = 0; i < failuresBeforeSuccess; i++) {
-        await vi.runAllTimersAsync();
-
-        if (mockWebSocketInstances.length > i + 1) {
-          const ws = mockWebSocketInstances[i + 1];
-
-          if (i < failuresBeforeSuccess - 1) {
-            // Fail this attempt
-            ws.simulateError();
-            ws.simulateClose(1006, 'Connection failed');
-          } else {
-            // Succeed on this attempt
-            ws.simulateOpen();
-          }
-        }
-      }
-
-      // Now disconnect and reconnect - should start from initial delay again
-      const lastSuccessfulWs = mockWebSocketInstances[mockWebSocketInstances.length - 1];
-      lastSuccessfulWs.simulateClose(1006, 'Connection lost');
-
+    // Simulate some failures
+    for (let i = 0; i < failuresBeforeSuccess; i++) {
       await vi.runAllTimersAsync();
 
-      // The next reconnection delay should be the initial delay (counter was reset)
-      const delayAfterSuccess = delays[delays.length - 1];
-      expect(delayAfterSuccess).toBe(config.initialDelay);
-
-      manager.disconnect();
+      if (mockWebSocketInstances.length > i + 1) {
+        const ws = mockWebSocketInstances[i + 1];
+        
+        if (i < failuresBeforeSuccess - 1) {
+          // Fail this attempt
+          ws.simulateError();
+          ws.simulateClose(1006, 'Connection failed');
+        } else {
+          // Succeed on this attempt
+          ws.simulateOpen();
+        }
+      }
     }
-  );
+
+    // Now disconnect and reconnect - should start from initial delay again
+    const lastSuccessfulWs = mockWebSocketInstances[mockWebSocketInstances.length - 1];
+    lastSuccessfulWs.simulateClose(1006, 'Connection lost');
+
+    await vi.runAllTimersAsync();
+
+    // The next reconnection delay should be the initial delay (counter was reset)
+    const delayAfterSuccess = delays[delays.length - 1];
+    expect(delayAfterSuccess).toBe(config.initialDelay);
+
+    manager.disconnect();
+  });
 
   /**
    * Property: Manual disconnect prevents reconnection
-   *
+   * 
    * When disconnect() is called manually, no reconnection attempts should occur
    */
   it.prop([
@@ -316,7 +310,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
   /**
    * Property: Delay never exceeds maxDelay
-   *
+   * 
    * For any number of reconnection attempts, the delay should never exceed maxDelay
    */
   it.prop([
@@ -336,7 +330,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
 
     // Start connection
     const connectPromise = manager.connect('ws://test.example.com');
-
+    
     // Simulate initial connection failure
     const firstWs = mockWebSocketInstances[0];
     firstWs.simulateError();
@@ -356,7 +350,7 @@ describe('Property 10: WebSocket Reconnection with Backoff', () => {
     }
 
     // All delays should be <= maxDelay
-    delays.forEach(delay => {
+    delays.forEach((delay) => {
       expect(delay).toBeLessThanOrEqual(config.maxDelay);
     });
 

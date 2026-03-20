@@ -1,6 +1,6 @@
 /**
  * Unified Realtime Client
- *
+ * 
  * Implements IRealtimeClient interface with:
  * - Topic-based subscriptions
  * - Event publishing
@@ -33,24 +33,18 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
     // Create WebSocket client with realtime options
     this.wsClient = createWebSocketClient({
       url: options.url,
-      reconnect:
-        options.autoReconnect !== false
-          ? {
-              enabled: true,
-              maxAttempts: options.maxReconnectAttempts || 5,
-              delay: options.reconnectDelay || 1000,
-            }
-          : false,
-      heartbeat:
-        options.enableHeartbeat !== false
-          ? {
-              interval: options.heartbeatInterval || 30000,
-            }
-          : undefined,
+      reconnect: options.autoReconnect !== false ? {
+        enabled: true,
+        maxAttempts: options.maxReconnectAttempts || 5,
+        delay: options.reconnectDelay || 1000,
+      } : false,
+      heartbeat: options.enableHeartbeat !== false ? {
+        interval: options.heartbeatInterval || 30000,
+      } : undefined,
     });
 
     // Set up message routing
-    this.wsClient.on('message', message => {
+    this.wsClient.on('message', (message) => {
       this.handleMessage(message);
     });
 
@@ -120,9 +114,8 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
       // Note: We can't directly remove the handler without a reference
       // In a real implementation, we'd need to track handler-to-subscription mapping
       // For now, we'll check if there are any remaining subscriptions for this topic
-      const hasOtherSubscriptions = Array.from(this.subscriptions.values()).some(
-        sub => sub.topic === topic
-      );
+      const hasOtherSubscriptions = Array.from(this.subscriptions.values())
+        .some(sub => sub.topic === topic);
 
       if (!hasOtherSubscriptions) {
         // No more subscriptions for this topic, unsubscribe from WebSocket
@@ -208,7 +201,7 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
 
   private handleMessage(message: WebSocketMessage): void {
     const startTime = Date.now();
-
+    
     try {
       // Extract topic from message
       const topic = this.extractTopic(message);
@@ -235,7 +228,7 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
           handler(data);
         } catch (error) {
           const err = error instanceof Error ? error : new Error(String(error));
-
+          
           // Track handler error
           observability.trackError(err, {
             component: 'RealtimeClient',
@@ -244,7 +237,7 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
               topic,
             },
           });
-
+          
           logger.error('Error in realtime event handler', {
             component: 'RealtimeClient',
             topic,
@@ -252,11 +245,10 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
           });
         }
       });
-
+      
       // Track message processing performance
       const processingTime = Date.now() - startTime;
-      if (processingTime > 100) {
-        // Only track slow messages
+      if (processingTime > 100) { // Only track slow messages
         observability.trackPerformance({
           name: 'realtime_message_processing',
           value: processingTime,
@@ -266,7 +258,7 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-
+      
       // Track error
       observability.trackError(err, {
         component: 'RealtimeClient',
@@ -275,7 +267,7 @@ export class UnifiedRealtimeClient implements IRealtimeClient {
           messageType: message.type,
         },
       });
-
+      
       logger.error('Error handling realtime message', {
         component: 'RealtimeClient',
         error,

@@ -6,4 +6,4 @@ import { createContext } from 'react';
 
 import type { IntegrationContextValue } from '../types';
 
-export 
+export const IntegrationContext = createContext<IntegrationContextValue | null>(null);

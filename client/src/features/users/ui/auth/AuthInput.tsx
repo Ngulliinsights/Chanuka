@@ -121,10 +121,20 @@ export const AuthInput = React.memo<AuthInputProps>(
 );
 
 // Specialized input components
-export 
+export const EmailInput = React.memo<
+  Omit<AuthInputProps, 'name' | 'type'> & { icon?: React.ComponentType<{ className?: string }> }
+>(props => <AuthInput {...props} name="email" type="email" />);
+
 export const PasswordInput = React.memo<
   Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>
 >(props => <AuthInput {...props} name="password" type="password" showPasswordToggle={true} />);
 
-export 
-export 
+export const ConfirmPasswordInput = React.memo<
+  Omit<AuthInputProps, 'name' | 'type' | 'showPasswordToggle'>
+>(props => (
+  <AuthInput {...props} name="confirmPassword" type="password" showPasswordToggle={true} />
+));
+
+export const NameInput = React.memo<
+  Omit<AuthInputProps, 'type'> & { fieldType: 'first_name' | 'last_name' }
+>(({ fieldType, ...props }) => <AuthInput {...props} name={fieldType} type="text" />);

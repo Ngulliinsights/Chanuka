@@ -8,6 +8,7 @@ import {
   Calendar,
   Scale,
 } from 'lucide-react';
+import React from 'react';
 
 import { Progress } from '@client/lib/design-system/feedback/Progress';
 import { Button } from '@client/lib/design-system/interactive/Button';

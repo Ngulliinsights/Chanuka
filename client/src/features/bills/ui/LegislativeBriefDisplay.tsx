@@ -1,6 +1,6 @@
 /**
  * LegislativeBriefDisplay Component
- *
+ * 
  * Displays the AI-generated legislative brief summarizing all citizen input on a bill
  * Shows:
  * - Executive summary of citizen sentiment
@@ -53,11 +53,14 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 space-y-6">
+      
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h3 className="text-xl font-bold text-gray-800">Public Input Summary</h3>
-          <p className="text-sm text-gray-600 mt-1">Synthesized from {total} citizen comments</p>
+          <p className="text-sm text-gray-600 mt-1">
+            Synthesized from {total} citizen comments
+          </p>
         </div>
         <button
           onClick={() => setExpanded(!expanded)}
@@ -70,7 +73,9 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
       {/* Executive Summary */}
       <div className="bg-white rounded-lg p-4 border border-blue-100">
         <h4 className="font-semibold text-gray-800 mb-3">Executive Summary</h4>
-        <p className="text-gray-700 leading-relaxed">{brief.executiveSummary}</p>
+        <p className="text-gray-700 leading-relaxed">
+          {brief.executiveSummary}
+        </p>
       </div>
 
       {/* Position Breakdown */}
@@ -81,15 +86,18 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <span className="text-sm text-teal-700 font-medium">{supportPercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Support</p>
-          <div
+          <div 
             className="mt-3 w-full bg-gray-200 rounded-full h-2"
-            role="progressbar"
-            aria-valuenow={supportPercent}
-            aria-valuemin={0}
+            role="progressbar" 
+            aria-valuenow={supportPercent} 
+            aria-valuemin={0} 
             aria-valuemax={100}
             aria-label="Support percentage"
           >
-            <div className="bg-teal-600 h-2 rounded-full" style={{ width: `${supportPercent}%` }} />
+            <div
+              className="bg-teal-600 h-2 rounded-full"
+              style={{ width: `${supportPercent}%` }}
+            />
           </div>
         </div>
 
@@ -99,11 +107,11 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <span className="text-sm text-orange-600 font-medium">{opposePercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Oppose</p>
-          <div
+          <div 
             className="mt-3 w-full bg-gray-200 rounded-full h-2"
-            role="progressbar"
-            aria-valuenow={opposePercent}
-            aria-valuemin={0}
+            role="progressbar" 
+            aria-valuenow={opposePercent} 
+            aria-valuemin={0} 
             aria-valuemax={100}
             aria-label="Opposition percentage"
           >
@@ -120,15 +128,18 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
             <span className="text-sm text-gray-600 font-medium">{neutralPercent}%</span>
           </div>
           <p className="text-sm text-gray-600 mt-2">Neutral</p>
-          <div
+          <div 
             className="mt-3 w-full bg-gray-200 rounded-full h-2"
-            role="progressbar"
-            aria-valuenow={neutralPercent}
-            aria-valuemin={0}
+            role="progressbar" 
+            aria-valuenow={neutralPercent} 
+            aria-valuemin={0} 
             aria-valuemax={100}
             aria-label="Neutral percentage"
           >
-            <div className="bg-gray-500 h-2 rounded-full" style={{ width: `${neutralPercent}%` }} />
+            <div
+              className="bg-gray-500 h-2 rounded-full"
+              style={{ width: `${neutralPercent}%` }}
+            />
           </div>
         </div>
       </div>
@@ -155,9 +166,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
           {/* Top Supporting Arguments */}
           {brief.topSupportingArguments && brief.topSupportingArguments.length > 0 && (
             <div className="bg-white rounded-lg p-4 border border-teal-100">
-              <h4 className="font-semibold text-gray-800 mb-3 text-teal-700">
-                Top Reasons for Support
-              </h4>
+              <h4 className="font-semibold text-gray-800 mb-3 text-teal-700">Top Reasons for Support</h4>
               <ul className="space-y-2">
                 {brief.topSupportingArguments.map((arg: string, idx: number) => (
                   <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-teal-300">
@@ -171,9 +180,7 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
           {/* Top Opposing Arguments */}
           {brief.topOpposingArguments && brief.topOpposingArguments.length > 0 && (
             <div className="bg-white rounded-lg p-4 border border-orange-100">
-              <h4 className="font-semibold text-gray-800 mb-3 text-orange-700">
-                Key Concerns Raised
-              </h4>
+              <h4 className="font-semibold text-gray-800 mb-3 text-orange-700">Key Concerns Raised</h4>
               <ul className="space-y-2">
                 {brief.topOpposingArguments.map((arg: string, idx: number) => (
                   <li key={idx} className="text-sm text-gray-700 pl-4 border-l-2 border-orange-300">
@@ -187,10 +194,9 @@ export function LegislativeBriefDisplay({ billId }: LegislativeBriefDisplayProps
           {/* Footer Note */}
           <div className="bg-blue-100 border border-blue-300 rounded-lg p-4 text-sm text-blue-800">
             <p>
-              <strong>How this brief is created:</strong> Using advanced AI analysis, citizen
-              comments are automatically extracted into structured perspectives, clustered by
-              similarity, and synthesized into this brief. This helps lawmakers understand the full
-              spectrum of citizens perspectives on this bill.
+              <strong>How this brief is created:</strong> Using advanced AI analysis, citizen comments are automatically extracted 
+              into structured perspectives, clustered by similarity, and synthesized into this brief. This helps lawmakers understand 
+              the full spectrum of citizens perspectives on this bill.
             </p>
           </div>
         </>

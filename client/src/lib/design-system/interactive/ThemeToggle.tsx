@@ -3,6 +3,7 @@
  * Accessible theme switcher with light/dark/system options
  */
 
+import { Settings as Moon, Settings as Sun, Settings as Monitor } from 'lucide-react';
 import React from 'react';
 
 import { useTheme } from '@client/lib/contexts/ThemeContext';

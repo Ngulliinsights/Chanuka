@@ -7,17 +7,17 @@
  * - SecurityErrorHandler
  * - ServiceErrorHandler
  * - ErrorContext, ErrorSeverity, ErrorType (as separate modules)
- *
+ * 
  * These types/services are actually in:
  * - client/src/infrastructure/error/types.ts (for types)
  * - client/src/infrastructure/error/handler.ts (for error handling)
  * - client/src/infrastructure/error/middleware/ (for middleware handlers)
- *
+ * 
  * TODO: Either implement these modules or rewrite this test to use actual error handling modules
  */
 
 /*
-import { render, waitFor} from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 import { ErrorBoundary } from '../../../infrastructure/error/ErrorBoundary';
@@ -214,7 +214,8 @@ describe('Cross-System Error Propagation Tests', () => {
         propagationChain: ['security', 'hooks'],
       });
 
-            const hookHandler = new HookErrorHandler();
+      const securityHandler = new SecurityErrorHandler();
+      const hookHandler = new HookErrorHandler();
 
       const propagatedContext = await hookHandler.getErrorContext();
 
@@ -302,7 +303,8 @@ describe('Cross-System Error Propagation Tests', () => {
         propagationChain: ['security'],
       }));
 
-      
+      const securityHandler = new SecurityErrorHandler();
+
       for (const errorInfo of errors) {
         const error = new Error(errorInfo.message);
         (error as any).type = errorInfo.type;

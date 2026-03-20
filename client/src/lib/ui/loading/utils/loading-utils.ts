@@ -253,10 +253,10 @@ export function mergeProgress(
       progress1.status === 'complete' && progress2.status === 'complete'
         ? 'complete'
         : progress2.status === 'error' || progress1.status === 'error'
-          ? 'error'
-          : progress2.status === 'loading' || progress1.status === 'loading'
-            ? 'loading'
-            : 'pending',
+        ? 'error'
+        : progress2.status === 'loading' || progress1.status === 'loading'
+        ? 'loading'
+        : 'pending',
   };
 }
 
@@ -364,12 +364,12 @@ export function batchOperations<T>(
 
           if (delay > 0 && i + batchSize < items.length) {
             await new Promise(resolve => setTimeout(resolve, delay));
-          }
         }
-        resolve();
-      } catch (error) {
-        reject(error);
       }
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
     })();
   });
 }

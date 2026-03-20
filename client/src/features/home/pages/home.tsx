@@ -9,7 +9,7 @@ const EnhancedHomePage = React.lazy(() => import('./HomePage'));
 
 /**
  * Smart Home Page Selector
- *
+ * 
  * Determines which home page implementation to render based on:
  * 1. User preference (reduced motion)
  * 2. Device capabilities (implicity handled by reduced motion query for now)
@@ -29,7 +29,7 @@ const SmartHomePageSelector: React.FC = () => {
 
     logger.info('Smart Home Page Selector initialized', {
       mode: mediaQuery.matches ? 'Core (Basic)' : 'Enhanced (Additives)',
-      userId: user?.id,
+      userId: user?.id
     });
 
     return () => mediaQuery.removeEventListener('change', handler);

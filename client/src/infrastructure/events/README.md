@@ -41,7 +41,7 @@ The Event Infrastructure module provides a shared event system for application-w
 import { on, emit, off } from '@/infrastructure/events';
 
 // Subscribe to an event
-const unsubscribe = on('user:login', user => {
+const unsubscribe = on('user:login', (user) => {
   console.log('User logged in:', user);
   updateUI(user);
 });
@@ -80,7 +80,7 @@ interface UserLoginEvent {
 }
 
 // Type-safe subscription
-eventBus.on<UserLoginEvent>('user:login', data => {
+eventBus.on<UserLoginEvent>('user:login', (data) => {
   // data is typed as UserLoginEvent
   console.log(`User ${data.userId} logged in from ${data.source}`);
 });
@@ -89,7 +89,7 @@ eventBus.on<UserLoginEvent>('user:login', data => {
 eventBus.emit<UserLoginEvent>('user:login', {
   userId: '123',
   timestamp: Date.now(),
-  source: 'web',
+  source: 'web'
 });
 ```
 
@@ -152,8 +152,8 @@ const customBus = new EventBus({
       // Validate event data
       if (!data) throw new Error('Event data required');
       return data;
-    },
-  ],
+    }
+  ]
 });
 
 customBus.on('custom:event', handleCustomEvent);

@@ -153,4 +153,4 @@ export class ErrorMessageService {
 }
 
 // Export singleton instance
-export 
+export const errorMessageService = ErrorMessageService.getInstance();

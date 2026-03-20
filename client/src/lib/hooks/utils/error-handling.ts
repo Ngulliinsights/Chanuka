@@ -159,7 +159,12 @@ export function useErrorHandler(
       retries: number,
       options: RetryOptions = {}
     ): Promise<T> => {
-      const { baseDelay = 1000, maxDelay = 10000, backoffMultiplier = 2, jitter = true } = options;
+      const {
+        baseDelay = 1000,
+        maxDelay = 10000,
+        backoffMultiplier = 2,
+        jitter = true,
+      } = options;
 
       let lastError: Error;
 
@@ -205,8 +210,7 @@ export function useErrorHandler(
         return false;
       }
 
-      const connectionType =
-        (navigator as unknown as Record<string, unknown>).connection?.effectiveType || 'unknown';
+      const connectionType = (navigator as unknown as Record<string, unknown>).connection?.effectiveType || 'unknown';
       const isOnline = navigator.onLine;
 
       const errorContext: ErrorContext = {

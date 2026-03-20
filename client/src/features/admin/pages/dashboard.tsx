@@ -14,10 +14,7 @@ import { useUserProfile } from '@client/features/users/hooks/useUserAPI';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
 import { AdaptiveDashboard } from '@client/lib/ui/dashboard';
 import { RealTimeDashboard } from '@client/lib/ui/realtime';
-import {
-  PersonalizedRecommendationsWidget,
-  TrendingBillsWidget,
-} from '@client/infrastructure/recommendation';
+import { PersonalizedRecommendationsWidget, TrendingBillsWidget } from '@client/features/recommendation';
 import { logger } from '@client/lib/utils/logger';
 
 export default function Dashboard() {

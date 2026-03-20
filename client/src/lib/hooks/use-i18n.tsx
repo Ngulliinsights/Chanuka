@@ -1,3 +1,4 @@
+ 
 import {
   createContext,
   useContext,
@@ -13,6 +14,7 @@ import {
   detectLanguage,
   saveLanguagePreference,
   getKenyanContext,
+  type SupportedLanguage,
 } from '@client/lib/utils/i18n';
 
 /**
@@ -40,8 +42,8 @@ const I18nContext = createContext<I18nContextType | null>(null);
  */
 export const I18nProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<SupportedLanguage>(() => detectLanguage());
-  const [translations, setTranslations] = useState<TranslationObject>(
-    () => languages[detectLanguage()]
+  const [translations, setTranslations] = useState<TranslationObject>(() =>
+    languages[detectLanguage()]
   );
 
   // Load translations when language changes
@@ -80,7 +82,11 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
       // Navigate through the translation object
       let value: unknown = translations;
       for (const k of keys) {
-        if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, k)) {
+        if (
+          value &&
+          typeof value === 'object' &&
+          Object.prototype.hasOwnProperty.call(value, k)
+        ) {
           value = (value as Record<string, unknown>)[k];
         } else {
           // Fallback to English if key not found in current language
@@ -148,7 +154,10 @@ export const I18nProvider = ({ children }: { children: ReactNode }) => {
   /**
    * List of available languages
    */
-  const availableLanguages = useMemo(() => Object.keys(languages) as SupportedLanguage[], []);
+  const availableLanguages = useMemo(
+    () => Object.keys(languages) as SupportedLanguage[],
+    []
+  );
 
   /**
    * Check if current language is RTL
@@ -205,7 +214,9 @@ export type TranslationKey =
 /**
  * Example usage:
  *
- *  *
+ * const MyComponent = () => {
+ *   const { t, language, changeLanguage } = useI18n();
+ *
  *   return (
  *     <div>
  *       <h1>{t('common.loading')}</h1>

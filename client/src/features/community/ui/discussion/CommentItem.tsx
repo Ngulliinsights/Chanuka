@@ -8,6 +8,7 @@ import {
   Edit,
   Trash2,
   Shield,
+  AlertTriangle,
   User,
   Award,
   MessageSquare,
@@ -19,6 +20,7 @@ import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card, CardContent } from '@client/lib/design-system';
 import { Avatar, AvatarFallback, AvatarImage } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
 import type { CommunityComment } from '@client/lib/types';
 
 type ModerationViolationType = 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'other';
@@ -103,7 +105,7 @@ export function CommentItem({
     return { color: 'text-red-600', label: 'Low Quality' };
   };
 
-  //  // Not in shared type
+  // const qualityIndicator = getQualityIndicator(comment.qualityScore); // Not in shared type
 
   // Get user role badge (mock)
   const getUserRoleBadge = (isExpert?: boolean) => {

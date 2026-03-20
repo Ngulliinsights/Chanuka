@@ -45,7 +45,13 @@ export const breakpointTokens = {
 } as const;
 
 // Responsive utilities
-export   },
+export const responsiveUtils = {
+  /**
+   * Get media query for breakpoint
+   */
+  getMediaQuery: (breakpoint: keyof typeof breakpointTokens.values): string => {
+    return breakpointTokens.media[breakpoint];
+  },
 
   /**
    * Check if breakpoint is mobile

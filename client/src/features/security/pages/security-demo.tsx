@@ -5,6 +5,7 @@
 
 import { getSecuritySystem } from '@core/security';
 import { Shield, AlertTriangle, CheckCircle, Lock, Eye, Activity } from 'lucide-react';
+import React from 'react';
 import { useState, useEffect } from 'react';
 
 import { SecurityDashboard } from '@client/infrastructure/security/ui/dashboard/SecurityDashboard';
@@ -108,7 +109,7 @@ export default function SecurityDemoPage() {
             method: 'POST',
             body: JSON.stringify({ test: `request-${i}` }),
             headers: { 'Content-Type': 'application/json' },
-          }).catch(() => ({ status: 429, statusText: 'Rate Limited' }) as Response)
+          }).catch(() => ({ status: 429, statusText: 'Rate Limited' } as Response))
         );
 
       const responses = await Promise.all(requests);
@@ -133,7 +134,9 @@ export default function SecurityDemoPage() {
     }
   };
   // Vulnerability scan functionality - currently not exposed in UI
-  //   //   try {
+  // const runVulnerabilityScan = async () => {
+  //   setIsLoading(true);
+  //   try {
   //     const securitySystem = getSecuritySystem();
   //     if (securitySystem) {
   //       const newVulnerabilityReports = await securitySystem.vulnerabilityScanner.scan();

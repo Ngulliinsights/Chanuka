@@ -63,7 +63,9 @@ const BrowserCompatibilityReport: React.FC<BrowserCompatibilityReportProps> = ({
     return isSupported ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
   };
 
-      if (score >= 70) return 'text-yellow-600';
+  const getScoreColor = (score: number) => {
+    if (score >= 90) return 'text-green-600';
+    if (score >= 70) return 'text-yellow-600';
     if (score >= 50) return 'text-orange-600';
     return 'text-red-600';
   };

@@ -1,3 +1,5 @@
+import React from 'react';
+
 export function SkipLinks() {
   return (
     <div className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50">

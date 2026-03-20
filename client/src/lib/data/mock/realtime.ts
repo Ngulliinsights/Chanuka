@@ -9,7 +9,7 @@ import { faker } from '@faker-js/faker';
 
 import { mockBills } from './bills';
 import { mockExperts, mockOfficialExperts } from './experts';
-import { generateId, weightedRandom} from './generators';
+import { generateId, generateDateInRange, weightedRandom } from './generators';
 import { mockUsers } from './users';
 
 // Seed faker for consistent data
@@ -525,12 +525,14 @@ export const generateConnectionStatus = (): ConnectionStatus => {
 /**
  * Default real-time simulator instance
  */
-export 
+export const mockRealTimeSimulator = new RealTimeEventSimulator(3000);
+
 /**
  * Initial batch of real-time events
  */
-export 
+export const mockRealTimeEvents = generateRealTimeEventBatch(20);
+
 /**
  * Mock connection status
  */
-export 
+export const mockConnectionStatus = generateConnectionStatus();

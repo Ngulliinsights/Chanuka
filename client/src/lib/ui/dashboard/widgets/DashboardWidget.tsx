@@ -5,7 +5,16 @@
  * loading states, error handling, and customization options.
  */
 
-import { Eye, EyeOff, Settings, RefreshCw, Maximize2, X as Minimize2, X } from 'lucide-react';
+import {
+  Eye,
+  EyeOff,
+  Settings,
+  RefreshCw,
+  Maximize2,
+  X as Minimize2, // Using X as Minimize2 replacement
+  MoreHorizontal,
+  X,
+} from 'lucide-react';
 import React, { useState } from 'react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@client/lib/design-system';

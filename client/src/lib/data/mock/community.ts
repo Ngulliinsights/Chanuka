@@ -293,7 +293,8 @@ export const generateCampaigns = (count: number = 12): Campaign[] => {
   ];
 
   return Array.from({ length: count }, (): Campaign => {
-        const status = weightedRandom(statuses, [60, 20, 15, 5]) as 'active' | 'completed' | 'cancelled';
+    const type = faker.helpers.arrayElement(campaignTypes);
+    const status = weightedRandom(statuses, [60, 20, 15, 5]) as 'active' | 'completed' | 'cancelled';
     const title = faker.helpers.arrayElement(campaignTitles);
 
     const goal = faker.number.int({ min: 1000, max: 50000 });
@@ -430,4 +431,10 @@ export const generateLocalImpactMetrics = (location?: {
 /**
  * Default mock community datasets
  */
-export export export export export export export 
+export const mockActivityItems = generateActivityItems(100);
+export const mockTrendingTopics = generateTrendingTopics(20);
+export const mockExpertInsights = generateExpertInsights(25);
+export const mockCampaigns = generateCampaigns(15);
+export const mockPetitions = generatePetitions(10);
+export const mockCommunityStats = generateCommunityStats();
+export const mockLocalImpactMetrics = generateLocalImpactMetrics();

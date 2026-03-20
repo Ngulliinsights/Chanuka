@@ -1,11 +1,11 @@
 /**
  * Unit Tests for API Interceptors
- *
+ * 
  * Tests request/response interceptor pipeline, circuit breaker,
  * authentication, logging, compression, and sanitization.
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   headerInterceptor,
   loggingInterceptor,
@@ -22,10 +22,13 @@ import {
   addRequestInterceptor,
   addResponseInterceptor,
   removeRequestInterceptor,
+  removeResponseInterceptor,
   clearRequestInterceptors,
   clearResponseInterceptors,
   conditionalRequestInterceptor,
+  conditionalResponseInterceptor,
   combineRequestInterceptors,
+  combineResponseInterceptors,
 } from '../interceptors';
 
 // Mock dependencies

@@ -57,7 +57,10 @@ export const findNavigationItemByPath = (path: string): SharedNavigationItem | n
 /**
  * Finds a navigation item by its ID
  */
-export   }
+export const findNavigationItemById = (id: string): SharedNavigationItem | null => {
+  if (!id || typeof id !== 'string') {
+    return null;
+  }
 
   const item = DEFAULT_NAVIGATION_MAP.find(item => item.id === id);
   return item ? convertNavigationItem(item) : null;
@@ -66,7 +69,12 @@ export   }
 /**
  * Gets all navigation items for a specific section
  */
-export   }
+export const getNavigationItemsBySection = (
+  section: NavigationItem['section']
+): SharedNavigationItem[] => {
+  if (!section) {
+    return [];
+  }
 
   return DEFAULT_NAVIGATION_MAP.filter(item => item.section === section).map(convertNavigationItem);
 };
@@ -74,7 +82,13 @@ export   }
 /**
  * Gets navigation items accessible to a specific user role
  */
-export   }
+export const getAccessibleNavigationItems = (
+  user_role: SharedUserRole,
+  user: unknown | null
+): SharedNavigationItem[] => {
+  if (!user_role) {
+    return [];
+  }
 
   const convertedRole = convertUserRole(user_role);
 
@@ -96,7 +110,10 @@ export   }
 /**
  * Determines the current navigation section based on path
  */
-export     return item?.section || 'legislative';
+export const determineCurrentSection = (path: string): NavigationItem['section'] => {
+  try {
+    const item = findNavigationItemByPath(path);
+    return item?.section || 'legislative';
   } catch (error) {
     // If path validation fails, default to legislative
     return 'legislative';
@@ -106,7 +123,10 @@ export     return item?.section || 'legislative';
 /**
  * Gets the page title for a given path
  */
-export     return item?.label || 'Page';
+export const getPageTitle = (path: string): string => {
+  try {
+    const item = findNavigationItemByPath(path);
+    return item?.label || 'Page';
   } catch (error) {
     // If path validation fails, return default title
     return 'Page';
@@ -116,7 +136,10 @@ export     return item?.label || 'Page';
 /**
  * Checks if a path exists in the navigation
  */
-export   } catch (error) {
+export const isValidNavigationPath = (path: string): boolean => {
+  try {
+    return findNavigationItemByPath(path) !== null;
+  } catch (error) {
     // If path validation fails, it's not valid
     return false;
   }

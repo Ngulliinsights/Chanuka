@@ -1,6 +1,6 @@
 /**
  * API Documentation Validation Script
- *
+ * 
  * Validates that all infrastructure modules have:
  * - README.md files
  * - JSDoc comments on all exports
@@ -9,7 +9,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { Project, SourceFile } from 'ts-morph';
+import { Project, SourceFile, SyntaxKind } from 'ts-morph';
 
 interface ValidationResult {
   module: string;
@@ -57,21 +57,21 @@ function analyzeExports(sourceFile: SourceFile): ExportInfo[] {
 
   // Get all export declarations
   const exportDeclarations = sourceFile.getExportDeclarations();
-
+  
   for (const exportDecl of exportDeclarations) {
     const namedExports = exportDecl.getNamedExports();
-
+    
     for (const namedExport of namedExports) {
       const name = namedExport.getName();
       const jsDocs = namedExport.getJsDocs();
-
+      
       exports.push({
         name,
         type: 'named-export',
         hasJSDoc: jsDocs.length > 0,
         hasDescription: jsDocs.length > 0 && jsDocs[0].getDescription().trim().length > 0,
         hasExample: jsDocs.some(doc => doc.getTags().some(tag => tag.getTagName() === 'example')),
-        line: namedExport.getStartLineNumber(),
+        line: namedExport.getStartLineNumber()
       });
     }
   }
@@ -86,7 +86,7 @@ function analyzeExports(sourceFile: SourceFile): ExportInfo[] {
       hasJSDoc: jsDocs.length > 0,
       hasDescription: jsDocs.length > 0 && jsDocs[0].getDescription().trim().length > 0,
       hasExample: jsDocs.some(doc => doc.getTags().some(tag => tag.getTagName() === 'example')),
-      line: func.getStartLineNumber(),
+      line: func.getStartLineNumber()
     });
   }
 
@@ -100,7 +100,7 @@ function analyzeExports(sourceFile: SourceFile): ExportInfo[] {
       hasJSDoc: jsDocs.length > 0,
       hasDescription: jsDocs.length > 0 && jsDocs[0].getDescription().trim().length > 0,
       hasExample: jsDocs.some(doc => doc.getTags().some(tag => tag.getTagName() === 'example')),
-      line: cls.getStartLineNumber(),
+      line: cls.getStartLineNumber()
     });
   }
 
@@ -116,7 +116,7 @@ function analyzeExports(sourceFile: SourceFile): ExportInfo[] {
         hasJSDoc: jsDocs.length > 0,
         hasDescription: jsDocs.length > 0 && jsDocs[0].getDescription().trim().length > 0,
         hasExample: jsDocs.some(doc => doc.getTags().some(tag => tag.getTagName() === 'example')),
-        line: varStmt.getStartLineNumber(),
+        line: varStmt.getStartLineNumber()
       });
     }
   }
@@ -146,7 +146,7 @@ function validateModule(moduleName: string, project: Project): ValidationResult 
       indexFile: indexPath,
       exports: [],
       coverage: 0,
-      issues: [...issues, 'Missing index.ts file'],
+      issues: [...issues, 'Missing index.ts file']
     };
   }
 
@@ -159,12 +159,12 @@ function validateModule(moduleName: string, project: Project): ValidationResult 
       indexFile: indexPath,
       exports: [],
       coverage: 0,
-      issues: [...issues, 'Could not parse index.ts file'],
+      issues: [...issues, 'Could not parse index.ts file']
     };
   }
 
   const exports = analyzeExports(sourceFile);
-
+  
   // Check for undocumented exports
   const undocumented = exports.filter(e => !e.hasJSDoc || !e.hasDescription);
   if (undocumented.length > 0) {
@@ -184,7 +184,7 @@ function validateModule(moduleName: string, project: Project): ValidationResult 
     indexFile: indexPath,
     exports,
     coverage,
-    issues,
+    issues
   };
 }
 
@@ -199,37 +199,32 @@ function generateReport(results: ValidationResult[]): void {
   const totalModules = results.length;
   const modulesWithReadme = results.filter(r => r.hasReadme).length;
   const totalExports = results.reduce((sum, r) => sum + r.exports.length, 0);
-  const documentedExports = results.reduce(
-    (sum, r) => sum + r.exports.filter(e => e.hasJSDoc && e.hasDescription).length,
-    0
+  const documentedExports = results.reduce((sum, r) => 
+    sum + r.exports.filter(e => e.hasJSDoc && e.hasDescription).length, 0
   );
   const overallCoverage = totalExports > 0 ? (documentedExports / totalExports) * 100 : 100;
 
   console.log('SUMMARY');
   console.log('-'.repeat(80));
   console.log(`Total Modules: ${totalModules}`);
-  console.log(
-    `Modules with README: ${modulesWithReadme}/${totalModules} (${((modulesWithReadme / totalModules) * 100).toFixed(1)}%)`
-  );
+  console.log(`Modules with README: ${modulesWithReadme}/${totalModules} (${((modulesWithReadme/totalModules)*100).toFixed(1)}%)`);
   console.log(`Total Exports: ${totalExports}`);
-  console.log(
-    `Documented Exports: ${documentedExports}/${totalExports} (${overallCoverage.toFixed(1)}%)`
-  );
+  console.log(`Documented Exports: ${documentedExports}/${totalExports} (${overallCoverage.toFixed(1)}%)`);
   console.log(`Overall Coverage: ${overallCoverage.toFixed(1)}%\n`);
 
   // Module-by-module breakdown
   console.log('MODULE BREAKDOWN');
   console.log('-'.repeat(80));
-
+  
   results.sort((a, b) => a.coverage - b.coverage);
-
+  
   for (const result of results) {
     const status = result.coverage === 100 && result.hasReadme ? '✅' : '⚠️';
     console.log(`\n${status} ${result.module}`);
     console.log(`   README: ${result.hasReadme ? '✅' : '❌'}`);
     console.log(`   Exports: ${result.exports.length}`);
     console.log(`   Coverage: ${result.coverage.toFixed(1)}%`);
-
+    
     if (result.issues.length > 0) {
       console.log(`   Issues:`);
       result.issues.forEach(issue => console.log(`     ${issue}`));
@@ -252,12 +247,10 @@ function generateReport(results: ValidationResult[]): void {
   console.log('\n' + '='.repeat(80));
   console.log('SUCCESS CRITERIA');
   console.log('='.repeat(80));
-  console.log(
-    `✅ All modules have README.md: ${modulesWithReadme === totalModules ? 'PASS' : 'FAIL'}`
-  );
+  console.log(`✅ All modules have README.md: ${modulesWithReadme === totalModules ? 'PASS' : 'FAIL'}`);
   console.log(`✅ 100% JSDoc coverage: ${overallCoverage === 100 ? 'PASS' : 'FAIL'}`);
   console.log(`✅ All exports documented: ${documentedExports === totalExports ? 'PASS' : 'FAIL'}`);
-
+  
   const allPass = modulesWithReadme === totalModules && overallCoverage === 100;
   console.log(`\n${allPass ? '✅ ALL CHECKS PASSED' : '⚠️ SOME CHECKS FAILED'}\n`);
 
@@ -274,7 +267,7 @@ async function main() {
   // Initialize TypeScript project
   const project = new Project({
     tsConfigFilePath: path.join(process.cwd(), 'client/tsconfig.json'),
-    skipAddingFilesFromTsConfig: true,
+    skipAddingFilesFromTsConfig: true
   });
 
   // Get all modules

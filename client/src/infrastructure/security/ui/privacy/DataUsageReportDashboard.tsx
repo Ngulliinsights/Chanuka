@@ -37,7 +37,7 @@ import { useDashboardLoading, useDashboardError, useDashboardRefresh } from '@cl
 import { logger } from '@client/lib/utils/logger';
 import { privacyCompliance } from '@client/lib/utils/privacy-compliance';
 
-import { Globe } from '@client/lib/design-system/icons/ChanukaIcons';
+import { Globe } from '../icons/ChanukaIcons';
 
 interface DataUsageStats {
   totalDataPoints: number;
@@ -97,7 +97,8 @@ export function DataUsageReportDashboard() {
       };
 
       // Load privacy compliance data
-      
+      const privacyPolicySummary = privacyCompliance.generatePrivacyPolicySummary();
+
       // Transform data for display with safe fallbacks
       const transformedCategories: DataCategory[] = Object.entries(
         retentionSummary.categories || {}
@@ -205,19 +206,55 @@ export function DataUsageReportDashboard() {
   };
 
   // Helper function to provide clear descriptions for each data category
-      return descriptions[id] || 'Data category information';
+  const getDataCategoryDescription = (id: string): string => {
+    const descriptions: Record<string, string> = {
+      profile: 'Basic account information including name, email, and preferences',
+      activity: 'Your interactions with bills, comments, votes, and civic engagement',
+      analytics: 'Usage patterns and behavioral data to improve the platform',
+      security: 'Login attempts, security events, and audit trails',
+      communications: 'Email notifications and communication history',
+      temporary: 'Session data, cache, and temporary files',
+    };
+    return descriptions[id] || 'Data category information';
   };
 
   // Helper function to explain what each data category is used for
-      return purposes[id] || ['Platform functionality'];
+  const getDataCategoryPurposes = (id: string): string[] => {
+    const purposes: Record<string, string[]> = {
+      profile: ['Account management', 'Personalization', 'Communication'],
+      activity: ['Civic transparency', 'Platform improvement', 'Community features'],
+      analytics: ['Performance optimization', 'Feature development', 'User experience'],
+      security: ['Fraud prevention', 'Security monitoring', 'Compliance'],
+      communications: ['Service notifications', 'Updates', 'Support'],
+      temporary: ['Session management', 'Performance', 'Functionality'],
+    };
+    return purposes[id] || ['Platform functionality'];
   };
 
   // Helper function to identify the legal justification for processing each data type
-      return legalBasis[id] || 'Legitimate interest';
+  const getDataCategoryLegalBasis = (id: string): string => {
+    const legalBasis: Record<string, string> = {
+      profile: 'Contract performance',
+      activity: 'Public interest (civic transparency)',
+      analytics: 'Consent',
+      security: 'Legal obligation',
+      communications: 'Consent',
+      temporary: 'Legitimate interest',
+    };
+    return legalBasis[id] || 'Legitimate interest';
   };
 
   // Helper function to indicate whether data is shared with third parties
-      return sharing[id] || false;
+  const getThirdPartySharing = (id: string): boolean => {
+    const sharing: Record<string, boolean> = {
+      profile: false,
+      activity: false,
+      analytics: true, // Analytics data is shared with analytics providers
+      security: false,
+      communications: false,
+      temporary: false,
+    };
+    return sharing[id] || false;
   };
 
   // Loading state with skeleton UI

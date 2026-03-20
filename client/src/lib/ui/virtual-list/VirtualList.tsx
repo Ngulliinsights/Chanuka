@@ -1,9 +1,9 @@
 /**
  * VirtualList Component
- *
+ * 
  * Implements virtual scrolling for efficient rendering of large lists.
  * Only renders visible items plus overscan for smooth scrolling.
- *
+ * 
  * Feature: comprehensive-bug-fixes
  * Requirements: 12.1, 12.2
  */
@@ -183,7 +183,7 @@ export function DynamicVirtualList<T>({
   const findIndexAtPosition = (position: number): number => {
     let left = 0;
     let right = cumulativeHeights.length - 1;
-
+    
     while (left < right) {
       const mid = Math.floor((left + right) / 2);
       if (cumulativeHeights[mid] < position) {
@@ -192,7 +192,7 @@ export function DynamicVirtualList<T>({
         right = mid;
       }
     }
-
+    
     return Math.max(0, left - 1);
   };
 
@@ -261,11 +261,11 @@ export function DynamicVirtualList<T>({
           {visibleItems.map((item, index) => {
             const actualIndex = startIndex + index;
             const key = getItemKey ? getItemKey(item, actualIndex) : actualIndex;
-
+            
             return (
               <div
                 key={key}
-                ref={el => {
+                ref={(el) => {
                   if (el) {
                     itemRefs.current.set(actualIndex, el);
                   } else {

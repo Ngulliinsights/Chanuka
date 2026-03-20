@@ -5,8 +5,8 @@
  * direct schema usage while maintaining the same functionality.
  */
 
-import type { Maybe,Result } from '@shared/core';
-import type { Bill, NewBill } from '@server/infrastructure/schema';
+import type { Maybe, Result } from '@shared/core';
+import { type Bill, type NewBill } from '@server/infrastructure/schema';
 
 export interface IBillRepository {
   /**

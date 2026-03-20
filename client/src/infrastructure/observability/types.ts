@@ -1,9 +1,9 @@
 /**
  * Observability Module Types
- *
+ * 
  * Unified type definitions for error monitoring, performance tracking,
  * telemetry, and analytics across the application.
- *
+ * 
  * Requirements: 4.2, 11.1
  */
 

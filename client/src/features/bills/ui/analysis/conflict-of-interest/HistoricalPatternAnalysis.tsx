@@ -5,9 +5,10 @@
  * financial interests and organizational connections.
  */
 
-import { TrendingUp, Vote, AlertTriangle, BarChart3 } from 'lucide-react';
+import { TrendingUp, Vote, Calendar, AlertTriangle, BarChart3 } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
+  LineChart,
   Line,
   XAxis,
   YAxis,
@@ -146,9 +147,8 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
       consistentPatternRisk: Object.values(industryPatterns).filter(
         (p: unknown) => p.avgCorrelation > 0.3 && p.relatedVotes.length >= 3
       ).length,
-      recentTrendRisk: correlationTimeline
-        .slice(-10)
-        .filter(v => Math.abs(v.correlation ?? 0) > 0.4).length,
+      recentTrendRisk: correlationTimeline.slice(-10).filter(v => Math.abs(v.correlation ?? 0) > 0.4)
+        .length,
     };
 
     return {
@@ -161,10 +161,8 @@ export function HistoricalPatternAnalysis({ conflictAnalysis }: HistoricalPatter
       totalVotes: votingPatterns.length,
       avgOverallCorrelation:
         votingPatterns.length > 0
-          ? votingPatterns.reduce(
-              (sum, vote) => sum + Math.abs(vote.financialCorrelation ?? 0),
-              0
-            ) / votingPatterns.length
+          ? votingPatterns.reduce((sum, vote) => sum + Math.abs(vote.financialCorrelation ?? 0), 0) /
+            votingPatterns.length
           : 0,
     };
   }, [conflictAnalysis]);

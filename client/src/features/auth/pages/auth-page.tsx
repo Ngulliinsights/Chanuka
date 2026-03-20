@@ -90,7 +90,9 @@ export default function AuthPage() {
     }
   }, [searchParams, mode]);
 
-      try {
+  const handleEmailVerification = async (token: string) => {
+    setLoading(true);
+    try {
       const result = await verifyEmail(token);
       if (result.success) {
         setMessage({ type: 'success', text: 'Email verified successfully! You can now sign in.' });
@@ -106,7 +108,9 @@ export default function AuthPage() {
     }
   };
 
-      try {
+  const handleOAuthCallback = async (code: string, state: string) => {
+    setLoading(true);
+    try {
       const result = await loginWithOAuth(code, state);
       if (result.success) {
         setMessage({ type: 'success', text: 'Successfully signed in! Redirecting...' });

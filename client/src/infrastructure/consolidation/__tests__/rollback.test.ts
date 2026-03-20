@@ -1,13 +1,17 @@
 /**
  * Unit tests for rollback mechanism
- *
+ * 
  * Tests backup and restore functionality for module consolidation.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   createBackup,
+  restoreBackup,
   validateBuild,
+  listBackups,
+  deleteBackup,
+  findLatestBackup,
   rollbackConsolidation,
   BackupMetadata,
   RollbackConfig,
@@ -47,14 +51,14 @@ describe('rollback', () => {
   describe('createBackup', () => {
     it('should create backup with correct structure', async () => {
       const result = await createBackup(testMetadata, testConfig);
-
+      
       // Note: This will fail in actual execution due to mocked fs
       // In a real test environment with proper mocking, we would verify:
       // - Backup ID is generated
       // - Backup path is created
       // - Metadata is saved
       // - Manifest is saved
-
+      
       expect(result).toBeDefined();
     });
   });
@@ -63,9 +67,9 @@ describe('rollback', () => {
     it('should return boolean indicating build success', async () => {
       // This test requires proper mocking of exec
       // In a real implementation, we would mock exec to return success/failure
-
+      
       const result = await validateBuild('npm run build');
-
+      
       expect(typeof result).toBe('boolean');
     });
   });
@@ -73,7 +77,7 @@ describe('rollback', () => {
   describe('rollbackConsolidation', () => {
     it('should fail when no backup exists', async () => {
       const result = await rollbackConsolidation('non-existent-operation', testConfig);
-
+      
       expect(result.success).toBe(false);
       expect(result.error).toContain('No backup found');
     });
@@ -81,7 +85,7 @@ describe('rollback', () => {
 
   // Integration-style tests would require actual file system operations
   // or more sophisticated mocking. For now, we test the basic structure.
-
+  
   describe('backup metadata', () => {
     it('should have required fields', () => {
       expect(testMetadata.operation).toBeDefined();
@@ -108,7 +112,7 @@ describe('rollback', () => {
         ...testConfig,
         validateBuild: false,
       };
-
+      
       expect(config.validateBuild).toBe(false);
     });
   });

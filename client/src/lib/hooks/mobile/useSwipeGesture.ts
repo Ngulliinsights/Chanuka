@@ -9,7 +9,13 @@ interface SwipeGestureOptions {
 }
 
 export function useSwipeGesture(options: SwipeGestureOptions) {
-  const { onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, threshold = 50 } = options;
+  const {
+    onSwipeLeft,
+    onSwipeRight,
+    onSwipeUp,
+    onSwipeDown,
+    threshold = 50,
+  } = options;
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
   const [isSwiping, setIsSwiping] = useState(false);

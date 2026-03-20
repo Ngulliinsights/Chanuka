@@ -21,7 +21,14 @@ const ArrowLeft = Lucide.ArrowLeft;
 const Sparkles = Lucide.Sparkles;
 const ArrowRight = Lucide.ArrowRight;
 
-import { Card, CardContent, CardHeader, CardTitle, Button, Badge } from '@client/lib/design-system';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Badge,
+} from '@client/lib/design-system';
 
 // --- Types ---
 

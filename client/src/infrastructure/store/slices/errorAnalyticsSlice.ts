@@ -8,8 +8,12 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 
 // Import unified types from features analytics model
-import { errorAnalyticsBridge } from '@client/infrastructure/analytics/model/error-analytics-bridge';
-import { ErrorDomain, ErrorSeverity } from '@client/infrastructure/error';
+import {
+  errorAnalyticsBridge,
+  type Alert as RealTimeAlert,
+  type CoreError as ErrorAnalyticsData,
+  type ErrorOverviewMetrics,
+} from '@client/features/analytics/model/error-analytics-bridge';
 
 // Define extended types for dashboard features
 export interface DashboardFilters {
@@ -95,10 +99,10 @@ interface ErrorAnalyticsState {
 
 // Initial state
 const initialFilters: DashboardFilters = {
-  timeRange: {
-    start: Date.now() - 24 * 60 * 60 * 1000,
-    end: Date.now(),
-    preset: '24h',
+  timeRange: { 
+    start: Date.now() - 24 * 60 * 60 * 1000, 
+    end: Date.now(), 
+    preset: '24h' 
   },
   severity: [],
   domain: [],
@@ -128,17 +132,16 @@ export const fetchOverviewMetrics = createAsyncThunk(
     // Use the comprehensive analytics bridge
     const metrics = await errorAnalyticsBridge.getOverviewMetrics({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown as ErrorSeverity[],
-      domain: filters.domain as unknown as ErrorDomain[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
-
+    
     return {
       totalErrors: metrics.totalErrors,
       errorRate: metrics.errorRate,
       affectedUsers: metrics.affectedUsers,
-      criticalErrors:
-        (metrics.severityDistribution as Record<string, number>)[ErrorSeverity.CRITICAL] || 0,
+      criticalErrors: metrics.severityDistribution.CRITICAL || 0,
       trends: {
         daily: metrics.totalErrors,
         weekly: metrics.totalErrors,
@@ -153,11 +156,11 @@ export const fetchTrendData = createAsyncThunk(
     // Use comprehensive trend analysis
     const trendData = await errorAnalyticsBridge.getTrendData(period, {
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown as ErrorSeverity[],
-      domain: filters.domain as unknown as ErrorDomain[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
-
+    
     return trendData.timeSeries.map(point => ({
       timestamp: point.timestamp,
       count: point.totalErrors,
@@ -170,8 +173,8 @@ export const fetchPatterns = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const patterns = await errorAnalyticsBridge.getPatterns({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown as ErrorSeverity[],
-      domain: filters.domain as unknown as ErrorDomain[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
 
@@ -181,12 +184,8 @@ export const fetchPatterns = createAsyncThunk(
       pattern: pattern.name,
       frequency: pattern.frequency,
       impact: pattern.impact.businessImpact,
-      trend:
-        pattern.impact.frequency === 'persistent'
-          ? 'increasing'
-          : pattern.impact.frequency === 'frequent'
-            ? 'stable'
-            : 'decreasing',
+      trend: pattern.impact.frequency === 'persistent' ? 'increasing' : 
+             pattern.impact.frequency === 'frequent' ? 'stable' : 'decreasing',
     })) as ErrorPattern[];
   }
 );
@@ -196,11 +195,11 @@ export const fetchRecoveryAnalytics = createAsyncThunk(
   async (filters: DashboardFilters) => {
     const analytics = await errorAnalyticsBridge.getRecoveryAnalytics({
       timeRange: filters.timeRange,
-      severity: filters.severity as unknown as ErrorSeverity[],
-      domain: filters.domain as unknown as ErrorDomain[],
+      severity: filters.severity as unknown[],
+      domain: filters.domain as unknown[],
       component: filters.component,
     });
-
+    
     return {
       totalRecoveries: Math.floor(analytics.overallSuccessRate * 100),
       averageRecoveryTime: analytics.recoveryTimeDistribution.average,
@@ -218,7 +217,7 @@ export const fetchRealTimeMetrics = createAsyncThunk(
   'errorAnalytics/fetchRealTimeMetrics',
   async () => {
     const metrics = await errorAnalyticsBridge.getRealTimeMetrics();
-
+    
     return {
       currentErrorRate: metrics.currentErrorRate,
       activeAlerts: metrics.activeAlerts,
@@ -238,7 +237,7 @@ const errorAnalyticsSlice = createSlice({
       state.filters = { ...state.filters, ...action.payload };
     },
 
-    resetFilters: state => {
+    resetFilters: (state) => {
       state.filters = initialFilters;
     },
 
@@ -267,11 +266,11 @@ const errorAnalyticsSlice = createSlice({
       state.connectionStatus = action.payload;
     },
 
-    incrementReconnectAttempts: state => {
+    incrementReconnectAttempts: (state) => {
       state.reconnectAttempts += 1;
     },
 
-    resetReconnectAttempts: state => {
+    resetReconnectAttempts: (state) => {
       state.reconnectAttempts = 0;
     },
 
@@ -304,18 +303,20 @@ const errorAnalyticsSlice = createSlice({
         // Remove duplicate alert if exists, add new one at front
         state.realTimeMetrics.activeAlerts = [
           action.payload,
-          ...state.realTimeMetrics.activeAlerts.filter(alert => alert.id !== action.payload.id),
+          ...state.realTimeMetrics.activeAlerts.filter(
+            (alert) => alert.id !== action.payload.id
+          ),
         ].slice(0, 10); // Keep only last 10 alerts
       }
     },
 
     // Refresh all data
-    refreshData: state => {
+    refreshData: (state) => {
       state.lastRefresh = Date.now();
     },
 
     // Clear all data
-    clearData: state => {
+    clearData: (state) => {
       state.overviewMetrics = null;
       state.trendData = null;
       state.patterns = [];
@@ -324,10 +325,10 @@ const errorAnalyticsSlice = createSlice({
       state.lastRefresh = Date.now();
     },
   },
-  extraReducers: builder => {
+  extraReducers: (builder) => {
     // Overview metrics
     builder
-      .addCase(fetchOverviewMetrics.pending, state => {
+      .addCase(fetchOverviewMetrics.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -342,7 +343,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Trend data
-      .addCase(fetchTrendData.pending, state => {
+      .addCase(fetchTrendData.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -357,7 +358,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Patterns
-      .addCase(fetchPatterns.pending, state => {
+      .addCase(fetchPatterns.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -372,7 +373,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Recovery analytics
-      .addCase(fetchRecoveryAnalytics.pending, state => {
+      .addCase(fetchRecoveryAnalytics.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
@@ -387,7 +388,7 @@ const errorAnalyticsSlice = createSlice({
       })
 
       // Real-time metrics
-      .addCase(fetchRealTimeMetrics.pending, state => {
+      .addCase(fetchRealTimeMetrics.pending, (state) => {
         state.error = null;
       })
       .addCase(fetchRealTimeMetrics.fulfilled, (state, action) => {
@@ -424,5 +425,18 @@ interface RootState {
 }
 
 // Export selectors
-export default // Export reducer
-errorAnalyticsSlice.reducer;
+export const selectOverviewMetrics = (state: RootState) => state.errorAnalytics.overviewMetrics;
+export const selectTrendData = (state: RootState) => state.errorAnalytics.trendData;
+export const selectPatterns = (state: RootState) => state.errorAnalytics.patterns;
+export const selectRecoveryAnalytics = (state: RootState) => state.errorAnalytics.recoveryAnalytics;
+export const selectRealTimeMetrics = (state: RootState) => state.errorAnalytics.realTimeMetrics;
+export const selectFilters = (state: RootState) => state.errorAnalytics.filters;
+export const selectActiveTab = (state: RootState) => state.errorAnalytics.activeTab;
+export const selectIsLoading = (state: RootState) => state.errorAnalytics.isLoading;
+export const selectError = (state: RootState) => state.errorAnalytics.error;
+export const selectLastRefresh = (state: RootState) => state.errorAnalytics.lastRefresh;
+export const selectIsRealTimeEnabled = (state: RootState) => state.errorAnalytics.isRealTimeEnabled;
+export const selectConnectionStatus = (state: RootState) => state.errorAnalytics.connectionStatus;
+
+// Export reducer
+export default errorAnalyticsSlice.reducer;

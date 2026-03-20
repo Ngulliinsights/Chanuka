@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { Plus, Edit, Trash2, ToggleLeft, ToggleRight, TrendingUp } from 'lucide-react';
+import { Plus, Edit, Trash2, CheckCircle, Circle, TrendingUp } from 'lucide-react';
 import { useFeatureFlags, useDeleteFlag, useToggleFlag } from '../hooks/useFeatureFlags';
 import { FlagEditor } from './FlagEditor';
 import { RolloutControls } from './RolloutControls';
@@ -20,7 +20,7 @@ export function FeatureFlagManager() {
   const [showEditor, setShowEditor] = useState(false);
   const [editingFlag, setEditingFlag] = useState<FeatureFlag | undefined>();
   const [showRollout, setShowRollout] = useState<string | null>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState<string | null>(null);
 
   const handleCreate = () => {
     setEditingFlag(undefined);
@@ -75,8 +75,9 @@ export function FeatureFlagManager() {
         </div>
         <div className="flex gap-3">
           <button
-            onClick={() => setShowAnalytics(true)}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            onClick={() => alert('Select a flag to view its analytics')}
+            disabled={flags.length === 0}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <TrendingUp className="w-4 h-4" />
             Analytics
@@ -156,12 +157,12 @@ export function FeatureFlagManager() {
                     >
                       {flag.enabled ? (
                         <>
-                          <ToggleRight className="w-5 h-5 text-green-600" />
+                          <CheckCircle className="w-5 h-5 text-green-600" />
                           <span className="text-sm font-medium text-green-600">Enabled</span>
                         </>
                       ) : (
                         <>
-                          <ToggleLeft className="w-5 h-5 text-gray-400" />
+                          <Circle className="w-5 h-5 text-gray-400" />
                           <span className="text-sm font-medium text-gray-600">Disabled</span>
                         </>
                       )}
@@ -251,13 +252,16 @@ export function FeatureFlagManager() {
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">Feature Flag Analytics</h2>
                 <button
-                  onClick={() => setShowAnalytics(false)}
+                  onClick={() => setShowAnalytics(null)}
                   className="text-gray-400 hover:text-gray-600"
                 >
                   ×
                 </button>
               </div>
-              <FlagAnalyticsDashboard />
+              <FlagAnalyticsDashboard 
+                flagName={showAnalytics}
+                onClose={() => setShowAnalytics(null)}
+              />
             </div>
           </div>
         </div>

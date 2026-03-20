@@ -79,4 +79,4 @@ export class BrowserNavigationService implements NavigationService {
 }
 
 // Default instance for production use
-export 
+export const navigationService = new BrowserNavigationService();

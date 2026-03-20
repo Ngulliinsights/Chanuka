@@ -231,4 +231,4 @@ export class MobilePerformanceOptimizer {
 }
 
 // Singleton instance
-export 
+export const mobilePerformanceOptimizer = MobilePerformanceOptimizer.getInstance();

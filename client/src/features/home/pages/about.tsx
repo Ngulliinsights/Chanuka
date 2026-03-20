@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Target, Heart, Shield, Globe, Zap } from 'lucide-react';
 
@@ -11,12 +12,13 @@ export default function AboutPage() {
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
               <Users className="w-8 h-8" aria-hidden="true" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">About Chanuka</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              About Chanuka
+            </h1>
             <p className="text-xl text-blue-100 leading-relaxed">
-              Empowering Kenyan citizens with transparent access to legislative information and
-              civic engagement tools. We believe democracy thrives when information is accessible to
-              all, and we're committed to strengthening Kenya's democratic institutions through
-              technology.
+              Empowering Kenyan citizens with transparent access to legislative information and civic engagement tools.
+              We believe democracy thrives when information is accessible to all, and we're committed to strengthening
+              Kenya's democratic institutions through technology.
             </p>
           </div>
         </div>
@@ -32,8 +34,8 @@ export default function AboutPage() {
               </div>
               <h3 className="text-xl font-semibold mb-3">Our Mission</h3>
               <p className="text-gray-600 dark:text-gray-400">
-                To make Kenya's legislative processes transparent and accessible, enabling informed
-                civic participation and strengthening democratic engagement across all 47 counties.
+                To make Kenya's legislative processes transparent and accessible, enabling informed civic participation
+                and strengthening democratic engagement across all 47 counties.
               </p>
             </div>
 
@@ -68,22 +70,19 @@ export default function AboutPage() {
           <h2 className="text-3xl font-bold mb-6 text-center">Our Story</h2>
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              Chanuka was born from a simple observation: legislative information in Kenya is
-              public, but it's not accessible. Bills are written in complex legal language,
-              scattered across different systems, and difficult to track. Citizens who want to
-              engage with their democracy face unnecessary barriers.
+              Chanuka was born from a simple observation: legislative information in Kenya is public, but it's not accessible.
+              Bills are written in complex legal language, scattered across different systems, and difficult to track.
+              Citizens who want to engage with their democracy face unnecessary barriers.
             </p>
             <p className="text-gray-700 dark:text-gray-300 mb-4">
-              We set out to change that. By combining modern technology with a commitment to
-              transparency, we've created a platform that makes legislative information from both
-              the National Assembly and Senate understandable, trackable, and actionable - in both
-              English and Kiswahili.
+              We set out to change that. By combining modern technology with a commitment to transparency,
+              we've created a platform that makes legislative information from both the National Assembly and Senate
+              understandable, trackable, and actionable - in both English and Kiswahili.
             </p>
             <p className="text-gray-700 dark:text-gray-300">
-              Today, Chanuka serves thousands of engaged Kenyan citizens, researchers, journalists,
-              and advocates who use our platform to stay informed about national and county
-              legislation, analyze bills, and participate in the democratic process as envisioned by
-              the Constitution of Kenya 2010.
+              Today, Chanuka serves thousands of engaged Kenyan citizens, researchers, journalists, and advocates who
+              use our platform to stay informed about national and county legislation, analyze bills, and participate
+              in the democratic process as envisioned by the Constitution of Kenya 2010.
             </p>
           </div>
         </div>
@@ -102,8 +101,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Non-Partisan</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    We present facts without bias, letting you form your own opinions based on
-                    complete information.
+                    We present facts without bias, letting you form your own opinions based on complete information.
                   </p>
                 </div>
               </div>
@@ -115,8 +113,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Community-Driven</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    Our platform is shaped by user feedback and community needs, not corporate
-                    interests.
+                    Our platform is shaped by user feedback and community needs, not corporate interests.
                   </p>
                 </div>
               </div>
@@ -128,8 +125,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Real-Time Updates</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    Track bills as they move through the legislative process with instant
-                    notifications.
+                    Track bills as they move through the legislative process with instant notifications.
                   </p>
                 </div>
               </div>
@@ -141,8 +137,7 @@ export default function AboutPage() {
                 <div>
                   <h3 className="font-semibold mb-2">Comprehensive Coverage</h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    National Assembly, Senate, and County Assembly legislation all in one place with
-                    powerful search and analysis tools.
+                    National Assembly, Senate, and County Assembly legislation all in one place with powerful search and analysis tools.
                   </p>
                 </div>
               </div>

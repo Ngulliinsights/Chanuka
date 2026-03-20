@@ -6,13 +6,15 @@
  * session management, and business logic orchestration.
  */
 
+
 import { authApiService } from '@client/infrastructure/api/auth';
 import type { AuthUser } from '@client/infrastructure/api/auth';
 import { tokenManager } from '@client/infrastructure/auth/services/token-manager';
 import type { AuthTokens as JWTTokens } from '@client/infrastructure/auth/types';
 import { rbacManager } from '@client/infrastructure/auth/rbac';
-import { getStore, setCurrentSession } from '@client/infrastructure/store';
+import { getStore, type SessionInfo, setCurrentSession } from '@client/infrastructure/store';
 import { logger } from '@client/lib/utils/logger';
+import { securityMonitor, validatePassword } from '@client/lib/utils/security';
 
 import type { AuthResponse, RegisterData, User } from './types';
 
@@ -43,27 +45,27 @@ const convertAuthUserToUser = (authUser: AuthUser): User => {
   return {
     id: authUser.id,
     email: authUser.email,
-
+    
     // Map to User Profile
     profile: {
       displayName: authUser.name,
       avatarUrl: authUser.avatar_url,
       bio: '',
       anonymityLevel: 'public' as const,
-      isPublic: true,
+      isPublic: true
     },
-
+    
     verification: authUser.verified ? 'verified' : 'unverified',
-
+    
     // Valid audit fields
     createdAt: authUser.createdAt,
     lastLogin: authUser.lastLogin,
-
+    
     // Legacy mapping (maintained for compatibility)
     name: authUser.name,
     verified: authUser.verified,
     role: authUser.role as unknown, // Cast if necessary, or ensure 'citizen' matches
-
+    
     // Other fields
     twoFactorEnabled: authUser.twoFactorEnabled,
     avatar_url: authUser.avatar_url,

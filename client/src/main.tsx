@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { logger } from '@client/lib/utils/logger';
 
 import App from './App';
-import { initializeInfrastructure } from './infrastructure/init';
+import { initializeInfrastructure, type ServiceRegistry } from './infrastructure/init';
 
 import './index.css';
 
@@ -52,7 +52,7 @@ export function useService<T>(serviceName: string): T | undefined {
  */
 function setupProcessEnvironment(): void {
   try {
-    const globalWindow = globalThis as unknown;
+    const globalWindow = globalThis as any;
 
     if (typeof globalWindow.process === 'undefined') {
       globalWindow.process = {
@@ -78,7 +78,7 @@ function suppressExtensionErrors(): void {
     'Extension context invalidated',
   ];
 
-  window.addEventListener('error', (event: ErrorEvent) => {
+  window.addEventListener('error', (event: ErrorEvent): void => {
     if (!event.message) return;
 
     const isExtensionError = extensionErrorPatterns.some(pattern =>
@@ -87,7 +87,7 @@ function suppressExtensionErrors(): void {
 
     if (isExtensionError) {
       event.preventDefault();
-      return false;
+      return;
     }
   });
 }

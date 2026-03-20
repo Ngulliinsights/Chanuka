@@ -509,4 +509,4 @@ export class DashboardService implements IDashboardService, ServiceLifecycleInte
 }
 
 // Export singleton instance
-export 
+export const dashboardService = new DashboardService();

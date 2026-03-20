@@ -37,6 +37,8 @@ export interface AssetLoadResult {
   fromCache: boolean;
 }
 
+import { AssetLoadingProgress as LoadingProgress } from '@client/lib/types/loading';
+
 export interface AssetFallbackStrategy {
   primary: string;
   fallbacks: string[];

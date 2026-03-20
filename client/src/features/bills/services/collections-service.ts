@@ -52,16 +52,13 @@ class CollectionsService {
 
     if (index === -1) return null;
 
-    const collection = collections[index];
-    if (!collection) return null;
-
     collections[index] = {
-      ...collection,
+      ...collections[index],
       ...updates,
-      id: collection.id,
-      createdAt: collection.createdAt,
+      id: collections[index].id,
+      createdAt: collections[index].createdAt,
       updatedAt: new Date().toISOString(),
-    } as BillCollection;
+    };
 
     this.saveCollections(collections);
     logger.info('Collection updated', { component: 'CollectionsService', collectionId: id });
@@ -137,4 +134,4 @@ class CollectionsService {
   }
 }
 
-export 
+export const collectionsService = new CollectionsService();

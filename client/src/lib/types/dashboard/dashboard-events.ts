@@ -65,8 +65,7 @@ export interface WidgetRemovedEvent extends DashboardEvent<{ widgetId: string }>
   type: 'widget.removed';
 }
 
-export interface WidgetUpdatedEvent
-  extends DashboardEvent<{ widgetId: string; config: Partial<WidgetConfig> }> {
+export interface WidgetUpdatedEvent extends DashboardEvent<{ widgetId: string; config: Partial<WidgetConfig> }> {
   type: 'widget.updated';
 }
 
@@ -89,21 +88,18 @@ export interface DashboardLoadedEvent extends DashboardEvent<{ duration: number 
   type: 'dashboard.loaded';
 }
 
-export interface DashboardConfiguredEvent
-  extends DashboardEvent<{ config: Partial<DashboardConfig> }> {
+export interface DashboardConfiguredEvent extends DashboardEvent<{ config: Partial<DashboardConfig> }> {
   type: 'dashboard.configured';
 }
 
-export interface DashboardRefreshedEvent
-  extends DashboardEvent<{ duration: number; widgetCount: number }> {
+export interface DashboardRefreshedEvent extends DashboardEvent<{ duration: number; widgetCount: number }> {
   type: 'dashboard.refreshed';
 }
 
 /**
  * User interaction events
  */
-export interface PreferencesChangedEvent
-  extends DashboardEvent<{ preferences: Partial<DashboardPreferences> }> {
+export interface PreferencesChangedEvent extends DashboardEvent<{ preferences: Partial<DashboardPreferences> }> {
   type: 'preferences.changed';
 }
 
@@ -111,13 +107,11 @@ export interface FilterAppliedEvent extends DashboardEvent<{ filters: Record<str
   type: 'filter.applied';
 }
 
-export interface ExportStartedEvent
-  extends DashboardEvent<{ format: 'csv' | 'json' | 'pdf'; dataSize: number }> {
+export interface ExportStartedEvent extends DashboardEvent<{ format: 'csv' | 'json' | 'pdf'; dataSize: number }> {
   type: 'export.started';
 }
 
-export interface ExportCompletedEvent
-  extends DashboardEvent<{ format: 'csv' | 'json' | 'pdf'; fileSize: number; duration: number }> {
+export interface ExportCompletedEvent extends DashboardEvent<{ format: 'csv' | 'json' | 'pdf'; fileSize: number; duration: number }> {
   type: 'export.completed';
 }
 
@@ -165,9 +159,7 @@ export type AnyDashboardEvent =
  *   console.log(`Event: ${event.type}`);
  * };
  */
-export type DashboardEventHandler<T extends DashboardEvent = AnyDashboardEvent> = (
-  event: T
-) => void | Promise<void>;
+export type DashboardEventHandler<T extends DashboardEvent = AnyDashboardEvent> = (event: T) => void | Promise<void>;
 
 /**
  * Event emitter for dashboard events
@@ -240,9 +232,7 @@ export interface DashboardEventFilter {
  *   // Handle widget event
  * }
  */
-export function isWidgetEvent(
-  event: AnyDashboardEvent
-): event is WidgetAddedEvent | WidgetRemovedEvent | WidgetUpdatedEvent {
+export function isWidgetEvent(event: AnyDashboardEvent): event is WidgetAddedEvent | WidgetRemovedEvent | WidgetUpdatedEvent {
   return event.type.startsWith('widget.');
 }
 
@@ -254,9 +244,7 @@ export function isWidgetEvent(
  *   // Handle dashboard event
  * }
  */
-export function isDashboardEvent(
-  event: AnyDashboardEvent
-): event is DashboardCreatedEvent | DashboardLoadedEvent {
+export function isDashboardEvent(event: AnyDashboardEvent): event is DashboardCreatedEvent | DashboardLoadedEvent {
   return event.type.startsWith('dashboard.');
 }
 
@@ -268,8 +256,6 @@ export function isDashboardEvent(
  *   // Handle error event
  * }
  */
-export function isErrorEvent(
-  event: AnyDashboardEvent
-): event is WidgetErrorEvent | ErrorOccurredEvent {
+export function isErrorEvent(event: AnyDashboardEvent): event is WidgetErrorEvent | ErrorOccurredEvent {
   return event.type === 'widget.error' || event.type === 'error.occurred';
 }

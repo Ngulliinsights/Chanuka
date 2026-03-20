@@ -1,4 +1,5 @@
 import { GitBranch, CheckCircle, Clock, FileText, AlertTriangle } from 'lucide-react';
+import React from 'react';
 
 import {
   Badge,

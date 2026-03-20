@@ -13,7 +13,6 @@
 ## Current Exports (Temporary)
 
 ### Types
-
 - `UnifiedComment` - Comment data structure
 - `UnifiedThread` - Discussion thread structure
 - `UnifiedModeration` - Moderation data
@@ -21,7 +20,6 @@
 - `DiscussionState` - Discussion state
 
 ### Services
-
 - `ModerationService` - Moderation utilities (moving to features)
 - `StateSyncService` - State synchronization (moving to features)
 

@@ -495,7 +495,7 @@ export function useConnectionStatus(): {
   last_checked: Date | null;
 } {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [connectionInfo, _setConnectionInfo] = useState<ConnectionInfo | null>(null);
+  const [connectionInfo, setConnectionInfo] = useState<ConnectionInfo | null>(null);
 
   // Track component mount state to prevent state updates after unmount
   const isMountedRef = useRef(true);
@@ -524,6 +524,24 @@ export function useConnectionStatus(): {
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    // Connection monitor listener with smart updates and mount state checking
+    const __handleConnectionUpdate = (info: ConnectionInfo) => {
+      if (!isMountedRef.current) return;
+
+      setConnectionInfo(prevInfo => {
+        // Skip update if connection status hasn't changed
+        // This prevents unnecessary re-renders when only transient properties change
+        if (
+          prevInfo &&
+          prevInfo.apiReachable === info.apiReachable &&
+          prevInfo.corsEnabled === info.corsEnabled
+        ) {
+          return prevInfo;
+        }
+        return info;
+      });
+    };
 
     // TODO: Implement connectionMonitor.addListener(handleConnectionUpdate);
 

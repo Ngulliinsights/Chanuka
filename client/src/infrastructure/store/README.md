@@ -31,49 +31,42 @@ The Store module provides unified Redux state management for the Chanuka platfor
 ## State Slices
 
 ### Auth Slice
-
 - User authentication state
 - Login/logout actions
 - Token management
 - Session validation
 
 ### Dashboard Slice
-
 - Dashboard configuration
 - Widget management
 - Layout preferences
 - User customizations
 
 ### Navigation Slice
-
 - Current route state
 - Navigation history
 - Breadcrumbs
 - Route metadata
 
 ### Loading Slice
-
 - Global loading state
 - Operation-specific loading
 - Progress tracking
 - Loading indicators
 
 ### Session Slice
-
 - Session information
 - Session timeout
 - Activity tracking
 - Session metadata
 
 ### UI Slice
-
 - UI preferences
 - Theme settings
 - Layout configuration
 - Modal/drawer state
 
 ### Error Handling Slice
-
 - Error state management
 - Error history
 - Error recovery state
@@ -149,9 +142,9 @@ import { getStore } from '@/infrastructure/store';
 function someUtility() {
   const store = getStore();
   const state = store.getState();
-
+  
   console.log('Current user:', state.auth.user);
-
+  
   store.dispatch(someAction());
 }
 ```

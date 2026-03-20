@@ -20,7 +20,10 @@ export interface MarketInsight {
   relatedBills: string[];
 }
 
-export     return response.data;
+export const marketService = {
+  async fetchMarketData(category: string): Promise<MarketData[]> {
+    const response = await globalApiClient.get('/api/market/data', { params: { category } });
+    return response.data;
   },
 
   async getMarketInsights(): Promise<MarketInsight[]> {

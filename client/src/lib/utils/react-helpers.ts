@@ -8,7 +8,18 @@
 import React from 'react';
 
 // Ensure cloneElement is available
-export   });
+export const cloneElement =
+  React.cloneElement ||
+  ((element: React.ReactElement, props?: unknown) => {
+    // Fallback implementation if cloneElement is not available
+    return {
+      ...element,
+      props: {
+        ...element.props,
+        ...props,
+      },
+    };
+  });
 
 // Re-export other commonly used React utilities
 export const { memo, useMemo, useRef, useEffect, useState, useCallback, Fragment, createElement } =

@@ -106,7 +106,13 @@ export function createResponsiveClasses(
 /**
  * Responsive container utilities
  */
-export 
+export const containerUtils = {
+  /**
+   * Get container padding for current breakpoint
+   */
+  getPadding(): string {
+    const breakpoint = getCurrentBreakpoint();
+
     switch (breakpoint) {
       case 'xs':
       case 'sm':
@@ -140,7 +146,16 @@ export
 /**
  * Grid utilities for responsive layouts
  */
-export   },
+export const gridUtils = {
+  /**
+   * Create responsive grid columns
+   */
+  createResponsiveGrid(columns: Partial<Record<Breakpoint, number>>): string {
+    return createResponsiveClasses(
+      'grid-cols',
+      Object.fromEntries(Object.entries(columns).map(([bp, cols]) => [bp, cols.toString()]))
+    );
+  },
 
   /**
    * Create responsive gap classes
@@ -165,7 +180,13 @@ export   },
 /**
  * Typography responsive utilities
  */
-export   },
+export const typographyUtils = {
+  /**
+   * Create responsive text size classes
+   */
+  createResponsiveText(sizes: Partial<Record<Breakpoint, string>>): string {
+    return createResponsiveClasses('text', sizes);
+  },
 
   /**
    * Get optimal text size for content type

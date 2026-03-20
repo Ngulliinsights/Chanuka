@@ -486,6 +486,16 @@ export class RateLimiter {
 }
 
 // Export singleton instance
-export 
+export const clientRateLimiter = new RateLimiter({
+  enabled: true,
+  windowMs: 60000,
+  maxRequests: 100,
+  skipSuccessfulRequests: false,
+});
+
 // Export rate limit configs
-export 
+export const RateLimitConfigs = {
+  strict: { windowMs: 60000, maxRequests: 10 },
+  normal: { windowMs: 60000, maxRequests: 100 },
+  lenient: { windowMs: 60000, maxRequests: 1000 },
+};

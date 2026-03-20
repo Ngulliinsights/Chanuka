@@ -8,7 +8,7 @@ The observability module provides a centralized interface for tracking applicati
 
 ## Requirements
 
-- **4.1, 4.2, 4.3, 4.4**: Standard module structure with index.ts, types.ts, README.md, **tests**/
+- **4.1, 4.2, 4.3, 4.4**: Standard module structure with index.ts, types.ts, README.md, __tests__/
 - **11.1**: Unified observability interface with all capabilities
 - **11.2**: Error tracking with context
 - **11.3**: Performance monitoring with metrics
@@ -41,7 +41,7 @@ observability.trackError(error, {
   component: 'UserProfile',
   operation: 'loadUserData',
   userId: 'user-123',
-  metadata: { attemptNumber: 3 },
+  metadata: { attemptNumber: 3 }
 });
 
 // Track performance
@@ -50,20 +50,20 @@ observability.trackPerformance({
   value: 245,
   unit: 'ms',
   timestamp: new Date(),
-  category: 'api',
+  category: 'api'
 });
 
 // Track analytics event
 observability.trackEvent({
   name: 'button_clicked',
   properties: { buttonId: 'submit', page: 'profile' },
-  userId: 'user-123',
+  userId: 'user-123'
 });
 
 // Send telemetry
 await observability.sendTelemetry({
   type: 'system_health',
-  payload: { cpu: 45, memory: 60 },
+  payload: { cpu: 45, memory: 60 }
 });
 
 // Get metrics
@@ -77,7 +77,6 @@ const metrics = observability.getMetrics();
 Tracks and aggregates application errors with context. Integrates with external monitoring services like Sentry.
 
 **Key Features:**
-
 - Error tracking with rich context
 - Error aggregation and deduplication
 - Integration with Sentry
@@ -88,7 +87,6 @@ Tracks and aggregates application errors with context. Integrates with external 
 Monitors application performance including Web Vitals, custom metrics, and performance budgets.
 
 **Key Features:**
-
 - Web Vitals tracking (LCP, FID, INP, CLS, FCP, TTFB)
 - Performance budget monitoring
 - Real-time alerts
@@ -99,7 +97,6 @@ Monitors application performance including Web Vitals, custom metrics, and perfo
 Collects and aggregates system telemetry data for diagnostics and monitoring.
 
 **Key Features:**
-
 - System metrics collection
 - Data aggregation
 - Batch sending to reduce overhead
@@ -110,7 +107,6 @@ Collects and aggregates system telemetry data for diagnostics and monitoring.
 Tracks user behavior and engagement across the application.
 
 **Key Features:**
-
 - Event tracking
 - User journey tracking
 - Session management
@@ -137,7 +133,7 @@ try {
     component: 'UserService',
     operation: 'fetchUserData',
     userId,
-    metadata: { endpoint: '/api/users' },
+    metadata: { endpoint: '/api/users' }
   });
 }
 ```
@@ -154,7 +150,7 @@ observability.trackPerformance({
   value: duration,
   unit: 'ms',
   timestamp: new Date(),
-  category: 'business-logic',
+  category: 'business-logic'
 });
 ```
 
@@ -166,9 +162,9 @@ observability.trackEvent({
   properties: {
     feature: 'dashboard',
     action: 'widget_added',
-    widgetType: 'chart',
+    widgetType: 'chart'
   },
-  userId: currentUser.id,
+  userId: currentUser.id
 });
 ```
 
@@ -182,22 +178,22 @@ import { initializeObservability } from '@/infrastructure/observability';
 initializeObservability({
   errorMonitoring: {
     enabled: true,
-    sentryDsn: process.env.SENTRY_DSN,
+    sentryDsn: process.env.SENTRY_DSN
   },
   performance: {
     enabled: true,
     budgets: {
-      'page.load': { budget: 3000, warning: 2500 },
-    },
+      'page.load': { budget: 3000, warning: 2500 }
+    }
   },
   analytics: {
     enabled: true,
-    flushInterval: 30000,
+    flushInterval: 30000
   },
   telemetry: {
     enabled: true,
-    aggregationInterval: 60000,
-  },
+    aggregationInterval: 60000
+  }
 });
 ```
 
@@ -212,7 +208,6 @@ Tests are located in the `__tests__/` directory and cover:
 - Integration with external services
 
 Run tests with:
-
 ```bash
 npm test -- observability
 ```
@@ -222,7 +217,6 @@ npm test -- observability
 If you were using the old separate modules:
 
 ### From `monitoring`
-
 ```typescript
 // Old
 import { ErrorMonitor } from '@/infrastructure/observability/error-monitoring';
@@ -234,7 +228,6 @@ observability.trackError(error, context);
 ```
 
 ### From `performance`
-
 ```typescript
 // Old
 import { recordMetric } from '@/infrastructure/observability/performance';
@@ -246,7 +239,6 @@ observability.trackPerformance(metric);
 ```
 
 ### From `analytics`
-
 ```typescript
 // Old
 import { ComprehensiveAnalyticsTracker } from '@/infrastructure/analytics';
@@ -258,7 +250,6 @@ observability.trackEvent(event);
 ```
 
 ### From `telemetry`
-
 ```typescript
 // Old
 import { telemetryService } from '@/infrastructure/telemetry';

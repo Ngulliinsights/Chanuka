@@ -122,4 +122,4 @@ class RoutePreloader {
   }
 }
 
-export 
+export const routePreloader = RoutePreloader.getInstance();

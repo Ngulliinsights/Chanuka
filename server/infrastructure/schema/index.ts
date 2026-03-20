@@ -11,6 +11,10 @@
 // FOUNDATION - Core tables and base schemas
 // ============================================================================
 export * from './foundation';
+// Explicit type exports for repository interfaces
+export type { Bill, NewBill } from './foundation';
+export type { User, NewUser, UserProfile, NewUserProfile } from './foundation';
+export type { Sponsor, NewSponsor } from './foundation';
 
 // ============================================================================
 // DOMAIN SCHEMAS - Feature-specific tables

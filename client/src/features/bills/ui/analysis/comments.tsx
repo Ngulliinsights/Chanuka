@@ -1,7 +1,20 @@
 import {
-  MessageSquare, ChevronUp as ChevronUp, ChevronDown as ChevronDown, BarChart3, Reply, Flag, Award, CheckCircle as CheckCircle, Users, Clock, TrendingUp, } from 'lucide-react';
+  MessageSquare,
+  ChevronUp as ChevronUp,
+  ChevronDown as ChevronDown,
+  BarChart3,
+  Reply,
+  Flag,
+  Award,
+  CheckCircle as CheckCircle,
+  Users,
+  Clock,
+  TrendingUp,
+  Filter,
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
+import { useBillAnalysis } from '@client/features/bills';
 import { Badge } from '@client/lib/design-system';
 import { Button } from '@client/lib/design-system';
 import { Card } from '@client/lib/design-system';
@@ -13,6 +26,7 @@ import {
   DialogTrigger,
 } from '@client/lib/design-system';
 import { Input } from '@client/lib/design-system';
+import { Separator } from '@client/lib/design-system';
 import { Textarea } from '@client/lib/design-system';
 import { logger } from '@client/lib/utils/logger';
 // Using a simple date formatting function instead of date-fns
@@ -221,7 +235,11 @@ export function Comments({
     return content.substring(0, maxLength) + '...';
   };
 
-        case 'popular':
+  const getSortIcon = (sortType: string) => {
+    switch (sortType) {
+      case 'recent':
+        return <Clock className="w-4 h-4" />;
+      case 'popular':
         return <TrendingUp className="w-4 h-4" />;
       case 'verified':
         return <CheckCircle className="w-4 h-4" />;

@@ -8,7 +8,11 @@ import { createNavigationProvider } from '@client/infrastructure/navigation/cont
 import { ThemeProvider } from '@client/lib/contexts/ThemeContext';
 import { Toaster } from '@client/lib/design-system';
 import { useDeviceInfo } from '@client/lib/hooks/mobile/useDeviceInfo';
-import { setCurrentPath, addToRecentPages, setUserRole } from '@client/infrastructure/store';
+import {
+  setCurrentPath,
+  addToRecentPages,
+  setUserRole,
+} from '@client/infrastructure/store';
 import { UserRole } from '@shared/types/core/enums';
 import { LogoPattern } from '@client/lib/design-system/layout/LogoPattern';
 import { LoadingStateManager } from '@client/lib/ui/loading/LoadingStates';
@@ -160,7 +164,9 @@ function NavigationTracker({ children }: { children: React.ReactNode }) {
       const lastSegment = pathSegments[pathSegments.length - 1];
       const title =
         pathSegments.length > 0 && lastSegment
-          ? lastSegment.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+          ? lastSegment
+              .replace(/[-_]/g, ' ')
+              .replace(/\b\w/g, l => l.toUpperCase())
           : 'Home';
 
       dispatch(
@@ -303,60 +309,56 @@ export function AppShell({
           <NavigationWrapper>
             <NavigationTracker>
               {/* <AnalyticsIntegration> */}
-              {/* <RouteProfiler> */}
-              <NavigationConsistency>
-                <NavigationPerformance>
-                  {/* Skip Links for keyboard navigation accessibility */}
-                  {enableAccessibility && <SkipLinks links={skipLinks} />}
+                {/* <RouteProfiler> */}
+                <NavigationConsistency>
+                  <NavigationPerformance>
+                    {/* Skip Links for keyboard navigation accessibility */}
+                    {enableAccessibility && <SkipLinks links={skipLinks} />}
 
-                  {/* Main Application Layout */}
-                  <div id="app-shell" className="min-h-screen bg-gray-50 bg-noise relative">
-                    <LogoPattern
-                      opacity={0.03}
-                      scale={1.5}
-                      className="fixed inset-0 pointer-events-none"
-                    />
+                    {/* Main Application Layout */}
+                    <div id="app-shell" className="min-h-screen bg-gray-50 bg-noise relative">
+                      <LogoPattern opacity={0.03} scale={1.5} className="fixed inset-0 pointer-events-none" />
 
-                    {/* Top Navigation Bar */}
-                    {enableNavigation && (
-                      <NavigationBar
-                        showSearch={true}
-                        showNotifications={true}
-                        showUserMenu={true}
-                      />
-                    )}
+                      {/* Top Navigation Bar */}
+                      {enableNavigation && (
+                        <NavigationBar
+                          showSearch={true}
+                          showNotifications={true}
+                          showUserMenu={true}
+                        />
+                      )}
 
-                    {/* Breadcrumb Navigation */}
-                    <div className="bg-white border-b border-gray-200">
-                      <div className="container mx-auto px-4 py-2">
-                        <BreadcrumbNavigation showHome={true} maxItems={5} className="py-2" />
+                      {/* Breadcrumb Navigation */}
+                      <div className="bg-white border-b border-gray-200">
+                        <div className="container mx-auto px-4 py-2">
+                          <BreadcrumbNavigation showHome={true} maxItems={5} className="py-2" />
+                        </div>
                       </div>
+
+                      {/* Main Content Area - The heart of the application */}
+                      <main
+                        id="main-content"
+                        className="flex-1"
+                        role="main"
+                        aria-label="Main content"
+                        tabIndex={-1} // Allows focus for skip links
+                      >
+                        {/* Either render the router (for full app) or children (for testing) */}
+                        {enableRouter ? <AppRouter /> : children}
+                      </main>
+
+                      {/* Footer */}
+                      <BrandedFooter />
                     </div>
 
-                    {/* Main Content Area - The heart of the application */}
-                    <main
-                      id="main-content"
-                      className="flex-1"
-                      role="main"
-                      aria-label="Main content"
-                      tabIndex={-1} // Allows focus for skip links
-                    >
-                      {/* Either render the router (for full app) or children (for testing) */}
-                      {enableRouter ? <AppRouter /> : children}
-                    </main>
+                    {/* Toast notification system for user feedback */}
+                    <Toaster />
 
-                    {/* Footer */}
-                    <BrandedFooter />
-                  </div>
-
-                  {/* Toast notification system for user feedback */}
-                  <Toaster />
-
-                  {/* Development Monitoring Dashboard (Development Only) */}
-                  {/* <DevelopmentMonitoringDashboard /> */}
-                </NavigationPerformance>
-              </NavigationConsistency>
-              {/* </RouteProfiler> */}
+                    {/* Development Monitoring Dashboard (Development Only) */}
+                    {/* <DevelopmentMonitoringDashboard /> */}
+                  </NavigationPerformance>
+                </NavigationConsistency>
+                {/* </RouteProfiler> */}
               {/* </AnalyticsIntegration> */}
             </NavigationTracker>
           </NavigationWrapper>

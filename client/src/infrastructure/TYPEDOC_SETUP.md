@@ -11,7 +11,6 @@ TypeDoc configuration is located in `typedoc.json` at the project root.
 ### Entry Points
 
 All infrastructure modules are configured as entry points:
-
 - api
 - asset-loading
 - auth
@@ -59,7 +58,6 @@ pnpm docs:generate
 ```
 
 This will:
-
 - Parse all infrastructure module exports
 - Extract JSDoc comments
 - Generate HTML documentation
@@ -99,7 +97,7 @@ All public exports should have JSDoc comments including:
 
 ### Example
 
-````typescript
+```typescript
 /**
  * Invalidate a specific cache entry by key.
  *
@@ -115,7 +113,7 @@ All public exports should have JSDoc comments including:
 export async function invalidateCache(key: string): Promise<void> {
   // Implementation
 }
-````
+```
 
 ## Current Status
 
@@ -148,7 +146,6 @@ To publish to an internal documentation site:
 To publish to GitHub Pages:
 
 1. Update `typedoc.json`:
-
    ```json
    {
      "githubPages": true,

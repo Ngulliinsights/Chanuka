@@ -3,7 +3,7 @@
  *
  * DEPRECATED: This module is being migrated to features/community
  * Community is a business domain, not infrastructure
- *
+ * 
  * For WebSocket functionality, use @client/infrastructure/api/realtime
  * For community business logic, use @client/features/community
  */
@@ -24,5 +24,5 @@ export { StateSyncService } from './services/state-sync.service';
 // NOTE: Community hooks have been moved to @client/features/community
 // Import from features layer instead:
 // - useUnifiedDiscussion
-// - useUnifiedCommunity
+// - useUnifiedCommunity  
 // - useRealtime

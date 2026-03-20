@@ -8,7 +8,14 @@
 
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, TrendingUp, FileText, Shield, ArrowRight, Calendar } from 'lucide-react';
+import {
+  AlertTriangle,
+  TrendingUp,
+  FileText,
+  Shield,
+  ArrowRight,
+  Calendar,
+} from 'lucide-react';
 import {
   BarChart,
   Bar,
@@ -35,6 +42,8 @@ import {
 } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Progress } from '@client/lib/design-system';
+
+
 
 interface WorkaroundWithMetadata {
   id: string;
@@ -284,8 +293,7 @@ const COLORS = {
   low: 'hsl(120, 50%, 50%)',
 };
 
-export default function WorkaroundAnalysisPage() {
-  // Compute statistics
+export default function WorkaroundAnalysisPage() {  // Compute statistics
   const stats = useMemo(() => {
     const byType = MOCK_WORKAROUNDS.reduce(
       (acc, w) => {
@@ -324,11 +332,12 @@ export default function WorkaroundAnalysisPage() {
   const typeChartData = Object.entries(stats.byType).map(([type, count]) => ({
     name: type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
     value: count,
-    fill: type.includes('legislative')
-      ? COLORS.legislative
-      : type.includes('executive')
-        ? COLORS.executive
-        : COLORS.regulatory,
+    fill:
+      type.includes('legislative')
+        ? COLORS.legislative
+        : type.includes('executive')
+          ? COLORS.executive
+          : COLORS.regulatory,
   }));
 
   const branchChartData = Object.entries(stats.byBranch).map(([branch, count]) => ({
@@ -350,14 +359,8 @@ export default function WorkaroundAnalysisPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-brand-navy via-brand-teal to-brand-gold p-8 rounded-2xl text-white shadow-xl relative overflow-hidden">
         {/* Subtle noise overlay for texture */}
-        <div
-          className="absolute inset-0 opacity-10 mix-blend-overlay"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E\")",
-          }}
-        ></div>
-
+        <div className="absolute inset-0 opacity-10 mix-blend-overlay" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")'}}></div>
+        
         <div className="relative z-10">
           <h1 className="text-3xl font-bold flex items-center gap-3 drop-shadow-md">
             <AlertTriangle className="h-8 w-8 text-brand-gold" />
@@ -369,10 +372,7 @@ export default function WorkaroundAnalysisPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 relative z-10">
-          <Badge
-            variant="outline"
-            className="text-sm bg-white/10 hover:bg-white/20 border-white/30 text-white backdrop-blur-sm py-1.5 px-3"
-          >
+          <Badge variant="outline" className="text-sm bg-white/10 hover:bg-white/20 border-white/30 text-white backdrop-blur-sm py-1.5 px-3">
             <Calendar className="h-4 w-4 mr-2" />
             Last Updated: {new Date().toLocaleDateString()}
           </Badge>
@@ -634,7 +634,9 @@ export default function WorkaroundAnalysisPage() {
                           <span>
                             Confirmations: <strong>{workaround.confirmations}</strong>
                           </span>
-                          <span>Detected: {workaround.createdAt.toLocaleDateString()}</span>
+                          <span>
+                            Detected: {workaround.createdAt.toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                       <Link to={`/bills/${workaround.billId}?tab=workarounds`}>

@@ -288,4 +288,4 @@ export class BrowserDetector {
   }
 }
 
-export 
+export const browserDetector = BrowserDetector.getInstance();

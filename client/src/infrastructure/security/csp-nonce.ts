@@ -116,4 +116,4 @@ export class CSPNonceManager {
 }
 
 // Export singleton instance
-export 
+export const cspNonceManager = CSPNonceManager.getInstance();

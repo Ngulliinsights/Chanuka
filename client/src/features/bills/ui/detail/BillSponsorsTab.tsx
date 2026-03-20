@@ -73,9 +73,7 @@ function BillSponsorsTab({ bill, onSponsorClick }: BillSponsorsTabProps) {
                   <Users className="h-5 w-5 text-blue-500" />
                   Primary Sponsor
                 </CardTitle>
-                <CardDescription>
-                  The representative who introduced this legislation
-                </CardDescription>
+                <CardDescription>The representative who introduced this legislation</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-start gap-4">
@@ -197,7 +195,9 @@ function BillSponsorsTab({ bill, onSponsorClick }: BillSponsorsTabProps) {
                   <h4 className="font-medium mb-3">Bipartisan Analysis</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="text-sm font-medium text-green-800">Bipartisan Support</div>
+                      <div className="text-sm font-medium text-green-800">
+                        Bipartisan Support
+                      </div>
                       <div className="text-xs text-green-600">
                         {enhancedSponsors.filter(s => s.party === 'Republican').length > 0 &&
                         enhancedSponsors.filter(s => s.party === 'Democrat').length > 0
@@ -267,11 +267,7 @@ function BillSponsorsTab({ bill, onSponsorClick }: BillSponsorsTabProps) {
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary">Co-sponsor</Badge>
                         {/* Assuming onSponsorClick is a prop passed to BillSponsorsTab */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onSponsorClick?.(String(sponsor.id))}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onSponsorClick?.(String(sponsor.id))}>
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>

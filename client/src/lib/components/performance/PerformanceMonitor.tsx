@@ -10,7 +10,7 @@
 import { AlertTriangle, CheckCircle, Clock, TrendingUp, Zap } from 'lucide-react';
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 
-import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/admin/monitoring/model/performance-benchmarking';
+import { performanceBenchmarking, PerformanceBenchmark } from '@client/features/monitoring/model/performance-benchmarking';
 import {
   Badge,
   Card,
@@ -207,7 +207,12 @@ export const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   /**
    * Analyze performance metrics for issues
    */
-  
+  const analyzePerformanceIssues = (
+    metrics: PerformanceMetrics,
+    thresholds: PerformanceThresholds
+  ): string[] => {
+    const issues: string[] = [];
+
     if (metrics.loadTime > thresholds.loadTime) {
       issues.push(`Load time (${metrics.loadTime}ms) exceeds threshold (${thresholds.loadTime}ms)`);
     }

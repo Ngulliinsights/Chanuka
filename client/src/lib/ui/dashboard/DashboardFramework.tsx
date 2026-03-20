@@ -22,7 +22,11 @@ import { DashboardContent } from './layout-components/DashboardContent';
 import { DashboardFooter } from './layout-components/DashboardFooter';
 import { DashboardHeader } from './layout-components/DashboardHeader';
 import { DashboardSidebar } from './layout-components/DashboardSidebar';
-import { DashboardFrameworkProps, DashboardLayoutConfig, DashboardThemeConfig } from './types';
+import {
+  DashboardFrameworkProps,
+  DashboardLayoutConfig,
+  DashboardThemeConfig,
+} from './types';
 import { DashboardGrid } from './widgets/DashboardGrid';
 import { DashboardStack } from './widgets/DashboardStack';
 import { DashboardTabs } from './widgets/DashboardTabs';
@@ -74,6 +78,7 @@ class ErrorBoundary extends React.Component<
   },
   { hasError: boolean; error: Error | null }
 > {
+   
   constructor(props: unknown) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -220,7 +225,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
     const { config: dashboardConfig, updateConfig, updateWidget } = dashboardHook;
 
     // Cast layout to include potential missing properties from the type definition
-
+     
     const layoutHook = useDashboardLayout(dashboardConfig.layout as ExtendedDashboardLayout);
     const { layout, sidebarOpen, toggleSidebar, isMobile, breakpoint } = layoutHook;
 
@@ -282,10 +287,8 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
       (updates: Partial<DashboardThemeConfig>) => {
         // Ensure we preserve the colorScheme if not provided in updates, to match required type
         const newTheme = { ...dashboardConfig.theme, ...updates };
-
-        updateConfig?.({
-          theme: newTheme as DashboardThemeConfig & { customTokens?: Record<string, string> },
-        });
+         
+        updateConfig?.({ theme: newTheme as DashboardThemeConfig & { customTokens?: Record<string, string> } });
         if (onThemeChange && typeof onThemeChange === 'function') {
           onThemeChange(updates);
         }
@@ -408,7 +411,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
               {layoutMode === 'stack' && dashboardConfig.sections && (
                 <DashboardStack
                   // Cast extended sections to base sections type
-
+                   
                   sections={dashboardConfig.sections as ExtendedDashboardSection[]}
                   spacing="normal"
                   onSectionUpdate={(sectionId, updates) => {
@@ -421,7 +424,7 @@ export const DashboardFramework = React.memo<DashboardFrameworkProps>(
               {layoutMode === 'tabs' && dashboardConfig.sections && (
                 <DashboardTabs
                   // Cast extended sections to base sections type
-
+                   
                   sections={dashboardConfig.sections as ExtendedDashboardSection[]}
                   onTabChange={tabId => {
                     // Handle tab changes

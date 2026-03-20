@@ -389,4 +389,4 @@ export class FeatureDetector {
   }
 }
 
-export 
+export const featureDetector = FeatureDetector.getInstance();

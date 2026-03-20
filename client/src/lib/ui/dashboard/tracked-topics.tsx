@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle, Edit, RefreshCw, Search, X } from 'lucide-react';
+import { AlertCircle, CheckCircle, Edit, RefreshCw, Search, Star as Tag, X } from 'lucide-react';
 import React from 'react';
 
 import type { TopicCategory } from '@client/lib/types/dashboard';

@@ -269,27 +269,18 @@ class WebSocketMiddlewareAdapter {
       this.reduxDispatch?.(addBillUpdate(update));
     });
 
-    realTimeService.on<RealTimeNotification>(
-      'notification',
-      (notification: RealTimeNotification) => {
-        this.handlers.onNotification?.(notification);
-        this.reduxDispatch?.(addNotification(notification));
-      }
-    );
+    realTimeService.on<RealTimeNotification>('notification', (notification: RealTimeNotification) => {
+      this.handlers.onNotification?.(notification);
+      this.reduxDispatch?.(addNotification(notification));
+    });
 
-    realTimeService.on<CommunityRealTimeUpdate>(
-      'communityUpdate',
-      (update: CommunityRealTimeUpdate) => {
-        this.handlers.onCommunityUpdate?.(update);
-      }
-    );
+    realTimeService.on<CommunityRealTimeUpdate>('communityUpdate', (update: CommunityRealTimeUpdate) => {
+      this.handlers.onCommunityUpdate?.(update);
+    });
 
-    realTimeService.on<EngagementMetricsUpdate>(
-      'engagementMetrics',
-      (update: EngagementMetricsUpdate) => {
-        this.handlers.onEngagementUpdate?.(update);
-      }
-    );
+    realTimeService.on<EngagementMetricsUpdate>('engagementMetrics', (update: EngagementMetricsUpdate) => {
+      this.handlers.onEngagementUpdate?.(update);
+    });
 
     realTimeService.on<ExpertActivityUpdate>('expertActivity', (update: ExpertActivityUpdate) => {
       this.handlers.onExpertActivity?.(update);

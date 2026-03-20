@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import React from 'react';
 
 import { useBills } from '@client/features/bills';
 import { Badge } from '@client/lib/design-system';
@@ -12,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '@client/lib/design-system';
+import { logger } from '@client/lib/utils/logger';
 
 interface VerificationItem {
   id: number;
@@ -23,7 +25,9 @@ interface VerificationItem {
   dateSubmitted: string;
 }
 
-export   const [isLoading, setIsLoading] = useState(true);
+export const VerificationsList = () => {
+  const [items, setItems] = useState<VerificationItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<'all' | 'pending' | 'verified' | 'disputed'>(
     'all'
   );

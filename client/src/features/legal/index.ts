@@ -1,6 +1,6 @@
 /**
  * Legal Feature Index
- *
+ * 
  * Exports all legal analysis components and hooks
  * Used by other features to access constitutional analysis functionality
  */
@@ -10,7 +10,7 @@ export { LegalAnalysisTab } from './ui/LegalAnalysisTab';
 export { ConflictAlertCard, ConflictAlertGrid, ConflictSummary } from './ui/ConflictAlertCard';
 
 // Hooks
-export { useConstitutionalAnalysis } from '@client/features/analysis/constitutional/hooks/use-constitutional-analysis';
+export { useConstitutionalAnalysis } from './hooks/use-constitutional-analysis';
 export { useConflicts } from './hooks/useConflicts';
 export { useLegalRisks } from './hooks/useLegalRisks';
 export { usePrecedents } from './hooks/usePrecedents';

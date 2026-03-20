@@ -5,7 +5,6 @@ Comprehensive end-to-end tests for all integrated features in the Chanuka platfo
 ## Overview
 
 This test suite covers:
-
 - Pretext Detection
 - Recommendation Engine
 - Argument Intelligence
@@ -39,21 +38,17 @@ npx playwright test --debug
 ## Test Structure
 
 ### Fixtures (`fixtures.ts`)
-
 Reusable test utilities:
-
 - `authenticatedPage`: Pre-authenticated page for admin/user tests
 - `a11yPage`: Page with accessibility testing tools injected
 
 ### Global Setup/Teardown
-
 - `global-setup.ts`: Runs once before all tests (server readiness check)
 - `global-teardown.ts`: Runs once after all tests (cleanup)
 
 ## Test Coverage
 
 ### Pretext Detection (`pretext-detection.spec.ts`)
-
 - Navigation to pretext detection
 - Display of pretext analysis
 - Loading states
@@ -62,7 +57,6 @@ Reusable test utilities:
 - Accessibility compliance
 
 ### Recommendation Engine (`recommendation-engine.spec.ts`)
-
 - Dashboard recommendations widget
 - Bill page recommendations
 - Click tracking
@@ -71,7 +65,6 @@ Reusable test utilities:
 - Performance (< 500ms load time)
 
 ### Argument Intelligence (`argument-intelligence.spec.ts`)
-
 - Argument cluster display
 - Sentiment heatmap
 - Quality metrics
@@ -82,7 +75,6 @@ Reusable test utilities:
 - Accessibility compliance
 
 ### Constitutional Intelligence (`constitutional-intelligence.spec.ts`)
-
 - Constitutional analysis tab
 - Rights impact assessment
 - Precedent matches
@@ -94,7 +86,6 @@ Reusable test utilities:
 - Expert review workflow
 
 ### Advocacy Coordination (`advocacy-coordination.spec.ts`)
-
 - Advocacy dashboard navigation
 - Campaign display
 - Campaign details
@@ -108,7 +99,6 @@ Reusable test utilities:
 - Performance (< 2s load time)
 
 ### Feature Flag Admin (`feature-flags.spec.ts`)
-
 - Flag list display
 - Flag creation
 - Flag editing
@@ -120,7 +110,6 @@ Reusable test utilities:
 - Accessibility compliance
 
 ### Monitoring Dashboard (`monitoring-dashboard.spec.ts`)
-
 - Dashboard display
 - Metrics visualization
 - Health status
@@ -137,19 +126,18 @@ Reusable test utilities:
 
 All tests include performance assertions based on requirements:
 
-| Feature                     | Performance Target     | Test Coverage |
-| --------------------------- | ---------------------- | ------------- |
-| Recommendation Engine       | < 500ms widget load    | ✅            |
-| Argument Intelligence       | < 1s render time       | ✅            |
-| Constitutional Intelligence | < 1s page load         | ✅            |
-| Advocacy Coordination       | < 2s dashboard load    | ✅            |
-| Monitoring Dashboard        | < 2s dashboard load    | ✅            |
-| Monitoring Real-time        | < 100ms update latency | ✅            |
+| Feature | Performance Target | Test Coverage |
+|---------|-------------------|---------------|
+| Recommendation Engine | < 500ms widget load | ✅ |
+| Argument Intelligence | < 1s render time | ✅ |
+| Constitutional Intelligence | < 1s page load | ✅ |
+| Advocacy Coordination | < 2s dashboard load | ✅ |
+| Monitoring Dashboard | < 2s dashboard load | ✅ |
+| Monitoring Real-time | < 100ms update latency | ✅ |
 
 ## Accessibility Testing
 
 Tests use `axe-playwright` for automated accessibility checks:
-
 - WCAG 2.1 Level AA compliance
 - Keyboard navigation
 - Screen reader compatibility
@@ -159,7 +147,6 @@ Tests use `axe-playwright` for automated accessibility checks:
 ## CI/CD Integration
 
 Tests are configured to run in CI/CD pipelines:
-
 - Automatic retries on failure (2 retries in CI)
 - HTML, JSON, and JUnit reports
 - Screenshot and video capture on failure
@@ -168,7 +155,6 @@ Tests are configured to run in CI/CD pipelines:
 ## Browser Coverage
 
 Tests run across multiple browsers:
-
 - Chromium (Desktop)
 - Firefox (Desktop)
 - WebKit (Desktop Safari)
@@ -190,19 +176,16 @@ Tests run across multiple browsers:
 ## Troubleshooting
 
 ### Tests timing out
-
 - Increase timeout in `playwright.config.ts`
 - Check if dev server is running
 - Verify network connectivity
 
 ### Flaky tests
-
 - Add explicit waits for dynamic content
 - Use `waitForLoadState('networkidle')`
 - Avoid hard-coded timeouts
 
 ### Authentication issues
-
 - Check `fixtures.ts` authentication logic
 - Verify test user credentials
 - Ensure session persistence

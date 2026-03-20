@@ -7,7 +7,7 @@ import { createAuthApiService } from '@client/infrastructure/api/auth';
 import { globalApiClient } from '@client/infrastructure/api';
 
 // Create the auth service instance
-export {
-  // Re-export the class for type compatibility
-  AuthApiService as AuthService,
-} from '@client/infrastructure/api/auth';
+export const authService = createAuthApiService(globalApiClient);
+
+// Re-export the class for type compatibility
+export { AuthApiService as AuthService } from '@client/infrastructure/api/auth';
