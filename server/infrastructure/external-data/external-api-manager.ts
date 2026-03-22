@@ -306,7 +306,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
   addAPIConfiguration(config: APIConfiguration): void {
     this.configurations.set(config.source, config);
     this.initializeSourceManagement(config);
-    logger.info(`✅ Configured API source: ${config.source}`);
+    logger.info({ component: 'server' }, `✅ Configured API source: ${config.source}`);
   }
 
   private initializeSourceManagement(config: APIConfiguration): void {
@@ -948,7 +948,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
       if (fallbackHealth?.status === 'down') continue;
 
       try {
-        logger.info(`🔄 Attempting failover from ${source} to ${fallbackSource}`);
+        logger.info({ component: 'server' }, `🔄 Attempting failover from ${source} to ${fallbackSource}`);
 
         const result = await this.makeRequest(fallbackSource, endpoint, options);
 
@@ -957,7 +957,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
           return result;
         }
       } catch (error) {
-        logger.error(`Failover to ${fallbackSource} failed: ${error instanceof Error ? error.message : String(error)}`);
+        logger.error({ component: 'server' }, `Failover to ${fallbackSource} failed: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -1139,12 +1139,12 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     }
 
     this.costMonitoring.on('costAlert', (alert: any) => {
-      logger.warn(`💰 Cost alert for ${alert.source}: ${alert.message}`);
+      logger.warn({ component: 'server' }, `💰 Cost alert for ${alert.source}: ${alert.message}`);
       this.emit('costAlert', alert);
     });
 
     this.costMonitoring.on('budgetConfigUpdated', (event: any) => {
-      logger.info(`💰 Budget configuration updated for ${event.source}`);
+      logger.info({ component: 'server' }, `💰 Budget configuration updated for ${event.source}`);
       this.emit('budgetConfigUpdated', event);
     });
   }
@@ -1232,7 +1232,7 @@ export class UnifiedExternalAPIManagementService extends EventEmitter {
     // this.redis.disconnect(); // Uncomment when Redis is available
 
     this.emit('shutdown');
-    logger.info('External API Management Service shut down successfully');
+    logger.info({ component: 'server' }, 'External API Management Service shut down successfully');
   }
 
   // ========================================================================

@@ -86,13 +86,13 @@ export class BillStatusMonitorService {
       oldStatus: change.oldStatus,
       newStatus: change.newStatus
     };
-    logger.info(`📊 Processing bill status change`, logContext);
+    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📊 Processing bill status change`);
 
     try {
       // 1. Fetch Essential Bill Details (Title, Category) for context
       const bill = await this.getBillDetails(change.bill_id);
       if (!bill) {
-        logger.error(`Bill ${change.bill_id} not found during status change processing.`, logContext);
+        logger.error({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `Bill ${change.bill_id} not found during status change processing.`);
         return; // Cannot proceed without bill context
       }
 
@@ -118,7 +118,7 @@ export class BillStatusMonitorService {
       const usersToNotify = await this.getActiveTrackersForEvent(change.bill_id, 'status_changes');
 
       if (usersToNotify.length > 0) {
-        logger.info(`📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`, logContext);
+        logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`);
 
         // 5. Prepare Notification Template for the Orchestrator
         const notificationTemplate: Omit<NotificationRequest, 'user_id'> = {
@@ -148,13 +148,13 @@ export class BillStatusMonitorService {
         });
 
       } else {
-        logger.info(`📢 No users actively tracking status changes for this bill.`, logContext);
+        logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 No users actively tracking status changes for this bill.`);
       }
 
-      logger.info(`✅ Successfully processed status change`, logContext);
+      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `✅ Successfully processed status change`);
 
     } catch (error) {
-      logger.error('Error handling bill status change:', logContext, error);
+      logger.error({ error: logContext, error instanceof Error ? logContext, error.message : String(logContext, error) }, 'Error handling bill status change:');
       // Log error but avoid throwing to prevent cascading failures in event processing
     }
   }
@@ -170,13 +170,13 @@ export class BillStatusMonitorService {
       type: update.type,
       user_id: update.user_id
     };
-    logger.info(`📈 Processing engagement update`, logContext);
+    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📈 Processing engagement update`);
 
     try {
       // 1. Fetch Bill Details
       const bill = await this.getBillDetails(update.bill_id);
       if (!bill) {
-        logger.error(`Bill ${update.bill_id} not found during engagement update processing.`, logContext);
+        logger.error({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `Bill ${update.bill_id} not found during engagement update processing.`);
         return;
       }
 
@@ -204,7 +204,7 @@ export class BillStatusMonitorService {
         const filteredUsers = usersToNotify.filter(id => id !== update.user_id);
 
         if (filteredUsers.length > 0) {
-          logger.info(`📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`, logContext);
+          logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`);
 
           // Try to fetch commenter details to make notifications more informative
           let commenterName = 'A user';
@@ -221,7 +221,7 @@ export class BillStatusMonitorService {
               commenterName = userRes[0].email.split('@')[0];
             }
           } catch (uErr) {
-            logger.debug(`Failed to fetch commenter info for user ${update.user_id}: ${String(uErr)}`);
+            logger.debug({ component: 'server' }, `Failed to fetch commenter info for user ${update.user_id}: ${String(uErr)}`);
           }
 
           const notificationTemplate: Omit<NotificationRequest, 'user_id'> = {
@@ -247,14 +247,14 @@ export class BillStatusMonitorService {
             this.triggerNotification(user_id, notificationTemplate);
           });
         } else {
-          logger.info(`📢 No users actively tracking new comments for this bill (excluding author).`, logContext);
+          logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 No users actively tracking new comments for this bill (excluding author).`);
         }
       }
 
-      logger.info(`✅ Successfully processed engagement update`, logContext);
+      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `✅ Successfully processed engagement update`);
 
     } catch (error) {
-      logger.error('Error handling bill engagement update:', logContext, error);
+      logger.error({ error: logContext, error instanceof Error ? logContext, error.message : String(logContext, error) }, 'Error handling bill engagement update:');
     }
   }
 
@@ -297,10 +297,8 @@ export class BillStatusMonitorService {
       })
       .catch(err => {
         // Catch unexpected errors from the orchestrator promise itself
-        logger.error(`Unhandled error triggering Notification Orchestrator`, {
-          component: 'BillStatusMonitorService',
-          user_id
-        }, err);
+        logger.error({ component: 'BillStatusMonitorService',
+          user_id, error: err instanceof Error ? err.message : String(err) }, `Unhandled error triggering Notification Orchestrator`);
       });
   }
 
@@ -390,9 +388,7 @@ export class BillStatusMonitorService {
       }
       return bill;
     } catch (error) {
-      logger.error(`Failed to get bill details for bill ${bill_id}:`, {
-        component: 'BillStatusMonitorService'
-      }, error);
+      logger.error({ component: 'BillStatusMonitorService', error: error instanceof Error ? error.message : String(error) }, `Failed to get bill details for bill ${bill_id}:`);
       return null;
     }
   }
@@ -414,10 +410,8 @@ export class BillStatusMonitorService {
 
       await cacheService.set(cacheKey, updatedChanges, CACHE_TTL.BILL_DATA_LONG);
     } catch (error) {
-      logger.error('Error caching status change:', {
-        component: 'BillStatusMonitorService',
-        bill_id: change.bill_id
-      }, error);
+      logger.error({ component: 'BillStatusMonitorService',
+        bill_id: change.bill_id, error: error instanceof Error ? error.message : String(error) }, 'Error caching status change:');
     }
   }
 
@@ -433,9 +427,7 @@ export class BillStatusMonitorService {
         ? changes.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
         : [];
     } catch (error) {
-      logger.error(`Error getting status history for bill ${bill_id}:`, {
-        component: 'BillStatusMonitorService'
-      }, error);
+      logger.error({ component: 'BillStatusMonitorService', error: error instanceof Error ? error.message : String(error) }, `Error getting status history for bill ${bill_id}:`);
       return [];
     }
   }

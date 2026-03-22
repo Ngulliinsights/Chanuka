@@ -16,7 +16,16 @@ import type {
 /**
  * Recommendation Engine API Client
  */
-export     return response.data;
+export const recommendationApi = {
+  /**
+   * Get recommended bills based on user activity
+   */
+  async getRecommended(limit: number = 10): Promise<RecommendationResponse> {
+    const response = await globalApiClient.get<RecommendationResponse>(
+      '/api/recommendation/recommended',
+      { params: { limit } }
+    );
+    return response.data;
   },
 
   /**

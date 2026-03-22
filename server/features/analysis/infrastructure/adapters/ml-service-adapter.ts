@@ -15,13 +15,13 @@ export class MlServiceAdapter {
     constructor() {
         // Initialize the ML API client here
         // this.apiClient = new MlApiClient({ apiKey: process.env.ML_API_KEY });
-        logger.info("ML Service Adapter initialized.");
+        logger.info({ component: 'server' }, "ML Service Adapter initialized.");
     }
 
     async analyzeStakeholders(textContent: string): Promise<MLStakeholderResult> {
-        logger.debug(`Sending content to ML service for stakeholder analysis (length: ${textContent.length})`);
+        logger.debug({ component: 'server' }, `Sending content to ML service for stakeholder analysis (length: ${textContent.length})`);
         if (!textContent.trim()) {
-            logger.warn("Received empty content for stakeholder analysis, returning empty result.");
+            logger.warn({ component: 'server' }, "Received empty content for stakeholder analysis, returning empty result.");
             return { result: { /* default empty structure */ }, confidence: 0 };
         }
         try {
@@ -35,7 +35,7 @@ export class MlServiceAdapter {
                 },
                 model_confidence: 0.85
             };
-            logger.info("Received stakeholder analysis response from ML service.");
+            logger.info({ component: 'server' }, "Received stakeholder analysis response from ML service.");
             // --- End Replace ---
 
             // Transform the mock/real response to MLStakeholderResult format
@@ -54,9 +54,9 @@ export class MlServiceAdapter {
     }
 
     async analyzeBeneficiaries(textContent: string): Promise<MLBeneficiaryResult> {
-        logger.debug(`Sending content to ML service for beneficiary analysis (length: ${textContent.length})`);
+        logger.debug({ component: 'server' }, `Sending content to ML service for beneficiary analysis (length: ${textContent.length})`);
          if (!textContent.trim()) {
-            logger.warn("Received empty content for beneficiary analysis, returning empty result.");
+            logger.warn({ component: 'server' }, "Received empty content for beneficiary analysis, returning empty result.");
             return { result: { /* default empty structure */ }, confidence: 0 };
         }
         try {
@@ -71,7 +71,7 @@ export class MlServiceAdapter {
                  },
                  model_confidence: 0.90
              };
-             logger.info("Received beneficiary analysis response from ML service.");
+             logger.info({ component: 'server' }, "Received beneficiary analysis response from ML service.");
             // --- End Replace ---
 
              // Transform the mock/real response to MLBeneficiaryResult format

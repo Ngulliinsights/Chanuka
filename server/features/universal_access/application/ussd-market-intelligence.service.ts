@@ -3,11 +3,11 @@ import { MLAnalysisService } from '@server/features/analytics/application/servic
 
 export class USSDMarketIntelligenceService {
   constructor() {
-    logger.info('USSDMarketIntelligenceService initialized');
+    logger.info({ component: 'server' }, 'USSDMarketIntelligenceService initialized');
   }
 
   async getMarketInsights(query: string) {
-    logger.info(`Getting market insights for ${query}`);
+    logger.info({ component: 'server' }, `Getting market insights for ${query}`);
     try {
         // Connect to the analytics domain via the ML Analysis Service
         const analysis = await MLAnalysisService.analyzeBeneficiaries(query);

@@ -51,7 +51,7 @@ export class UserEmailService {
   private async initialize(): Promise<void> {
     try {
       this.emailService = await getEmailService();
-      logger.info('✅ User Email Service initialized');
+      logger.info({ component: 'server' }, '✅ User Email Service initialized');
     } catch (error) {
       logger.error({ error }, '❌ Failed to initialize User Email Service');
       throw error;
@@ -68,7 +68,7 @@ export class UserEmailService {
         loginUrl: data.loginUrl
       });
 
-      logger.info(`📧 Welcome email sent to ${data.email} for user ${data.user_id}`);
+      logger.info({ component: 'server' }, `📧 Welcome email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send welcome email to ${data.email}`);
@@ -86,7 +86,7 @@ export class UserEmailService {
         resetUrl: data.resetUrl
       });
 
-      logger.info(`🔐 Password reset email sent to ${data.email} for user ${data.user_id}`);
+      logger.info({ component: 'server' }, `🔐 Password reset email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send password reset email to ${data.email}`);
@@ -106,7 +106,7 @@ export class UserEmailService {
         text: this.generateVerificationEmailText(data)
       });
 
-      logger.info(`✅ Verification email sent to ${data.email} for user ${data.user_id}`);
+      logger.info({ component: 'server' }, `✅ Verification email sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send verification email to ${data.email}`);
@@ -126,7 +126,7 @@ export class UserEmailService {
         text: this.generateAccountChangeEmailText(data)
       });
 
-      logger.info(`🔄 Account change notification sent to ${data.email} for user ${data.user_id}`);
+      logger.info({ component: 'server' }, `🔄 Account change notification sent to ${data.email} for user ${data.user_id}`);
       return result;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send account change notification to ${data.email}`);
@@ -151,7 +151,7 @@ export class UserEmailService {
         text: this.generateUserNotificationText(subject, message, userName)
       });
 
-      logger.info(`📬 User notification email sent to ${email}`);
+      logger.info({ component: 'server' }, `📬 User notification email sent to ${email}`);
       return result;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send user notification email to ${email}`);

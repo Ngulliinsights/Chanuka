@@ -256,7 +256,7 @@ export class EnhancedAPIRaceConditionDetector {
 
       return report;
     } catch (error) {
-      logger.error('❌ Analysis failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error }, '❌ Analysis failed:');
       throw error;
     }
   }

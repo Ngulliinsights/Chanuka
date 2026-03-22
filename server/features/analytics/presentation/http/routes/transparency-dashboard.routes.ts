@@ -174,7 +174,7 @@ export class SimpleTransparencyDashboardService {
 
       return { trends, analysis, recommendations };
     } catch (error) {
-      logger.error('Error analyzing transparency trends:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error analyzing transparency trends:');
       throw new Error('Failed to analyze transparency trends');
     }
   }
@@ -300,7 +300,7 @@ export class SimpleTransparencyDashboardService {
         }
       };
     } catch (error) {
-      logger.error('Error loading transparency dashboard:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error loading transparency dashboard:');
       throw new Error('Failed to load transparency dashboard');
     }
   }
@@ -504,7 +504,7 @@ export class SimpleTransparencyDashboardService {
         conflictCount
       };
     } catch (error) {
-      logger.error('Error calculating period transparency:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error calculating period transparency:');
       return {
         averageScore: 0,
         averageRiskLevel: 'low',

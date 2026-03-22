@@ -1,284 +1,288 @@
 /**
  * Native WebSocket Adapter
- * 
- * Adapter implementation for the native WebSocket service
+ *
+ * Thin adapter over the core WebSocketService that conforms to the unified
+ * WebSocketAdapter interface.
  */
 
 import { Server } from 'http';
+import { WebSocketService } from '@server/infrastructure/websocket/core/websocket-service';
+import {
+  HealthStatus,
+  ServiceStats,
+  WebSocketAdapter,
+} from './websocket-adapter';
+import { logger } from '@server/infrastructure/observability';
 
-// FIXME: Use @server/infrastructure/websocket
-// import { WebSocketService } from '@server/infrastructure/core/websocket-service';
-import { HealthStatus,ServiceStats, WebSocketAdapter } from './websocket-adapter';
+// ─── Domain types ─────────────────────────────────────────────────────────────
 
-
-// Note: If @shared/core is unavailable, consider using a local logger implementation
-// or importing from a different path. For now, we'll create a fallback.
-/* eslint-disable no-console */
-const logger = {
-  info: (message: string, meta?: Record<string, unknown>) => console.log(`[INFO] ${message}`, meta),
-  warn: (message: string, meta?: Record<string, unknown>) => console.warn(`[WARN] ${message}`, meta),
-  error: (message: string, meta?: Record<string, unknown>, error?: Error) => console.error(`[ERROR] ${message}`, meta, error)
-};
-/* eslint-enable no-console */
-
-/**
- * Type definitions for better type safety
- */
-interface BillUpdate {
+export interface BillUpdate {
   type: 'status_change' | 'new_comment' | 'amendment' | 'voting_scheduled';
   data: Record<string, unknown>;
   timestamp?: Date;
 }
 
-interface UserNotification {
-  type: string;
-  title: string;
+export interface UserNotification {
+  type:    string;
+  title:   string;
   message: string;
-  data?: Record<string, unknown>;
+  data?:   Record<string, unknown>;
 }
 
-interface BroadcastMessage {
-  type: string;
-  data: Record<string, unknown>;
+export interface BroadcastMessage {
+  type:       string;
+  data:       Record<string, unknown>;
   timestamp?: Date;
 }
 
-/**
- * Type guard to check if ServiceState is an object with statistics
- */
+// ─── Internal type guard ──────────────────────────────────────────────────────
+
 interface ServiceStateObject {
   activeConnections?: number;
-  totalConnections?: number;
-  totalMessages?: number;
-  totalBroadcasts?: number;
-  droppedMessages?: number;
-  averageLatency?: number;
-  memoryUsage?: number;
+  totalConnections?:  number;
+  totalMessages?:     number;
+  totalBroadcasts?:   number;
+  droppedMessages?:   number;
+  averageLatency?:    number;
+  memoryUsage?:       number;
 }
 
 function isServiceStateObject(state: unknown): state is ServiceStateObject {
-  return typeof state === 'object' && state !== null && typeof state !== 'string';
+  return typeof state === 'object' && state !== null;
 }
 
+// ─── Adapter ──────────────────────────────────────────────────────────────────
+
 /**
- * Adapter for the native WebSocket service implementation
+ * Adapter over the native WebSocket service.
+ *
+ * Methods that depend on WebSocketService capabilities not yet available
+ * (`sendUserNotification`, `broadcastToAll`) return `false` so callers can
+ * detect the gap and fall back (e.g. via Redis pub/sub) rather than silently
+ * losing messages.
  */
 export class NativeWebSocketAdapter extends WebSocketAdapter {
-  private webSocketService: WebSocketService;
+  private readonly webSocketService: WebSocketService;
 
-  constructor(webSocketService?: WebSocketService) {
+  constructor(webSocketService: WebSocketService) {
     super();
-
-    // If webSocketService is not provided, you'll need to initialize it with required parameters
-    // Based on the error, WebSocketService expects 6-8 arguments
-    // Example: new WebSocketService(server, config, logger, metrics, connectionManager, eventEmitter, ...)
-    // For now, we'll require it to be passed in or handle initialization in the initialize method
     if (!webSocketService) {
-      throw new Error('WebSocketService must be provided. Cannot instantiate without required dependencies.');
+      throw new Error(
+        'NativeWebSocketAdapter: WebSocketService is required.',
+      );
     }
-
     this.webSocketService = webSocketService;
   }
 
-  /**
-   * Initialize the native WebSocket service
-   */
+  // ─── Lifecycle ───────────────────────────────────────────────────────────────
+
   async initialize(server: Server): Promise<void> {
     if (this.isInitialized) {
-      logger.warn({
-        component: 'NativeWebSocketAdapter'
-      }, 'NativeWebSocketAdapter already initialized');
+      logger.warn(
+        { component: 'NativeWebSocketAdapter' },
+        'Already initialized — skipping duplicate call',
+      );
       return;
     }
 
     try {
       await this.webSocketService.initialize(server);
       this.isInitialized = true;
-
-      logger.info({
-        component: 'NativeWebSocketAdapter'
-      }, 'NativeWebSocketAdapter initialized successfully');
+      logger.info(
+        { component: 'NativeWebSocketAdapter' },
+        'Initialized successfully',
+      );
     } catch (error) {
-      logger.error('Failed to initialize NativeWebSocketAdapter', {
-        component: 'NativeWebSocketAdapter'
-      }, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        { component: 'NativeWebSocketAdapter', error: errorMessage(error) },
+        'Failed to initialize',
+      );
       throw error;
     }
   }
 
-  /**
-   * Broadcast bill update using native WebSocket service
-   */
-  broadcastBillUpdate(bill_id: number, update: BillUpdate): void {
-    if (!this.isReady()) {
-      logger.warn({
-        component: 'NativeWebSocketAdapter',
-        bill_id
-      }, 'Adapter not ready for bill update broadcast');
-      return;
-    }
-
-    // Use broadcastToBill instead of broadcastBillUpdate
-    const message = {
-      type: update.type,
-      data: update.data,
-      timestamp: update.timestamp || new Date()
-    };
-
-    this.webSocketService.broadcastToBill(bill_id, message);
-  }
-
-  /**
-   * Send user notification using native WebSocket service
-   */
-  sendUserNotification(user_id: string, notification: UserNotification): void {
-    if (!this.isReady()) {
-      logger.warn({
-        component: 'NativeWebSocketAdapter',
-        user_id
-      }, 'Adapter not ready for user notification');
-      return;
-    }
-
-    // If sendUserNotification doesn't exist, you may need to use a different method
-    // or implement it as a wrapper around existing functionality
-    // For example, you might need to use sendToUser or a similar method
-    try {
-      // Implementation would depend on the actual WebSocketService API
-      logger.warn({
-        user_id,
-        notification
-      }, 'sendUserNotification not implemented in WebSocketService');
-    } catch (error) {
-      logger.error('Error sending user notification', {
-        component: 'NativeWebSocketAdapter',
-        user_id
-      }, error instanceof Error ? error : new Error(String(error)));
-    }
-  }
-
-  /**
-   * Broadcast to all clients using native WebSocket service
-   */
-  broadcastToAll(_message: BroadcastMessage): void {
-    if (!this.isReady()) {
-      logger.warn({
-        component: 'NativeWebSocketAdapter'
-      }, 'Adapter not ready for broadcast');
-      return;
-    }
-
-    // Note: broadcastToAll doesn't exist. You may need to:
-    // 1. Use broadcastToBill with a special bill_id that means "all"
-    // 2. Iterate through all connected clients
-    // 3. Use a different method if available
-    logger.warn('broadcastToAll not implemented in WebSocketService. Consider using broadcastToBill or alternative approach.');
-  }
-
-  /**
-   * Get statistics from native WebSocket service
-   */
-  getStats(): ServiceStats {
-    const state = this.webSocketService.getState();
-
-    // Handle the case where state might be a string or an object
-    if (!isServiceStateObject(state)) {
-      return {
-        activeConnections: 0,
-        totalConnections: 0,
-        totalMessages: 0,
-        totalBroadcasts: 0,
-        droppedMessages: 0,
-        errorRate: 0,
-        averageLatency: 0,
-        memoryUsage: 0,
-        uptime: this.getUptime()
-      };
-    }
-
-    return {
-      activeConnections: state.activeConnections || 0,
-      totalConnections: state.totalConnections || 0,
-      totalMessages: state.totalMessages || 0,
-      totalBroadcasts: state.totalBroadcasts || 0,
-      droppedMessages: state.droppedMessages || 0,
-      errorRate: state.totalMessages && state.totalMessages > 0
-        ? (state.droppedMessages || 0) / state.totalMessages
-        : 0,
-      averageLatency: state.averageLatency || 0,
-      memoryUsage: state.memoryUsage || 0,
-      uptime: this.getUptime()
-    };
-  }
-
-  /**
-   * Get health status from native WebSocket service
-   */
-  getHealthStatus(): HealthStatus {
-    const state = this.webSocketService.getState();
-
-    // Handle the case where state might be a string or an object
-    if (!isServiceStateObject(state)) {
-      return {
-        isHealthy: false,
-        status: 'unhealthy',
-        issues: ['Service state is not available'],
-        lastCheck: new Date()
-      };
-    }
-
-    // Determine health based on available state information
-    const activeConnections = state.activeConnections || 0;
-    const errorRate = state.totalMessages && state.totalMessages > 0
-      ? (state.droppedMessages || 0) / state.totalMessages
-      : 0;
-
-    const isHealthy = activeConnections >= 0 && errorRate < 0.1;
-    const issues: string[] = [];
-
-    if (errorRate >= 0.1) {
-      issues.push(`High error rate: ${(errorRate * 100).toFixed(2)}%`);
-    }
-
-    return {
-      isHealthy,
-      status: isHealthy ? 'healthy' : 'unhealthy',
-      issues,
-      lastCheck: new Date()
-    };
-  }
-
-  /**
-   * Shutdown the native WebSocket service
-   */
   async shutdown(): Promise<void> {
     if (this.isShuttingDown) {
-      logger.warn('Shutdown already in progress');
+      logger.warn(
+        { component: 'NativeWebSocketAdapter' },
+        'Shutdown already in progress',
+      );
       return;
     }
 
     this.isShuttingDown = true;
-
     try {
       await this.webSocketService.shutdown();
       this.isInitialized = false;
-
-      logger.info({
-        component: 'NativeWebSocketAdapter'
-      }, 'NativeWebSocketAdapter shutdown complete');
+      logger.info({ component: 'NativeWebSocketAdapter' }, 'Shutdown complete');
     } catch (error) {
-      logger.error('Error during NativeWebSocketAdapter shutdown', {
-        component: 'NativeWebSocketAdapter'
-      }, error instanceof Error ? error : new Error(String(error)));
+      logger.error(
+        { component: 'NativeWebSocketAdapter', error: errorMessage(error) },
+        'Error during shutdown',
+      );
     } finally {
       this.isShuttingDown = false;
     }
   }
 
+  // ─── Messaging ───────────────────────────────────────────────────────────────
+
   /**
-   * Get the underlying WebSocket service instance
+   * Broadcasts a bill update to all subscribers of that bill via the
+   * underlying WebSocketService.
    */
+  broadcastBillUpdate(billId: number, update: BillUpdate): void {
+    if (!this.isReady()) {
+      logger.warn(
+        { component: 'NativeWebSocketAdapter', billId },
+        'broadcastBillUpdate called before adapter is ready — message dropped',
+      );
+      return;
+    }
+
+    this.webSocketService.broadcastToBill(billId, {
+      type:      update.type,
+      data:      update.data,
+      timestamp: update.timestamp ?? new Date(),
+    });
+  }
+
+  /**
+   * Sends a notification to a specific user.
+   *
+   * @returns `true` when delivered, `false` when the capability is not yet
+   *          wired on the underlying service (so callers can route elsewhere).
+   *
+   * TODO: replace the stub body with
+   *       `this.webSocketService.sendToUser(userId, notification)`
+   *       once the service exposes that method.
+   */
+  sendUserNotification(userId: string, notification: UserNotification): boolean {
+    if (!this.isReady()) {
+      logger.warn(
+        { component: 'NativeWebSocketAdapter', userId },
+        'sendUserNotification called before adapter is ready',
+      );
+      return false;
+    }
+
+    // NOT YET WIRED: log and signal the gap to the caller.
+    logger.warn(
+      {
+        component:        'NativeWebSocketAdapter',
+        userId,
+        notificationType: notification.type,
+      },
+      'sendUserNotification: service method not yet available — notification not delivered',
+    );
+    return false;
+  }
+
+  /**
+   * Broadcasts a message to all connected clients.
+   *
+   * @returns `true` when delivered, `false` when the capability is not yet
+   *          wired on the underlying service.
+   *
+   * TODO: replace the stub body with
+   *       `this.webSocketService.broadcastToAll(message)`
+   *       once the service exposes that method.
+   */
+  broadcastToAll(_message: BroadcastMessage): boolean {
+    if (!this.isReady()) {
+      logger.warn(
+        { component: 'NativeWebSocketAdapter' },
+        'broadcastToAll called before adapter is ready',
+      );
+      return false;
+    }
+
+    // NOT YET WIRED: log and signal the gap to the caller.
+    logger.warn(
+      { component: 'NativeWebSocketAdapter' },
+      'broadcastToAll: service method not yet available — message not delivered',
+    );
+    return false;
+  }
+
+  // ─── Observability ───────────────────────────────────────────────────────────
+
+  getStats(): ServiceStats {
+    const state = this.webSocketService.getState();
+    if (!isServiceStateObject(state)) return this.emptyStats();
+
+    const totalMessages   = state.totalMessages   ?? 0;
+    const droppedMessages = state.droppedMessages ?? 0;
+
+    return {
+      activeConnections: state.activeConnections ?? 0,
+      totalConnections:  state.totalConnections  ?? 0,
+      totalMessages,
+      totalBroadcasts:   state.totalBroadcasts   ?? 0,
+      droppedMessages,
+      errorRate:         totalMessages > 0 ? droppedMessages / totalMessages : 0,
+      averageLatency:    state.averageLatency     ?? 0,
+      memoryUsage:       state.memoryUsage        ?? 0,
+      uptime:            this.getUptime(),
+    };
+  }
+
+  getHealthStatus(): HealthStatus {
+    const state = this.webSocketService.getState();
+
+    if (!isServiceStateObject(state)) {
+      return {
+        isHealthy: false,
+        status:    'unhealthy',
+        issues:    ['Service state unavailable'],
+        lastCheck: new Date(),
+      };
+    }
+
+    const totalMessages   = state.totalMessages   ?? 0;
+    const droppedMessages = state.droppedMessages ?? 0;
+    const errorRate       = totalMessages > 0 ? droppedMessages / totalMessages : 0;
+
+    const issues: string[] = [];
+    if (errorRate >= 0.1) {
+      issues.push(`High error rate: ${(errorRate * 100).toFixed(2)}%`);
+    }
+
+    const isHealthy = issues.length === 0;
+    return {
+      isHealthy,
+      status:    isHealthy ? 'healthy' : 'unhealthy',
+      issues,
+      lastCheck: new Date(),
+    };
+  }
+
+  // ─── Internal access ─────────────────────────────────────────────────────────
+
+  /** Expose the underlying service for advanced callers. */
   getWebSocketService(): WebSocketService {
     return this.webSocketService;
   }
+
+  // ─── Private helpers ─────────────────────────────────────────────────────────
+
+  private emptyStats(): ServiceStats {
+    return {
+      activeConnections: 0,
+      totalConnections:  0,
+      totalMessages:     0,
+      totalBroadcasts:   0,
+      droppedMessages:   0,
+      errorRate:         0,
+      averageLatency:    0,
+      memoryUsage:       0,
+      uptime:            this.getUptime(),
+    };
+  }
+}
+
+// ─── Utility ──────────────────────────────────────────────────────────────────
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

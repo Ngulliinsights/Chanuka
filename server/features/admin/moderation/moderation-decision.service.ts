@@ -8,13 +8,8 @@ import { User } from '@server/features/users/domain/entities/user';
 import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { comments, 
-  content_report, 
-  moderation_action,
-  users
- } from '@server/infrastructure/schema';
+import { comments, content_reports, users, moderation_queue } from '@server/infrastructure/schema';
 import { db } from '@server/infrastructure/database';
-import { users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 import { 
@@ -52,8 +47,8 @@ export class ModerationDecisionService {
       // Fetch the report to be reviewed
       const [report] = await db
         .select()
-        .from(content_report)
-        .where(eq(content_report.id, report_id));
+        .from(content_reports)
+        .where(eq(content_reports.id, report_id));
 
       if (!report) {
         return {
@@ -64,7 +59,7 @@ export class ModerationDecisionService {
 
       // Update the report with the review decision
       await db
-        .update(content_report)
+        .update(content_reports)
         .set({
           status: decision === 'resolve' ? 'resolved' : 
                   decision === 'dismiss' ? 'dismissed' : 'escalated',
@@ -73,7 +68,7 @@ export class ModerationDecisionService {
           resolutionNotes: resolutionNotes,
           updated_at: new Date()
         })
-        .where(eq(content_report.id, report_id));
+        .where(eq(content_reports.id, report_id));
 
       // Record the moderation action
       await writeDatabase.insert(moderation_action).values({
@@ -134,8 +129,8 @@ export class ModerationDecisionService {
         try {
           const [report] = await db
             .select()
-            .from(content_report)
-            .where(eq(content_report.id, report_id));
+            .from(content_reports)
+            .where(eq(content_reports.id, report_id));
 
           if (!report) {
             failedIds.push(report_id);
@@ -144,7 +139,7 @@ export class ModerationDecisionService {
 
           // Update report status
           await db
-            .update(content_report)
+            .update(content_reports)
             .set({
               status: operation.action === 'resolve' ? 'resolved' :
                       operation.action === 'dismiss' ? 'dismissed' :
@@ -154,7 +149,7 @@ export class ModerationDecisionService {
               resolutionNotes: operation.resolutionNotes,
               updated_at: new Date()
             })
-            .where(eq(content_report.id, report_id));
+            .where(eq(content_reports.id, report_id));
 
           // Record action
           const actionType = operation.action === 'delete' ? 'delete' : 'hide';

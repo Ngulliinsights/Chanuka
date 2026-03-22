@@ -239,7 +239,7 @@ class CircuitBreaker {
       const elapsed = Date.now() - this.lastFailureTime;
       if (elapsed > this.resetTimeoutMs) {
         this.state = 'HALF_OPEN';
-        logger.info('Circuit breaker transitioning to HALF_OPEN for health probe');
+        logger.info({ component: 'server' }, 'Circuit breaker transitioning to HALF_OPEN for health probe');
       } else {
         const retrySeconds = Math.ceil((this.resetTimeoutMs - elapsed) / 1000);
         throw new Error(`Circuit breaker is OPEN. Retry in ${retrySeconds}s`);

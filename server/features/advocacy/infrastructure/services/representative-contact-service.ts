@@ -545,7 +545,7 @@ Sincerely,
       logger.debug({ representativeId }, 'Cache cleared for representative');
     } else {
       this.representativeCache.clear();
-      logger.debug('All representative cache cleared');
+      logger.debug({ component: 'server' }, 'All representative cache cleared');
     }
   }
 

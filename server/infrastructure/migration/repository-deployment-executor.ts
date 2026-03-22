@@ -144,7 +144,7 @@ export class RepositoryDeploymentExecutor {
 
     // Configure orchestrator for parallel deployment
     this.orchestrator.onRollback(async () => {
-      logger.info('Rollback callback triggered - cleaning up parallel implementation');
+      logger.info({ component: 'server' }, 'Rollback callback triggered - cleaning up parallel implementation');
       await this.cleanupParallelImplementation();
     });
 
@@ -215,7 +215,7 @@ export class RepositoryDeploymentExecutor {
 
     if (this.config.extendedValidationPeriod) {
       // Wait for larger sample size
-      logger.info('Waiting for extended validation period to gather larger sample size');
+      logger.info({ component: 'server' }, 'Waiting for extended validation period to gather larger sample size');
       await new Promise(resolve => setTimeout(resolve, 30000)); // 30 seconds for testing
     }
 

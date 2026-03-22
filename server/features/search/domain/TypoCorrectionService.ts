@@ -456,7 +456,7 @@ export class TypoCorrectionService {
   clearCaches(): void {
     this.synonymCache.clear();
     this.correctionCache.clear();
-    logger.info('Typo correction and synonym caches cleared');
+    logger.info({ component: 'server' }, 'Typo correction and synonym caches cleared');
   }
 
   /**

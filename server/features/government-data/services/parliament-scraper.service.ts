@@ -348,7 +348,7 @@ export async function fetchJsRendered(url: string): Promise<string | null> {
  * Enqueues each profile for extraction.
  */
 export async function discoverMpProfiles(): Promise<void> {
-  logger.info("Discovering MP profiles");
+  logger.info({ component: 'server' }, "Discovering MP profiles");
   const url = `${PARLIAMENT_BASE}/the-national-assembly/mps`;
   const html = await fetchJsRendered(url);
   if (!html) return;
@@ -380,7 +380,7 @@ export async function discoverMpProfiles(): Promise<void> {
  * Handles pagination by following "next page" links.
  */
 export async function discoverBills(): Promise<void> {
-  logger.info("Discovering bills");
+  logger.info({ component: 'server' }, "Discovering bills");
   let pageUrl: string | null = `${PARLIAMENT_BASE}/the-national-assembly/house-business/bills`;
   let pageCount = 0;
 
@@ -419,7 +419,7 @@ export async function discoverBills(): Promise<void> {
  * The DSpace repository serves a paginated list of sitting records.
  */
 export async function discoverHansards(): Promise<void> {
-  logger.info("Discovering Hansard PDFs");
+  logger.info({ component: 'server' }, "Discovering Hansard PDFs");
 
   // DSpace community/collection listing
   const indexUrl = `${HANSARD_NA_BASE}/handle/123456789/1/browse?type=dateissued&order=DESC`;
@@ -882,11 +882,11 @@ async function createDataQualityFlag(flag: {
  */
 export async function runScrapeCycle(): Promise<void> {
   if (isRecessPeriod()) {
-    logger.info("Parliament in recess — skipping scrape cycle");
+    logger.info({ component: 'server' }, "Parliament in recess — skipping scrape cycle");
     return;
   }
 
-  logger.info("Starting scrape cycle");
+  logger.info({ component: 'server' }, "Starting scrape cycle");
   const runStart = Date.now();
 
   try {
@@ -1029,7 +1029,7 @@ function inferSessionFromDate(isoDate: string): number {
 export function startScheduler(): void {
   const CHECK_INTERVAL_MS = 60 * 60 * 1000; // check every hour
 
-  logger.info("Scrape scheduler started");
+  logger.info({ component: 'server' }, "Scrape scheduler started");
 
   const checkAndRun = async () => {
     const now = new Date();

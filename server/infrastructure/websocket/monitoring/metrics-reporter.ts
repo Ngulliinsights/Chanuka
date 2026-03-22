@@ -127,7 +127,7 @@ export class MetricsReporter implements IMetricsReporter {
   logMetrics(level: string = 'info', options: Partial<ExportOptions> = {}): void {
     if (!this.logger) {
       if (process.env.NODE_ENV !== 'production') {
-        logger.warn('No logger configured for MetricsReporter');
+        logger.warn({ component: 'MetricsReporter' }, 'No logger configured for MetricsReporter');
       }
       return;
     }
@@ -141,7 +141,7 @@ export class MetricsReporter implements IMetricsReporter {
       } catch (logError) {
         // If logging the error also fails, just ignore it to prevent throwing
         if (process.env.NODE_ENV !== 'production') {
-          logger.error('Failed to log metrics error:', logError);
+          logger.error({ logError }, 'Failed to log metrics error:');
         }
       }
     }

@@ -56,10 +56,8 @@ export class BillNotificationService {
       }, 'Bill created notifications sent');
 
     } catch (error) {
-      logger.error('Failed to handle bill created event', {
-        component: 'BillNotificationService',
-        bill_id: event.bill_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        bill_id: event.bill_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to handle bill created event');
     }
   }
 
@@ -110,10 +108,8 @@ export class BillNotificationService {
       }, 'Bill status change notifications sent');
 
     } catch (error) {
-      logger.error('Failed to handle bill status changed event', {
-        component: 'BillNotificationService',
-        bill_id: event.bill_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        bill_id: event.bill_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to handle bill status changed event');
     }
   }
 
@@ -166,10 +162,8 @@ export class BillNotificationService {
       }, 'Bill updated notifications sent');
 
     } catch (error) {
-      logger.error('Failed to handle bill updated event', {
-        component: 'BillNotificationService',
-        bill_id: event.bill_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        bill_id: event.bill_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to handle bill updated event');
     }
   }
 
@@ -195,10 +189,8 @@ export class BillNotificationService {
         }
       ];
     } catch (error) {
-      logger.error('Failed to get bill stakeholders', {
-        component: 'BillNotificationService',
-        bill_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        bill_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to get bill stakeholders');
       return [];
     }
   }
@@ -300,10 +292,8 @@ export class BillNotificationService {
       }, 'Urgent bill notifications sent');
 
     } catch (error) {
-      logger.error('Failed to send urgent bill notification', {
-        component: 'BillNotificationService',
-        bill_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        bill_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to send urgent bill notification');
     }
   }
 
@@ -355,10 +345,8 @@ export class BillNotificationService {
       }, 'Bill digest notification sent');
 
     } catch (error) {
-      logger.error('Failed to send bill digest notification', {
-        component: 'BillNotificationService',
-        user_id
-      }, error);
+      logger.error({ component: 'BillNotificationService',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Failed to send bill digest notification');
     }
   }
 }

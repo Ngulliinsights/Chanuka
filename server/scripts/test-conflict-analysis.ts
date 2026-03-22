@@ -91,8 +91,8 @@ async function testConflictAnalysis() {
     console.log(`   - Severity calculation: Working correctly`);
 
   } catch (error) {
-    logger.error('❌ Test failed:', { component: 'Chanuka' }, error);
-    logger.error('Stack trace:', { component: 'Chanuka' }, error instanceof Error ? error.stack : 'Unknown error');
+    logger.error({ component: 'Chanuka', error }, '❌ Test failed:');
+    logger.error({ component: 'Chanuka', stack: error instanceof Error ? error.stack : 'Unknown error' }, 'Stack trace:');
   }
 }
 
@@ -101,7 +101,7 @@ testConflictAnalysis().then(() => {
   logger.info({ component: 'Chanuka' }, '\n🎉 Test script completed');
   process.exit(0);
 }).catch((error) => {
-  logger.error('💥 Test script failed:', { component: 'Chanuka' }, error);
+  logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, '💥 Test script failed:');
   process.exit(1);
 });
 

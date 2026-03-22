@@ -216,7 +216,7 @@ export class AdvancedCachingService {
     try {
       this.cache.clear();
       this.tagIndex.clear();
-      logger.info('Cache cleared');
+      logger.info({ component: 'server' }, 'Cache cleared');
       return true;
     } catch (error) {
       logger.error({ error }, 'Cache clear error');
@@ -480,7 +480,7 @@ export class AdvancedCachingService {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);
       this.cleanupTimer = undefined;
-      logger.info('Cache cleanup timer stopped');
+      logger.info({ component: 'server' }, 'Cache cleanup timer stopped');
     }
   }
 
@@ -490,7 +490,7 @@ export class AdvancedCachingService {
   resetStats(): void {
     this.stats.hits = 0;
     this.stats.misses = 0;
-    logger.info('Cache stats reset');
+    logger.info({ component: 'server' }, 'Cache stats reset');
   }
 }
 

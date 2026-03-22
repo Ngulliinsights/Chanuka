@@ -15,8 +15,5 @@ export * from './controller/index';
 // Database interaction types
 export * from './database/index';
 
-// Backward compatibility exports
-export { default as middlewareTypes } from './middleware/index';
-export { default as serviceTypes } from './service/index';
-export { default as controllerTypes } from './controller/index';
-export { default as databaseTypes } from './database/index';
+// Feature-specific types
+export * from '../features/advocacy/types/index';

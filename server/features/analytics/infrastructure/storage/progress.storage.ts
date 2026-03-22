@@ -25,7 +25,7 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
       // Simple health check for in-memory storage
       return true;
     } catch (error) {
-      logger.error('ProgressStorage health check failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'ProgressStorage health check failed:');
       return false;
     }
   }

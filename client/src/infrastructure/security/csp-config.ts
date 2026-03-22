@@ -285,4 +285,6 @@ export function isCSPSecure(directives: CSPDirectives): boolean {
 /**
  * Get recommended CSP configuration for specific use cases
  */
-export 
+export const getRecommendedCSPConfig = (): CSPDirectives => {
+  return getCSPConfig('production');
+};

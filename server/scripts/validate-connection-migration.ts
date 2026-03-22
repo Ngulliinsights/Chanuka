@@ -22,7 +22,7 @@ import { SocketIOWebSocketService,WebSocketMigrationDeployer } from '../../deplo
  * Validate Socket.IO service initialization
  */
 async function validateSocketIOInitialization(): Promise<boolean> {
-  logger.info('🔍 Validating Socket.IO service initialization...');
+  logger.info({ component: 'server' }, '🔍 Validating Socket.IO service initialization...');
 
   try {
     const server = createServer();
@@ -58,10 +58,10 @@ async function validateSocketIOInitialization(): Promise<boolean> {
       server.close(() => resolve());
     });
 
-    logger.info('✅ Socket.IO service initialization validation passed');
+    logger.info({ component: 'server' }, '✅ Socket.IO service initialization validation passed');
     return true;
   } catch (error) {
-    logger.error('❌ Socket.IO service initialization validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Socket.IO service initialization validation failed');
     return false;
   }
 }
@@ -70,7 +70,7 @@ async function validateSocketIOInitialization(): Promise<boolean> {
  * Validate Socket.IO authentication
  */
 async function validateSocketIOAuthentication(): Promise<boolean> {
-  logger.info('🔍 Validating Socket.IO authentication...');
+  logger.info({ component: 'server' }, '🔍 Validating Socket.IO authentication...');
 
   try {
     const server = createServer();
@@ -148,14 +148,14 @@ async function validateSocketIOAuthentication(): Promise<boolean> {
     });
 
     if (validAuthTest && invalidAuthTest) {
-      logger.info('✅ Socket.IO authentication validation passed');
+      logger.info({ component: 'server' }, '✅ Socket.IO authentication validation passed');
       return true;
     } else {
       throw new Error(`Authentication test failed: valid=${validAuthTest}, invalid=${invalidAuthTest}`);
     }
 
   } catch (error) {
-    logger.error('❌ Socket.IO authentication validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Socket.IO authentication validation failed');
     return false;
   }
 }
@@ -164,7 +164,7 @@ async function validateSocketIOAuthentication(): Promise<boolean> {
  * Validate Socket.IO subscription management
  */
 async function validateSubscriptionManagement(): Promise<boolean> {
-  logger.info('🔍 Validating Socket.IO subscription management...');
+  logger.info({ component: 'server' }, '🔍 Validating Socket.IO subscription management...');
 
   try {
     const server = createServer();
@@ -230,14 +230,14 @@ async function validateSubscriptionManagement(): Promise<boolean> {
     });
 
     if (subscriptionTest) {
-      logger.info('✅ Socket.IO subscription management validation passed');
+      logger.info({ component: 'server' }, '✅ Socket.IO subscription management validation passed');
       return true;
     } else {
       throw new Error('Subscription test failed');
     }
 
   } catch (error) {
-    logger.error('❌ Socket.IO subscription management validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Socket.IO subscription management validation failed');
     return false;
   }
 }
@@ -246,7 +246,7 @@ async function validateSubscriptionManagement(): Promise<boolean> {
  * Validate migration deployment process
  */
 async function validateMigrationDeployment(): Promise<boolean> {
-  logger.info('🔍 Validating migration deployment process...');
+  logger.info({ component: 'server' }, '🔍 Validating migration deployment process...');
 
   try {
     const server = createServer();
@@ -291,10 +291,10 @@ async function validateMigrationDeployment(): Promise<boolean> {
       server.close(() => resolve());
     });
 
-    logger.info('✅ Migration deployment validation passed');
+    logger.info({ component: 'server' }, '✅ Migration deployment validation passed');
     return true;
   } catch (error) {
-    logger.error('❌ Migration deployment validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Migration deployment validation failed');
     return false;
   }
 }
@@ -303,7 +303,7 @@ async function validateMigrationDeployment(): Promise<boolean> {
  * Validate zero downtime migration
  */
 async function validateZeroDowntimeMigration(): Promise<boolean> {
-  logger.info('🔍 Validating zero downtime migration...');
+  logger.info({ component: 'server' }, '🔍 Validating zero downtime migration...');
 
   try {
     const server = createServer();
@@ -387,7 +387,7 @@ async function validateZeroDowntimeMigration(): Promise<boolean> {
     }
 
   } catch (error) {
-    logger.error('❌ Zero downtime migration validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Zero downtime migration validation failed');
     return false;
   }
 }
@@ -428,7 +428,7 @@ function expect(actual: unknown): {
 // ============================================================================
 
 async function main(): Promise<void> {
-  logger.info('🚀 Starting Socket.IO WebSocket migration validation...');
+  logger.info({ component: 'server' }, '🚀 Starting Socket.IO WebSocket migration validation...');
 
   const validations = [
     { name: 'Socket.IO Initialization', fn: validateSocketIOInitialization },
@@ -470,7 +470,7 @@ async function main(): Promise<void> {
 // Run validation if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   main().catch((error) => {
-    logger.error('Validation script failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error : new Error(String(error)) }, 'Validation script failed');
     process.exit(1);
   });
 }

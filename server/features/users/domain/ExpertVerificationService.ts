@@ -59,10 +59,10 @@ export class ExpertVerificationService {
    */
   async healthCheck(): Promise<boolean> {
     try {
-      this.logger.info('Expert verification service is healthy');
+      this.logger.info({ component: 'server' }, 'Expert verification service is healthy');
       return true;
     } catch (err) {
-      this.logger.error(`Health check failure: ${err}`);
+      this.logger.error({ component: 'server' }, `Health check failure: ${err}`);
       return false;
     }
   }
@@ -72,15 +72,15 @@ export class ExpertVerificationService {
    */
   async assignExpertsToAnalysis(analysis: Analysis): Promise<string[]> {
     try {
-      this.logger.info(`Assigning experts to analysis: ${analysis.id}`);
+      this.logger.info({ component: 'server' }, `Assigning experts to analysis: ${analysis.id}`);
       
       // Simplified implementation - return mock task IDs
       const mockTaskIds = ['task-1', 'task-2'];
       
-      this.logger.info(`Assigned ${mockTaskIds.length} experts to analysis ${analysis.id}`);
+      this.logger.info({ component: 'server' }, `Assigned ${mockTaskIds.length} experts to analysis ${analysis.id}`);
       return mockTaskIds;
     } catch (error) {
-      this.logger.error('Error assigning experts: ' + String(error));
+      this.logger.error({ component: 'ExpertVerificationService', error: String(error) }, 'Error assigning experts');
       throw error;
     }
   }
@@ -96,7 +96,7 @@ export class ExpertVerificationService {
     reasoning: string
   ): Promise<void> {
     try {
-      this.logger.info(`Expert ${expertId} submitted verification for analysis ${analysis_id}`);
+      this.logger.info({ component: 'server' }, `Expert ${expertId} submitted verification for analysis ${analysis_id}`);
       
       // Simplified implementation - just log the submission
       this.logger.debug({
@@ -108,7 +108,7 @@ export class ExpertVerificationService {
       }, 'Verification details:');
       
     } catch (error) {
-      this.logger.error('Error submitting expert verification: ' + String(error));
+      this.logger.error({ component: 'ExpertVerificationService', error: String(error) }, 'Error submitting expert verification');
       throw error;
     }
   }
@@ -118,11 +118,11 @@ export class ExpertVerificationService {
    */
   async getAnalysisStatus(analysis_id: string): Promise<VerificationStatus> {
     try {
-      this.logger.debug(`getAnalysisStatus called for analysis_id=${analysis_id}`);
+      this.logger.debug({ component: 'server' }, `getAnalysisStatus called for analysis_id=${analysis_id}`);
       // Simplified implementation - return pending status
       return VerificationStatus.PENDING;
     } catch (error) {
-      this.logger.error('Error getting analysis status: ' + String(error));
+      this.logger.error({ component: 'ExpertVerificationService', error: String(error) }, 'Error getting analysis status');
       throw error;
     }
   }

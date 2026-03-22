@@ -54,7 +54,7 @@ export class StakeholderAnalysisService {
      * Performs stakeholder analysis using bill content and potentially ML services.
      */
     async analyzeBill(bill_id: string): Promise<StakeholderAnalysisResult> { 
-        logger.info(`👥 Performing stakeholder analysis for bill ${bill_id }`);
+        logger.info({ component: 'server' }, `👥 Performing stakeholder analysis for bill ${bill_id }`);
         try { 
             const bill = await this.getBillContent(bill_id);
             const billContent = bill?.full_text ?? '';
@@ -65,9 +65,9 @@ export class StakeholderAnalysisService {
             try {
                  // Run ML analyses concurrently
                  mlBeneficiaries = await MLAnalysisService.analyzeBeneficiaries(billContent);
-                 logger.debug(`ML analysis results received for bill ${bill_id }`);
+                 logger.debug({ component: 'server' }, `ML analysis results received for bill ${bill_id }`);
             } catch (mlError) { 
-                logger.warn(`ML analysis failed for bill ${bill_id }, using fallback methods. Error: ${mlError}`);
+                logger.warn({ component: 'server' }, `ML analysis failed for bill ${bill_id }, using fallback methods. Error: ${mlError}`);
             }
 
             // --- Extract and combine results ---
@@ -106,7 +106,7 @@ export class StakeholderAnalysisService {
 
     /** Extracts stakeholder groups from ML results or uses fallback */
     private extractStakeholderGroups(beneficiaryData?: any): { primaryBeneficiaries: StakeholderGroup[], negativelyAffected: StakeholderGroup[] } {
-        logger.debug("Extracting stakeholder groups.");
+        logger.debug({ component: 'server' }, "Extracting stakeholder groups.");
         const primaryBeneficiaries: StakeholderGroup[] = [];
         const negativelyAffected: StakeholderGroup[] = [];
         const defaultConfidence = beneficiaryData ? 80 : 50; // Lower confidence for fallback
@@ -130,7 +130,7 @@ export class StakeholderAnalysisService {
         } else {
              // --- Fallback: Basic keyword matching (less reliable) ---
              // Add basic fallback logic if needed, e.g., matching common terms
-             logger.warn("Using fallback stakeholder group extraction.");
+             logger.warn({ component: 'server' }, "Using fallback stakeholder group extraction.");
         }
         return { primaryBeneficiaries, negativelyAffected };
     }
@@ -149,7 +149,7 @@ export class StakeholderAnalysisService {
 
     /** Estimates impact on specific population demographics */
     private estimatePopulationImpact(billContent: string, billTitle: string): PopulationImpact[] {
-        logger.debug("Estimating population impact.");
+        logger.debug({ component: 'server' }, "Estimating population impact.");
         const textToAnalyze = `${billTitle} ${billContent}`.toLowerCase();
         const impacts: PopulationImpact[] = [];
         const demographics = [
@@ -178,7 +178,7 @@ export class StakeholderAnalysisService {
 
     /** Calculates estimated economic impact */
     private calculateEconomicImpact(billContent: string, billTitle: string): EconomicImpact {
-        logger.debug("Calculating economic impact.");
+        logger.debug({ component: 'server' }, "Calculating economic impact.");
         const textToAnalyze = `${billTitle} ${billContent}`;
         // Regex to find monetary values with units (more robust)
         const moneyRegex = /\$?(\d{1,3}(?:,\d{3})*|\d+)(?:\.(\d+))?\s*(million|billion|trillion)?/gi;
@@ -259,7 +259,7 @@ export class StakeholderAnalysisService {
 
     /** Assesses social impact across different dimensions */
     private assessSocialImpact(billContent: string, billTitle: string): SocialImpact {
-        logger.debug("Assessing social impact.");
+        logger.debug({ component: 'server' }, "Assessing social impact.");
         const textToAnalyze = `${billTitle} ${billContent}`;
         return {
             equityEffect: this.calculateScore(textToAnalyze,

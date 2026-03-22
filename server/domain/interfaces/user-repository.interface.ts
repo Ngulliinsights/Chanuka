@@ -6,7 +6,7 @@
  */
 
 import type { Maybe,Result } from '@shared/core';
-import type { NewUser, NewUserProfile,User, UserProfile } from '@server/infrastructure/schema';
+import type { NewUser, NewUserProfile,User, UserProfile } from '@server/infrastructure/schema/foundation';
 
 export interface IUserRepository {
   /**

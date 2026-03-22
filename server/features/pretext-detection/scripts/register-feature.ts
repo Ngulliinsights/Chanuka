@@ -9,7 +9,7 @@ import { logger } from '@server/infrastructure/observability';
 
 async function registerPretextDetection() {
   try {
-    logger.info('Registering pretext detection feature with monitoring system...');
+    logger.info({ component: 'server' }, 'Registering pretext detection feature with monitoring system...');
 
     await integrationMonitor.registerFeature({
       id: 'pretext-detection',
@@ -61,7 +61,7 @@ async function registerPretextDetection() {
       enabled: true
     });
 
-    logger.info('Pretext detection feature registered successfully');
+    logger.info({ component: 'server' }, 'Pretext detection feature registered successfully');
   } catch (error) {
     logger.error({
       component: 'RegisterPretextDetection',

@@ -19,6 +19,27 @@ interface RootState {
 
 // Base types (normally imported from @client/lib/types)
 
+interface Comment {
+  id: string;
+  threadId: string;
+  billId: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar?: string;
+  content: string;
+  parentId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  upvotes: number;
+  downvotes: number;
+  isExpertComment: boolean;
+  isHighQuality: boolean;
+  isLocked: boolean;
+  hideReason?: string;
+  status?: 'visible' | 'hidden' | 'deleted' | 'pending_review';
+  qualityScore?: number;
+}
+
 interface DiscussionThread {
   id: number;
   billId: string;

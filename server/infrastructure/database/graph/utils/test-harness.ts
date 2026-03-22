@@ -25,7 +25,7 @@ export async function setupGraphTestEnvironment(): Promise<Driver> {
   );
   
   await testDriver.verifyConnectivity();
-  logger.info('Test environment setup complete');
+  logger.info({ component: 'server' }, 'Test environment setup complete');
   return testDriver;
 }
 
@@ -39,7 +39,7 @@ export async function teardownGraphTestEnvironment(): Promise<void> {
     
     await testDriver.close();
     testDriver = null;
-    logger.info('Test environment cleaned up');
+    logger.info({ component: 'server' }, 'Test environment cleaned up');
   } catch (error) {
     logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Test cleanup failed');
   }

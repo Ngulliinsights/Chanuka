@@ -254,7 +254,7 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
 
     // Log the response
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      logger.info(`Memory leak response executed: ${data.severity} severity, ${response.actions.length} actions`);
+      logger.info({ component: 'server' }, `Memory leak response executed: ${data.severity} severity, ${response.actions.length} actions`);
     }
   }
 
@@ -318,7 +318,7 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
     // This would integrate with the connection manager to enforce limits
     // Implementation depends on the connection manager interface
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      logger.info(`Applying connection limits: ${limits.maxConnectionsPerUser} per user, ${limits.maxTotalConnections} total`);
+      logger.info({ component: 'server' }, `Applying connection limits: ${limits.maxConnectionsPerUser} per user, ${limits.maxTotalConnections} total`);
     }
   }
 
@@ -433,7 +433,7 @@ export class LeakDetectorHandler implements ILeakDetectorHandler {
       } catch (error) {
         // Log error without using console directly in production
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          logger.error('Error in leak response listener:', error);
+          logger.error({ error }, 'Error in leak response listener:');
         }
       }
     });

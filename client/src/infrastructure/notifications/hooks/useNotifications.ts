@@ -5,11 +5,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { notificationsService } from '../services/notifications';
 
-export };
+export const useNotifications = () => {
+  return useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => notificationsService.getNotifications(),
+  });
+};
 
-export };
+export const useUnreadCount = () => {
+  return useQuery({
+    queryKey: ['unread-notification-count'],
+    queryFn: () => notificationsService.getUnreadCount(),
+  });
+};
 
-export 
+export const useUpdatePreferences = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ type, channels, enabled }: { type: string; channels: string[]; enabled: boolean }) =>
       notificationsService.updatePreference(type, channels, enabled),
@@ -19,7 +30,8 @@ export
   });
 };
 
-export 
+export const useMarkAsRead = () => {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (notificationId: string) => notificationsService.markAsRead(notificationId),
     onSuccess: () => {

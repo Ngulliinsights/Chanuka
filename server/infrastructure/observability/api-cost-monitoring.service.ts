@@ -73,7 +73,7 @@ export class APICostMonitoringService extends EventEmitter {
   recordRequestCost(source: string, requests: number = 1, customCost?: number): void {
     const budget = this.budgetConfigs.get(source);
     if (!budget) {
-      logger.warn(`No budget configuration for source: ${source}`);
+      logger.warn({ component: 'server' }, `No budget configuration for source: ${source}`);
       return;
     }
 

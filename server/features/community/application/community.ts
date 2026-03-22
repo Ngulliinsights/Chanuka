@@ -96,7 +96,7 @@ router.get('/comments/:bill_id', asyncHandler(async (req: Request, res: Response
 
     res.json(result);
   } catch (error) {
-    logger.error('Failed to fetch comments', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    logger.error({ component: 'community-routes', billId: req.params.bill_id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch comments');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
@@ -137,7 +137,7 @@ router.post('/comments', requireAuth, asyncHandler(async (req: AuthenticatedRequ
 
     res.status(201).json(comment);
   } catch (error) {
-    logger.error('Failed to create comment', { component: 'community-routes', userId: req.user?.id }, error as Error);
+    logger.error({ component: 'community-routes', userId: req.user?.id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to create comment');
     throw error;
   }
 }));
@@ -167,7 +167,7 @@ router.get('/comments/:id/replies', asyncHandler(async (req: Request, res: Respo
 
     res.json(replies);
   } catch (error) {
-    logger.error('Failed to fetch replies', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    logger.error({ component: 'community-routes', commentId: req.params.id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch replies');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
@@ -209,7 +209,7 @@ router.put('/comments/:id', requireAuth, asyncHandler(async (req: AuthenticatedR
 
     res.json(updatedComment);
   } catch (error) {
-    logger.error('Failed to update comment', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    logger.error({ component: 'community-routes', commentId: req.params.id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to update comment');
     throw error;
   }
 }));
@@ -237,7 +237,7 @@ router.delete('/comments/:id', requireAuth, asyncHandler(async (req: Authenticat
 
     res.json({ success });
   } catch (error) {
-    logger.error('Failed to delete comment', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    logger.error({ component: 'community-routes', commentId: req.params.id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to delete comment');
     throw error;
   }
 }));
@@ -260,7 +260,7 @@ router.get('/comments/:bill_id/stats', asyncHandler(async (req: Request, res: Re
 
     res.json(stats);
   } catch (error) {
-    logger.error('Failed to fetch comment statistics', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    logger.error({ component: 'community-routes', billId: req.params.bill_id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch comment statistics');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
@@ -285,7 +285,7 @@ router.get('/comments/:bill_id/trending', asyncHandler(async (req: Request, res:
 
     res.json(trendingComments);
   } catch (error) {
-    logger.error('Failed to fetch trending comments', { component: 'community-routes', billId: req.params.bill_id }, error as Error);
+    logger.error({ component: 'community-routes', billId: req.params.bill_id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch trending comments');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
@@ -331,7 +331,7 @@ router.post('/comments/:id/vote', requireAuth, asyncHandler(async (req: Authenti
 
     res.json(voteResult);
   } catch (error) {
-    logger.error('Failed to vote', { component: 'community-routes', commentId: req.params.id }, error as Error);
+    logger.error({ component: 'community-routes', commentId: req.params.id, error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to vote');
     throw error;
   }
 }));
@@ -376,7 +376,7 @@ router.get('/participation/stats', asyncHandler(async (req: Request, res: Respon
       res.json(stats);
     }
   } catch (error) {
-    logger.error('Failed to fetch participation stats', { component: 'community-routes' }, error as Error);
+    logger.error({ component: 'community-routes', error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch participation stats');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));
@@ -408,7 +408,7 @@ router.get('/engagement/recent', asyncHandler(async (req: Request, res: Response
 
     res.json(recentActivity);
   } catch (error) {
-    logger.error('Failed to fetch engagement data', { component: 'community-routes' }, error as Error);
+    logger.error({ component: 'community-routes', error: error as Error instanceof Error ? error as Error.message : String(error as Error) }, 'Failed to fetch engagement data');
     throw createSystemError(error as Error, { component: 'community-routes' });
   }
 }));

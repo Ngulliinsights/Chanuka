@@ -538,11 +538,10 @@ router.get('/user/:user_id/metrics', authenticateToken, async (req: Authenticate
       'business_logic'
     );
 
-    logger.error('Error fetching user engagement metrics:', { component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'getUserEngagementMetrics',
       user_id: req.params.user_id,
-      timeframe: req.query.timeframe
-     }, error instanceof Error ? error : { message: String(error) });
+      timeframe: req.query.timeframe, error: error instanceof Error ? error : { message: String(error }, 'Error fetching user engagement metrics:') });
 
     return ApiErrorResponse(res, 'Failed to fetch user engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -573,10 +572,9 @@ router.get('/bill/:bill_id/metrics', authenticateToken, async (req: Authenticate
       'business_logic'
     );
 
-    logger.error('Error fetching bill engagement metrics:', { component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'getBillEngagementMetrics',
-      bill_id: req.params.bill_id
-     }, error instanceof Error ? error : { message: String(error) });
+      bill_id: req.params.bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching bill engagement metrics:') });
 
     return ApiErrorResponse(res, error instanceof Error ? error.message : 'Failed to fetch bill engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -599,11 +597,10 @@ router.get('/bill/:bill_id/trends', authenticateToken, async (req: Authenticated
       return ApiValidationErrorResponse(res, error.errors,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     }
-    logger.error('Error fetching engagement trends:', { component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'getEngagementTrends',
       bill_id: req.params.bill_id,
-      period: req.query.period
-     }, error instanceof Error ? error : { message: String(error) });
+      period: req.query.period, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement trends:') });
     return ApiErrorResponse(res, 'Failed to fetch engagement trends', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -633,12 +630,10 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
       'business_logic'
     );
 
-    logger.error('Error fetching engagement leaderboard:', {
-      component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'getEngagementLeaderboard',
       timeframe: req.query.timeframe,
-      limit: req.query.limit
-    }, error instanceof Error ? error : { message: String(error) });
+      limit: req.query.limit, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement leaderboard:') });
 
     return ApiErrorResponse(res, 'Failed to fetch engagement leaderboard', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));

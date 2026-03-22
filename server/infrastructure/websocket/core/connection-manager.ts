@@ -128,7 +128,7 @@ export class ConnectionManager implements IConnectionManager {
     } catch (error) {
       // Log error but don't throw to avoid disrupting cleanup
       if (process.env.NODE_ENV !== 'production') {
-        logger.error('Error removing connection:', error);
+        logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error removing connection:');
       }
     }
   }
@@ -215,7 +215,7 @@ export class ConnectionManager implements IConnectionManager {
         this.removeConnection(ws);
       } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-          logger.error('Error cleaning up stale connection:', error);
+          logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error cleaning up stale connection:');
         }
       }
     }
@@ -333,7 +333,7 @@ export class ConnectionManager implements IConnectionManager {
     // Handle connection errors
     ws.on('error', (error) => {
       if (process.env.NODE_ENV !== 'production') {
-        logger.error(`Connection error for ${ws.connectionId}:`, error);
+        logger.error({ error: error instanceof Error ? error.message : String(error) }, `Connection error for ${ws.connectionId}:`);
       }
       this.removeConnection(ws);
     });

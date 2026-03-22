@@ -151,7 +151,7 @@ async function createSchemaElement(
  * @returns Promise resolving to count of successfully created/verified constraints
  */
 export async function createConstraints(driver: Driver): Promise<number> {
-  logger.info('Creating database constraints...');
+  logger.info({ component: 'server' }, 'Creating database constraints...');
 
   let successCount = 0;
   const results = await Promise.allSettled(
@@ -185,7 +185,7 @@ export async function createConstraints(driver: Driver): Promise<number> {
  * @returns Promise resolving to count of successfully created/verified indexes
  */
 export async function createIndexes(driver: Driver): Promise<number> {
-  logger.info('Creating database indexes...');
+  logger.info({ component: 'server' }, 'Creating database indexes...');
 
   let successCount = 0;
   const results = await Promise.allSettled(
@@ -219,7 +219,7 @@ export async function createIndexes(driver: Driver): Promise<number> {
  * @throws Error if schema initialization fails critically
  */
 export async function initializeGraphSchema(driver: Driver): Promise<void> {
-  logger.info('Initializing Neo4j graph schema...');
+  logger.info({ component: 'server' }, 'Initializing Neo4j graph schema...');
 
   const startTime = Date.now();
 
@@ -263,7 +263,7 @@ export async function initializeGraphSchema(driver: Driver): Promise<void> {
  */
 export async function verifyGraphSchema(driver: Driver): Promise<SchemaVerification> {
   try {
-    logger.debug('Verifying graph schema...');
+    logger.debug({ component: 'server' }, 'Verifying graph schema...');
 
     const [constraintResult, indexResult] = await Promise.all([
       executeCypherSafely(
@@ -327,7 +327,7 @@ export async function verifyGraphSchema(driver: Driver): Promise<SchemaVerificat
  */
 export async function getDatabaseStats(driver: Driver): Promise<DatabaseStats> {
   try {
-    logger.debug('Retrieving database statistics...');
+    logger.debug({ component: 'server' }, 'Retrieving database statistics...');
 
     const [nodeResult, relResult] = await Promise.all([
       executeCypherSafely(
@@ -398,7 +398,7 @@ export async function getDatabaseStats(driver: Driver): Promise<DatabaseStats> {
  * @returns Promise resolving when schema is cleared
  */
 export async function clearGraphSchema(driver: Driver): Promise<void> {
-  logger.warn('Clearing graph schema - this will drop all constraints and indexes');
+  logger.warn({ component: 'server' }, 'Clearing graph schema - this will drop all constraints and indexes');
 
   try {
     // Get all constraints and indexes
@@ -430,7 +430,7 @@ export async function clearGraphSchema(driver: Driver): Promise<void> {
       logger.debug({ name }, 'Dropped index');
     }
 
-    logger.info('Graph schema cleared successfully');
+    logger.info({ component: 'server' }, 'Graph schema cleared successfully');
   } catch (error) {
     logger.error({
       error: error instanceof Error ? error.message : String(error)

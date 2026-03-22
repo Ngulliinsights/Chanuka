@@ -633,7 +633,7 @@ export class WebSocketService {
    */
   private logInfo(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      logger.info(`[WebSocketService] ${message}`);
+      logger.info({ component: 'server' }, `[WebSocketService] ${message}`);
     }
   }
 
@@ -642,7 +642,7 @@ export class WebSocketService {
    */
   private logDebug(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      logger.info(`[WebSocketService] ${message}`);
+      logger.info({ component: 'server' }, `[WebSocketService] ${message}`);
     }
   }
 
@@ -651,7 +651,7 @@ export class WebSocketService {
    */
   private logWarn(message: string): void {
     if (process.env.NODE_ENV !== 'production') {
-      logger.warn(`[WebSocketService] ${message}`);
+      logger.warn({ component: 'server' }, `[WebSocketService] ${message}`);
     }
   }
 
@@ -660,7 +660,7 @@ export class WebSocketService {
    */
   private logError(message: string, error?: unknown): void {
     if (process.env.NODE_ENV !== 'production') {
-      logger.error(`[WebSocketService] ${message}`, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, `[WebSocketService] ${message}`);
     }
   }
 }

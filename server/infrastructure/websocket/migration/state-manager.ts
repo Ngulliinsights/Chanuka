@@ -56,9 +56,10 @@ export class StateManager {
 
       return new Map(this.connectionStates);
     } catch (error) {
-      logger.error('Failed to capture connection states', {
-        component: 'StateManager'
-      }, error instanceof Error ? error : new Error(String(error)));
+      logger.error({
+        component: 'StateManager',
+        error: error instanceof Error ? error.message : String(error)
+      }, 'Failed to capture connection states');
       throw error;
     }
   }
@@ -154,9 +155,7 @@ export class StateManager {
       
       // In production, trigger actual subscription restoration through service APIs
     } catch (error) {
-      logger.error(`Subscription restoration failed for user ${user_id}`, {
-        component: 'StateManager'
-      }, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ component: 'StateManager', error: error instanceof Error ? error.message : String(error) }, `Subscription restoration failed for user ${user_id}`);
     }
   }
 

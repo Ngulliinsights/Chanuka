@@ -13,16 +13,16 @@ import { PriorityQueue } from '../utils/priority-queue';
 // Temporary fallback logger until shared/core import is resolved
 const logger = {
   info: (message: string, context?: unknown) => {
-    logger.info(`[INFO] ${message}`, context || '');
+    console.log(`[INFO] ${message}`, context || '');
   },
   warn: (message: string, context?: unknown) => {
-    logger.warn(`[WARN] ${message}`, context || '');
+    console.warn(`[WARN] ${message}`, context || '');
   },
   error: (message: string, context?: unknown, error?: Error) => {
-    logger.error(`[ERROR] ${message}`, context || '', error || '');
+    console.error(`[ERROR] ${message}`, context || '', error || '');
   },
   debug: (message: string, context?: unknown) => {
-    logger.info(`[DEBUG] ${message}`, context || '');
+    console.log(`[DEBUG] ${message}`, context || '');
   }
 };
 

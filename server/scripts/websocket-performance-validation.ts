@@ -117,7 +117,7 @@ export class WebSocketPerformanceValidator {
    * Validate >99.9% message delivery success rate
    */
   async validateMessageDeliveryRate(): Promise<ValidationCheckpoint> {
-    logger.info('🔍 Validating message delivery success rate...');
+    logger.info({ component: 'server' }, '🔍 Validating message delivery success rate...');
 
     const testConfig = {
       clientCount: 1000,
@@ -232,7 +232,7 @@ export class WebSocketPerformanceValidator {
    * Validate 30% memory usage reduction with long-term monitoring
    */
   async validateMemoryReduction(): Promise<ValidationCheckpoint> {
-    logger.info('🔍 Validating memory usage reduction...');
+    logger.info({ component: 'server' }, '🔍 Validating memory usage reduction...');
 
     // Establish baseline if not already done
     if (!this.baselineMetrics) {
@@ -294,7 +294,7 @@ export class WebSocketPerformanceValidator {
    * Test instant rollback capability via load balancer
    */
   async validateRollbackCapability(): Promise<ValidationCheckpoint> {
-    logger.info('🔍 Validating instant rollback capability...');
+    logger.info({ component: 'server' }, '🔍 Validating instant rollback capability...');
 
     const rollbackTest = {
       clientCount: 500,
@@ -413,7 +413,7 @@ export class WebSocketPerformanceValidator {
    * Run comprehensive A/B testing analysis
    */
   async runABTestingAnalysis(): Promise<ABTestingResults> {
-    logger.info('🔍 Running A/B testing analysis...');
+    logger.info({ component: 'server' }, '🔍 Running A/B testing analysis...');
 
     const testConfig = {
       controlGroupSize: 500,
@@ -580,7 +580,7 @@ export class WebSocketPerformanceValidator {
       clients.forEach(client => client.disconnect());
 
     } catch (error) {
-      logger.error('Sustained load test failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error : new Error(String(error)) }, 'Sustained load test failed');
       throw error;
     }
   }

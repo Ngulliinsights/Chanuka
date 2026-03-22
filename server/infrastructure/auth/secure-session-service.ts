@@ -138,7 +138,7 @@ export class SecureSessionService {
       return { session_id, csrfToken };
 
     } catch (error) {
-      logger.error('Session creation failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Session creation failed:');
       throw new Error('Failed to create session');
     }
   }
@@ -272,7 +272,7 @@ export class SecureSessionService {
       return { isValid: true, session: sessionData };
 
     } catch (error) {
-      logger.error('Session validation failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Session validation failed:');
       return { isValid: false, error: 'Session validation failed' };
     }
   }
@@ -290,7 +290,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.id, session_id));
     } catch (error) {
-      logger.error('Session invalidation failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Session invalidation failed:');
     }
   }
 
@@ -307,7 +307,7 @@ export class SecureSessionService {
         })
         .where(eq(sessions.user_id, user_id));
     } catch (error) {
-      logger.error('User session invalidation failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'User session invalidation failed:');
     }
   }
 
@@ -325,7 +325,7 @@ export class SecureSessionService {
 
       logger.info({ component: 'Chanuka' }, 'Expired sessions cleaned up');
     } catch (error) {
-      logger.error('Session cleanup failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Session cleanup failed:');
     }
   }
 
@@ -353,7 +353,7 @@ export class SecureSessionService {
         }
       }
     } catch (error) {
-      logger.error('User session cleanup failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'User session cleanup failed:');
     }
   }
 

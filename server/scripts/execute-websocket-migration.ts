@@ -45,7 +45,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
   try {
     // Step 1: Pre-migration validation (if not skipped)
     if (!skipValidation) {
-      logger.info('📋 Running pre-migration validation...');
+      logger.info({ component: 'server' }, '📋 Running pre-migration validation...');
       
       const validationResults = await runValidationSuite();
       const failedValidations = validationResults.filter(r => !r.success);
@@ -60,7 +60,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
           throw new Error(`Pre-migration validation failed: ${failedValidations.map(v => v.name).join(', ')}`);
         }
       } else {
-        logger.info('✅ Pre-migration validation passed');
+        logger.info({ component: 'server' }, '✅ Pre-migration validation passed');
       }
     }
 
@@ -74,11 +74,11 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
       });
     });
 
-    logger.info(`🌐 HTTP server started on port ${port}`);
+    logger.info({ component: 'server' }, `🌐 HTTP server started on port ${port}`);
 
     // Step 3: Execute migration
     if (!dryRun) {
-      logger.info('🔄 Executing WebSocket migration...');
+      logger.info({ component: 'server' }, '🔄 Executing WebSocket migration...');
       
       const deployer = new WebSocketMigrationDeployer({
         environment: 'development',
@@ -104,7 +104,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
 
       // Step 4: Post-migration validation
       if (!skipValidation) {
-        logger.info('🔍 Running post-migration validation...');
+        logger.info({ component: 'server' }, '🔍 Running post-migration validation...');
         
         // Give the service a moment to stabilize
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -118,7 +118,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
             failedValidations: postFailedValidations.map(v => v.name)
           }, '⚠️ Post-migration validation had issues');
         } else {
-          logger.info('✅ Post-migration validation passed');
+          logger.info({ component: 'server' }, '✅ Post-migration validation passed');
         }
       }
 
@@ -127,13 +127,13 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
 
       // Keep server running for testing (in development)
       if (process.env.NODE_ENV === 'development') {
-        logger.info('🔧 Development mode: Server will keep running for testing');
-        logger.info(`📡 Socket.IO endpoint: http://localhost:${port}/socket.io`);
-        logger.info('Press Ctrl+C to stop the server');
+        logger.info({ component: 'server' }, '🔧 Development mode: Server will keep running for testing');
+        logger.info({ component: 'server' }, `📡 Socket.IO endpoint: http://localhost:${port}/socket.io`);
+        logger.info({ component: 'WebSocketMigration' }, 'Press Ctrl+C to stop the server');
         
         // Handle graceful shutdown
         process.on('SIGINT', async () => {
-          logger.info('🛑 Shutting down WebSocket migration server...');
+          logger.info({ component: 'server' }, '🛑 Shutting down WebSocket migration server...');
           
           await socketIOService.shutdown();
           
@@ -141,7 +141,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
             server.close(() => resolve());
           });
           
-          logger.info('✅ Server shutdown complete');
+          logger.info({ component: 'server' }, '✅ Server shutdown complete');
           process.exit(0);
         });
         
@@ -156,7 +156,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
       }
 
     } else {
-      logger.info('🧪 Dry run completed - no actual migration performed');
+      logger.info({ component: 'server' }, '🧪 Dry run completed - no actual migration performed');
       
       await new Promise<void>((resolve) => {
         server.close(() => resolve());
@@ -164,9 +164,7 @@ async function executeWebSocketMigration(options: ExecutionOptions = {}): Promis
     }
 
   } catch (error) {
-    logger.error('❌ WebSocket migration execution failed', {
-      component: 'WebSocketMigrationExecution'
-    }, error);
+    logger.error({ component: 'WebSocketMigrationExecution', error: error instanceof Error ? error.message : String(error) }, '❌ WebSocket migration execution failed');
     
     throw error;
   }
@@ -320,13 +318,13 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   executeWebSocketMigration(options)
     .then(() => {
       if (!options.dryRun && process.env.NODE_ENV !== 'development') {
-        logger.info('🎉 WebSocket migration execution completed successfully');
+        logger.info({ component: 'server' }, '🎉 WebSocket migration execution completed successfully');
         process.exit(0);
       }
       // In development mode, the process stays alive
     })
     .catch((error) => {
-      logger.error('💥 WebSocket migration execution failed', {}, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '💥 WebSocket migration execution failed');
       process.exit(1);
     });
 }

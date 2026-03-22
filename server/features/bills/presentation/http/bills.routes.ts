@@ -181,10 +181,8 @@ router.get('/:id', asyncHandler(async (req, res) => {
   );
 
   billStorage.incrementBillViews(billId).catch((err: Error) =>
-    logger.error('Failed to increment bill views:', { 
-      bill_id: billId,
-      component: 'BillsRouter'
-    }, err)
+    logger.error({ bill_id: billId,
+      component: 'BillsRouter', error: err instanceof Error ? err.message : String(err) }, 'Failed to increment bill views:')
   );
 
   res.json({ bill });

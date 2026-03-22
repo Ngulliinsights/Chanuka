@@ -146,7 +146,7 @@ export class ModerationService {
 
         return { success: true, queueItemId };
       });
-    }, { service: 'ModerationService', operation: 'queueForModeration', context });
+    }, { service: 'ModerationService', operation: 'queueForModeration', metadata: { context } });
   }
 
   async assignModerator(queueItemId: string, moderatorId: string) {
@@ -184,7 +184,7 @@ export class ModerationService {
         logger.info({ queueItemId, moderatorId }, 'Moderator assigned to queue item');
         return true;
       });
-    }, { service: 'ModerationService', operation: 'assignModerator', queueItemId, moderatorId });
+    }, { service: 'ModerationService', operation: 'assignModerator', metadata: { queueItemId, moderatorId } });
   }
 
   async getPendingQueueItems(limit = 50) {
@@ -209,7 +209,7 @@ export class ModerationService {
         .limit(limit)) as ModerationQueueItem[];
 
       return items;
-    }, { service: 'ModerationService', operation: 'getPendingQueueItems', limit });
+    }, { service: 'ModerationService', operation: 'getPendingQueueItems', metadata: { limit } });
   }
 
   async getAssignedItems(moderatorId: string) {
@@ -230,7 +230,7 @@ export class ModerationService {
         .orderBy(desc(moderationQueue.priority), asc(moderationQueue.assigned_at))) as ModerationQueueItem[];
 
       return items;
-    }, { service: 'ModerationService', operation: 'getAssignedItems', moderatorId });
+    }, { service: 'ModerationService', operation: 'getAssignedItems', metadata: { moderatorId } });
   }
 
   // ==================== Decision Management ====================
@@ -304,7 +304,7 @@ export class ModerationService {
 
         return { success: true, decisionId };
       });
-    }, { service: 'ModerationService', operation: 'recordDecision', decision });
+    }, { service: 'ModerationService', operation: 'recordDecision', metadata: { decision } });
   }
 
   async getDecision(decisionId: string) {
@@ -320,7 +320,7 @@ export class ModerationService {
         .limit(1)) as unknown as ModerationDecision[];
 
       return result[0] ?? null;
-    }, { service: 'ModerationService', operation: 'getDecision', decisionId });
+    }, { service: 'ModerationService', operation: 'getDecision', metadata: { decisionId } });
   }
 
   // ==================== Appeal Management ====================
@@ -390,7 +390,7 @@ export class ModerationService {
 
         return { success: true, appealId };
       });
-    }, { service: 'ModerationService', operation: 'fileAppeal', appeal });
+    }, { service: 'ModerationService', operation: 'fileAppeal', metadata: { appeal } });
   }
 
   async getPendingAppeals(limit = 50) {
@@ -407,7 +407,7 @@ export class ModerationService {
         .limit(limit)) as unknown as ModerationAppeal[];
 
       return appeals;
-    }, { service: 'ModerationService', operation: 'getPendingAppeals', limit });
+    }, { service: 'ModerationService', operation: 'getPendingAppeals', metadata: { limit } });
   }
 
   // ==================== Performance Tracking ====================
@@ -500,7 +500,7 @@ export class ModerationService {
       );
 
       return metrics;
-    }, { service: 'ModerationService', operation: 'calculateModeratorPerformance', moderatorId });
+    }, { service: 'ModerationService', operation: 'calculateModeratorPerformance', metadata: { moderatorId } });
   }
 
   // ==================== SLA Management ====================

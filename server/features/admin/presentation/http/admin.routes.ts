@@ -102,7 +102,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching admin stats:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error fetching admin stats:');
       // Return fallback data if system health services fail
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -139,7 +139,7 @@ export class AdminService {
           }
         };
       } catch (fallbackError) {
-        logger.error('Error fetching fallback admin stats:', { component: 'Chanuka' }, { error: fallbackError });
+        logger.error({ component: 'Chanuka', error: { error: fallbackError } instanceof Error ? { error: fallbackError }.message : String({ error: fallbackError }) }, 'Error fetching fallback admin stats:');
         throw error;
       }
     }
@@ -207,7 +207,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching user management data:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error fetching user management data:');
       throw error;
     }
   }
@@ -220,7 +220,7 @@ export class AdminService {
 
       return { success: true  };
     } catch (error) {
-      logger.error('Error updating user status:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error updating user status:');
       throw error;
     }
   }
@@ -256,7 +256,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching system logs:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error fetching system logs:');
       throw error;
     }
   }
@@ -290,7 +290,7 @@ export class AdminService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching content moderation data:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error fetching content moderation data:');
       throw error;
     }
   }
@@ -301,7 +301,7 @@ export class AdminService {
       console.log(`Moderating comment ${comment_id} with action: ${action}`);
       return { success: true };
     } catch (error) {
-      logger.error('Error moderating comment:', { component: 'Chanuka' }, { error });
+      logger.error({ component: 'Chanuka', error: { error } instanceof Error ? { error }.message : String({ error }) }, 'Error moderating comment:');
       throw error;
     }
   }

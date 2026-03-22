@@ -182,7 +182,7 @@ export class UnifiedHealthMonitor {
    */
   public start(): void {
     if (this._isRunning) {
-      logger.warn('Health monitor is already running');
+      logger.warn({ component: 'server' }, 'Health monitor is already running');
       return;
     }
 

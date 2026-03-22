@@ -49,10 +49,8 @@ export class MLMigrationConfigurator {
                 rolloutPercentage: config.rolloutPercentage
             }, 'ML service migration configured successfully');
         } catch (error) {
-            logger.error('Failed to configure ML service migration:', {
-                component: 'analytics',
-                operation: 'configureGradualRollout'
-            }, error instanceof Error ? error : { message: String(error) });
+            logger.error({ component: 'analytics',
+                operation: 'configureGradualRollout', error: error instanceof Error ? error : { message: String(error }, 'Failed to configure ML service migration:') });
             throw error;
         }
     }

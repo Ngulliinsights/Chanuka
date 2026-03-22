@@ -208,7 +208,7 @@ export class VerificationService {
    */
   async getVerificationStats(): AsyncServiceResult<VerificationStats> {
     return safeAsync(async () => {
-      logger.info('Fetching verification statistics');
+      logger.info({ component: 'server' }, 'Fetching verification statistics');
       
       const db = readDatabase();
       

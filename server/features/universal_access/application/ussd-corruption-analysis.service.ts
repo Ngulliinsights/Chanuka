@@ -3,11 +3,11 @@ import { conflictDetectionOrchestratorService } from '@server/features/analytics
 
 export class USSDCorruptionAnalysisService {
   constructor() {
-    logger.info('USSDCorruptionAnalysisService initialized');
+    logger.info({ component: 'server' }, 'USSDCorruptionAnalysisService initialized');
   }
 
   async analyzeCorruptionRisk(billId: string) {
-    logger.info(`Analyzing corruption risk for bill ${billId}`);
+    logger.info({ component: 'server' }, `Analyzing corruption risk for bill ${billId}`);
     try {
         // For this USSD adapter, we lookup the primary sponsor for the bill.
         // We mock sponsorId=1 here temporarily to connect the bounded contexts.

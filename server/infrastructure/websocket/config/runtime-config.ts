@@ -266,7 +266,7 @@ export class RuntimeConfig {
         // Log error without using console directly
         // In production, this should use the application's logging system
         if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-          logger.error('Error in configuration change listener:', error);
+          logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error in configuration change listener:');
         }
       }
     });

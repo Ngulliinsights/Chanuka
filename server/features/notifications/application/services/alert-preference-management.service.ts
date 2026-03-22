@@ -82,10 +82,8 @@ export class AlertPreferenceManagementService {
 
       return newPreference;
     } catch (error) {
-      logger.error('Error creating alert preference', {
-        component: 'AlertPreferenceManagement',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertPreferenceManagement',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error creating alert preference');
       throw error;
     }
   }
@@ -119,10 +117,8 @@ export class AlertPreferenceManagementService {
       await cacheService.set(cacheKey, preferences, this.CACHE_TTL);
       return preferences;
     } catch (error) {
-      logger.error('Error fetching alert preferences', {
-        component: 'AlertPreferenceManagement',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertPreferenceManagement',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error fetching alert preferences');
       
       // Return default on error
       const defaultPref = await this.createDefaultAlertPreference(user_id);
@@ -177,11 +173,9 @@ export class AlertPreferenceManagementService {
 
       return updatedPreference;
     } catch (error) {
-      logger.error('Error updating alert preference', {
-        component: 'AlertPreferenceManagement',
+      logger.error({ component: 'AlertPreferenceManagement',
         user_id,
-        preferenceId
-      }, error);
+        preferenceId, error: error instanceof Error ? error.message : String(error) }, 'Error updating alert preference');
       throw error;
     }
   }
@@ -206,11 +200,9 @@ export class AlertPreferenceManagementService {
         preferenceId
       }, `Alert preference deleted: ${preferenceId}`);
     } catch (error) {
-      logger.error('Error deleting alert preference', {
-        component: 'AlertPreferenceManagement',
+      logger.error({ component: 'AlertPreferenceManagement',
         user_id,
-        preferenceId
-      }, error);
+        preferenceId, error: error instanceof Error ? error.message : String(error) }, 'Error deleting alert preference');
       throw error;
     }
   }
@@ -251,10 +243,8 @@ export class AlertPreferenceManagementService {
         })
         .where(eq(schema.users.id, log.user_id));
     } catch (error) {
-      logger.error('Error storing delivery log', {
-        component: 'AlertPreferenceManagement',
-        user_id: log.user_id
-      }, error);
+      logger.error({ component: 'AlertPreferenceManagement',
+        user_id: log.user_id, error: error instanceof Error ? error.message : String(error) }, 'Error storing delivery log');
     }
   }
 
@@ -318,10 +308,8 @@ export class AlertPreferenceManagementService {
         }
       };
     } catch (error) {
-      logger.error('Error fetching delivery logs', {
-        component: 'AlertPreferenceManagement',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertPreferenceManagement',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error fetching delivery logs');
       return {
         logs: [],
         pagination: { page, limit, total: 0, pages: 0 }
@@ -404,10 +392,8 @@ export class AlertPreferenceManagementService {
       await cacheService.set(cacheKey, result, this.CACHE_TTL);
       return result;
     } catch (error) {
-      logger.error('Error fetching alert stats', {
-        component: 'AlertPreferenceManagement',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertPreferenceManagement',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error fetching alert stats');
       throw error;
     }
   }

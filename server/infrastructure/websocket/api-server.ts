@@ -142,9 +142,7 @@ export class WebSocketAPIServer {
         config: this.config
       }, 'WebSocket API server initialized');
     } catch (error) {
-      logger.error('Failed to initialize WebSocket API server', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Failed to initialize WebSocket API server');
       throw error;
     }
   }
@@ -182,9 +180,7 @@ export class WebSocketAPIServer {
         finalStats: this.stats
       }, 'WebSocket API server shut down gracefully');
     } catch (error) {
-      logger.error('Error during WebSocket API server shutdown', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Error during WebSocket API server shutdown');
       throw error;
     }
   }
@@ -226,9 +222,7 @@ export class WebSocketAPIServer {
 
       return true;
     } catch (error) {
-      logger.error('Error verifying WebSocket client', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Error verifying WebSocket client');
       return false;
     }
   }
@@ -249,9 +243,7 @@ export class WebSocketAPIServer {
         const url = new URL(req.url, `http://${req.headers.host}`);
         return url.searchParams.get('token');
       } catch (error) {
-        logger.error('Error parsing URL for token extraction', {
-          component: 'WebSocketAPIServer'
-        }, error);
+        logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Error parsing URL for token extraction');
       }
     }
     
@@ -273,9 +265,7 @@ export class WebSocketAPIServer {
     });
 
     this.wss.on('error', (error: Error) => {
-      logger.error('WebSocket server error', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'WebSocket server error');
       this.stats.errors++;
     });
 
@@ -359,10 +349,8 @@ export class WebSocketAPIServer {
       });
 
     }).catch(error => {
-      logger.error('Failed to authenticate WebSocket connection', {
-        component: 'WebSocketAPIServer',
-        connectionId
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer',
+        connectionId, error: error instanceof Error ? error.message : String(error) }, 'Failed to authenticate WebSocket connection');
       ws.close(1008, 'Authentication failed');
     });
   }
@@ -380,9 +368,7 @@ export class WebSocketAPIServer {
       const user = await this.authenticateWebSocket(token);
       return user;
     } catch (error) {
-      logger.error('Authentication error', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Authentication error');
       throw new Error('Authentication failed');
     }
   }
@@ -429,10 +415,8 @@ export class WebSocketAPIServer {
 
     } catch (error) {
       this.stats.errors++;
-      logger.error('Error handling WebSocket message', {
-        component: 'WebSocketAPIServer',
-        connectionId
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer',
+        connectionId, error: error instanceof Error ? error.message : String(error) }, 'Error handling WebSocket message');
       this.sendError(connection.ws, 'Failed to process message');
     }
   }
@@ -471,10 +455,8 @@ export class WebSocketAPIServer {
    */
   private handleConnectionError(connectionId: string, error: Error): void {
     this.stats.errors++;
-    logger.error('WebSocket connection error', {
-      component: 'WebSocketAPIServer',
-      connectionId
-    }, error);
+    logger.error({ component: 'WebSocketAPIServer',
+      connectionId, error: error instanceof Error ? error.message : String(error) }, 'WebSocket connection error');
     
     // Optionally close the connection on error
     const connection = this.connections.get(connectionId);
@@ -498,11 +480,9 @@ export class WebSocketAPIServer {
         handler(connection, message);
       } catch (error) {
         this.stats.errors++;
-        logger.error('Error in message handler', {
-          component: 'WebSocketAPIServer',
+        logger.error({ component: 'WebSocketAPIServer',
           messageType: message.type,
-          connectionId: connection.id
-        }, error);
+          connectionId: connection.id, error: error instanceof Error ? error.message : String(error) }, 'Error in message handler');
         this.sendError(connection.ws, 'Failed to process message');
       }
     } else {
@@ -734,9 +714,7 @@ export class WebSocketAPIServer {
       return true;
     } catch (error) {
       this.stats.errors++;
-      logger.error('Error sending WebSocket message', {
-        component: 'WebSocketAPIServer'
-      }, error);
+      logger.error({ component: 'WebSocketAPIServer', error: error instanceof Error ? error.message : String(error) }, 'Error sending WebSocket message');
       return false;
     }
   }
@@ -782,10 +760,8 @@ export class WebSocketAPIServer {
           try {
             connection.ws.ping();
           } catch (error) {
-            logger.error('Error sending ping', {
-              component: 'WebSocketAPIServer',
-              connectionId: connection.id
-            }, error);
+            logger.error({ component: 'WebSocketAPIServer',
+              connectionId: connection.id, error: error instanceof Error ? error.message : String(error) }, 'Error sending ping');
           }
         }
       });

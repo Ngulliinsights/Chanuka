@@ -152,7 +152,7 @@ export class SearchDeploymentService {
    * Deploy search system improvements with A/B testing framework
    */
   async deploySearchImprovements(): Promise<void> {
-    logger.info('🚀 Starting search system deployment with A/B testing framework');
+    logger.info({ component: 'server' }, '🚀 Starting search system deployment with A/B testing framework');
 
     try {
       await this.initializeSearchFeatureFlags();
@@ -164,7 +164,7 @@ export class SearchDeploymentService {
 
       await Promise.all(deploymentPromises);
 
-      logger.info('✅ Search system deployment initiated successfully');
+      logger.info({ component: 'server' }, '✅ Search system deployment initiated successfully');
     } catch (error) {
       logger.error({ error }, '❌ Search system deployment failed');
       throw error;
@@ -189,7 +189,7 @@ export class SearchDeploymentService {
       try {
         await featureFlagsService.enableGradualRollout(`search-${component}`, percentage);
 
-        logger.info(`📊 Deployed ${component} to ${percentage}% of traffic`);
+        logger.info({ component: 'server' }, `📊 Deployed ${component} to ${percentage}% of traffic`);
 
         await this.waitForMetricsCollection(component, percentage);
 
@@ -197,16 +197,16 @@ export class SearchDeploymentService {
         this.storeValidationResult(component, validation);
 
         if (validation.recommendation === 'rollback') {
-          logger.warn(`🔄 Rolling back ${component} due to validation failure`);
+          logger.warn({ component: 'server' }, `🔄 Rolling back ${component} due to validation failure`);
           await this.rollbackComponent(component, validation);
           return;
         } else if (validation.recommendation === 'investigate') {
-          logger.warn(`⚠️ ${component} requires investigation before proceeding`);
+          logger.warn({ component: 'server' }, `⚠️ ${component} requires investigation before proceeding`);
           await this.pauseDeployment(component, validation);
           return;
         }
 
-        logger.info(`✅ ${component} validation passed for ${percentage}% rollout`);
+        logger.info({ component: 'server' }, `✅ ${component} validation passed for ${percentage}% rollout`);
 
         if (percentage < 100) {
           await new Promise(resolve => setTimeout(resolve, 30000));
@@ -233,7 +233,7 @@ export class SearchDeploymentService {
       }
     }
 
-    logger.info(`🎉 ${component} deployment completed successfully`);
+    logger.info({ component: 'server' }, `🎉 ${component} deployment completed successfully`);
   }
 
   /**
@@ -254,14 +254,14 @@ export class SearchDeploymentService {
       });
     }
 
-    logger.info('🏁 Search feature flags initialized');
+    logger.info({ component: 'server' }, '🏁 Search feature flags initialized');
   }
 
   /**
    * Establish performance baselines for comparison
    */
   private async establishPerformanceBaselines(): Promise<void> {
-    logger.info('📊 Establishing performance baselines');
+    logger.info({ component: 'server' }, '📊 Establishing performance baselines');
 
     for (const component of this.deploymentConfigs.keys()) {
       const baseline = await this.measureSearchPerformance(component, 'baseline');
@@ -283,7 +283,7 @@ export class SearchDeploymentService {
     const scaleFactor = Math.max(1, 10 / percentage);
     const collectionTime = Math.min(baseTime * scaleFactor, 300000);
 
-    logger.info(`⏱️ Collecting metrics for ${component} (${percentage}%) - ${collectionTime / 1000}s`);
+    logger.info({ component: 'server' }, `⏱️ Collecting metrics for ${component} (${percentage}%) - ${collectionTime / 1000}s`);
     await new Promise(resolve => setTimeout(resolve, collectionTime));
   }
 
@@ -400,7 +400,7 @@ export class SearchDeploymentService {
     let totalQueries = 0;
     const relevanceScores: number[] = [];
 
-    logger.info(`📊 Measuring ${component} performance (${context})`);
+    logger.info({ component: 'server' }, `📊 Measuring ${component} performance (${context})`);
 
     for (const query of sampleQueries) {
       for (let i = 0; i < 10; i++) {
@@ -504,9 +504,9 @@ export class SearchDeploymentService {
         postRollbackMetrics.responseTime.p95 <= baseline.responseTime.p95 * 1.2;
 
       if (rollbackSuccess) {
-        logger.info(`✅ Rollback successful for ${component}`);
+        logger.info({ component: 'server' }, `✅ Rollback successful for ${component}`);
       } else {
-        logger.error(`❌ Rollback verification failed for ${component}`);
+        logger.error({ component: 'server' }, `❌ Rollback verification failed for ${component}`);
       }
     } catch (error) {
       logger.error({ error }, `❌ Rollback failed for ${component}`);
@@ -530,14 +530,14 @@ export class SearchDeploymentService {
    * Run data validation checkpoints between Phase 1 and Phase 2
    */
   async runDataValidationCheckpoints(): Promise<void> {
-    logger.info('🔍 Running data validation checkpoints between Phase 1 and Phase 2');
+    logger.info({ component: 'server' }, '🔍 Running data validation checkpoints between Phase 1 and Phase 2');
 
     try {
       await this.validateSearchIndexConsistency();
       await this.validateCrossPhaseDataIntegrity();
       await this.validatePerformanceMetricsAlignment();
 
-      logger.info('✅ Data validation checkpoints completed successfully');
+      logger.info({ component: 'server' }, '✅ Data validation checkpoints completed successfully');
     } catch (error) {
       logger.error({ error }, '❌ Data validation checkpoints failed');
       throw error;
@@ -548,7 +548,7 @@ export class SearchDeploymentService {
    * Validate search index consistency
    */
   private async validateSearchIndexConsistency(): Promise<void> {
-    logger.info('📊 Validating search index consistency');
+    logger.info({ component: 'server' }, '📊 Validating search index consistency');
 
     const testQueries = ['healthcare', 'budget', 'education'];
 
@@ -577,7 +577,7 @@ export class SearchDeploymentService {
    * Validate cross-phase data integrity
    */
   private async validateCrossPhaseDataIntegrity(): Promise<void> {
-    logger.info('🔗 Validating cross-phase data integrity');
+    logger.info({ component: 'server' }, '🔗 Validating cross-phase data integrity');
 
     try {
       const concurrentSearches = Array.from({ length: 10 }, (_, i) =>
@@ -590,10 +590,10 @@ export class SearchDeploymentService {
       const results = await Promise.all(concurrentSearches);
 
       if (results.some(r => r.results.length === 0 && r.totalCount === 0)) {
-        logger.warn('Some concurrent searches returned empty results');
+        logger.warn({ component: 'server' }, 'Some concurrent searches returned empty results');
       }
 
-      logger.info('✅ Cross-phase data integrity validation passed');
+      logger.info({ component: 'server' }, '✅ Cross-phase data integrity validation passed');
     } catch (error) {
       logger.error({ error }, '❌ Cross-phase data integrity validation failed');
       throw error;
@@ -604,7 +604,7 @@ export class SearchDeploymentService {
    * Validate performance metrics alignment
    */
   private async validatePerformanceMetricsAlignment(): Promise<void> {
-    logger.info('📈 Validating performance metrics alignment');
+    logger.info({ component: 'server' }, '📈 Validating performance metrics alignment');
 
     const systemMetrics = await this.measureSearchPerformance('system', 'current');
 
@@ -630,7 +630,7 @@ export class SearchDeploymentService {
       throw new Error(`Performance metrics validation failed: ${issues.join(', ')}`);
     }
 
-    logger.info('✅ Performance metrics alignment validation passed');
+    logger.info({ component: 'server' }, '✅ Performance metrics alignment validation passed');
   }
 
   /**

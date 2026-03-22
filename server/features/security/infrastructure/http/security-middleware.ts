@@ -30,7 +30,7 @@ export const firewallMiddleware = async (req: Request, res: Response, next: Next
     const result = await intrusionDetectionService.analyzeRequest(req);
     
     if (result.action === 'block') {
-      logger.warn(`Firewall blocked request from ${req.ip}: ${result.reason}`);
+      logger.warn({ component: 'server' }, `Firewall blocked request from ${req.ip}: ${result.reason}`);
       res.status(403).json({ 
         error: 'Access Denied', 
         message: 'Your request triggered a security rule.',

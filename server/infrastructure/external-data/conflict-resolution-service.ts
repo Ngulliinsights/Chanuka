@@ -401,10 +401,10 @@ export class ConflictResolutionService {
       //   });
       // }
       
-      logger.info(`Conflict stored (in-memory): ${conflict.conflictId}`);
+      logger.info({ component: 'server' }, `Conflict stored (in-memory): ${conflict.conflictId}`);
 
     } catch (error) {
-      logger.error(`Error storing conflict: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error storing conflict: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
@@ -456,7 +456,7 @@ export class ConflictResolutionService {
       
       return [];
     } catch (error) {
-      logger.error(`Error getting pending conflicts: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error getting pending conflicts: ${error instanceof Error ? error.message : String(error)}`);
       return [];
     }
   }
@@ -485,10 +485,10 @@ export class ConflictResolutionService {
       //   })
       //   .where(eq(conflicts.id, conflictId));
       
-      logger.info(`Conflict manually resolved (in-memory): ${conflictId}`);
+      logger.info({ component: 'server' }, `Conflict manually resolved (in-memory): ${conflictId}`);
 
     } catch (error) {
-      logger.error(`Error manually resolving conflict: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error manually resolving conflict: ${error instanceof Error ? error.message : String(error)}`);
       throw error;
     }
   }
@@ -537,7 +537,7 @@ export class ConflictResolutionService {
         averageConfidence: 0
       };
     } catch (error) {
-      logger.error(`Error getting conflict statistics: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error getting conflict statistics: ${error instanceof Error ? error.message : String(error)}`);
       
       // Return empty statistics on error
       return {
@@ -597,7 +597,7 @@ export class ConflictResolutionService {
       
       return [];
     } catch (error) {
-      logger.error(`Error getting conflicts by type: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error getting conflicts by type: ${error instanceof Error ? error.message : String(error)}`);
       return [];
     }
   }
@@ -637,12 +637,12 @@ export class ConflictResolutionService {
       //   }
       // }
       //
-      // logger.info(`Cleaned up ${deletedCount} old conflicts`);
+      // logger.info({ component: 'server' }, `Cleaned up ${deletedCount} old conflicts`);
       // return deletedCount;
       
       return 0;
     } catch (error) {
-      logger.error(`Error cleaning up old conflicts: ${error instanceof Error ? error.message : String(error)}`);
+      logger.error({ component: 'server' }, `Error cleaning up old conflicts: ${error instanceof Error ? error.message : String(error)}`);
       return 0;
     }
   }
@@ -655,7 +655,7 @@ export class ConflictResolutionService {
       throw new Error('Priority must be between 0 and 1');
     }
     this.priorityWeights[sourceId] = priority;
-    logger.info(`Updated priority for ${sourceId} to ${priority}`);
+    logger.info({ component: 'server' }, `Updated priority for ${sourceId} to ${priority}`);
   }
 
   /**
@@ -673,7 +673,7 @@ export class ConflictResolutionService {
       throw new Error('Threshold must be between 0 and 1');
     }
     this.autoResolveThreshold = threshold;
-    logger.info(`Updated auto-resolve threshold to ${threshold}`);
+    logger.info({ component: 'server' }, `Updated auto-resolve threshold to ${threshold}`);
   }
 
   /**

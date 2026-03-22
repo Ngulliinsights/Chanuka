@@ -501,9 +501,10 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
 
     // Initialize Redis adapter
     redisAdapter.connect().catch(error => {
-      logger.error('Failed to connect Redis adapter', {
-        component: 'WebSocketServiceFactory'
-      }, error);
+      logger.error({
+        component: 'WebSocketServiceFactory',
+        error: error instanceof Error ? error.message : String(error)
+      }, 'Failed to connect Redis adapter');
     });
 
     // Set up Redis message handlers for cross-server communication
@@ -529,10 +530,8 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
       originalBroadcastBillUpdate(billId, update);
       // Broadcast to other servers via Redis
       redisAdapter.publishBillUpdate(billId, update).catch(error => {
-        logger.error('Failed to publish bill update to Redis', {
-          component: 'WebSocketServiceFactory',
-          billId
-        }, error);
+        logger.error({ component: 'WebSocketServiceFactory',
+          billId, error: error instanceof Error ? error.message : String(error) }, 'Failed to publish bill update to Redis');
       });
     };
 
@@ -542,10 +541,8 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
       originalSendUserNotification(userId, notification);
       // Send to other servers via Redis
       redisAdapter.publishUserNotification(userId, notification).catch(error => {
-        logger.error('Failed to publish user notification to Redis', {
-          component: 'WebSocketServiceFactory',
-          userId
-        }, error);
+        logger.error({ component: 'WebSocketServiceFactory',
+          userId, error: error instanceof Error ? error.message : String(error) }, 'Failed to publish user notification to Redis');
       });
     };
 
@@ -555,9 +552,7 @@ export function createUnifiedWebSocketService(config: UnifiedServiceConfig = {})
       originalBroadcastToAll(message);
       // Broadcast to other servers via Redis
       redisAdapter.publishBroadcast(message).catch(error => {
-        logger.error('Failed to publish broadcast to Redis', {
-          component: 'WebSocketServiceFactory'
-        }, error);
+        logger.error({ component: 'WebSocketServiceFactory', error: error instanceof Error ? error.message : String(error) }, 'Failed to publish broadcast to Redis');
       });
     };
 
@@ -595,9 +590,7 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
     });
 
     redisAdapter.connect().catch(error => {
-      logger.error('Failed to connect Redis adapter for Socket.IO service', {
-        component: 'WebSocketServiceFactory'
-      }, error);
+      logger.error({ component: 'WebSocketServiceFactory', error: error instanceof Error ? error.message : String(error) }, 'Failed to connect Redis adapter for Socket.IO service');
     });
 
     // Set up cross-server message handling
@@ -616,10 +609,8 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
     socketIOAdapter.broadcastBillUpdate = (billId: number, update: unknown) => {
       originalBroadcastBillUpdate(billId, update);
       redisAdapter.publishBillUpdate(billId, update).catch(error => {
-        logger.error('Failed to publish bill update to Redis from Socket.IO', {
-          component: 'WebSocketServiceFactory',
-          billId
-        }, error);
+        logger.error({ component: 'WebSocketServiceFactory',
+          billId, error: error instanceof Error ? error.message : String(error) }, 'Failed to publish bill update to Redis from Socket.IO');
       });
     };
 
@@ -627,10 +618,8 @@ export function createSocketIOWebSocketService(config: UnifiedServiceConfig = {}
     socketIOAdapter.sendUserNotification = (userId: string, notification: unknown) => {
       originalSendUserNotification(userId, notification);
       redisAdapter.publishUserNotification(userId, notification).catch(error => {
-        logger.error('Failed to publish user notification to Redis from Socket.IO', {
-          component: 'WebSocketServiceFactory',
-          userId
-        }, error);
+        logger.error({ component: 'WebSocketServiceFactory',
+          userId, error: error instanceof Error ? error.message : String(error) }, 'Failed to publish user notification to Redis from Socket.IO');
       });
     };
 

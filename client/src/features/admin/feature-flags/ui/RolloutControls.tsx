@@ -1,10 +1,10 @@
-// ============================================================================
-// ROLLOUT CONTROLS - Manage feature rollout percentage
-// ============================================================================
+/**
+ * ROLLOUT CONTROLS - Manage feature rollout percentage
+ */
 
 import { useState } from 'react';
 import { useUpdateRollout, useFeatureFlags } from '../hooks/useFeatureFlags';
-import { logger } from '@client/lib/utils/logger';
+import logger from '@client/lib/utils/logger';
 
 interface RolloutControlsProps {
   flagName: string;

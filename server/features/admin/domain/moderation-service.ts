@@ -1,20 +1,11 @@
-import { contentModerationService } from "@server/features/admin/application/content-moderation.routes";
+import { contentModerationService } from "@server/features/admin/presentation/http/content-moderation.routes";
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { ApiValidationError } from '@shared/types/api';
 import { ApiResponseWrapper, ApiSuccess } from '@server/utils/api-utils';
 import { Request, Response,Router } from "express";
 import { z } from "zod";
 
 export const router = Router();
-
-// Define authenticated request type for better type safety
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: number;
-    role: string;
-  };
-}
 
 // Input validation schemas - these define the shape of incoming data
 const reviewFlagSchema = z.object({
@@ -41,7 +32,7 @@ type ModerationFilters = z.infer<typeof moderationFiltersSchema>;
 // Helper function to handle errors consistently across all routes
 // This centralizes error handling logic and ensures proper logging
 const handleError = (res: Response, error: unknown, message: string, startTime: number) => {
-  logger.error(message, { component: 'Chanuka', error: error instanceof Error ? error.message : String(error) });
+  logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, message);
 
   // Create the error response wrapper with proper metadata
   const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
@@ -64,7 +55,7 @@ router.get("/queue", async (req: Request, res: Response) => {
     if (!result.success) {
       // If validation fails, return a structured error with details about what went wrong
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiValidationError(res, result.error.errors, metadata);
+      return ApiResponseWrapper.error(res, "Validation failed", 400, metadata);
     }
 
     // Extract the validated and typed data from the parse result
@@ -86,7 +77,7 @@ router.get("/queue", async (req: Request, res: Response) => {
 
 // Review and resolve a specific moderation flag
 // This endpoint allows moderators to take action on flagged content
-router.post("/flags/:flagId/review", async (req: AuthenticatedRequest, res: Response) => {
+router.post("/flags/:flagId/review", async (req: Request, res: Response) => {
   const startTime = Date.now();
   
   try {
@@ -150,13 +141,13 @@ router.get("/stats", async (req: Request, res: Response) => {
 
     switch (timeframe) {
       case '24h':
-        startDate.setHours(start_date.getHours() - 24);
+        start_date.setHours(start_date.getHours() - 24);
         break;
       case '7d':
-        startDate.setDate(start_date.getDate() - 7);
+        start_date.setDate(start_date.getDate() - 7);
         break;
       case '30d':
-        startDate.setDate(start_date.getDate() - 30);
+        start_date.setDate(start_date.getDate() - 30);
         break;
     }
 

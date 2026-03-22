@@ -50,7 +50,7 @@ export class SessionCleanupService {
       await authService.cleanupExpiredTokens();
       logger.info({ component: 'Chanuka' }, '✅ Session cleanup completed');
     } catch (error) {
-      logger.error('❌ Session cleanup failed:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, '❌ Session cleanup failed:');
     }
   }
 

@@ -40,10 +40,10 @@ export class TransparencyAnalysisService {
     /**
      * Calculates the transparency score based on bill data and conflict analysis.
      */
-    async calculateScore(bill_id: string, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> { logger.info(`📊 Calculating transparency score for bill ${bill_id }`);
+    async calculateScore(bill_id: string, conflictAnalysis: ConflictSummary): Promise<TransparencyScoreResult> { logger.info({ component: 'server' }, `📊 Calculating transparency score for bill ${bill_id }`);
          try { const bill = await this.getBillDetails(bill_id); // Fetch more details if needed
             if (!bill) {
-                 logger.warn(`Bill ${bill_id } not found for transparency scoring.`);
+                 logger.warn({ component: 'server' }, `Bill ${bill_id } not found for transparency scoring.`);
                  return { overall: 0, breakdown: { sponsorDisclosure: 0, legislativeProcess: 0, financialConflicts: 0, publicAccessibility: 0 }, grade: 'F' };
              }
 
@@ -66,7 +66,7 @@ export class TransparencyAnalysisService {
                 },
                 grade
             };
-         } catch (error) { logger.error(`Error calculating transparency score for bill ${bill_id }:`, { component: 'TransparencyAnalysisService'}, error);
+         } catch (error) { logger.error({ component: 'TransparencyAnalysisService', error: error instanceof Error ? error.message : String(error) }, `Error calculating transparency score for bill ${bill_id }:`);
              return { overall: 0, breakdown: { sponsorDisclosure: 0, legislativeProcess: 0, financialConflicts: 0, publicAccessibility: 0 }, grade: 'F' };
          }
     }
@@ -84,7 +84,7 @@ export class TransparencyAnalysisService {
 
     /** Calculates score based on sponsor's historical transparency and current conflicts */
     private async calculateSponsorDisclosureScore(sponsor_id: number | null, conflictAnalysis: ConflictSummary): Promise<number> {
-        logger.debug(`Calculating sponsor disclosure score (Sponsor ID: ${sponsor_id})`);
+        logger.debug({ component: 'server' }, `Calculating sponsor disclosure score (Sponsor ID: ${sponsor_id})`);
         if (!sponsor_id) return 50; // Neutral score if no specific sponsor
 
         try {
@@ -101,7 +101,7 @@ export class TransparencyAnalysisService {
 
             return Math.max(0, Math.min(100, Math.round(score)));
         } catch (error) {
-             logger.error(`Error fetching sponsor data for transparency score (Sponsor ID: ${sponsor_id}):`, { component: 'TransparencyAnalysisService'}, error);
+             logger.error({ component: 'TransparencyAnalysisService', error: error instanceof Error ? error.message : String(error) }, `Error fetching sponsor data for transparency score (Sponsor ID: ${sponsor_id}):`);
              return 30; // Lower score on error
         }
     }
@@ -110,7 +110,7 @@ export class TransparencyAnalysisService {
     private calculateProcessTransparencyScore(bill: Pick<schema.Bill, 'status'>): number {
         // *** Needs refinement based on actual available data ***
         // Example: Check if committee hearings held, public comments allowed, amendments tracked
-        logger.debug("Calculating legislative process transparency score.");
+        logger.debug({ component: 'server' }, "Calculating legislative process transparency score.");
         let score = 40; // Base score
         // if (bills.committeeHearingsCount > 0) score += 20;
         // if (bills.publicCommentPeriodEnabled) score += 20;
@@ -123,7 +123,7 @@ export class TransparencyAnalysisService {
 
     /** Calculates score based on detected financial conflicts */
     private calculateFinancialConflictScore(conflictAnalysis: ConflictSummary): number {
-        logger.debug("Calculating financial conflict transparency score.");
+        logger.debug({ component: 'server' }, "Calculating financial conflict transparency score.");
          // Higher penalty for direct conflicts
          const directConflictPenalty = (conflictAnalysis.directConflictCount || 0) * 20;
          const indirectConflictPenalty = (conflictAnalysis.indirectConflictCount || 0) * 10;
@@ -139,7 +139,7 @@ export class TransparencyAnalysisService {
     private calculatePublicAccessibilityScore(bill: unknown): number {
         // *** Needs refinement based on actual available data ***
         // Example: Check if full text URL, summary, sponsor info, vote records are available
-        logger.debug("Calculating public accessibility score.");
+        logger.debug({ component: 'server' }, "Calculating public accessibility score.");
          const score = 40;
          // Assume these fields might exist on the bill object or related data
          // if (bills.full_textUrl) score += 25;

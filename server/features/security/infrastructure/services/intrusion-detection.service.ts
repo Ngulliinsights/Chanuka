@@ -218,11 +218,11 @@ export class IntrusionDetectionService {
     if (this.blockedIPs.has(ip)) return;
 
     this.blockedIPs.add(ip);
-    logger.warn(`🚫 Blocking IP ${ip}: ${reason}`);
+    logger.warn({ component: 'server' }, `🚫 Blocking IP ${ip}: ${reason}`);
 
     setTimeout(() => {
       this.blockedIPs.delete(ip);
-      logger.info(`🔓 Unblocking IP ${ip} after timeout`);
+      logger.info({ component: 'server' }, `🔓 Unblocking IP ${ip} after timeout`);
     }, this.config.blockDurationMs);
   }
 

@@ -378,10 +378,9 @@ class DashboardStorageService {
 
       return result[0].id;
     } catch (error) {
-      logger.error('Error creating evaluation', { 
-        component: 'Chanuka',
-        data: { ...data, candidateName: data.candidateName?.substring(0, 50) }, // Truncate for logging
-        error: error instanceof Error ? error.message : String(error)
+      logger.error({ component: 'Chanuka',
+        data: { ...data, candidateName: data.candidateName?.substring(0, 50), error: // Truncate for logging
+        error: error instanceof Error ? error.message : String(error }, 'Error creating evaluation')
       });
       
       if (error instanceof Error) {
@@ -538,7 +537,7 @@ class DashboardStorageService {
       });
 
       // Return empty array as graceful degradation rather than throwing
-      logger.warn('Returning empty department statistics due to error');
+      logger.warn({ component: 'server' }, 'Returning empty department statistics due to error');
       return [];
     }
   }

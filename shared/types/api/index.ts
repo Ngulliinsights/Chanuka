@@ -5,7 +5,9 @@
  */
 
 export * from './contracts';
+export * from './error-types';
 export * from './request-types';
+export * from './response-types';
 export * from './serialization';
 export * from './websocket';
 export * from './factories';

@@ -25,7 +25,10 @@ interface CivicActionToolboxProps {
   onRightsCardOpen: (card: RightsCard) => void;
 }
 
-export 
+export const CivicActionToolbox = React.memo(
+  ({ billId, actions, rightsCards, onActionSelect, onRightsCardOpen }: CivicActionToolboxProps) => {
+    const [selectedTab, setSelectedTab] = useState('actions');
+
     const getActionIcon = (type: string) => {
       switch (type) {
         case 'foi':

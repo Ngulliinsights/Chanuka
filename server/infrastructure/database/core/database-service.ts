@@ -164,12 +164,12 @@ export class DatabaseService {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('Database service already initialized');
+      logger.warn({ component: 'server' }, 'Database service already initialized');
       return;
     }
 
     try {
-      logger.info('🚀 Initializing database service');
+      logger.info({ component: 'server' }, '🚀 Initializing database service');
       this.startTime = new Date();
 
       // Initialize monitoring components first
@@ -182,7 +182,7 @@ export class DatabaseService {
       await this.initializeTransactionManager();
 
       this.initialized = true;
-      logger.info('✅ Database service initialized successfully');
+      logger.info({ component: 'server' }, '✅ Database service initialized successfully');
 
     } catch (error) {
       logger.error({
@@ -197,7 +197,7 @@ export class DatabaseService {
    * Initialize monitoring components
    */
   private async initializeMonitoring(): Promise<void> {
-    logger.info('📊 Initializing monitoring components');
+    logger.info({ component: 'server' }, '📊 Initializing monitoring components');
 
     if (this.config.enableMetrics) {
       this.metricsCollector = createProductionMetricsCollector('primary');
@@ -214,14 +214,14 @@ export class DatabaseService {
       this.queryLogger = createProductionQueryLogger('primary');
     }
 
-    logger.info('✅ Monitoring components initialized');
+    logger.info({ component: 'server' }, '✅ Monitoring components initialized');
   }
 
   /**
    * Initialize connection components
    */
   private async initializeConnections(): Promise<void> {
-    logger.info('🔌 Initializing connection components');
+    logger.info({ component: 'server' }, '🔌 Initializing connection components');
 
     // Initialize primary pool
     this.primaryPoolManager = createProductionPoolManager(
@@ -251,14 +251,14 @@ export class DatabaseService {
       enableReadReplicas: this.readPoolManagers.length > 0,
     });
 
-    logger.info('✅ Connection components initialized');
+    logger.info({ component: 'server' }, '✅ Connection components initialized');
   }
 
   /**
    * Initialize transaction manager
    */
   private async initializeTransactionManager(): Promise<void> {
-    logger.info('💼 Initializing transaction manager');
+    logger.info({ component: 'server' }, '💼 Initializing transaction manager');
 
     const { TransactionManager } = await import('../connections');
     this.transactionManager = new TransactionManager({
@@ -267,7 +267,7 @@ export class DatabaseService {
       enableCircuitBreaker: this.config.enableCircuitBreaker,
     });
 
-    logger.info('✅ Transaction manager initialized');
+    logger.info({ component: 'server' }, '✅ Transaction manager initialized');
   }
 
   /**
@@ -490,7 +490,7 @@ export class DatabaseService {
   async shutdown(timeoutMs?: number): Promise<void> {
     const timeout = timeoutMs || this.config.gracefulShutdownTimeout;
 
-    logger.info('🛑 Shutting down database service');
+    logger.info({ component: 'server' }, '🛑 Shutting down database service');
 
     const shutdownPromises: Promise<void>[] = [];
 
@@ -512,7 +512,7 @@ export class DatabaseService {
         ),
       ]);
 
-      logger.info('✅ Database service shutdown completed');
+      logger.info({ component: 'server' }, '✅ Database service shutdown completed');
     } catch (error) {
       logger.error({
         error: error instanceof Error ? error.message : 'Unknown error',

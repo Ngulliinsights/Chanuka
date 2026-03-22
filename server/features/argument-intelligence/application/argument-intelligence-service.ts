@@ -96,7 +96,7 @@ export class ArgumentIntelligenceService {
   // TODO: Replace 'any' with proper type definition
   async storeArgument(argumentData: unknown): Promise<Argument> {
     const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };
-    logger.debug('Storing processed argument', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing processed argument');
 
     try {
       const now = new Date();
@@ -132,7 +132,7 @@ export class ArgumentIntelligenceService {
       operation: 'getArgumentsForBill',
       bill_id
     };
-    logger.debug('Fetching argList for bill', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching argList for bill');
 
     try {
       const results = await readDatabase(async (db) => {
@@ -161,7 +161,7 @@ export class ArgumentIntelligenceService {
       searchText,
       limit
     };
-    logger.debug('Searching argList', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Searching argList');
 
     try {
       const searchPattern = `%${searchText}%`;
@@ -201,7 +201,7 @@ export class ArgumentIntelligenceService {
       operation: 'storeClaims',
       count: claimsData.length
     };
-    logger.debug('Storing extracted claims', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing extracted claims');
 
     try {
       const now = new Date();
@@ -239,7 +239,7 @@ export class ArgumentIntelligenceService {
       operation: 'getClaimsForArgument',
       argumentId
     };
-    logger.debug('Fetching claims for argument', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching claims for argument');
 
     try {
       const results = await readDatabase(async (db) => {
@@ -272,7 +272,7 @@ export class ArgumentIntelligenceService {
       operation: 'storeEvidence',
       count: evidenceData.length
     };
-    logger.debug('Storing evidence records', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing evidence records');
 
     try {
       const now = new Date();
@@ -310,7 +310,7 @@ export class ArgumentIntelligenceService {
       operation: 'getEvidenceForClaim',
       claimId
     };
-    logger.debug('Fetching evidence for claim', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching evidence for claim');
 
     try {
       const results = await readDatabase(async (db) => {
@@ -343,7 +343,7 @@ export class ArgumentIntelligenceService {
       operation: 'storeBrief',
       briefType: briefData.brief_type
     };
-    logger.debug('Storing legislative brief', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing legislative brief');
 
     try {
       const now = new Date();
@@ -379,7 +379,7 @@ export class ArgumentIntelligenceService {
       operation: 'getBriefsForBill',
       bill_id
     };
-    logger.debug('Fetching briefs for bill', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching briefs for bill');
 
     try {
       const results = await readDatabase(async (db) => {
@@ -407,7 +407,7 @@ export class ArgumentIntelligenceService {
       operation: 'getBriefById',
       briefId
     };
-    logger.debug('Fetching brief by ID', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching brief by ID');
 
     try {
       const [brief] = await readDatabase(async (db) => {
@@ -419,7 +419,7 @@ export class ArgumentIntelligenceService {
       });
 
       if (!brief) {
-        logger.debug('Brief not found', logContext);
+        logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Brief not found');
       }
 
       return brief || null;
@@ -442,7 +442,7 @@ export class ArgumentIntelligenceService {
       operation: 'storeBillSynthesis',
       bill_id: synthesis.bill_id
     };
-    logger.debug('Storing bill synthesis', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing bill synthesis');
 
     try {
       const now = new Date();
@@ -468,7 +468,7 @@ export class ArgumentIntelligenceService {
           });
       });
 
-      logger.info('✅ Bill synthesis stored successfully', logContext);
+      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, '✅ Bill synthesis stored successfully');
     } catch (error) {
       logger.error({ ...logContext, error }, 'Failed to store bill synthesis');
       throw error;
@@ -484,7 +484,7 @@ export class ArgumentIntelligenceService {
       operation: 'getBillSynthesis',
       bill_id
     };
-    logger.debug('Fetching bill synthesis', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching bill synthesis');
 
     try {
       const [synthesis] = await readDatabase(async (db) => {
@@ -503,7 +503,7 @@ export class ArgumentIntelligenceService {
       });
 
       if (!synthesis) {
-        logger.debug('Bill synthesis not found', logContext);
+        logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Bill synthesis not found');
         return null;
       }
 
@@ -539,7 +539,7 @@ export class ArgumentIntelligenceService {
       operation: 'storeArgumentRelationships',
       count: relationships.length
     };
-    logger.debug('Storing argument relationships', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing argument relationships');
 
     try {
       const now = new Date();
@@ -578,7 +578,7 @@ export class ArgumentIntelligenceService {
       argumentId,
       relationshipType
     };
-    logger.debug('Fetching related argList', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching related argList');
 
     try {
       const results = await readDatabase(async (db) => {
@@ -621,7 +621,7 @@ export class ArgumentIntelligenceService {
       operation: 'getArgumentStatistics',
       bill_id
     };
-    logger.debug('Calculating argument statistics', logContext);
+    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Calculating argument statistics');
 
     try {
       const [stats, claimStats, evidenceStats] = await readDatabase(async (db) => {
@@ -748,7 +748,7 @@ export class ArgumentIntelligenceService {
       userId: request.userId,
     };
 
-    logger.info('Processing comment through argument intelligence', logContext);
+    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Processing comment through argument intelligence');
 
     try {
       // Store the argument with basic extraction

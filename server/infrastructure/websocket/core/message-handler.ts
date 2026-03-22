@@ -77,7 +77,7 @@ export class MessageHandler implements IMessageHandler {
 
       // Check for duplicate messages
       if (this.isDuplicateMessage(message)) {
-        logger.warn('Duplicate message detected, ignoring:', message.messageId);
+        logger.warn({ error: message.messageId instanceof Error ? message.messageId.message : String(message.messageId) }, 'Duplicate message detected, ignoring:');
         return;
       }
 
@@ -85,7 +85,7 @@ export class MessageHandler implements IMessageHandler {
       await this.routeMessage(ws, message);
 
     } catch (error) {
-      logger.error('Error handling message:', error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error handling message:');
       await this.sendErrorResponse(ws, message, error);
     }
   }
@@ -148,13 +148,13 @@ export class MessageHandler implements IMessageHandler {
       // Queue the broadcast operation
       const queued = this.operationQueueManager.enqueue(operation);
       if (!queued) {
-        logger.warn('Failed to queue broadcast operation for bill:', billId);
+        logger.warn({ error: billId instanceof Error ? billId.message : String(billId) }, 'Failed to queue broadcast operation for bill:');
         // Fallback to direct broadcast
         this.directBroadcast(subscribers, message);
       }
 
     } catch (error) {
-      logger.error('Error broadcasting to subscribers:', error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error broadcasting to subscribers:');
     }
   }
 
@@ -508,7 +508,7 @@ export class MessageHandler implements IMessageHandler {
       const responseStr = JSON.stringify(response);
       ws.send(responseStr);
     } catch (error) {
-      logger.error('Error sending response:', error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error sending response:');
     }
   }
 
@@ -549,7 +549,7 @@ export class MessageHandler implements IMessageHandler {
         try {
           ws.send(messageStr);
         } catch (error) {
-          logger.error('Error in direct broadcast:', error);
+          logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error in direct broadcast:');
         }
       }
     }

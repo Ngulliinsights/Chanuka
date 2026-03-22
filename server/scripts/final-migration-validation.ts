@@ -56,7 +56,7 @@ export class FinalMigrationValidator {
     };
     crossPhaseValidation: CrossPhaseValidation;
   }> {
-    logger.info('🚀 Starting final migration validation...');
+    logger.info({ component: 'server' }, '🚀 Starting final migration validation...');
 
     try {
       // Phase 1: Utilities validation
@@ -92,7 +92,7 @@ export class FinalMigrationValidator {
       };
 
     } catch (error) {
-      logger.error('❌ Final migration validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Final validation failed');
       throw error;
     }
   }  /**
@@ -100,7 +100,7 @@ export class FinalMigrationValidator {
 * Validate Phase 1: Utilities Migration
    */
   private async validateUtilitiesMigration(): Promise<void> {
-    logger.info('🔍 Validating Phase 1: Utilities Migration...');
+    logger.info({ component: 'server' }, '🔍 Validating Phase 1: Utilities Migration...');
 
     try {
       // Test async-mutex functionality
@@ -152,7 +152,7 @@ export class FinalMigrationValidator {
    * Validate Phase 2: Search Migration
    */
   private async validateSearchMigration(): Promise<void> {
-    logger.info('🔍 Validating Phase 2: Search Migration...');
+    logger.info({ component: 'server' }, '🔍 Validating Phase 2: Search Migration...');
 
     try {
       // Test Fuse.js integration
@@ -193,7 +193,7 @@ export class FinalMigrationValidator {
    * Validate Phase 3: Error Handling Migration
    */
   private async validateErrorHandlingMigration(): Promise<void> {
-    logger.info('🔍 Validating Phase 3: Error Handling Migration...');
+    logger.info({ component: 'server' }, '🔍 Validating Phase 3: Error Handling Migration...');
 
     try {
       // Test Boom error handling
@@ -228,7 +228,7 @@ export class FinalMigrationValidator {
    * Validate Phase 4: Repository Migration
    */
   private async validateRepositoryMigration(): Promise<void> {
-    logger.info('🔍 Validating Phase 4: Repository Migration...');
+    logger.info({ component: 'server' }, '🔍 Validating Phase 4: Repository Migration...');
 
     try {
       // Test direct Drizzle usage
@@ -274,7 +274,7 @@ export class FinalMigrationValidator {
    * Validate Phase 5: WebSocket Migration
    */
   private async validateWebSocketMigration(): Promise<void> {
-    logger.info('🔍 Validating Phase 5: WebSocket Migration...');
+    logger.info({ component: 'server' }, '🔍 Validating Phase 5: WebSocket Migration...');
 
     try {
       // Test Socket.IO integration
@@ -328,7 +328,7 @@ export class FinalMigrationValidator {
    * Validate cross-phase compatibility
    */
   private async validateCrossPhaseCompatibility(): Promise<CrossPhaseValidation> {
-    logger.info('🔍 Validating cross-phase compatibility...');
+    logger.info({ component: 'server' }, '🔍 Validating cross-phase compatibility...');
 
     const validation: CrossPhaseValidation = {
       phase1_utilities: false,
@@ -481,7 +481,7 @@ async function main(): Promise<void> {
     }
     
   } catch (error) {
-    logger.error('Final validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error : new Error(String(error)) }, 'Final validation failed');
     process.exit(1);
   } finally {
     await validator.cleanup();

@@ -211,7 +211,7 @@ export class ConflictDetectionOrchestratorService {
         logger.warn({ failures }, `Some cache invalidations failed for sponsor ${sponsor_id}`);
       }
 
-      logger.info(`Cache invalidated for sponsor ${sponsor_id}`);
+      logger.info({ component: 'server' }, `Cache invalidated for sponsor ${sponsor_id}`);
     } catch (error) {
       logger.error({ error }, `Failed to invalidate cache for sponsor ${sponsor_id}`);
     }

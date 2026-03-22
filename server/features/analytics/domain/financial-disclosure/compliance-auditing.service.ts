@@ -110,7 +110,7 @@ export class ComplianceAuditingService {
    */
   startAutomatedMonitoring(): void {
     if (this.monitoringTimer) {
-      this.logger.warn('Monitoring already active. Ignoring start request.');
+      this.logger.warn({ component: 'server' }, 'Monitoring already active. Ignoring start request.');
       return;
     }
 
@@ -159,11 +159,11 @@ export class ComplianceAuditingService {
    */
   async stopAutomatedMonitoring(): Promise<void> {
     if (!this.monitoringTimer) {
-      this.logger.info('Monitoring not active. Nothing to stop.');
+      this.logger.info({ component: 'server' }, 'Monitoring not active. Nothing to stop.');
       return;
     }
 
-    this.logger.info('Initiating graceful monitoring shutdown...');
+    this.logger.info({ component: 'server' }, 'Initiating graceful monitoring shutdown...');
     this.isShuttingDown = true;
 
     clearInterval(this.monitoringTimer);
@@ -177,7 +177,7 @@ export class ComplianceAuditingService {
     }
 
     if (this.isCycleRunning) {
-      this.logger.warn('Monitoring cycle still running after timeout. Forcing shutdown.');
+      this.logger.warn({ component: 'server' }, 'Monitoring cycle still running after timeout. Forcing shutdown.');
     }
 
     this.status.isRunning = false;
@@ -198,7 +198,7 @@ export class ComplianceAuditingService {
    * Useful for testing or on-demand compliance runs.
    */
   async triggerManualCheck(): Promise<FinancialAlert[]> {
-    this.logger.info('Manual monitoring check triggered');
+    this.logger.info({ component: 'server' }, 'Manual monitoring check triggered');
 
     try {
       const alerts = await this.performMonitoringCycle();
@@ -496,12 +496,12 @@ export class ComplianceAuditingService {
    */
   private async performMonitoringCycle(): Promise<FinancialAlert[]> {
     if (this.isCycleRunning) {
-      this.logger.warn('Monitoring cycle already in progress. Skipping.');
+      this.logger.warn({ component: 'server' }, 'Monitoring cycle already in progress. Skipping.');
       return [];
     }
 
     this.isCycleRunning = true;
-    this.logger.info('Starting monitoring cycle');
+    this.logger.info({ component: 'server' }, 'Starting monitoring cycle');
 
     const allAlerts: FinancialAlert[] = [];
 
@@ -519,7 +519,7 @@ export class ComplianceAuditingService {
 
       for (let i = 0; i < totalSponsors; i += batchSize) {
         if (this.isShuttingDown) {
-          this.logger.info('Shutdown requested. Stopping batch processing.');
+          this.logger.info({ component: 'server' }, 'Shutdown requested. Stopping batch processing.');
           break;
         }
 

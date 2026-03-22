@@ -94,7 +94,7 @@ function toError(value: unknown): Error & { code?: string; status?: number } {
 // This wrapper keeps every call site to a single readable line.
 // ---------------------------------------------------------------------------
 function logError(message: string, err: unknown): void {
-  logger.error(`${message} ${toError(err).message}`);
+  logger.error({ component: 'server' }, `${message} ${toError(err).message}`);
 }
 
 // ---------------------------------------------------------------------------

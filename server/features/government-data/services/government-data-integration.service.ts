@@ -349,10 +349,10 @@ export class GovernmentDataIntegrationService {
         
         // If we got good data, we can be less aggressive with other sources
         if (sourceResult.success && sourceResult.recordsProcessed > 0) {
-          logger.info(`✅ Successfully integrated ${sourceResult.recordsProcessed} bills from ${source.name}`);
+          logger.info({ component: 'server' }, `✅ Successfully integrated ${sourceResult.recordsProcessed} bills from ${source.name}`);
         }
       } catch (error) {
-        logger.error(`❌ Failed to integrate bills from ${source.name}`, error);
+        logger.error({ error: error instanceof Error ? error.message : String(error) }, `❌ Failed to integrate bills from ${source.name}`);
         await this.updateSourceReliability(source.name, false);
         
         results.push({
@@ -370,7 +370,7 @@ export class GovernmentDataIntegrationService {
 
     // If all primary sources failed, try fallback mechanisms
     if (results.every(r => !r.success)) {
-      logger.warn('🔄 All primary sources failed, attempting fallback mechanisms');
+      logger.warn({ component: 'server' }, '🔄 All primary sources failed, attempting fallback mechanisms');
       const fallbackResult = await this.attemptBillDataFallbacks(options);
       results.push(fallbackResult);
     }
@@ -477,7 +477,7 @@ export class GovernmentDataIntegrationService {
     if (!options.forceRefresh) {
       const cached = await cache.get(cacheKey);
       if (cached) {
-        logger.info(`📦 Using cached data from ${source.name}`);
+        logger.info({ component: 'server' }, `📦 Using cached data from ${source.name}`);
         return cached;
       }
     }
@@ -507,7 +507,7 @@ export class GovernmentDataIntegrationService {
         }
       } catch (error) {
         retryCount++;
-        logger.warn(`API request failed (attempt ${retryCount}/${maxRetries})`, error);
+        logger.warn({ error: error instanceof Error ? error.message : String(error) }, `API request failed (attempt ${retryCount}/${maxRetries})`);
         
         if (retryCount < maxRetries) {
           await this.delay(Math.pow(2, retryCount) * 1000); // Exponential backoff
@@ -543,7 +543,7 @@ export class GovernmentDataIntegrationService {
       await cache.set(cacheKey, bills, this.CACHE_TTL.bills);
       
     } catch (error) {
-      logger.error(`Web scraping failed for ${source.name}`, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, `Web scraping failed for ${source.name}`);
       throw error;
     }
 
@@ -589,7 +589,7 @@ export class GovernmentDataIntegrationService {
       }));
 
     } catch (error) {
-      logger.warn('Failed to fetch crowdsourced bills', error);
+      logger.warn({ error: error instanceof Error ? error.message : String(error) }, 'Failed to fetch crowdsourced bills');
       return [];
     }
   }
@@ -626,7 +626,7 @@ export class GovernmentDataIntegrationService {
       }));
 
     } catch (error) {
-      logger.warn('Failed to fetch manual bills', error);
+      logger.warn({ error: error instanceof Error ? error.message : String(error) }, 'Failed to fetch manual bills');
       return [];
     }
   }
@@ -851,7 +851,7 @@ export class GovernmentDataIntegrationService {
           });
         }
       } catch (error) {
-        logger.warn(`Failed to process sponsor ${sponsorInfo.name} for bill ${bill_id}`, error);
+        logger.warn({ error: error instanceof Error ? error.message : String(error) }, `Failed to process sponsor ${sponsorInfo.name} for bill ${bill_id}`);
       }
     }
   }
@@ -890,7 +890,7 @@ export class GovernmentDataIntegrationService {
 
     if (limiter.requests >= source.rateLimit.requestsPerMinute) {
       const waitTime = limiter.resetTime - now;
-      logger.info(`Rate limit reached for ${sourceName}, waiting ${waitTime}ms`);
+      logger.info({ component: 'server' }, `Rate limit reached for ${sourceName}, waiting ${waitTime}ms`);
       await this.delay(waitTime);
       
       // Reset after waiting
@@ -963,7 +963,7 @@ export class GovernmentDataIntegrationService {
       } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error));
         lastError = err;
-        logger.warn(`Attempt ${attempt}/${source.retryAttempts} failed for ${source.name}:`, err.message);
+        logger.warn({ error: err.message instanceof Error ? err.message.message : String(err.message) }, `Attempt ${attempt}/${source.retryAttempts} failed for ${source.name}:`);
 
         if (attempt < source.retryAttempts) {
           // Exponential backoff
@@ -1141,7 +1141,7 @@ export class GovernmentDataIntegrationService {
       // Disable source if too many consecutive failures
       if (source.reliability.consecutiveFailures >= 5) {
         source.is_active = false;
-        logger.warn(`Disabling unreliable source: ${sourceName}`);
+        logger.warn({ component: 'server' }, `Disabling unreliable source: ${sourceName}`);
       }
     }
   }
@@ -1286,7 +1286,7 @@ export class GovernmentDataIntegrationService {
           });
         }
       } catch (error) {
-        logger.warn(`Failed to process affiliation for sponsor ${sponsor_id}`, error);
+        logger.warn({ error: error instanceof Error ? error.message : String(error) }, `Failed to process affiliation for sponsor ${sponsor_id}`);
       }
     }
   }

@@ -155,7 +155,7 @@ export class UnifiedConnectionManager {
    */
   public async initialize(): Promise<void> {
     if (this.isInitialized) {
-      logger.warn('Connection manager already initialized');
+      logger.warn({ component: 'server' }, 'Connection manager already initialized');
       return;
     }
 

@@ -57,7 +57,7 @@ export class CacheAdapter<T = any> {
 
   clear(): void {
     this.cache.clear();
-    logger.info('Cache cleared');
+    logger.info({ component: 'server' }, 'Cache cleared');
   }
 
   has(key: string): boolean {

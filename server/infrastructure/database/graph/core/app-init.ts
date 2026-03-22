@@ -12,7 +12,7 @@ import { logger } from '@server/infrastructure/observability';
 let appDriver: Driver | null = null;
 
 export async function initializeGraphDatabase(): Promise<Driver> {
-  logger.info('Initializing graph database...');
+  logger.info({ component: 'server' }, 'Initializing graph database...');
 
   try {
     // Validate configuration
@@ -31,11 +31,11 @@ export async function initializeGraphDatabase(): Promise<Driver> {
 
     // Verify connectivity
     await appDriver.verifyConnectivity();
-    logger.info('Connected to Neo4j');
+    logger.info({ component: 'server' }, 'Connected to Neo4j');
 
     // Initialize schema
     await initializeGraphSchema(appDriver);
-    logger.info('Schema initialized');
+    logger.info({ component: 'server' }, 'Schema initialized');
 
     // Initialize sync service
     await initializeSyncService({
@@ -48,7 +48,7 @@ export async function initializeGraphDatabase(): Promise<Driver> {
       enableAutoSync: SYNC_CONFIG.ENABLE_AUTO_SYNC,
     });
 
-    logger.info('Graph database initialized successfully');
+    logger.info({ component: 'server' }, 'Graph database initialized successfully');
     return appDriver;
   } catch (error) {
     logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Failed to initialize graph database');
@@ -57,7 +57,7 @@ export async function initializeGraphDatabase(): Promise<Driver> {
 }
 
 export async function shutdownGraphDatabase(): Promise<void> {
-  logger.info('Shutting down graph database...');
+  logger.info({ component: 'server' }, 'Shutting down graph database...');
 
   try {
     await shutdownSyncService();
@@ -67,7 +67,7 @@ export async function shutdownGraphDatabase(): Promise<void> {
       appDriver = null;
     }
 
-    logger.info('Graph database shut down successfully');
+    logger.info({ component: 'server' }, 'Graph database shut down successfully');
   } catch (error) {
     logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error during shutdown');
   }

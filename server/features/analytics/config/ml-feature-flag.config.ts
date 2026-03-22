@@ -32,10 +32,8 @@ export function initializeMLFeatureFlag(): void {
       environment: process.env.NODE_ENV
     }, 'ML service feature flag initialized');
   } catch (error) {
-    logger.error('Failed to initialize ML service feature flag:', {
-      component: 'analytics',
-      operation: 'initializeMLFeatureFlag'
-    }, error instanceof Error ? error : { message: String(error) });
+    logger.error({ component: 'analytics',
+      operation: 'initializeMLFeatureFlag', error: error instanceof Error ? error : { message: String(error }, 'Failed to initialize ML service feature flag:') });
   }
 }
 
@@ -52,11 +50,9 @@ export async function enableMLServiceRollout(percentage: number): Promise<void> 
       rolloutPercentage: percentage
     }, 'ML service rollout updated');
   } catch (error) {
-    logger.error('Failed to enable ML service rollout:', {
-      component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'enableMLServiceRollout',
-      percentage
-    }, error instanceof Error ? error : { message: String(error) });
+      percentage, error: error instanceof Error ? error : { message: String(error }, 'Failed to enable ML service rollout:') });
     throw error;
   }
 }
@@ -73,10 +69,8 @@ export async function rollbackMLService(): Promise<void> {
       operation: 'rollbackMLService'
     }, 'ML service rolled back to mock implementation');
   } catch (error) {
-    logger.error('Failed to rollback ML service:', {
-      component: 'analytics',
-      operation: 'rollbackMLService'
-    }, error instanceof Error ? error : { message: String(error) });
+    logger.error({ component: 'analytics',
+      operation: 'rollbackMLService', error: error instanceof Error ? error : { message: String(error }, 'Failed to rollback ML service:') });
     throw error;
   }
 }
@@ -98,10 +92,8 @@ export function getMLServiceStatus(): {
       fallbackEnabled: flag?.fallbackEnabled || true
     };
   } catch (error) {
-    logger.error('Failed to get ML service status:', {
-      component: 'analytics',
-      operation: 'getMLServiceStatus'
-    }, error instanceof Error ? error : { message: String(error) });
+    logger.error({ component: 'analytics',
+      operation: 'getMLServiceStatus', error: error instanceof Error ? error : { message: String(error }, 'Failed to get ML service status:') });
     
     return {
       enabled: false,

@@ -44,14 +44,13 @@ export async function initializeDatabase(): Promise<boolean> {
     return true;
 
   } catch (error) {
-    logger.error("Database initialization failed", {
+    logger.error({
       component: "database",
-      operation: "initialize"
-    }, {
+      operation: "initialize",
       message: error instanceof Error ? error.message : String(error),
       code: (error as Record<string, unknown>)?.code,
       detail: (error as Record<string, unknown>)?.detail
-    });
+    }, "Database initialization failed");
 
     logger.info({
       component: "database",
@@ -90,12 +89,11 @@ export async function validateDatabaseHealth() {
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Database health check failed', {
+    logger.error({
       component: 'database',
-      operation: 'health_check'
-    }, {
+      operation: 'health_check',
       message: errorMessage
-    });
+    }, 'Database health check failed');
     return {
       connected: false,
       tablesExist: false,
@@ -117,12 +115,11 @@ async function checkTablesExist(): Promise<boolean> {
     return tableCheck.rows.length >= 4; // At least the core tables should exist
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('Error checking table existence', {
+    logger.error({
       component: 'database',
-      operation: 'table_check'
-    }, {
+      operation: 'table_check',
       message: errorMessage
-    });
+    }, 'Error checking table existence');
     return false;
   }
 }

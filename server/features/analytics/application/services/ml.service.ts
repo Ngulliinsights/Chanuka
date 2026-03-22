@@ -18,11 +18,9 @@ interface AnalysisError {
 export class MLAnalysisService {
   // Public helper method for consistent error handling
   public static handleAnalysisError(error: unknown, analysis_type: string): AnalysisResult {
-    logger.error(`Error in ${analysis_type} analysis:`, {
-      component: 'analytics',
+    logger.error({ component: 'analytics',
       operation: 'handleAnalysisError',
-      analysis_type
-    }, error instanceof Error ? error : { message: String(error) });
+      analysis_type, error: error instanceof Error ? error : { message: String(error }, `Error in ${analysis_type} analysis:`) });
 
     return {
       confidence: 0.0,
@@ -294,10 +292,8 @@ export class MLAnalysisService {
         ]
       };
     } catch (error) {
-      logger.error('Error in implementation workaround detection:', {
-        component: 'analytics',
-        operation: 'detectImplementationWorkarounds'
-      }, error instanceof Error ? error : { message: String(error) });
+      logger.error({ component: 'analytics',
+        operation: 'detectImplementationWorkarounds', error: error instanceof Error ? error : { message: String(error }, 'Error in implementation workaround detection:') });
       return {
         matches: [],
         overallRisk: 0.0,
@@ -350,11 +346,9 @@ export async function detectImplementationWorkarounds(bill_id: string): Promise<
         }
       }
     ];
-  } catch (error) { logger.error('Error in detectImplementationWorkarounds:', {
-      component: 'analytics',
+  } catch (error) { logger.error({ component: 'analytics',
       operation: 'detectImplementationWorkarounds',
-      bill_id
-     }, error instanceof Error ? error : { message: String(error) });
+      bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error in detectImplementationWorkarounds:') });
     return [];
   }
 }
@@ -440,11 +434,9 @@ export async function performComprehensiveAnalysis(bill_id: string): Promise<{
         dataQuality: overallScore >= 0.85 ? 'excellent' : overallScore >= 0.7 ? 'good' : overallScore >= 0.5 ? 'fair' : 'poor'
       }
     };
-  } catch (error) { logger.error('Error in comprehensive analysis:', {
-      component: 'analytics',
+  } catch (error) { logger.error({ component: 'analytics',
       operation: 'performComprehensiveAnalysis',
-      bill_id
-     }, error instanceof Error ? error : { message: String(error) });
+      bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error in comprehensive analysis:') });
 
     // Return fallback response with error indication
     return {

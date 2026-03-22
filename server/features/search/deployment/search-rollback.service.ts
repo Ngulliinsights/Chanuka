@@ -98,7 +98,7 @@ export class SearchRollbackService {
 
     // Execute rollback asynchronously
     this.executeRollback(rollbackId).catch(error => {
-      logger.error(`❌ Rollback execution failed for ${component}:`, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, `❌ Rollback execution failed for ${component}:`);
       execution.status = 'failed';
     });
 
@@ -182,7 +182,7 @@ export class SearchRollbackService {
     }
 
     execution.status = 'in_progress';
-    logger.info(`🔄 Executing rollback plan for ${execution.component}`);
+    logger.info({ component: 'server' }, `🔄 Executing rollback plan for ${execution.component}`);
 
     try {
       // Record baseline metrics before rollback
@@ -265,7 +265,7 @@ export class SearchRollbackService {
 
       execution.metrics.trafficShifted += Math.abs(stage.targetPercentage - (execution.stages[stage.stage - 2]?.targetPercentage || 100));
 
-      logger.info(`✅ Rollback stage ${stage.stage} completed for ${execution.component}`);
+      logger.info({ component: 'server' }, `✅ Rollback stage ${stage.stage} completed for ${execution.component}`);
 
     } catch (error) {
       stage.status = 'failed';
@@ -324,7 +324,7 @@ export class SearchRollbackService {
    * Perform final rollback validation
    */
   private async performFinalValidation(execution: RollbackExecution): Promise<void> {
-    logger.info(`🔍 Performing final validation for ${execution.component} rollback`);
+    logger.info({ component: 'server' }, `🔍 Performing final validation for ${execution.component} rollback`);
 
     const component = execution.component;
     const issues: string[] = [];
@@ -362,7 +362,7 @@ export class SearchRollbackService {
       throw new Error(`Final rollback validation failed: ${issues.join(', ')}`);
     }
 
-    logger.info(`✅ Final validation passed for ${execution.component} rollback`);
+    logger.info({ component: 'server' }, `✅ Final validation passed for ${execution.component} rollback`);
   }
 
   /**
@@ -443,14 +443,14 @@ export class SearchRollbackService {
     this.rollbackHistory.push(execution);
     this.activeRollbacks.delete(rollbackId);
 
-    logger.warn(`🚫 Rollback cancelled: ${rollbackId}`);
+    logger.warn({ component: 'server' }, `🚫 Rollback cancelled: ${rollbackId}`);
   }
 
   /**
    * Emergency rollback - immediate traffic cutoff
    */
   async emergencyRollback(component: string, reason: string): Promise<string> {
-    logger.error(`🚨 EMERGENCY ROLLBACK initiated for ${component}: ${reason}`);
+    logger.error({ component: 'server' }, `🚨 EMERGENCY ROLLBACK initiated for ${component}: ${reason}`);
 
     // Immediately disable feature flag
     await featureFlagsService.rollbackFeature(`search-${component}`);
@@ -497,7 +497,7 @@ export class SearchRollbackService {
 
     this.rollbackHistory.push(execution);
 
-    logger.error(`🚨 Emergency rollback completed for ${component}`);
+    logger.error({ component: 'server' }, `🚨 Emergency rollback completed for ${component}`);
     return rollbackId;
   }
 

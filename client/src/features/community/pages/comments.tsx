@@ -39,6 +39,22 @@ interface BillInfo {
   billNumber: string;
 }
 
+interface Comment {
+  id: string;
+  author: {
+    name: string;
+    avatar?: string;
+    verified: boolean;
+    title?: string;
+  };
+  content: string;
+  timestamp: string;
+  likes: number;
+  dislikes: number;
+  isExpert: boolean;
+  replies: Comment[];
+}
+
 export default function CommentsPage() {
   const { id } = useParams();
   const [comments, setComments] = useState<Comment[]>([]);

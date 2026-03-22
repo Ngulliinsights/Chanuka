@@ -443,7 +443,7 @@ export class KenyanGovernmentDataIntegrationService {
 
     // In a real implementation, this would make actual HTTP requests
     // For now, we'll return synthetic data to demonstrate the structure
-    logger.info(`Fetching bills from ${sourceName}`, options);
+    logger.info({ error: options instanceof Error ? options.message : String(options) }, `Fetching bills from ${sourceName}`);
 
     // Simulate API call with synthetic data
     const syntheticBills = await this.generateSyntheticBills(options.limit || 10);
@@ -476,7 +476,7 @@ export class KenyanGovernmentDataIntegrationService {
       throw new Error(`Rate limit exceeded for ${sourceName}`);
     }
 
-    logger.info(`Fetching sponsors from ${sourceName}`, options);
+    logger.info({ error: options instanceof Error ? options.message : String(options) }, `Fetching sponsors from ${sourceName}`);
 
     const syntheticSponsors = await this.generateSyntheticSponsors(options.limit || 10);
     

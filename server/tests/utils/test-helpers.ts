@@ -498,13 +498,13 @@ export class ConcurrencyTestHelper {
       );
     }
 
-    logger.debug('Concurrent response validation passed', {
+    logger.debug({
       component: 'concurrency-test-helper',
       totalResponses: responses.length,
       expectedStatus,
       successCount,
       successRate: `${(successRate * 100).toFixed(1)}%`
-    });
+    }, 'Concurrent response validation passed');
   }
 }
 

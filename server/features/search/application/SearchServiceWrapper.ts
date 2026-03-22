@@ -321,7 +321,7 @@ class SearchServiceImpl {
    */
   async getSearchIndexHealth(): Promise<AsyncServiceResult<IndexHealth>> {
     return safeAsync(async () => {
-      logger.info('Getting search index health');
+      logger.info({ component: 'server' }, 'Getting search index health');
       
       // TODO: Implement actual health check logic
       // This is a placeholder implementation
@@ -404,7 +404,7 @@ class SearchServiceImpl {
    */
   async getSearchMetrics(): Promise<AsyncServiceResult<SearchMetrics>> {
     return safeAsync(async () => {
-      logger.info('Getting search metrics');
+      logger.info({ component: 'server' }, 'Getting search metrics');
       
       // TODO: Implement actual metrics logic
       // This is a placeholder implementation

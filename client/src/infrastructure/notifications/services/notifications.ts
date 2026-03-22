@@ -15,7 +15,10 @@ export interface UserNotifications {
   preferences: NotificationPreference[];
 }
 
-export     return response.data;
+export const notificationsService = {
+  async getNotifications(): Promise<UserNotifications> {
+    const response = await globalApiClient.get('/api/notifications');
+    return response.data;
   },
 
   async updatePreference(type: string, channels: string[], enabled: boolean): Promise<void> {

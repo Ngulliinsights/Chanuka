@@ -58,7 +58,7 @@ export class TLSConfigService {
 
       logger.info({ component: 'TLSConfigService' }, '✅ TLS certificates loaded successfully');
     } catch (error) {
-      logger.error('❌ Failed to load TLS certificates:', { component: 'TLSConfigService' }, error);
+      logger.error({ component: 'TLSConfigService', error: error instanceof Error ? error.message : String(error) }, '❌ Failed to load TLS certificates:');
       throw new Error('TLS configuration failed');
     }
 
@@ -112,7 +112,7 @@ export class TLSConfigService {
 
       logger.info({ component: 'TLSConfigService' }, '✅ Self-signed certificate generated successfully');
     } catch (error) {
-      logger.error('❌ Failed to generate self-signed certificate:', { component: 'TLSConfigService' }, error);
+      logger.error({ component: 'TLSConfigService', error: error instanceof Error ? error.message : String(error) }, '❌ Failed to generate self-signed certificate:');
       throw new Error('Certificate generation failed');
     }
   }
@@ -163,7 +163,7 @@ VQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC7
       logger.info({ component: 'TLSConfigService' }, '✅ TLS configuration validated successfully');
       return true;
     } catch (error) {
-      logger.error('❌ TLS configuration validation failed:', { component: 'TLSConfigService' }, error);
+      logger.error({ component: 'TLSConfigService', error: error instanceof Error ? error.message : String(error) }, '❌ TLS configuration validation failed:');
       return false;
     }
   }

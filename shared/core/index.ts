@@ -32,6 +32,9 @@ export {
 
 // Error types
 export {
+  ValidationError,
+  TransformationError,
+  NetworkError,
   ErrorDomain,
   ErrorSeverity,
 } from '../types';

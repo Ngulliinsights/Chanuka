@@ -199,7 +199,7 @@ export class PerformanceMonitoringService {
    */
   clearAlerts(): void {
     this.alerts = [];
-    logger.info('Performance alerts cleared');
+    logger.info({ component: 'server' }, 'Performance alerts cleared');
   }
 
   /**
@@ -298,7 +298,7 @@ export class PerformanceMonitoringService {
    */
   clearMetrics(): void {
     this.metrics.clear();
-    logger.info('Performance metrics cleared');
+    logger.info({ component: 'server' }, 'Performance metrics cleared');
   }
 
   /**

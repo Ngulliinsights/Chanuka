@@ -75,7 +75,7 @@ router.get(
       });
 
     } catch (error) {
-      logger.error(`Error getting notifications: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error getting notifications: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       if (error instanceof ZodError) {
         return sendValidationError(res, error.errors);
@@ -118,7 +118,7 @@ router.post(
       });
 
     } catch (error) {
-      logger.error(`Error creating notification: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error creating notification: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       if (error instanceof ZodError) {
         return sendValidationError(res, error.errors);
@@ -155,7 +155,7 @@ router.patch(
       });
 
     } catch (error) {
-      logger.error(`Error marking notification as read: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error marking notification as read: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to mark notification as read', 500);
     }
@@ -183,7 +183,7 @@ router.patch(
       });
 
     } catch (error) {
-      logger.error(`Error marking all notifications as read: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error marking all notifications as read: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to mark all notifications as read', 500);
     }
@@ -216,7 +216,7 @@ router.delete(
       });
 
     } catch (error) {
-      logger.error(`Error deleting notification: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error deleting notification: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to delete notification', 500);
     }
@@ -242,7 +242,7 @@ router.get(
       return sendSuccess(res, stats);
 
     } catch (error) {
-      logger.error(`Error getting notification stats: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error getting notification stats: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to get notification statistics', 500);
     }
@@ -304,7 +304,7 @@ router.get(
       });
 
     } catch (error) {
-      logger.error(`Error getting enhanced preferences: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error getting enhanced preferences: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to get enhanced preferences', 500);
     }
@@ -336,7 +336,7 @@ router.patch(
       });
 
     } catch (error) {
-      logger.error(`Error updating channel preferences: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error updating channel preferences: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to update channel preferences', 500);
     }
@@ -367,7 +367,7 @@ router.post(
       return sendSuccess(res, filterResult);
 
     } catch (error) {
-      logger.error(`Error testing smart filter: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+      logger.error({ component: 'server' }, `Error testing smart filter: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
       return sendError(res, 'Failed to test smart filter', 500);
     }
@@ -392,7 +392,7 @@ router.get('/status', async (_req: Request, res: Response) => {
     });
 
   } catch (error) {
-    logger.error(`Error getting service status: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
+    logger.error({ component: 'server' }, `Error getting service status: ${error instanceof Error ? error.message : String(error)} | component=NotificationRoutes`);
 
     return sendError(res, 'Failed to get service status', 500);
   }

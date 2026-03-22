@@ -338,4 +338,4 @@ class NotificationService {
   }
 }
 
-export 
+export const notificationService = new NotificationService();

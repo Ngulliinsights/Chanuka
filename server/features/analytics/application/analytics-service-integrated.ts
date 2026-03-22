@@ -12,7 +12,7 @@
 
 import { Result, ok, err } from 'neverthrow';
 import { z } from 'zod';
-import { eq, and, gte, lte, desc, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 
 // Infrastructure imports
 import { secureQueryBuilderService, queryValidationService, inputSanitizationService } from '@server/features/security';
@@ -79,24 +79,18 @@ export class AnalyticsServiceIntegrated {
   )
   async getOverview(): Promise<Result<AnalyticsOverview, Error>> {
     try {
-      logger.info('Fetching analytics overview');
+      logger.info({ component: 'server' }, 'Fetching analytics overview');
 
       // Build secure query for total events
-      const totalEventsQuery = secureQueryBuilderService.buildParameterizedQuery(
-        'SELECT COUNT(*) as count FROM analytics_events',
-        {}
-      );
+      const totalEventsQuery = sql`SELECT COUNT(*) as count FROM analytics_events`;
 
       // Build secure query for unique users
-      const uniqueUsersQuery = secureQueryBuilderService.buildParameterizedQuery(
-        'SELECT COUNT(DISTINCT user_id) as count FROM analytics_events',
-        {}
-      );
+      const uniqueUsersQuery = sql`SELECT COUNT(DISTINCT user_id) as count FROM analytics_events`;
 
       // Execute queries (using Drizzle ORM for safety)
       const [totalEvents, uniqueUsers] = await Promise.all([
-        db.execute(sql`SELECT COUNT(*) as count FROM analytics_events`),
-        db.execute(sql`SELECT COUNT(DISTINCT user_id) as count FROM analytics_events`)
+        db.execute(totalEventsQuery),
+        db.execute(uniqueUsersQuery)
       ]);
 
       // Build overview

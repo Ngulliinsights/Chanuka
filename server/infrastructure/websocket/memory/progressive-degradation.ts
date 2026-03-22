@@ -199,7 +199,7 @@ export class ProgressiveDegradation implements IProgressiveDegradation {
 
     // Log the degradation change
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      logger.info(`WebSocket service degradation level changed: ${previousLevel} -> ${level}`);
+      logger.info({ component: 'server' }, `WebSocket service degradation level changed: ${previousLevel} -> ${level}`);
     }
 
     // Notify listeners

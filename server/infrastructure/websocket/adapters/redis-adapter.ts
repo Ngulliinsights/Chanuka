@@ -1,47 +1,54 @@
 /**
  * Redis Adapter for WebSocket Service
- * 
- * Provides Redis-based scaling and persistence for WebSocket connections
- * across multiple server instances.
+ *
+ * Provides Redis-based pub/sub and state persistence for horizontal scaling
+ * of WebSocket connections across multiple server instances.
  */
 
 import Redis, { RedisOptions } from 'ioredis';
 import { logger } from '@server/infrastructure/observability';
-
 import { promisify } from 'util';
-import { gunzip,gzip } from 'zlib';
+import { gunzip, gzip } from 'zlib';
+import type { AdapterConfig, ServiceStats } from '../types';
 
-// Temporary fallback logger until shared/core import is resolved
-const logger = {
-  info: (message: string, context?: unknown) => {
-    logger.info(`[INFO] ${message}`, context || '');
-  },
-  warn: (message: string, context?: unknown) => {
-    logger.warn(`[WARN] ${message}`, context || '');
-  },
-  error: (message: string, context?: unknown, error?: Error) => {
-    logger.error(`[ERROR] ${message}`, context || '', error || '');
-  },
-  debug: (message: string, context?: unknown) => {
-    logger.info(`[DEBUG] ${message}`, context || '');
-  }
-};
-import type { AdapterConfig,ServiceStats } from '../types';
+// ─── Constants ────────────────────────────────────────────────────────────────
 
-// Promisified compression functions
-const compressAsync = promisify(gzip);
-const decompressAsync = promisify(gunzip);
+const CHANNELS = {
+  BILL_UPDATES:       'websocket:bill_updates',
+  USER_NOTIFICATIONS: 'websocket:user_notifications',
+  BROADCASTS:         'websocket:broadcasts',
+} as const;
+
+/** Seconds before an idle connection-state key expires. */
+const CONNECTION_STATE_TTL_S = 3_600;
+
+/** Seconds before a subscription set expires when idle. */
+const SUBSCRIPTION_TTL_S = 86_400;
+
+/** Maximum keys returned per SCAN page. */
+const SCAN_COUNT = 100;
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Channel = (typeof CHANNELS)[keyof typeof CHANNELS];
+
+/** Extended stats that include Redis-specific counters. */
+interface RedisStats extends ServiceStats {
+  messagesProcessed: number;
+  errors: number;
+}
 
 export interface RedisAdapterConfig extends AdapterConfig {
   redisUrl?: string;
   maxRetries?: number;
-  retryDelayOnFailover?: number;
+  retryDelayMs?: number;
   enableOfflineQueue?: boolean;
   lazyConnect?: boolean;
   keepAlive?: number;
   family?: 4 | 6;
   db?: number;
   enableCompression?: boolean;
+  /** Minimum byte length before a payload is gzip-compressed (default 1 024). */
   compressionThreshold?: number;
 }
 
@@ -49,594 +56,414 @@ export interface RedisMessage {
   type: 'bill_update' | 'user_notification' | 'broadcast';
   data: unknown;
   timestamp: number;
-  serverId: string;
+  source?: string;
 }
 
-export class RedisAdapter {
-  private client!: Redis;
-  private subClient!: Redis;
-  private connected: boolean = false;
-  private connectionPromise: Promise<void> | null = null;
-  private serverId: string;
-  private messageHandlers: Map<string, (message: RedisMessage) => void> = new Map();
+// ─── Promisified compression ──────────────────────────────────────────────────
 
-  private stats = {
-    messagesPublished: 0,
-    messagesReceived: 0,
-    connectionErrors: 0,
-    lastActivity: Date.now(),
-    startTime: Date.now(),
+const compressAsync   = promisify(gzip);
+const decompressAsync = promisify(gunzip);
+
+// ─── Adapter ──────────────────────────────────────────────────────────────────
+
+/**
+ * Redis-based adapter for horizontal scaling of WebSocket connections.
+ *
+ * Responsibilities:
+ *  - Publish/subscribe across server instances via Redis channels.
+ *  - Store per-connection state with a rolling TTL.
+ *  - Track per-user bill subscriptions in Redis Sets.
+ */
+export class RedisAdapter {
+  private readonly client:     Redis;
+  private readonly subscriber: Redis;
+  private readonly config:     Required<RedisAdapterConfig>;
+
+  private connected = false;
+  private readonly messageHandlers = new Map<
+    Channel,
+    (message: RedisMessage) => void
+  >();
+
+  private readonly stats: RedisStats = {
+    totalConnections:  0,
+    activeConnections: 0,
+    totalMessages:     0,
+    totalBroadcasts:   0,
+    droppedMessages:   0,
+    duplicateMessages: 0,
+    queueOverflows:    0,
+    reconnections:     0,
+    startTime:         Date.now(),
+    lastActivity:      Date.now(),
+    peakConnections:   0,
+    uptime:            0,           // computed on read
+    memoryUsage:       0,
+    uniqueUsers:       0,
+    averageLatency:    0,
+    messagesProcessed: 0,
+    errors:            0,
   };
 
-  constructor(private config: RedisAdapterConfig = {}) {
-    this.serverId = `server-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
-    this.initializeRedis();
-  }
+  /** Epoch ms at construction; used to derive `uptime`. */
+  private readonly startTime = Date.now();
 
-  /**
-   * Initialize Redis connections
-   */
-  private initializeRedis(): void {
+  // ─── Constructor ────────────────────────────────────────────────────────────
+
+  constructor(config: RedisAdapterConfig = {}) {
+    this.config = {
+      maxRetries:           3,
+      retryDelayMs:         100,
+      enableOfflineQueue:   false,
+      lazyConnect:          true,
+      keepAlive:            30_000,
+      family:               4,
+      db:                   0,
+      enableCompression:    true,
+      compressionThreshold: 1_024,
+      redisUrl:             '',
+      ...config,
+    } as Required<RedisAdapterConfig>;
+
     const redisUrl = this.config.redisUrl || process.env.REDIS_URL || 'redis://localhost:6379';
+    const options  = this.buildRedisOptions();
 
-    const redisOptions: RedisOptions = {
-      maxRetriesPerRequest: this.config.maxRetries ?? 3,
-      retryStrategy: (times: number) => {
-        const delay = Math.min(times * 50, 2000);
-        return delay;
-      },
-      enableOfflineQueue: this.config.enableOfflineQueue ?? false,
-      lazyConnect: this.config.lazyConnect ?? true,
-      keepAlive: this.config.keepAlive ?? 30000,
-      family: this.config.family ?? 4,
-      db: this.config.db ?? 0,
-      enableReadyCheck: true,
-      autoResubscribe: true,
-      autoResendUnfulfilledCommands: true,
-    };
-
-    this.client = new Redis(redisUrl, redisOptions);
-    this.subClient = new Redis(redisUrl, redisOptions);
+    this.client     = new Redis(redisUrl, options);
+    this.subscriber = new Redis(redisUrl, options);
 
     this.setupEventHandlers();
   }
 
-  /**
-   * Setup Redis event handlers
-   */
-  private setupEventHandlers(): void {
-    // Main client events
-    this.client.on('connect', () => {
-      this.connected = true;
-      logger.info({ component: 'RedisAdapter' }, 'Redis client connected');
-    });
+  // ─── Connection ─────────────────────────────────────────────────────────────
 
-    this.client.on('ready', () => {
-      this.connected = true;
-    });
-
-    this.client.on('error', (error) => {
-      this.connected = false;
-      this.stats.connectionErrors++;
-      logger.error('Redis client error', { component: 'RedisAdapter' }, error);
-    });
-
-    this.client.on('close', () => {
-      this.connected = false;
-    });
-
-    // Subscription client events
-    this.subClient.on('connect', () => {
-      logger.info({ component: 'RedisAdapter' }, 'Redis subscription client connected');
-    });
-
-    this.subClient.on('error', (error) => {
-      this.stats.connectionErrors++;
-      logger.error('Redis subscription client error', { component: 'RedisAdapter' }, error);
-    });
-
-    // Handle incoming messages
-    this.subClient.on('message', (channel: string, message: string) => {
-      this.handleIncomingMessage(channel, message);
-    });
-  }
-
-  /**
-   * Connect to Redis
-   */
   async connect(): Promise<void> {
-    if (this.connectionPromise) {
-      return this.connectionPromise;
+    try {
+      await Promise.all([this.client.connect(), this.subscriber.connect()]);
+
+      await this.subscriber.subscribe(
+        CHANNELS.BILL_UPDATES,
+        CHANNELS.USER_NOTIFICATIONS,
+        CHANNELS.BROADCASTS,
+      );
+
+      // `connected` is also flipped in the 'connect' event handler, but we set
+      // it here so callers that await connect() get a consistent view immediately.
+      this.connected = true;
+
+      logger.info({ component: 'RedisAdapter' }, 'Redis adapter connected');
+    } catch (error) {
+      logger.error(
+        { component: 'RedisAdapter', error: errorMessage(error) },
+        'Failed to connect Redis adapter',
+      );
+      throw error;
     }
-
-    if (this.connected) {
-      return Promise.resolve();
-    }
-
-    this.connectionPromise = Promise.all([
-      this.client.connect(),
-      this.subClient.connect()
-    ])
-      .then(() => {
-        this.connected = true;
-        this.connectionPromise = null;
-
-        // Subscribe to channels
-        this.subClient.subscribe(
-          'websocket:bill_updates',
-          'websocket:user_notifications',
-          'websocket:broadcasts'
-        );
-
-        logger.info({
-          component: 'RedisAdapter',
-          serverId: this.serverId
-        }, 'Redis adapter connected and subscribed');
-      })
-      .catch((error) => {
-        this.connectionPromise = null;
-        throw error;
-      });
-
-    return this.connectionPromise;
   }
 
-  /**
-   * Disconnect from Redis
-   */
   async disconnect(): Promise<void> {
+    this.connected = false;
     try {
-      if (this.connected) {
-        await Promise.all([
-          this.client.quit(),
-          this.subClient.quit()
-        ]);
-      }
-      this.connected = false;
-
-      logger.info({
-        component: 'RedisAdapter',
-        serverId: this.serverId
-      }, 'Redis adapter disconnected');
+      await Promise.all([this.client.disconnect(), this.subscriber.disconnect()]);
+      logger.info({ component: 'RedisAdapter' }, 'Redis adapter disconnected');
     } catch (error) {
-      logger.error('Error disconnecting Redis adapter', {
-        component: 'RedisAdapter'
-      }, error instanceof Error ? error : new Error(String(error)));
-
-      // Force disconnect on error
-      this.client.disconnect();
-      this.subClient.disconnect();
-      this.connected = false;
+      logger.error(
+        { component: 'RedisAdapter', error: errorMessage(error) },
+        'Error disconnecting Redis adapter',
+      );
     }
   }
 
-  /**
-   * Check if connected
-   */
-  isConnected(): boolean {
-    return this.connected &&
-      this.client.status === 'ready' &&
-      this.subClient.status === 'ready';
-  }
+  // ─── Publishing ─────────────────────────────────────────────────────────────
 
-  /**
-   * Publish bill update to all servers
-   */
   async publishBillUpdate(billId: number, update: unknown): Promise<void> {
-    if (!this.connected) {
-      logger.warn({
-        component: 'RedisAdapter',
-        billId
-      }, 'Cannot publish bill update - Redis not connected');
-      return;
-    }
-
-    try {
-      const message: RedisMessage = {
-        type: 'bill_update',
-        data: { billId, update },
-        timestamp: Date.now(),
-        serverId: this.serverId
-      };
-
-      const serialized = await this.serializeMessage(message);
-      await this.client.publish('websocket:bill_updates', serialized);
-
-      this.stats.messagesPublished++;
-      this.stats.lastActivity = Date.now();
-
-      logger.debug({
-        component: 'RedisAdapter',
-        billId,
-        serverId: this.serverId
-      }, 'Published bill update to Redis');
-    } catch (error) {
-      logger.error('Error publishing bill update', {
-        component: 'RedisAdapter',
-        billId
-      }, error instanceof Error ? error : new Error(String(error)));
-    }
+    await this.publish(CHANNELS.BILL_UPDATES, {
+      type:      'bill_update',
+      data:      { billId, update },
+      timestamp: Date.now(),
+    });
   }
 
-  /**
-   * Publish user notification to all servers
-   */
   async publishUserNotification(userId: string, notification: unknown): Promise<void> {
-    if (!this.connected) {
-      logger.warn({
-        component: 'RedisAdapter',
-        userId
-      }, 'Cannot publish user notification - Redis not connected');
-      return;
-    }
-
-    try {
-      const message: RedisMessage = {
-        type: 'user_notification',
-        data: { userId, notification },
-        timestamp: Date.now(),
-        serverId: this.serverId
-      };
-
-      const serialized = await this.serializeMessage(message);
-      await this.client.publish('websocket:user_notifications', serialized);
-
-      this.stats.messagesPublished++;
-      this.stats.lastActivity = Date.now();
-
-      logger.debug({
-        component: 'RedisAdapter',
-        userId,
-        serverId: this.serverId
-      }, 'Published user notification to Redis');
-    } catch (error) {
-      logger.error('Error publishing user notification', {
-        component: 'RedisAdapter',
-        userId
-      }, error instanceof Error ? error : new Error(String(error)));
-    }
+    await this.publish(CHANNELS.USER_NOTIFICATIONS, {
+      type:      'user_notification',
+      data:      { userId, notification },
+      timestamp: Date.now(),
+    });
   }
 
-  /**
-   * Publish broadcast message to all servers
-   */
   async publishBroadcast(message: unknown): Promise<void> {
-    if (!this.connected) {
-      logger.warn({
-        component: 'RedisAdapter'
-      }, 'Cannot publish broadcast - Redis not connected');
-      return;
-    }
-
-    try {
-      const redisMessage: RedisMessage = {
-        type: 'broadcast',
-        data: { message },
-        timestamp: Date.now(),
-        serverId: this.serverId
-      };
-
-      const serialized = await this.serializeMessage(redisMessage);
-      await this.client.publish('websocket:broadcasts', serialized);
-
-      this.stats.messagesPublished++;
-      this.stats.lastActivity = Date.now();
-
-      logger.debug({
-        component: 'RedisAdapter',
-        serverId: this.serverId
-      }, 'Published broadcast to Redis');
-    } catch (error) {
-      logger.error('Error publishing broadcast', {
-        component: 'RedisAdapter'
-      }, error instanceof Error ? error : new Error(String(error)));
-    }
+    await this.publish(CHANNELS.BROADCASTS, {
+      type:      'broadcast',
+      data:      message,
+      timestamp: Date.now(),
+    });
   }
 
-  /**
-   * Register message handler
-   */
-  onMessage(type: string, handler: (message: RedisMessage) => void): void {
-    this.messageHandlers.set(type, handler);
-  }
+  // ─── Connection State ───────────────────────────────────────────────────────
 
-  /**
-   * Handle incoming Redis message
-   */
-  private async handleIncomingMessage(channel: string, message: string): Promise<void> {
-    try {
-      const redisMessage = await this.deserializeMessage(message);
-
-      // Ignore messages from this server instance
-      if (redisMessage.serverId === this.serverId) {
-        return;
-      }
-
-      this.stats.messagesReceived++;
-      this.stats.lastActivity = Date.now();
-
-      // Route message to appropriate handler
-      const handler = this.messageHandlers.get(redisMessage.type);
-      if (handler) {
-        handler(redisMessage);
-      } else {
-        logger.warn({
-          component: 'RedisAdapter',
-          type: redisMessage.type,
-          channel
-        }, 'No handler for Redis message type');
-      }
-    } catch (error) {
-      logger.error('Error handling Redis message', {
-        component: 'RedisAdapter',
-        channel
-      }, error instanceof Error ? error : new Error(String(error)));
-    }
-  }
-
-  /**
-   * Serialize message with optional compression
-   */
-  private async serializeMessage(message: RedisMessage): Promise<string> {
-    const serialized = JSON.stringify(message);
-
-    if (this.config.enableCompression &&
-      serialized.length > (this.config.compressionThreshold || 1024)) {
-      const compressed = await compressAsync(Buffer.from(serialized, 'utf8'));
-      return `gzip:${compressed.toString('base64')}`;
-    }
-
-    return serialized;
-  }
-
-  /**
-   * Deserialize message with decompression support
-   */
-  private async deserializeMessage(message: string): Promise<RedisMessage> {
-    if (message.startsWith('gzip:')) {
-      const compressed = Buffer.from(message.slice(5), 'base64');
-      const decompressed = await decompressAsync(compressed);
-      return JSON.parse(decompressed.toString('utf8'));
-    }
-
-    return JSON.parse(message);
-  }
-
-  /**
-   * Store connection state in Redis
-   */
-  async storeConnectionState(userId: string, connectionId: string, data: unknown): Promise<void> {
+  async storeConnectionState(
+    userId:       string,
+    connectionId: string,
+    state:        unknown,
+  ): Promise<void> {
     if (!this.connected) return;
-
     try {
-      const key = `websocket:connection:${userId}:${connectionId}`;
-      const serialized = JSON.stringify({
-        ...(typeof data === 'object' && data !== null ? data : {}),
-        serverId: this.serverId,
-        timestamp: Date.now()
-      });
-
-      await this.client.setex(key, 3600, serialized); // 1 hour TTL
+      const key = connectionStateKey(userId, connectionId);
+      await this.client.setex(key, CONNECTION_STATE_TTL_S, JSON.stringify(state));
     } catch (error) {
-      logger.error('Error storing connection state', {
-        component: 'RedisAdapter',
-        userId,
-        connectionId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('storeConnectionState', { connectionId }, error);
     }
   }
 
-  /**
-   * Remove connection state from Redis
-   */
   async removeConnectionState(userId: string, connectionId: string): Promise<void> {
     if (!this.connected) return;
-
     try {
-      const key = `websocket:connection:${userId}:${connectionId}`;
-      await this.client.del(key);
+      await this.client.del(connectionStateKey(userId, connectionId));
     } catch (error) {
-      logger.error('Error removing connection state', {
-        component: 'RedisAdapter',
-        userId,
-        connectionId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('removeConnectionState', { connectionId }, error);
     }
   }
 
   /**
-   * Get all connection states for a user
+   * Returns all connection states for a user.
+   *
+   * Uses SCAN instead of KEYS to avoid blocking the Redis event loop on large
+   * key spaces.
    */
   async getConnectionStates(userId: string): Promise<unknown[]> {
     if (!this.connected) return [];
-
     try {
       const pattern = `websocket:connection:${userId}:*`;
-      const keys = await this.client.keys(pattern);
-
+      const keys    = await this.scanKeys(pattern);
       if (keys.length === 0) return [];
 
       const values = await this.client.mget(...keys);
       return values
-        .filter(value => value !== null)
-        .map(value => {
-          try {
-            return JSON.parse(value!);
-          } catch {
-            return null;
-          }
-        })
-        .filter(value => value !== null);
+        .filter((v): v is string => v !== null)
+        .map(v => JSON.parse(v) as unknown);
     } catch (error) {
-      logger.error('Error getting connection states', {
-        component: 'RedisAdapter',
-        userId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('getConnectionStates', { userId }, error);
       return [];
     }
   }
 
-  /**
-   * Store subscription data in Redis
-   */
+  // ─── Subscriptions ──────────────────────────────────────────────────────────
+
   async storeSubscription(userId: string, billId: number): Promise<void> {
     if (!this.connected) return;
-
     try {
-      const userKey = `websocket:subscriptions:user:${userId}`;
-      const billKey = `websocket:subscriptions:bill:${billId}`;
+      const userKey = userSubscriptionKey(userId);
+      const billKey = billSubscriberKey(billId);
 
       await Promise.all([
         this.client.sadd(userKey, billId.toString()),
         this.client.sadd(billKey, userId),
-        this.client.expire(userKey, 86400), // 24 hours
-        this.client.expire(billKey, 86400)  // 24 hours
+        // Refresh TTLs on every write so idle keys eventually self-clean.
+        this.client.expire(userKey, SUBSCRIPTION_TTL_S),
+        this.client.expire(billKey, SUBSCRIPTION_TTL_S),
       ]);
     } catch (error) {
-      logger.error('Error storing subscription', {
-        component: 'RedisAdapter',
-        userId,
-        billId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('storeSubscription', { userId, billId }, error);
     }
   }
 
-  /**
-   * Remove subscription from Redis
-   */
   async removeSubscription(userId: string, billId: number): Promise<void> {
     if (!this.connected) return;
-
     try {
-      const userKey = `websocket:subscriptions:user:${userId}`;
-      const billKey = `websocket:subscriptions:bill:${billId}`;
-
       await Promise.all([
-        this.client.srem(userKey, billId.toString()),
-        this.client.srem(billKey, userId)
+        this.client.srem(userSubscriptionKey(userId), billId.toString()),
+        this.client.srem(billSubscriberKey(billId), userId),
       ]);
     } catch (error) {
-      logger.error('Error removing subscription', {
-        component: 'RedisAdapter',
-        userId,
-        billId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('removeSubscription', { userId, billId }, error);
     }
   }
 
-  /**
-   * Get subscribers for a bill
-   */
   async getBillSubscribers(billId: number): Promise<string[]> {
     if (!this.connected) return [];
-
     try {
-      const key = `websocket:subscriptions:bill:${billId}`;
-      return await this.client.smembers(key);
+      return await this.client.smembers(billSubscriberKey(billId));
     } catch (error) {
-      logger.error('Error getting bill subscribers', {
-        component: 'RedisAdapter',
-        billId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('getBillSubscribers', { billId }, error);
       return [];
     }
   }
 
-  /**
-   * Get user subscriptions
-   */
   async getUserSubscriptions(userId: string): Promise<number[]> {
     if (!this.connected) return [];
-
     try {
-      const key = `websocket:subscriptions:user:${userId}`;
-      const billIds = await this.client.smembers(key);
-      return billIds.map(id => parseInt(id, 10)).filter(id => !isNaN(id));
+      const ids = await this.client.smembers(userSubscriptionKey(userId));
+      return ids.map(id => parseInt(id, 10));
     } catch (error) {
-      logger.error('Error getting user subscriptions', {
-        component: 'RedisAdapter',
-        userId
-      }, error instanceof Error ? error : new Error(String(error)));
+      this.recordError('getUserSubscriptions', { userId }, error);
       return [];
     }
   }
 
-  /**
-   * Get adapter statistics
-   */
-  getStats(): ServiceStats {
+  // ─── Public API ─────────────────────────────────────────────────────────────
+
+  onMessage(channel: Channel, handler: (message: RedisMessage) => void): void {
+    this.messageHandlers.set(channel, handler);
+  }
+
+  isReady(): boolean {
+    return this.connected;
+  }
+
+  getStats(): RedisStats {
+    return { ...this.stats, uptime: Date.now() - this.startTime };
+  }
+
+  async healthCheck(): Promise<{
+    status:   'healthy' | 'unhealthy';
+    latency:  number;
+    error?:   string;
+  }> {
+    const start = Date.now();
+    if (!this.connected) {
+      return { status: 'unhealthy', latency: 0, error: 'Not connected to Redis' };
+    }
+    try {
+      await this.client.ping();
+      return { status: 'healthy', latency: Date.now() - start };
+    } catch (error) {
+      return { status: 'unhealthy', latency: Date.now() - start, error: errorMessage(error) };
+    }
+  }
+
+  async shutdown(): Promise<void> {
+    logger.info({ component: 'RedisAdapter', stats: this.getStats() }, 'Shutting down Redis adapter');
+    await this.disconnect();
+    this.messageHandlers.clear();
+    logger.info({ component: 'RedisAdapter' }, 'Redis adapter shutdown complete');
+  }
+
+  // ─── Private helpers ────────────────────────────────────────────────────────
+
+  private buildRedisOptions(): RedisOptions {
     return {
-      totalConnections: 0, // Not applicable for Redis adapter
-      activeConnections: 0, // Not applicable for Redis adapter
-      totalMessages: this.stats.messagesReceived,
-      totalBroadcasts: this.stats.messagesPublished,
-      droppedMessages: 0,
-      duplicateMessages: 0,
-      queueOverflows: 0,
-      reconnections: this.stats.connectionErrors,
-      startTime: this.stats.startTime,
-      lastActivity: this.stats.lastActivity,
-      peakConnections: 0,
-      uptime: Date.now() - this.stats.startTime,
-      memoryUsage: process.memoryUsage().heapUsed,
-      uniqueUsers: 0,
-      averageLatency: 0,
+      maxRetriesPerRequest: this.config.maxRetries,
+      enableOfflineQueue:   this.config.enableOfflineQueue,
+      lazyConnect:          this.config.lazyConnect,
+      keepAlive:            this.config.keepAlive,
+      family:               this.config.family,
+      db:                   this.config.db,
+      retryStrategy: (times: number) => {
+        if (times > this.config.maxRetries) return null;
+        return this.config.retryDelayMs * Math.min(times, 3);
+      },
     };
   }
 
-  /**
-   * Health check
-   */
-  async healthCheck(): Promise<{ status: 'healthy' | 'unhealthy'; latency: number; error?: string }> {
-    const start = Date.now();
+  private setupEventHandlers(): void {
+    this.client.on('connect', () => {
+      logger.info({ component: 'RedisAdapter' }, 'Redis client connected');
+      this.connected = true;
+    });
 
+    this.client.on('reconnecting', () => {
+      logger.warn({ component: 'RedisAdapter' }, 'Redis client reconnecting');
+      this.stats.reconnections++;
+    });
+
+    this.client.on('error', (err: Error) => {
+      logger.error({ component: 'RedisAdapter', error: err.message }, 'Redis client error');
+      this.stats.errors++;
+    });
+
+    this.subscriber.on('message', (channel: string, raw: string) => {
+      void this.handleMessage(channel as Channel, raw);
+    });
+
+    this.subscriber.on('error', (err: Error) => {
+      logger.error({ component: 'RedisAdapter', error: err.message }, 'Redis subscriber error');
+      this.stats.errors++;
+    });
+  }
+
+  private async publish(channel: Channel, message: RedisMessage): Promise<void> {
+    if (!this.connected) return;
     try {
-      if (!this.connected) {
-        return {
-          status: 'unhealthy',
-          latency: Date.now() - start,
-          error: 'Not connected to Redis'
-        };
-      }
-
-      // Test Redis ping
-      const pingResult = await this.client.ping();
-      if (pingResult !== 'PONG') {
-        return {
-          status: 'unhealthy',
-          latency: Date.now() - start,
-          error: 'Redis ping failed'
-        };
-      }
-
-      return {
-        status: 'healthy',
-        latency: Date.now() - start
-      };
+      const payload = await this.serialize(message);
+      await this.client.publish(channel, payload);
+      this.stats.messagesProcessed++;
     } catch (error) {
-      return {
-        status: 'unhealthy',
-        latency: Date.now() - start,
-        error: error instanceof Error ? error.message : String(error)
-      };
+      this.recordError('publish', { channel }, error);
     }
   }
 
-  /**
-   * Cleanup and shutdown
-   */
-  async shutdown(): Promise<void> {
-    logger.info({
-      component: 'RedisAdapter',
-      serverId: this.serverId
-    }, 'Shutting down Redis adapter');
-
-    await this.disconnect();
-    this.messageHandlers.clear();
-
-    logger.info({
-      component: 'RedisAdapter',
-      finalStats: this.getStats()
-    }, 'Redis adapter shutdown complete');
+  private async handleMessage(channel: Channel, raw: string): Promise<void> {
+    try {
+      const message = await this.deserialize(raw);
+      this.messageHandlers.get(channel)?.(message);
+      this.stats.messagesProcessed++;
+    } catch (error) {
+      this.stats.errors++;
+      logger.error(
+        { component: 'RedisAdapter', channel, error: errorMessage(error) },
+        'Error handling Redis message',
+      );
+    }
   }
+
+  private async serialize(message: RedisMessage): Promise<string> {
+    const json = JSON.stringify(message);
+    if (this.config.enableCompression && json.length > this.config.compressionThreshold) {
+      const buf = await compressAsync(Buffer.from(json));
+      return `compressed:${buf.toString('base64')}`;
+    }
+    return json;
+  }
+
+  private async deserialize(data: string): Promise<RedisMessage> {
+    if (data.startsWith('compressed:')) {
+      const buf         = Buffer.from(data.slice(11), 'base64');
+      const decompressed = await decompressAsync(buf);
+      return JSON.parse(decompressed.toString()) as RedisMessage;
+    }
+    return JSON.parse(data) as RedisMessage;
+  }
+
+  /**
+   * Non-blocking key scan using Redis SCAN.
+   * Safe for production; never calls KEYS.
+   */
+  private async scanKeys(pattern: string): Promise<string[]> {
+    const keys: string[] = [];
+    let cursor = '0';
+    do {
+      const [next, batch] = await this.client.scan(
+        cursor, 'MATCH', pattern, 'COUNT', SCAN_COUNT,
+      );
+      cursor = next;
+      keys.push(...batch);
+    } while (cursor !== '0');
+    return keys;
+  }
+
+  private recordError(op: string, ctx: Record<string, unknown>, error: unknown): void {
+    this.stats.errors++;
+    logger.error(
+      { component: 'RedisAdapter', op, ...ctx, error: errorMessage(error) },
+      `Error in ${op}`,
+    );
+  }
+}
+
+// ─── Key helpers ──────────────────────────────────────────────────────────────
+
+function connectionStateKey(userId: string, connectionId: string): string {
+  return `websocket:connection:${userId}:${connectionId}`;
+}
+
+function userSubscriptionKey(userId: string): string {
+  return `websocket:subscriptions:user:${userId}`;
+}
+
+function billSubscriberKey(billId: number): string {
+  return `websocket:subscriptions:bill:${billId}`;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

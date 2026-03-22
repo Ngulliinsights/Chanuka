@@ -222,7 +222,7 @@ export class ElectoralAccountabilityCacheService {
   async invalidateAll(): Promise<void> {
     try {
       await this.cache.deleteByTag(CACHE_TAGS.ELECTORAL_ACCOUNTABILITY);
-      logger.info('All electoral accountability caches invalidated');
+      logger.info({ component: 'server' }, 'All electoral accountability caches invalidated');
     } catch (error) {
       logger.error({ error }, 'Failed to invalidate all caches');
     }

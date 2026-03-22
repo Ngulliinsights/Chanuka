@@ -782,4 +782,4 @@ export class AnalyticsService {
 /**
  * Global singleton instance of the analytics business logic service.
  */
-export 
+export const analyticsService = new AnalyticsService();

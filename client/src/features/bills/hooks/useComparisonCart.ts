@@ -29,7 +29,9 @@ export interface UseComparisonCartReturn {
   setBills: (ids: string[]) => void;
 }
 
-export   
+export const useComparisonCart = (): UseComparisonCartReturn => {
+  const dispatch = useAppDispatch();
+  
   // Use typed selector with proper RootState
   const billIds = useAppSelector((state: RootState) => state.comparisonCart?.billIds || []);
   const maxBills = useAppSelector((state: RootState) => state.comparisonCart?.maxBills || 4);

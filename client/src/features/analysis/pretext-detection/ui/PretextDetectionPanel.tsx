@@ -36,9 +36,10 @@ const isPretextIndicator = (value: unknown): value is PretextIndicator => {
   );
 };
 
-export 
-  // Transform hook data to match component expectations
-  const analysis = hookAnalysis
+export const PretextDetectionPanel = React.memo(
+  ({ billId, hookAnalysis }: PretextDetectionPanelProps) => {
+    // Transform hook data to match component expectations
+    const analysis = hookAnalysis
     ? {
         billId: billId || '',
         score: hookAnalysis.score,

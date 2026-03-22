@@ -79,7 +79,7 @@ let isInitialized = false;
  */
 export async function initializeSyncService(config: SyncServiceConfig): Promise<void> {
   if (isInitialized) {
-    logger.warn('Sync service already initialized');
+    logger.warn({ component: 'server' }, 'Sync service already initialized');
     return;
   }
 
@@ -102,7 +102,7 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
       }
     );
 
-    logger.info('Connected to Neo4j successfully');
+    logger.info({ component: 'server' }, 'Connected to Neo4j successfully');
 
     // Test connection
     const isConnected = await testNeo4jConnection();
@@ -115,11 +115,11 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
 
     // Initialize Neo4j schema (constraints, indexes)
     await neo4jSchema.initializeGraphSchema(neoDriver!);
-    logger.info('Neo4j schema initialized');
+    logger.info({ component: 'server' }, 'Neo4j schema initialized');
 
     // Create sync tables if not exist
     await ensureSyncTablesExist();
-    logger.info('Sync tracking tables verified');
+    logger.info({ component: 'server' }, 'Sync tracking tables verified');
 
     // Verify data consistency
     const consistencyReport = await verifyDataConsistency();
@@ -139,7 +139,7 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
     }
 
     isInitialized = true;
-    logger.info('Sync service initialized successfully');
+    logger.info({ component: 'server' }, 'Sync service initialized successfully');
   } catch (error) {
     logger.error({
       error: error instanceof Error ? error.message : String(error),
@@ -164,26 +164,26 @@ export async function initializeSyncService(config: SyncServiceConfig): Promise<
  */
 export async function shutdownSyncService(): Promise<void> {
   if (!isInitialized) {
-    logger.debug('Sync service not initialized, nothing to shutdown');
+    logger.debug({ component: 'server' }, 'Sync service not initialized, nothing to shutdown');
     return;
   }
 
-  logger.info('Shutting down sync service...');
+  logger.info({ component: 'server' }, 'Shutting down sync service...');
 
   try {
     // Stop auto-sync
     stopSyncScheduler();
-    logger.info('Auto-sync scheduler stopped');
+    logger.info({ component: 'server' }, 'Auto-sync scheduler stopped');
 
     // Close Neo4j connection
     if (neoDriver) {
       await neoDriver.close();
       neoDriver = null;
-      logger.info('Neo4j connection closed');
+      logger.info({ component: 'server' }, 'Neo4j connection closed');
     }
 
     isInitialized = false;
-    logger.info('Sync service shut down successfully');
+    logger.info({ component: 'server' }, 'Sync service shut down successfully');
   } catch (error) {
     logger.error({
       error: error instanceof Error ? error.message : String(error),
@@ -209,7 +209,7 @@ export async function triggerFullSync(): Promise<any> {
     });
   }
 
-  logger.info('Triggering full sync...');
+  logger.info({ component: 'server' }, 'Triggering full sync...');
 
   try {
     const stats = await runBatchSync(
@@ -400,7 +400,7 @@ async function ensureSyncTablesExist(): Promise<void> {
   try {
     // Tables are created by Drizzle migrations, just verify they exist
     await db.select().from(graph_sync_status).limit(1);
-    logger.debug('Sync tables verified');
+    logger.debug({ component: 'server' }, 'Sync tables verified');
   } catch (error: unknown) {
     if (error instanceof Error && error.message?.includes('does not exist')) {
       throw new GraphError({
@@ -427,7 +427,7 @@ async function ensureSyncTablesExist(): Promise<void> {
  * @returns Consistency report
  */
 export async function verifyDataConsistency(): Promise<ConsistencyReport> {
-  logger.info('Verifying data consistency...');
+  logger.info({ component: 'server' }, 'Verifying data consistency...');
 
   const report: ConsistencyReport = {
     entitiesChecked: 0,

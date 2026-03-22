@@ -582,7 +582,7 @@ export class UserManagementService {
    */
   private handleError(message: string, error: unknown): void {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error(message, { component: 'UserManagementService', error: errorMessage });
+    logger.error({ component: 'UserManagementService', error: errorMessage }, message);
   }
 
   /**

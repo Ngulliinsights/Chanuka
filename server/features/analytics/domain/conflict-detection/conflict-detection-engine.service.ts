@@ -130,7 +130,7 @@ export class ConflictDetectionEngineService {
       const validVotes = votingHistory.filter(isValidVote);
 
       if (validVotes.length < 5) {
-        logger.warn(`Insufficient voting data for sponsor ${sponsors.id}`);
+        logger.warn({ component: 'server' }, `Insufficient voting data for sponsor ${sponsors.id}`);
         return [];
       }
 

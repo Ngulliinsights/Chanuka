@@ -317,11 +317,9 @@ export class NotificationOrchestratorService {
       return deliveryResult;
 
     } catch (error) { this.metrics.totalFailed++;
-      logger.error('Error in notification orchestration:', {
-        component: 'NotificationOrchestrator',
+      logger.error({ component: 'NotificationOrchestrator',
         user_id: request.user_id,
-        error: error instanceof Error ? error.message : String(error)
-       }, error);
+        error: error instanceof Error ? error.message : String(error), error: error instanceof Error ? error.message : String(error) }, 'Error in notification orchestration:');
       
       return {
         success: false,
@@ -600,9 +598,7 @@ export class NotificationOrchestratorService {
         
         return { billTracking: globalCombined };
       }
-    } catch (error) { logger.error(`Error fetching combined preferences for user ${user_id }, bill ${ bill_id }:`, {
-        component: 'NotificationOrchestrator'
-      }, error);
+    } catch (error) { logger.error({ component: 'NotificationOrchestrator', error: error instanceof Error ? error.message : String(error) }, `Error fetching combined preferences for user ${user_id }, bill ${ bill_id }:`);
       
       // Return sensible defaults on error to prevent notification failures
       const defaultPrefs: CombinedBillTrackingPreferences = {
@@ -707,10 +703,8 @@ export class NotificationOrchestratorService {
     try {
       return await smartNotificationFilterService.shouldSendNotification(filterCriteria);
     } catch (error) { // Fail open: if filtering fails, allow notification but log the error
-      logger.error('Smart filtering service error, allowing notification:', {
-        component: 'NotificationOrchestrator',
-        user_id: request.user_id
-       }, error);
+      logger.error({ component: 'NotificationOrchestrator',
+        user_id: request.user_id, error: error instanceof Error ? error.message : String(error) }, 'Smart filtering service error, allowing notification:');
       
       return {
         shouldNotify: true,
@@ -843,9 +837,8 @@ export class NotificationOrchestratorService {
             result = await notificationChannelService.sendToChannel(channelRequest);
             if (result.success) break; // Success - exit retry loop
           } catch (channelError) {
-            logger.error(`Error sending to channel ${channel} (Attempt ${attempt + 1})`, { component: 'NotificationOrchestrator',
-              user_id: request.user_id
-             }, channelError);
+            logger.error({ component: 'NotificationOrchestrator',
+              user_id: request.user_id, error: channelError instanceof Error ? channelError.message : String(channelError) }, `Error sending to channel ${channel} (Attempt ${attempt + 1})`);
             result = {
               success: false,
               channel: channel,
@@ -896,10 +889,8 @@ export class NotificationOrchestratorService {
         notification_id: deliveryResults.find(r => r.success)?.messageId
       };
 
-    } catch (error) { logger.error('Unhandled error during immediate delivery:', {
-        component: 'NotificationOrchestrator',
-        user_id: request.user_id
-       }, error);
+    } catch (error) { logger.error({ component: 'NotificationOrchestrator',
+        user_id: request.user_id, error: error instanceof Error ? error.message : String(error) }, 'Unhandled error during immediate delivery:');
       
       return {
         success: false,
@@ -966,9 +957,7 @@ export class NotificationOrchestratorService {
       
       // Process batch asynchronously without blocking
       this.processBatch(batch).catch(err => {
-        logger.error(`Error processing full batch ${batch.id}:`, {
-          component: 'NotificationOrchestrator'
-        }, err);
+        logger.error({ component: 'NotificationOrchestrator', error: err instanceof Error ? err.message : String(err) }, `Error processing full batch ${batch.id}:`);
       });
     }
 
@@ -1090,16 +1079,12 @@ export class NotificationOrchestratorService {
       if (batch.retryCount < this.config.batching.maxRetries) {
         batch.status = 'pending';
         batch.scheduledFor = new Date(Date.now() + 5 * 60 * 1000); // Retry in 5 minutes
-        logger.warn(`Unexpected error processing batch, scheduled for retry`, {
-          component: 'NotificationOrchestrator',
+        logger.warn({ component: 'NotificationOrchestrator',
           batchId: batch.id,
-          retryCount: batch.retryCount
-        }, error);
+          retryCount: batch.retryCount, error: error instanceof Error ? error.message : String(error) }, `Unexpected error processing batch, scheduled for retry`);
       } else {
-        logger.error('Unexpected error processing batch after max retries, discarding', {
-          component: 'NotificationOrchestrator',
-          batchId: batch.id
-        }, error);
+        logger.error({ component: 'NotificationOrchestrator',
+          batchId: batch.id, error: error instanceof Error ? error.message : String(error) }, 'Unexpected error processing batch after max retries, discarding');
         this.batches.delete(batch.id);
       }
     } finally {
@@ -1273,10 +1258,8 @@ export class NotificationOrchestratorService {
       
       // Process batch asynchronously
       this.processBatch(batch).catch(error => {
-        logger.error('Scheduled batch processing failed:', {
-          component: 'NotificationOrchestrator',
-          batchId: batch.id
-        }, error);
+        logger.error({ component: 'NotificationOrchestrator',
+          batchId: batch.id, error: error instanceof Error ? error.message : String(error) }, 'Scheduled batch processing failed:');
       });
     }
   }

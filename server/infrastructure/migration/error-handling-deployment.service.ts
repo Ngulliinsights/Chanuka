@@ -105,7 +105,7 @@ export class ErrorHandlingDeploymentService {
    * Deploy error handling improvements with gradual rollout
    */
   async deployErrorHandling(): Promise<void> {
-    logger.info('Starting error handling deployment with feature flags and A/B testing');
+    logger.info({ component: 'server' }, 'Starting error handling deployment with feature flags and A/B testing');
 
     try {
       // Phase 1: Deploy Boom error standardization (1% rollout)
@@ -126,7 +126,7 @@ export class ErrorHandlingDeploymentService {
       // Gradual rollout if metrics are good
       await this.executeGradualRollout();
 
-      logger.info('Error handling deployment completed successfully');
+      logger.info({ component: 'server' }, 'Error handling deployment completed successfully');
     } catch (error) {
       logger.error({ error }, 'Error handling deployment failed');
       await this.rollbackErrorHandling();
@@ -138,7 +138,7 @@ export class ErrorHandlingDeploymentService {
    * Deploy Boom error handling with feature flag control
    */
   private async deployBoomErrorHandling(percentage: number): Promise<void> {
-    logger.info(`Deploying Boom error handling at ${percentage}% rollout`);
+    logger.info({ component: 'server' }, `Deploying Boom error handling at ${percentage}% rollout`);
 
     await featureFlagsService.enableGradualRollout('error-handling-boom', percentage);
 
@@ -155,7 +155,7 @@ export class ErrorHandlingDeploymentService {
    * Deploy Neverthrow Result types with feature flag control
    */
   private async deployResultTypes(percentage: number): Promise<void> {
-    logger.info(`Deploying Neverthrow Result types at ${percentage}% rollout`);
+    logger.info({ component: 'server' }, `Deploying Neverthrow Result types at ${percentage}% rollout`);
 
     await featureFlagsService.enableGradualRollout('error-handling-neverthrow', percentage);
 
@@ -172,7 +172,7 @@ export class ErrorHandlingDeploymentService {
    * Deploy middleware updates with feature flag control
    */
   private async deployMiddlewareUpdates(percentage: number): Promise<void> {
-    logger.info(`Deploying middleware updates at ${percentage}% rollout`);
+    logger.info({ component: 'server' }, `Deploying middleware updates at ${percentage}% rollout`);
 
     await featureFlagsService.enableGradualRollout('error-handling-middleware', percentage);
 
@@ -189,7 +189,7 @@ export class ErrorHandlingDeploymentService {
    * Validate deployment phase with comprehensive checks
    */
   private async validateDeploymentPhase(component: string, percentage: number): Promise<void> {
-    logger.info(`Validating ${component} deployment at ${percentage}% rollout`);
+    logger.info({ component: 'server' }, `Validating ${component} deployment at ${percentage}% rollout`);
 
     // Run data validation checkpoints
     await this.runDataValidationCheckpoints(component);
@@ -216,7 +216,7 @@ export class ErrorHandlingDeploymentService {
    * Monitor initial deployment for stability
    */
   private async monitorInitialDeployment(): Promise<void> {
-    logger.info('Monitoring initial deployment for 5 minutes');
+    logger.info({ component: 'server' }, 'Monitoring initial deployment for 5 minutes');
 
     const monitoringDuration = 5 * 60 * 1000; // 5 minutes
     const checkInterval = 30 * 1000; // 30 seconds
@@ -235,10 +235,10 @@ export class ErrorHandlingDeploymentService {
         }
       }
 
-      logger.debug('Deployment monitoring check passed');
+      logger.debug({ component: 'server' }, 'Deployment monitoring check passed');
     }
 
-    logger.info('Initial deployment monitoring completed successfully');
+    logger.info({ component: 'server' }, 'Initial deployment monitoring completed successfully');
   }
 
   /**
@@ -248,7 +248,7 @@ export class ErrorHandlingDeploymentService {
     const rolloutSteps = [5, 10, 25, 50, 100];
 
     for (const percentage of rolloutSteps) {
-      logger.info(`Executing rollout to ${percentage}%`);
+      logger.info({ component: 'server' }, `Executing rollout to ${percentage}%`);
 
       // Update all error handling flags
       await featureFlagsService.enableGradualRollout('error-handling-boom', percentage);
@@ -268,7 +268,7 @@ export class ErrorHandlingDeploymentService {
         await this.runComprehensiveValidation();
       }
 
-      logger.info(`Rollout to ${percentage}% completed successfully`);
+      logger.info({ component: 'server' }, `Rollout to ${percentage}% completed successfully`);
     }
   }
 
@@ -276,15 +276,15 @@ export class ErrorHandlingDeploymentService {
    * Run comprehensive validation including code complexity analysis
    */
   private async runComprehensiveValidation(): Promise<void> {
-    logger.info('Running comprehensive validation');
+    logger.info({ component: 'server' }, 'Running comprehensive validation');
 
     // Validate code complexity reduction
     const complexityMetrics = await this.validateCodeComplexityReduction();
     
     if (complexityMetrics.reductionPercentage < 60) {
-      logger.warn(`Code complexity reduction below target: ${complexityMetrics.reductionPercentage}%`);
+      logger.warn({ component: 'server' }, `Code complexity reduction below target: ${complexityMetrics.reductionPercentage}%`);
     } else {
-      logger.info(`Code complexity reduction achieved: ${complexityMetrics.reductionPercentage}%`);
+      logger.info({ component: 'server' }, `Code complexity reduction achieved: ${complexityMetrics.reductionPercentage}%`);
     }
 
     // Validate response consistency across all error types
@@ -293,14 +293,14 @@ export class ErrorHandlingDeploymentService {
     // Run parallel error handling validation
     await this.validateParallelErrorHandling();
 
-    logger.info('Comprehensive validation completed');
+    logger.info({ component: 'server' }, 'Comprehensive validation completed');
   }
 
   /**
    * Validate 60% code complexity reduction requirement
    */
   private async validateCodeComplexityReduction(): Promise<CodeComplexityMetrics> {
-    logger.info('Validating code complexity reduction');
+    logger.info({ component: 'server' }, 'Validating code complexity reduction');
 
     // Simulate code complexity analysis (in real implementation, use tools like ESLint complexity rules)
     const currentComplexity: CodeComplexityMetrics = {
@@ -342,7 +342,7 @@ export class ErrorHandlingDeploymentService {
    * Validate response consistency across error types
    */
   private async validateResponseConsistency(): Promise<void> {
-    logger.info('Validating response consistency across error types');
+    logger.info({ component: 'server' }, 'Validating response consistency across error types');
 
     const errorTypes = ['validation', 'authentication', 'authorization', 'not_found', 'conflict'];
     const consistencyResults: Record<string, number> = {};
@@ -355,7 +355,7 @@ export class ErrorHandlingDeploymentService {
       consistencyResults[errorType] = consistency;
 
       if (consistency < 0.95) {
-        logger.warn(`Low response consistency for ${errorType}: ${consistency * 100}%`);
+        logger.warn({ component: 'server' }, `Low response consistency for ${errorType}: ${consistency * 100}%`);
       }
     }
 
@@ -375,7 +375,7 @@ export class ErrorHandlingDeploymentService {
    * Validate parallel error handling during transition period
    */
   private async validateParallelErrorHandling(): Promise<void> {
-    logger.info('Validating parallel error handling during transition');
+    logger.info({ component: 'server' }, 'Validating parallel error handling during transition');
 
     // Test scenarios where both legacy and new error handling might be active
     const testScenarios = [
@@ -388,7 +388,7 @@ export class ErrorHandlingDeploymentService {
       await this.testParallelErrorHandling(scenario.errorType, scenario.testData);
     }
 
-    logger.info('Parallel error handling validation completed');
+    logger.info({ component: 'server' }, 'Parallel error handling validation completed');
   }
 
   /**
@@ -623,7 +623,7 @@ export class ErrorHandlingDeploymentService {
    * Run data validation checkpoints
    */
   private async runDataValidationCheckpoints(component: string): Promise<void> {
-    logger.info(`Running data validation checkpoints for ${component}`);
+    logger.info({ component: 'server' }, `Running data validation checkpoints for ${component}`);
 
     const checkpointId = `${component}_${Date.now()}`;
     const testCases = this.generateTestCases(component);
@@ -632,7 +632,7 @@ export class ErrorHandlingDeploymentService {
       await this.testParallelErrorHandling(testCase.errorType, testCase.testData);
     }
 
-    logger.info(`Data validation checkpoints completed for ${component}`);
+    logger.info({ component: 'server' }, `Data validation checkpoints completed for ${component}`);
   }
 
   /**
@@ -731,14 +731,14 @@ export class ErrorHandlingDeploymentService {
    * Rollback error handling deployment
    */
   private async rollbackErrorHandling(): Promise<void> {
-    logger.warn('Rolling back error handling deployment');
+    logger.warn({ component: 'server' }, 'Rolling back error handling deployment');
 
     try {
       await featureFlagsService.rollbackFeature('error-handling-boom');
       await featureFlagsService.rollbackFeature('error-handling-neverthrow');
       await featureFlagsService.rollbackFeature('error-handling-middleware');
 
-      logger.info('Error handling rollback completed');
+      logger.info({ component: 'server' }, 'Error handling rollback completed');
     } catch (error) {
       logger.error({ error }, 'Error during rollback');
       throw error;

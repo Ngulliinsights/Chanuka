@@ -98,4 +98,5 @@ export class ErrorRateLimiter {
     }
   }
 }
-export };
+
+export const errorRateLimiter = new ErrorRateLimiter();

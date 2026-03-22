@@ -37,7 +37,7 @@ class SimpleWebSocketValidator {
       overallStatus: 'passed' | 'failed' | 'partial';
     };
   }> {
-    logger.info('🚀 Starting simple WebSocket migration validation...');
+    logger.info({ component: 'server' }, '🚀 Starting simple WebSocket migration validation...');
 
     // Validate Socket.IO installation and basic functionality
     await this.validateSocketIO();
@@ -290,7 +290,7 @@ class SimpleWebSocketValidator {
     });
 
     const statusIcon = status === 'passed' ? '✅' : status === 'failed' ? '❌' : '⚠️';
-    logger.info(`${statusIcon} ${component}: ${details}`);
+    logger.info({ component: 'server' }, `${statusIcon} ${component}: ${details}`);
   }
 
   /**
@@ -401,7 +401,7 @@ async function main(): Promise<void> {
     }
     
   } catch (error) {
-    logger.error('Simple WebSocket validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error : new Error(String(error)) }, 'Simple WebSocket validation failed');
     process.exit(1);
   }
 }

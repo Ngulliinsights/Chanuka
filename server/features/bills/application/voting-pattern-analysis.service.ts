@@ -56,7 +56,7 @@ export class VotingPatternAnalysisService {
 
       return mockPatterns;
     } catch (error) {
-      logger.error('Error analyzing voting patterns', { sponsor_id }, error);
+      logger.error({ sponsor_id, error: error instanceof Error ? error.message : String(error) }, 'Error analyzing voting patterns');
       throw error;
     }
   }
@@ -103,10 +103,8 @@ export class VotingPatternAnalysisService {
 
       return mockAnalysis;
     } catch (error) {
-      logger.error('Error building comparative analysis', { 
-        target_sponsor_id, 
-        comparisonSponsorIds 
-      }, error);
+      logger.error({ target_sponsor_id, 
+        comparisonSponsorIds, error: error instanceof Error ? error.message : String(error) }, 'Error building comparative analysis');
       throw error;
     }
   }
@@ -131,7 +129,7 @@ export class VotingPatternAnalysisService {
         totalVotesAnalyzed: patterns.reduce((sum, p) => sum + p.totalVotes, 0)
       };
     } catch (error) {
-      logger.error('Error getting voting statistics', {}, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, 'Error getting voting statistics');
       throw error;
     }
   }

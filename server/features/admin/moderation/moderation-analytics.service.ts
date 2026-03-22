@@ -7,13 +7,8 @@
 import { ContentAnalytics } from '@server/features/admin/moderation/types';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { bill, 
-  comments, 
-  content_report, 
-  moderation_action,
-  users } from '@server/infrastructure/schema';
+import { bills, comments, content_reports, users, moderation_queue } from '@server/infrastructure/schema';
 import { db } from '@server/infrastructure/database';
-import { users } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, inArray,sql } from 'drizzle-orm';
 
 export class ModerationAnalyticsService {
@@ -52,24 +47,24 @@ export class ModerationAnalyticsService {
       // Count reports created in the time period
       const [reportsCreatedResult] = await db
         .select({ count: count() })
-        .from(content_report)
+        .from(content_reports)
         .where(
           and(
-            gte(content_report.created_at, start_date),
-            sql`${content_report.created_at} <= ${ end_date }`
+            gte(content_reports.created_at, start_date),
+            sql`${content_reports.created_at} <= ${ end_date }`
           )
         );
 
       // Count reports resolved in the time period
       const [reportsResolvedResult] = await db
         .select({ count: count() })
-        .from(content_report)
+        .from(content_reports)
         .where(
           and(
-            eq(content_report.status, 'resolved'),
-            sql`${content_report.reviewedAt} IS NOT NULL`,
-            gte(content_report.reviewedAt, start_date),
-            sql`${content_report.reviewedAt} <= ${ end_date }`
+            eq(content_reports.status, 'resolved'),
+            sql`${content_reports.reviewedAt} IS NOT NULL`,
+            gte(content_reports.reviewedAt, start_date),
+            sql`${content_reports.reviewedAt} <= ${ end_date }`
           )
         );
 

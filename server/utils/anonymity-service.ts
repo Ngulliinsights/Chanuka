@@ -6,8 +6,8 @@
  */
 
 // Re-export platform-specific implementation
-export { default } from '../../../platform/kenya/anonymity/anonymity-helper';
-export * from '../../../platform/kenya/anonymity/anonymity-helper';
+export { default } from '@shared/platform/kenya/anonymity/anonymity-helper';
+export * from '@shared/platform/kenya/anonymity/anonymity-helper';
 
 // Re-export types for convenience
 export type {

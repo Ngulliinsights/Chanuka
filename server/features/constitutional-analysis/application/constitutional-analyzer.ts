@@ -81,7 +81,7 @@ export class ConstitutionalAnalyzer {
       );
 
       if (relevantProvisions.length === 0) {
-        logger.info(`No constitutional provisions identified for bill ${request.bill_id}`);
+        logger.info({ component: 'server' }, `No constitutional provisions identified for bill ${request.bill_id}`);
         return this.createMinimalResult(request.bill_id, startTime);
       }
 

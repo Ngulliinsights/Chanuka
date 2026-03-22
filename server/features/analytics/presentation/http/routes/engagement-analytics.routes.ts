@@ -152,10 +152,8 @@ class EngagementAnalyticsRouter {
       return ApiSuccess(res, sanitizedOverview,
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
-      logger.error('Error fetching engagement overview:', {
-        component: 'analytics',
-        operation: 'getEngagementOverview'
-      }, error instanceof Error ? error : { message: String(error) });
+      logger.error({ component: 'analytics',
+        operation: 'getEngagementOverview', error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement overview:') });
 
       return ApiError(res, { 
         code: 'OVERVIEW_FETCH_ERROR', 
@@ -200,10 +198,9 @@ class EngagementAnalyticsRouter {
         }, 404, ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
 
-      logger.error('Error fetching bill engagement metrics:', { component: 'analytics',
+      logger.error({ component: 'analytics',
         operation: 'getBillEngagementMetrics',
-        bill_id: req.params.id
-       }, error instanceof Error ? error : { message: String(error) });
+        bill_id: req.params.id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching bill engagement metrics:') });
 
       return ApiError(res, { 
         code: 'BILL_METRICS_ERROR', 
@@ -277,10 +274,9 @@ class EngagementAnalyticsRouter {
         }, 404, ApiResponseWrapper.createMetadata(startTime, 'database'));
       }
 
-      logger.error('Error fetching user engagement history:', { component: 'analytics',
+      logger.error({ component: 'analytics',
         operation: 'getUserEngagementHistory',
-        user_id: req.params.id
-       }, error instanceof Error ? error : { message: String(error) });
+        user_id: req.params.id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching user engagement history:') });
 
       return ApiError(res, { 
         code: 'USER_HISTORY_ERROR', 
@@ -323,11 +319,9 @@ class EngagementAnalyticsRouter {
         })), ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
 
-      logger.error('Error fetching engagement trends:', {
-        component: 'analytics',
+      logger.error({ component: 'analytics',
         operation: 'getEngagementTrends',
-        period: req.query.period
-      }, error instanceof Error ? error : { message: String(error) });
+        period: req.query.period, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement trends:') });
 
       return ApiError(res, { 
         code: 'TRENDS_ERROR', 
@@ -374,10 +368,9 @@ class EngagementAnalyticsRouter {
         })), ApiResponseWrapper.createMetadata(startTime, 'validation'));
       }
 
-      logger.error('Error tracking engagement event:', { component: 'analytics',
+      logger.error({ component: 'analytics',
         operation: 'trackEngagementEvent',
-        user_id: req.user?.id
-       }, error instanceof Error ? error : { message: String(error) });
+        user_id: req.user?.id, error: error instanceof Error ? error : { message: String(error }, 'Error tracking engagement event:') });
 
       return ApiError(res, { 
         code: 'TRACKING_ERROR', 
@@ -749,7 +742,7 @@ class EngagementAnalyticsRouter {
       await cacheInstance.del(`${ cacheKeys.analytics('bill_engagement', bill_id.toString()) }`);
       await cacheInstance.del('engagement:overview');
     } catch (dbError) {
-      logger.error('Database error in processEngagementEvent:', dbError);
+      logger.error({ error: dbError instanceof Error ? dbError.message : String(dbError) }, 'Database error in processEngagementEvent:');
       throw dbError;
     }
   }

@@ -40,7 +40,7 @@ import { configureAppMiddleware } from '@server/middleware/app-middleware';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
 import { createUnifiedErrorMiddleware, asyncHandler } from '@server/middleware/error-management';
 import { securityMiddleware } from '@server/middleware/security.middleware';
-import { webSocketService } from '@server/utils/missing-modules-fallback';
+import { createWebSocketService } from '@server/infrastructure/websocket';
 import { setupVite } from '@server/vite';
 import { logger } from '@server/infrastructure/observability';
 import { pool } from '@server/infrastructure/database';
@@ -49,7 +49,7 @@ import express, { Express, NextFunction, Request, Response } from 'express';
 import { createServer, Server } from 'http';
 
 // Diagnostic logging at startup for debugging environment configuration
-logger.info('🔍 DIAGNOSTIC: Server startup initiated');
+logger.info({ component: 'server' }, '🔍 DIAGNOSTIC: Server startup initiated');
 logger.info({
   DATABASE_URL: process.env.DATABASE_URL ? 'SET' : 'NOT SET',
   JWT_SECRET: process.env.JWT_SECRET ? 'SET' : 'NOT SET',
@@ -91,6 +91,9 @@ interface WebSocketServiceExtended {
 const initializeMonitoring = (env: string): void => {
   logger.info({ environment: env } as LogContext, 'Performance monitoring initialized');
 };
+
+// Initialize real WebSocket service
+const webSocketService = createWebSocketService();
 
 // Application instance with proper typing
 export const app: Express = express();
@@ -476,7 +479,7 @@ async function performStartupInitialization(): Promise<void> {
       try {
         const report = await schemaValidationService.generateValidationReport();
         if (report.criticalIssues > 0) {
-          logger.warn(`⚠️  Schema validation found ${report.criticalIssues} critical issues`, { component: 'Chanuka' } as LogContext);
+          logger.warn({ component: 'Chanuka', criticalIssues: report.criticalIssues } as LogContext, `⚠️  Schema validation found ${report.criticalIssues} critical issues`);
           logger.info({ component: 'Chanuka' } as LogContext, '🔧 Attempting automatic schema repair...');
           const repairResult = await schemaValidationService.repairSchema();
           if (repairResult.success) {
@@ -495,7 +498,7 @@ async function performStartupInitialization(): Promise<void> {
       logger.info({ component: 'Chanuka' } as LogContext, '✅ Platform ready with full database functionality');
     } else {
       logger.info({ component: 'Chanuka' } as LogContext, '⚠️  Platform starting in demonstration mode with sample data');
-      logger.info(`💡 ${healthInfo.system.message}`, { component: 'Chanuka' } as LogContext);
+      logger.info({ component: 'Chanuka', message: healthInfo.system.message } as LogContext, `💡 ${healthInfo.system.message}`);
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -516,7 +519,7 @@ const server: Server = createServer(app);
 
 // Graceful shutdown handler
 const gracefulShutdown = async (signal: string): Promise<void> => {
-  logger.info(`\n${signal} received. Starting graceful shutdown...`, { component: 'Chanuka' } as LogContext);
+  logger.info({ component: 'Chanuka', signal } as LogContext, `\n${signal} received. Starting graceful shutdown...`);
 
   try {
     logger.info({ component: 'Chanuka' } as LogContext, '🛑 Stopping new connections...');
@@ -538,7 +541,7 @@ const gracefulShutdown = async (signal: string): Promise<void> => {
         await task.fn();
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        logger.error(`Error stopping ${task.name}:`, { error: errorMessage, component: 'Chanuka' } as LogContext);
+        logger.error({ error: errorMessage, component: 'Chanuka', taskName: task.name } as LogContext, `Error stopping ${task.name}:`);
       }
     }
 
@@ -582,7 +585,7 @@ process.on('unhandledRejection', (reason: unknown) => {
 
 server.on('error', (error: NodeJS.ErrnoException) => {
   if (error.code === 'EADDRINUSE') {
-    logger.error(`❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`, { component: 'Chanuka' } as LogContext);
+    logger.error({ component: 'Chanuka', port: PORT } as LogContext, `❌ Port ${PORT} is already in use. Please try a different port or stop the existing process.`);
     logger.info({ component: 'Chanuka' } as LogContext, `💡 You can try: PORT=4201 npm run dev`);
   } else {
     logger.error({ error: error.message, component: 'Chanuka' } as LogContext, '❌ Server error:');
@@ -593,7 +596,7 @@ server.on('error', (error: NodeJS.ErrnoException) => {
 // Server startup
 if (process.env.NODE_ENV !== 'test') {
   server.listen(config.server.port, config.server.host, async () => {
-    logger.info(`Server running on http://${config.server.host}:${config.server.port}`, { component: 'Chanuka' } as LogContext);
+    logger.info({ component: 'Chanuka', host: config.server.host, port: config.server.port } as LogContext, `Server running on http://${config.server.host}:${config.server.port}`);
 
     const wsService = webSocketService as WebSocketServiceExtended;
 
@@ -610,10 +613,10 @@ if (process.env.NODE_ENV !== 'test') {
     for (const service of serviceInitializers) {
       try {
         await service.init();
-        logger.info(`✅ ${service.name} initialized`, { component: 'Chanuka' } as LogContext);
+        logger.info({ component: 'Chanuka', serviceName: service.name } as LogContext, `✅ ${service.name} initialized`);
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
-        logger.warn(`⚠️  ${service.name} initialization failed: ${errorMessage}`, { component: 'Chanuka' } as LogContext);
+        logger.warn({ component: 'Chanuka', serviceName: service.name, error: errorMessage } as LogContext, `⚠️  ${service.name} initialization failed: ${errorMessage}`);
       }
     }
 

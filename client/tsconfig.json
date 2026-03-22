@@ -88,11 +88,6 @@
     "src/utils/archive/**/*",
     "src/__tests__/**/*",
     "src/**/*.test.ts",
-    "src/features/admin/**/*",
-    "src/features/analysis/**/*",
-    "src/features/argument-intelligence/**/*",
-    "src/features/advocacy/**/*",
-    "src/features/analytics/**/*",
     "src/lib/ui/navigation/**/*",
     "src/**/*.test.tsx",
     "src/scripts/**/*"

@@ -42,26 +42,26 @@ export async function initializeServerServices(options?: {
   skipDatabase?: boolean;
 }): Promise<ServerServicesContainer> {
   if (serverServicesContainer) {
-    logger.debug('Server services already initialized, returning existing container');
+    logger.debug({ component: 'server' }, 'Server services already initialized, returning existing container');
     return serverServicesContainer;
   }
 
-  logger.info('Initializing server services...');
+  logger.info({ component: 'server' }, 'Initializing server services...');
   const startTime = Date.now();
 
   try {
     // Step 1: Initialize database connection
     let database;
     if (!options?.skipDatabase) {
-      logger.debug('Initializing database connection...');
+      logger.debug({ component: 'server' }, 'Initializing database connection...');
       database = options?.dbPool || await getDatabaseOrchestrator().getConnectionManager().getDatabase();
     } else {
-      logger.debug('Skipping database initialization');
+      logger.debug({ component: 'server' }, 'Skipping database initialization');
       database = null;
     }
 
     // Step 2: Initialize validation services
-    logger.debug('Initializing validation services...');
+    logger.debug({ component: 'server' }, 'Initializing validation services...');
     const validation = await initializeValidationServices(options?.dbPool);
 
     // Step 3: Initialize other services as needed
@@ -77,7 +77,7 @@ export async function initializeServerServices(options?: {
     };
 
     const initTime = Date.now() - startTime;
-    logger.info(`All server services initialized successfully in ${initTime}ms`);
+    logger.info({ component: 'server' }, `All server services initialized successfully in ${initTime}ms`);
 
     // Record initialization metric
     validation.metricsCollector.recordMetric({
@@ -134,7 +134,7 @@ export function areServerServicesInitialized(): boolean {
  * Reset server services (mainly for testing)
  */
 export function resetServerServices(): void {
-  logger.debug('Resetting server services container');
+  logger.debug({ component: 'server' }, 'Resetting server services container');
   serverServicesContainer = null;
 }
 
@@ -143,11 +143,11 @@ export function resetServerServices(): void {
  */
 export async function shutdownServerServices(): Promise<void> {
   if (!serverServicesContainer) {
-    logger.debug('Server services not initialized, nothing to shutdown');
+    logger.debug({ component: 'server' }, 'Server services not initialized, nothing to shutdown');
     return;
   }
 
-  logger.info('Shutting down server services...');
+  logger.info({ component: 'server' }, 'Shutting down server services...');
 
   try {
     // Shutdown services in reverse order
@@ -164,7 +164,7 @@ export async function shutdownServerServices(): Promise<void> {
     // Reset container
     serverServicesContainer = null;
     
-    logger.info('Server services shutdown completed');
+    logger.info({ component: 'server' }, 'Server services shutdown completed');
   } catch (error) {
     logger.error({ error }, 'Error during server services shutdown');
     throw error;

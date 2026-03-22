@@ -141,7 +141,7 @@ class DatabaseMonitoringService {
    */
   start(): void {
     if (this.isRunning) {
-      logger.warn('Database monitoring service is already running');
+      logger.warn({ component: 'server' }, 'Database monitoring service is already running');
       return;
     }
 
@@ -174,7 +174,7 @@ class DatabaseMonitoringService {
    */
   stop(): void {
     if (!this.isRunning) {
-      logger.warn('Database monitoring service is not running');
+      logger.warn({ component: 'server' }, 'Database monitoring service is not running');
       return;
     }
 
@@ -547,7 +547,7 @@ class DatabaseMonitoringService {
       }
 
       // If we reach here, the issue may have resolved itself
-      logger.info(`No automated recovery action available for ${poolName}, monitoring for resolution`);
+      logger.info({ component: 'server' }, `No automated recovery action available for ${poolName}, monitoring for resolution`);
       return false;
       
     } catch (error) {
@@ -691,7 +691,7 @@ class DatabaseMonitoringService {
    * Performs an immediate health check without waiting for the interval
    */
   async checkNow(): Promise<Record<string, unknown>> {
-    logger.info('Performing on-demand health check');
+    logger.info({ component: 'server' }, 'Performing on-demand health check');
     await this.performHealthCheck();
     return await monitorPoolHealth();
   }
@@ -702,7 +702,7 @@ class DatabaseMonitoringService {
   resetMetrics(): void {
     this.metrics = this.createInitialMetrics();
     this.checkDurations = [];
-    logger.info('Monitoring metrics have been reset');
+    logger.info({ component: 'server' }, 'Monitoring metrics have been reset');
   }
 }
 

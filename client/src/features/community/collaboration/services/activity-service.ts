@@ -58,4 +58,4 @@ class ActivityService {
   }
 }
 
-export 
+export const activityService = new ActivityService();

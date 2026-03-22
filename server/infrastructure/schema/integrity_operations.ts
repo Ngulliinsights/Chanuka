@@ -506,3 +506,25 @@ export const securityEventsRelations = relations(security_events, ({ one }) => (
     relationName: "responseInitiator",
   }),
 }));
+
+// ============================================================================
+// TYPE EXPORTS
+// ============================================================================
+
+export type ContentReport = typeof content_reports.$inferSelect;
+export type NewContentReport = typeof content_reports.$inferInsert;
+
+export type ModerationQueue = typeof moderation_queue.$inferSelect;
+export type NewModerationQueue = typeof moderation_queue.$inferInsert;
+
+export type ExpertProfile = typeof expert_profiles.$inferSelect;
+export type NewExpertProfile = typeof expert_profiles.$inferInsert;
+
+export type UserActivityLog = typeof user_activity_log.$inferSelect;
+export type NewUserActivityLog = typeof user_activity_log.$inferInsert;
+
+export type SystemAuditLog = typeof system_audit_log.$inferSelect;
+export type NewSystemAuditLog = typeof system_audit_log.$inferInsert;
+
+export type SecurityEvent = typeof security_events.$inferSelect;
+export type NewSecurityEvent = typeof security_events.$inferInsert;

@@ -317,7 +317,7 @@ export class MockEmailService extends BaseEmailService {
         labels: ['inquiry', 'complaint'],
       },
     ];
-    logger.info('MockEmailService initialized with seeded inbox');
+    logger.info({ component: 'server' }, 'MockEmailService initialized with seeded inbox');
   }
 
   async getInboxMessages(limit = 50): Promise<EmailInboxMessage[]> {
@@ -333,7 +333,7 @@ export class MockEmailService extends BaseEmailService {
     await new Promise((r) => setTimeout(r, 200));
 
     if (this.fallbackEmails.length >= this.MAX_QUEUE_SIZE) {
-      logger.warn('Mock fallback queue full — dropping oldest email');
+      logger.warn({ component: 'server' }, 'Mock fallback queue full — dropping oldest email');
       this.fallbackEmails.shift();
     }
 
@@ -356,7 +356,7 @@ export class MockEmailService extends BaseEmailService {
     const msg = this.mockMessages.find((m) => m.id === messageId);
     if (msg) {
       msg.is_read = true;
-      logger.debug(`Marked message ${messageId} as read`);
+      logger.debug({ component: 'server' }, `Marked message ${messageId} as read`);
     }
   }
 
@@ -364,7 +364,7 @@ export class MockEmailService extends BaseEmailService {
     const msg = this.mockMessages.find((m) => m.id === messageId);
     if (msg) {
       msg.labels = [...(msg.labels ?? []), 'archived'];
-      logger.debug(`Archived message ${messageId}`);
+      logger.debug({ component: 'server' }, `Archived message ${messageId}`);
     }
   }
 
@@ -565,7 +565,7 @@ export class SMTPService extends BaseEmailService {
   isInFallbackMode(): boolean       { return this.fallbackMode; }
 
   async retryInitialization(): Promise<boolean> {
-    logger.info('Attempting to retry SMTP initialization…');
+    logger.info({ component: 'server' }, 'Attempting to retry SMTP initialization…');
     await this.initialize();
     return !this.fallbackMode;
   }

@@ -48,7 +48,7 @@ interface ValidationSummary {
  * Main validation runner
  */
 async function runWebSocketValidation(): Promise<ValidationSummary> {
-  logger.info('🚀 Starting comprehensive WebSocket migration validation...');
+  logger.info({ component: 'server' }, '🚀 Starting comprehensive WebSocket migration validation...');
   
   const performanceValidator = new WebSocketPerformanceValidator();
   const migrationValidator = new FinalMigrationValidator();
@@ -86,7 +86,7 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
     await performanceValidator.initialize();
 
     // Step 1: Performance Validation
-    logger.info('📊 Step 1: Running performance validations...');
+    logger.info({ component: 'server' }, '📊 Step 1: Running performance validations...');
     
     try {
       const deliveryCheckpoint = await performanceValidator.validateMessageDeliveryRate();
@@ -112,12 +112,12 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       });
       
     } catch (error) {
-      logger.error('❌ Performance validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Performance validation failed');
       summary.overall.recommendations.push('Performance validation failed - review WebSocket implementation');
     }
 
     // Step 2: A/B Testing Analysis
-    logger.info('🧪 Step 2: Running A/B testing analysis...');
+    logger.info({ component: 'server' }, '🧪 Step 2: Running A/B testing analysis...');
     
     try {
       const abResults = await performanceValidator.runABTestingAnalysis();
@@ -136,12 +136,12 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       }
       
     } catch (error) {
-      logger.error('❌ A/B testing analysis failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ A/B testing analysis failed');
       summary.overall.recommendations.push('A/B testing analysis failed - review testing methodology');
     }
 
     // Step 3: Migration Validation
-    logger.info('🔍 Step 3: Running migration validations...');
+    logger.info({ component: 'server' }, '🔍 Step 3: Running migration validations...');
     
     try {
       const migrationResults = await migrationValidator.runAllValidations();
@@ -165,12 +165,12 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       }
       
     } catch (error) {
-      logger.error('❌ Migration validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Migration validation failed');
       summary.overall.recommendations.push('Migration validation failed - review migration state');
     }
 
     // Step 4: Cleanup Validation
-    logger.info('🧹 Step 4: Running cleanup validation...');
+    logger.info({ component: 'server' }, '🧹 Step 4: Running cleanup validation...');
     
     try {
       const cleanupResults = await cleanupManager.runCleanup();
@@ -192,12 +192,12 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
       }
       
     } catch (error) {
-      logger.error('❌ Cleanup validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Cleanup validation failed');
       summary.overall.recommendations.push('Cleanup validation failed - review cleanup configuration');
     }
 
     // Step 5: Overall Assessment
-    logger.info('📋 Step 5: Generating overall assessment...');
+    logger.info({ component: 'server' }, '📋 Step 5: Generating overall assessment...');
     
     const allValidationsPassed = 
       summary.performance.status === 'passed' &&
@@ -231,14 +231,14 @@ async function runWebSocketValidation(): Promise<ValidationSummary> {
     return summary;
 
   } catch (error) {
-    logger.error('❌ WebSocket validation failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ WebSocket validation failed');
     
     // Ensure cleanup even on failure
     try {
       await performanceValidator.cleanup();
       await migrationValidator.cleanup();
     } catch (cleanupError) {
-      logger.error('Failed to cleanup after validation failure', {}, cleanupError instanceof Error ? cleanupError : new Error(String(cleanupError)));
+      logger.error({ cleanupError: cleanupError instanceof Error ? cleanupError : new Error(String(cleanupError)) }, 'Failed to cleanup after validation failure');
     }
     
     throw error;
@@ -314,7 +314,7 @@ async function main(): Promise<void> {
     }
     
   } catch (error) {
-    logger.error('WebSocket validation runner failed', {}, error instanceof Error ? error : new Error(String(error)));
+    logger.error({ error: error instanceof Error ? error : new Error(String(error)) }, 'WebSocket validation runner failed');
     process.exit(1);
   }
 }

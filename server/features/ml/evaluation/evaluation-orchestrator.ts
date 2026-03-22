@@ -88,7 +88,7 @@ export class EvaluationOrchestrator {
       });
       const cached = await cacheService.get<EvaluationReport>(cacheKey);
       if (cached) {
-        logger.info('Returning cached evaluation result');
+        logger.info({ component: 'server' }, 'Returning cached evaluation result');
         return cached;
       }
 

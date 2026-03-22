@@ -38,7 +38,7 @@ export class UserGovernmentDataService {
 
   constructor() {
     this.governmentDataService = new GovernmentDataIntegrationService();
-    logger.info('✅ User Government Data Service initialized');
+    logger.info({ component: 'server' }, '✅ User Government Data Service initialized');
   }
 
   /**
@@ -50,7 +50,7 @@ export class UserGovernmentDataService {
       const cacheKey = this.generateCacheKey(query);
       const cached = this.getCachedResult(cacheKey);
       if (cached) {
-        logger.debug(`📋 Using cached government data for user ${query.user_id}`);
+        logger.debug({ component: 'server' }, `📋 Using cached government data for user ${query.user_id}`);
         return cached;
       }
 
@@ -79,7 +79,7 @@ export class UserGovernmentDataService {
         this.cacheResult(cacheKey, result);
       }
 
-      logger.info(`📊 Government data query completed for user ${query.user_id}: ${query.queryType}`);
+      logger.info({ component: 'server' }, `📊 Government data query completed for user ${query.user_id}: ${query.queryType}`);
       return result;
 
     } catch (error) {
@@ -403,7 +403,7 @@ export class UserGovernmentDataService {
     }
 
     keysToDelete.forEach(key => this.userQueryCache.delete(key));
-    logger.info(`🧹 Cleared government data cache for user ${ user_id }`);
+    logger.info({ component: 'server' }, `🧹 Cleared government data cache for user ${ user_id }`);
   }
 
   /**

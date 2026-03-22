@@ -11,7 +11,8 @@
 // FOUNDATION - Core tables and base schemas
 // ============================================================================
 export * from './foundation';
-// Explicit type exports for repository interfaces
+export type * from './foundation';
+// Explicit type exports for repository interfaces (re-exports for clarity)
 export type { Bill, NewBill } from './foundation';
 export type { User, NewUser, UserProfile, NewUserProfile } from './foundation';
 export type { Sponsor, NewSponsor } from './foundation';
@@ -23,8 +24,13 @@ export type { Sponsor, NewSponsor } from './foundation';
 // Keyna Gazette Notices
 export * from './gazette';
 
-// Citizen Participation
+// Citizen Participation (includes notifications)
 export * from './citizen_participation';
+export type { notifications } from './citizen_participation';
+
+// Integrity Operations (content moderation)
+export * from './integrity_operations';
+export type { content_reports, moderation_queue } from './integrity_operations';
 
 // Constitutional Intelligence
 export * from './constitutional_intelligence';

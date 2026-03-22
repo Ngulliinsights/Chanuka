@@ -18,7 +18,7 @@ import {
   Settings,
   Eye,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import { useComprehensiveAnalytics } from '@client/infrastructure/observability/analytics';
 import { userJourneyTracker } from '@client/features/analytics/model/user-journey-tracker';
@@ -34,7 +34,40 @@ import { Button } from '@client/lib/design-system';
 import { Badge } from '@client/lib/design-system';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@client/lib/design-system';
 import { Alert, AlertDescription, AlertTitle } from '@client/lib/design-system';
-import { logger } from '@client/lib/utils/logger';
+import logger from '@client/lib/utils/logger';
+
+// Type definitions for analytics data
+interface PopularPath {
+  path?: string[];
+  frequency?: number;
+  completionRate?: number;
+  averageCompletionTime?: number;
+}
+
+interface DropOffPoint {
+  pageId?: string;
+  dropOffRate?: number;
+  averageTimeBeforeExit?: number;
+}
+
+interface ConversionFunnel {
+  name?: string;
+  totalConversions?: number;
+  steps?: string[];
+  conversionRates?: number[];
+}
+
+interface JourneyAnalyticsData {
+  totalJourneys: number;
+  completedJourneys: number;
+  averageJourneyLength: number;
+  averageTimeSpent: number;
+  completionRate: number;
+  bounceRate: number;
+  popularPaths: PopularPath[];
+  dropOffPoints: DropOffPoint[];
+  conversionFunnels: ConversionFunnel[];
+}
 
 /**
  * Analytics Dashboard Page Component
@@ -42,7 +75,7 @@ import { logger } from '@client/lib/utils/logger';
 export const AnalyticsDashboardPage: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
-  const [journeyAnalytics, setJourneyAnalytics] = useState<any>(null);
+  const [journeyAnalytics, setJourneyAnalytics] = useState<JourneyAnalyticsData | null>(null);
 
   const { getMetrics, exportData, clearData, setEnabled } = useComprehensiveAnalytics();
 
@@ -51,14 +84,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
   /**
    * Load journey analytics data
    */
-  const loadJourneyAnalytics = async () => {
+  const loadJourneyAnalytics = useCallback(async () => {
     try {
       const analytics = journeyTracker.getJourneyAnalytics();
       setJourneyAnalytics(analytics);
     } catch (error) {
       logger.error('Failed to load journey analytics', { error });
     }
-  };
+  }, []);
 
   /**
    * Handle data export
@@ -133,9 +166,9 @@ export const AnalyticsDashboardPage: React.FC = () => {
    */
   useEffect(() => {
     loadJourneyAnalytics();
-  }, []);
+  }, [loadJourneyAnalytics]);
 
-  const currentMetrics = getMetrics() as any;
+  const currentMetrics = getMetrics() as Record<string, unknown> | { eventCount?: number; [key: string]: unknown };
   const isTrackingEnabled = currentMetrics?.isEnabled ?? false;
 
   return (
@@ -315,7 +348,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Popular User Paths</h3>
                     <div className="space-y-2">
-                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: any, index: number) => (
+                      {journeyAnalytics.popularPaths.slice(0, 5).map((path: PopularPath, index: number) => (
                         <div
                           key={index}
                           className="flex items-center justify-between p-3 bg-gray-50 rounded"
@@ -341,7 +374,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <div className="space-y-2">
                       {journeyAnalytics.dropOffPoints
                         .slice(0, 5)
-                        .map((dropOff: any, index: number) => (
+                        .map((dropOff: DropOffPoint, index: number) => (
                           <div
                             key={index}
                             className="flex items-center justify-between p-3 bg-red-50 rounded"
@@ -367,7 +400,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Conversion Funnels</h3>
                     <div className="space-y-4">
-                      {journeyAnalytics.conversionFunnels.map((funnel: any, index: number) => (
+                      {journeyAnalytics.conversionFunnels.map((funnel: ConversionFunnel, index: number) => (
                         <Card key={index}>
                           <CardHeader>
                             <CardTitle className="text-base">{funnel?.name || 'Funnel'}</CardTitle>
@@ -382,11 +415,13 @@ export const AnalyticsDashboardPage: React.FC = () => {
                                   <span className="text-sm">{step}</span>
                                   <div className="flex items-center space-x-2">
                                     <div className="w-32 bg-gray-200 rounded-full h-2">
+                                      {/* Dynamic width requires inline styles for progress bar */}
                                       <div
                                         className="bg-blue-600 h-2 rounded-full"
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                         style={{
                                           width: `${((funnel?.conversionRates?.[stepIndex] as number) ?? 0) * 100}%`,
-                                        }}
+                                        } as React.CSSProperties}
                                       ></div>
                                     </div>
                                     <span className="text-sm font-medium">
@@ -464,7 +499,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     <strong>Last Refresh:</strong> {lastRefresh.toLocaleString()}
                   </p>
                   <p>
-                    <strong>Current Session:</strong> {currentMetrics.eventCount} events tracked
+                    <strong>Current Session:</strong> {String((currentMetrics as Record<string, unknown> | { eventCount?: number })?.eventCount ?? 0)} events tracked
                   </p>
                   <p>
                     <strong>Status:</strong> {isTrackingEnabled ? 'Active tracking' : 'Tracking disabled'}

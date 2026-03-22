@@ -110,7 +110,7 @@ async function verifyExternalAPIManagement() {
     apiManager.shutdown();
 
   } catch (error) {
-    logger.error('❌ Verification failed:', { component: 'Chanuka' }, error);
+    logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, '❌ Verification failed:');
     process.exit(1);
   }
 }

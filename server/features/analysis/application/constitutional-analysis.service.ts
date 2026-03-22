@@ -268,7 +268,7 @@ export class ConstitutionalAnalysisService {
    * against predefined patterns and linking to actual constitutional provisions.
    */
   private async identifyConstitutionalConcerns(billText: string): Promise<ConstitutionalConcern[]> {
-    logger.debug('Identifying constitutional concerns based on content patterns');
+    logger.debug({ component: 'server' }, 'Identifying constitutional concerns based on content patterns');
     const concerns: ConstitutionalConcern[] = [];
 
     for (const check of this.constitutionalChecks) {
@@ -385,7 +385,7 @@ export class ConstitutionalAnalysisService {
     billText: string,
     concerns: ConstitutionalConcern[]
   ): Promise<LegalPrecedent[]> {
-    logger.debug('Finding relevant legal precedents from database');
+    logger.debug({ component: 'server' }, 'Finding relevant legal precedents from database');
 
     try {
       // Collect all keywords from matched patterns
@@ -466,7 +466,7 @@ export class ConstitutionalAnalysisService {
     concerns: ConstitutionalConcern[],
     precedents: LegalPrecedent[]
   ): number {
-    logger.debug(`Calculating constitutionality score based on ${concerns.length} concerns and ${precedents.length} precedents`);
+    logger.debug({ component: 'server' }, `Calculating constitutionality score based on ${concerns.length} concerns and ${precedents.length} precedents`);
 
     // Start with a baseline score
     let score = 85;
@@ -534,7 +534,7 @@ export class ConstitutionalAnalysisService {
     score: number,
     concerns: ConstitutionalConcern[]
   ): 'low' | 'medium' | 'high' {
-    logger.debug(`Assessing constitutional risk based on score ${score} and ${concerns.length} concerns`);
+    logger.debug({ component: 'server' }, `Assessing constitutional risk based on score ${score} and ${concerns.length} concerns`);
 
     const hasCritical = concerns.some(c => c.severity === 'critical');
     const hasMajor = concerns.some(c => c.severity === 'major');

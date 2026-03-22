@@ -145,7 +145,7 @@ export class EmbeddingService {
             limit(async () => {
                 try {
                     const result = await this.generateEmbedding(text, { model, cacheTTL });
-                    logger.debug(`Batch embedding ${index + 1}/${texts.length} completed`);
+                    logger.debug({ component: 'server' }, `Batch embedding ${index + 1}/${texts.length} completed`);
                     return result;
                 } catch (error) {
                     logger.error({

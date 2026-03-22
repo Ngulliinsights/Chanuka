@@ -9,7 +9,7 @@ import { logger } from '../../observability/core/logger';
 export class ConnectionMigrator {
   // Placeholder implementation
   async migrate(): Promise<void> {
-    logger.info('Connection migration started');
+    logger.info({ component: 'ConnectionMigrator' }, 'Connection migration started');
 
   }
 }

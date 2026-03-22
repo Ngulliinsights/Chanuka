@@ -797,7 +797,7 @@ export class DemoDataService {
 
       return true;
     } catch (error) {
-      logger.error('Data consistency validation failed:', { component: 'DemoDataService' }, error);
+      logger.error({ component: 'DemoDataService', error: error instanceof Error ? error.message : String(error) }, 'Data consistency validation failed:');
       return false;
     }
   }

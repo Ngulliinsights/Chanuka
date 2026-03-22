@@ -1,9 +1,7 @@
 import { config } from '@server/config/index';
 import { correlationIdMiddleware } from '@server/middleware/error-management';
 import { standardRateLimits } from '@server/middleware/rate-limiter';
-import { auditMiddleware, commandInjectionPrevention, enhancedSecurityService, fileUploadSecurity } from '@server/utils/missing-modules-fallback';
-import { performanceMonitor } from '@server/utils/missing-modules-fallback';
-import { logger } from '@server/infrastructure/observability';
+import { auditMiddleware, logger } from '@server/infrastructure/observability';
 import { responseStandardizer } from '@server/middleware/response-standardizer.middleware';
 import cors from 'cors';
 import express, { Express,NextFunction, Request, Response } from 'express';
@@ -37,18 +35,21 @@ const requestLogger = (req: Request, res: Response, next: NextFunction): void =>
   next();
 };
 
-// Create performance middleware from performanceMonitor
+// Performance tracking middleware - logs response times for monitoring
 const performanceMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const operationId = performanceMonitor.startOperation?.('http', `${req.method} ${req.path}`, {
-    method: req.method,
-    path: req.path,
-    userAgent: req.get('User-Agent')
-  });
+  const startTime = Date.now();
 
   res.on('finish', () => {
-    performanceMonitor.endOperation?.(operationId, res.statusCode < 400, undefined, {
-      statusCode: res.statusCode,
-    });
+    const duration = Date.now() - startTime;
+    if (duration > 1000) { // Log slow requests (>1s)
+      logger.warn({
+        method: req.method,
+        path: req.path,
+        statusCode: res.statusCode,
+        duration,
+        component: 'Performance'
+      }, 'Slow request detected');
+    }
   });
 
   next();
@@ -164,23 +165,4 @@ export function configureAppMiddleware(app: Express): void {
   app.use(standardRateLimits.api);
   app.use(auditMiddleware);
   app.use(securityMonitoringMiddleware.initializeAll());
-
-  // Command injection prevention middleware (strict mode for production)
-  app.use(commandInjectionPrevention({
-    mode: isDevelopment ? 'sanitize' : 'strict',
-    whitelist: ['/api/health', '/api/frontend-health', '/api/service-status'],
-    maxViolations: 10
-  }));
-
-  // File upload security middleware
-  app.use(fileUploadSecurity({
-    allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.doc', '.docx', '.txt'],
-    maxFileSize: 10 * 1024 * 1024, // 10MB
-    scanContent: true
-  }));
-
-  // Enhanced security middleware
-  app.use(enhancedSecurityService.csrfProtection());
-  app.use(enhancedSecurityService.rateLimiting());
-  app.use(enhancedSecurityService.vulnerabilityScanning());
 }

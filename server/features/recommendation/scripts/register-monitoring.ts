@@ -12,7 +12,7 @@ const FEATURE_ID = 'recommendation-engine';
 
 export async function registerRecommendationMonitoring(): Promise<void> {
   try {
-    logger.info('Registering recommendation engine with monitoring system...');
+    logger.info({ component: 'server' }, 'Registering recommendation engine with monitoring system...');
     
     // Register the feature
     await integrationMonitor.registerFeature({
@@ -38,10 +38,10 @@ export async function registerRecommendationMonitoring(): Promise<void> {
       },
     });
     
-    logger.info('Recommendation engine registered successfully');
+    logger.info({ component: 'server' }, 'Recommendation engine registered successfully');
     
     // Add alert rules
-    logger.info('Setting up alert rules...');
+    logger.info({ component: 'server' }, 'Setting up alert rules...');
     
     // Response time alert (> 200ms)
     await integrationMonitor.addAlertRule({
@@ -95,7 +95,7 @@ export async function registerRecommendationMonitoring(): Promise<void> {
       cooldown: 10, // 10 minutes
     });
     
-    logger.info('Alert rules configured successfully');
+    logger.info({ component: 'server' }, 'Alert rules configured successfully');
     
     // Log initial event
     await integrationMonitor.logEvent(
@@ -109,7 +109,7 @@ export async function registerRecommendationMonitoring(): Promise<void> {
       }
     );
     
-    logger.info('Recommendation engine monitoring setup complete');
+    logger.info({ component: 'server' }, 'Recommendation engine monitoring setup complete');
   } catch (error) {
     logger.error({ error }, 'Failed to register recommendation engine monitoring');
     throw error;
@@ -120,7 +120,7 @@ export async function registerRecommendationMonitoring(): Promise<void> {
 if (require.main === module) {
   registerRecommendationMonitoring()
     .then(() => {
-      logger.info('Monitoring registration complete');
+      logger.info({ component: 'server' }, 'Monitoring registration complete');
       process.exit(0);
     })
     .catch((error) => {

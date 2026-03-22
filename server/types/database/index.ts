@@ -4,6 +4,10 @@
  */
 
 import { BaseEntity } from '@shared/types/core/base';
+import type { RetryPolicy as ServiceRetryPolicy, Transaction as ServiceTransaction } from '../service';
+
+// Re-export from service to avoid duplication
+export type { RetryPolicy, Transaction } from '../service';
 
 /**
  * Database Entity
@@ -53,30 +57,6 @@ export interface CacheOptions {
   readonly ttlSeconds: number;
   readonly keyPrefix?: string;
   readonly tags?: string[];
-}
-
-/**
- * Retry Policy
- * Standardized retry configuration for database operations
- */
-export interface RetryPolicy {
-  readonly maxAttempts: number;
-  readonly delayMs: number;
-  readonly backoffStrategy: 'linear' | 'exponential' | 'none';
-  readonly retryOnErrors?: string[];
-}
-
-/**
- * Transaction Interface
- * Standardized transaction representation
- */
-export interface Transaction extends BaseEntity {
-  readonly transactionId: string;
-  readonly status: 'active' | 'committed' | 'rolled_back' | 'failed';
-  readonly startedAt: Date;
-  readonly isolationLevel?: 'read_uncommitted' | 'read_committed' | 'repeatable_read' | 'serializable';
-  readonly operations: string[];
-  readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
 /**

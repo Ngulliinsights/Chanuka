@@ -13,7 +13,7 @@ const createLimiter = (options: {
     standardHeaders: true,
     legacyHeaders: false,
     handler: (req: Request, res: Response) => {
-      logger.warn(`Rate limit exceeded for ${req.ip} on ${req.path}`);
+      logger.warn({ component: 'server' }, `Rate limit exceeded for ${req.ip} on ${req.path}`);
       res.status(429).json({
         success: false,
         error: 'Too Many Requests',

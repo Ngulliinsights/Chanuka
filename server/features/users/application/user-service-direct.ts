@@ -580,55 +580,55 @@ export class UserService {
 
   async findInterestsByUserId(user_id: string): Promise<UserInterest[]> {
     // Would need user_interests table
-    logger.warn('findInterestsByUserId not implemented - user_interests table missing');
+    logger.warn({ component: 'server' }, 'findInterestsByUserId not implemented - user_interests table missing');
     return [];
   }
 
   async saveInterest(interest: UserInterest): Promise<void> {
     // Would need user_interests table
-    logger.warn('saveInterest not implemented - user_interests table missing');
+    logger.warn({ component: 'server' }, 'saveInterest not implemented - user_interests table missing');
   }
 
   async deleteInterest(user_id: string, interest: string): Promise<void> {
     // Would need user_interests table
-    logger.warn('deleteInterest not implemented - user_interests table missing');
+    logger.warn({ component: 'server' }, 'deleteInterest not implemented - user_interests table missing');
   }
 
   async deleteAllInterests(user_id: string): Promise<void> {
     // Would need user_interests table
-    logger.warn('deleteAllInterests not implemented - user_interests table missing');
+    logger.warn({ component: 'server' }, 'deleteAllInterests not implemented - user_interests table missing');
   }
 
   async findVerificationsByUserId(user_id: string): Promise<CitizenVerification[]> {
     // Would need user_verifications table
-    logger.warn('findVerificationsByUserId not implemented - user_verifications table missing');
+    logger.warn({ component: 'server' }, 'findVerificationsByUserId not implemented - user_verifications table missing');
     return [];
   }
 
   async findVerificationById(id: string): Promise<CitizenVerification | null> {
     // Would need user_verifications table
-    logger.warn('findVerificationById not implemented - user_verifications table missing');
+    logger.warn({ component: 'server' }, 'findVerificationById not implemented - user_verifications table missing');
     return null;
   }
 
   async saveVerification(verification: CitizenVerification): Promise<void> {
     // Would need user_verifications table
-    logger.warn('saveVerification not implemented - user_verifications table missing');
+    logger.warn({ component: 'server' }, 'saveVerification not implemented - user_verifications table missing');
   }
 
   async updateVerification(verification: CitizenVerification): Promise<void> {
     // Would need user_verifications table
-    logger.warn('updateVerification not implemented - user_verifications table missing');
+    logger.warn({ component: 'server' }, 'updateVerification not implemented - user_verifications table missing');
   }
 
   async saveUserAggregate(aggregate: UserAggregate): Promise<void> {
     // Would need to coordinate multiple table operations
-    logger.warn('saveUserAggregate not implemented - requires multiple table coordination');
+    logger.warn({ component: 'server' }, 'saveUserAggregate not implemented - requires multiple table coordination');
   }
 
   async findUsersByReputationRange(min: number, max: number): Promise<User[]> {
     // Reputation is not stored in users table - would require domain service coordination
-    logger.warn('findUsersByReputationRange not implemented - reputation not stored in users table');
+    logger.warn({ component: 'server' }, 'findUsersByReputationRange not implemented - reputation not stored in users table');
     return [];
   }
 }

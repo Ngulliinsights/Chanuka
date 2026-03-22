@@ -1211,7 +1211,7 @@ export class SuggestionEngineService {
     this.searchHistory.clear();
     this.popularTerms.clear();
     this.lastCleanup = Date.now();
-    logger.info('Search history and popular terms cleared');
+    logger.info({ component: 'server' }, 'Search history and popular terms cleared');
   }
 
   /**

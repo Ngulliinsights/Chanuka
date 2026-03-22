@@ -174,13 +174,11 @@ export class UserProfileService {
 
         return { ...user, interests };
       } catch (error) {
-        logger.error('Failed to get user profile', {
-          error,
+        logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserProfile',
-          context: { user_id },
-        });
-        logger.warn(`Using fallback data for user profile: ${user_id}`);
+          context: { user_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user profile');
+        logger.warn({ component: 'server' }, `Using fallback data for user profile: ${user_id}`);
         return {
           id: user_id,
           email: 'user@example.com',
@@ -247,13 +245,11 @@ export class UserProfileService {
       await cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
       return await this.getUserProfile(sanitizedUserId);
     } catch (error) {
-      logger.error('Failed to update user profile', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserProfile',
-        context: { user_id: sanitizedUserId },
-      });
-      logger.warn(`Using fallback data for user profile update: ${sanitizedUserId}`);
+        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user profile');
+      logger.warn({ component: 'server' }, `Using fallback data for user profile update: ${sanitizedUserId}`);
 
       const cached = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
       if (cached) return { ...cached, profile: { ...cached.profile, ...profileData } };
@@ -285,13 +281,11 @@ export class UserProfileService {
       await cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
       return { success: true };
     } catch (error) {
-      logger.error('Failed to update user interests', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserInterests',
-        context: { user_id: sanitizedUserId },
-      });
-      logger.warn(`Cannot update user interests: database unavailable for user ${sanitizedUserId}`);
+        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user interests');
+      logger.warn({ component: 'server' }, `Cannot update user interests: database unavailable for user ${sanitizedUserId}`);
       return { success: false };
     }
   }
@@ -319,13 +313,11 @@ export class UserProfileService {
       await cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
       return await this.getUserProfile(sanitizedUserId);
     } catch (error) {
-      logger.error('Failed to update user basic info', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserBasicInfo',
-        context: { user_id: sanitizedUserId },
-      });
-      logger.warn(`Using fallback data for user basic info update: ${sanitizedUserId}`);
+        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user basic info');
+      logger.warn({ component: 'server' }, `Using fallback data for user basic info update: ${sanitizedUserId}`);
 
       const cachedProfile = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
       if (cachedProfile) return { ...cachedProfile, ...data };
@@ -415,13 +407,11 @@ export class UserProfileService {
 
         return { ...DEFAULT_PREFERENCES, ...((row?.preferences as UserPreferences) ?? {}) };
       } catch (error) {
-        logger.error('Failed to get user preferences', {
-          error,
+        logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserPreferences',
-          context: { user_id: sanitizedUserId },
-        });
-        logger.warn(`Using fallback preferences for user: ${sanitizedUserId}`);
+          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user preferences');
+        logger.warn({ component: 'server' }, `Using fallback preferences for user: ${sanitizedUserId}`);
         return { ...DEFAULT_PREFERENCES };
       }
     })();
@@ -452,12 +442,10 @@ export class UserProfileService {
 
       return updatedPreferences;
     } catch (error) {
-      logger.error('Failed to update user preferences', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserPreferences',
-        context: { user_id: sanitizedUserId },
-      });
+        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user preferences');
       logger.warn(
         `Cannot update user preferences: database unavailable for user ${sanitizedUserId}`,
       );
@@ -505,12 +493,10 @@ export class UserProfileService {
       await cacheService.delete(cacheKeys.USER_PROFILE(sanitizedUserId));
       return await this.getUserProfile(sanitizedUserId);
     } catch (error) {
-      logger.error('Failed to update user verification status', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserVerificationStatus',
-        context: { user_id: sanitizedUserId },
-      });
+        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user verification status');
       logger.warn(
         `Cannot update user verification status: database unavailable for user ${sanitizedUserId}`,
       );
@@ -554,13 +540,11 @@ export class UserProfileService {
           canSubmitDocuments: status === 'pending' || status === 'rejected',
         };
       } catch (error) {
-        logger.error('Failed to get user verification status', {
-          error,
+        logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserVerificationStatus',
-          context: { user_id: sanitizedUserId },
-        });
-        logger.warn(`Using fallback verification status for user: ${sanitizedUserId}`);
+          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user verification status');
+        logger.warn({ component: 'server' }, `Using fallback verification status for user: ${sanitizedUserId}`);
         return { verification_status: 'pending', verificationDocuments: null, canSubmitDocuments: true };
       }
     })();
@@ -669,13 +653,11 @@ export class UserProfileService {
           })),
         };
       } catch (error) {
-        logger.error('Failed to get user engagement history', {
-          error,
+        logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserEngagementHistory',
-          context: { user_id: sanitizedUserId },
-        });
-        logger.warn(`Using fallback engagement history for user: ${sanitizedUserId}`);
+          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user engagement history');
+        logger.warn({ component: 'server' }, `Using fallback engagement history for user: ${sanitizedUserId}`);
         return {
           totalBillsTracked: 0,
           totalComments: 0,
@@ -771,12 +753,10 @@ export class UserProfileService {
       await cacheService.delete(`${cacheKeys.USER_PROFILE(sanitizedUserId)}:engagement`);
       return { success: true };
     } catch (error) {
-      logger.error('Failed to update user engagement', {
-        error,
+      logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserEngagement',
-        context: { user_id: sanitizedUserId, bill_id: sanitizedBillId, engagement_type },
-      });
+        context: { user_id: sanitizedUserId, bill_id: sanitizedBillId, engagement_type, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user engagement');
       logger.warn(
         `Cannot update user engagement: database unavailable for user ${sanitizedUserId}, bill ${sanitizedBillId}`,
       );

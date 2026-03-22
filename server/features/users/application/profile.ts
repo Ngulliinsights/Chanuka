@@ -153,7 +153,7 @@ router.patch('/me/interests', authenticateToken, asyncHandler(async (req: Authen
       throw new ValidationError('Invalid interests data', formatZodErrors(error.errors));
     }
 
-    logger.error('Error updating interests:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error updating interests:');
 
     throw new BaseError('Failed to update interests', {
       statusCode: 500,
@@ -177,7 +177,7 @@ router.get('/me/complete', authenticateToken, asyncHandler(async (req: Authentic
 
     res.json(completeProfile);
   } catch (error) {
-    logger.error('Error fetching complete profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching complete profile:');
 
     throw new BaseError('Failed to fetch complete profile', {
       statusCode: 500,
@@ -205,7 +205,7 @@ router.get('/me/preferences', authenticateToken, asyncHandler(async (req: Authen
 
     res.json(preferences);
   } catch (error) {
-    logger.error('Error fetching preferences:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching preferences:');
 
     throw new BaseError('Failed to fetch preferences', {
       statusCode: 500,
@@ -235,7 +235,7 @@ router.patch('/me/preferences', authenticateToken, asyncHandler(async (req: Auth
       throw new ValidationError('Invalid preferences data', formatZodErrors(error.errors));
     }
 
-    logger.error('Error updating preferences:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error updating preferences:');
 
     throw new BaseError('Failed to update preferences', {
       statusCode: 500,
@@ -263,7 +263,7 @@ router.get('/me/verification', authenticateToken, asyncHandler(async (req: Authe
 
     res.json(verification_status);
   } catch (error) {
-    logger.error('Error fetching verification status:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching verification status:');
 
     throw new BaseError('Failed to fetch verification status', {
       statusCode: 500,
@@ -308,7 +308,7 @@ router.patch('/me/verification', authenticateToken, asyncHandler(async (req: Aut
       throw error;
     }
 
-    logger.error('Error updating verification status:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error updating verification status:');
 
     throw new BaseError('Failed to update verification status', {
       statusCode: 500,
@@ -336,7 +336,7 @@ router.get('/me/engagement', authenticateToken, asyncHandler(async (req: Authent
 
     res.json(engagementHistory);
   } catch (error) {
-    logger.error('Error fetching engagement history:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching engagement history:');
 
     throw new BaseError('Failed to fetch engagement history', {
       statusCode: 500,
@@ -379,7 +379,7 @@ router.post('/me/engagement/:bill_id', authenticateToken, asyncHandler(async (re
       throw error;
     }
 
-    logger.error('Error updating engagement:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error updating engagement:');
 
     throw new BaseError('Failed to update engagement', {
       statusCode: 500,
@@ -408,7 +408,7 @@ router.get('/profile', authenticateToken, asyncHandler(async (req: Authenticated
 
     res.json(profile);
   } catch (error) {
-    logger.error('Error fetching profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching profile:');
 
     throw new BaseError('Failed to fetch profile', {
       statusCode: 500,
@@ -432,7 +432,7 @@ router.get('/preferences', authenticateToken, asyncHandler(async (req: Authentic
 
     res.json(preferences);
   } catch (error) {
-    logger.error('Error fetching preferences:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching preferences:');
 
     throw new BaseError('Failed to fetch preferences', {
       statusCode: 500,
@@ -462,7 +462,7 @@ router.put('/preferences', authenticateToken, asyncHandler(async (req: Authentic
       throw new ValidationError('Invalid preferences data', formatZodErrors(error.errors));
     }
 
-    logger.error('Error updating preferences:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error updating preferences:');
 
     throw new BaseError('Failed to update preferences', {
       statusCode: 500,
@@ -499,7 +499,7 @@ router.get('/search/:query', asyncHandler(async (req, res: Response) => {
       throw error;
     }
 
-    logger.error('Error searching users:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error searching users:');
 
     throw new BaseError('User search failed', {
       statusCode: 500,
@@ -524,7 +524,7 @@ router.get('/:user_id/profile', asyncHandler(async (req, res: Response) => {
 
     res.json(profile);
   } catch (error) {
-    logger.error('Error fetching public profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching public profile:');
 
     throw new BaseError('Failed to fetch profile', {
       statusCode: 500,
@@ -549,7 +549,7 @@ router.get('/:user_id', asyncHandler(async (req, res: Response) => {
 
     res.json(profile);
   } catch (error) {
-    logger.error('Error fetching public profile:', { component: 'profile-routes', context }, error as Record<string, unknown> | undefined);
+    logger.error({ component: 'profile-routes', context, error: error as Record<string, unknown> | undefined instanceof Error ? error as Record<string, unknown> | undefined.message : String(error as Record<string, unknown> | undefined) }, 'Error fetching public profile:');
 
     throw new BaseError('Failed to fetch profile', {
       statusCode: 500,

@@ -29,7 +29,7 @@ export interface UserActivityNotification { user_id: string;
  */
 export class UserNotificationService {
   constructor() {
-    logger.info('✅ User Notification Service initialized');
+    logger.info({ component: 'server' }, '✅ User Notification Service initialized');
   }
 
   /**
@@ -38,7 +38,7 @@ export class UserNotificationService {
   async sendUserNotification(data: UserNotificationData): Promise<any> {
     try {
       const notification = await notificationService.createNotification(data);
-      logger.info(`📱 User notification sent to ${data.user_id}: ${data.title}`);
+      logger.info({ component: 'server' }, `📱 User notification sent to ${data.user_id}: ${data.title}`);
       return notification;
     } catch (error) {
       logger.error({ error }, `❌ Failed to send notification to user ${data.user_id}`);
@@ -59,7 +59,7 @@ export class UserNotificationService {
         metadata: data.metadata
       });
 
-      logger.info(`📬 Bulk user notifications sent: ${result.success} success, ${result.failed} failed`);
+      logger.info({ component: 'server' }, `📬 Bulk user notifications sent: ${result.success} success, ${result.failed} failed`);
       return result;
     } catch (error) {
       logger.error({ error }, '❌ Failed to send bulk user notifications');

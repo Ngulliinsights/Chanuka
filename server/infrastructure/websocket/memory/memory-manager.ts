@@ -444,7 +444,7 @@ export class MemoryManager implements IMemoryManager {
    */
   private logDebug(message: string): void {
     if (typeof process !== 'undefined' && process.env.NODE_ENV !== 'production') {
-      logger.debug(`[MemoryManager] ${message}`);
+      logger.debug({ component: 'server' }, `[MemoryManager] ${message}`);
     }
   }
 

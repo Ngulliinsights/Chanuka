@@ -78,8 +78,8 @@ class MigrationRunner {
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      logger.error('💥 Migration execution failed:', { component: 'Chanuka' }, err.message);
-      logger.error('Stack trace:', { component: 'Chanuka' }, err.stack);
+      logger.error({ component: 'Chanuka', error: err.message }, '💥 Migration execution failed:');
+      logger.error({ component: 'Chanuka', stack: err.stack }, 'Stack trace:');
       process.exit(1);
     }
   }
@@ -311,7 +311,7 @@ async function main(): Promise<void> {
     }
   } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
-    logger.error('💥 Migration runner failed:', { component: 'Chanuka' }, err.message);
+    logger.error({ component: 'Chanuka', error: err.message instanceof Error ? err.message.message : String(err.message) }, '💥 Migration runner failed:');
     process.exit(1);
   } finally {
     await runner.cleanup();
@@ -320,18 +320,18 @@ async function main(): Promise<void> {
 
 // Handle uncaught errors gracefully
 process.on('uncaughtException', (error) => {
-  logger.error('💥 Uncaught exception:', { component: 'Chanuka' }, error.message);
+  logger.error({ component: 'Chanuka', error: error.message instanceof Error ? error.message.message : String(error.message) }, '💥 Uncaught exception:');
   process.exit(1);
 });
 
 process.on('unhandledRejection', (error) => {
-  logger.error('💥 Unhandled rejection:', { component: 'Chanuka' }, error);
+  logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, '💥 Unhandled rejection:');
   process.exit(1);
 });
 
 // Run the main function
 main().catch(error => {
-  logger.error('💥 Fatal error:', { component: 'Chanuka' }, error.message);
+  logger.error({ component: 'Chanuka', error: error.message instanceof Error ? error.message.message : String(error.message) }, '💥 Fatal error:');
   process.exit(1);
 });
 

@@ -309,11 +309,11 @@ class AlertingService {
       try {
         await this.checkAlertConditions();
       } catch (err) {
-        logger.error(`[Alerting] Error checking alert conditions: ${err instanceof Error ? err.message : String(err)}`);
+        logger.error({ component: 'server' }, `[Alerting] Error checking alert conditions: ${err instanceof Error ? err.message : String(err)}`);
       }
     }, 60_000);
 
-    logger.info('[Alerting] Started monitoring with alert rules');
+    logger.info({ component: 'server' }, '[Alerting] Started monitoring with alert rules');
   }
 
   private async checkAlertConditions(): Promise<void> {

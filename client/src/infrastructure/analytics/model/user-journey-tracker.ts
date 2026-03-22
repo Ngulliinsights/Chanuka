@@ -424,4 +424,4 @@ class UserJourneyTracker {
   }
 }
 
-export 
+export const userJourneyTracker = new UserJourneyTracker();

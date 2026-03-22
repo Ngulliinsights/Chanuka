@@ -46,34 +46,34 @@ let validationServicesContainer: ValidationServicesContainer | null = null;
  */
 export async function initializeValidationServices(providedDbPool?: PoolType): Promise<ValidationServicesContainer> {
   if (validationServicesContainer) {
-    logger.debug('Validation services already initialized, returning existing container');
+    logger.debug({ component: 'server' }, 'Validation services already initialized, returning existing container');
     return validationServicesContainer;
   }
 
-  logger.info('Initializing validation services...');
+  logger.info({ component: 'server' }, 'Initializing validation services...');
 
   try {
     // Step 1: Initialize metrics collector (no dependencies)
-    logger.debug('Initializing validation metrics collector...');
+    logger.debug({ component: 'server' }, 'Initializing validation metrics collector...');
     const metricsCollector = ValidationMetricsCollector.getInstance();
 
     // Step 2: Initialize input validation service
-    logger.debug('Initializing input validation service...');
+    logger.debug({ component: 'server' }, 'Initializing input validation service...');
     const inputValidation = InputValidationService.getInstance();
 
     // Step 3: Get database connection for services that need it
     const pool: PoolType = providedDbPool || dbPool;
 
     // Step 4: Initialize schema validation service
-    logger.debug('Initializing schema validation service...');
+    logger.debug({ component: 'server' }, 'Initializing schema validation service...');
     const schemaValidation = new SchemaValidationService();
 
     // Step 5: Initialize data integrity validation service
-    logger.debug('Initializing data integrity validation service...');
+    logger.debug({ component: 'server' }, 'Initializing data integrity validation service...');
     const dataIntegrityValidation = new DataIntegrityValidationService(pool);
 
     // Step 6: Initialize data completeness service
-    logger.debug('Initializing data completeness service...');
+    logger.debug({ component: 'server' }, 'Initializing data completeness service...');
     const dataCompleteness = new DataCompletenessService();
 
     // Create the container
@@ -85,7 +85,7 @@ export async function initializeValidationServices(providedDbPool?: PoolType): P
       dataCompleteness
     };
 
-    logger.info('All validation services initialized successfully');
+    logger.info({ component: 'server' }, 'All validation services initialized successfully');
     
     // Record initialization metric
     metricsCollector.recordMetric({
@@ -145,7 +145,7 @@ export function areValidationServicesInitialized(): boolean {
  * This will force re-initialization on next access
  */
 export function resetValidationServices(): void {
-  logger.debug('Resetting validation services container');
+  logger.debug({ component: 'server' }, 'Resetting validation services container');
   validationServicesContainer = null;
 }
 
@@ -155,18 +155,18 @@ export function resetValidationServices(): void {
  */
 export async function shutdownValidationServices(): Promise<void> {
   if (!validationServicesContainer) {
-    logger.debug('Validation services not initialized, nothing to shutdown');
+    logger.debug({ component: 'server' }, 'Validation services not initialized, nothing to shutdown');
     return;
   }
 
-  logger.info('Shutting down validation services...');
+  logger.info({ component: 'server' }, 'Shutting down validation services...');
 
   try {
     // Cleanup any resources if needed
     // For now, just reset the container
     validationServicesContainer = null;
     
-    logger.info('Validation services shutdown completed');
+    logger.info({ component: 'server' }, 'Validation services shutdown completed');
   } catch (error) {
     logger.error({ component: 'ValidationServicesInit', error }, 'Error during validation services shutdown');
     throw error;

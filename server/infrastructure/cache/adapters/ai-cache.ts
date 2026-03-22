@@ -125,14 +125,14 @@ export class AICache {
 
         this.recordCacheHit(service, entry.cost, performance.now() - startTime);
 
-        logger.info('AI Cache Hit', { component: 'Chanuka' }, {
+        logger.info({
           service,
           operation,
           key: cacheKey,
           hitCount: entry.hitCount,
           age: Date.now() - entry.timestamp,
           cost: entry.cost
-        });
+        }, 'AI Cache Hit');
 
         return entry.data;
       }
@@ -151,7 +151,7 @@ export class AICache {
       return null;
 
     } catch (error) {
-      logger.error('AI cache get error:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'AI cache get error:');
       this.recordCacheMiss(service, performance.now() - startTime);
       return null;
     }
@@ -193,14 +193,28 @@ export class AICache {
 
       await this.baseCache.set(cacheKey, entry, ttl);
 
-      logger.info('AI Cache Set', { component: 'Chanuka' }, {
+      logger.info({ component: 'Chanuka', error: {
         service,
         operation,
         key: cacheKey,
         ttl,
         cost: entry.cost,
         accuracy: entry.accuracy
-      });
+      } instanceof Error ? {
+        service,
+        operation,
+        key: cacheKey,
+        ttl,
+        cost: entry.cost,
+        accuracy: entry.accuracy
+      }.message : String({
+        service,
+        operation,
+        key: cacheKey,
+        ttl,
+        cost: entry.cost,
+        accuracy: entry.accuracy
+      }) }, 'AI Cache Set');
 
       // Trigger cache warming for related operations if enabled
       if (this.options.enableCacheWarming) {
@@ -208,7 +222,7 @@ export class AICache {
       }
 
     } catch (error) {
-      logger.error('AI cache set error:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'AI cache set error:');
     }
   }
 
@@ -235,12 +249,12 @@ export class AICache {
       } else {
         // For more complex criteria, we'd need to scan all keys
         // This is a simplified implementation
-        logger.info('AI cache invalidation requested', { component: 'Chanuka' }, criteria);
+        logger.info({ component: 'Chanuka', error: criteria instanceof Error ? criteria.message : String(criteria) }, 'AI cache invalidation requested');
       }
 
       return invalidatedCount;
     } catch (error) {
-      logger.error('AI cache invalidation error:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'AI cache invalidation error:');
       return 0;
     }
   }
@@ -275,11 +289,19 @@ export class AICache {
           return;
         }
 
-        logger.info('Warming AI cache', { component: 'Chanuka' }, {
+        logger.info({ component: 'Chanuka', error: {
           service: entry.service,
           operation: entry.operation,
           key: entry.key
-        });
+        } instanceof Error ? {
+          service: entry.service,
+          operation: entry.operation,
+          key: entry.key
+        }.message : String({
+          service: entry.service,
+          operation: entry.operation,
+          key: entry.key
+        }) }, 'Warming AI cache');
 
         // Generate the data
         const data = await entry.factory();
@@ -423,10 +445,16 @@ export class AICache {
   ): void {
     // This would implement intelligent cache warming based on patterns
     // For now, just log the warming opportunity
-    logger.info('Cache warming opportunity detected', { component: 'Chanuka' }, {
+    logger.info({ component: 'Chanuka', error: {
       service,
       operation,
-      inputHash: this.hashInput(inputData)
+      inputHash: this.hashInput(inputData instanceof Error ? {
+      service,
+      operation,
+      inputHash: this.hashInput(inputData.message : String({
+      service,
+      operation,
+      inputHash: this.hashInput(inputData) }, 'Cache warming opportunity detected')
     });
   }
 

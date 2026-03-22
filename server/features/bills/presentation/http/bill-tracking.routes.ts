@@ -177,7 +177,7 @@ router.get('/recommended', authenticateToken, async (req: AuthenticatedRequest, 
 
 // --- Centralized Error Handler for this Router ---
 router.use((err: Error, req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    logger.error(`Error in Bill Tracking route ${req.method} ${req.originalUrl}:`, { component: 'BillTrackingRoutes', user_id: req.user?.id  }, err);
+    logger.error({ component: 'BillTrackingRoutes', user_id: req.user?.id, error: err instanceof Error ? err.message : String(err) }, `Error in Bill Tracking route ${req.method} ${req.originalUrl}:`);
 
     // Handle specific service errors
     if (err.message.includes('not found') || err.message.includes('No active tracking preference found')) {

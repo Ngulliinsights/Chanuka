@@ -27,7 +27,7 @@ export class PublicInterestAnalysisService {
         stakeholderImpact: StakeholderAnalysisResult,
         transparency_score: TransparencyScoreResult
     ): PublicInterestScoreResult {
-        logger.info("⚖️ Calculating public interest score.");
+        logger.info({ component: 'server' }, "⚖️ Calculating public interest score.");
          try {
             const economicScoreNorm = this.normalizeEconomicScore(stakeholderImpact.economicImpact);
             const socialScoreNorm = this.normalizeSocialScore(stakeholderImpact.socialImpact);
@@ -52,14 +52,14 @@ export class PublicInterestAnalysisService {
                 assessment: this.getQualitativeAssessment(finalScore)
             };
          } catch (error) {
-             logger.error("Error calculating public interest score:", { component: 'PublicInterestAnalysisService' }, error);
+             logger.error({ component: 'PublicInterestAnalysisService', error: error instanceof Error ? error.message : String(error) }, "Error calculating public interest score:");
               return { score: 0, factors: { economicScoreNormalized: 0, socialScoreNormalized: 0, transparency_score: 0 }, assessment: 'Very Low' };
          }
     }
 
     /** Normalizes economic impact score to 0-100 range */
     private normalizeEconomicScore(economicImpact: EconomicImpact): number {
-        logger.debug("Normalizing economic score.");
+        logger.debug({ component: 'server' }, "Normalizing economic score.");
         // Scale net impact relative to a baseline (e.g., $1B), centered around 50
         const baseline = 1_000_000_000; // $1 Billion
         // Calculate raw score based on net impact relative to baseline
@@ -80,7 +80,7 @@ export class PublicInterestAnalysisService {
 
     /** Normalizes social impact score to 0-100 range */
      private normalizeSocialScore(socialImpact: SocialImpact): number {
-         logger.debug("Normalizing social score.");
+         logger.debug({ component: 'server' }, "Normalizing social score.");
          // Shift scores from -100 to 100 range to 0-100 range
          const scaledEquity = (socialImpact.equityEffect + 100) / 2;
          const scaledAccessibility = (socialImpact.accessibilityEffect + 100) / 2; // Assuming -100 to 100 range

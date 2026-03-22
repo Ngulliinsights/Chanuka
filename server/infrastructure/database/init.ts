@@ -27,14 +27,14 @@ let initializationPromise: Promise<void> | null = null;
 export async function initializeDatabaseSafety(): Promise<void> {
   // Fast path: Already initialized, no synchronization overhead
   if (isInitialized) {
-    logger.debug('Database safety mechanisms already initialized, skipping');
+    logger.debug({ component: 'server' }, 'Database safety mechanisms already initialized, skipping');
     return;
   }
 
   // If initialization is in progress, wait for the existing promise
   // This prevents multiple concurrent initialization attempts
   if (initializationPromise) {
-    logger.debug('Database safety initialization in progress, awaiting existing promise');
+    logger.debug({ component: 'server' }, 'Database safety initialization in progress, awaiting existing promise');
     return initializationPromise;
   }
 
@@ -58,11 +58,11 @@ export async function initializeDatabaseSafety(): Promise<void> {
  * Separated from the public API to enable proper promise management.
  */
 async function performInitialization(): Promise<void> {
-  logger.info('Initializing database safety mechanisms...');
+  logger.info({ component: 'server' }, 'Initializing database safety mechanisms...');
 
   try {
     // Note: Global error handlers are set up elsewhere in the application
-    logger.info('✓ Proceeding with database initialization');
+    logger.info({ component: 'server' }, '✓ Proceeding with database initialization');
 
     // Perform initial health check with timeout to prevent hanging
     const healthCheckPromise = monitorPoolHealth();
@@ -98,7 +98,7 @@ async function performInitialization(): Promise<void> {
 
     // Start database monitoring service
     databaseMonitor.start();
-    logger.info('✓ Database monitoring service started');
+    logger.info({ component: 'server' }, '✓ Database monitoring service started');
 
     // Log configuration summary with more structured information
     logger.info({
@@ -143,12 +143,12 @@ async function performInitialization(): Promise<void> {
  */
 async function cleanupPartialInitialization(): Promise<void> {
   try {
-    logger.info('Attempting to clean up after failed initialization');
+    logger.info({ component: 'server' }, 'Attempting to clean up after failed initialization');
     
     // Stop monitoring if it was started
     if (databaseMonitor.isMonitoringActive()) {
       databaseMonitor.stop();
-      logger.info('✓ Monitoring service stopped during cleanup');
+      logger.info({ component: 'server' }, '✓ Monitoring service stopped during cleanup');
     }
   } catch (cleanupError) {
     // Log but don't throw, as we're already handling an error
@@ -165,19 +165,19 @@ async function cleanupPartialInitialization(): Promise<void> {
 export async function shutdownDatabaseSafety(): Promise<void> {
   // If not initialized, there's nothing to shut down
   if (!isInitialized && !initializationPromise) {
-    logger.debug('Database safety not initialized, skipping shutdown');
+    logger.debug({ component: 'server' }, 'Database safety not initialized, skipping shutdown');
     return;
   }
 
-  logger.info('Shutting down database safety mechanisms...');
+  logger.info({ component: 'server' }, 'Shutting down database safety mechanisms...');
 
   try {
     // Stop monitoring service with defensive check
     if (databaseMonitor.isMonitoringActive()) {
       databaseMonitor.stop();
-      logger.info('✓ Database monitoring service stopped');
+      logger.info({ component: 'server' }, '✓ Database monitoring service stopped');
     } else {
-      logger.debug('Monitoring service was not active, skipping stop');
+      logger.debug({ component: 'server' }, 'Monitoring service was not active, skipping stop');
     }
 
     // Perform final health check with timeout protection
@@ -200,7 +200,7 @@ export async function shutdownDatabaseSafety(): Promise<void> {
     isInitialized = false;
     initializationPromise = null;
 
-    logger.info('Database safety shutdown completed successfully');
+    logger.info({ component: 'server' }, 'Database safety shutdown completed successfully');
 
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -274,7 +274,7 @@ export async function getDatabaseSafetyStatus(): Promise<{
  * to reinitialize the system from a clean state.
  */
 export function resetDatabaseSafetyState(): void {
-  logger.warn('Forcefully resetting database safety state');
+  logger.warn({ component: 'server' }, 'Forcefully resetting database safety state');
   isInitialized = false;
   initializationPromise = null;
 }

@@ -127,4 +127,4 @@ class WorkspaceService {
   }
 }
 
-export 
+export const workspaceService = new WorkspaceService();

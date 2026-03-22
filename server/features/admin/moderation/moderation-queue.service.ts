@@ -8,15 +8,8 @@ import { contentAnalysisService } from '@server/features/admin/moderation/conten
 import { ContentModerationFilters, ModerationItem, PaginationInfo } from '@server/features/admin/moderation/types';
 import { logger } from '@server/infrastructure/observability';
 import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
-import { bill, 
-  comments, 
-  content_report, 
-  sponsor, 
-  users } from '@server/infrastructure/schema';
+import { bills, comments, content_reports, sponsors, users, moderation_queue } from '@server/infrastructure/schema';
 import { db } from '@server/infrastructure/database';
-import { bills } from '@server/infrastructure/schema';
-import { users } from '@server/infrastructure/schema';
-import { sponsors } from '@server/infrastructure/schema';
 import { and, count, desc, eq, gte, SQL,sql } from 'drizzle-orm';
 
 export class ModerationQueueService {
@@ -49,32 +42,32 @@ export class ModerationQueueService {
       // Fetch reports with all their details
       const queueItems = await db
         .select({
-          id: content_report.id,
-          content_type: content_report.content_type,
-          content_id: content_report.content_id,
-          reportType: content_report.reportType,
-          severity: content_report.severity,
-          reason: content_report.reason,
-          description: content_report.description,
-          reportedBy: content_report.reportedBy,
-          autoDetected: content_report.autoDetected,
-          status: content_report.status,
-          reviewedBy: content_report.reviewedBy,
-          reviewedAt: content_report.reviewedAt,
-          resolutionNotes: content_report.resolutionNotes,
-          created_at: content_report.created_at,
-          updated_at: content_report.updated_at
+          id: content_reports.id,
+          content_type: content_reports.content_type,
+          content_id: content_reports.content_id,
+          reportType: content_reports.reportType,
+          severity: content_reports.severity,
+          reason: content_reports.reason,
+          description: content_reports.description,
+          reportedBy: content_reports.reportedBy,
+          autoDetected: content_reports.autoDetected,
+          status: content_reports.status,
+          reviewedBy: content_reports.reviewedBy,
+          reviewedAt: content_reports.reviewedAt,
+          resolutionNotes: content_reports.resolutionNotes,
+          created_at: content_reports.created_at,
+          updated_at: content_reports.updated_at
         })
-        .from(content_report)
+        .from(content_reports)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(desc(content_report.severity), desc(content_report.created_at))
+        .orderBy(desc(content_reports.severity), desc(content_reports.created_at))
         .limit(limit)
         .offset(offset);
 
       // Get total count for pagination
       const countResult = await db
         .select({ count: count() })
-        .from(content_report)
+        .from(content_reports)
         .where(conditions.length > 0 ? and(...conditions) : undefined);
 
       const total = countResult[0]?.count ?? 0;
@@ -127,12 +120,12 @@ export class ModerationQueueService {
       // Check if there's already a pending report for this content
       const [existingReport] = await db
         .select()
-        .from(content_report)
+        .from(content_reports)
         .where(
           and(
-            eq(content_report.content_type, content_type),
-            eq(content_report.content_id, content_id),
-            eq(content_report.status, 'pending')
+            eq(content_reports.content_type, content_type),
+            eq(content_reports.content_id, content_id),
+            eq(content_reports.status, 'pending')
           )
         );
 
@@ -142,7 +135,7 @@ export class ModerationQueueService {
       if (existingReport) {
         // Update existing report instead of creating duplicate
         await db
-          .update(content_report)
+          .update(content_reports)
           .set({
             reason: `${existingReport.reason}; ${reason}`,
             description: description ? 
@@ -150,7 +143,7 @@ export class ModerationQueueService {
               existingReport.description,
             updated_at: new Date()
           })
-          .where(eq(content_report.id, existingReport.id));
+          .where(eq(content_reports.id, existingReport.id));
 
         return { 
           success: true, 
@@ -160,7 +153,7 @@ export class ModerationQueueService {
       } else {
         // Create new report
         const [newReport] = await db
-          .insert(content_report)
+          .insert(content_reports)
           .values({
             content_type,
             content_id,
@@ -172,7 +165,7 @@ export class ModerationQueueService {
             severity,
             autoDetected
           })
-          .returning({ id: content_report.id });
+          .returning({ id: content_reports.id });
 
         return { 
           success: true, 
@@ -196,8 +189,8 @@ export class ModerationQueueService {
     try {
       const [report] = await db
         .select()
-        .from(content_report)
-        .where(eq(content_report.id, report_id));
+        .from(content_reports)
+        .where(eq(content_reports.id, report_id));
 
       if (!report) {
         return null;
@@ -230,32 +223,32 @@ export class ModerationQueueService {
     if (!filters) return conditions;
 
     if (filters.content_type) {
-      conditions.push(eq(content_report.content_type, filters.content_type));
+      conditions.push(eq(content_reports.content_type, filters.content_type));
     }
 
     if (filters.status) {
-      conditions.push(eq(content_report.status, filters.status));
+      conditions.push(eq(content_reports.status, filters.status));
     }
 
     if (filters.severity) {
-      conditions.push(eq(content_report.severity, filters.severity));
+      conditions.push(eq(content_reports.severity, filters.severity));
     }
 
     if (filters.reportType) {
-      conditions.push(eq(content_report.reportType, filters.reportType));
+      conditions.push(eq(content_reports.reportType, filters.reportType));
     }
 
     if (filters.moderator) {
-      conditions.push(eq(content_report.reviewedBy, filters.moderator));
+      conditions.push(eq(content_reports.reviewedBy, filters.moderator));
     }
 
     if (filters.autoDetected !== undefined) {
-      conditions.push(eq(content_report.autoDetected, filters.autoDetected));
+      conditions.push(eq(content_reports.autoDetected, filters.autoDetected));
     }
 
     if (filters.dateRange) {
-      conditions.push(gte(content_report.created_at, filters.dateRange.start));
-      conditions.push(sql`${content_report.created_at} <= ${filters.dateRange.end}`);
+      conditions.push(gte(content_reports.created_at, filters.dateRange.start));
+      conditions.push(sql`${content_reports.created_at} <= ${filters.dateRange.end}`);
     }
 
     return conditions;

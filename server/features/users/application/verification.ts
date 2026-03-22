@@ -64,11 +64,10 @@ export function setupVerificationRoutes() {
         throw error;
       }
 
-      logger.error(
-        'Error fetching verifications for bill',
-        { component: 'verification-routes', context, billId: req.params.bill_id },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, billId: req.params.bill_id, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error fetching verifications for bill');
 
       throw new BaseError('Failed to fetch bill verifications', {
         statusCode: 500,
@@ -149,11 +148,10 @@ export function setupVerificationRoutes() {
         throw error;
       }
 
-      logger.error(
-        'Error creating verification',
-        { component: 'verification-routes', context },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error creating verification');
 
       throw new BaseError('Failed to create verification', {
         statusCode: 500,
@@ -259,11 +257,10 @@ export function setupVerificationRoutes() {
         throw error;
       }
 
-      logger.error(
-        'Error updating verification',
-        { component: 'verification-routes', context, verificationId: req.params.id },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, verificationId: req.params.id, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error updating verification');
 
       throw new BaseError('Failed to update verification', {
         statusCode: 500,
@@ -313,11 +310,10 @@ export function setupVerificationRoutes() {
         breakdown,
       });
     } catch (error) {
-      logger.error(
-        'Error fetching verification stats',
-        { component: 'verification-routes', context },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error fetching verification stats');
 
       throw new BaseError('Failed to fetch verification statistics', {
         statusCode: 500,
@@ -356,11 +352,10 @@ export function setupVerificationRoutes() {
 
       res.json(userVerifications);
     } catch (error) {
-      logger.error(
-        'Error fetching user verifications',
-        { component: 'verification-routes', context, citizenId: req.params.citizen_id },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, citizenId: req.params.citizen_id, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error fetching user verifications');
 
       throw new BaseError('Failed to fetch user verifications', {
         statusCode: 500,
@@ -412,11 +407,10 @@ export function setupVerificationRoutes() {
         throw error;
       }
 
-      logger.error(
-        'Error deleting verification',
-        { component: 'verification-routes', context, verificationId: req.params.id },
-        error as Record<string, unknown> | undefined
-      );
+      logger.error({ component: 'verification-routes', context, verificationId: req.params.id, error: error as Record<string, unknown> | undefined
+       instanceof Error ? error as Record<string, unknown> | undefined
+      .message : String(error as Record<string, unknown> | undefined
+      ) }, 'Error deleting verification');
 
       throw new BaseError('Failed to delete verification', {
         statusCode: 500,

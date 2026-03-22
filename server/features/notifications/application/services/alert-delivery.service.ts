@@ -210,11 +210,9 @@ export class AlertDeliveryService {
         failedCount
       };
     } catch (error) {
-      logger.error('Error processing alert delivery', {
-        component: 'AlertDelivery',
+      logger.error({ component: 'AlertDelivery',
         user_id,
-        alertType
-      }, error);
+        alertType, error: error instanceof Error ? error.message : String(error) }, 'Error processing alert delivery');
       throw error;
     }
   }
@@ -282,11 +280,9 @@ export class AlertDeliveryService {
 
       return batch.length;
     } catch (error) {
-      logger.error('Error processing batched alerts', {
-        component: 'AlertDelivery',
+      logger.error({ component: 'AlertDelivery',
         user_id,
-        preferenceId
-      }, error);
+        preferenceId, error: error instanceof Error ? error.message : String(error) }, 'Error processing batched alerts');
       return 0;
     }
   }
@@ -331,10 +327,8 @@ export class AlertDeliveryService {
         confidence: filterResult.confidence
       };
     } catch (error) {
-      logger.error('Error applying smart filtering', {
-        component: 'AlertDelivery',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertDelivery',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error applying smart filtering');
 
       // On error, default to sending
       return {
@@ -395,10 +389,8 @@ export class AlertDeliveryService {
 
       return { success: true };
     } catch (error) {
-      logger.error('Error delivering immediate alert', {
-        component: 'AlertDelivery',
-        user_id
-      }, error);
+      logger.error({ component: 'AlertDelivery',
+        user_id, error: error instanceof Error ? error.message : String(error) }, 'Error delivering immediate alert');
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error'
@@ -424,11 +416,9 @@ export class AlertDeliveryService {
 
       await cacheService.set(batchKey, batch, 7200); // 2 hours
     } catch (error) {
-      logger.error('Error adding to batch', {
-        component: 'AlertDelivery',
+      logger.error({ component: 'AlertDelivery',
         user_id,
-        preferenceId
-      }, error);
+        preferenceId, error: error instanceof Error ? error.message : String(error) }, 'Error adding to batch');
     }
   }
 

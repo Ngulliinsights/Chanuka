@@ -20,7 +20,7 @@ export const initializeApp = async (): Promise<void> => {
     // Initialize all safety mechanisms
     await initializeDatabaseSafety();
 
-    logger.info('Application database layer initialized safely');
+    logger.info({ component: 'server' }, 'Application database layer initialized safely');
   } catch (error) {
     logger.error({ error }, 'Error initializing app');
     throw error;
@@ -111,7 +111,7 @@ export const safeConcurrentExample = async (): Promise<void> => {
 export const shutdownApp = async (): Promise<void> => {
   try {
     await shutdownDatabaseSafety();
-    logger.info('Application database layer shut down safely');
+    logger.info({ component: 'server' }, 'Application database layer shut down safely');
   } catch (error) {
     logger.error({ error }, 'Error in shutdownApp');
     throw error;

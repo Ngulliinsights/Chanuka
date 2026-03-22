@@ -70,7 +70,7 @@ export class SocketIOWebSocketService {
    */
   async initialize(httpServer: HttpServer, config: MigrationConfig): Promise<void> {
     if (this.isInitialized) {
-      logger.warn('Socket.IO service already initialized');
+      logger.warn({ component: 'SocketIOWebSocketService' }, 'Socket.IO service already initialized');
       return;
     }
 
@@ -153,9 +153,10 @@ export class SocketIOWebSocketService {
       }, 'Socket.IO WebSocket service initialized successfully');
 
     } catch (error) {
-      logger.error('Failed to initialize Socket.IO service', {
-        component: 'SocketIOWebSocketService'
-      }, error);
+      logger.error({
+        component: 'SocketIOWebSocketService',
+        error
+      }, 'Failed to initialize Socket.IO service');
       throw error;
     }
   }
@@ -182,9 +183,10 @@ export class SocketIOWebSocketService {
       }, 'Redis adapter configured for Socket.IO');
 
     } catch (error) {
-      logger.error('Failed to setup Redis adapter', {
-        component: 'SocketIOWebSocketService'
-      }, error);
+      logger.error({
+        component: 'SocketIOWebSocketService',
+        error
+      }, 'Failed to setup Redis adapter');
       throw error;
     }
   }
@@ -334,10 +336,11 @@ export class SocketIOWebSocketService {
         results.push({ bill_id, success: true });
       } catch (error) {
         results.push({ bill_id, success: false });
-        logger.error('Batch subscribe failed for bill', {
+        logger.error({
           component: 'SocketIOWebSocketService',
-          bill_id
-        }, error);
+          bill_id,
+          error: error instanceof Error ? error.message : String(error)
+        }, 'Batch subscribe failed for bill');
       }
     }
 
@@ -360,10 +363,11 @@ export class SocketIOWebSocketService {
         results.push({ bill_id, success: true });
       } catch (error) {
         results.push({ bill_id, success: false });
-        logger.error('Batch unsubscribe failed for bill', {
+        logger.error({
           component: 'SocketIOWebSocketService',
-          bill_id
-        }, error);
+          bill_id,
+          error: error instanceof Error ? error.message : String(error)
+        }, 'Batch unsubscribe failed for bill');
       }
     }
 
@@ -418,11 +422,12 @@ export class SocketIOWebSocketService {
   private handleError(socket: unknown, error: Error): void {
     this.metrics.errors++;
     
-    logger.error('Socket.IO connection error', {
+    logger.error({
       component: 'SocketIOWebSocketService',
       socketId: socket.id,
-      user_id: socket.data.user_id
-    }, error);
+      user_id: socket.data.user_id,
+      error: error instanceof Error ? error.message : String(error)
+    }, 'Socket.IO connection error');
   }
 
   /**
@@ -668,11 +673,11 @@ export class WebSocketMigrationDeployer {
 
     const duration = this.migrationState.completionTime - this.migrationState.startTime;
 
-    logger.info('WebSocket migration completed successfully', {
+    logger.info({
       component: 'WebSocketMigrationDeployer',
       duration: `${duration}ms`,
       finalMetrics: this.socketIOService.getMetrics()
-    });
+    }, 'WebSocket migration completed successfully');
 
     // Broadcast migration completion to any connected clients
     this.broadcastMigrationStatus('completed');
@@ -685,11 +690,12 @@ export class WebSocketMigrationDeployer {
     this.migrationState.phase = 'failed';
     this.migrationState.errors.push(error instanceof Error ? error.message : String(error));
 
-    logger.error('WebSocket migration deployment failed', {
+    logger.error({
       component: 'WebSocketMigrationDeployer',
       phase: this.migrationState.phase,
-      errors: this.migrationState.errors
-    }, error);
+      errors: this.migrationState.errors,
+      error: error instanceof Error ? error.message : String(error)
+    }, 'WebSocket migration deployment failed');
 
     if (this.config.rollbackOnError) {
       await this.rollback();
@@ -716,9 +722,10 @@ export class WebSocketMigrationDeployer {
       }, 'WebSocket migration rollback completed');
 
     } catch (rollbackError) {
-      logger.error('Rollback failed', {
-        component: 'WebSocketMigrationDeployer'
-      }, rollbackError);
+      logger.error({
+        component: 'WebSocketMigrationDeployer',
+        rollbackError: rollbackError instanceof Error ? rollbackError.message : String(rollbackError)
+      }, 'Rollback failed');
     }
   }
 

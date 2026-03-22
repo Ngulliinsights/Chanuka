@@ -100,7 +100,7 @@ export class NotificationSchedulerService {
         `Scheduled digest notifications for ${usersWithDigests.length} users`
       );
     } catch (error) {
-      logger.error('Error scheduling digest notifications:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error scheduling digest notifications:');
     }
   }
 
@@ -243,7 +243,7 @@ export class NotificationSchedulerService {
 
       return billUpdates.filter(bill => bills.updates.length > 0);
     } catch (error) {
-      logger.error('Error getting bill updates for user:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error getting bill updates for user:');
       return [];
     }
   }
@@ -276,7 +276,7 @@ export class NotificationSchedulerService {
         newBillsTracked: Number(result?.billsTracked) || 0
       };
     } catch (error) {
-      logger.error('Error getting engagement summary:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error getting engagement summary:');
       return {
         totalViews: 0,
         totalComments: 0,
@@ -316,7 +316,7 @@ export class NotificationSchedulerService {
         category: bills.category || 'Uncategorized'
        }));
     } catch (error) {
-      logger.error('Error getting trending bills:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error getting trending bills:');
       return [];
     }
   }
@@ -348,7 +348,7 @@ export class NotificationSchedulerService {
         deadline: bills.last_action_date ? new Date(bills.last_action_date) : undefined
        }));
     } catch (error) {
-      logger.error('Error getting action items:', { component: 'Chanuka' }, error);
+      logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error getting action items:');
       return [];
     }
   }
@@ -363,7 +363,7 @@ export class NotificationSchedulerService {
         await this.cleanupOldNotifications();
         logger.info({ component: 'Chanuka' }, 'Completed notification cleanup');
       } catch (error) {
-        logger.error('Error during notification cleanup:', { component: 'Chanuka' }, error);
+        logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error during notification cleanup:');
       }
     });
 
@@ -380,7 +380,7 @@ export class NotificationSchedulerService {
         await this.analyzeEngagementPatterns();
         logger.info({ component: 'Chanuka' }, 'Completed engagement analysis');
       } catch (error) {
-        logger.error('Error during engagement analysis:', { component: 'Chanuka' }, error);
+        logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error during engagement analysis:');
       }
     });
 
@@ -609,7 +609,7 @@ export class NotificationSchedulerService {
       try {
         job.destroy();
       } catch (error) {
-        logger.error('Error destroying scheduled job:', { component: 'Chanuka' }, error);
+        logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, 'Error destroying scheduled job:');
       }
     });
     this.scheduledJobs.clear();

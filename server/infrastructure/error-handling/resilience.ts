@@ -92,7 +92,7 @@ export async function withRetry<T>(
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      logger.debug(`[${operationName}] attempt ${attempt}/${maxAttempts}`);
+      logger.debug({ component: 'server' }, `[${operationName}] attempt ${attempt}/${maxAttempts}`);
       return await fn();
     } catch (error) {
       lastError = error;
@@ -392,7 +392,7 @@ export class CircuitBreaker {
       return await this.execute(fn);
     } catch (error) {
       if (error instanceof CircuitOpenError) {
-        logger.warn(`[CircuitBreaker:${this.name}] using fallback`);
+        logger.warn({ component: 'server' }, `[CircuitBreaker:${this.name}] using fallback`);
       } else {
         // FIX: pino requires object first, message string second
         logger.error(
@@ -420,7 +420,7 @@ export class CircuitBreaker {
     this.consecutiveFails     = 0;
     this.lastFailureTime      = null;
     this.halfOpenProbePending = false;
-    logger.info(`[CircuitBreaker:${this.name}] manually reset to CLOSED`);
+    logger.info({ component: 'server' }, `[CircuitBreaker:${this.name}] manually reset to CLOSED`);
   }
 
   // ── Private state machine ──────────────────────────────────────────────────
@@ -428,7 +428,7 @@ export class CircuitBreaker {
   private recordSuccess(): void {
     this.totalSuccess++;
     if (this.state === CircuitState.HALF_OPEN) {
-      logger.info(`[CircuitBreaker:${this.name}] probe succeeded — closing circuit`);
+      logger.info({ component: 'server' }, `[CircuitBreaker:${this.name}] probe succeeded — closing circuit`);
       this.state            = CircuitState.CLOSED;
       this.consecutiveFails = 0;
       this.lastFailureTime  = null;
@@ -444,7 +444,7 @@ export class CircuitBreaker {
     this.lastFailureTime = Date.now();
 
     if (this.state === CircuitState.HALF_OPEN) {
-      logger.warn(`[CircuitBreaker:${this.name}] probe failed — reopening circuit`);
+      logger.warn({ component: 'server' }, `[CircuitBreaker:${this.name}] probe failed — reopening circuit`);
       this.state = CircuitState.OPEN;
       return;
     }
@@ -473,7 +473,7 @@ export class CircuitBreaker {
       this.lastFailureTime !== null &&
       Date.now() - this.lastFailureTime >= this.opts.resetTimeoutMs
     ) {
-      logger.info(`[CircuitBreaker:${this.name}] reset timeout elapsed — entering HALF_OPEN`);
+      logger.info({ component: 'server' }, `[CircuitBreaker:${this.name}] reset timeout elapsed — entering HALF_OPEN`);
       this.state = CircuitState.HALF_OPEN;
     }
 

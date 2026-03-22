@@ -470,7 +470,7 @@ export class SearchPerformanceMonitor {
     let totalScore = 0;
     let totalWeight = 0;
 
-    logger.info(`📊 Measuring search relevance for ${component}`);
+    logger.info({ component: 'server' }, `📊 Measuring search relevance for ${component}`);
 
     for (const testCase of this.relevanceTestCases) {
       try {
@@ -521,7 +521,7 @@ export class SearchPerformanceMonitor {
 
     const overallRelevanceScore = totalWeight > 0 ? totalScore / totalWeight : 0;
     
-    logger.info(`📈 Overall relevance score for ${component}: ${overallRelevanceScore.toFixed(3)}`);
+    logger.info({ component: 'server' }, `📈 Overall relevance score for ${component}: ${overallRelevanceScore.toFixed(3)}`);
     
     return overallRelevanceScore;
   }
@@ -589,7 +589,7 @@ export class SearchPerformanceMonitor {
     const alert = this.activeAlerts.get(alertId);
     if (alert) {
       alert.resolved = true;
-      logger.info(`✅ Alert resolved: ${alert.message}`);
+      logger.info({ component: 'server' }, `✅ Alert resolved: ${alert.message}`);
     }
   }
 

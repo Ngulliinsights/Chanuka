@@ -5,13 +5,13 @@
  */
 
 import { safeAsync, AsyncServiceResult } from '@server/infrastructure/error-handling';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
-import { db } from '@server/infrastructure/database';
 import type { IArgumentAnalysisService } from '../../domain/interfaces/IArgumentAnalysisService';
 import type { ArgumentAnalysis } from '../../application/community-validation.schemas';
 
 export class MockArgumentAnalysisService implements IArgumentAnalysisService {
+  private analyses = new Map<string, ArgumentAnalysis>();
+
   async analyzeComment(commentId: string, content: string): Promise<AsyncServiceResult<ArgumentAnalysis>> {
     return safeAsync(async () => {
       logger.info({ 
@@ -20,67 +20,21 @@ export class MockArgumentAnalysisService implements IArgumentAnalysisService {
       }, 'Analyzing comment (mock heuristic)');
       
       // Heuristic-based analysis (simple pattern matching)
-      const analysis = this.performHeuristicAnalysis(content);
+      const heuristic = this.performHeuristicAnalysis(content);
       
-      // Save to database
-      const result = await withTransaction(async (tx) => {
-        const [saved] = await tx.raw(`
-          INSERT INTO argument_analysis (
-            comment_id,
-            quality_score,
-            evidence_strength,
-            logical_validity,
-            clarity,
-            relevance,
-            detected_fallacies,
-            claims,
-            evidence,
-            suggested_improvements,
-            reasoning_type,
-            coherence_score
-          ) VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb, ?::jsonb, ?, ?)
-          ON CONFLICT (comment_id) 
-          DO UPDATE SET
-            quality_score = EXCLUDED.quality_score,
-            evidence_strength = EXCLUDED.evidence_strength,
-            logical_validity = EXCLUDED.logical_validity,
-            clarity = EXCLUDED.clarity,
-            relevance = EXCLUDED.relevance,
-            detected_fallacies = EXCLUDED.detected_fallacies,
-            claims = EXCLUDED.claims,
-            evidence = EXCLUDED.evidence,
-            suggested_improvements = EXCLUDED.suggested_improvements,
-            reasoning_type = EXCLUDED.reasoning_type,
-            coherence_score = EXCLUDED.coherence_score,
-            analyzed_at = NOW()
-          RETURNING *
-        `, [
-          commentId,
-          analysis.quality_metrics.overall_score,
-          analysis.quality_metrics.evidence_strength,
-          analysis.quality_metrics.logical_validity,
-          analysis.quality_metrics.clarity,
-          analysis.quality_metrics.relevance,
-          JSON.stringify(analysis.structure.fallacies),
-          JSON.stringify(analysis.structure.claims),
-          JSON.stringify(analysis.structure.evidence),
-          JSON.stringify(analysis.suggested_improvements),
-          analysis.structure.reasoning_type,
-          analysis.structure.coherence_score,
-        ]);
-        
-        return saved;
-      });
-      
-      return {
+      // Create and store analysis
+      const analysis: ArgumentAnalysis = {
         comment_id: commentId,
-        structure: analysis.structure,
-        quality_metrics: analysis.quality_metrics,
+        structure: heuristic.structure,
+        quality_metrics: heuristic.quality_metrics,
         related_arguments: [],
         counter_arguments: [],
-        suggested_improvements: analysis.suggested_improvements,
+        suggested_improvements: heuristic.suggested_improvements,
         analyzed_at: new Date(),
       };
+      
+      this.analyses.set(commentId, analysis);
+      return analysis;
     }, { service: 'MockArgumentAnalysisService', operation: 'analyzeComment' });
   }
 
@@ -90,28 +44,28 @@ export class MockArgumentAnalysisService implements IArgumentAnalysisService {
     limit: number
   ): Promise<AsyncServiceResult<string[]>> {
     return safeAsync(async () => {
-      // Simplified: Find comments with similar quality scores
-      const db = await readDatabase();
-      
-      const [currentAnalysis] = await db.raw(`
-        SELECT quality_score FROM argument_analysis WHERE comment_id = ?
-      `, [commentId]);
-      
+      // Find analyses with similar quality scores (in-memory)
+      const currentAnalysis = this.analyses.get(commentId);
       if (!currentAnalysis) return [];
       
-      const qualityScore = currentAnalysis.quality_score;
+      const currentScore = currentAnalysis.quality_metrics.overall_score;
       const range = 1.0; // +/- 1.0 quality score
       
-      const related = await db.raw(`
-        SELECT a.comment_id
-        FROM argument_analysis a
-        WHERE a.comment_id != ?
-          AND a.quality_score BETWEEN ? AND ?
-        ORDER BY ABS(a.quality_score - ?) ASC
-        LIMIT ?
-      `, [commentId, qualityScore - range, qualityScore + range, qualityScore, limit]);
+      const related = Array.from(this.analyses.entries())
+        .filter(([id, analysis]) => {
+          return id !== commentId &&
+                 analysis.quality_metrics.overall_score >= (currentScore - range) &&
+                 analysis.quality_metrics.overall_score <= (currentScore + range);
+        })
+        .sort(([, a], [, b]) => {
+          const aDiff = Math.abs(a.quality_metrics.overall_score - currentScore);
+          const bDiff = Math.abs(b.quality_metrics.overall_score - currentScore);
+          return aDiff - bDiff;
+        })
+        .slice(0, limit)
+        .map(([id]) => id);
       
-      return related.map((r: any) => r.comment_id);
+      return related;
     }, { service: 'MockArgumentAnalysisService', operation: 'findRelatedArguments' });
   }
 
@@ -120,102 +74,22 @@ export class MockArgumentAnalysisService implements IArgumentAnalysisService {
     limit: number
   ): Promise<AsyncServiceResult<string[]>> {
     return safeAsync(async () => {
-      // Simplified: Find replies to the comment
-      const db = await readDatabase();
-      
-      const counterArgs = await db.raw(`
-        SELECT id FROM comments
-        WHERE parent_id = ? AND is_deleted = FALSE
-        ORDER BY upvotes DESC
-        LIMIT ?
-      `, [commentId, limit]);
-      
-      return counterArgs.map((c: any) => c.id);
+      // Simplified: Return empty array (would require comment repository integration)
+      // In production, this would query the comment repository for replies
+      logger.debug({ comment_id: commentId }, 'Finding counter arguments (not implemented in mock)');
+      return [];
     }, { service: 'MockArgumentAnalysisService', operation: 'findCounterArguments' });
   }
 
   async getAnalysis(commentId: string): Promise<AsyncServiceResult<ArgumentAnalysis | null>> {
     return safeAsync(async () => {
-      const db = await readDatabase();
-      
-      const [analysis] = await db.raw(`
-        SELECT * FROM argument_analysis WHERE comment_id = ?
-      `, [commentId]);
-      
-      if (!analysis) return null;
-      
-      return {
-        comment_id: commentId,
-        structure: {
-          claims: analysis.claims || [],
-          evidence: analysis.evidence || [],
-          fallacies: analysis.detected_fallacies || [],
-          reasoning_type: analysis.reasoning_type || 'unclear',
-          coherence_score: parseFloat(analysis.coherence_score) || 0.5,
-        },
-        quality_metrics: {
-          overall_score: parseFloat(analysis.quality_score),
-          evidence_strength: parseFloat(analysis.evidence_strength) || 0,
-          logical_validity: parseFloat(analysis.logical_validity) || 0,
-          clarity: parseFloat(analysis.clarity) || 0,
-          relevance: parseFloat(analysis.relevance) || 0,
-          fallacy_penalty: 0,
-        },
-        related_arguments: [],
-        counter_arguments: [],
-        suggested_improvements: analysis.suggested_improvements || [],
-        analyzed_at: new Date(analysis.analyzed_at),
-      };
+      return this.analyses.get(commentId) || null;
     }, { service: 'MockArgumentAnalysisService', operation: 'getAnalysis' });
   }
 
   async saveAnalysis(analysis: ArgumentAnalysis): Promise<AsyncServiceResult<ArgumentAnalysis>> {
     return safeAsync(async () => {
-      await withTransaction(async (tx) => {
-        await tx.raw(`
-          INSERT INTO argument_analysis (
-            comment_id,
-            quality_score,
-            evidence_strength,
-            logical_validity,
-            clarity,
-            relevance,
-            detected_fallacies,
-            claims,
-            evidence,
-            suggested_improvements,
-            reasoning_type,
-            coherence_score
-          ) VALUES (?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb, ?::jsonb, ?::jsonb, ?, ?)
-          ON CONFLICT (comment_id) DO UPDATE SET
-            quality_score = EXCLUDED.quality_score,
-            evidence_strength = EXCLUDED.evidence_strength,
-            logical_validity = EXCLUDED.logical_validity,
-            clarity = EXCLUDED.clarity,
-            relevance = EXCLUDED.relevance,
-            detected_fallacies = EXCLUDED.detected_fallacies,
-            claims = EXCLUDED.claims,
-            evidence = EXCLUDED.evidence,
-            suggested_improvements = EXCLUDED.suggested_improvements,
-            reasoning_type = EXCLUDED.reasoning_type,
-            coherence_score = EXCLUDED.coherence_score,
-            analyzed_at = NOW()
-        `, [
-          analysis.comment_id,
-          analysis.quality_metrics.overall_score,
-          analysis.quality_metrics.evidence_strength,
-          analysis.quality_metrics.logical_validity,
-          analysis.quality_metrics.clarity,
-          analysis.quality_metrics.relevance,
-          JSON.stringify(analysis.structure.fallacies),
-          JSON.stringify(analysis.structure.claims),
-          JSON.stringify(analysis.structure.evidence),
-          JSON.stringify(analysis.suggested_improvements),
-          analysis.structure.reasoning_type,
-          analysis.structure.coherence_score,
-        ]);
-      });
-      
+      this.analyses.set(analysis.comment_id, analysis);
       return analysis;
     }, { service: 'MockArgumentAnalysisService', operation: 'saveAnalysis' });
   }

@@ -44,7 +44,7 @@ export async function runBatchSync(
       duration: Date.now() - startTime,
     };
 
-    logger.info('Batch sync completed', result);
+    logger.info({ error: result instanceof Error ? result.message : String(result) }, 'Batch sync completed');
     return result;
   } catch (error) {
     errorHandler.handle(error as Error, { operation: 'runBatchSync', batchId });
@@ -58,7 +58,7 @@ export async function runBatchSync(
 
 export function startSyncScheduler(intervalMs: number): void {
   if (schedulerInterval) {
-    logger.warn('Sync scheduler already running');
+    logger.warn({ component: 'server' }, 'Sync scheduler already running');
     return;
   }
 
@@ -75,7 +75,7 @@ export function stopSyncScheduler(): void {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
-    logger.info('Sync scheduler stopped');
+    logger.info({ component: 'server' }, 'Sync scheduler stopped');
   }
 }
 

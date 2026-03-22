@@ -104,17 +104,17 @@ export class DatabaseOrchestrator {
    */
   async initialize(): Promise<void> {
     if (this.initialized) {
-      logger.warn('Database orchestrator already initialized');
+      logger.warn({ component: 'server' }, 'Database orchestrator already initialized');
       return;
     }
 
     try {
-      logger.info('🚀 Initializing database orchestrator');
+      logger.info({ component: 'server' }, '🚀 Initializing database orchestrator');
       this.startTime = new Date();
 
       // Initialize configuration if not already done
       if (!this.configManager['config']) {
-        logger.info('📋 Loading database configuration from environment');
+        logger.info({ component: 'server' }, '📋 Loading database configuration from environment');
         this.configManager.loadFromEnvironment();
       }
 
@@ -132,7 +132,7 @@ export class DatabaseOrchestrator {
       }
 
       this.initialized = true;
-      logger.info('✅ Database orchestrator initialized successfully');
+      logger.info({ component: 'server' }, '✅ Database orchestrator initialized successfully');
 
     } catch (error) {
       logger.error({ error }, '❌ Failed to initialize database orchestrator');
@@ -325,7 +325,7 @@ export class DatabaseOrchestrator {
    * Initialize the connection manager
    */
   private async initializeConnectionManager(): Promise<void> {
-    logger.info('🔌 Initializing connection manager');
+    logger.info({ component: 'server' }, '🔌 Initializing connection manager');
 
     const connectionConfig = this.configManager.getConnectionConfig();
 
@@ -337,7 +337,7 @@ export class DatabaseOrchestrator {
       await this.connectionManager.initialize();
     }
 
-    logger.info('✅ Connection manager initialized');
+    logger.info({ component: 'server' }, '✅ Connection manager initialized');
   }
 
   /**
@@ -348,12 +348,12 @@ export class DatabaseOrchestrator {
       throw new Error('Connection manager must be initialized before health monitoring');
     }
 
-    logger.info('🏥 Initializing health monitoring');
+    logger.info({ component: 'server' }, '🏥 Initializing health monitoring');
 
     const monitoringConfig = this.configManager.getMonitoringConfig();
 
     if (!monitoringConfig.enabled) {
-      logger.info('Health monitoring disabled by configuration');
+      logger.info({ component: 'server' }, 'Health monitoring disabled by configuration');
       return;
     }
 
@@ -363,14 +363,14 @@ export class DatabaseOrchestrator {
 
     this.healthMonitor.start();
 
-    logger.info('✅ Health monitoring initialized');
+    logger.info({ component: 'server' }, '✅ Health monitoring initialized');
   }
 
   /**
    * Initialize migrations (placeholder for future implementation)
    */
   private async initializeMigrations(): Promise<void> {
-    logger.info('📦 Migration system ready (implementation pending)');
+    logger.info({ component: 'server' }, '📦 Migration system ready (implementation pending)');
     // TODO: Implement migration initialization when migration service is moved to shared
   }
 
@@ -378,13 +378,13 @@ export class DatabaseOrchestrator {
    * Perform the actual shutdown process
    */
   private async performShutdown(timeoutMs: number): Promise<void> {
-    logger.info('🛑 Shutting down database orchestrator');
+    logger.info({ component: 'server' }, '🛑 Shutting down database orchestrator');
 
     const shutdownPromises: Promise<void>[] = [];
 
     // Stop health monitoring
     if (this.healthMonitor) {
-      logger.info('Stopping health monitor');
+      logger.info({ component: 'server' }, 'Stopping health monitor');
       shutdownPromises.push(
         Promise.resolve(this.healthMonitor.stop()).catch(error => {
           logger.error({ error }, 'Error stopping health monitor');
@@ -394,7 +394,7 @@ export class DatabaseOrchestrator {
 
     // Close connection manager
     if (this.connectionManager) {
-      logger.info('Closing connection manager');
+      logger.info({ component: 'server' }, 'Closing connection manager');
       shutdownPromises.push(
         this.connectionManager.close().catch(error => {
           logger.error({ error }, 'Error closing connection manager');
@@ -411,7 +411,7 @@ export class DatabaseOrchestrator {
         ),
       ]);
 
-      logger.info('✅ Database orchestrator shutdown completed');
+      logger.info({ component: 'server' }, '✅ Database orchestrator shutdown completed');
     } catch (error) {
       logger.error({ error }, '⚠️ Database orchestrator shutdown completed with errors');
     } finally {

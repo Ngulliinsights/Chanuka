@@ -21,7 +21,7 @@ class SimpleSocketIOService {
   };
 
   async initialize(httpServer: unknown): Promise<void> {
-    logger.info('Initializing simple Socket.IO service for testing');
+    logger.info({ component: 'SocketIOService' }, 'Initializing simple Socket.IO service for testing');
 
     this.io = new Server(httpServer, {
       path: '/socket.io',
@@ -66,7 +66,7 @@ class SimpleSocketIOService {
       });
     });
 
-    logger.info('Simple Socket.IO service initialized successfully');
+    logger.info({ component: 'SocketIOService' }, 'Simple Socket.IO service initialized successfully');
   }
 
   getMetrics() {
@@ -77,7 +77,7 @@ class SimpleSocketIOService {
     if (this.io) {
       this.io.close();
     }
-    logger.info('Simple Socket.IO service shutdown complete');
+    logger.info({ component: 'SocketIOService' }, 'Simple Socket.IO service shutdown complete');
   }
 }
 
@@ -85,7 +85,7 @@ class SimpleSocketIOService {
  * Test Socket.IO deployment
  */
 async function testSocketIODeployment(): Promise<void> {
-  logger.info('🚀 Starting simple Socket.IO deployment test');
+  logger.info({ component: 'server' }, '🚀 Starting simple Socket.IO deployment test');
 
   try {
     // Create HTTP server
@@ -99,7 +99,7 @@ async function testSocketIODeployment(): Promise<void> {
       });
     });
 
-    logger.info(`🌐 HTTP server started on port ${port}`);
+    logger.info({ component: 'server' }, `🌐 HTTP server started on port ${port}`);
 
     // Initialize Socket.IO service
     const socketIOService = new SimpleSocketIOService();
@@ -131,7 +131,7 @@ async function testSocketIODeployment(): Promise<void> {
 
     // Handle graceful shutdown
     process.on('SIGINT', async () => {
-      logger.info('🛑 Shutting down Socket.IO test server...');
+      logger.info({ component: 'server' }, '🛑 Shutting down Socket.IO test server...');
       
       await socketIOService.shutdown();
       
@@ -139,7 +139,7 @@ async function testSocketIODeployment(): Promise<void> {
         server.close(() => resolve());
       });
       
-      logger.info('✅ Server shutdown complete');
+      logger.info({ component: 'server' }, '✅ Server shutdown complete');
       process.exit(0);
     });
 
@@ -147,7 +147,7 @@ async function testSocketIODeployment(): Promise<void> {
     return new Promise(() => {});
 
   } catch (error) {
-    logger.error('❌ Socket.IO deployment test failed', {}, error);
+    logger.error({ error: error instanceof Error ? error.message : String(error) }, '❌ Socket.IO deployment test failed');
     throw error;
   }
 }
@@ -156,7 +156,7 @@ async function testSocketIODeployment(): Promise<void> {
 if (import.meta.url === `file://${process.argv[1]}`) {
   testSocketIODeployment()
     .catch((error) => {
-      logger.error('💥 Socket.IO deployment test failed', {}, error);
+      logger.error({ error: error instanceof Error ? error.message : String(error) }, '💥 Socket.IO deployment test failed');
       process.exit(1);
     });
 }

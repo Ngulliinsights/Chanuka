@@ -32,8 +32,8 @@ const TRACKING_TABLE = (schema as any).bill_tracking_preferences ||
                        (schema as any).billTracking;
 
 if (!TRACKING_TABLE) {
-  logger.error('❌ CRITICAL: bill_tracking_preferences table not found in schema exports!');
-  logger.error('Please check server/infrastructure/schema/citizen_participation.ts');
+  logger.error({ component: 'server' }, '❌ CRITICAL: bill_tracking_preferences table not found in schema exports!');
+  logger.error({ component: 'server' }, 'Please check server/infrastructure/schema/citizen_participation.ts');
 }
 // ============================================================================
 
@@ -166,7 +166,7 @@ export class BillTrackingService {
     bill_id: number,
     preferences?: z.infer<typeof basePreferenceSchema>
   ): Promise<BillTrackingPreference> {
-    logger.info(`📌 Tracking bill ${bill_id} for user ${user_id}`);
+    logger.info({ component: 'server' }, `📌 Tracking bill ${bill_id} for user ${user_id}`);
     
     try {
       const bill = await this.validateBillExists(bill_id);
@@ -240,11 +240,11 @@ export class BillTrackingService {
       await this.clearUserTrackingCaches(user_id, bill_id);
       await this.recordTrackingAnalytics(user_id, bill_id, 'tracked', bill.title);
       
-      logger.info(`✅ Successfully tracked bill ${bill_id} for user ${user_id}`);
+      logger.info({ component: 'server' }, `✅ Successfully tracked bill ${bill_id} for user ${user_id}`);
       return result as BillTrackingPreference;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error tracking bill: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error tracking bill: ${errorMessage}`);
       throw error;
     }
   }
@@ -253,7 +253,7 @@ export class BillTrackingService {
    * Mark a user's tracking preference for a bill as inactive.
    */
   async untrackBill(user_id: string, bill_id: number): Promise<void> {
-    logger.info(`📌 Untracking bill ${bill_id} for user ${user_id}`);
+    logger.info({ component: 'server' }, `📌 Untracking bill ${bill_id} for user ${user_id}`);
     
     try {
       const bill = await this.validateBillExists(bill_id);
@@ -270,9 +270,7 @@ export class BillTrackingService {
         .returning({ id: TRACKING_TABLE.id });
 
       if (result.length === 0) {
-        logger.warn(
-          `Attempted to untrack bill ${bill_id} for user ${user_id}, but no active preference found.`
-        );
+        logger.warn({ component: 'server' }, `Attempted to untrack bill ${bill_id} for user ${user_id}, but no active preference found.`);
         return;
       }
 
@@ -281,10 +279,10 @@ export class BillTrackingService {
         await this.recordTrackingAnalytics(user_id, bill_id, 'untracked', bill.title);
       }
       
-      logger.info(`✅ Successfully untracked bill ${bill_id} for user ${user_id}`);
+      logger.info({ component: 'server' }, `✅ Successfully untracked bill ${bill_id} for user ${user_id}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error untracking bill: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error untracking bill: ${errorMessage}`);
       throw error;
     }
   }
@@ -319,13 +317,13 @@ export class BillTrackingService {
 
     const cachedData = await cacheService.get(cacheKey);
     if (cachedData) {
-      logger.debug(`Cache hit for tracked bills: ${cacheKey}`);
+      logger.debug({ component: 'server' }, `Cache hit for tracked bills: ${cacheKey}`);
       return cachedData as {
         bills: TrackedBillWithDetails[];
         pagination: { page: number; limit: number; total: number; pages: number };
       };
     }
-    logger.debug(`Cache miss for tracked bills: ${cacheKey}`);
+    logger.debug({ component: 'server' }, `Cache miss for tracked bills: ${cacheKey}`);
 
     try {
       // Step 1: Get tracking preferences for user
@@ -360,7 +358,7 @@ export class BillTrackingService {
       });
 
       if (billsResult.isErr) {
-        logger.error(`Error fetching bills: ${billsResult.error.message}`);
+        logger.error({ component: 'server' }, `Error fetching bills: ${billsResult.error.message}`);
         return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
       }
 
@@ -421,7 +419,7 @@ export class BillTrackingService {
       return response;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error getting tracked bills: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error getting tracked bills: ${errorMessage}`);
       return { bills: [], pagination: { page, limit, total: 0, pages: 0 } };
     }
   }
@@ -434,7 +432,7 @@ export class BillTrackingService {
     bill_id: number,
     preferences: z.infer<typeof updatePreferencesSchema>
   ): Promise<BillTrackingPreference> {
-    logger.info(`🔄 Updating tracking preferences for bill ${bill_id}, user ${user_id}`);
+    logger.info({ component: 'server' }, `🔄 Updating tracking preferences for bill ${bill_id}, user ${user_id}`);
     
     try {
       const updateData: any = {
@@ -463,11 +461,11 @@ export class BillTrackingService {
       await this.clearUserTrackingCaches(user_id, bill_id);
       await this.recordTrackingAnalytics(user_id, bill_id, 'updated_preferences');
 
-      logger.info(`✅ Updated tracking preferences for bill ${bill_id} and user ${user_id}`);
+      logger.info({ component: 'server' }, `✅ Updated tracking preferences for bill ${bill_id} and user ${user_id}`);
       return updatedPreference as BillTrackingPreference;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error updating tracking preferences: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error updating tracking preferences: ${errorMessage}`);
       throw error;
     }
   }
@@ -476,9 +474,7 @@ export class BillTrackingService {
    * Perform bulk track or untrack operations for multiple bills.
    */
   async bulkTrackingOperation(operation: BulkTrackingOperation): Promise<BulkTrackingResult> {
-    logger.info(
-      `📦 Performing bulk ${operation.operation} for user ${operation.user_id} on ${operation.bill_ids.length} bills`
-    );
+    logger.info({ component: 'server' }, `📦 Performing bulk ${operation.operation} for user ${operation.user_id} on ${operation.bill_ids.length} bills`);
     
     const result: BulkTrackingResult = {
       successful: [],
@@ -504,7 +500,7 @@ export class BillTrackingService {
         result.summary.successful++;
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error';
-        logger.error(`Bulk ${operation.operation} failed for bill ${bill_id}: ${message}`);
+        logger.error({ component: 'server' }, `Bulk ${operation.operation} failed for bill ${bill_id}: ${message}`);
         result.failed.push({ bill_id, error: message });
         result.summary.failed++;
       }
@@ -512,9 +508,7 @@ export class BillTrackingService {
 
     await this.clearUserTrackingCaches(operation.user_id);
 
-    logger.info(
-      `✅ Bulk ${operation.operation} completed: ${result.summary.successful}/${result.summary.total} successful`
-    );
+    logger.info({ component: 'server' }, `✅ Bulk ${operation.operation} completed: ${result.summary.successful}/${result.summary.total} successful`);
     return result;
   }
 
@@ -526,10 +520,10 @@ export class BillTrackingService {
     const cachedData = await cacheService.get(cacheKey);
     
     if (cachedData) {
-      logger.debug(`Cache hit for tracking analytics: ${cacheKey}`);
+      logger.debug({ component: 'server' }, `Cache hit for tracking analytics: ${cacheKey}`);
       return cachedData as TrackingAnalytics;
     }
-    logger.debug(`Cache miss for tracking analytics: ${cacheKey}`);
+    logger.debug({ component: 'server' }, `Cache miss for tracking analytics: ${cacheKey}`);
 
     try {
       const [totals, categoryData, statusData, engagementSummaryData, recentActivityData] =
@@ -617,7 +611,7 @@ export class BillTrackingService {
       return analyticsData;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error getting tracking analytics: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error getting tracking analytics: ${errorMessage}`);
       return {
         user_id,
         totalTrackedBills: 0,
@@ -643,10 +637,10 @@ export class BillTrackingService {
     const cachedValue = await cacheService.get(cacheKey);
     
     if (cachedValue !== null && cachedValue !== undefined) {
-      logger.debug(`Cache hit for isUserTrackingBill: ${cacheKey}`);
+      logger.debug({ component: 'server' }, `Cache hit for isUserTrackingBill: ${cacheKey}`);
       return Boolean(cachedValue);
     }
-    logger.debug(`Cache miss for isUserTrackingBill: ${cacheKey}`);
+    logger.debug({ component: 'server' }, `Cache miss for isUserTrackingBill: ${cacheKey}`);
 
     try {
       const [preference] = await this.db
@@ -665,7 +659,7 @@ export class BillTrackingService {
       return isTracking;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error checking if user is tracking bill: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error checking if user is tracking bill: ${errorMessage}`);
       return false;
     }
   }
@@ -684,10 +678,10 @@ export class BillTrackingService {
     const cachedData = await cacheService.get(cacheKey);
     
     if (cachedData) {
-      logger.debug(`Cache hit for recommended tracking: ${cacheKey}`);
+      logger.debug({ component: 'server' }, `Cache hit for recommended tracking: ${cacheKey}`);
       return cachedData as schema.Bill[];
     }
-    logger.debug(`Cache miss for recommended tracking: ${cacheKey}`);
+    logger.debug({ component: 'server' }, `Cache miss for recommended tracking: ${cacheKey}`);
 
     try {
       // Find bills user is already tracking
@@ -745,7 +739,7 @@ export class BillTrackingService {
       return finalRecommendations;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error getting recommended bills: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error getting recommended bills: ${errorMessage}`);
       return [];
     }
   }
@@ -769,7 +763,7 @@ export class BillTrackingService {
       const result = await this.billRepository.findById(bill_id);
       
       if (result.isErr) {
-        logger.error(`Error finding bill ${bill_id}: ${result.error.message}`);
+        logger.error({ component: 'server' }, `Error finding bill ${bill_id}: ${result.error.message}`);
         throw result.error;
       }
 
@@ -784,7 +778,7 @@ export class BillTrackingService {
       };
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error validating bill existence: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error validating bill existence: ${errorMessage}`);
       throw new Error(`Database error validating bill existence for ID ${bill_id}`);
     }
   }
@@ -808,7 +802,7 @@ export class BillTrackingService {
           if (typeof cacheService.invalidateByPattern === 'function') {
             return cacheService.invalidateByPattern(keyOrPattern);
           }
-          logger.warn(`Pattern-based cache invalidation not supported, skipping: ${keyOrPattern}`);
+          logger.warn({ component: 'server' }, `Pattern-based cache invalidation not supported, skipping: ${keyOrPattern}`);
           return Promise.resolve();
         } else {
           return cacheService.del(keyOrPattern);
@@ -816,10 +810,10 @@ export class BillTrackingService {
       });
       
       await Promise.all(clearPromises);
-      logger.debug(`Successfully cleared caches for user ${user_id}`);
+      logger.debug({ component: 'server' }, `Successfully cleared caches for user ${user_id}`);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error clearing cache: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error clearing cache: ${errorMessage}`);
     }
   }
 
@@ -836,7 +830,7 @@ export class BillTrackingService {
       const billResult = await this.billRepository.findById(bill_id);
       
       if (billResult.isErr) {
-        logger.error(`Error fetching bill ${bill_id}: ${billResult.error.message}`);
+        logger.error({ component: 'server' }, `Error fetching bill ${bill_id}: ${billResult.error.message}`);
         return [];
       }
 
@@ -870,7 +864,7 @@ export class BillTrackingService {
       return updates.slice(0, 3);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error getting recent updates: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error getting recent updates: ${errorMessage}`);
       return [];
     }
   }
@@ -884,7 +878,7 @@ export class BillTrackingService {
       return (activity as TrackingAnalytics['recentActivity']) || [];
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error getting recent tracking activity: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error getting recent tracking activity: ${errorMessage}`);
       return [];
     }
   }
@@ -910,7 +904,7 @@ export class BillTrackingService {
       await cacheService.set(cacheKey, updatedActivity, CACHE_TTL.USER_DATA_LONG);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      logger.error(`Error recording tracking analytics: ${errorMessage}`);
+      logger.error({ component: 'server' }, `Error recording tracking analytics: ${errorMessage}`);
     }
   }
 }

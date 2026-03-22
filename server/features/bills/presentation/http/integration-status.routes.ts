@@ -43,7 +43,7 @@ router.post('/enable', async (_req: Request, res: Response) => {
   try {
     billLifecycleHooks.setEnabled(true);
     
-    logger.info('Bill lifecycle hooks enabled');
+    logger.info({ component: 'server' }, 'Bill lifecycle hooks enabled');
     
     res.json({
       success: true,
@@ -66,7 +66,7 @@ router.post('/disable', async (_req: Request, res: Response) => {
   try {
     billLifecycleHooks.setEnabled(false);
     
-    logger.info('Bill lifecycle hooks disabled');
+    logger.info({ component: 'server' }, 'Bill lifecycle hooks disabled');
     
     res.json({
       success: true,
