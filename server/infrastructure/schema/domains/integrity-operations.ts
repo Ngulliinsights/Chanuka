@@ -7,6 +7,7 @@
 export {
   content_reports,
   moderation_queue,
+  moderation_action,
   expert_profiles,
   user_verification,
   user_activity_log,
@@ -15,6 +16,7 @@ export {
   security_events,
   contentReportsRelations,
   moderationQueueRelations,
+  moderationActionRelations,
   expertProfilesRelations,
   userVerificationRelations,
   userActivityLogRelations,

@@ -306,7 +306,7 @@ export class UserGovernmentDataService {
     }
 
     const transformed = await Promise.all(
-      rawData.map(item => this.governmentDataService.transformBillData(item, sourceId))
+      (rawData as any).map(item => this.governmentDataService.transformBillData(item as any, sourceId))
     );
 
     return transformed.filter(Boolean);
@@ -321,7 +321,7 @@ export class UserGovernmentDataService {
     }
 
     const transformed = await Promise.all(
-      rawData.map(item => this.governmentDataService.transformSponsorData(item, sourceId))
+      (rawData as any).map(item => this.governmentDataService.transformSponsorData(item as any, sourceId))
     );
 
     return transformed.filter(Boolean);

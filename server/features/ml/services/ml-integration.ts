@@ -397,13 +397,13 @@ export class MLIntegrationService {
       bill_name: this.sanitizeString(analysis.billTitle || 'Unknown Bill', 500),
       trojan_risk_score: this.clampNumber(analysis.trojanRiskScore, 0, 100),
       stated_purpose: this.sanitizeString(analysis.statedPurpose, 2000),
-      hidden_provisions: Array.isArray(analysis.hiddenProvisions) ? analysis.hiddenProvisions : [],
+      hidden_provisions: Array.isArray(analysis.hiddenProvisions) ? (analysis as any).hiddenProvisions : [],
       detection_method: 'automated',
       detection_date: new Date(),
       detection_confidence: this.clampNumber(analysis.confidence || 0, 0, 1),
       analysis_summary: this.generateTrojanSummary(analysis),
       detailed_analysis: this.generateTrojanDetailedAnalysis(analysis),
-      red_flags: Array.isArray(analysis.redFlags) ? analysis.redFlags.map((f: unknown) => 
+      red_flags: Array.isArray(analysis.redFlags) ? (analysis as any).redFlags.map((f: unknown) => 
         this.sanitizeString(String(f), 500)
       ) : [],
       public_alert_issued: false,
@@ -426,9 +426,9 @@ export class MLIntegrationService {
       analysis_type: 'automated',
       confidence_score: this.clampNumber(analysis.confidence || 0, 0, 1),
       constitutional_provisions_cited: Array.isArray(analysis.citedProvisions)
-        ? analysis.citedProvisions.map((p: unknown) => p.article).filter((a: unknown) => a)
+        ? (analysis as any).citedProvisions.map((p: unknown) => (p as any).article).filter((a: unknown) => a)
         : [],
-      potential_violations: Array.isArray(analysis.violations) ? analysis.violations : [],
+      potential_violations: Array.isArray(analysis.violations) ? (analysis as any).violations : [],
       constitutional_alignment: alignment,
       executive_summary: this.generateConstitutionalSummary(analysis),
       detailed_analysis: this.generateConstitutionalDetailedAnalysis(analysis),
@@ -445,20 +445,20 @@ export class MLIntegrationService {
   }
 
   private transformConflictAnalysis(billId: string, analysis: unknown): ConflictDetectionData {
-    const conflicts = Array.isArray(analysis.conflicts) ? analysis.conflicts : [];
+    const conflicts = Array.isArray(analysis.conflicts) ? (analysis as any).conflicts : [];
     const highestSeverityConflict = this.findHighestSeverityConflict(conflicts);
 
     const data = {
       bill_id: billId,
-      sponsor_id: analysis.sponsorId || '00000000-0000-0000-0000-000000000000',
+      sponsor_id: (analysis as any).sponsorId || '00000000-0000-0000-0000-000000000000',
       conflict_type: highestSeverityConflict?.type || 'none',
       severity_level: this.normalizeSeverity(highestSeverityConflict?.severity || 'low'),
       confidence_score: this.clampNumber(analysis.confidence || 0, 0, 1),
       detection_method: 'automated',
       evidence_data: {
         conflicts: conflicts,
-        riskFactors: analysis.riskFactors || [],
-        disclosureQuality: analysis.disclosureQuality,
+        riskFactors: (analysis as any).riskFactors || [],
+        disclosureQuality: (analysis as any).disclosureQuality,
       },
       reviewed_by_expert: false,
       public_disclosure_quality: this.normalizeDisclosureQuality(analysis.disclosureQuality),
@@ -473,10 +473,10 @@ export class MLIntegrationService {
   // ============================================================================
 
   private generateTrojanSummary(analysis: unknown): string {
-    const riskScore = analysis.trojanRiskScore || 0;
+    const riskScore = (analysis as any).trojanRiskScore || 0;
     const riskLevel = riskScore > 70 ? 'HIGH' : riskScore > 40 ? 'MEDIUM' : 'LOW';
-    const hiddenCount = Array.isArray(analysis.hiddenProvisions) ? analysis.hiddenProvisions.length : 0;
-    const redFlagCount = Array.isArray(analysis.redFlags) ? analysis.redFlags.length : 0;
+    const hiddenCount = Array.isArray(analysis.hiddenProvisions) ? (analysis as any).hiddenProvisions.length : 0;
+    const redFlagCount = Array.isArray(analysis.redFlags) ? (analysis as any).redFlags.length : 0;
     const confidence = Math.round((analysis.confidence || 0) * 100);
     
     return this.sanitizeString(
@@ -490,23 +490,23 @@ export class MLIntegrationService {
   private generateTrojanDetailedAnalysis(analysis: unknown): string {
     let detailed = 'TROJAN BILL ANALYSIS REPORT\n\n';
     
-    detailed += `Risk Score: ${analysis.trojanRiskScore || 0}/100\n`;
+    detailed += `Risk Score: ${(analysis as any).trojanRiskScore || 0}/100\n`;
     detailed += `Confidence: ${Math.round((analysis.confidence || 0) * 100)}%\n\n`;
     
-    const hiddenProvisions = Array.isArray(analysis.hiddenProvisions) ? analysis.hiddenProvisions : [];
+    const hiddenProvisions = Array.isArray(analysis.hiddenProvisions) ? (analysis as any).hiddenProvisions : [];
     if (hiddenProvisions.length > 0) {
       detailed += 'HIDDEN PROVISIONS DETECTED:\n';
       hiddenProvisions.forEach((provision: unknown, index: number) => {
-        detailed += `${index + 1}. ${provision.section || 'Unknown'}: ${provision.hiddenAgenda || 'N/A'}\n`;
-        detailed += `   Severity: ${provision.severity || 'Unknown'}\n`;
+        detailed += `${index + 1}. ${(provision as any).section || 'Unknown'}: ${(provision as any).hiddenAgenda || 'N/A'}\n`;
+        detailed += `   Severity: ${(provision as any).severity || 'Unknown'}\n`;
         if (provision.constitutionalConcern) {
-          detailed += `   Constitutional Concern: ${provision.constitutionalConcern}\n`;
+          detailed += `   Constitutional Concern: ${(provision as any).constitutionalConcern}\n`;
         }
         detailed += '\n';
       });
     }
     
-    const redFlags = Array.isArray(analysis.redFlags) ? analysis.redFlags : [];
+    const redFlags = Array.isArray(analysis.redFlags) ? (analysis as any).redFlags : [];
     if (redFlags.length > 0) {
       detailed += 'RED FLAGS:\n';
       redFlags.forEach((flag: string) => {
@@ -515,13 +515,13 @@ export class MLIntegrationService {
       detailed += '\n';
     }
     
-    const techniques = Array.isArray(analysis.deceptionTechniques) ? analysis.deceptionTechniques : [];
+    const techniques = Array.isArray(analysis.deceptionTechniques) ? (analysis as any).deceptionTechniques : [];
     if (techniques.length > 0) {
       detailed += 'DECEPTION TECHNIQUES:\n';
       techniques.forEach((technique: unknown) => {
-        detailed += `- ${technique.technique || 'Unknown'} (Effectiveness: ${technique.effectiveness || 0}/10)\n`;
+        detailed += `- ${(technique as any).technique || 'Unknown'} (Effectiveness: ${(technique as any).effectiveness || 0}/10)\n`;
         if (technique.example) {
-          detailed += `  Example: ${technique.example}\n`;
+          detailed += `  Example: ${(technique as any).example}\n`;
         }
       });
     }
@@ -530,9 +530,9 @@ export class MLIntegrationService {
   }
 
   private generateConstitutionalSummary(analysis: unknown): string {
-    const alignment = analysis.alignment || 'uncertain';
-    const violationCount = Array.isArray(analysis.violations) ? analysis.violations.length : 0;
-    const citationCount = Array.isArray(analysis.citedProvisions) ? analysis.citedProvisions.length : 0;
+    const alignment = (analysis as any).alignment || 'uncertain';
+    const violationCount = Array.isArray(analysis.violations) ? (analysis as any).violations.length : 0;
+    const citationCount = Array.isArray(analysis.citedProvisions) ? (analysis as any).citedProvisions.length : 0;
     const confidence = Math.round((analysis.confidence || 0) * 100);
     
     return this.sanitizeString(
@@ -547,37 +547,37 @@ export class MLIntegrationService {
   private generateConstitutionalDetailedAnalysis(analysis: unknown): string {
     let detailed = 'CONSTITUTIONAL ANALYSIS REPORT\n\n';
     
-    detailed += `Overall Alignment: ${analysis.alignment || 'Unknown'}\n`;
+    detailed += `Overall Alignment: ${(analysis as any).alignment || 'Unknown'}\n`;
     detailed += `Confidence: ${Math.round((analysis.confidence || 0) * 100)}%\n\n`;
     
-    const violations = Array.isArray(analysis.violations) ? analysis.violations : [];
+    const violations = Array.isArray(analysis.violations) ? (analysis as any).violations : [];
     if (violations.length > 0) {
       detailed += 'CONSTITUTIONAL VIOLATIONS:\n';
       violations.forEach((violation: unknown, index: number) => {
-        detailed += `${index + 1}. ${violation.provision || 'Unknown'} - ${violation.violationType || 'Unspecified'}\n`;
-        detailed += `   Severity: ${violation.severity || 'Unknown'}\n`;
-        detailed += `   Explanation: ${violation.explanation || 'N/A'}\n`;
-        detailed += `   Recommended Action: ${violation.recommendedAction || 'N/A'}\n\n`;
+        detailed += `${index + 1}. ${(violation as any).provision || 'Unknown'} - ${(violation as any).violationType || 'Unspecified'}\n`;
+        detailed += `   Severity: ${(violation as any).severity || 'Unknown'}\n`;
+        detailed += `   Explanation: ${(violation as any).explanation || 'N/A'}\n`;
+        detailed += `   Recommended Action: ${(violation as any).recommendedAction || 'N/A'}\n\n`;
       });
     }
     
-    const provisions = Array.isArray(analysis.citedProvisions) ? analysis.citedProvisions : [];
+    const provisions = Array.isArray(analysis.citedProvisions) ? (analysis as any).citedProvisions : [];
     if (provisions.length > 0) {
       detailed += 'RELEVANT CONSTITUTIONAL PROVISIONS:\n';
       provisions.forEach((provision: unknown) => {
-        detailed += `- ${provision.article || 'Unknown'}: ${provision.title || 'N/A'}\n`;
-        detailed += `  Relevance: ${provision.relevance || 'N/A'}, Impact: ${provision.impact || 'N/A'}\n`;
+        detailed += `- ${(provision as any).article || 'Unknown'}: ${(provision as any).title || 'N/A'}\n`;
+        detailed += `  Relevance: ${(provision as any).relevance || 'N/A'}, Impact: ${(provision as any).impact || 'N/A'}\n`;
       });
       detailed += '\n';
     }
     
-    const precedents = Array.isArray(analysis.precedents) ? analysis.precedents : [];
+    const precedents = Array.isArray(analysis.precedents) ? (analysis as any).precedents : [];
     if (precedents.length > 0) {
       detailed += 'RELEVANT LEGAL PRECEDENTS:\n';
       precedents.forEach((precedent: unknown) => {
-        detailed += `- ${precedent.caseName || 'Unknown'} (${precedent.court || 'Unknown Court'})\n`;
+        detailed += `- ${(precedent as any).caseName || 'Unknown'} (${(precedent as any).court || 'Unknown Court'})\n`;
         detailed += `  Relevance: ${Math.round((precedent.relevance || 0) * 100)}%\n`;
-        detailed += `  Outcome: ${precedent.outcome || 'Unknown'}\n`;
+        detailed += `  Outcome: ${(precedent as any).outcome || 'Unknown'}\n`;
       });
     }
     
@@ -612,7 +612,7 @@ export class MLIntegrationService {
 
   private generateSponsorRecommendations(results: unknown): string[] {
     const recommendations: string[] = [];
-    const riskLevel = results.riskLevel || 'low';
+    const riskLevel = (results as any).riskLevel || 'low';
     
     if (riskLevel === 'high') {
       recommendations.push('Enhanced monitoring required');
@@ -635,7 +635,7 @@ export class MLIntegrationService {
   }
 
   private determineModerationAction(results: unknown): string {
-    const classification = results.classification?.classifications;
+    const classification = (results as any).classification?.classifications;
     
     if (classification?.misinformationRisk?.riskLevel === 'very_high') {
       return 'flag_for_review';
@@ -663,8 +663,8 @@ export class MLIntegrationService {
   private determinePublicAlertRequirement(results: unknown): boolean {
     if ((results.trojanAnalysis?.trojanRiskScore || 0) > 80) return true;
     
-    const violations = results.constitutionalAnalysis?.violations || [];
-    if (violations.some((v: unknown) => v.severity === 'critical')) return true;
+    const violations = (results as any).constitutionalAnalysis?.violations || [];
+    if (violations.some((v: unknown) => (v as any).severity === 'critical')) return true;
     
     return false;
   }
@@ -685,7 +685,7 @@ export class MLIntegrationService {
     const severityOrder: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 };
     
     return conflicts.reduce((highest, current) => {
-      const currentSeverity = severityOrder[current.severity] || 0;
+      const currentSeverity = severityOrder[(current as any).severity] || 0;
       const highestSeverity = severityOrder[highest?.severity] || 0;
       return currentSeverity > highestSeverity ? current : highest;
     }, null);

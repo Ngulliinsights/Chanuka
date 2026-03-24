@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { validateRequest } from '@server/middleware/validation/validate-request';
+import { validateRequest } from '@server/middleware/validation-middleware';
+import { authenticateToken } from '@server/middleware';
 import { marketController } from './market.controller';
 import { AddPriceSchema, GetHistorySchema, GetMetricsSchema } from './market.validation';
-import { requireAuth } from '@server/infrastructure/auth';
 import { rateLimiter } from '@server/middleware/security/rate-limiter';
 
 const router = Router();
@@ -17,7 +17,7 @@ const signalRateLimiter = rateLimiter({
 router.post(
   '/price',
   signalRateLimiter,
-  requireAuth,
+  authenticateToken,
   validateRequest(AddPriceSchema),
   marketController.addPrice
 );

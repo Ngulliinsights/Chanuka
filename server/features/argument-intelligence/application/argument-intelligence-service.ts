@@ -135,7 +135,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching argList for bill');
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(argumentTable)
@@ -165,7 +165,7 @@ export class ArgumentIntelligenceService {
 
     try {
       const searchPattern = `%${searchText}%`;
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(argumentTable)
@@ -242,7 +242,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching claims for argument');
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(claims)
@@ -313,7 +313,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching evidence for claim');
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(evidence)
@@ -341,7 +341,7 @@ export class ArgumentIntelligenceService {
     const logContext = {
       component: 'ArgumentIntelligenceService',
       operation: 'storeBrief',
-      briefType: briefData.brief_type
+      briefType: (briefData as any).brief_type
     };
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing legislative brief');
 
@@ -382,7 +382,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching briefs for bill');
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(legislative_briefs)
@@ -410,7 +410,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching brief by ID');
 
     try {
-      const [brief] = await readDatabase(async (db) => {
+      const [brief] = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(legislative_briefs)
@@ -487,7 +487,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching bill synthesis');
 
     try {
-      const [synthesis] = await readDatabase(async (db) => {
+      const [synthesis] = await readDatabase(async (db: any) => {
         return db
           .select()
           .from(synthesis_jobs)
@@ -511,11 +511,11 @@ export class ArgumentIntelligenceService {
 
       return {
         bill_id: synthesis.bill_id,
-        majorClaims: inputData.majorClaims || [],
-        evidenceBase: inputData.evidenceBase || [],
-        stakeholderPositions: inputData.stakeholderPositions || [],
-        consensusAreas: inputData.consensusAreas || [],
-        controversialPoints: inputData.controversialPoints || [],
+        majorClaims: (inputData as any).majorClaims || [],
+        evidenceBase: (inputData as any).evidenceBase || [],
+        stakeholderPositions: (inputData as any).stakeholderPositions || [],
+        consensusAreas: (inputData as any).consensusAreas || [],
+        controversialPoints: (inputData as any).controversialPoints || [],
         legislativeBrief: synthesis.output_data || '',
         lastUpdated: synthesis.completed_at || synthesis.updated_at
       };
@@ -581,7 +581,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching related argList');
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         let query = db
           .select()
           .from(argument_relationships)
@@ -624,7 +624,7 @@ export class ArgumentIntelligenceService {
     logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Calculating argument statistics');
 
     try {
-      const [stats, claimStats, evidenceStats] = await readDatabase(async (db) => {
+      const [stats, claimStats, evidenceStats] = await readDatabase(async (db: any) => {
         const statsPromise = db
           .select({
             totalArguments: count(),
@@ -988,7 +988,7 @@ export class ArgumentIntelligenceService {
   async healthCheck(): Promise<{ status: string; timestamp: Date }> {
     try {
       // Simple query to test database connectivity
-      await readDatabase(async (db) => {
+      await readDatabase(async (db: any) => {
         return readDatabase.select({ count: count() }).from(argumentTable).limit(1);
       });
 

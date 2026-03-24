@@ -71,7 +71,7 @@ async function fixMVPFeatures() {
             const names = importName[1] || importName[2];
             // Simple check: if imported name appears elsewhere in file
             const restOfFile = lines.slice(lines.indexOf(line) + 1).join('\n');
-            if (!restOfFile.includes(names.trim().split(',')[0].trim())) {
+            if (!restOfFile.includes(names!.trim().split(',')[0].trim())) {
               return false; // Remove this line
             }
           }

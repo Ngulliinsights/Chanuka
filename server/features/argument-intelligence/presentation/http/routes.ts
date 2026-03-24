@@ -166,7 +166,7 @@ router.post('/cluster/:billId', async (req, res) => {
     res.json({
       success: true,
       billId,
-      clusters: clusters.map(c => ({
+      clusters: clusters.map((c: any) => ({
         id: c.id,
         name: c.name,
         size: c.size,

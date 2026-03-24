@@ -1,9 +1,11 @@
 // ============================================================================
-// ADVOCACY COORDINATION - Notification Service
+// NOTIFICATIONS - Multi-Channel Delivery Service
 // ============================================================================
+// cspell: ignore USSD
+// Generic multi-channel notification delivery with preference-based routing
 
-import { NotificationPreferences } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
+import type { NotificationPreferences } from '@server/types/index';
 
 export interface NotificationConfig {
   enableEmail: boolean;
@@ -17,7 +19,7 @@ export interface NotificationConfig {
 export interface NotificationMessage {
   id: string;
   recipientId: string;
-  type: 'campaign_update' | 'action_reminder' | 'coalition_opportunity' | 'impact_report' | 'urgent_alert';
+  type: 'campaign_update' | 'action_reminder' | 'coalition_opportunity' | 'impact_report' | 'urgent_alert' | string;
   title: string;
   content: string;
   actionUrl?: string;
@@ -37,7 +39,19 @@ export interface NotificationResult {
   deliveryConfirmation?: boolean;
 }
 
-export class NotificationService {
+/**
+ * ChannelDeliveryService
+ *
+ * Generic multi-channel notification delivery service. Handles routing notifications
+ * through email, SMS, push, and USSD channels based on user preferences and system configuration.
+ *
+ * Features:
+ * - Channel preference filtering (user + system)
+ * - Retry logic via configuration
+ * - Per-channel error handling
+ * - Delivery confirmation tracking
+ */
+export class ChannelDeliveryService {
   constructor(private config: NotificationConfig) {}
 
   async sendNotification(
@@ -49,11 +63,14 @@ export class NotificationService {
       const enabledChannels = this.getEnabledChannels(message, userPreferences);
 
       if (enabledChannels.length === 0) {
-        logger.info({ 
-          messageId: message.id,
-          recipientId: message.recipientId,
-          component: 'NotificationService' 
-        }, 'No enabled channels for notification');
+        logger.info(
+          {
+            messageId: message.id,
+            recipientId: message.recipientId,
+            component: 'ChannelDeliveryService',
+          },
+          'No enabled channels for notification'
+        );
         return [];
       }
 
@@ -62,54 +79,39 @@ export class NotificationService {
           const result = await this.sendThroughChannel(message, channel);
           results.push(result);
         } catch (error) {
-          logger.error(`Failed to send notification through ${channel}`, error, { 
-            messageId: message.id,
-            recipientId: message.recipientId,
-            channel,
-            component: 'NotificationService' 
-          });
+          logger.error(
+            {
+              error,
+              messageId: message.id,
+              recipientId: message.recipientId,
+              channel,
+              component: 'ChannelDeliveryService',
+            },
+            `Failed to send notification through ${channel}`
+          );
 
           results.push({
             messageId: message.id,
             channel,
             status: 'failed',
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           });
         }
       }
 
       return results;
     } catch (error) {
-      logger.error('Failed to send notification', error, { 
-        messageId: message.id,
-        recipientId: message.recipientId,
-        component: 'NotificationService' 
-      });
+      logger.error(
+        {
+          error,
+          messageId: message.id,
+          recipientId: message.recipientId,
+          component: 'ChannelDeliveryService',
+        },
+        'Failed to send notification'
+      );
       throw error;
     }
-  }
-
-  createCampaignUpdateNotification(
-    campaign_id: string,
-    campaignTitle: string,
-    updateType: string,
-    updateDescription: string,
-    recipientId: string
-  ): NotificationMessage {
-    return {
-      id: `campaign-update-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      recipientId,
-      type: 'campaign_update',
-      title: `Campaign Update: ${campaignTitle}`,
-      content: `${updateType}: ${updateDescription}`,
-      actionUrl: `/campaigns/${ campaign_id }`,
-      priority: 'medium',
-      channels: ['email', 'push'],
-      metadata: {
-        campaign_id,
-        updateType
-      }
-    };
   }
 
   private getEnabledChannels(
@@ -132,7 +134,7 @@ export class NotificationService {
 
   private isChannelEnabledForUser(
     channel: string,
-    messageType: NotificationMessage['type'],
+    messageType: string,
     preferences: NotificationPreferences
   ): boolean {
     if (!preferences.channels[channel as keyof typeof preferences.channels]) {
@@ -151,7 +153,7 @@ export class NotificationService {
       case 'urgent_alert':
         return preferences.urgentAlerts;
       default:
-        return false;
+        return true; // Allow custom types to pass through
     }
   }
 
@@ -189,48 +191,46 @@ export class NotificationService {
   }
 
   private async sendEmail(message: NotificationMessage): Promise<NotificationResult> {
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 100));
     return {
       messageId: message.id,
       channel: 'email',
       status: 'sent',
       sentAt: new Date(),
-      deliveryConfirmation: true
+      deliveryConfirmation: true,
     };
   }
 
   private async sendSMS(message: NotificationMessage): Promise<NotificationResult> {
-    await new Promise(resolve => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 50));
     return {
       messageId: message.id,
       channel: 'sms',
       status: 'sent',
       sentAt: new Date(),
-      deliveryConfirmation: true
+      deliveryConfirmation: true,
     };
   }
 
   private async sendPushNotification(message: NotificationMessage): Promise<NotificationResult> {
-    await new Promise(resolve => setTimeout(resolve, 30));
+    await new Promise((resolve) => setTimeout(resolve, 30));
     return {
       messageId: message.id,
       channel: 'push',
       status: 'sent',
       sentAt: new Date(),
-      deliveryConfirmation: true
+      deliveryConfirmation: true,
     };
   }
 
   private async sendUSSD(message: NotificationMessage): Promise<NotificationResult> {
-    await new Promise(resolve => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
     return {
       messageId: message.id,
       channel: 'ussd',
       status: 'sent',
       sentAt: new Date(),
-      deliveryConfirmation: false
+      deliveryConfirmation: false,
     };
   }
 }
-
-

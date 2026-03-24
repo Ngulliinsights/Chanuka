@@ -508,7 +508,7 @@ export class ValidationService {
 
   private calculateMLVariance(mock: unknown, real: unknown): number {
     // Simulate ML variance calculation
-    return Math.abs(mock.confidence - real.confidence);
+    return Math.abs(mock.confidence - (real as any).confidence);
   }
 
   private async testAPIEndpoint(endpoint: string): Promise<{ compatible: boolean; issues?: unknown[] }> {

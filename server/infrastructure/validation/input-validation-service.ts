@@ -1,6 +1,5 @@
 import { validationMetricsCollector } from '@server/infrastructure/validation/validation-metrics';
 import { logger } from '@server/infrastructure/observability';
-import { ApiValidationError } from '@shared/types/api';
 import { NextFunction,Request, Response } from 'express';
 import { z } from 'zod';
 import { emailSchema, userRoleSchema } from '@shared/validation';

@@ -28,6 +28,8 @@ export {
   filterMaybe,
   maybeToArray,
   combineMaybes,
+  some,
+  none,
 } from './maybe';
 
 // Error types

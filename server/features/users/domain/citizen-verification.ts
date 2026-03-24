@@ -454,17 +454,17 @@ export class CitizenVerificationService {
     return results.map((r: unknown) => {
       const data = (r.verification_data as Record<string, unknown>) || {};
       return {
-        id: r.id,
+        id: (r as any).id,
         bill_id: data.bill_id,
-        citizenId: r.user_id,
-        verification_type: r.verification_type,
-        verification_status: r.verification_status,
+        citizenId: (r as any).user_id,
+        verification_type: (r as any).verification_type,
+        verification_status: (r as any).verification_status,
         confidence: data.confidence ?? 0,
         evidence: data.evidence || [],
         expertise: data.expertise || { domain: '', level: 'citizen', credentials: [], verifiedCredentials: false, reputation_score: 0 },
         reasoning: data.reasoning || (r.verification_notes as string) || '',
-        created_at: r.created_at,
-        updated_at: r.updated_at,
+        created_at: (r as any).created_at,
+        updated_at: (r as any).updated_at,
         endorsements: data.endorsements || 0,
         disputes: data.disputes || 0,
       } as CitizenVerification;
@@ -576,17 +576,17 @@ export class CitizenVerificationService {
     return results.map((r: unknown) => {
       const data = (r.verification_data as Record<string, unknown>) || {};
       return {
-        id: r.id,
+        id: (r as any).id,
         bill_id: data.bill_id,
-        citizenId: r.user_id,
-        verification_type: r.verification_type,
-        verification_status: r.verification_status,
+        citizenId: (r as any).user_id,
+        verification_type: (r as any).verification_type,
+        verification_status: (r as any).verification_status,
         confidence: data.confidence ?? 0,
         evidence: data.evidence || [],
         expertise: data.expertise || { domain: '', level: 'citizen', credentials: [], verifiedCredentials: false, reputation_score: 0 },
         reasoning: data.reasoning || (r.verification_notes as string) || '',
-        created_at: r.created_at,
-        updated_at: r.updated_at,
+        created_at: (r as any).created_at,
+        updated_at: (r as any).updated_at,
         endorsements: data.endorsements || 0,
         disputes: data.disputes || 0,
       } as CitizenVerification;

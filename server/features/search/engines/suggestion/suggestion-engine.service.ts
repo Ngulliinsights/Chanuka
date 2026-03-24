@@ -285,7 +285,7 @@ export class SuggestionEngineService {
   private async getBillTitleSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await readDatabase(async (db) => {
+    const results = await readDatabase(async (db: any) => {
       return db
         .select({
           id: schema.bills.id,
@@ -302,7 +302,7 @@ export class SuggestionEngineService {
 
     // Map database results to SearchSuggestion format with proper metadata
     // Each field in metadata provides context that helps users understand the suggestion
-    return results.map(bill => ({
+    return results.map((bill: any) => ({
       term: bill.title,
       frequency: 1, // Individual bills have frequency of 1
       score: this.calculateRelevanceScore(bill.title, query),
@@ -323,7 +323,7 @@ export class SuggestionEngineService {
   private async getCategorySuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await readDatabase(async (db) => {
+    const results = await readDatabase(async (db: any) => {
       return db
         .select({
           category: schema.bills.category,
@@ -338,7 +338,7 @@ export class SuggestionEngineService {
 
     // Map categories to SearchSuggestion format
     // The frequency here represents how many bills are in this category
-    return results.map(result => ({
+    return results.map((result: any) => ({
       term: result.category,
       frequency: result.count,
       score: this.calculateRelevanceScore(result.category, query),
@@ -358,7 +358,7 @@ export class SuggestionEngineService {
   private async getSponsorSuggestions(query: string, limit: number): Promise<SearchSuggestion[]> {
     const searchPattern = `%${query}%`;
 
-    const results = await readDatabase(async (db) => {
+    const results = await readDatabase(async (db: any) => {
       return db
         .select({
           sponsor: schema.bills.sponsor,
@@ -373,7 +373,7 @@ export class SuggestionEngineService {
     });
 
     // Map sponsors to SearchSuggestion format with proper metadata
-    return results.map(result => ({
+    return results.map((result: any) => ({
       term: result.sponsor,
       frequency: result.count,
       score: this.calculateRelevanceScore(result.sponsor, query),
@@ -394,7 +394,7 @@ export class SuggestionEngineService {
     const searchPattern = `%${query}%`;
 
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select({
             tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
@@ -408,7 +408,7 @@ export class SuggestionEngineService {
       });
 
       // Map tags to SearchSuggestion format
-      return results.map(result => ({
+      return results.map((result: any) => ({
         term: result.tag.trim(),
         frequency: result.count,
         score: this.calculateRelevanceScore(result.tag, query),
@@ -433,7 +433,7 @@ export class SuggestionEngineService {
 
     try {
       // Fetch all relevant data in a single query for efficiency
-      const facetData = await readDatabase(async (db) => {
+      const facetData = await readDatabase(async (db: any) => {
         return db
           .select({
             category: schema.bills.category,
@@ -518,7 +518,7 @@ export class SuggestionEngineService {
    */
   private async getTagFacets(searchPattern: string) {
     try {
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select({
             tag: sql<string>`unnest(string_to_array(${schema.bills.tags}, ','))`.as('tag'),
@@ -531,7 +531,7 @@ export class SuggestionEngineService {
           .limit(CONFIG.MAX_FACET_VALUES);
       });
 
-      return results.map(result => ({
+      return results.map((result: any) => ({
         name: result.tag.trim(),
         count: result.count,
         value: result.tag.trim(),
@@ -801,7 +801,7 @@ export class SuggestionEngineService {
         const start_date = new Date(now);
         start_date.setDate(start_date.getDate() - range.days);
 
-        const result = await readDatabase(async (db) => {
+        const result = await readDatabase(async (db: any) => {
           return db
             .select({ count: count() })
             .from(schema.bills)
@@ -826,7 +826,7 @@ export class SuggestionEngineService {
       const rangeCounts = await Promise.all(countPromises);
 
       // Add "All time" facet
-      const allTimeCount = await readDatabase(async (db) => {
+      const allTimeCount = await readDatabase(async (db: any) => {
         return db
           .select({ count: count() })
           .from(schema.bills)

@@ -978,12 +978,12 @@ export class GovernmentDataIntegrationService {
 
   private transformAPIBillData(apiData: unknown[]): BillData[] {
     return apiData.map(item => ({
-      billNumber: item.bill_number,
-      title: item.title,
-      status: item.status,
-      chamber: item.chamber,
-      summary: item.summary,
-      introduced_date: item.introduced_date ? new Date(item.introduced_date) : undefined
+      billNumber: (item as any).bill_number,
+      title: (item as any).title,
+      status: (item as any).status,
+      chamber: (item as any).chamber,
+      summary: (item as any).summary,
+      introduced_date: (item as any).introduced_date ? new Date(item.introduced_date) : undefined
     }));
   }
 
@@ -1003,10 +1003,10 @@ export class GovernmentDataIntegrationService {
 
   private transformScrapedBillData(scrapedData: unknown[]): BillData[] {
     return scrapedData.map(item => ({
-      billNumber: item.billNumber,
-      title: item.title,
-      status: item.status,
-      chamber: item.chamber
+      billNumber: (item as any).billNumber,
+      title: (item as any).title,
+      status: (item as any).status,
+      chamber: (item as any).chamber
     }));
   }
 

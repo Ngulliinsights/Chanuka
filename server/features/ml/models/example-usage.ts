@@ -89,7 +89,7 @@ async function exampleBatchProcessing() {
     comments.map((text) => analyzeSentiment(text))
   );
 
-  results.forEach((result, index) => {
+  results.forEach((result: any, index: any) => {
     console.log(`Comment ${index + 1}:`);
     console.log(`  Sentiment: ${result.result.sentiment}`);
     console.log(`  Confidence: ${result.result.confidence.toFixed(2)}`);

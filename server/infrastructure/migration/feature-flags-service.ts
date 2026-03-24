@@ -665,19 +665,19 @@ export class FeatureFlagsService {
 
     // Update flag rollout percentage
     await this.updateFlag(flagName, { 
-      rolloutPercentage: stage.percentage,
+      rolloutPercentage: stage!.percentage,
       enabled: true
     });
 
     logger.info({
       component: 'FeatureFlagsService',
       flagName,
-      stage: stage.name,
-      percentage: stage.percentage
+      stage: stage!.name,
+      percentage: stage!.percentage
     }, 'Advanced to rollout stage');
 
     // Schedule auto-advance if configured
-    if (rolloutConfig.autoAdvance && stage.duration && stageIndex < rolloutConfig.stages.length - 1) {
+    if (rolloutConfig.autoAdvance && stage!.duration && stageIndex < rolloutConfig.stages.length - 1) {
       setTimeout(async () => {
         try {
           // Check advance conditions before auto-advancing
@@ -692,7 +692,7 @@ export class FeatureFlagsService {
             error: error instanceof Error ? error.message : 'Unknown error'
           }, 'Auto-advance failed');
         }
-      }, stage.duration * 60 * 1000); // Convert minutes to milliseconds
+      }, stage!.duration * 60 * 1000); // Convert minutes to milliseconds
     }
   }
 

@@ -1,8 +1,8 @@
 import { contentModerationService } from "@server/features/admin/presentation/http/content-moderation.routes";
 import { authenticateToken, requireRole } from '@server/middleware/auth';
 import { logger } from '@server/infrastructure/observability';
-import { ApiResponseWrapper, ApiSuccess } from '@server/utils/api-utils';
-import { Request, Response,Router } from "express";
+import { ApiResponseWrapper, HttpStatus } from '@server/utils/api-utils';
+import { Request, Response, Router } from "express";
 import { z } from "zod";
 
 export const router = Router();
@@ -32,11 +32,11 @@ type ModerationFilters = z.infer<typeof moderationFiltersSchema>;
 // Helper function to handle errors consistently across all routes
 // This centralizes error handling logic and ensures proper logging
 const handleError = (res: Response, error: unknown, message: string, startTime: number) => {
-  logger.error({ component: 'Chanuka', error: error instanceof Error ? error.message : String(error) }, message);
+  logger.error({ component: 'ModerationService', error: error instanceof Error ? error.message : String(error) }, message);
 
   // Create the error response wrapper with proper metadata
   const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-  return ApiResponseWrapper.error(res, message, 500, metadata);
+  return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json(ApiResponseWrapper.error(message, 'MODERATION_ERROR', undefined, metadata));
 };
 
 // All moderation routes require authentication and admin/moderator role
@@ -55,7 +55,7 @@ router.get("/queue", async (req: Request, res: Response) => {
     if (!result.success) {
       // If validation fails, return a structured error with details about what went wrong
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Validation failed", 400, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Validation failed", 'VALIDATION_ERROR', undefined, metadata));
     }
 
     // Extract the validated and typed data from the parse result
@@ -69,7 +69,7 @@ router.get("/queue", async (req: Request, res: Response) => {
     );
     
     const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-    return ApiSuccess(res, queue, metadata);
+    return res.status(HttpStatus.OK).json(ApiResponseWrapper.success(queue, undefined, metadata));
   } catch (error) {
     return handleError(res, error, "Failed to fetch moderation queue", startTime);
   }
@@ -87,20 +87,20 @@ router.post("/flags/:flagId/review", async (req: Request, res: Response) => {
     // Verify that the user is authenticated and has an ID
     if (!moderatorId) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Authentication required", 401, metadata);
+      return res.status(HttpStatus.UNAUTHORIZED).json(ApiResponseWrapper.error("Authentication required", 'AUTH_ERROR', undefined, metadata));
     }
 
     // Validate that the flag ID is a valid positive integer
     if (isNaN(flagId) || flagId <= 0) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Invalid flag ID", 400, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Invalid flag ID", 'INVALID_INPUT', undefined, metadata));
     }
     
     // Validate the request body against our schema to ensure it has the required fields
     const result = reviewFlagSchema.safeParse(req.body);
     if (!result.success) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiValidationError(res, result.error.errors, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Validation failed", 'VALIDATION_ERROR', undefined, metadata));
     }
 
     // Process the flag review through the content moderation service
@@ -114,7 +114,7 @@ router.post("/flags/:flagId/review", async (req: Request, res: Response) => {
     );
     
     const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-    return ApiSuccess(res, reviewResult, metadata);
+    return res.status(HttpStatus.OK).json(ApiResponseWrapper.success(reviewResult, undefined, metadata));
   } catch (error) {
     return handleError(res, error, "Failed to review flag", startTime);
   }
@@ -132,7 +132,7 @@ router.get("/stats", async (req: Request, res: Response) => {
     // Validate that the timeframe is one of our allowed values
     if (!['24h', '7d', '30d'].includes(timeframe)) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Invalid timeframe. Must be one of: 24h, 7d, 30d", 400, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Invalid timeframe. Must be one of: 24h, 7d, 30d", 'INVALID_INPUT', undefined, metadata));
     }
 
     // Calculate date range based on timeframe
@@ -155,7 +155,7 @@ router.get("/stats", async (req: Request, res: Response) => {
     const stats = await contentModerationService.getModerationStats(start_date, end_date);
     
     const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-    return ApiSuccess(res, stats, metadata);
+    return res.status(HttpStatus.OK).json(ApiResponseWrapper.success(stats, undefined, metadata));
   } catch (error) {
     return handleError(res, error, "Failed to fetch moderation statistics", startTime);
   }
@@ -172,13 +172,13 @@ router.post("/analyze", async (req: Request, res: Response) => {
     // Validate that content is provided and is a non-empty string
     if (!content || typeof content !== 'string' || content.trim().length === 0) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Valid content string is required", 400, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Valid content string is required", 'INVALID_INPUT', undefined, metadata));
     }
 
     // Validate that the content type is one we support
     if (!['comment', 'bill'].includes(content_type)) {
       const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-      return ApiResponseWrapper.error(res, "Invalid content type. Must be one of: comment, bill", 400, metadata);
+      return res.status(HttpStatus.BAD_REQUEST).json(ApiResponseWrapper.error("Invalid content type. Must be one of: comment, bill", 'INVALID_INPUT', undefined, metadata));
     }
 
     // Run content analysis without persisting the result to the database
@@ -188,7 +188,7 @@ router.post("/analyze", async (req: Request, res: Response) => {
     );
     
     const metadata = ApiResponseWrapper.createMetadata(startTime, 'database');
-    return ApiSuccess(res, analysis, metadata);
+    return res.status(HttpStatus.OK).json(ApiResponseWrapper.success(analysis, undefined, metadata));
   } catch (error) {
     return handleError(res, error, "Failed to analyze content", startTime);
   }

@@ -52,7 +52,7 @@ export const safeWriteExample = async (userData: unknown): Promise<void> => {
     return await withTransaction(async (tx: unknown) => {
       // All operations within this transaction are protected
       // Note: tx should be a proper Drizzle transaction object
-      const insertedUserRows = await tx.insert(userTable).values(userData).returning();
+      const insertedUserRows = await (tx as any).insert(userTable).values(userData).returning();
 
       // Additional operations can be added here
       // If any fail, the entire transaction will be rolled back

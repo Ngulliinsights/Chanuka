@@ -155,7 +155,7 @@ export class ConflictSeverityAnalyzerService {
     let score = 0.3; // Base score for having any disclosures
 
     // Points for verified disclosures
-    const verifiedCount = disclosures.filter(d => d.is_verified).length;
+    const verifiedCount = disclosures.filter(d => (d as any).is_verified).length;
     score += (verifiedCount / disclosures.length) * 0.4;
 
     // Points for recent disclosures
@@ -168,7 +168,7 @@ export class ConflictSeverityAnalyzerService {
     score += (recentCount / disclosures.length) * 0.2;
 
     // Points for comprehensive disclosures
-    const types = new Set(disclosures.map(d => d.disclosureType));
+    const types = new Set(disclosures.map(d => (d as any).disclosureType));
     score += Math.min(types.size * 0.05, 0.1);
 
     return Math.min(score, 1.0);

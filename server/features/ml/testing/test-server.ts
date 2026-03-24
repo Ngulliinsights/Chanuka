@@ -47,7 +47,7 @@ app.get('/models', (_req, res) => {
   const models = mlOrchestrator.getAvailableModels();
   res.json({
     success: true,
-    models: models.map(model => ({
+    models: models.map((model: any) => ({
       type: model.type,
       name: model.info?.name,
       version: model.info?.version,

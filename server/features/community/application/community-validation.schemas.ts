@@ -42,7 +42,7 @@ export const GetCommentsSchema = z.object({
   bill_id: CommonSchemas.id,
   parent_id: CommonSchemas.id.optional(),
   sort_by: z.enum(['recent', 'popular', 'quality', 'controversial']).default('quality'),
-  limit: CommonSchemas.limit.default(50),
+  limit: CommonSchemas.limit,
   offset: CommonSchemas.offset,
   min_quality_score: z.number().min(0).max(10).optional(),
 });
@@ -137,12 +137,12 @@ export const AnalyzeCommentSchema = z.object({
 export const FindRelatedArgumentsSchema = z.object({
   comment_id: CommonSchemas.id,
   similarity_threshold: z.number().min(0).max(1).default(0.7),
-  limit: CommonSchemas.limit.default(10),
+  limit: CommonSchemas.limit,
 });
 
 export const FindCounterArgumentsSchema = z.object({
   comment_id: CommonSchemas.id,
-  limit: CommonSchemas.limit.default(5),
+  limit: CommonSchemas.limit,
 });
 
 export const GetArgumentClustersSchema = z.object({

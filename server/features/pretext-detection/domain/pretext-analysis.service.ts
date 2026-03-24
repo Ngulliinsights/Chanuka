@@ -42,7 +42,7 @@ export class PretextAnalysisService {
       });
 
       // Convert ML results to domain format
-      const detections: PretextDetection[] = mlResult.detections.map(d => ({
+      const detections: PretextDetection[] = mlResult.detections.map((d: any) => ({
         type: d.type,
         severity: this.mapSeverity(d.severity),
         description: d.description,

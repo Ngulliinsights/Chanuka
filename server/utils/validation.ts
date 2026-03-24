@@ -1,4 +1,3 @@
-import { ValidationError } from '@shared/core';
 import { logger } from '@server/infrastructure/observability';
 import { NextFunction, Request, Response } from 'express';
 import DOMPurify from 'isomorphic-dompurify';
@@ -41,7 +40,7 @@ export const validate = (fields: string | string[]): ValidationDecorator<any> =>
           throw new Error(`Missing required field: ${field}`);
         }
       });
-      return originalMethod.apply(this, args);
+      return (originalMethod as any).apply(this, args);
     };
 
     return descriptor;

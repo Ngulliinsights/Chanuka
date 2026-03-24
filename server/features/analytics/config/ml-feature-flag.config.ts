@@ -33,7 +33,7 @@ export function initializeMLFeatureFlag(): void {
     }, 'ML service feature flag initialized');
   } catch (error) {
     logger.error({ component: 'analytics',
-      operation: 'initializeMLFeatureFlag', error: error instanceof Error ? error : { message: String(error }, 'Failed to initialize ML service feature flag:') });
+      operation: 'initializeMLFeatureFlag', error: error instanceof Error ? error : { message: String(error) } }, 'Failed to initialize ML service feature flag:');
   }
 }
 
@@ -52,7 +52,7 @@ export async function enableMLServiceRollout(percentage: number): Promise<void> 
   } catch (error) {
     logger.error({ component: 'analytics',
       operation: 'enableMLServiceRollout',
-      percentage, error: error instanceof Error ? error : { message: String(error }, 'Failed to enable ML service rollout:') });
+      percentage, error: error instanceof Error ? error : { message: String(error) } }, 'Failed to enable ML service rollout:');
     throw error;
   }
 }
@@ -70,7 +70,7 @@ export async function rollbackMLService(): Promise<void> {
     }, 'ML service rolled back to mock implementation');
   } catch (error) {
     logger.error({ component: 'analytics',
-      operation: 'rollbackMLService', error: error instanceof Error ? error : { message: String(error }, 'Failed to rollback ML service:') });
+      operation: 'rollbackMLService', error: error instanceof Error ? error : { message: String(error) } }, 'Failed to rollback ML service:');
     throw error;
   }
 }
@@ -93,7 +93,7 @@ export function getMLServiceStatus(): {
     };
   } catch (error) {
     logger.error({ component: 'analytics',
-      operation: 'getMLServiceStatus', error: error instanceof Error ? error : { message: String(error }, 'Failed to get ML service status:') });
+      operation: 'getMLServiceStatus', error: error instanceof Error ? error : { message: String(error) } }, 'Failed to get ML service status:');
     
     return {
       enabled: false,

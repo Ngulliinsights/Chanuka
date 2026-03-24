@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const AddPriceSchema = z.object({
   productId: z.string().uuid('Invalid commodity ID'),
   price: z.number().positive('Price must be greater than zero'),
-  currency: z.string().length(3).openapi({ example: 'KES' }),
+  currency: z.string().length(3),
   location: z.string().optional(),
 });
 

@@ -37,7 +37,7 @@ describe('Bills Data Source Integration', () => {
       
       // Test findById with existing bill
       const firstBill = allBills[0];
-      const foundBill = await dataSource.findById(firstBill.id);
+      const foundBill = await dataSource.findById(firstBill!.id);
       expect(foundBill).toEqual(firstBill);
       
       // Test count

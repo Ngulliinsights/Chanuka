@@ -186,7 +186,7 @@ export const swaggerUiOptions = {
       // Add auth header if token exists in localStorage
       const token = localStorage.getItem('authToken');
       if (token) {
-        req.headers.Authorization = `Bearer ${token}`;
+        (req as any).headers.Authorization = `Bearer ${token}`;
       }
       return req;
     }

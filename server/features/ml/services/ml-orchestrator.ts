@@ -350,7 +350,7 @@ export class MLOrchestrator {
       throw new Error(`Model ${modelType} not found`);
     }
 
-    const timeout = options.timeout || 30000;
+    const timeout = (options as any).timeout || 30000;
     
     // Create timeout promise
     const timeoutPromise = new Promise<never>((_, reject) => {

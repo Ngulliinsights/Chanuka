@@ -35,13 +35,13 @@ async function testConflictAnalysis() {
     console.log(`   Detected ${conflicts.length} conflicts`);
     
     if (conflicts.length > 0) {
-      const severityCount = conflicts.reduce((acc, c) => {
+      const severityCount = conflicts.reduce((acc: any, c: any) => {
         acc[c.severity] = (acc[c.severity] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       console.log(`   Severity distribution:`, severityCount);
       
-      const typeCount = conflicts.reduce((acc, c) => {
+      const typeCount = conflicts.reduce((acc: any, c: any) => {
         acc[c.conflictType] = (acc[c.conflictType] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
@@ -56,7 +56,7 @@ async function testConflictAnalysis() {
     console.log(`   Network density: ${Math.round(mapping.metrics.density * 100)}%`);
     console.log(`   Found ${mapping.clusters.length} clusters`);
     
-    const nodeTypes = mapping.nodes.reduce((acc, n) => {
+    const nodeTypes = mapping.nodes.reduce((acc: any, n: any) => {
       acc[n.type] = (acc[n.type] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
@@ -69,16 +69,16 @@ async function testConflictAnalysis() {
     console.log(`   Analyzed trends for ${trends.length} sponsors`);
     
     if (trends.length > 0) {
-      const avgRiskScore = trends.reduce((sum, t) => sum + t.risk_score, 0) / trends.length;
+      const avgRiskScore = trends.reduce((sum: any, t: any) => sum + t.risk_score, 0) / trends.length;
       console.log(`   Average risk score: ${Math.round(avgRiskScore)}`);
       
-      const trendDistribution = trends.reduce((acc, t) => {
+      const trendDistribution = trends.reduce((acc: any, t: any) => {
         acc[t.severityTrend] = (acc[t.severityTrend] || 0) + 1;
         return acc;
       }, {} as Record<string, number>);
       console.log(`   Trend distribution:`, trendDistribution);
       
-      const totalPredictions = trends.reduce((sum, t) => sum + t.predictions.length, 0);
+      const totalPredictions = trends.reduce((sum: any, t: any) => sum + t.predictions.length, 0);
       console.log(`   Total predictions: ${totalPredictions}`);
     }
     console.log();

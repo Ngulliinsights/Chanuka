@@ -92,10 +92,10 @@ export function calculateMockImpact(billId: string, userContext: UserContext): P
   if (userContext.monthlyIncome) {
     const incomeMultiplier = userContext.monthlyIncome / 50000; // Normalize to 50k baseline
     adjustedImpact.financialImpact = {
-      ...baseImpact.financialImpact,
-      estimatedCostPerMonth: Math.round(baseImpact.financialImpact.estimatedCostPerMonth * incomeMultiplier),
-      estimatedCostPerYear: Math.round(baseImpact.financialImpact.estimatedCostPerYear * incomeMultiplier),
-      breakdown: baseImpact.financialImpact.breakdown.map(item => ({
+      ...baseImpact!.financialImpact,
+      estimatedCostPerMonth: Math.round(baseImpact!.financialImpact.estimatedCostPerMonth * incomeMultiplier),
+      estimatedCostPerYear: Math.round(baseImpact!.financialImpact.estimatedCostPerYear * incomeMultiplier),
+      breakdown: baseImpact!.financialImpact.breakdown.map(item => ({
         ...item,
         amount: Math.round(item.amount * incomeMultiplier)
       }))
@@ -104,30 +104,30 @@ export function calculateMockImpact(billId: string, userContext: UserContext): P
   
   // Adjust based on mobile money usage
   if (userContext.useMobileMoney === false) {
-    adjustedImpact.financialImpact.breakdown = adjustedImpact.financialImpact.breakdown.filter(
+    adjustedImpact.financialImpact!.breakdown = adjustedImpact.financialImpact!.breakdown.filter(
       item => item.category !== 'Mobile Money Transactions'
     );
-    adjustedImpact.financialImpact.estimatedCostPerMonth -= 200;
-    adjustedImpact.financialImpact.estimatedCostPerYear -= 2400;
+    adjustedImpact.financialImpact!.estimatedCostPerMonth -= 200;
+    adjustedImpact.financialImpact!.estimatedCostPerYear -= 2400;
   }
   
   // Adjust based on online services usage
   if (userContext.useOnlineServices === false) {
-    adjustedImpact.financialImpact.breakdown = adjustedImpact.financialImpact.breakdown.filter(
+    adjustedImpact.financialImpact!.breakdown = adjustedImpact.financialImpact!.breakdown.filter(
       item => item.category !== 'Digital Services'
     );
-    adjustedImpact.financialImpact.estimatedCostPerMonth -= 300;
-    adjustedImpact.financialImpact.estimatedCostPerYear -= 3600;
+    adjustedImpact.financialImpact!.estimatedCostPerMonth -= 300;
+    adjustedImpact.financialImpact!.estimatedCostPerYear -= 3600;
   }
   
   // Adjust household impact
   if (userContext.householdSize && userContext.householdSize > 1) {
     const householdMultiplier = Math.sqrt(userContext.householdSize); // Economies of scale
-    adjustedImpact.financialImpact.estimatedCostPerMonth = Math.round(
-      adjustedImpact.financialImpact.estimatedCostPerMonth * householdMultiplier
+    adjustedImpact.financialImpact!.estimatedCostPerMonth = Math.round(
+      adjustedImpact.financialImpact!.estimatedCostPerMonth * householdMultiplier
     );
-    adjustedImpact.financialImpact.estimatedCostPerYear = Math.round(
-      adjustedImpact.financialImpact.estimatedCostPerYear * householdMultiplier
+    adjustedImpact.financialImpact!.estimatedCostPerYear = Math.round(
+      adjustedImpact.financialImpact!.estimatedCostPerYear * householdMultiplier
     );
   }
   

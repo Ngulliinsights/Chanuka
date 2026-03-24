@@ -206,7 +206,7 @@ export class SemanticSearchEngine {
       // 4. Main results query — typed via the SearchRow generic.
       //    Using readDatabase with execute bypasses drizzle's builder inference, which
       //    collapses to `unknown` when pgvector SQL expressions enter .where().
-      const rowsResult = await readDatabase(async (db) => {
+      const rowsResult = await readDatabase(async (db: any) => {
         return db.execute(sql`
         SELECT
           content_id                            AS id,
@@ -238,7 +238,7 @@ export class SemanticSearchEngine {
       const rows = rowsResult.rows as unknown as SearchRow[];
 
       // 5. Separate count query for accurate pagination.
-      const countResult = await readDatabase(async (db) => {
+      const countResult = await readDatabase(async (db: any) => {
         return db.execute(sql`
         SELECT count(*)::text AS total
         FROM content_embeddings
@@ -326,7 +326,7 @@ export class SemanticSearchEngine {
 
     try {
       // Using readDatabase with execute avoids drizzle builder collapse on and(gte(...), lte(...)).
-      const statsResult = await readDatabase(async (db) => {
+      const statsResult = await readDatabase(async (db: any) => {
         return db.execute(sql`
         SELECT
           count(*)::text                 AS total_queries,

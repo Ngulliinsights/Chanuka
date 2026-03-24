@@ -51,7 +51,7 @@ export const marketService = {
         throw createNotFoundError('Insufficient data for this commodity', { productId: safeProductId });
       }
 
-      const priceData = signals.map(s => ({
+      const priceData = signals.map((s: any) => ({
         productId: s.commodity_id,
         price: Number(s.price_reported),
         currency: 'KES',

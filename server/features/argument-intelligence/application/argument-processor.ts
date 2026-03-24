@@ -403,11 +403,11 @@ export class ArgumentProcessor {
   private async synthesizeClaims(clusters: ArgumentCluster[]): Promise<SynthesizedClaim[]> {
     return clusters.map(cluster => ({
       claimText: cluster.representativeText,
-      supportingComments: cluster.arguments.filter(a => this.inferPosition(a.text) === 'support').length, // Simplified count
-      opposingComments: cluster.arguments.filter(a => this.inferPosition(a.text) === 'oppose').length,
+      supportingComments: cluster.arguments.filter((a: any) => this.inferPosition(a.text) === 'support').length, // Simplified count
+      opposingComments: cluster.arguments.filter((a: any) => this.inferPosition(a.text) === 'oppose').length,
       evidenceStrength: cluster.evidenceStrength,
       stakeholderGroups: cluster.stakeholderGroups,
-      representativeQuotes: cluster.arguments.slice(0, 3).map(a => a.text)
+      representativeQuotes: cluster.arguments.slice(0, 3).map((a: any) => a.text)
     }));
   }
 
@@ -424,7 +424,7 @@ export class ArgumentProcessor {
     const stakeholderGroups = new Map<string, unknown[]>();
 
     args.forEach(arg => {
-      arg.affectedGroups?.forEach((group: string) => {
+      (arg as any).affectedGroups?.forEach((group: string) => {
         if (!stakeholderGroups.has(group)) {
           stakeholderGroups.set(group, []);
         }
@@ -437,12 +437,12 @@ export class ArgumentProcessor {
       position: this.determineGroupPosition(groupArgs),
       keyArguments: this.extractKeyArguments(groupArgs),
       evidenceProvided: this.extractEvidence(groupArgs),
-      participantCount: new Set(groupArgs.map((a: unknown) => a.user_id)).size
+      participantCount: new Set(groupArgs.map((a: unknown) => (a as any).user_id)).size
     }));
   }
 
   private determineGroupPosition(args: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
-    const positions = args.map(arg => arg.position);
+    const positions = args.map(arg => (arg as any).position);
     const supportCount = positions.filter((p: string) => p === 'support').length;
     const opposeCount = positions.filter((p: string) => p === 'oppose').length;
 
@@ -454,15 +454,15 @@ export class ArgumentProcessor {
 
   private extractKeyArguments(args: unknown[]): string[] {
     return args
-      .filter((arg: unknown) => arg.type === 'claim' && (arg.confidence || 0) > 0.7)
-      .map((arg: unknown) => arg.normalizedText || arg.extractedText || '')
+      .filter((arg: unknown) => (arg as any).type === 'claim' && (arg.confidence || 0) > 0.7)
+      .map((arg: unknown) => (arg as any).normalizedText || (arg as any).extractedText || '')
       .slice(0, 5); // Top 5 argList
   }
 
   private extractEvidence(args: unknown[]): string[] {
     return args
-      .filter((arg: unknown) => arg.type === 'evidence' && arg.evidenceQuality !== 'none')
-      .map((arg: unknown) => arg.normalizedText || arg.extractedText || '')
+      .filter((arg: unknown) => (arg as any).type === 'evidence' && (arg as any).evidenceQuality !== 'none')
+      .map((arg: unknown) => (arg as any).normalizedText || (arg as any).extractedText || '')
       .slice(0, 3); // Top 3 pieces of evidence
   }
 

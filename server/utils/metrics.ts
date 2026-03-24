@@ -56,7 +56,7 @@ class Metrics {
 
       descriptor.value = function (...args: unknown[]) {
         // Execute the original method
-        const result = originalMethod.apply(this, args);
+        const result = (originalMethod as any).apply(this, args);
 
         // If a value is provided in the last argument and it's a number, use it
         const value = typeof args[args.length - 1] === 'number' ? args[args.length - 1] : 1;
@@ -104,7 +104,7 @@ class Metrics {
         const start = performance.now();
         try {
           // Execute the original method and preserve its return value
-          return await originalMethod.apply(this, args);
+          return await (originalMethod as any).apply(this, args);
         } finally {
           const duration = performance.now() - start;
 

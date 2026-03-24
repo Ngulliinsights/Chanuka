@@ -56,16 +56,16 @@ interface DeploymentResult {
  * Formats deployment progress updates in a readable format for console output
  */
 function formatProgressUpdate(progress: unknown): void {
-  const timestamp = progress.timestamp.toISOString();
+  const timestamp = (progress as any).timestamp.toISOString();
   const components: ComponentProgress[] = Object.keys(progress.components).map(comp => ({
     name: comp.replace('utilities-', ''),
-    status: progress.components[comp].status,
-    rollout: `${progress.components[comp].rolloutPercentage}%`,
-    stage: progress.components[comp].currentStage
+    status: (progress as any).components[comp].status,
+    rollout: `${(progress as any).components[comp].rolloutPercentage}%`,
+    stage: (progress as any).components[comp].currentStage
   }));
 
   console.log(`[${timestamp}] Deployment Progress:`);
-  console.log(`  Active Alerts: ${progress.alerts}`);
+  console.log(`  Active Alerts: ${(progress as any).alerts}`);
   
   components.forEach(comp => {
     console.log(`  ${comp.name}: ${comp.status} | Rollout: ${comp.rollout} | Stage: ${comp.stage}`);

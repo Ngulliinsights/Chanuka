@@ -320,7 +320,7 @@ export function introspectSchema(schema: z.ZodSchema): SchemaIntrospectionResult
       }
 
       // Extract type information
-      fieldTypes[fieldName] = fieldSchema._type ?? 'unknown';
+      fieldTypes[fieldName] = (fieldSchema as any)._type ?? 'unknown';
     }
   }
 

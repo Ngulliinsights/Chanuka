@@ -551,7 +551,7 @@ export class GovernmentDataRepository {
         .from(government_data)
         .where(eq(government_data.status, 'active'));
 
-      const dataTypes = results.map(r => r.data_type).filter(Boolean);
+      const dataTypes = results.map((r: any) => r.data_type).filter(Boolean);
 
       // Cache with longer TTL (metadata changes infrequently)
       await cacheService.set(cacheKey, dataTypes, CACHE_TTL.LONG);
@@ -581,7 +581,7 @@ export class GovernmentDataRepository {
         .selectDistinct({ source: government_data.source })
         .from(government_data);
 
-      const sources = results.map(r => r.source).filter(Boolean);
+      const sources = results.map((r: any) => r.source).filter(Boolean);
 
       // Cache with longer TTL
       await cacheService.set(cacheKey, sources, CACHE_TTL.LONG);
@@ -627,7 +627,7 @@ export class GovernmentDataRepository {
         .from(government_data)
         .groupBy(government_data.data_type);
 
-      const byDataType = dataTypeResults.reduce((acc, row) => {
+      const byDataType = dataTypeResults.reduce((acc: any, row: any) => {
         acc[row.data_type] = row.count;
         return acc;
       }, {} as Record<string, number>);
@@ -641,7 +641,7 @@ export class GovernmentDataRepository {
         .from(government_data)
         .groupBy(government_data.source);
 
-      const bySource = sourceResults.reduce((acc, row) => {
+      const bySource = sourceResults.reduce((acc: any, row: any) => {
         acc[row.source] = row.count;
         return acc;
       }, {} as Record<string, number>);
@@ -655,7 +655,7 @@ export class GovernmentDataRepository {
         .from(government_data)
         .groupBy(government_data.status);
 
-      const byStatus = statusResults.reduce((acc, row) => {
+      const byStatus = statusResults.reduce((acc: any, row: any) => {
         acc[row.status || 'unknown'] = row.count;
         return acc;
       }, {} as Record<string, number>);

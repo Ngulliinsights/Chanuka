@@ -14,7 +14,7 @@ import * as dotenvExpand from 'dotenv-expand';
 
 import { ErrorSeverity } from '../error-handling/types';
 import { ObservabilityStack } from '../observability/core/types';
-import { Result, err, ok } from '../primitives/types/result';
+import { Result, Err, Ok } from '@shared/core';
 
 import { configSchema, type AppConfig, envMapping, defaultFeatures } from './schema';
 import type {
@@ -117,7 +117,7 @@ export class ConfigurationManager extends EventEmitter {
       if (rawConfigResult.isErr()) {
         const error = rawConfigResult.error;
         this.emit('config:error', error);
-        return err(error);
+        return new Err(error);
       }
       const rawConfig = rawConfigResult.value;
 
@@ -127,7 +127,7 @@ export class ConfigurationManager extends EventEmitter {
         const error = validationResult.error;
         this.emit('config:error', error);
         this.observability?.getMetrics()?.counter('config.validation.failed', 1);
-        return err(error);
+        return new Err(error);
       }
 
       const config = validationResult.unwrap();
@@ -178,7 +178,7 @@ export class ConfigurationManager extends EventEmitter {
         this.setupHotReload();
       }
 
-      return ok(this._config);
+      return new Ok(this._config);
     } catch (error) {
       const configError = new ConfigurationError(
         `Configuration loading failed: ${error instanceof Error ? error.message : String(error)}`,
@@ -186,7 +186,7 @@ export class ConfigurationManager extends EventEmitter {
       );
       this.emit('config:error', configError);
       this.observability?.getMetrics()?.counter('config.load.failed', 1);
-      return err(configError);
+      return new Err(configError);
     }
   }
 
@@ -255,7 +255,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   configure(overrides: Partial<AppConfig>): Result<void, ConfigurationError> {
     if (!this._config) {
-      return err(new ConfigurationError('Configuration not loaded. Call load() first.'));
+      return new Err(new ConfigurationError('Configuration not loaded. Call load() first.'));
     }
 
     try {
@@ -268,7 +268,7 @@ export class ConfigurationManager extends EventEmitter {
           message: err.message,
           code: err.code,
         }));
-        return err(new ConfigurationValidationError(
+        return new Err(new ConfigurationValidationError(
           `Configuration update failed: ${errors.map(e => `${e.path}: ${e.message}`).join(', ')}`,
           errors
         ));
@@ -287,9 +287,9 @@ export class ConfigurationManager extends EventEmitter {
       this.emit('config:changed', changeEvent);
       this.observability?.getMetrics()?.counter('config.updated', 1);
 
-      return ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return err(new ConfigurationError(
+      return new Err(new ConfigurationError(
         `Configuration update failed: ${error instanceof Error ? error.message : String(error)}`,
         error instanceof Error ? error : undefined
       ));
@@ -301,7 +301,7 @@ export class ConfigurationManager extends EventEmitter {
    */
   validate(): Result<ConfigValidationResult, ConfigurationError> {
     if (!this._config) {
-      return ok({
+      return new Ok({
         valid: false,
         errors: [{ path: 'root', message: 'Configuration not loaded', code: 'NOT_LOADED' }],
         warnings: [],
@@ -330,7 +330,7 @@ export class ConfigurationManager extends EventEmitter {
     this.emit('config:validated', result);
     this.observability?.getMetrics()?.counter('config.validated', 1);
 
-    return ok(result);
+    return new Ok(result);
   }
 
   /**
@@ -340,14 +340,14 @@ export class ConfigurationManager extends EventEmitter {
     try {
       // Validate key strength — AES-256 requires exactly 32 bytes
       if (Buffer.byteLength(key, 'utf8') < 32) {
-        return err(new ConfigurationEncryptionError('Encryption key must be at least 32 bytes long'));
+        return new Err(new ConfigurationEncryptionError('Encryption key must be at least 32 bytes long'));
       }
 
       this.encryptionKey = key;
       this.observability?.getLogger()?.info('Configuration encryption key set');
-      return ok(undefined);
+      return new Ok(undefined);
     } catch (error) {
-      return err(new ConfigurationEncryptionError(
+      return new Err(new ConfigurationEncryptionError(
         'Failed to set encryption key',
         error instanceof Error ? error : undefined
       ));
@@ -373,9 +373,9 @@ export class ConfigurationManager extends EventEmitter {
       this.encryptedValues.add(path);
       this.observability?.getMetrics()?.counter('config.value.encrypted', 1);
 
-      return ok(`ENC:${iv.toString('hex')}:${encrypted}`);
+      return new Ok(`ENC:${iv.toString('hex')}:${encrypted}`);
     } catch (error) {
-      return err(new ConfigurationEncryptionError(
+      return new Err(new ConfigurationEncryptionError(
         `Failed to encrypt value at path ${path}`,
         error instanceof Error ? error : undefined
       ));
@@ -387,11 +387,11 @@ export class ConfigurationManager extends EventEmitter {
    */
   decryptValue(encryptedValue: string): Result<string, ConfigurationEncryptionError> {
     if (!this.encryptionKey) {
-      return err(new ConfigurationEncryptionError('Encryption key not set'));
+      return new Err(new ConfigurationEncryptionError('Encryption key not set'));
     }
 
     if (!encryptedValue.startsWith('ENC:')) {
-      return ok(encryptedValue); // Not encrypted
+      return new Ok(encryptedValue); // Not encrypted
     }
 
     try {
@@ -414,7 +414,7 @@ export class ConfigurationManager extends EventEmitter {
 
       this.observability?.getMetrics()?.counter('config.value.decrypted', 1);
 
-      return ok(decrypted);
+      return new Ok(decrypted);
     } catch (error) {
       return err(new ConfigurationEncryptionError(
         'Failed to decrypt value',
@@ -460,7 +460,7 @@ export class ConfigurationManager extends EventEmitter {
         this._state.watchingFiles = [];
 
         this.observability?.getLogger()?.info('Configuration manager destroyed');
-        return ok(undefined);
+        return new Ok(undefined);
       } catch (error) {
         return err(new ConfigurationError(
           'Failed to destroy configuration manager',
@@ -573,7 +573,7 @@ export class ConfigurationManager extends EventEmitter {
         }
       }
 
-      return ok(config);
+      return new Ok(config);
     } catch (error) {
       return err(new ConfigurationError(
         `Failed to build configuration: ${error instanceof Error ? error.message : String(error)}`,
@@ -599,7 +599,7 @@ export class ConfigurationManager extends EventEmitter {
       ));
     }
 
-    return ok(parsed.data);
+    return new Ok(parsed.data);
   }
 
   private getEnvFilePaths(): string[] {

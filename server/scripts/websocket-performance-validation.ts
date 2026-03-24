@@ -614,7 +614,7 @@ export class WebSocketPerformanceValidator {
   ): { pValue: number; confidenceLevel: number; sampleSize: number } {
     // Simplified statistical significance calculation
     // In production, use proper statistical libraries
-    const difference = Math.abs(treatment.deliveryRate - control.deliveryRate);
+    const difference = Math.abs(treatment.deliveryRate - (control as any).deliveryRate);
     const pooledStdDev = Math.sqrt((0.001 + 0.001) / 2); // Simplified
     const standardError = pooledStdDev * Math.sqrt(2 / sampleSize);
     const zScore = difference / standardError;

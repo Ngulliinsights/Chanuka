@@ -657,15 +657,15 @@ export class EvidenceValidatorService {
     const claims: EvidenceClaim[] = [];
 
     argList.forEach(arg => {
-      if (arg.type === 'evidence' || arg.evidenceQuality !== 'none') {
+      if (arg.type === 'evidence' || (arg as any).evidenceQuality !== 'none') {
         claims.push({
           id: crypto.randomUUID(),
-          text: arg.text,
+          text: (arg as any).text,
           claimType: this.inferClaimType(arg.text),
           citedSources: this.extractCitedSources(arg.text),
-          extractedFrom: arg.text,
-          confidence: arg.confidence || 0.5,
-          user_id: arg.user_id,
+          extractedFrom: (arg as any).text,
+          confidence: (arg as any).confidence || 0.5,
+          user_id: (arg as any).user_id,
           submittedAt: new Date()
         });
       }

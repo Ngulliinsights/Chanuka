@@ -944,7 +944,7 @@ export const defaultMessageHandlers = {
     const topics = Array.isArray(message.data) ? message.data : [message.data];
     
     const subscribedTopics: string[] = [];
-    topics.forEach(topic => {
+    topics.forEach((topic: any) => {
       if (typeof topic === 'string' && topic.trim()) {
         connection.ws.subscriptions.add(topic);
         connection.subscriptions.add(topic);
@@ -973,7 +973,7 @@ export const defaultMessageHandlers = {
     const topics = Array.isArray(message.data) ? message.data : [message.data];
     
     const unsubscribedTopics: string[] = [];
-    topics.forEach(topic => {
+    topics.forEach((topic: any) => {
       if (typeof topic === 'string') {
         if (connection.ws.subscriptions.has(topic)) {
           connection.ws.subscriptions.delete(topic);

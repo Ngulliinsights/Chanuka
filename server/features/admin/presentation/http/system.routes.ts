@@ -60,7 +60,7 @@ export function setupSystemRoutes(app: express.Router): void {
 
       // We explicitly type the parameter here to tell TypeScript what structure to expect
       // This is safer than using 'any' and provides proper autocomplete and error checking
-      tableInfo.rows.forEach((row: unknown) => {
+      (tableInfo as any).rows.forEach((row: unknown) => {
         const dbRow = row as DatabaseRow;
 
         // Guard against undefined values - defensive programming for database queries
@@ -133,9 +133,9 @@ export function setupSystemRoutes(app: express.Router): void {
       `);
 
       return ResponseHelper.success(res, {
-        tables: tableStats.rows,
+        tables: (tableStats as any).rows,
         summary: {
-          totalTables: tableStats.rows.length,
+          totalTables: (tableStats as any).rows.length,
           timestamp: new Date().toISOString()
         }
       });
@@ -192,7 +192,7 @@ export function setupSystemRoutes(app: express.Router): void {
 
       // Extract table names with proper type casting
       // We type the parameter explicitly to avoid implicit 'any' errors
-      const tableNames = tables.rows.map((row: unknown) => {
+      const tableNames = (tables as any).rows.map((row: unknown) => {
         const dbRow = row as DatabaseRow;
         return dbRow.table_name;
       });
@@ -220,7 +220,7 @@ export function setupSystemRoutes(app: express.Router): void {
 
         // We need to check if rows exist AND if the first row exists before accessing properties
         // This prevents the "Object is possibly 'undefined'" error
-        if (userIdType.rows.length > 0 && userIdType.rows[0]) {
+        if (userIdType.rows.length > 0 && (userIdType as any).rows[0]) {
           const idType = (userIdType.rows[0] as DatabaseRow).data_type;
           if (idType !== 'uuid') {
             issues.push({

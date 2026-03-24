@@ -89,7 +89,7 @@ export const cache = Object.assign(
         }
 
         cacheMetrics.misses++;
-        const result = await originalMethod.apply(this, args);
+        const result = await (originalMethod as any).apply(this, args);
 
         try {
           await defaultAdapter.set(key, result, options.ttl ?? 3600);

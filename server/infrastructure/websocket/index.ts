@@ -224,7 +224,7 @@ class BackwardCompatibleWebSocketService {
    */
   isUserConnected(user_id: string): boolean {
     const connections = this.connectionManager.getConnectionsForUser(user_id);
-    return connections.length > 0 && connections.some((ws: unknown) => ws.readyState === ws.OPEN);
+    return connections.length > 0 && connections.some((ws: unknown) => (ws as any).readyState === (ws as any).OPEN);
   }
 
   /**
@@ -232,7 +232,7 @@ class BackwardCompatibleWebSocketService {
    */
   getConnectionCount(user_id: string): number {
     const connections = this.connectionManager.getConnectionsForUser(user_id);
-    return connections.filter((ws: unknown) => ws.readyState === ws.OPEN).length;
+    return connections.filter((ws: unknown) => (ws as any).readyState === (ws as any).OPEN).length;
   }
 
   /**

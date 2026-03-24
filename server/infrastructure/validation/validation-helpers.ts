@@ -59,6 +59,9 @@ export const CommonSchemas = {
   /** Limit from query string (server-specific transformation) */
   limit: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().positive().max(100)).default('20'),
   
+  /** Offset from query string (server-specific transformation) */
+  offset: z.string().regex(/^\d+$/).transform(Number).pipe(z.number().int().min(0)).default('0'),
+  
   /** Date string validation (server-specific) */
   dateString: z.string().datetime(),
   
@@ -138,10 +141,10 @@ export interface ValidationResult<T> {
 /**
  * Validate data against schema
  */
-export async function validateData<T>(
-  schema: z.ZodSchema<T>,
+export async function validateData<Output, Def extends z.ZodTypeDef = z.ZodTypeDef, Input = Output>(
+  schema: z.ZodSchema<Output, Def, Input>,
   data: unknown
-): Promise<ValidationResult<T>> {
+): Promise<ValidationResult<Output>> {
   try {
     const validated = await schema.parseAsync(data);
     return {
@@ -217,3 +220,76 @@ export function validateIds(ids: unknown): string[] {
   const result = CommonSchemas.idArray.parse(ids);
   return result;
 }
+
+// ============================================================================
+// SCHEMA FACTORY FUNCTIONS - For Feature-Specific Validation
+// ============================================================================
+
+/**
+ * Create an enum schema without requiring direct z import
+ * 
+ * @param values - Array of allowed enum values
+ * @param errorMessage - Optional custom error message
+ * @returns Zod enum schema
+ * 
+ * @example
+ * const CampaignTypeSchema = createEnumSchema(['petition', 'letter_writing', 'phone_banking']);
+ */
+export function createEnumSchema<T extends string>(
+  values: readonly [T, ...T[]],
+  errorMessage?: string
+): z.ZodEnum<[T, ...T[]]> {
+  return z.enum(values, {
+    errorMap: () => ({
+      message: errorMessage || `Invalid value. Must be one of: ${values.join(', ')}`,
+    }),
+  });
+}
+
+/**
+ * Create a string schema with min/max length constraints
+ * 
+ * @param minLength - Minimum length
+ * @param maxLength - Maximum length
+ * @param fieldName - For error messages
+ * @returns Zod string schema
+ */
+export function createStringSchema(
+  minLength: number,
+  maxLength: number,
+  fieldName: string = 'value'
+): z.ZodString {
+  return z
+    .string()
+    .min(minLength, `${fieldName} must be at least ${minLength} character${minLength > 1 ? 's' : ''}`)
+    .max(maxLength, `${fieldName} must not exceed ${maxLength} characters`);
+}
+
+/**
+ * Create a number array schema
+ * 
+ * @returns Zod number array schema
+ */
+export function createNumberArraySchema(): z.ZodArray<z.ZodNumber> {
+  return z.array(z.number().int());
+}
+
+/**
+ * Create a string array schema
+ * 
+ * @param maxItems - Maximum items in array (optional)
+ * @returns Zod string array schema
+ */
+export function createStringArraySchema(maxItems?: number): z.ZodArray<z.ZodString> {
+  let schema = z.array(z.string());
+  if (maxItems) {
+    schema = schema.max(maxItems);
+  }
+  return schema;
+}
+
+/**
+ * Re-export z for internal use or advanced schema composition
+ * INTERNAL USE ONLY - Features should use factory functions above
+ */
+export { z };

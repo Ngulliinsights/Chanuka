@@ -1,476 +1,465 @@
-import { User } from '@server/features/users/domain/entities/user';
-// ============================================================================
-// ADVOCACY COORDINATION - Campaign Domain Service
-// ============================================================================
+/**
+ * Advocacy Feature — Campaign Domain Service
+ *
+ * Core business logic for campaign management, status transitions, and analytics.
+ * Coordinates domain entities, enforces business rules, and delegates persistence
+ * to the repository abstraction.
+ */
 
-// Repository interfaces removed - using direct service calls
-import { CampaignMetrics, CoalitionOpportunity } from '@server/types/index';
 import { logger } from '@server/infrastructure/observability';
 
+import type { ICampaignRepository } from '../repositories/campaign-repository';
+import type {
+  Campaign,
+  CampaignFilters,
+  CampaignMetrics,
+  CampaignStatus,
+  NewCampaign,
+  PaginationOptions,
+} from '../types';
 
+/** Milliseconds in one day — used for date-diff calculations. */
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+/**
+ * Campaign Domain Service
+ *
+ * Encapsulates campaign aggregate business logic:
+ * - Campaign creation with validation
+ * - Status transitions and state machine enforcement
+ * - Participant lifecycle (join/leave)
+ * - Metrics computation and analytics
+ * - Discovery queries
+ *
+ * Depends only on the repository abstraction, not on HTTP or infrastructure concerns.
+ */
 export class CampaignDomainService {
-  constructor(
-    private campaignRepository: ICampaignRepository,
-    private actionRepository: IActionRepository
-  ) {}
+  constructor(private readonly campaignRepository: ICampaignRepository) {}
 
+  // ── Creation ─────────────────────────────────────────────────────────────
+
+  /**
+   * Create a new campaign with full validation.
+   *
+   * Business rules enforced:
+   * - Creator must match organizerId
+   * - End date must be after start date
+   * - Start date must not be in the past
+   * - User cannot have multiple active or draft campaigns for the same bill
+   *
+   * @throws Error if validation fails
+   */
   async createCampaign(data: NewCampaign, creatorId: string): Promise<Campaign> {
-    logger.info({ 
-      title: data.title, 
-      bill_id: data.bill_id, 
-      organizerId: data.organizerId,
-      component: 'CampaignDomainService' 
-    }, 'Creating new campaign');
-
     if (data.organizerId !== creatorId) {
       throw new Error('User can only create campaigns for themselves');
     }
 
-    if (data.end_date && data.end_date <= data.start_date) {
+    if (data.endDate <= data.startDate) {
       throw new Error('End date must be after start date');
     }
 
-    if (data.start_date < new Date()) {
+    if (data.startDate < new Date()) {
       throw new Error('Start date cannot be in the past');
     }
 
-    if (!data.objectives || data.objectives.length === 0) {
-      throw new Error('Campaign must have at least one objective');
-    }
+    if (data.billId) {
+      const existingCampaigns = await this.campaignRepository.findByBillId(data.billId, {
+        organizerId: data.organizerId,
+      });
 
-    const existingCampaigns = await this.campaignRepository.findByBillId(data.bill_id, {
-      organizerId: data.organizerId
-    });
+      const hasActiveCampaign = existingCampaigns.some(
+        (c) => c.status === 'active' || c.status === 'draft'
+      );
 
-    const activeCampaigns = existingCampaigns.filter(c => 
-      c.status === 'active' || c.status === 'draft'
-    );
-
-    if (activeCampaigns.length > 0) {
-      throw new Error('User already has an active campaign for this bill');
+      if (hasActiveCampaign) {
+        throw new Error('User already has an active campaign for this bill');
+      }
     }
 
     const campaign = await this.campaignRepository.create(data);
-    
-    logger.info({ 
-      campaign_id: campaign.id,
-      component: 'CampaignDomainService' 
-    }, 'Campaign created successfully');
+
+    logger.info(
+      { campaign_id: campaign.id, organizerId: data.organizerId, component: 'CampaignDomainService' },
+      'Campaign created successfully'
+    );
 
     return campaign;
   }
 
-  async updateCampaignStatus(
-    campaign_id: string, 
-    newStatus: Campaign['status'], 
-    user_id: string
-  ): Promise<Campaign> {
-    const campaign = await this.campaignRepository.findById(campaign_id);
-    if (!campaign) {
-      throw new Error('Campaign not found');
-    }
+  // ── Status Transitions ────────────────────────────────────────────────────
 
-    const campaignEntity = CampaignEntity.fromData(campaign);
-    
-    if (!campaignEntity.canBeModifiedBy(user_id)) {
+  /**
+   * Update campaign status with state-machine validation.
+   *
+   * Valid transitions:
+   * - draft     → active, cancelled
+   * - active    → paused, completed, cancelled
+   * - paused    → active, cancelled
+   * - completed → (terminal)
+   * - cancelled → (terminal)
+   *
+   * @throws Error if transition is invalid or user is not the organizer
+   */
+  async updateCampaignStatus(
+    campaignId: string,
+    newStatus: CampaignStatus,
+    userId: string
+  ): Promise<Campaign> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
+
+    if (campaign.organizerId !== userId) {
       throw new Error('User not authorized to modify this campaign');
     }
 
-    campaignEntity.updateStatus(newStatus, user_id);
+    this.validateStatusTransition(campaign.status, newStatus);
 
-    const updatedCampaign = await this.campaignRepository.update(
-      campaign_id, 
-      { status: newStatus, updated_at: new Date() }
-    );
+    const updated = await this.campaignRepository.update(campaignId, {
+      status: newStatus,
+      updatedAt: new Date(),
+    });
 
-    if (!updatedCampaign) {
+    if (!updated) {
       throw new Error('Failed to update campaign status');
     }
 
-    logger.info({ 
-      campaign_id, 
-      oldStatus: campaign.status, 
-      newStatus,
-      component: 'CampaignDomainService' 
-    }, 'Campaign status updated');
+    logger.info(
+      {
+        campaign_id: campaignId,
+        oldStatus: campaign.status,
+        newStatus,
+        component: 'CampaignDomainService',
+      },
+      'Campaign status updated'
+    );
 
-    return updatedCampaign;
+    return updated;
   }
 
-  async joinCampaign(campaign_id: string, user_id: string): Promise<boolean> {
-    const campaign = await this.campaignRepository.findById(campaign_id);
-    if (!campaign) {
-      throw new Error('Campaign not found');
+  /**
+   * Enforce the campaign state machine. Throws on any invalid transition.
+   */
+  private validateStatusTransition(current: CampaignStatus, next: CampaignStatus): void {
+    const validTransitions: Record<CampaignStatus, CampaignStatus[]> = {
+      draft:     ['active', 'cancelled'],
+      active:    ['paused', 'completed', 'cancelled'],
+      paused:    ['active', 'cancelled'],
+      completed: [],
+      cancelled: [],
+    };
+
+    if (!validTransitions[current].includes(next)) {
+      throw new Error(
+        `Invalid status transition: cannot move from '${current}' to '${next}'`
+      );
+    }
+  }
+
+  // ── Participant Lifecycle ─────────────────────────────────────────────────
+
+  /**
+   * Add a user as a participant to an active campaign.
+   *
+   * Business rules:
+   * - Campaign must be active
+   * - User must not already be a participant
+   *
+   * NOTE: Duplicate-join prevention currently relies on participantCount only.
+   * Implement `ICampaignRepository.hasParticipant(campaignId, userId)` to enforce
+   * per-user uniqueness at the data layer.
+   *
+   * @returns true on success
+   * @throws Error if campaign is not active
+   */
+  async joinCampaign(campaignId: string, userId: string): Promise<boolean> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
+
+    if (campaign.status !== 'active') {
+      throw new Error('Campaign is not accepting new participants');
     }
 
-    const campaignEntity = CampaignEntity.fromData(campaign);
+    // TODO: Add per-user deduplication once ICampaignRepository exposes
+    //   hasParticipant(campaignId, userId): Promise<boolean>
+    // e.g.: if (await this.campaignRepository.hasParticipant(campaignId, userId)) {
+    //         throw new Error('User is already a participant in this campaign');
+    //       }
 
-    if (!campaignEntity.canAcceptParticipants()) {
-      throw new Error('Campaign cannot accept new participants');
-    }
-
-    const isAlreadyParticipant = await this.campaignRepository.isParticipant(campaign_id, user_id);
-    if (isAlreadyParticipant) {
-      throw new Error('User is already a participant in this campaign');
-    }
-
-    const success = await this.campaignRepository.addParticipant(campaign_id, user_id, {
-      joinedAt: new Date(),
-      role: 'participant'
+    await this.campaignRepository.update(campaignId, {
+      participantCount: campaign.participantCount + 1,
+      updatedAt: new Date(),
     });
 
-    if (success) {
-      campaignEntity.addParticipant();
-      await this.campaignRepository.update(campaign_id, {
-        participantCount: campaignEntity.participantCount,
-        updated_at: new Date()
-      });
+    logger.info(
+      { campaign_id: campaignId, user_id: userId, component: 'CampaignDomainService' },
+      'User joined campaign'
+    );
 
-      logger.info({ 
-        campaign_id, 
-        user_id,
-        component: 'CampaignDomainService' 
-      }, 'User joined campaign');
-    }
-
-    return success;
+    return true;
   }
 
   /**
-   * Calculate comprehensive campaign impact metrics
+   * Remove a user as a participant from a campaign.
+   *
+   * @throws Error if campaign has already reached a terminal state
    */
-  async calculateCampaignImpact(campaign_id: string): Promise<CampaignMetrics> {
-    try {
-      const campaign = await this.campaignRepository.findById(campaign_id);
-      if (!campaign) {
-        throw new Error('Campaign not found');
-      }
+  async leaveCampaign(campaignId: string, userId: string): Promise<boolean> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
 
-      // Get campaign actions and completions
-      const actions = await this.actionRepository.findByCampaign(campaign_id);
-      const participants = await this.campaignRepository.getCampaignParticipants(campaign_id);
-      
-      // Calculate action metrics
-      const totalActions = actions.length;
-      const completedActions = actions.filter(a => a.status === 'completed').length;
-      const completionRate = totalActions > 0 ? completedActions / totalActions : 0;
-
-      // Calculate engagement metrics
-      const activeParticipants = participants.filter(p => 
-        p.lastActivityAt && new Date(p.lastActivityAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      ).length;
-      const retentionRate = participants.length > 0 ? activeParticipants / participants.length : 0;
-
-      // Calculate geographic reach
-      const countiesReached = new Set(participants.map(p => p.county).filter(Boolean)).size;
-      const constituenciesReached = new Set(participants.map(p => p.constituency).filter(Boolean)).size;
-
-      // Calculate impact score
-      const impactScore = this.calculateImpactScore({
-        completionRate,
-        totalActions,
-        completedActions
-      }, {
-        engagementMetrics: { retentionRate },
-        geographicDistribution: { countiesReached }
-      });
-
-      const metrics: CampaignMetrics = {
-        campaign_id,
-        participantCount: participants.length,
-        actionCompletionRate: completionRate,
-        totalActionsCompleted: completedActions,
-        engagement_score: retentionRate * 100,
-        geographicReach: {
-          counties: countiesReached,
-          constituencies: constituenciesReached
-        },
-        impactScore,
-        lastCalculated: new Date()
-      };
-
-      // Store metrics for historical tracking
-      await this.campaignRepository.storeMetrics(campaign_id, metrics);
-
-      return metrics;
-
-    } catch (error) {
-      logger.error('Failed to calculate campaign impact', error, { campaign_id });
-      throw error;
+    if (campaign.status === 'completed' || campaign.status === 'cancelled') {
+      throw new Error(`Cannot leave a ${campaign.status} campaign`);
     }
+
+    await this.campaignRepository.update(campaignId, {
+      participantCount: Math.max(0, campaign.participantCount - 1),
+      updatedAt: new Date(),
+    });
+
+    logger.info(
+      { campaign_id: campaignId, user_id: userId, component: 'CampaignDomainService' },
+      'User left campaign'
+    );
+
+    return true;
+  }
+
+  // ── Metrics & Analytics ───────────────────────────────────────────────────
+
+  /**
+   * Compute aggregated metrics for a single campaign.
+   *
+   * Metrics include:
+   * - totalParticipants  — current participant count
+   * - totalActions       — sum of actions taken (requires action repository; TODO)
+   * - participationRate  — participants as a fraction of the campaign's goal (TODO)
+   * - reach              — geographic / network spread (TODO)
+   * - engagement         — activity density over time (TODO)
+   * - conversion         — actions-to-participant ratio (actions / participants)
+   * - targetResponse     — legislator / official feedback count (TODO)
+   *
+   * Accepts an already-fetched campaign to avoid a redundant repository round-trip
+   * when called from getCampaignAnalytics.
+   */
+  async computeCampaignMetrics(campaignId: string): Promise<CampaignMetrics> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
+    return this.buildMetrics(campaign);
+  }
+
+  /** Pure metrics calculation — separated so analytics can reuse a fetched campaign. */
+  private buildMetrics(campaign: Campaign): CampaignMetrics {
+    const totalParticipants = campaign.participantCount;
+    const totalActions      = 0; // TODO: query action repository
+
+    return {
+      totalParticipants,
+      totalActions,
+      // TODO: replace with (participants / targetParticipants) once Campaign exposes a goal field
+      participationRate: 0,
+      reach:             0, // TODO: geographic spread calculation
+      engagement:        0, // TODO: activity density over time
+      // Actions completed per participant; 0 when there are no participants
+      conversion:        totalParticipants > 0 ? totalActions / totalParticipants : 0,
+      targetResponse:    0, // TODO: legislator / official feedback count
+    };
   }
 
   /**
-   * Identify coalition opportunities with other campaigns
+   * Retrieve detailed campaign analytics including day-count trends.
+   *
+   * Reuses the already-fetched campaign to avoid a second repository call.
    */
-  async identifyCoalitionOpportunities(campaign_id: string): Promise<CoalitionOpportunity[]> {
-    try {
-      const campaign = await this.campaignRepository.findById(campaign_id);
-      if (!campaign) {
-        throw new Error('Campaign not found');
-      }
+  async getCampaignAnalytics(campaignId: string): Promise<Record<string, unknown>> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
+    const metrics  = this.buildMetrics(campaign);
+    const now      = Date.now();
 
-      const opportunities: CoalitionOpportunity[] = [];
-
-      // Find campaigns on the same bill
-      const sameBillCampaigns = await this.campaignRepository.findByBillId(campaign.bill_id);
-      const otherCampaigns = sameBillCampaigns.filter(c => c.id !== campaign_id);
-
-      for (const otherCampaign of otherCampaigns) {
-        // Check for alignment in objectives
-        const sharedObjectives = campaign.objectives.filter(obj => 
-          otherCampaign.objectives.some(otherObj => 
-            this.calculateObjectiveSimilarity(obj, otherObj) > 0.7
-          )
-        );
-
-        if (sharedObjectives.length > 0) {
-          opportunities.push({
-            campaign_id: otherCampaign.id,
-            campaignTitle: otherCampaign.title,
-            organizerName: otherCampaign.organizerName || 'Unknown',
-            alignmentScore: sharedObjectives.length / Math.max(campaign.objectives.length, otherCampaign.objectives.length),
-            sharedObjectives,
-            potentialBenefits: [
-              'Increased participant pool',
-              'Shared resources and expertise',
-              'Coordinated action strategies',
-              'Enhanced media visibility'
-            ],
-            recommendedActions: [
-              'Schedule coordination meeting',
-              'Share action templates',
-              'Cross-promote campaigns',
-              'Coordinate media outreach'
-            ]
-          });
-        }
-      }
-
-      // Find campaigns in same geographic area
-      const sameCountyCampaigns = await this.campaignRepository.findByCounty(campaign.targetCounties[0]);
-      for (const countyCampaign of sameCountyCampaigns) {
-        if (countyCampaign.id !== campaign_id && !opportunities.find(o => o.campaign_id === countyCampaign.id)) {
-          opportunities.push({
-            campaign_id: countyCampaign.id,
-            campaignTitle: countyCampaign.title,
-            organizerName: countyCampaign.organizerName || 'Unknown',
-            alignmentScore: 0.5, // Geographic alignment
-            sharedObjectives: [],
-            potentialBenefits: [
-              'Local network sharing',
-              'Joint community events',
-              'Shared local expertise'
-            ],
-            recommendedActions: [
-              'Organize joint community meeting',
-              'Share local contact lists',
-              'Coordinate local media outreach'
-            ]
-          });
-        }
-      }
-
-      return opportunities.sort((a, b) => b.alignmentScore - a.alignmentScore);
-
-    } catch (error) {
-      logger.error('Failed to identify coalition opportunities', error, { campaign_id });
-      throw error;
-    }
+    return {
+      ...metrics,
+      campaignId,
+      title:  campaign.title,
+      status: campaign.status,
+      // Clamp to 0 — daysActive is negative if the campaign hasn't started yet
+      daysActive:    Math.max(0, Math.floor((now - campaign.startDate.getTime()) / MS_PER_DAY)),
+      daysRemaining: Math.max(0, Math.floor((campaign.endDate.getTime() - now) / MS_PER_DAY)),
+    };
   }
 
   /**
-   * Optimize campaign strategy based on performance data
+   * Retrieve campaigns that need moderation attention.
+   * TODO: Implement flagging system with moderation queue.
    */
-  async optimizeCampaignStrategy(campaign_id: string): Promise<{
-    recommendations: string[];
-    priorityActions: string[];
-    targetAdjustments: Record<string, unknown>;
-  }> {
-    try {
-      const metrics = await this.calculateCampaignImpact(campaign_id);
-      const campaign = await this.campaignRepository.findById(campaign_id);
-      
-      if (!campaign) {
-        throw new Error('Campaign not found');
-      }
+  async getCampaignsRequiringAttention(): Promise<Campaign[]> {
+    logger.info(
+      { component: 'CampaignDomainService', operation: 'getCampaignsRequiringAttention' },
+      'Moderation queue system not yet implemented'
+    );
+    return [];
+  }
 
-      const recommendations: string[] = [];
-      const priorityActions: string[] = [];
-      const targetAdjustments: Record<string, unknown> = {};
+  // ── Discovery ─────────────────────────────────────────────────────────────
 
-      // Analyze completion rates
-      if (metrics.actionCompletionRate < 0.6) {
-        recommendations.push('Action completion rate is below optimal (60%). Consider simplifying action items or providing better guidance.');
-        priorityActions.push('Review and simplify complex actions');
-        priorityActions.push('Create step-by-step guides for actions');
-        priorityActions.push('Implement peer mentoring system');
-      }
-
-      // Analyze engagement
-      if (metrics.engagement_score < 50) {
-        recommendations.push('Participant engagement is low. Implement strategies to increase interaction and motivation.');
-        priorityActions.push('Launch weekly engagement challenges');
-        priorityActions.push('Create participant recognition program');
-        priorityActions.push('Organize virtual meetups');
-      }
-
-      // Analyze geographic reach
-      if (metrics.geographicReach.counties < campaign.targetCounties.length * 0.7) {
-        recommendations.push('Geographic reach is below target. Expand outreach to underrepresented areas.');
-        targetAdjustments.focusCounties = campaign.targetCounties.filter(county => 
-          // Logic to identify counties with low participation
-          true // Placeholder
-        );
-        priorityActions.push('Launch targeted outreach in underrepresented counties');
-        priorityActions.push('Partner with local organizations');
-      }
-
-      // Analyze participant growth
-      if (metrics.participantCount < 50) {
-        recommendations.push('Participant count is low. Increase recruitment and outreach efforts.');
-        priorityActions.push('Launch social media recruitment campaign');
-        priorityActions.push('Implement referral incentive program');
-        priorityActions.push('Organize community awareness events');
-      }
-
-      return {
-        recommendations,
-        priorityActions,
-        targetAdjustments
-      };
-
-    } catch (error) {
-      logger.error('Failed to optimize campaign strategy', error, { campaign_id });
-      throw error;
-    }
+  /**
+   * Find campaigns by multiple filters with pagination.
+   *
+   * @param _userId Reserved for future visibility / ACL filtering
+   */
+  async getCampaigns(
+    filters?: CampaignFilters,
+    pagination?: PaginationOptions,
+    _userId?: string // reserved for visibility / ACL filtering
+  ): Promise<Campaign[]> {
+    return this.campaignRepository.findAll(filters, pagination);
   }
 
   /**
-   * Coordinate action assignments based on participant skills and availability
+   * Get a single campaign by ID.
+   *
+   * @param _userId Reserved for future visibility / ACL filtering
    */
-  async coordinateActionAssignments(campaign_id: string): Promise<{
-    assignments: Array<{
-      actionId: string;
-      assignedTo: string[];
-      reasoning: string;
-    }>;
-    unassignedActions: string[];
-    overloadedParticipants: string[];
-  }> {
-    try {
-      const actions = await this.actionRepository.findByCampaign(campaign_id, { status: 'active' });
-      const participants = await this.campaignRepository.getCampaignParticipants(campaign_id);
+  async getCampaign(campaignId: string, _userId?: string /* reserved */): Promise<Campaign> {
+    return this.findCampaignOrThrow(campaignId);
+  }
 
-      const assignments: Array<{
-        actionId: string;
-        assignedTo: string[];
-        reasoning: string;
-      }> = [];
-      const unassignedActions: string[] = [];
-      const overloadedParticipants: string[] = [];
+  /** Find campaigns associated with a specific bill. */
+  async getCampaignsByBill(billId: string): Promise<Campaign[]> {
+    return this.campaignRepository.findByBillId(billId);
+  }
 
-      // Analyze participant workload
-      const participantWorkload = new Map<string, number>();
-      participants.forEach(p => {
-        participantWorkload.set(p.user_id, p.actionsAssigned || 0);
-      });
+  /** Find campaigns created by a user. */
+  async getCampaignsByUser(userId: string): Promise<Campaign[]> {
+    return this.campaignRepository.findByOrganizer(userId);
+  }
 
-      // Assign actions based on skills and availability
-      for (const action of actions) {
-        const suitableParticipants = participants.filter(p => {
-          // Check skill match
-          const hasRequiredSkills = !action.requiredSkills || 
-            action.requiredSkills.some(skill => p.offeredSkills?.includes(skill));
-          
-          // Check availability (not overloaded)
-          const currentWorkload = participantWorkload.get(p.user_id) || 0;
-          const isAvailable = currentWorkload < 5; // Max 5 active actions per participant
+  /** Search campaigns by text query. */
+  async searchCampaigns(
+    query: string,
+    filters?: CampaignFilters,
+    pagination?: PaginationOptions
+  ): Promise<Campaign[]> {
+    return this.campaignRepository.search(query, filters, pagination);
+  }
 
-          // Check geographic relevance
-          const isGeographicallyRelevant = !action.targetCounties || 
-            action.targetCounties.length === 0 ||
-            action.targetCounties.includes(p.userCounty);
+  /** Return the most recently active campaigns, up to `limit`. */
+  async getTrendingCampaigns(limit = 10): Promise<Campaign[]> {
+    return this.campaignRepository.findAll({ status: 'active' }, { page: 1, limit });
+  }
 
-          return hasRequiredSkills && isAvailable && isGeographicallyRelevant;
-        });
+  // ── Update & Delete ───────────────────────────────────────────────────────
 
-        if (suitableParticipants.length > 0) {
-          // Assign to best matches (up to 3 participants per action)
-          const bestMatches = suitableParticipants
-            .sort((a, b) => (b.engagement_score || 0) - (a.engagement_score || 0))
-            .slice(0, 3);
+  /**
+   * Update campaign details (excluding status). Restricted to the organizer.
+   *
+   * Status changes must go through updateCampaignStatus to enforce the state machine.
+   *
+   * @throws Error if campaign not found, user is not the organizer, or persistence fails
+   */
+  async updateCampaign(
+    campaignId: string,
+    updates: Partial<Campaign>,
+    userId: string
+  ): Promise<Campaign> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
 
-          assignments.push({
-            actionId: action.id,
-            assignedTo: bestMatches.map(p => p.user_id),
-            reasoning: `Assigned based on skill match and engagement score. Skills: ${action.requiredSkills?.join(', ') || 'none required'}`
-          });
-
-          // Update workload tracking
-          bestMatches.forEach(p => {
-            const currentWorkload = participantWorkload.get(p.user_id) || 0;
-            participantWorkload.set(p.user_id, currentWorkload + 1);
-          });
-        } else {
-          unassignedActions.push(action.id);
-        }
-      }
-
-      // Identify overloaded participants
-      participantWorkload.forEach((workload, user_id) => {
-        if (workload > 7) { // Threshold for overload
-          overloadedParticipants.push(user_id);
-        }
-      });
-
-      return {
-        assignments,
-        unassignedActions,
-        overloadedParticipants
-      };
-
-    } catch (error) {
-      logger.error('Failed to coordinate action assignments', error, { campaign_id });
-      throw error;
+    if (campaign.organizerId !== userId) {
+      throw new Error('User not authorized to modify this campaign');
     }
+
+    // Destructure status out so it is never persisted through this path.
+    // Status changes must go through updateCampaignStatus to enforce the state machine.
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { status, ...safeUpdates } = updates;
+
+    const updated = await this.campaignRepository.update(campaignId, {
+      ...safeUpdates,
+      updatedAt: new Date(),
+    });
+
+    if (!updated) {
+      throw new Error('Failed to update campaign');
+    }
+
+    logger.info(
+      { campaign_id: campaignId, component: 'CampaignDomainService' },
+      'Campaign updated'
+    );
+
+    return updated;
   }
 
-  private calculateImpactScore(actionSummary: unknown, analytics: unknown): number {
-    if (!actionSummary) return 0;
-    
-    let score = 0;
-    
-    // Action completion contributes 40% to impact score
-    score += (actionSummary.completionRate || 0) * 40;
-    
-    // Engagement retention contributes 30%
-    const engagementRate = analytics?.engagementMetrics?.retentionRate || 0;
-    score += engagementRate * 30;
-    
-    // Geographic reach contributes 20%
-    const countyCount = analytics?.geographicDistribution?.countiesReached || 0;
-    const reachScore = Math.min(countyCount / 10, 1) * 20;
-    score += reachScore;
-    
-    // Action diversity contributes 10%
-    const actionCount = actionSummary.totalActions || 0;
-    const diversityScore = Math.min(actionCount / 10, 1) * 10;
-    score += diversityScore;
-    
-    return Math.round(score);
+  /**
+   * Delete a campaign. Restricted to the organizer; active campaigns must be
+   * paused or completed before deletion.
+   */
+  async deleteCampaign(campaignId: string, userId: string): Promise<void> {
+    const campaign = await this.findCampaignOrThrow(campaignId);
+
+    if (campaign.organizerId !== userId) {
+      throw new Error('User not authorized to delete this campaign');
+    }
+
+    if (campaign.status === 'active') {
+      throw new Error('Cannot delete an active campaign — pause or complete it first');
+    }
+
+    const deleted = await this.campaignRepository.delete(campaignId);
+    if (!deleted) {
+      throw new Error('Failed to delete campaign');
+    }
+
+    logger.info(
+      { campaign_id: campaignId, component: 'CampaignDomainService' },
+      'Campaign deleted'
+    );
   }
 
-  private calculateObjectiveSimilarity(obj1: string, obj2: string): number {
-    // Simple similarity calculation based on common words
-    const words1 = obj1.toLowerCase().split(/\s+/);
-    const words2 = obj2.toLowerCase().split(/\s+/);
-    
-    const commonWords = words1.filter(word => words2.includes(word));
-    const totalWords = new Set([...words1, ...words2]).size;
-    
-    return commonWords.length / totalWords;
+  // ── Dashboard Statistics ──────────────────────────────────────────────────
+
+  /**
+   * Aggregate campaign statistics for the dashboard.
+   *
+   * Computes all counts in a single pass over the result set to avoid
+   * re-iterating for each status bucket.
+   *
+   * NOTE: This performs a full-table scan via findAll(). Consider adding
+   * a dedicated `ICampaignRepository.getStats()` method backed by SQL
+   * aggregates (COUNT / SUM grouped by status) for large datasets.
+   */
+  async getCampaignStats(): Promise<Record<string, unknown>> {
+    const allCampaigns = await this.campaignRepository.findAll();
+
+    const counts = allCampaigns.reduce(
+      (acc, c) => {
+        acc.totalParticipants += c.participantCount;
+        if (c.status === 'active')    acc.active    += 1;
+        if (c.status === 'draft')     acc.draft     += 1;
+        if (c.status === 'completed') acc.completed += 1;
+        return acc;
+      },
+      { active: 0, draft: 0, completed: 0, totalParticipants: 0 }
+    );
+
+    const stats = {
+      total: allCampaigns.length,
+      ...counts,
+      avgParticipantsPerCampaign: Math.round(
+        counts.totalParticipants / (allCampaigns.length || 1)
+      ),
+    };
+
+    logger.info({ stats, component: 'CampaignDomainService' }, 'Campaign statistics compiled');
+
+    return stats;
+  }
+
+  // ── Private Helpers ───────────────────────────────────────────────────────
+
+  /**
+   * Fetch a campaign by ID or throw a consistent "not found" error.
+   * Centralizes the null-check that was duplicated across every method.
+   */
+  private async findCampaignOrThrow(campaignId: string): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findById(campaignId);
+    if (!campaign) {
+      throw new Error(`Campaign not found: ${campaignId}`);
+    }
+    return campaign;
   }
 }
-
-

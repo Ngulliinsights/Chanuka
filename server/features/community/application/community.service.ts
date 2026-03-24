@@ -101,7 +101,7 @@ export class CommunityService {
       const results = await query;
 
       // Transform results to include engagement data
-      const commentsWithEngagement: Comment[] = results.map(row => ({
+      const commentsWithEngagement: Comment[] = results.map((row: any) => ({
         id: row.id,
         billId: row.billId,
         userId: row.userId,

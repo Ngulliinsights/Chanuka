@@ -176,7 +176,7 @@ export class SimpleMatchingEngine {
     const offset = (page - 1) * limit;
 
     // Search bills using ILIKE for simple matching
-    const billResults = await readDatabase(async (db) => {
+    const billResults = await readDatabase(async (db: any) => {
       return db
         .select({
           id: bills.id,
@@ -200,7 +200,7 @@ export class SimpleMatchingEngine {
     });
 
     // Convert to SearchResult format
-    return billResults.map(bill => ({
+    return billResults.map((bill: any) => ({
       id: bill.id.toString(),
       title: bill.title || '',
       description: bill.description || '',

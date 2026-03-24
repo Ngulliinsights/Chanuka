@@ -217,10 +217,10 @@ router.get('/gaps', async (_req: Request, res: Response) => {
         gaps,
         summary: {
           total: gaps.length,
-          critical: gaps.filter(g => g.severity === 'critical').length,
-          high: gaps.filter(g => g.severity === 'high').length,
-          medium: gaps.filter(g => g.severity === 'medium').length,
-          low: gaps.filter(g => g.severity === 'low').length
+          critical: gaps.filter((g: any) => g.severity === 'critical').length,
+          high: gaps.filter((g: any) => g.severity === 'high').length,
+          medium: gaps.filter((g: any) => g.severity === 'medium').length,
+          low: gaps.filter((g: any) => g.severity === 'low').length
         }
       }
     });

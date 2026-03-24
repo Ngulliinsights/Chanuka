@@ -29,12 +29,16 @@ export type { ServiceResult, AsyncServiceResult };
  */
 export const createResponseMetadata = (
   startTime?: number,
-  additional?: Partial<ResponseMetadata>
+  additional?: Partial<ResponseMetadata> | string
 ): ResponseMetadata => {
+  const metadata: Partial<ResponseMetadata> = typeof additional === 'string' 
+    ? { source: additional } 
+    : additional || {};
+
   return {
     timestamp: new Date().toISOString(),
     ...(startTime && { performance: { duration: Date.now() - startTime } }),
-    ...additional,
+    ...metadata,
   } as ResponseMetadata;
 };
 
@@ -47,13 +51,14 @@ export class ApiResponseWrapper {
   static success<T>(
     data: T, 
     message?: string, 
-    metadata?: Partial<ResponseMetadata>
+    metadata?: Partial<ResponseMetadata> | string
   ): ApiResponse<T> {
     return {
       success: true,
       data,
       ...(message && { message }),
-      metadata: createResponseMetadata(undefined, metadata)
+      metadata: createResponseMetadata(undefined, metadata),
+      timestamp: new Date().toISOString()
     };
   }
 
@@ -61,7 +66,7 @@ export class ApiResponseWrapper {
     message: string, 
     code: string = 'INTERNAL_ERROR', 
     details?: Record<string, any>, 
-    metadata?: Partial<ResponseMetadata>
+    metadata?: Partial<ResponseMetadata> | string
   ): ApiResponse<never> {
     return {
       success: false,
@@ -71,7 +76,8 @@ export class ApiResponseWrapper {
         ...(details && { details })
       },
       message,
-      metadata: createResponseMetadata(undefined, metadata)
+      metadata: createResponseMetadata(undefined, metadata),
+      timestamp: new Date().toISOString()
     };
   }
 }

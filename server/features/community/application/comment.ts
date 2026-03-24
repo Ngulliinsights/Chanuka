@@ -181,7 +181,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'getBillComments',
-        context: { bill_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to get bill comments');
+        context: { bill_id, error } }, 'Failed to get bill comments');
       return { comments: [], totalCount: 0, hasMore: false };
     }
   }
@@ -226,7 +226,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'getCommentReplies',
-        context: { parent_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to get comment replies');
+        context: { parent_id, error } }, 'Failed to get comment replies');
       return [];
     }
   }
@@ -260,7 +260,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'findCommentById',
-        context: { id, error: } instanceof Error ? }.message : String(}) }, 'Failed to find comment by ID');
+        context: { id, error } }, 'Failed to find comment by ID');
       return null;
     }
   }
@@ -312,7 +312,7 @@ export class CommentService {
           .limit(5),
       ]);
 
-      const totalComments = Number(totalRow.count);
+      const totalComments = Number(totalRow!.count);
       const contributors = topContributors.map((c) => ({
         user_id: c.user_id,
         userName: c.userName,
@@ -322,8 +322,8 @@ export class CommentService {
 
       const stats: CommentStats = {
         totalComments,
-        expertComments: Number(expertRow.count),
-        verifiedComments: Number(verifiedRow.count),
+        expertComments: Number(expertRow!.count),
+        verifiedComments: Number(verifiedRow!.count),
         averageEngagement: this.calculateAverageEngagement(totalComments, contributors),
         topContributors: contributors,
       };
@@ -334,7 +334,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'getCommentStats',
-        context: { bill_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to get comment stats');
+        context: { bill_id, error } }, 'Failed to get comment stats');
       await this.safeCacheSet(cacheKey, empty, this.COMMENT_CACHE_TTL);
       return empty;
     }
@@ -406,12 +406,12 @@ export class CommentService {
       // Process comment through argument intelligence pipeline (async, non-blocking)
       this.processCommentArguments(newComment, userInfo).catch((error) =>
         logger.error({ error,
-          context: { comment_id: newComment.id, bill_id: data.bill_id, error: } instanceof Error ? }.message : String(}) }, 'Error processing comment arguments'),
+          context: { comment_id: newComment.id, bill_id: data.bill_id, error } }, 'Error processing comment arguments'),
       );
 
       this.clearCommentCaches(data.bill_id).catch((error) =>
         logger.error({ error,
-          context: { bill_id: data.bill_id, error: } instanceof Error ? }.message : String(}) }, 'Error clearing comment caches after create'),
+          context: { bill_id: data.bill_id, error } }, 'Error clearing comment caches after create'),
       );
 
       return {
@@ -426,7 +426,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'createComment',
-        context: { bill_id: data.bill_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to create comment');
+        context: { bill_id: data.bill_id, error } }, 'Failed to create comment');
       return this.createFallbackComment(data);
     }
   }
@@ -477,7 +477,7 @@ export class CommentService {
           processingTime,
           claimsExtracted: result.claimsExtracted,
           evidenceFound: result.evidenceFound,
-          position: result.position,, error: } instanceof Error ? }.message : String(}) }, 'Comment processed through argument intelligence');
+          position: result.position, error } }, 'Comment processed through argument intelligence');
     } catch (error) {
       const processingTime = Date.now() - startTime;
 
@@ -486,7 +486,7 @@ export class CommentService {
         component: 'CommentService',
         context: {
           comment_id: comment.id,
-          processingTime,, error: } instanceof Error ? }.message : String(}) }, 'Failed to process comment arguments');
+          processingTime, error } }, 'Failed to process comment arguments');
     }
   }
 
@@ -565,7 +565,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'updateComment',
-        context: { comment_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to update comment');
+        context: { comment_id, error } }, 'Failed to update comment');
       return null;
     }
   }
@@ -619,7 +619,7 @@ export class CommentService {
       logger.error({ error,
         component: 'CommentService',
         operation: 'deleteComment',
-        context: { comment_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to delete comment');
+        context: { comment_id, error } }, 'Failed to delete comment');
       return false;
     }
   }
@@ -709,10 +709,10 @@ export class CommentService {
   ): Promise<CommentWithUser[]> {
     if (rows.length === 0) return [];
 
-    const comment_ids = rows.map((r) => r.comment.id as number);
+    const comment_ids = rows.map((r: any) => r.comment.id as number);
     const replyCounts = await this.getBatchReplyCounts(comment_ids);
 
-    const transformed: CommentWithUser[] = rows.map((row) => ({
+    const transformed: CommentWithUser[] = rows.map((row: any) => ({
       ...row.comment,
       user: row.user,
       user_profiles: row.user_profiles,
@@ -761,7 +761,7 @@ export class CommentService {
           })
           .catch((error) => {
             logger.error({ error,
-              context: { comment_id: comment.id, error: } instanceof Error ? }.message : String(}) }, 'Error loading replies for comment');
+              context: { comment_id: comment.id, error } }, 'Error loading replies for comment');
             comment.replies = [];
           }),
       ),
@@ -777,7 +777,7 @@ export class CommentService {
       return Number(replyCount);
     } catch (error) {
       logger.error({ error,
-        context: { comment_id, error: } instanceof Error ? }.message : String(}) }, 'Error getting reply count');
+        context: { comment_id, error } }, 'Error getting reply count');
       return 0;
     }
   }

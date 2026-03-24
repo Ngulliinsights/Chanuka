@@ -1,8 +1,9 @@
 /**
  * Moderation Workflow Orchestrator Service
- * 
- * Main coordination service that orchestrates the entire moderation workflow.
- * This service acts as the primary interface for moderation operations.
+ *
+ * Central coordinator for the content moderation system. Delegates to
+ * specialized services and provides a single, stable interface for all
+ * moderation operations.
  */
 
 import { contentAnalysisService } from '@server/features/admin/moderation/content-analysis.service';
@@ -11,369 +12,417 @@ import { moderationDecisionService } from '@server/features/admin/moderation/mod
 import { moderationQueueService } from '@server/features/admin/moderation/moderation-queue.service';
 import { logger } from '@server/infrastructure/observability';
 
-import { 
+import {
   BulkModerationOperation,
   ContentAnalysisResult,
   ContentAnalytics,
-  ContentModerationFilters, 
+  ContentModerationFilters,
   ModerationActionRecord,
-  ModerationItem, 
-  PaginationInfo
+  ModerationItem,
+  PaginationInfo,
 } from './types';
 
-/**
- * Main orchestrator for the content moderation system.
- * 
- * This service coordinates between all moderation components and provides
- * a unified interface for moderation operations.
- */
+// ─── Supporting types ─────────────────────────────────────────────────────────
+
+type ContentType = 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency';
+type AnalyzableContentType = Extract<ContentType, 'bill' | 'comment'>;
+type ReportType = 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other';
+type DecisionType = 'resolve' | 'dismiss' | 'escalate';
+type ActionType = 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight';
+
+interface CreateReportOptions {
+  contentType: ContentType;
+  contentId: number;
+  reportType: ReportType;
+  reason: string;
+  reportedBy: string;
+  autoDetected?: boolean;
+  description?: string;
+}
+
+interface CreateReportResult {
+  success: boolean;
+  message: string;
+  reportId?: number;
+}
+
+interface ReviewReportResult {
+  success: boolean;
+  message: string;
+  report?: ModerationItem;
+}
+
+interface BulkModerationResult {
+  success: boolean;
+  message: string;
+  processedCount: number;
+  failedIds: number[];
+}
+
+interface ProcessSubmissionResult {
+  approved: boolean;
+  requiresReview: boolean;
+  analysis: ContentAnalysisResult;
+  reportId?: number;
+}
+
+interface EscalationResult {
+  success: boolean;
+  message: string;
+}
+
+interface ModerationStats {
+  reportsCreated: number;
+  reportsResolved: number;
+  reportsPending: number;
+  averageResolutionTime: number;
+  reportsByType: { type: string; count: number }[];
+  actionsByType: { type: string; count: number }[];
+  moderatorActivity: {
+    moderatorId: string;
+    moderatorName: string;
+    reviewCount: number;
+    averageReviewTime: number;
+  }[];
+  contentTypeBreakdown: { contentType: string | null; count: number }[];
+  severityBreakdown: { severity: string | null; count: number }[];
+}
+
+interface RawModerationStats {
+  reportsCreated?: number;
+  reports_created?: number;
+  reportsResolved?: number;
+  reports_resolved?: number;
+  reportsPending?: number;
+  reports_pending?: number;
+  averageResolutionTime?: number;
+  average_resolution_time?: number;
+  reportsByType?: { type: string; count: number }[];
+  reports_by_type?: { type: string; count: number }[];
+  actionsByType?: { type: string; count: number }[];
+  actions_by_type?: { type: string; count: number }[];
+  moderatorActivity?: Array<{
+    moderatorId?: string;
+    moderator_id?: string;
+    moderatorName?: string;
+    moderator_name?: string;
+    reviewCount?: number;
+    review_count?: number;
+    averageReviewTime?: number;
+    average_review_time?: number;
+  }>;
+  moderator_activity?: Array<{
+    moderatorId?: string;
+    moderator_id?: string;
+    moderatorName?: string;
+    moderator_name?: string;
+    reviewCount?: number;
+    review_count?: number;
+    averageReviewTime?: number;
+    average_review_time?: number;
+  }>;
+  contentTypeBreakdown?: Array<{ contentType?: string | null; content_type?: string | null; count: number }>;
+  content_type_breakdown?: Array<{ contentType?: string | null; content_type?: string | null; count: number }>;
+  severityBreakdown?: Array<{ severity?: string | null; count: number }>;
+  severity_breakdown?: Array<{ severity?: string | null; count: number }>;
+}
+
+// ─── Service ──────────────────────────────────────────────────────────────────
+
 export class ModerationOrchestratorService {
   private static instance: ModerationOrchestratorService;
 
-  public static getInstance(): ModerationOrchestratorService {
+  static getInstance(): ModerationOrchestratorService {
     if (!ModerationOrchestratorService.instance) {
       ModerationOrchestratorService.instance = new ModerationOrchestratorService();
     }
     return ModerationOrchestratorService.instance;
   }
 
-  // Queue Management Operations
+  // ─── Queue management ────────────────────────────────────────────────────────
 
   /**
-   * Retrieves the moderation queue with filtering and pagination
+   * Returns the moderation queue with optional filtering and pagination.
    */
-  async getModerationQueue(
+  getModerationQueue(
     page = 1,
     limit = 20,
-    filters?: ContentModerationFilters
-  ): Promise<{
-    items: ModerationItem[];
-    pagination: PaginationInfo;
-  }> {
-    try {
-      return await moderationQueueService.getModerationQueue(page, limit, filters);
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - getModerationQueue:');
-      throw error;
-    }
+    filters?: ContentModerationFilters,
+  ): Promise<{ items: ModerationItem[]; pagination: PaginationInfo }> {
+    return this.exec('getModerationQueue', () =>
+      moderationQueueService.getModerationQueue(page, limit, filters),
+    );
   }
 
   /**
-   * Creates a new content report with optional automated analysis
+   * Creates a new content report.
+   *
+   * Note: Pass the real `contentId` at the call site — this method does not
+   * accept a sentinel value such as `0` for unknown IDs.
    */
-  async createReport(
-    content_type: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    content_id: number,
-    reportType: 'spam' | 'harassment' | 'misinformation' | 'inappropriate' | 'copyright' | 'other',
-    reason: string,
-    reportedBy: string,
-    autoDetected = false,
-    description?: string,
-    performAnalysis = true
-  ): Promise<{ 
-    success: boolean; 
-    message: string; 
-    report_id?: number;
-    analysis?: ContentAnalysisResult;
-  }> {
-    try {
-      // Create the report
-      const reportResult = await moderationQueueService.createReport(
-        content_type,
-        content_id,
+  async createReport(options: CreateReportOptions): Promise<CreateReportResult> {
+    const {
+      contentType,
+      contentId,
+      reportType,
+      reason,
+      reportedBy,
+      autoDetected = false,
+      description,
+    } = options;
+
+    return this.exec('createReport', () =>
+      moderationQueueService.createReport(
+        contentType,
+        contentId,
         reportType,
         reason,
         reportedBy,
         autoDetected,
-        description
-      );
-
-      // Optionally perform content analysis for additional context
-      let analysis: ContentAnalysisResult | undefined;
-      if (performAnalysis && (content_type === 'bill' || content_type === 'comment')) {
-        try {
-          // We would need to fetch the content first, but for now we'll skip this
-          // In a real implementation, we'd fetch the content and analyze it
-          analysis = undefined;
-        } catch (analysisError) {
-          logger.warn({
-            component: 'ModerationOrchestrator',
-            error: analysisError instanceof Error ? analysisError.message : String(analysisError)
-          }, 'Content analysis failed during report creation:');
-        }
-      }
-
-      return {
-        ...reportResult,
-        analysis
-      };
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - createReport:');
-      throw error;
-    }
+        description,
+      ),
+    );
   }
 
-  // Content Analysis Operations
+  // ─── Content analysis ────────────────────────────────────────────────────────
 
   /**
-   * Analyzes content for policy violations
+   * Analyzes content for policy violations.
    */
-  async analyzeContent(
-    content_type: 'bill' | 'comment',
+  analyzeContent(
+    contentType: AnalyzableContentType,
     content: string,
-    additionalContext?: {
-      authorId?: string;
-      relatedContentId?: number;
-    }
+    additionalContext?: { authorId?: string; relatedContentId?: number },
   ): Promise<ContentAnalysisResult> {
-    try {
-      return await contentAnalysisService.analyzeContent(content_type, content, additionalContext);
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - analyzeContent:');
-      throw error;
-    }
+    return this.exec('analyzeContent', () =>
+      contentAnalysisService.analyzeContent(contentType, content, additionalContext),
+    );
   }
 
-  // Decision Processing Operations
+  // ─── Decision processing ─────────────────────────────────────────────────────
 
   /**
-   * Reviews a content report and applies moderation action
+   * Reviews a content report and records the moderation decision.
    */
-  async reviewReport(
-    report_id: number,
+  reviewReport(
+    reportId: number,
     moderatorId: string,
-    decision: 'resolve' | 'dismiss' | 'escalate',
-    actionType: 'warn' | 'hide' | 'delete' | 'ban_user' | 'verify' | 'highlight',
-    resolutionNotes: string
-  ): Promise<{
-    success: boolean;
-    message: string;
-    report?: ModerationItem;
-  }> {
-    try {
-      return await moderationDecisionService.reviewReport(
-        report_id,
+    decision: DecisionType,
+    actionType: ActionType,
+    resolutionNotes: string,
+  ): Promise<ReviewReportResult> {
+    return this.exec('reviewReport', () =>
+      moderationDecisionService.reviewReport(
+        reportId,
         moderatorId,
         decision,
         actionType,
-        resolutionNotes
-      );
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - reviewReport:');
-      throw error;
-    }
+        resolutionNotes,
+      ),
+    );
   }
 
   /**
-   * Performs bulk moderation operations
+   * Applies a moderation action to multiple reports in one operation.
    */
-  async bulkModerateReports(
-    operation: BulkModerationOperation
-  ): Promise<{ 
-    success: boolean; 
-    message: string; 
-    processedCount: number;
-    failedIds: number[];
-  }> {
-    try {
-      return await moderationDecisionService.bulkModerateReports(operation);
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - bulkModerateReports:');
-      throw error;
-    }
+  bulkModerateReports(operation: BulkModerationOperation): Promise<BulkModerationResult> {
+    return this.exec('bulkModerateReports', () =>
+      moderationDecisionService.bulkModerateReports(operation),
+    );
   }
 
   /**
-   * Retrieves moderation history
+   * Returns the moderation action history, optionally scoped to a piece of content.
    */
-  async getModerationHistory(
-    content_type?: 'bill' | 'comment' | 'user_profile' | 'sponsor_transparency',
-    content_id?: number,
+  getModerationHistory(
+    contentType?: ContentType,
+    contentId?: number,
     page = 1,
-    limit = 20
-  ): Promise<{
-    actions: ModerationActionRecord[];
-    pagination: PaginationInfo;
-  }> {
-    try {
-      return await moderationDecisionService.getModerationHistory(
-        content_type,
-        content_id,
-        page,
-        limit
-      );
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - getModerationHistory:');
-      throw error;
-    }
+    limit = 20,
+  ): Promise<{ actions: ModerationActionRecord[]; pagination: PaginationInfo }> {
+    return this.exec('getModerationHistory', () =>
+      moderationDecisionService.getModerationHistory(contentType, contentId, page, limit),
+    );
   }
 
-  // Analytics and Reporting Operations
+  // ─── Analytics ───────────────────────────────────────────────────────────────
 
   /**
-   * Retrieves comprehensive moderation statistics
+   * Returns moderation statistics for the given date range.
    */
-  async getModerationStats(
-    start_date: Date,
-    end_date: Date
-  ): Promise<{
-    reportsCreated: number;
-    reportsResolved: number;
-    reportsPending: number;
-    averageResolutionTime: number;
-    reportsByType: { type: string; count: number }[];
-    actionsByType: { type: string; count: number }[];
-    moderatorActivity: {
-      moderatorId: string;
-      moderatorName: string;
-      review_count: number;
-      averageReviewTime: number;
-    }[];
-    content_typeBreakdown: { content_type: string; count: number }[];
-    severityBreakdown: { severity: string; count: number }[];
-  }> {
-    try {
-      return await moderationAnalyticsService.getModerationStats(start_date, end_date);
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - getModerationStats:');
-      throw error;
-    }
+  getModerationStats(startDate: Date, endDate: Date): Promise<ModerationStats> {
+    return this.exec('getModerationStats', async () => {
+      const stats = await moderationAnalyticsService.getModerationStats(startDate, endDate);
+      return this.normalizeModerationStats(stats);
+    });
   }
 
   /**
-   * Generates comprehensive content analytics
+   * Normalizes the raw analytics service response to match the orchestrator's
+   * ModerationStats interface (snake_case → camelCase property transformation).
    */
-  async getContentAnalytics(): Promise<ContentAnalytics> {
-    try {
-      return await moderationAnalyticsService.getContentAnalytics();
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - getContentAnalytics:');
-      throw error;
-    }
+  private normalizeModerationStats(stats: RawModerationStats): ModerationStats {
+    const normalizedContentTypes = (
+      stats.contentTypeBreakdown ||
+      stats.content_type_breakdown ||
+      []
+    ).map((item: { contentType?: string | null; content_type?: string | null; count: number }) => ({
+      contentType: item.contentType ?? item.content_type ?? null,
+      count: item.count,
+    }));
+
+    const normalizedSeverity = (stats.severityBreakdown || stats.severity_breakdown || []).map(
+      (item: { severity?: string | null; count: number }) => ({
+        severity: item.severity ?? null,
+        count: item.count,
+      }),
+    );
+
+    return {
+      reportsCreated: stats.reportsCreated ?? stats.reports_created ?? 0,
+      reportsResolved: stats.reportsResolved ?? stats.reports_resolved ?? 0,
+      reportsPending: stats.reportsPending ?? stats.reports_pending ?? 0,
+      averageResolutionTime: stats.averageResolutionTime ?? stats.average_resolution_time ?? 0,
+      reportsByType: stats.reportsByType ?? stats.reports_by_type ?? [],
+      actionsByType: stats.actionsByType ?? stats.actions_by_type ?? [],
+      moderatorActivity: (stats.moderatorActivity || stats.moderator_activity || []).map(
+        (activity: {
+          moderatorId?: string;
+          moderator_id?: string;
+          moderatorName?: string;
+          moderator_name?: string;
+          reviewCount?: number;
+          review_count?: number;
+          averageReviewTime?: number;
+          average_review_time?: number;
+        }) => ({
+          moderatorId: activity.moderatorId || activity.moderator_id || '',
+          moderatorName: activity.moderatorName || activity.moderator_name || '',
+          reviewCount: activity.reviewCount || activity.review_count || 0,
+          averageReviewTime: activity.averageReviewTime || activity.average_review_time || 0,
+        }),
+      ),
+      contentTypeBreakdown: normalizedContentTypes,
+      severityBreakdown: normalizedSeverity,
+    };
   }
 
-  // Workflow Orchestration Methods
+  /**
+   * Returns aggregated content analytics.
+   */
+  getContentAnalytics(): Promise<ContentAnalytics> {
+    return this.exec('getContentAnalytics', () =>
+      moderationAnalyticsService.getContentAnalytics(),
+    );
+  }
+
+  // ─── Workflow orchestration ──────────────────────────────────────────────────
 
   /**
-   * Processes content submission through the moderation pipeline
+   * Runs newly submitted content through the analysis pipeline and, when the
+   * content is flagged, automatically creates a moderation report.
+   *
+   * @param contentId - The persisted ID of the content being submitted.
+   *   The caller must supply a valid ID; `0` or negative values are rejected.
    */
   async processContentSubmission(
-    content_type: 'bill' | 'comment',
+    contentType: AnalyzableContentType,
     content: string,
     authorId: string,
-    content_id?: number
-  ): Promise<{
-    approved: boolean;
-    requiresReview: boolean;
-    analysis: ContentAnalysisResult;
-    report_id?: number;
-  }> {
-    try {
-      // Analyze the content
-      const analysis = await this.analyzeContent(content_type, content, { authorId });
+    contentId: number,
+  ): Promise<ProcessSubmissionResult> {
+    if (!Number.isInteger(contentId) || contentId <= 0) {
+      throw new Error(
+        `processContentSubmission requires a valid contentId (received ${contentId}). ` +
+        'Persist the content before running moderation analysis.',
+      );
+    }
 
-      // Determine if content should be auto-flagged
-      if (analysis.shouldFlag) {
-        // Create an automated report
-        const reportResult = await this.createReport(
-          content_type,
-          content_id || 0, // In real implementation, this would be the actual content ID
-          analysis.detectedIssues[0]?.type as unknown || 'other',
-          `Automated detection: ${analysis.detectedIssues.map(i => i.description).join(', ')}`,
-          'system',
-          true,
-          `Analysis score: ${analysis.overallScore}. Issues: ${analysis.detectedIssues.length}`,
-          false // Don't re-analyze
-        );
+    return this.exec('processContentSubmission', async () => {
+      const analysis = await this.analyzeContent(contentType, content, { authorId });
 
-        return {
-          approved: false,
-          requiresReview: true,
-          analysis,
-          report_id: reportResult.report_id
-        };
+      if (!analysis.shouldFlag) {
+        return { approved: true, requiresReview: false, analysis };
       }
 
+      const reportType = this.resolveReportType(analysis.detectedIssues[0]?.type);
+      const reason = analysis.detectedIssues.map(i => i.description).join('; ');
+      const description = `Analysis score: ${analysis.overallScore}. Issues detected: ${analysis.detectedIssues.length}`;
+
+      const reportResult = await this.createReport({
+        contentType,
+        contentId,
+        reportType,
+        reason: `Automated detection: ${reason}`,
+        reportedBy: 'system',
+        autoDetected: true,
+        description,
+      });
+
       return {
-        approved: true,
-        requiresReview: false,
-        analysis
+        approved: false,
+        requiresReview: true,
+        analysis,
+        reportId: reportResult.reportId,
       };
+    });
+  }
+
+  /**
+   * Records an escalation event for a report.
+   *
+   * TODO: Full implementation should notify senior moderators, update report
+   * priority, and persist an escalation audit trail.
+   */
+  async handleEscalation(
+    reportId: number,
+    escalationReason: string,
+    escalatedBy: string,
+  ): Promise<EscalationResult> {
+    return this.exec('handleEscalation', async () => {
+      logger.info(
+        { component: 'ModerationOrchestrator', reportId, escalationReason, escalatedBy },
+        'Escalation event received — full escalation workflow not yet implemented',
+      );
+
+      // Placeholder until the escalation workflow is built out.
+      return { success: true, message: 'Escalation logged' };
+    });
+  }
+
+  // ─── Private helpers ─────────────────────────────────────────────────────────
+
+  /**
+   * Wraps any delegate call with consistent error logging and re-throws.
+   * Eliminates the identical try/catch boilerplate across every public method.
+   */
+  private async exec<T>(operation: string, fn: () => Promise<T>): Promise<T> {
+    try {
+      return await fn();
     } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - processContentSubmission:');
+      logger.error(
+        {
+          component: 'ModerationOrchestrator',
+          operation,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        'Moderation orchestrator error',
+      );
       throw error;
     }
   }
 
   /**
-   * Handles escalated moderation decisions
+   * Maps a raw issue type string to the `ReportType` union.
+   * Falls back to `'other'` for unrecognized values.
    */
-  async handleEscalation(
-    report_id: number,
-    escalationReason: string,
-    escalatedBy: string
-  ): Promise<{
-    success: boolean;
-    message: string;
-  }> {
-    try {
-      // In a full implementation, this would:
-      // 1. Notify senior moderators
-      // 2. Add escalation tracking
-      // 3. Update report priority
-      // 4. Log escalation event
-
-      logger.info({
-        component: 'ModerationOrchestrator',
-        report_id,
-        escalationReason,
-        escalatedBy
-      }, 'Moderation escalation handled:');
-
-      return {
-        success: true,
-        message: 'Escalation processed successfully'
-      };
-    } catch (error) {
-      logger.error({
-        component: 'ModerationOrchestrator',
-        error: error instanceof Error ? error.message : String(error)
-      }, 'Error in moderation orchestrator - handleEscalation:');
-      return {
-        success: false,
-        message: 'Failed to process escalation'
-      };
-    }
+  private resolveReportType(rawType: string | undefined): ReportType {
+    const VALID_REPORT_TYPES = new Set<ReportType>([
+      'spam', 'harassment', 'misinformation', 'inappropriate', 'copyright', 'other',
+    ]);
+    const candidate = rawType as ReportType;
+    return VALID_REPORT_TYPES.has(candidate) ? candidate : 'other';
   }
 }
 
 export const moderationOrchestratorService = ModerationOrchestratorService.getInstance();
-
-

@@ -184,7 +184,7 @@ export class SearchService {
       .limit(limit)
       .offset(offset);
 
-    return results.map(bill => ({
+    return results.map((bill: any) => ({
       id: bill.id,
       type: 'bill' as const,
       title: bill.title,
@@ -211,7 +211,7 @@ export class SearchService {
       .limit(limit)
       .offset(offset);
 
-    return results.map(user => ({
+    return results.map((user: any) => ({
       id: user.id,
       type: 'user' as const,
       title: user.email,
@@ -240,7 +240,7 @@ export class SearchService {
       .limit(limit)
       .offset(offset);
 
-    return results.map(comment => ({
+    return results.map((comment: any) => ({
       id: comment.id,
       type: 'comment' as const,
       title: `Comment on bill ${comment.bill_id}`,
@@ -314,7 +314,7 @@ export class SearchService {
         .limit(limit)
         .offset(offset);
 
-      const searchResults: SearchResult[] = results.map(bill => ({
+      const searchResults: SearchResult[] = results.map((bill: any) => ({
         id: bill.id,
         type: 'bill' as const,
         title: bill.title,
@@ -382,7 +382,7 @@ export class SearchService {
           .where('title', 'LIKE', searchPattern)
           .limit(validatedInput.limit);
         
-        suggestions.push(...billTitles.map(b => b.title));
+        suggestions.push(...billTitles.map((b: any) => b.title));
       }
 
       // Remove duplicates and limit

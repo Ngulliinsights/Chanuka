@@ -50,7 +50,7 @@ export class MLMigrationConfigurator {
             }, 'ML service migration configured successfully');
         } catch (error) {
             logger.error({ component: 'analytics',
-                operation: 'configureGradualRollout', error: error instanceof Error ? error : { message: String(error }, 'Failed to configure ML service migration:') });
+                operation: 'configureGradualRollout', error: error instanceof Error ? error : { message: String(error) } }, 'Failed to configure ML service migration:');
             throw error;
         }
     }

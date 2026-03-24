@@ -165,7 +165,7 @@ export class SearchRepository extends BaseRepository<SearchQuery> {
           .orderBy(desc(searchQueries.created_at))
           .limit(limit);
 
-        return rows.map(row => ({
+        return rows.map((row: any) => ({
           id: row.id,
           query: row.query,
           timestamp: row.timestamp.toISOString(),
@@ -223,7 +223,7 @@ export class SearchRepository extends BaseRepository<SearchQuery> {
           .orderBy(desc(searchQueries.created_at))
           .limit(limit);
 
-        return rows.map(row => ({
+        return rows.map((row: any) => ({
           id: row.id,
           query: row.query,
           timestamp: row.timestamp.toISOString(),

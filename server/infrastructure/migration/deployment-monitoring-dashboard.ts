@@ -305,7 +305,7 @@ export class DeploymentMonitoringDashboard {
     const typeMap = new Map<string, number>();
     
     inconsistencies.forEach(inc => {
-      const type = inc.type || 'unknown';
+      const type = (inc as any).type || 'unknown';
       typeMap.set(type, (typeMap.get(type) || 0) + (inc.count || 1));
     });
 
@@ -413,18 +413,18 @@ export class DeploymentMonitoringDashboard {
     const last = recentData[recentData.length - 1];
 
     const performanceTrend = this.calculateTrend(
-      first.metrics.performance?.overallImprovement || 0,
-      last.metrics.performance?.overallImprovement || 0
+      first!.metrics.performance?.overallImprovement || 0,
+      last!.metrics.performance?.overallImprovement || 0
     );
 
     const userExperienceTrend = this.calculateTrend(
-      first.metrics.userExperience?.userSatisfactionScore || 0,
-      last.metrics.userExperience?.userSatisfactionScore || 0
+      first!.metrics.userExperience?.userSatisfactionScore || 0,
+      last!.metrics.userExperience?.userSatisfactionScore || 0
     );
 
     const errorRateTrend = this.calculateTrend(
-      last.metrics.performance?.errorRate || 0, // Inverted for error rate
-      first.metrics.performance?.errorRate || 0
+      last!.metrics.performance?.errorRate || 0, // Inverted for error rate
+      first!.metrics.performance?.errorRate || 0
     );
 
     return {

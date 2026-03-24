@@ -285,7 +285,7 @@ class DashboardStorageService {
       const candidates = hasMore ? results.slice(0, limit) : results;
 
       // Sanitize candidate data for privacy
-      const sanitizedCandidates = candidates.map(candidate => {
+      const sanitizedCandidates = candidates.map((candidate: any) => {
         // Remove or anonymize sensitive information
         const sanitized = { ...candidate };
         
@@ -379,9 +379,8 @@ class DashboardStorageService {
       return result[0].id;
     } catch (error) {
       logger.error({ component: 'Chanuka',
-        data: { ...data, candidateName: data.candidateName?.substring(0, 50), error: // Truncate for logging
-        error: error instanceof Error ? error.message : String(error }, 'Error creating evaluation')
-      });
+        data: { ...data, candidateName: data.candidateName?.substring(0, 50), error } // Truncate for logging
+      }, 'Error creating evaluation');
       
       if (error instanceof Error) {
         throw new Error(`Failed to create evaluation: ${error.message}`);
@@ -499,10 +498,10 @@ class DashboardStorageService {
       });
 
       // Calculate statistics for each department
-      const stats: DepartmentStat[] = result.map(dept => {
+      const stats: DepartmentStat[] = result.map((dept: any) => {
         // Count hires that came through relationships (excluding 'None')
         const relationHires = dept.hires.filter(
-          h => h.relationType && h.relationType !== 'None'
+          (h: any) => h.relationType && h.relationType !== 'None'
         ).length;
         
         const totalHires = dept.hires.length;
@@ -583,7 +582,7 @@ class DashboardStorageService {
 
       // Transform the assessment data into radar chart format
       // We clamp scores to 0-100 range to prevent display issues
-      const metrics: RadarDatum[] = candidate.competencyAssessment?.map(assessment => ({
+      const metrics: RadarDatum[] = candidate.competencyAssessment?.map((assessment: any) => ({
         subject: assessment.category || 'Unknown',
         candidate: Math.max(0, Math.min(100, assessment.score || 0)),
         department: Math.max(0, Math.min(100, assessment.departmentAverage || 0)),

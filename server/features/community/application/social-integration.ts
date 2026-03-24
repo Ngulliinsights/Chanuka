@@ -415,21 +415,21 @@ export class SocialIntegrationService {
       return Promise.all(
         profiles.map(async (profile: unknown) => {
           try {
-            const optimizedContent = await this.optimizeContent(action.content, profile.platform);
+            const optimizedContent = await this.optimizeContent(action.content, (profile as any).platform);
             await this.shareToSocialPlatform(
-              profile.platform,
-              profile.access_token,
+              (profile as any).platform,
+              (profile as any).access_token,
               optimizedContent,
             );
 
             logger.info({
               user_id: users.id,
-              platform: profile.platform,
+              platform: (profile as any).platform,
               content_id: action.content.url,
              }, 'Content shared to social platform successfully');
           } catch (error) { logger.error({
               user_id: users.id,
-              platform: profile.platform,
+              platform: (profile as any).platform,
               error,
              }, 'Failed to share content to social platform');
           }
@@ -549,15 +549,15 @@ export class SocialIntegrationService {
     // High priority indicators: verified accounts, high follower counts, urgent keywords
     const highPriorityKeywords = ['urgent', 'breaking', 'important'];
     const hasHighPriorityKeyword = highPriorityKeywords.some(keyword =>
-      mention.text.toLowerCase().includes(keyword),
+      (mention as any).text.toLowerCase().includes(keyword),
     );
 
     return (
-      mention.author.verified ||
-      mention.author.followers > 10000 ||
+      (mention as any).author.verified ||
+      (mention as any).author.followers > 10000 ||
       hasHighPriorityKeyword ||
-      mention.engagement?.likes > 100 ||
-      mention.engagement?.shares > 50
+      (mention as any).engagement?.likes > 100 ||
+      (mention as any).engagement?.shares > 50
     );
   }
 
@@ -571,12 +571,12 @@ export class SocialIntegrationService {
       type: 'social_mention',
       priority: 'high',
       title: 'Important Social Media Mention',
-      message: `From ${mention.author.name} on ${mention.platform}: ${mention.text.substring(0, 100)}...`,
-      link: mention.url,
+      message: `From ${(mention as any).author.name} on ${(mention as any).platform}: ${(mention as any).text.substring(0, 100)}...`,
+      link: (mention as any).url,
       metadata: {
-        platform: mention.platform,
-        authorId: mention.author.id,
-        mentionId: mention.id,
+        platform: (mention as any).platform,
+        authorId: (mention as any).author.id,
+        mentionId: (mention as any).id,
       },
     }, 'High priority social mention notification sent');
   }

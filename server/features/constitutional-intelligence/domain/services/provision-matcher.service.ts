@@ -100,13 +100,13 @@ export class ProvisionMatcherService {
 
     // Find first match and extract surrounding text
     const firstMatch = allMatches[0];
-    const index = text.toLowerCase().indexOf(firstMatch.toLowerCase());
+    const index = text.toLowerCase().indexOf(firstMatch!.toLowerCase());
     
     if (index === -1) return '';
 
     // Extract 100 characters before and after
     const start = Math.max(0, index - 100);
-    const end = Math.min(text.length, index + firstMatch.length + 100);
+    const end = Math.min(text.length, index + firstMatch!.length + 100);
     
     let context = text.substring(start, end);
     

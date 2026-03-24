@@ -411,6 +411,32 @@ export const security_events = pgTable("security_events", {
 }));
 
 // ============================================================================
+// MODERATION ACTIONS - Audit trail of moderation decisions
+// ============================================================================
+
+export const moderation_action = pgTable("moderation_action", {
+  id: primaryKeyUuid(),
+
+  // Content and report being moderated
+  content_type: varchar("content_type", { length: 50 }).notNull(), // "comment", "user_profile", "bill", "sponsor_transparency"
+  content_id: integer("content_id").notNull(),
+  report_id: uuid("report_id").references(() => content_reports.id, { onDelete: "set null" }),
+
+  // Action details
+  actionType: varchar("actionType", { length: 100 }).notNull(), // "warn", "hide", "delete", "ban_user", "verify", "highlight"
+  reason: text("reason").notNull(),
+
+  // Moderator information
+  moderatorId: uuid("moderatorId").notNull().references(() => users.id, { onDelete: "set null" }),
+
+  ...auditFields(),
+}, (table) => ({
+  reportIdx: index("idx_moderation_action_report").on(table.report_id),
+  moderatorIdx: index("idx_moderation_action_moderator").on(table.moderatorId),
+  contentIdx: index("idx_moderation_action_content").on(table.content_type, table.content_id),
+}));
+
+// ============================================================================
 // RELATIONSHIPS
 // ============================================================================
 
@@ -504,6 +530,17 @@ export const securityEventsRelations = relations(security_events, ({ one }) => (
     fields: [security_events.response_initiated_by],
     references: [users.id],
     relationName: "responseInitiator",
+  }),
+}));
+
+export const moderationActionRelations = relations(moderation_action, ({ one }) => ({
+  report: one(content_reports, {
+    fields: [moderation_action.report_id],
+    references: [content_reports.id],
+  }),
+  moderator: one(users, {
+    fields: [moderation_action.moderatorId],
+    references: [users.id],
   }),
 }));
 

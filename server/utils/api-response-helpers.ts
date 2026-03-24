@@ -4,8 +4,14 @@
  */
 
 import { Response } from 'express';
+// Shared canonical types are referenced via @see JSDoc tags in the interfaces below.
+// import type { ApiResponse, ApiError } from '@shared/types/api/contracts/core.contracts';
 
 // Response type definitions
+/**
+ * Server success response — structurally compatible with shared ApiResponse<T>
+ * @see SharedApiResponse
+ */
 export interface ApiSuccessResponse<T = unknown> {
   success: true;
   data: T;
@@ -14,6 +20,11 @@ export interface ApiSuccessResponse<T = unknown> {
   timestamp: string;
 }
 
+/**
+ * Server error response — structurally compatible with shared ApiResponse
+ * @see SharedApiResponse
+ * @see SharedApiError
+ */
 export interface ApiErrorResponse {
   success: false;
   error: {

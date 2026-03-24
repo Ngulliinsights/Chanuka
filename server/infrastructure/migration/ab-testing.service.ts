@@ -160,10 +160,10 @@ export class ABTestingService {
         user_id,
         cohort,
         metrics: {
-          responseTime: metrics.responseTime || 0,
-          errorRate: metrics.errorRate || 0,
-          memoryUsage: metrics.memoryUsage,
-          successRate: metrics.successRate !== undefined ? metrics.successRate : 1
+          responseTime: (metrics as any).responseTime || 0,
+          errorRate: (metrics as any).errorRate || 0,
+          memoryUsage: (metrics as any).memoryUsage,
+          successRate: (metrics as any).successRate !== undefined ? (metrics as any).successRate : 1
         },
         timestamp: new Date()
       };
@@ -293,13 +293,13 @@ export class ABTestingService {
       }
 
       const totalUsers = behaviorData.length;
-      const conversions = behaviorData.filter(d => d.converted).length;
-      const completedTasks = behaviorData.filter(d => d.taskCompleted).length;
-      const bouncedUsers = behaviorData.filter(d => d.bounced).length;
+      const conversions = behaviorData.filter(d => (d as any).converted).length;
+      const completedTasks = behaviorData.filter(d => (d as any).taskCompleted).length;
+      const bouncedUsers = behaviorData.filter(d => (d as any).bounced).length;
 
       // Calculate satisfaction scores only from users who provided them
       const satisfactionScores = behaviorData
-        .map(d => d.satisfactionScore)
+        .map(d => (d as any).satisfactionScore)
         .filter(s => s !== undefined && s !== null);
 
       const avgSatisfaction = satisfactionScores.length > 0
@@ -308,7 +308,7 @@ export class ABTestingService {
 
       // Calculate data quality metrics to assess reliability
       const dataCompleteness = behaviorData.filter(d =>
-        d.sessionDuration !== undefined && d.pageViews !== undefined
+        (d as any).sessionDuration !== undefined && (d as any).pageViews !== undefined
       ).length / totalUsers;
 
       return {

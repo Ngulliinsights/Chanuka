@@ -1,5 +1,5 @@
 import { errorTracker } from '@server/infrastructure/observability/monitoring/error-tracker';
-import { performanceMonitor   } from '@shared/core';
+import { performanceMonitor } from '@server/infrastructure/observability';
 import { logger } from '@server/infrastructure/observability';
 import { Router } from 'express';
 
@@ -56,12 +56,12 @@ router.get('/report', async (req, res) => {
 router.get('/core-web-vitals', async (req, res) => {
   try {
     const report = performanceMonitor.generateReport();
-    const coreWebVitals = report.metrics.filter(m =>
+    const coreWebVitals = report.metrics.filter((m: any) =>
       ['lcp', 'fid', 'cls', 'fcp', 'ttfb'].includes(m.name)
     );
 
     // Group by metric type
-    const vitals = coreWebVitals.reduce((acc, metric) => {
+    const vitals = coreWebVitals.reduce((acc: any, metric: any) => {
       if (!acc[metric.name]) {
         acc[metric.name] = [];
       }
@@ -80,7 +80,7 @@ router.get('/core-web-vitals', async (req, res) => {
         latest: Object.fromEntries(
           Object.entries(vitals).map(([key, values]) => [
             key,
-            values.sort((a, b) => b.timestamp - a.timestamp)[0]
+            (values as any).sort((a: any, b) => b.timestamp - a.timestamp)[0]
           ])
         ),
       },
@@ -101,7 +101,7 @@ router.get('/core-web-vitals', async (req, res) => {
 router.get('/bundle-metrics', async (req, res) => {
   try {
     const report = performanceMonitor.generateReport();
-    const bundleMetrics = report.metrics.filter(m =>
+    const bundleMetrics = report.metrics.filter((m: any) =>
       m.name.includes('Size') || m.metadata?.bundle
     );
 
@@ -110,9 +110,9 @@ router.get('/bundle-metrics', async (req, res) => {
       data: {
         metrics: bundleMetrics,
         summary: {
-          totalJsSize: bundleMetrics.find(m => m.name === 'totalJsSize')?.value,
-          initialChunkSize: bundleMetrics.find(m => m.name === 'initialChunkSize')?.value,
-          largestChunkSize: bundleMetrics.find(m => m.name === 'largestChunkSize')?.value,
+          totalJsSize: bundleMetrics.find((m: any) => m.name === 'totalJsSize')?.value,
+          initialChunkSize: bundleMetrics.find((m: any) => m.name === 'initialChunkSize')?.value,
+          largestChunkSize: bundleMetrics.find((m: any) => m.name === 'largestChunkSize')?.value,
         },
       },
     });
@@ -134,7 +134,7 @@ router.get('/violations', async (req, res) => {
     const report = performanceMonitor.generateReport();
 
     // Group violations by severity
-    const violations = report.violations.reduce((acc, violation) => {
+    const violations = report.violations.reduce((acc: any, violation: any) => {
       const severity = violation.severity;
       if (!acc[severity]) {
         acc[severity] = [];
@@ -194,7 +194,7 @@ router.get('/trends', async (req, res) => {
       success: true,
       data: {
         period: `${daysNum} days`,
-        trends: report.metrics.map(metric => ({
+        trends: report.metrics.map((metric: any) => ({
           metric: metric.name,
           current: metric.value,
           unit: metric.unit,

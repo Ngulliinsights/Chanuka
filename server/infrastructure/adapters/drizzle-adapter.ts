@@ -67,12 +67,12 @@ export class DrizzleAdapter<TEntity, TRow> {
       this.logPerformance('findById', startTime, { id, found: !!result });
       return result;
     } catch (error) {
-      logger.error('Operation failed', {
+      logger.error({
         error,
         component: 'DrizzleAdapter',
         operation: `findById:${this.tableName}:${id}`,
         context: { id }
-      });
+      }, 'Operation failed');
       this.logError('findById', error, { id });
       return null;
     }
@@ -125,12 +125,12 @@ export class DrizzleAdapter<TEntity, TRow> {
       
       return result;
     } catch (error) {
-      logger.error('Operation failed', {
+      logger.error({
         error,
         component: 'DrizzleAdapter',
         operation: `findMany:${this.tableName}`,
         context: { filters, options }
-      });
+      }, 'Operation failed');
       this.logError('findMany', error, { filters, options });
       return [];
     }
@@ -167,7 +167,7 @@ export class DrizzleAdapter<TEntity, TRow> {
       );
 
       this.logPerformance('create', startTime, { created: true });
-      return result.data;
+      return (result as any).data;
     } catch (error) {
       this.logError('create', error, { entity });
       throw error;
@@ -199,8 +199,8 @@ export class DrizzleAdapter<TEntity, TRow> {
         `DrizzleAdapter:update:${this.tableName}`
       );
 
-      this.logPerformance('update', startTime, { id, updated: !!result.data });
-      return result.data;
+      this.logPerformance('update', startTime, { id, updated: !!(result as any).data });
+      return (result as any).data;
     } catch (error) {
       this.logError('update', error, { id, updates });
       throw error;
@@ -225,8 +225,8 @@ export class DrizzleAdapter<TEntity, TRow> {
         `DrizzleAdapter:delete:${this.tableName}`
       );
 
-      this.logPerformance('delete', startTime, { id, deleted: result.data });
-      return result.data;
+      this.logPerformance('delete', startTime, { id, deleted: (result as any).data });
+      return (result as any).data;
     } catch (error) {
       this.logError('delete', error, { id });
       throw error;
@@ -253,12 +253,12 @@ export class DrizzleAdapter<TEntity, TRow> {
       this.logPerformance('count', startTime, { filterCount: filters.length, count: result });
       return result;
     } catch (error) {
-      logger.error('Operation failed', {
+      logger.error({
         error,
         component: 'DrizzleAdapter',
         operation: `count:${this.tableName}`,
         context: { filters }
-      });
+      }, 'Operation failed');
       this.logError('count', error, { filters });
       return 0;
     }
@@ -294,7 +294,7 @@ export class DrizzleAdapter<TEntity, TRow> {
       );
 
       this.logPerformance('batchCreate', startTime, { count: entities.length });
-      return result.data;
+      return (result as any).data;
     } catch (error) {
       this.logError('batchCreate', error, { count: entities.length });
       throw error;
@@ -358,12 +358,12 @@ export class DrizzleAdapter<TEntity, TRow> {
       
       return result;
     } catch (error) {
-      logger.error('Operation failed', {
+      logger.error({
         error,
         component: 'DrizzleAdapter',
         operation: `search:${this.tableName}`,
         context: { query, searchFields, options }
-      });
+      }, 'Operation failed');
       this.logError('search', error, { query, searchFields, options });
       return [];
     }
@@ -442,8 +442,8 @@ export class DrizzleAdapter<TEntity, TRow> {
     logger.error({
       table: this.tableName,
       operation,
-      error: error.message,
-      stack: error.stack,
+      error: (error as Error).message,
+      stack: (error as Error).stack,
       ...metadata
     }, `DrizzleAdapter error`);
   }

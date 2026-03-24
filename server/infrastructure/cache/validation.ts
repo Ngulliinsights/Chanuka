@@ -347,9 +347,12 @@ export class CacheMigrationValidator {
 
       if (keysA.length !== keysB.length) return false;
 
+      const objA = a as Record<string, unknown>;
+      const objB = b as Record<string, unknown>;
+
       for (const key of keysA) {
         if (!keysB.includes(key)) return false;
-        if (!this.deepEqual(a[key], b[key])) return false;
+        if (!this.deepEqual(objA[key], objB[key])) return false;
       }
 
       return true;

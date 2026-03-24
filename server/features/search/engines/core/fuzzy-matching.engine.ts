@@ -22,7 +22,7 @@ export class FuzzyMatchingEngine {
 
     try {
       // Use PostgreSQL similarity function for fuzzy matching
-      const results = await readDatabase(async (db) => {
+      const results = await readDatabase(async (db: any) => {
         return db
           .select({
             id: bills.id,
@@ -40,7 +40,7 @@ export class FuzzyMatchingEngine {
           .offset(offset);
       });
 
-      return results.map(bill => ({
+      return results.map((bill: any) => ({
         id: bill.id.toString(),
         title: bill.title || '',
         description: bill.description || '',

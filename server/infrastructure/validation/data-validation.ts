@@ -425,18 +425,19 @@ export class GovernmentDataValidationService {
     
     for (const record of records) {
       let identifier: string;
+      const data = record.data as Record<string, unknown> | undefined;
       
       if (type === 'bills') {
-        identifier = record.data.bill_number || record.data.id || 'unknown';
+        identifier = (data?.bill_number as string) || (data?.id as string) || 'unknown';
       } else {
         // For sponsors, use name + role as identifier
-        identifier = `${record.data.name || 'unknown'}|${record.data.role || 'unknown'}`;
+        identifier = `${(data?.name as string) || 'unknown'}|${(data?.role as string) || 'unknown'}`;
       }
       
       if (!groups.has(identifier)) {
         groups.set(identifier, []);
       }
-      groups.get(identifier).push(record);
+      groups.get(identifier)!.push(record);
     }
     
     return groups;

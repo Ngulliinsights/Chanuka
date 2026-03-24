@@ -254,7 +254,7 @@ class SearchServiceImpl {
         .limit(limit);
       
       // Extract unique suggestions
-      const suggestions = [...new Set(results.map(r => r.title))].slice(0, limit);
+      const suggestions = [...new Set(results.map((r: any) => r.title))].slice(0, limit);
       
       return suggestions;
     }, {
@@ -284,7 +284,7 @@ class SearchServiceImpl {
         .orderBy(desc(sql`count(*)`))
         .limit(limit);
       
-      const terms = results.map(r => r.term).filter(Boolean);
+      const terms = results.map((r: any) => r.term).filter(Boolean);
       
       return terms;
     }, {

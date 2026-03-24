@@ -73,10 +73,10 @@ export function parseCompilerOutput(output: string): CompilationError[] {
     
     errors.push({
       code,
-      file: file.trim(),
+      file: file!.trim(),
       line: parseInt(lineStr, 10),
       column: parseInt(columnStr, 10),
-      message: message.trim(),
+      message: message!.trim(),
       category,
     });
   }
@@ -114,7 +114,7 @@ export function compileAndCollectErrors(): CompilationError[] {
     return [];
   } catch (error: unknown) {
     // Compilation failed, parse the output
-    const output = error.stdout || error.output?.join('') || error.stderr || '';
+    const output = (error as any).stdout || (error as any).output?.join('') || (error as any).stderr || '';
     console.log(`Captured output length: ${output.length} characters`);
     console.log(`First 500 chars: ${output.substring(0, 500)}`);
     return parseCompilerOutput(output);

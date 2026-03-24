@@ -50,7 +50,7 @@ export class UtilitiesConfigProvider extends EventEmitter {
     // this.config will be loaded lazily or via event
     
     // Listen for configuration changes
-    configManager.on('config:changed', (event) => {
+    configManager.on('config:changed', (event: any) => {
       const previousUtilities = event.previous.utilities;
       const currentUtilities = event.current.utilities;
 
@@ -118,9 +118,9 @@ export class UtilitiesConfigProvider extends EventEmitter {
         if (assets.isSlowConnection(speedMbps)) {
           return {
             ...baseConfig,
-            maxRetries: Math.max(1, baseConfig.maxRetries - 1),
-            retryDelay: baseConfig.retryDelay * this.config.utilities.assets.connection.slowRetryMultiplier,
-            timeout: baseConfig.timeout * this.config.utilities.assets.connection.slowTimeoutMultiplier,
+            maxRetries: Math.max(1, (baseConfig as any).maxRetries - 1),
+            retryDelay: (baseConfig as any).retryDelay * this.config.utilities.assets.connection.slowRetryMultiplier,
+            timeout: (baseConfig as any).timeout * this.config.utilities.assets.connection.slowTimeoutMultiplier,
           };
         }
         return baseConfig;
@@ -289,23 +289,23 @@ export class UtilitiesConfigProvider extends EventEmitter {
     try {
       switch (utility) {
         case 'api':
-          return typeof config.timeout === 'number' && config.timeout > 0 &&
-                 typeof config.retries === 'number' && config.retries >= 0;
+          return typeof (config as any).timeout === 'number' && (config as any).timeout > 0 &&
+                 typeof (config as any).retries === 'number' && (config as any).retries >= 0;
 
         case 'assets':
-          return config.critical && config.script && config.style && config.image && config.font;
+          return (config as any).critical && (config as any).script && (config as any).style && (config as any).image && (config as any).font;
 
         case 'tokens':
-          return typeof config.refreshBufferMinutes === 'number' && config.refreshBufferMinutes > 0;
+          return typeof (config as any).refreshBufferMinutes === 'number' && (config as any).refreshBufferMinutes > 0;
 
         case 'errors':
-          return config.recovery && config.strategies;
+          return (config as any).recovery && (config as any).strategies;
 
         case 'performance':
-          return config.renderTracker && config.assetTracker;
+          return (config as any).renderTracker && (config as any).assetTracker;
 
         case 'storage':
-          return config.secureStorage && config.cache;
+          return (config as any).secureStorage && (config as any).cache;
 
         default:
           return true;

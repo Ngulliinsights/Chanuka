@@ -29,9 +29,10 @@ module.exports = {
         ],
       },
       node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
+        extensions: [".js", ".jsx", ".ts", ".tsx", ".json"],
       },
     },
+    "import/extensions": [".ts", ".tsx", ".js", ".jsx"],
     "import/internal-regex": "^@(shared|client|server|workspace)/",
   },
   rules: {

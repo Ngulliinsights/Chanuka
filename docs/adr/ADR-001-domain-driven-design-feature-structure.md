@@ -30,23 +30,31 @@ We will adopt **Domain-Driven Design (DDD) layered architecture** for all featur
 ```
 features/<feature-name>/
 ├── application/           # Application Layer
-│   ├── *.routes.ts       # HTTP routes (Express routers)
-│   ├── *.controller.ts   # Controllers (request/response handling)
 │   ├── *.service.ts      # Application services (orchestration)
 │   └── use-cases/        # Use case implementations
 ├── domain/               # Domain Layer
 │   ├── entities/         # Domain entities (business objects)
 │   ├── events/           # Domain events
 │   ├── services/         # Domain services (business logic)
+│   ├── repositories/     # Repository interfaces (data access contracts)
 │   └── value-objects/    # Value objects (immutable values)
 ├── infrastructure/       # Infrastructure Layer
-│   ├── repositories/     # Repository implementations (data access)
+│   ├── repositories/     # Repository implementations
+│   ├── services/         # Infrastructure service implementations
 │   ├── storage/          # Storage adapters
 │   └── adapters/         # External service adapters
+├── presentation/         # Presentation Layer (HTTP/API)
+│   ├── http/
+│   │   ├── *.routes.ts  # HTTP routes (Express routers)
+│   │   └── *.middleware.ts # Validation & auth middleware
+│   └── websocket/        # Optional: WebSocket layer
 ├── types/               # Shared type definitions
+├── config/              # Feature-specific configuration
 ├── index.ts             # Public API (centralized exports)
 └── README.md            # Feature documentation
 ```
+
+**Status Update (March 2026):** This ADR was originally written with routes in `application/`, but the team has standardized on `presentation/http/` for all route files. This structure reflects the actual implementation across 12+ features.
 
 ---
 
@@ -76,31 +84,65 @@ features/<feature-name>/
 
 ### Why This Specific Structure?
 
-1. **application/** - Entry point for external requests
+1. **presentation/http/** - Entry point for HTTP/API requests
    - Routes define HTTP endpoints
-   - Controllers handle request/response
-   - Services orchestrate domain logic
+   - Middleware handles validation and authentication
+   - Separated from application layer to prevent tight coupling
+   - Enables multiple presentation layers (http, websocket, CLI) without affecting application logic
 
-2. **domain/** - Core business logic
+2. **application/** - Orchestration layer
+   - Services coordinate use cases
+   - Orchestrate domain entities and services
+   - Handle application-level transactions
+   - Pure business orchestration (not HTTP concerns)
+
+3. **domain/** - Core business logic
    - Entities represent business concepts
-   - Services implement business rules
+   - Services implement domain-specific business rules
+   - Repository interfaces define contracts for persistence
    - Events communicate state changes
-   - Value objects ensure immutability
+   - Value objects ensure immutability and type safety
 
-3. **infrastructure/** - Technical implementation
-   - Repositories abstract data access
-   - Adapters integrate external services
+4. **infrastructure/** - Technical implementation
+   - Repository implementations handle data access
+   - Services implement infrastructure-specific logic (emails, APIs, caching)
+   - Adapters integrate external systems
    - Storage handles persistence details
 
-4. **types/** - Shared contracts
-   - DTOs for data transfer
+5. **types/** - Shared contracts
+   - DTOs for data transfer between layers
    - Interfaces for contracts
    - Type definitions for TypeScript
 
-5. **index.ts** - Public API
+6. **index.ts** - Public API
    - Single entry point for imports
    - Hides internal structure
    - Enables refactoring without breaking consumers
+
+---
+
+## Implementation Notes
+
+### Actual vs. Planned (as of March 2026)
+
+The specification was originally written with routes in `application/*.routes.ts`, but during implementation, the team standardized on `presentation/http/` for better separation of HTTP concerns from application orchestration. This has proven beneficial as it allows:
+- Multiple presentation layers (HTTP, WebSocket, CLI) to coexist
+- Clearer separation between request/response handling and business logic
+- Easier testing of application services without HTTP dependencies
+
+**Adoption Status:**
+- **12/13 surveyed features** follow the updated structure correctly ✓
+- **1 feature (advocacy)** deviates: uses `presentation/advocacy-router.ts` instead of `presentation/http/advocacy-router.ts` ⚠️
+
+### Advocacy Feature Correction Needed
+
+The advocacy feature should be restructured as:
+```
+advocacy/
+├── presentation/
+│   └── http/              ← MISSING
+│       └── advocacy-router.ts
+```
 
 ---
 

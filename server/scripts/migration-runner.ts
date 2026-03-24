@@ -42,7 +42,7 @@ class MigrationRunner {
       logger.info({ component: 'Chanuka' }, '🔍 DRY RUN MODE - No changes will be made');
       const pending = await this.migrationService.getPendingMigrations();
       console.log(`Would execute ${pending.length} migrations:`);
-      pending.forEach(filename => console.log(`  - ${filename}`));
+      pending.forEach((filename: any) => console.log(`  - ${filename}`));
       return;
     }
 
@@ -122,14 +122,14 @@ class MigrationRunner {
     const pending = await this.migrationService.getPendingMigrations();
 
     console.log(`✅ Applied migrations: ${applied.length}`);
-    applied.forEach(migration => {
+    applied.forEach((migration: any) => {
       const rollbackInfo = migration.rollbackSql ? '(rollback available)' : '(no rollback)';
       const executedAt = migration.executedAt ? new Date(migration.executedAt).toISOString() : 'unknown';
       console.log(`  - ${migration.filename} - ${executedAt} ${rollbackInfo}`);
     });
 
     console.log(`\n⏳ Pending migrations: ${pending.length}`);
-    pending.forEach(filename => {
+    pending.forEach((filename: any) => {
       console.log(`  - ${filename}`);
     });
 
@@ -153,12 +153,12 @@ class MigrationRunner {
 
     if (validation.errors.length > 0) {
       logger.info({ component: 'Chanuka' }, '\n🚨 Errors:');
-      validation.errors.forEach(error => console.log(`  - ${error}`));
+      validation.errors.forEach((error: any) => console.log(`  - ${error}`));
     }
 
     if (validation.warnings.length > 0) {
       logger.info({ component: 'Chanuka' }, '\n⚠️  Warnings:');
-      validation.warnings.forEach(warning => console.log(`  - ${warning}`));
+      validation.warnings.forEach((warning: any) => console.log(`  - ${warning}`));
     }
 
     if (!validation.isValid) {
@@ -175,7 +175,7 @@ class MigrationRunner {
     // Generate migration number
     const applied = await this.migrationService.getAppliedMigrations();
     const pending = await this.migrationService.getPendingMigrations();
-    const allMigrations = [...applied.map(m => m.filename), ...pending];
+    const allMigrations = [...applied.map((m: any) => m.filename), ...pending];
     
     const numbers = allMigrations
       .map(filename => parseInt(filename.split('_')[0]))

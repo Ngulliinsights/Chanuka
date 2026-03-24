@@ -204,23 +204,23 @@ async function runValidationSuite(): Promise<Array<{ name: string; success: bool
  * Display migration summary
  */
 function displayMigrationSummary(deployer: WebSocketMigrationDeployer, migrationState: unknown, metrics: unknown): void {
-  const duration = migrationState.completionTime ? 
-    migrationState.completionTime - migrationState.startTime : 0;
+  const duration = (migrationState as any).completionTime ? 
+    (migrationState as any).completionTime - (migrationState as any).startTime : 0;
 
   console.log('\n' + '='.repeat(60));
   console.log('🎉 WEBSOCKET MIGRATION SUMMARY');
   console.log('='.repeat(60));
-  console.log(`📊 Migration Status: ${migrationState.phase.toUpperCase()}`);
+  console.log(`📊 Migration Status: ${(migrationState as any).phase.toUpperCase()}`);
   console.log(`⏱️  Migration Duration: ${duration}ms`);
-  console.log(`🔗 Total Connections: ${metrics.totalConnections}`);
-  console.log(`📡 Active Connections: ${metrics.activeConnections}`);
-  console.log(`📤 Messages Sent: ${metrics.messagesSent}`);
-  console.log(`📥 Messages Received: ${metrics.messagesReceived}`);
-  console.log(`❌ Errors: ${metrics.errors}`);
+  console.log(`🔗 Total Connections: ${(metrics as any).totalConnections}`);
+  console.log(`📡 Active Connections: ${(metrics as any).activeConnections}`);
+  console.log(`📤 Messages Sent: ${(metrics as Error).messagesSent}`);
+  console.log(`📥 Messages Received: ${(metrics as Error).messagesReceived}`);
+  console.log(`❌ Errors: ${(metrics as any).errors}`);
   
   if (migrationState.errors.length > 0) {
     console.log(`\n⚠️  Migration Errors:`);
-    migrationState.errors.forEach((error: string, index: number) => {
+    (migrationState as any).errors.forEach((error: string, index: number) => {
       console.log(`   ${index + 1}. ${error}`);
     });
   }
@@ -265,7 +265,7 @@ function parseArguments(): ExecutionOptions {
         process.exit(0);
         break;
       default:
-        if (arg.startsWith('--')) {
+        if (arg!.startsWith('--')) {
           console.error(`Unknown option: ${arg}`);
           displayHelp();
           process.exit(1);

@@ -75,6 +75,13 @@ export {
 } from './application/services/alert-delivery.service';
 
 export {
+  ChannelDeliveryService,
+  type NotificationConfig,
+  type NotificationMessage,
+  type NotificationResult
+} from './application/services/channel-delivery.service';
+
+export {
   alertingService,
   type AlertRule,
   type AlertAction,

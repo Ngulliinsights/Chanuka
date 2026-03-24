@@ -187,7 +187,7 @@ export class StructureExtractorService {
     const argList: ExtractedArgument[] = [];
 
     for (const sentence of classifiedSentences) {
-      if (sentence.type === 'other' || sentence.confidence < 0.6) {
+      if (sentence.type === 'other' || (sentence as any).confidence < 0.6) {
         continue; // Skip low-confidence or non-argumentative sentences
       }
 
@@ -199,24 +199,24 @@ export class StructureExtractorService {
       const affectedGroups = this.extractAffectedGroups(sentence.text, entities);
       
       // Assess evidence quality
-      const evidenceQuality = this.assessEvidenceQuality(sentence.text, sentence.type);
+      const evidenceQuality = this.assessEvidenceQuality(sentence.text, (sentence as any).type);
 
       // Create normalized version for deduplication
       const normalizedText = this.normalizeArgumentText(sentence.text);
 
       const argument: ExtractedArgument = {
         id: this.generateArgumentId(),
-        type: sentence.type,
+        type: (sentence as any).type,
         position,
-        text: sentence.text,
+        text: (sentence as any).text,
         normalizedText,
-        confidence: sentence.confidence,
+        confidence: (sentence as any).confidence,
         topicTags,
         affectedGroups,
         evidenceQuality,
         sentenceSpan: {
-          start: sentence.start,
-          end: sentence.end
+          start: (sentence as any).start,
+          end: (sentence as any).end
         }
       };
 
@@ -337,7 +337,7 @@ export class StructureExtractorService {
     
     // Extract from entities
     if (entities.topics) {
-      tags.push(...entities.topics);
+      tags.push(...(entities as any).topics);
     }
 
     // Add keyword-based tags
@@ -366,7 +366,7 @@ export class StructureExtractorService {
 
     // Extract from entities
     if (entities.groups) {
-      groups.push(...entities.groups);
+      groups.push(...(entities as any).groups);
     }
 
     // Add keyword-based groups
@@ -562,17 +562,17 @@ export class StructureExtractorService {
       const sentence = sentences[i];
       
       // Skip sentences that don't contain argumentative content
-      if (sentence.confidence < 0.5) continue;
+      if (sentence!.confidence < 0.5) continue;
 
       const argument: ExtractedArgument = {
         id: crypto.randomUUID(),
-        type: sentence.type,
-        position: sentence.position,
-        text: sentence.text,
-        normalizedText: this.normalizeText(sentence.text),
-        confidence: sentence.confidence,
-        topicTags: this.extractTopicTags(sentence.text, entities),
-        affectedGroups: this.identifyAffectedGroups(sentence.text, entities),
+        type: sentence!.type,
+        position: sentence!.position,
+        text: sentence!.text,
+        normalizedText: this.normalizeText(sentence!.text),
+        confidence: sentence!.confidence,
+        topicTags: this.extractTopicTags(sentence!.text, entities),
+        affectedGroups: this.identifyAffectedGroups(sentence!.text, entities),
         evidenceQuality: this.assessEvidenceQuality(sentence),
         sentenceSpan: { start: i, end: i }
       };
@@ -844,7 +844,7 @@ export class StructureExtractorService {
     // Look ahead for continuation indicators
     for (let i = startIndex + 1; i < sentences.length && i < startIndex + 3; i++) {
       const sentence = sentences[i];
-      const text = sentence.text.toLowerCase();
+      const text = sentence!.text.toLowerCase();
       
       // Check for continuation patterns
       if (text.startsWith('this') || text.startsWith('furthermore') || 

@@ -92,7 +92,7 @@ export const descriptionField = () =>
  */
 // TODO: Replace 'any' with proper type definition
 export const statusField = (enumType: unknown, defaultValue: string) => {
-  const enumNameOrStatus = enumType.name ?? "status";
+  const enumNameOrStatus = (enumType as Error).name ?? "status";
   return enumType(enumNameOrStatus).notNull().default(defaultValue);
 };
 

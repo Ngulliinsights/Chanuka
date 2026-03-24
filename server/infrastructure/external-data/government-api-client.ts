@@ -111,13 +111,13 @@ export class GovernmentAPIClient {
     
     // Add request interceptor for authentication
     instance.interceptors.request.use(
-      (config) => this.addAuthentication(config),
-      (error) => Promise.reject(error)
+      (config: any) => this.addAuthentication(config),
+      (error: any) => Promise.reject(error)
     );
     
     // Add response interceptor for logging
     instance.interceptors.response.use(
-      (response) => {
+      (response: any) => {
         this.requestCount++;
         logger.debug({
           provider: this.config.provider,
@@ -126,7 +126,7 @@ export class GovernmentAPIClient {
         }, 'Government API request successful');
         return response;
       },
-      (error) => {
+      (error: any) => {
         this.errorCount++;
         logger.error({
           provider: this.config.provider,

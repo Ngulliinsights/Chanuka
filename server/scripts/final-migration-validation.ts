@@ -9,9 +9,7 @@
 
 import { logger } from '@server/infrastructure/observability';
 import { database as db } from '@server/infrastructure/database';
-// FIXME: Invalid import - Comment out invalid @shared subdirectory imports
-// import { BatchingService } from '@shared/infrastructure/batching-service';
-import { webSocketService } from '@server/infrastructure/websocket';
+import { WebSocketService, BatchingService } from '@server/infrastructure/websocket';
 
 interface ValidationResult {
   phase: string;

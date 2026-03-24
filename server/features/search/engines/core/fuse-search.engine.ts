@@ -131,7 +131,7 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${bills.chamber} = ANY(${query.filters.chamber})`);
     }
 
-    const billsData = await readDatabase(async (db) => {
+    const billsData = await readDatabase(async (db: any) => {
       return db
         .select({
           id: bills.id,
@@ -192,7 +192,7 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${sponsors.county} = ANY(${query.filters.county})`);
     }
 
-    const sponsorsData = await readDatabase(async (db) => {
+    const sponsorsData = await readDatabase(async (db: any) => {
       return db
         .select({
           id: sponsors.id,
@@ -253,7 +253,7 @@ export class FuseSearchEngine implements SearchEngine {
       conditions.push(sql`${comments.created_at} <= ${query.filters.dateRange.end}`);
     }
 
-    const commentsData = await readDatabase(async (db) => {
+    const commentsData = await readDatabase(async (db: any) => {
       return db
         .select({
           id: comments.id,

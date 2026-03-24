@@ -20,7 +20,7 @@ export class MLAnalysisService {
   public static handleAnalysisError(error: unknown, analysis_type: string): AnalysisResult {
     logger.error({ component: 'analytics',
       operation: 'handleAnalysisError',
-      analysis_type, error: error instanceof Error ? error : { message: String(error }, `Error in ${analysis_type} analysis:`) });
+      analysis_type, error: error instanceof Error ? error : { message: String(error) } }, `Error in ${analysis_type} analysis:`);
 
     return {
       confidence: 0.0,
@@ -293,7 +293,7 @@ export class MLAnalysisService {
       };
     } catch (error) {
       logger.error({ component: 'analytics',
-        operation: 'detectImplementationWorkarounds', error: error instanceof Error ? error : { message: String(error }, 'Error in implementation workaround detection:') });
+        operation: 'detectImplementationWorkarounds', error: error instanceof Error ? error : { message: String(error) } }, 'Error in implementation workaround detection:');
       return {
         matches: [],
         overallRisk: 0.0,
@@ -348,7 +348,7 @@ export async function detectImplementationWorkarounds(bill_id: string): Promise<
     ];
   } catch (error) { logger.error({ component: 'analytics',
       operation: 'detectImplementationWorkarounds',
-      bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error in detectImplementationWorkarounds:') });
+      bill_id, error: error instanceof Error ? error : { message: String(error) } }, 'Error in detectImplementationWorkarounds:');
     return [];
   }
 }
@@ -436,7 +436,7 @@ export async function performComprehensiveAnalysis(bill_id: string): Promise<{
     };
   } catch (error) { logger.error({ component: 'analytics',
       operation: 'performComprehensiveAnalysis',
-      bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error in comprehensive analysis:') });
+      bill_id, error: error instanceof Error ? error : { message: String(error) } }, 'Error in comprehensive analysis:');
 
     // Return fallback response with error indication
     return {

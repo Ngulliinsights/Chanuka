@@ -54,13 +54,13 @@ export class FinancialAnalysisService {
 
           // Build relationships from financial disclosures.
           const disclosureRelationships = disclosures
-            .filter((d): d is FinancialDisclosure & { source: string; amount: number } =>
+            .filter((d: any): d is FinancialDisclosure & { source: string; amount: number } =>
               d.source != null && d.amount != null,
             )
-            .map((d) => this.mapDisclosureToRelationship(sponsor_id, d));
+            .map((d: any) => this.mapDisclosureToRelationship(sponsor_id, d));
 
           // Build relationships from organisational affiliations.
-          const affiliationRelationships = affiliations.map((a) =>
+          const affiliationRelationships = affiliations.map((a: any) =>
             this.mapAffiliationToRelationship(sponsor_id, a),
           );
 

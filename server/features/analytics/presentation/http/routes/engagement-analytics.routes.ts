@@ -32,7 +32,7 @@ const buildTimeThreshold = (timeframe: string): Date => {
 // Simple authentication middleware placeholder
 const authenticateToken = (req: unknown, res: unknown, next: unknown) => {
   // This should be replaced with actual authentication logic
-  req.user = { id: '1', role: 'user' }; // Mock user for now
+  (req as any).user = { id: '1', role: 'user' }; // Mock user for now
   next();
 };
 
@@ -153,7 +153,7 @@ class EngagementAnalyticsRouter {
         ApiResponseWrapper.createMetadata(startTime, 'database'));
     } catch (error) {
       logger.error({ component: 'analytics',
-        operation: 'getEngagementOverview', error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement overview:') });
+        operation: 'getEngagementOverview', error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching engagement overview:');
 
       return ApiError(res, { 
         code: 'OVERVIEW_FETCH_ERROR', 
@@ -200,7 +200,7 @@ class EngagementAnalyticsRouter {
 
       logger.error({ component: 'analytics',
         operation: 'getBillEngagementMetrics',
-        bill_id: req.params.id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching bill engagement metrics:') });
+        bill_id: req.params.id, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching bill engagement metrics:');
 
       return ApiError(res, { 
         code: 'BILL_METRICS_ERROR', 
@@ -276,7 +276,7 @@ class EngagementAnalyticsRouter {
 
       logger.error({ component: 'analytics',
         operation: 'getUserEngagementHistory',
-        user_id: req.params.id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching user engagement history:') });
+        user_id: req.params.id, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching user engagement history:');
 
       return ApiError(res, { 
         code: 'USER_HISTORY_ERROR', 
@@ -321,7 +321,7 @@ class EngagementAnalyticsRouter {
 
       logger.error({ component: 'analytics',
         operation: 'getEngagementTrends',
-        period: req.query.period, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement trends:') });
+        period: req.query.period, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching engagement trends:');
 
       return ApiError(res, { 
         code: 'TRENDS_ERROR', 
@@ -370,7 +370,7 @@ class EngagementAnalyticsRouter {
 
       logger.error({ component: 'analytics',
         operation: 'trackEngagementEvent',
-        user_id: req.user?.id, error: error instanceof Error ? error : { message: String(error }, 'Error tracking engagement event:') });
+        user_id: req.user?.id, error: error instanceof Error ? error : { message: String(error) } }, 'Error tracking engagement event:');
 
       return ApiError(res, { 
         code: 'TRACKING_ERROR', 
@@ -446,12 +446,12 @@ class EngagementAnalyticsRouter {
       totalEngagement: Number(commentStats?.totalVotes || 0),
       activeUsersToday: Number(activeUsersToday?.count || 0),
       activeUsersThisWeek: Number(activeUsersThisWeek?.count || 0),
-      topEngagedBills: topEngagedBills.map(bill => ({
+      topEngagedBills: topEngagedBills.map((bill: any) => ({
         bill_id: bills.bill_id,
         billTitle: bills.billTitle,
         engagementCount: Number(bills.engagementCount || 0)
        })),
-      engagementTrends: engagementTrends.map(trend => ({
+      engagementTrends: engagementTrends.map((trend: any) => ({
         date: trend.date,
         comments: Number(trend.comments),
         users: Number(trend.users)
@@ -660,7 +660,7 @@ class EngagementAnalyticsRouter {
       .groupBy(groupBy)
       .orderBy(groupBy);
 
-    const formattedTrends = trends.map(trend => ({
+    const formattedTrends = trends.map((trend: any) => ({
       [period === 'hourly' ? 'hour' : period === 'daily' ? 'date' : 'week']:
         period === 'hourly' ? Number(trend.period) : String(trend.period),
       comments: Number(trend.comments),

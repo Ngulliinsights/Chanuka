@@ -419,7 +419,7 @@ export class UserService {
         .from(users)
         .where(eq(users.role, role));
 
-      return results.map(result => this.mapToUser(result));
+      return results.map((result: any) => this.mapToUser(result as any));
     } catch (error) {
       logger.error({ role, error }, 'Error finding users by role');
       throw error;
@@ -434,7 +434,7 @@ export class UserService {
         .from(users)
         .where(eq(users.is_verified, is_verified));
 
-      return results.map(result => this.mapToUser(result));
+      return results.map((result: any) => this.mapToUser(result as any));
     } catch (error) {
       logger.error({ status, error }, 'Error finding users by verification status');
       throw error;
@@ -478,7 +478,7 @@ export class UserService {
         }
       });
 
-      return results.map(result => this.mapToUser(result));
+      return results.map((result: any) => this.mapToUser(result as any));
     } catch (error) {
       logger.error({ query, error }, 'Error searching users');
       throw error;
@@ -513,7 +513,7 @@ export class UserService {
         .groupBy(users.role);
 
       const roleCounts: Record<string, number> = {};
-      results.forEach(result => {
+      results.forEach((result: any) => {
         roleCounts[result.role] = Number(result.count);
       });
 
@@ -535,7 +535,7 @@ export class UserService {
         .groupBy(users.is_verified);
 
       const statusCounts: Record<string, number> = {};
-      results.forEach(result => {
+      results.forEach((result: any) => {
         statusCounts[result.status] = Number(result.count);
       });
 

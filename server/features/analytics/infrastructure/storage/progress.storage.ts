@@ -46,7 +46,7 @@ export class ProgressStorage extends BaseStorage<UserProgress> {
    * Creates or updates user progress using Drizzle ORM
    */
   async updateUserProgress(progress: InsertUserProgress): Promise<UserProgress> {
-    return this.withTransaction(async (tx) => {
+    return this.withTransaction(async (tx: any) => {
       const result = await tx.insert(user_progress).values({
         ...progress,
         unlocked_at: progress.unlocked_at || new Date(),

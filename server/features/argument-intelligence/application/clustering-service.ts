@@ -661,7 +661,7 @@ export class ClusteringService {
     const clusteredArgIds = new Set<string>();
     
     clusters.forEach(cluster => {
-      cluster.arguments.forEach(arg => {
+      cluster.arguments.forEach((arg: any) => {
         clusteredArgIds.add(arg.id);
       });
     });

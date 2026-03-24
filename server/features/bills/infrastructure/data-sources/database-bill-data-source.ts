@@ -130,7 +130,7 @@ export class DatabaseBillDataSource implements BillDataSource {
         .orderBy(desc(bills.created_at))
         .limit(50);
 
-      return billResults.map(bill => ({
+      return billResults.map((bill: any) => ({
         ...bill,
         complexity_score: 5, // Default complexity score
       })) as BillDataRecord[];
@@ -206,14 +206,14 @@ export class DatabaseBillDataSource implements BillDataSource {
       return {
         total: totalResults[0]?.count ?? 0,
         byStatus: statusResults.reduce<Record<string, number>>(
-          (acc, row) => {
+          (acc: any, row: any) => {
             acc[row.status] = row.count;
             return acc;
           },
           {},
         ),
         byCategory: categoryResults.reduce<Record<string, number>>(
-          (acc, row) => {
+          (acc: any, row: any) => {
             acc[row.category ?? 'uncategorized'] = row.count;
             return acc;
           },

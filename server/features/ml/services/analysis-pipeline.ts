@@ -565,34 +565,34 @@ export class AnalysisPipeline {
           const step = batch[i];
           const result = batchResults[i];
 
-          if (result.status === 'fulfilled') {
-            const stepResult = result.value;
+          if (result!.status === 'fulfilled') {
+            const stepResult = result!.value;
             stepResults.push(stepResult);
-            stepOutputs[step.id] = stepResult;
-            executedSteps.add(step.id);
+            stepOutputs[step!.id] = stepResult;
+            executedSteps.add(step!.id);
 
             if (stepResult.skipped) {
               stepsSkipped++;
             } else if (!stepResult.success) {
               stepsFailed++;
-              if (!options?.continueOnError && !step.optional) {
-                throw new Error(`Critical step '${step.id}' failed: ${stepResult.error}`);
+              if (!options?.continueOnError && !step!.optional) {
+                throw new Error(`Critical step '${step!.id}' failed: ${stepResult.error}`);
               }
             }
           } else {
             const errorResult: StepResult = {
-              stepId: step.id,
+              stepId: step!.id,
               success: false,
-              error: result.reason?.message || 'Unknown error',
+              error: result!.reason?.message || 'Unknown error',
               processingTime: 0,
             };
             stepResults.push(errorResult);
             stepsFailed++;
 
-            if (!options?.continueOnError && !step.optional) {
-              throw new Error(`Step '${step.id}' failed: ${errorResult.error}`);
+            if (!options?.continueOnError && !step!.optional) {
+              throw new Error(`Step '${step!.id}' failed: ${errorResult.error}`);
             }
-            executedSteps.add(step.id);
+            executedSteps.add(step!.id);
           }
         }
       }

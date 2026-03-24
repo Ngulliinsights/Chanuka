@@ -195,8 +195,8 @@ export class SocketIOWebSocketService {
    * Handle new socket connection
    */
   private handleConnection(socket: unknown): void {
-    const user_id = socket.data.user_id;
-    const socketId = socket.id;
+    const user_id = (socket as any).data.user_id;
+    const socketId = (socket as any).id;
 
     // Update metrics
     this.metrics.totalConnections++;
@@ -217,7 +217,7 @@ export class SocketIOWebSocketService {
     }, 'New Socket.IO connection established');
 
     // Send connection confirmation
-    socket.emit('connected', {
+    (socket as any).emit('connected', {
       message: 'Socket.IO connection established',
       user_id,
       socketId,
@@ -231,31 +231,31 @@ export class SocketIOWebSocketService {
     });
 
     // Setup event handlers
-    socket.on('subscribe', (data: { bill_id: number }) => {
+    (socket as any).on('subscribe', (data: { bill_id: number }) => {
       this.handleSubscribe(socket, data);
     });
 
-    socket.on('unsubscribe', (data: { bill_id: number }) => {
+    (socket as any).on('unsubscribe', (data: { bill_id: number }) => {
       this.handleUnsubscribe(socket, data);
     });
 
-    socket.on('batch_subscribe', (data: { bill_ids: number[] }) => {
+    (socket as any).on('batch_subscribe', (data: { bill_ids: number[] }) => {
       this.handleBatchSubscribe(socket, data);
     });
 
-    socket.on('batch_unsubscribe', (data: { bill_ids: number[] }) => {
+    (socket as any).on('batch_unsubscribe', (data: { bill_ids: number[] }) => {
       this.handleBatchUnsubscribe(socket, data);
     });
 
-    socket.on('ping', () => {
-      socket.emit('pong', { timestamp: Date.now() });
+    (socket as any).on('ping', () => {
+      (socket as any).emit('pong', { timestamp: Date.now() });
     });
 
-    socket.on('disconnect', (reason) => {
+    (socket as any).on('disconnect', (reason: any) => {
       this.handleDisconnect(socket, reason);
     });
 
-    socket.on('error', (error) => {
+    (socket as any).on('error', (error: any) => {
       this.handleError(socket, error);
     });
   }
@@ -265,7 +265,7 @@ export class SocketIOWebSocketService {
    */
   private handleSubscribe(socket: unknown, data: { bill_id: number }): void {
     const { bill_id } = data;
-    const socketId = socket.id;
+    const socketId = (socket as any).id;
 
     // Add to bill subscriptions
     if (!this.billSubscriptions.has(bill_id)) {
@@ -274,7 +274,7 @@ export class SocketIOWebSocketService {
     this.billSubscriptions.get(bill_id)!.add(socketId);
 
     // Join Socket.IO room for efficient broadcasting
-    socket.join(`bill:${bill_id}`);
+    (socket as any).join(`bill:${bill_id}`);
 
     logger.debug({
       component: 'SocketIOWebSocketService',
@@ -283,7 +283,7 @@ export class SocketIOWebSocketService {
       subscriberCount: this.billSubscriptions.get(bill_id)!.size
     }, 'Socket subscribed to bill');
 
-    socket.emit('subscribed', {
+    (socket as any).emit('subscribed', {
       bill_id,
       message: `Subscribed to bill ${bill_id}`,
       timestamp: new Date().toISOString()
@@ -295,7 +295,7 @@ export class SocketIOWebSocketService {
    */
   private handleUnsubscribe(socket: unknown, data: { bill_id: number }): void {
     const { bill_id } = data;
-    const socketId = socket.id;
+    const socketId = (socket as any).id;
 
     // Remove from bill subscriptions
     if (this.billSubscriptions.has(bill_id)) {
@@ -308,7 +308,7 @@ export class SocketIOWebSocketService {
     }
 
     // Leave Socket.IO room
-    socket.leave(`bill:${bill_id}`);
+    (socket as any).leave(`bill:${bill_id}`);
 
     logger.debug({
       component: 'SocketIOWebSocketService',
@@ -316,7 +316,7 @@ export class SocketIOWebSocketService {
       bill_id
     }, 'Socket unsubscribed from bill');
 
-    socket.emit('unsubscribed', {
+    (socket as any).emit('unsubscribed', {
       bill_id,
       message: `Unsubscribed from bill ${bill_id}`,
       timestamp: new Date().toISOString()
@@ -344,7 +344,7 @@ export class SocketIOWebSocketService {
       }
     }
 
-    socket.emit('batch_subscribed', {
+    (socket as any).emit('batch_subscribed', {
       results,
       timestamp: new Date().toISOString()
     });
@@ -371,7 +371,7 @@ export class SocketIOWebSocketService {
       }
     }
 
-    socket.emit('batch_unsubscribed', {
+    (socket as any).emit('batch_unsubscribed', {
       results,
       timestamp: new Date().toISOString()
     });
@@ -381,7 +381,7 @@ export class SocketIOWebSocketService {
    * Handle socket disconnection
    */
   private handleDisconnect(socket: unknown, reason: string): void {
-    const socketId = socket.id;
+    const socketId = (socket as any).id;
     const user_id = this.socketUsers.get(socketId);
 
     // Update metrics
@@ -424,8 +424,8 @@ export class SocketIOWebSocketService {
     
     logger.error({
       component: 'SocketIOWebSocketService',
-      socketId: socket.id,
-      user_id: socket.data.user_id,
+      socketId: (socket as any).id,
+      user_id: (socket as any).data.user_id,
       error: error instanceof Error ? error.message : String(error)
     }, 'Socket.IO connection error');
   }

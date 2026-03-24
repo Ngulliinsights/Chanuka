@@ -86,13 +86,13 @@ export class BillStatusMonitorService {
       oldStatus: change.oldStatus,
       newStatus: change.newStatus
     };
-    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📊 Processing bill status change`);
+    logger.info(logContext, `📊 Processing bill status change`);
 
     try {
       // 1. Fetch Essential Bill Details (Title, Category) for context
       const bill = await this.getBillDetails(change.bill_id);
       if (!bill) {
-        logger.error({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `Bill ${change.bill_id} not found during status change processing.`);
+        logger.error(logContext, `Bill ${change.bill_id} not found during status change processing.`);
         return; // Cannot proceed without bill context
       }
 
@@ -118,7 +118,7 @@ export class BillStatusMonitorService {
       const usersToNotify = await this.getActiveTrackersForEvent(change.bill_id, 'status_changes');
 
       if (usersToNotify.length > 0) {
-        logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`);
+        logger.info(logContext, `📢 Triggering Notification Orchestrator for ${usersToNotify.length} users`);
 
         // 5. Prepare Notification Template for the Orchestrator
         const notificationTemplate: Omit<NotificationRequest, 'user_id'> = {
@@ -148,13 +148,13 @@ export class BillStatusMonitorService {
         });
 
       } else {
-        logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 No users actively tracking status changes for this bill.`);
+        logger.info(logContext, `📢 No users actively tracking status changes for this bill.`);
       }
 
-      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `✅ Successfully processed status change`);
+      logger.info(logContext, `✅ Successfully processed status change`);
 
     } catch (error) {
-      logger.error({ error: logContext, error instanceof Error ? logContext, error.message : String(logContext, error) }, 'Error handling bill status change:');
+      logger.error({ logContext, error }, 'Error handling bill status change:');
       // Log error but avoid throwing to prevent cascading failures in event processing
     }
   }
@@ -170,13 +170,13 @@ export class BillStatusMonitorService {
       type: update.type,
       user_id: update.user_id
     };
-    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📈 Processing engagement update`);
+    logger.info(logContext, `📈 Processing engagement update`);
 
     try {
       // 1. Fetch Bill Details
       const bill = await this.getBillDetails(update.bill_id);
       if (!bill) {
-        logger.error({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `Bill ${update.bill_id} not found during engagement update processing.`);
+        logger.error(logContext, `Bill ${update.bill_id} not found during engagement update processing.`);
         return;
       }
 
@@ -204,7 +204,7 @@ export class BillStatusMonitorService {
         const filteredUsers = usersToNotify.filter(id => id !== update.user_id);
 
         if (filteredUsers.length > 0) {
-          logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`);
+          logger.info(logContext, `📢 Triggering Notification Orchestrator for ${filteredUsers.length} users (new comment)`);
 
           // Try to fetch commenter details to make notifications more informative
           let commenterName = 'A user';
@@ -247,14 +247,14 @@ export class BillStatusMonitorService {
             this.triggerNotification(user_id, notificationTemplate);
           });
         } else {
-          logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `📢 No users actively tracking new comments for this bill (excluding author).`);
+          logger.info(logContext, `📢 No users actively tracking new comments for this bill (excluding author).`);
         }
       }
 
-      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, `✅ Successfully processed engagement update`);
+      logger.info(logContext, `✅ Successfully processed engagement update`);
 
     } catch (error) {
-      logger.error({ error: logContext, error instanceof Error ? logContext, error.message : String(logContext, error) }, 'Error handling bill engagement update:');
+      logger.error({ logContext, error }, 'Error handling bill engagement update:');
     }
   }
 

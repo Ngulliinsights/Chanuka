@@ -16,14 +16,11 @@ export * from './application/campaign-service';
 export * from './application/action-coordinator';
 export * from './application/coalition-builder';
 export * from './application/impact-tracker';
-
-// Infrastructure exports
-// Repository implementations removed
-export * from './infrastructure/services/notification-service';
-export * from './infrastructure/services/representative-contact-service';
+export * from './application/notification-service';
+export * from './application/representative-contact-service';
 
 // Presentation exports
-export * from './presentation/advocacy-router';
+export * from './presentation/http/advocacy-router';
 
 // Configuration exports
 export * from './config/advocacy-config';

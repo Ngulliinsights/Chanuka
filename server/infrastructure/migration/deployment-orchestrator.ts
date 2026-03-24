@@ -103,42 +103,42 @@ export class DeploymentOrchestrator {
       for (let i = 0; i < this.deploymentPlan.phases.length; i++) {
         const phase = this.deploymentPlan.phases[i];
         this.status.currentPhase = i;
-        this.status.rolloutPercentage = phase.rolloutPercentage;
+        this.status.rolloutPercentage = phase!.rolloutPercentage;
         this.status.status = 'deploying';
 
         logger.info({
           component: 'DeploymentOrchestrator',
-          phase: phase.name,
-          rolloutPercentage: phase.rolloutPercentage
+          phase: phase!.name,
+          rolloutPercentage: phase!.rolloutPercentage
         }, `Executing deployment phase ${i + 1}/${this.deploymentPlan.phases.length}`);
 
         // Deploy phase
         await this.executePhase(phase);
 
         // Validate if required
-        if (phase.validationRequired) {
+        if (phase!.validationRequired) {
           this.status.status = 'validating';
           const validationPassed = await this.validatePhase(phase);
           
           if (!validationPassed) {
             logger.error({
               component: 'DeploymentOrchestrator',
-              phase: phase.name
+              phase: phase!.name
             }, 'Phase validation failed, initiating rollback');
             
             await this.initiateRollback({
-              reason: `Phase ${phase.name} validation failed`,
+              reason: `Phase ${phase!.name} validation failed`,
               triggeredBy: 'automatic',
               timestamp: new Date(),
               metrics: this.status.metrics
             });
             
-            throw new Error(`Deployment failed at phase: ${phase.name}`);
+            throw new Error(`Deployment failed at phase: ${phase!.name}`);
           }
         }
 
         // Wait for phase duration
-        await this.waitForPhaseDuration(phase.duration);
+        await this.waitForPhaseDuration(phase!.duration);
       }
 
       // Final validation

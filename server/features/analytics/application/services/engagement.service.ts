@@ -1,21 +1,18 @@
 import { User } from '@server/features/users/domain/entities/user';
 // cspell:words upvotes Upvotes downvotes Downvotes commenters Commenters
-import { cacheService } from '@server/infrastructure/cache';
+import { cacheService, cacheKeys } from '@server/infrastructure/cache';
 // FIXED: Import plural table names and correct type references
-import { bills, comment_votes,comments, user_profiles, users } from '@server/infrastructure/schema';
+import { bills, comment_votes, comments, user_profiles, users } from '@server/infrastructure/schema';
 import { bill_engagement } from '@server/infrastructure/schema';
-// FIXED: Import cacheKeys from the correct location
-import { cache, cacheKeys } from '@server/infrastructure/cache';
 import { ApiErrorResponse, ApiSuccessResponse, ApiValidationErrorResponse } from '@server/utils/api-utils';
 import { logger } from '@server/infrastructure/observability';
 import { ApiResponseWrapper } from '@server/utils/api-utils';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';;
+import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database';
 import type {
   BillEngagementMetrics,
-  CommentEngagementTrends,
-  EngagementLeaderboard,
-  UserEngagementMetrics} from '@shared/types';
-import { and, avg,count, desc, eq, sql, sum } from 'drizzle-orm';
+  UserEngagementMetrics
+} from '@shared/types';
+import { and, avg, count, desc, eq, sql, sum } from 'drizzle-orm';
 import { Router } from 'express';
 import { z } from 'zod';
 
@@ -108,9 +105,9 @@ export class EngagementAnalyticsService {
               ));
 
             // Calculate engagement score
-            const totalComments = Number(commentStats.totalComments || 0);
-            const totalVotes = Number(commentStats.totalVotes || 0);
-            const avgVotes = Number(commentStats.averageVotes || 0);
+            const totalComments = Number(commentStats!.totalComments || 0);
+            const totalVotes = Number(commentStats!.totalVotes || 0);
+            const avgVotes = Number(commentStats!.averageVotes || 0);
             const days = Number(participationDays[0]?.uniqueDays || 0);
 
             const engagement_score = this.calculateUserEngagementScore(
@@ -215,13 +212,13 @@ export class EngagementAnalyticsService {
               .from(comments)
               .where(eq(comments.bill_id, bill_id));
 
-            const totalComments = Number(engagementStats.totalComments || 0);
-            const totalVotes = Number(engagementStats.totalVotes || 0);
-            const uniqueParticipants = Number(engagementStats.uniqueParticipants || 0);
-            const expertComments = Number(engagementStats.expertComments || 0);
+            const totalComments = Number(engagementStats!.totalComments || 0);
+            const totalVotes = Number(engagementStats!.totalVotes || 0);
+            const uniqueParticipants = Number(engagementStats!.uniqueParticipants || 0);
+            const expertComments = Number(engagementStats!.expertComments || 0);
 
-            const upvotes = Number(controversyData.totalUpvotes || 0);
-            const downvotes = Number(controversyData.totalDownvotes || 0);
+            const upvotes = Number(controversyData!.totalUpvotes || 0);
+            const downvotes = Number(controversyData!.totalDownvotes || 0);
             const controversyScore = this.calculateControversyScore(upvotes, downvotes);
 
             const timeToFirstComment = firstComment ?
@@ -541,7 +538,7 @@ router.get('/user/:user_id/metrics', authenticateToken, async (req: Authenticate
     logger.error({ component: 'analytics',
       operation: 'getUserEngagementMetrics',
       user_id: req.params.user_id,
-      timeframe: req.query.timeframe, error: error instanceof Error ? error : { message: String(error }, 'Error fetching user engagement metrics:') });
+      timeframe: req.query.timeframe, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching user engagement metrics:');
 
     return ApiErrorResponse(res, 'Failed to fetch user engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -574,7 +571,7 @@ router.get('/bill/:bill_id/metrics', authenticateToken, async (req: Authenticate
 
     logger.error({ component: 'analytics',
       operation: 'getBillEngagementMetrics',
-      bill_id: req.params.bill_id, error: error instanceof Error ? error : { message: String(error }, 'Error fetching bill engagement metrics:') });
+      bill_id: req.params.bill_id, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching bill engagement metrics:');
 
     return ApiErrorResponse(res, error instanceof Error ? error.message : 'Failed to fetch bill engagement metrics', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
@@ -600,7 +597,7 @@ router.get('/bill/:bill_id/trends', authenticateToken, async (req: Authenticated
     logger.error({ component: 'analytics',
       operation: 'getEngagementTrends',
       bill_id: req.params.bill_id,
-      period: req.query.period, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement trends:') });
+      period: req.query.period, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching engagement trends:');
     return ApiErrorResponse(res, 'Failed to fetch engagement trends', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));
   }
@@ -633,7 +630,7 @@ router.get('/leaderboard', authenticateToken, async (req: AuthenticatedRequest, 
     logger.error({ component: 'analytics',
       operation: 'getEngagementLeaderboard',
       timeframe: req.query.timeframe,
-      limit: req.query.limit, error: error instanceof Error ? error : { message: String(error }, 'Error fetching engagement leaderboard:') });
+      limit: req.query.limit, error: error instanceof Error ? error : { message: String(error) } }, 'Error fetching engagement leaderboard:');
 
     return ApiErrorResponse(res, 'Failed to fetch engagement leaderboard', 500,
       ApiResponseWrapper.createMetadata(startTime, 'database'));

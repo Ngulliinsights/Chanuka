@@ -4,18 +4,13 @@
  * Handles both the new { success, data } format and legacy formats
  */
 
-export interface StandardApiResponse<T = unknown> {
-  success: boolean;
-  data?: T;
-  error?: {
-    code?: string;
-    message: string;
-    details?: unknown;
-    statusCode?: number;
-  };
-  message?: string;
-  timestamp: string;
-}
+import type { ApiResponse } from '@shared/types/api/contracts/core.contracts';
+
+/**
+ * Client-side alias for the shared API response type.
+ * @see ApiResponse from @shared/types/api/contracts/core.contracts
+ */
+export type StandardApiResponse<T = unknown> = ApiResponse<T>;
 
 /**
  * Extract data from standardized response

@@ -338,7 +338,7 @@ export class SponsorService {
         .orderBy(asc(sponsors.constituency));
 
       const constituencies = results
-        .map(r => r.constituency)
+        .map((r: any) => r.constituency)
         .filter((constituency: string | null): constituency is string => Boolean(constituency));
 
       logger.debug({ ...logContext, count: constituencies.length }, "✅ Unique constituencies retrieved");

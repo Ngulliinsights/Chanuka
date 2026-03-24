@@ -200,7 +200,7 @@ export class SimpleTransparencyDashboardService {
       const totalSponsors = allSponsors.length;
       const averageTransparencyScore = totalSponsors > 0
         ? Math.round(
-            allSponsors.reduce((sum, s) => sum + (Number(s.transparency_score) || 0), 0) / totalSponsors
+            allSponsors.reduce((sum: any, s: any) => sum + (Number(s.transparency_score) || 0), 0) / totalSponsors
           )
         : 0;
 
@@ -210,13 +210,13 @@ export class SimpleTransparencyDashboardService {
         .from(sponsorTransparency);
 
       const totalDisclosures = allDisclosures.length;
-      const verifiedDisclosures = allDisclosures.filter(d => d.is_verified).length;
+      const verifiedDisclosures = allDisclosures.filter((d: any) => d.is_verified).length;
       const verificationRate = totalDisclosures > 0
         ? Math.round((verifiedDisclosures / totalDisclosures) * 100)
         : 0;
 
       // Calculate risk distribution
-      const riskDistribution = allSponsors.reduce((acc, sponsor) => {
+      const riskDistribution = allSponsors.reduce((acc: any, sponsor: any) => {
         const score = Number(sponsors.transparency_score) || 0;
         let riskLevel: string;
         if (score < 50) riskLevel = 'critical';
@@ -230,10 +230,10 @@ export class SimpleTransparencyDashboardService {
 
       // Get top risk sponsors for analysis
       const topRisks = allSponsors
-        .filter(s => Number(s.transparency_score) < 70)
-        .sort((a, b) => (Number(a.transparency_score) || 0) - (Number(b.transparency_score) || 0))
+        .filter((s: any) => Number(s.transparency_score) < 70)
+        .sort((a: any, b: any) => (Number(a.transparency_score) || 0) - (Number(b.transparency_score) || 0))
         .slice(0, 10)
-        .map(s => ({
+        .map((s: any) => ({
           sponsor_id: s.id,
           sponsorName: s.name,
           transparency_score: Number(s.transparency_score) || 0,
@@ -319,16 +319,16 @@ export class SimpleTransparencyDashboardService {
 
   private calculateVerificationScore(disclosures: unknown[]): number {
     if (disclosures.length === 0) return 0;
-    const verifiedCount = disclosures.filter(d => d.is_verified).length;
+    const verifiedCount = disclosures.filter(d => (d as any).is_verified).length;
     return Math.round((verifiedCount / disclosures.length) * 100);
   }
 
   private calculateConflictResolutionScore(relationshipMapping: unknown): number {
-    const totalRelationships = relationshipMapping.relationships.length;
+    const totalRelationships = (relationshipMapping as any).relationships.length;
     if (totalRelationships === 0) return 100;
     
-    const highRiskCount = relationshipMapping.relationships.filter(
-      (r: unknown) => r.conflictPotential === 'high' || r.conflictPotential === 'critical'
+    const highRiskCount = (relationshipMapping as any).relationships.filter(
+      (r: unknown) => (r as any).conflictPotential === 'high' || (r as any).conflictPotential === 'critical'
     ).length;
     
     return Math.max(100 - (highRiskCount / totalRelationships) * 100, 0);
@@ -339,7 +339,7 @@ export class SimpleTransparencyDashboardService {
     
     const now = Date.now();
     const recentDisclosures = disclosures.filter(d => {
-      const daysSince = (now - d.dateReported.getTime()) / (1000 * 60 * 60 * 24);
+      const daysSince = (now - (d as any).dateReported.getTime()) / (1000 * 60 * 60 * 24);
       return daysSince <= 365; // Within last year
     }).length;
     
@@ -366,8 +366,7 @@ export class SimpleTransparencyDashboardService {
 
   private generateTransparencyRecommendations(
     componentScores: Record<string, number>,
-    overallScore: number,
-    completenessReport: any,
+    overallScore: number, completenessReport: any,
     relationshipMapping: any
   ): string[] {
     const recommendations: string[] = [];
@@ -465,7 +464,7 @@ export class SimpleTransparencyDashboardService {
       // Calculate average transparency score
       const averageScore = sponsorsInPeriod.length > 0
         ? Math.round(
-            sponsorsInPeriod.reduce((sum, s) => sum + (Number(s.transparency_score) || 0), 0) / sponsorsInPeriod.length
+            sponsorsInPeriod.reduce((sum: any, s: any) => sum + (Number(s.transparency_score) || 0), 0) / sponsorsInPeriod.length
           )
         : 0;
 
@@ -481,7 +480,7 @@ export class SimpleTransparencyDashboardService {
         );
 
       // Calculate metrics
-      const verifiedDisclosures = disclosures.filter(d => d.is_verified).length;
+      const verifiedDisclosures = disclosures.filter((d: any) => d.is_verified).length;
       const verificationRate = disclosures.length > 0 
         ? Math.round((verifiedDisclosures / disclosures.length) * 100)
         : 0;
@@ -492,7 +491,7 @@ export class SimpleTransparencyDashboardService {
                           averageScore < 85 ? 'medium' : 'low';
 
       // Count conflicts
-      const conflictCount = disclosures.filter(d => 
+      const conflictCount = disclosures.filter((d: any) => 
         d.amount && Number(d.amount) > 1000000
       ).length;
 
@@ -559,12 +558,12 @@ export class SimpleTransparencyDashboardService {
       const prev = trends[i - 1];
       const curr = trends[i];
       
-      const scoreChange = curr.transparency_score - prev.transparency_score;
-      const disclosureChange = curr.disclosureCount - prev.disclosureCount;
+      const scoreChange = curr!.transparency_score - prev!.transparency_score;
+      const disclosureChange = curr!.disclosureCount - prev!.disclosureCount;
       
       if (Math.abs(scoreChange) > 10) {
         keyChanges.push({
-          period: curr.period,
+          period: curr!.period,
           change: scoreChange > 0 ? 'score_improvement' : 'score_decline',
           impact: Math.abs(scoreChange),
           description: `Transparency score ${scoreChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(scoreChange)} points`
@@ -573,7 +572,7 @@ export class SimpleTransparencyDashboardService {
       
       if (Math.abs(disclosureChange) > 5) {
         keyChanges.push({
-          period: curr.period,
+          period: curr!.period,
           change: disclosureChange > 0 ? 'disclosure_increase' : 'disclosure_decrease',
           impact: Math.abs(disclosureChange),
           description: `Disclosure volume ${disclosureChange > 0 ? 'increased' : 'decreased'} by ${Math.abs(disclosureChange)} disclosures`

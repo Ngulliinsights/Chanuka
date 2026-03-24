@@ -11,10 +11,10 @@ import type { CacheMetrics, CacheHealthStatus } from './core/interfaces';
 export interface CacheService {
   get<T>(key: string): Promise<T | null>;
   set<T>(key: string, value: T, ttlSec?: number): Promise<void>;
-  del(key: string): Promise<void>;
+  del(key: string): Promise<boolean>;
   flush?(): Promise<void>;
   mget?<T>(keys: string[]): Promise<(T | null)[]>;
-  mset?<T>(entries: [string, T, number?][]): Promise<void>;
+  mset?<T>(entries: { key: string; value: T; ttl?: number }[]): Promise<void>;
   getMetrics?(): CacheMetrics;
   getHealth?(): Promise<CacheHealthStatus>;
   exists?(key: string): Promise<boolean>;

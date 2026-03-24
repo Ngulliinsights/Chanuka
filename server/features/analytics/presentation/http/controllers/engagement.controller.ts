@@ -126,8 +126,8 @@ export class EngagementController {
 
     return {
       totalUsers: leaderboard.topCommenters.length + leaderboard.topVoters.length,
-      totalComments: leaderboard.topCommenters.reduce((sum, user) => sum + users.comment_count, 0),
-      totalVotes: leaderboard.topCommenters.reduce((sum, user) => sum + users.totalVotes, 0),
+      totalComments: leaderboard.topCommenters.reduce((sum: any, user: any) => sum + users.comment_count, 0),
+      totalVotes: leaderboard.topCommenters.reduce((sum: any, user: any) => sum + users.totalVotes, 0),
       topCategories: [], // Would need implementation
       dateRange: {
         start_date: query.start_date,
@@ -215,7 +215,7 @@ export class EngagementController {
   ) { // Use leaderboard data as approximation for user patterns
     const leaderboard = await engagementAnalyticsService.getEngagementLeaderboard('30d', input.limit || 10);
 
-    const patterns = leaderboard.topCommenters.map(user => ({
+    const patterns = leaderboard.topCommenters.map((user: any) => ({
       user_id: users.user_id,
       userName: users.userName,
       totalEngagements: users.comment_count + users.totalVotes,

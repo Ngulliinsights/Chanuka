@@ -28,9 +28,9 @@ async function verifyExternalAPIManagement() {
     const analytics = apiManager.getAPIAnalytics();
     
     console.log(`   - Total sources configured: ${analytics.sources.length}`);
-    console.log(`   - Sources: ${analytics.sources.map(s => s.source).join(', ')}`);
+    console.log(`   - Sources: ${analytics.sources.map((s: any) => s.source).join(', ')}`);
     
-    analytics.sources.forEach(source => {
+    analytics.sources.forEach((source: any) => {
       console.log(`   - ${source.source}: Quota utilization - Minute: ${source.quotaUtilization.minute.toFixed(1)}%, Hour: ${source.quotaUtilization.hour.toFixed(1)}%, Day: ${source.quotaUtilization.day.toFixed(1)}%, Month: ${source.quotaUtilization.month.toFixed(1)}%`);
     });
 
@@ -39,7 +39,7 @@ async function verifyExternalAPIManagement() {
     const healthStatuses = apiManager.getHealthStatus();
     
     console.log(`   - Health monitoring active for ${healthStatuses.length} sources`);
-    healthStatuses.forEach(status => {
+    healthStatuses.forEach((status: any) => {
       console.log(`   - ${status.source}: Status=${status.status}, Response Time=${status.responseTime}ms, Success Rate=${status.successRate.toFixed(1)}%, Uptime=${status.uptime.toFixed(1)}%`);
     });
 

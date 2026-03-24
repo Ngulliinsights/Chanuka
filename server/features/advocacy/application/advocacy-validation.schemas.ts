@@ -1,253 +1,292 @@
+// ============================================================================
+// ADVOCACY COORDINATION - Validation Schemas
+// ============================================================================
+// Validation schemas for advocacy and campaign inputs.
+// Uses shared validation primitives for consistency.
+// ============================================================================
+
+import {
+  CommonSchemas,
+  createEnumSchema,
+  DateRangeSchema,
+  PaginationSchema,
+  SearchSchema,
+  z,
+} from '@server/infrastructure/validation/validation-helpers';
+
+// ============================================================================
+// Shared primitives — re-exported for consumers that import from this module
+// ============================================================================
+
+export { DateRangeSchema, PaginationSchema, SearchSchema };
+
+// ============================================================================
+// Local primitives
+// ============================================================================
+
 /**
- * Advocacy Feature - Validation Schemas
- * 
- * Zod schemas for validating advocacy and campaign inputs.
- * Uses common schemas from validation helpers for consistency.
+ * Accepts US 5-digit and ZIP+4 formats.
+ * Adjust the regex if the project targets non-US postal codes.
  */
-
-import { z } from 'zod';
-import { CommonSchemas } from '@server/infrastructure/validation/validation-helpers';
+const ZipCodeSchema = z
+  .string()
+  .regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format');
 
 // ============================================================================
-// Campaign and Action Enums
+// Enums
 // ============================================================================
 
-export const CampaignTypeSchema = z.enum([
+export const CampaignTypeSchema = createEnumSchema([
   'petition',
   'letter_writing',
   'phone_banking',
   'social_media',
   'grassroots',
   'coalition',
-  'awareness'
-]);
+  'awareness',
+] as const);
 
-export const CampaignStatusSchema = z.enum([
+export const CampaignStatusSchema = createEnumSchema([
   'draft',
   'active',
   'paused',
   'completed',
-  'cancelled'
-]);
+  'cancelled',
+] as const);
 
-export const ActionTypeSchema = z.enum([
+export const ActionTypeSchema = createEnumSchema([
   'sign_petition',
   'send_letter',
   'make_call',
   'share_social',
   'attend_event',
   'donate',
-  'volunteer'
-]);
+  'volunteer',
+] as const);
 
-export const TargetTypeSchema = z.enum([
+export const TargetTypeSchema = createEnumSchema([
   'legislator',
   'committee',
   'agency',
   'official',
-  'organization'
-]);
+  'organization',
+] as const);
 
 // ============================================================================
-// Campaign Creation and Update Schemas
+// Campaign schemas
 // ============================================================================
 
-export const CreateCampaignSchema = z.object({
-  title: CommonSchemas.title,
-  description: CommonSchemas.description,
-  type: CampaignTypeSchema,
-  bill_id: CommonSchemas.id.optional(),
-  goal: z.string().min(10).max(500),
+/**
+ * Core campaign fields shared between Create and Update.
+ * No defaults here — they are applied per-schema below so that
+ * Zod's `.partial()` chaining does not collapse defaults to `never`.
+ */
+const CampaignBaseSchema = z.object({
+  title:        CommonSchemas.title,
+  description:  CommonSchemas.description,
+  type:         CampaignTypeSchema,
+  goal:         z.string().min(10).max(500),
   target_count: z.number().int().positive().optional(),
-  start_date: z.string().datetime(),
-  end_date: z.string().datetime(),
+  tags:         z.array(z.string().max(50)).max(20).optional(),
+  is_public:    z.boolean(),
+});
+
+export const CreateCampaignSchema = DateRangeSchema.merge(CampaignBaseSchema).extend({
   organizer_id: CommonSchemas.id,
-  tags: z.array(z.string().max(50)).max(20).optional(),
-  is_public: z.boolean().default(true),
+  bill_id:      CommonSchemas.id.optional(),
+  is_public:    z.boolean().default(true),
 });
 
-export const UpdateCampaignSchema = z.object({
-  title: CommonSchemas.title.optional(),
-  description: CommonSchemas.description.optional(),
+/**
+ * All fields optional; status transitions are enforced server-side.
+ * Derived from CampaignBaseSchema (not CreateCampaignSchema) to avoid
+ * the `.default()` → `.partial()` type collapse bug in Zod v3.
+ */
+export const UpdateCampaignSchema = CampaignBaseSchema
+  .extend({
+    status:   CampaignStatusSchema,
+    end_date: z.string().datetime(),
+  })
+  .partial();
+
+export const GetCampaignsSchema = PaginationSchema.extend({
+  type:         CampaignTypeSchema.optional(),
+  status:       CampaignStatusSchema.optional(),
+  bill_id:      CommonSchemas.id.optional(),
+  organizer_id: CommonSchemas.id.optional(),
+  tags:         z.array(z.string().max(50)).max(20).optional(),
+  active_only:  z.boolean().default(false),
+});
+
+export const SearchCampaignsSchema = PaginationSchema.extend({
+  query:  CommonSchemas.searchQuery,
+  type:   CampaignTypeSchema.optional(),
   status: CampaignStatusSchema.optional(),
-  goal: z.string().min(10).max(500).optional(),
-  target_count: z.number().int().positive().optional(),
-  end_date: z.string().datetime().optional(),
-  tags: z.array(z.string().max(50)).max(20).optional(),
-  is_public: z.boolean().optional(),
 });
 
 // ============================================================================
-// Action Schemas
+// Action schemas
 // ============================================================================
 
-export const RecordActionSchema = z.object({
+/** Metadata carried alongside a recorded advocacy action. */
+const ActionMetadataSchema = z.object({
+  message:         z.string().max(5_000).optional(),
+  phone_number:    CommonSchemas.phone.optional(),
+  email_sent:      z.boolean().optional(),
+  social_platform: z.string().max(50).optional(),
+});
+
+const RecordActionBaseSchema = z.object({
   campaign_id: CommonSchemas.id,
-  user_id: CommonSchemas.id,
+  user_id:     CommonSchemas.id,
   action_type: ActionTypeSchema,
-  target_id: CommonSchemas.id.optional(),
+  target_id:   CommonSchemas.id.optional(),
   target_type: TargetTypeSchema.optional(),
-  metadata: z.object({
-    message: z.string().max(5000).optional(),
-    phone_number: CommonSchemas.phone.optional(),
-    email_sent: z.boolean().optional(),
-    social_platform: z.string().max(50).optional(),
-  }).optional(),
+  metadata:    ActionMetadataSchema.optional(),
 });
 
-export const GetActionsSchema = z.object({
+export const RecordActionSchema = RecordActionBaseSchema.refine(
+  (d: z.infer<typeof RecordActionBaseSchema>) =>
+    (d.target_id == null) === (d.target_type == null),
+  {
+    message: 'target_id and target_type must both be present or both absent',
+    path: ['target_type'],
+  },
+);
+
+export const GetActionsSchema = PaginationSchema.extend({
   campaign_id: CommonSchemas.id.optional(),
-  user_id: CommonSchemas.id.optional(),
+  user_id:     CommonSchemas.id.optional(),
   action_type: ActionTypeSchema.optional(),
-  start_date: z.string().datetime().optional(),
-  end_date: z.string().datetime().optional(),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
+  start_date:  z.string().datetime().optional(),
+  end_date:    z.string().datetime().optional(),
 });
 
 // ============================================================================
-// Target Management Schemas
+// Target schemas
 // ============================================================================
 
-export const AddTargetSchema = z.object({
+/** Shared contact fields used by both Add and Update target schemas. */
+const TargetContactSchema = z.object({
+  name:     CommonSchemas.name,
+  title:    z.string().max(200).optional(),
+  email:    CommonSchemas.email.optional(),
+  phone:    CommonSchemas.phone.optional(),
+  address:  z.string().max(500).optional(),
+  district: z.string().max(100).optional(),
+  party:    z.string().max(50).optional(),
+});
+
+export const AddTargetSchema = TargetContactSchema.extend({
   campaign_id: CommonSchemas.id,
   target_type: TargetTypeSchema,
-  name: CommonSchemas.name,
-  title: z.string().max(200).optional(),
-  email: CommonSchemas.email.optional(),
-  phone: CommonSchemas.phone.optional(),
-  address: z.string().max(500).optional(),
-  district: z.string().max(100).optional(),
-  party: z.string().max(50).optional(),
 });
 
-export const UpdateTargetSchema = z.object({
-  name: CommonSchemas.name.optional(),
-  title: z.string().max(200).optional(),
-  email: CommonSchemas.email.optional(),
-  phone: CommonSchemas.phone.optional(),
-  address: z.string().max(500).optional(),
-  district: z.string().max(100).optional(),
-  party: z.string().max(50).optional(),
-});
+/** All contact fields optional for PATCH-style updates. */
+export const UpdateTargetSchema = TargetContactSchema.partial();
 
 // ============================================================================
-// Petition Schemas
+// Petition schemas
 // ============================================================================
 
 export const SignPetitionSchema = z.object({
-  campaign_id: CommonSchemas.id,
-  user_id: CommonSchemas.id,
+  campaign_id:    CommonSchemas.id,
+  user_id:        CommonSchemas.id,
   signature_data: z.object({
-    name: CommonSchemas.name,
-    email: CommonSchemas.email,
-    zip_code: z.string().regex(/^\d{5}(-\d{4})?$/),
-    comment: z.string().max(1000).optional(),
+    name:      CommonSchemas.name,
+    email:     CommonSchemas.email,
+    zip_code:  ZipCodeSchema,
+    comment:   z.string().max(1_000).optional(),
     is_public: z.boolean().default(false),
   }),
 });
 
-export const GetSignaturesSchema = z.object({
-  campaign_id: CommonSchemas.id,
+export const GetSignaturesSchema = PaginationSchema.extend({
+  campaign_id:     CommonSchemas.id,
   include_private: z.boolean().default(false),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
 });
 
 // ============================================================================
-// Letter Writing Schemas
+// Letter-writing schemas
 // ============================================================================
 
+const LetterPersonalizationSchema = z.object({
+  salutation:     z.string().max(100).optional(),
+  personal_story: z.string().max(2_000).optional(),
+  closing:        z.string().max(200).optional(),
+});
+
 export const GenerateLetterSchema = z.object({
-  campaign_id: CommonSchemas.id,
-  target_id: CommonSchemas.id,
-  template_id: CommonSchemas.id.optional(),
-  personalization: z.object({
-    salutation: z.string().max(100).optional(),
-    personal_story: z.string().max(2000).optional(),
-    closing: z.string().max(200).optional(),
-  }).optional(),
+  campaign_id:     CommonSchemas.id,
+  target_id:       CommonSchemas.id,
+  template_id:     CommonSchemas.id.optional(),
+  personalization: LetterPersonalizationSchema.optional(),
 });
 
 export const SendLetterSchema = z.object({
-  campaign_id: CommonSchemas.id,
-  user_id: CommonSchemas.id,
-  target_id: CommonSchemas.id,
-  letter_content: z.string().min(100).max(10000),
+  campaign_id:     CommonSchemas.id,
+  user_id:         CommonSchemas.id,
+  target_id:       CommonSchemas.id,
+  letter_content:  z.string().min(100).max(10_000),
   delivery_method: z.enum(['email', 'postal', 'fax']),
 });
 
 // ============================================================================
-// Query and Filter Schemas
-// ============================================================================
-
-export const GetCampaignsSchema = z.object({
-  type: CampaignTypeSchema.optional(),
-  status: CampaignStatusSchema.optional(),
-  bill_id: CommonSchemas.id.optional(),
-  organizer_id: CommonSchemas.id.optional(),
-  tags: z.array(z.string().max(50)).max(20).optional(),
-  active_only: z.boolean().default(false),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
-});
-
-export const SearchCampaignsSchema = z.object({
-  query: CommonSchemas.searchQuery,
-  type: CampaignTypeSchema.optional(),
-  status: CampaignStatusSchema.optional(),
-  page: CommonSchemas.page.optional(),
-  limit: CommonSchemas.limit.optional(),
-});
-
-// ============================================================================
-// Analytics Schemas
+// Analytics schemas
 // ============================================================================
 
 export const GetCampaignStatsSchema = z.object({
-  campaign_id: CommonSchemas.id,
+  campaign_id:          CommonSchemas.id,
   include_demographics: z.boolean().default(false),
-  include_timeline: z.boolean().default(true),
+  include_timeline:     z.boolean().default(true),
 });
+
+export const ImpactMetricSchema = z.enum([
+  'participation_rate',
+  'reach',
+  'engagement',
+  'conversion',
+  'target_response',
+]);
 
 export const GetImpactMetricsSchema = z.object({
   campaign_id: CommonSchemas.id,
-  metrics: z.array(z.enum([
-    'participation_rate',
-    'reach',
-    'engagement',
-    'conversion',
-    'target_response'
-  ])).optional(),
+  metrics:     z.array(ImpactMetricSchema).min(1).optional(),
 });
 
-export const GetLeaderboardSchema = z.object({
+export const GetLeaderboardSchema = PaginationSchema.extend({
   campaign_id: CommonSchemas.id.optional(),
-  timeframe: z.enum(['day', 'week', 'month', 'all']).default('all'),
-  metric: z.enum(['actions', 'signatures', 'letters', 'calls']).default('actions'),
-  limit: CommonSchemas.limit.optional(),
+  timeframe:   z.enum(['day', 'week', 'month', 'all']).default('all'),
+  metric:      z.enum(['actions', 'signatures', 'letters', 'calls']).default('actions'),
 });
 
 // ============================================================================
-// Type Exports
+// Inferred types
 // ============================================================================
 
-export type CreateCampaignInput = z.infer<typeof CreateCampaignSchema>;
-export type UpdateCampaignInput = z.infer<typeof UpdateCampaignSchema>;
-export type RecordActionInput = z.infer<typeof RecordActionSchema>;
-export type GetActionsInput = z.infer<typeof GetActionsSchema>;
-export type AddTargetInput = z.infer<typeof AddTargetSchema>;
-export type UpdateTargetInput = z.infer<typeof UpdateTargetSchema>;
-export type SignPetitionInput = z.infer<typeof SignPetitionSchema>;
-export type GetSignaturesInput = z.infer<typeof GetSignaturesSchema>;
-export type GenerateLetterInput = z.infer<typeof GenerateLetterSchema>;
-export type SendLetterInput = z.infer<typeof SendLetterSchema>;
-export type GetCampaignsInput = z.infer<typeof GetCampaignsSchema>;
-export type SearchCampaignsInput = z.infer<typeof SearchCampaignsSchema>;
+export type CreateCampaignInput   = z.infer<typeof CreateCampaignSchema>;
+export type UpdateCampaignInput   = z.infer<typeof UpdateCampaignSchema>;
+export type GetCampaignsInput     = z.infer<typeof GetCampaignsSchema>;
+export type SearchCampaignsInput  = z.infer<typeof SearchCampaignsSchema>;
+
+export type RecordActionInput     = z.infer<typeof RecordActionSchema>;
+export type GetActionsInput       = z.infer<typeof GetActionsSchema>;
+
+export type AddTargetInput        = z.infer<typeof AddTargetSchema>;
+export type UpdateTargetInput     = z.infer<typeof UpdateTargetSchema>;
+
+export type SignPetitionInput     = z.infer<typeof SignPetitionSchema>;
+export type GetSignaturesInput    = z.infer<typeof GetSignaturesSchema>;
+
+export type GenerateLetterInput   = z.infer<typeof GenerateLetterSchema>;
+export type SendLetterInput       = z.infer<typeof SendLetterSchema>;
+
 export type GetCampaignStatsInput = z.infer<typeof GetCampaignStatsSchema>;
 export type GetImpactMetricsInput = z.infer<typeof GetImpactMetricsSchema>;
-export type GetLeaderboardInput = z.infer<typeof GetLeaderboardSchema>;
-export type CampaignType = z.infer<typeof CampaignTypeSchema>;
-export type CampaignStatus = z.infer<typeof CampaignStatusSchema>;
-export type ActionType = z.infer<typeof ActionTypeSchema>;
-export type TargetType = z.infer<typeof TargetTypeSchema>;
+export type GetLeaderboardInput   = z.infer<typeof GetLeaderboardSchema>;
+
+export type CampaignType          = z.infer<typeof CampaignTypeSchema>;
+export type CampaignStatus        = z.infer<typeof CampaignStatusSchema>;
+export type ActionType            = z.infer<typeof ActionTypeSchema>;
+export type TargetType            = z.infer<typeof TargetTypeSchema>;
+export type ImpactMetric          = z.infer<typeof ImpactMetricSchema>;

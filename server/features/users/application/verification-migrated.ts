@@ -68,14 +68,14 @@ router.get('/verification/bills/:bill_id', asyncHandler(async (req, res: Respons
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'getBillVerifications',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -102,14 +102,14 @@ router.post('/verification', asyncHandler(async (req, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'createVerification',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -136,14 +136,14 @@ router.put('/verification/:id', asyncHandler(async (req, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'updateVerification',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -155,14 +155,14 @@ router.put('/verification/:id', asyncHandler(async (req, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'updateVerification',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -205,14 +205,14 @@ router.get('/verification/user/:citizen_id', asyncHandler(async (req, res: Respo
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'getUserVerifications',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -239,14 +239,14 @@ router.delete('/verification/:id', asyncHandler(async (req, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'VerificationController',
         operation: 'deleteVerification',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }

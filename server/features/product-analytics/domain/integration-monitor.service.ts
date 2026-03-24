@@ -517,7 +517,7 @@ export class IntegrationMonitorService {
       const features = await readDatabase.select().from(integrationFeatures);
 
       const featureData = await Promise.all(
-        features.map(async (feature) => {
+        features.map(async (feature: any) => {
           // Get latest metrics
           const [latestMetrics] = await db
             .select()
@@ -553,9 +553,9 @@ export class IntegrationMonitorService {
 
       // Calculate system health
       const totalFeatures = features.length;
-      const healthyFeatures = features.filter((f) => f.healthStatus === 'healthy').length;
-      const degradedFeatures = features.filter((f) => f.healthStatus === 'degraded').length;
-      const downFeatures = features.filter((f) => f.healthStatus === 'down').length;
+      const healthyFeatures = features.filter((f: any) => f.healthStatus === 'healthy').length;
+      const degradedFeatures = features.filter((f: any) => f.healthStatus === 'degraded').length;
+      const downFeatures = features.filter((f: any) => f.healthStatus === 'down').length;
 
       const totalAlertsResult = await db
         .select({ count: sql<number>`count(*)` })

@@ -425,7 +425,7 @@ export class UserVerificationDomainService {
     const verificationData: VerificationData = verificationDataRaw;
     const disputes = verificationData.disputes || [];
 
-    if (disputes.some((d: unknown) => d.user_id === disputerId)) {
+    if (disputes.some((d: unknown) => (d as any).user_id === disputerId)) {
       return { success: false, errors: ['Already disputed this verification'] };
     }
 
@@ -565,16 +565,16 @@ export class UserVerificationDomainService {
       .orderBy(desc(user_verification.created_at));
 
     const verifications = verificationRows.map((row: unknown) => {
-      const dataRaw = row.verification_data;
+      const dataRaw = (row as any).verification_data;
       if (!isVerificationData(dataRaw)) {
-        throw new Error(`Invalid verification data structure for verification ${row.id}`);
+        throw new Error(`Invalid verification data structure for verification ${(row as any).id}`);
       }
       const data: VerificationData = dataRaw;
       return CitizenVerification.create({
-        id: row.id,
+        id: (row as any).id,
         bill_id: data.bill_id,
         citizenId: data.citizenId,
-        verification_type: row.verification_type,
+        verification_type: (row as any).verification_type,
         verification_status: data.verification_status,
         confidence: data.confidence,
         evidence: data.evidence,
@@ -582,8 +582,8 @@ export class UserVerificationDomainService {
         reasoning: data.reasoning,
         endorsements: data.endorsements || [],
         disputes: data.disputes || [],
-        created_at: row.created_at,
-        updated_at: row.updated_at
+        created_at: (row as any).created_at,
+        updated_at: (row as any).updated_at
       });
     });
 
@@ -644,16 +644,16 @@ export class UserVerificationDomainService {
       .orderBy(desc(user_verification.created_at));
 
     const verifications = verificationRows.map((row: unknown) => {
-      const dataRaw = row.verification_data;
+      const dataRaw = (row as any).verification_data;
       if (!isVerificationData(dataRaw)) {
-        throw new Error(`Invalid verification data structure for verification ${row.id}`);
+        throw new Error(`Invalid verification data structure for verification ${(row as any).id}`);
       }
       const data: VerificationData = dataRaw;
       return CitizenVerification.create({
-        id: row.id,
+        id: (row as any).id,
         bill_id: data.bill_id,
         citizenId: data.citizenId,
-        verification_type: row.verification_type,
+        verification_type: (row as any).verification_type,
         verification_status: data.verification_status,
         confidence: data.confidence,
         evidence: data.evidence,
@@ -661,8 +661,8 @@ export class UserVerificationDomainService {
         reasoning: data.reasoning,
         endorsements: data.endorsements || [],
         disputes: data.disputes || [],
-        created_at: row.created_at,
-        updated_at: row.updated_at
+        created_at: (row as any).created_at,
+        updated_at: (row as any).updated_at
       });
     });
 

@@ -5,8 +5,9 @@
  * by deferring expensive operations until actually needed.
  */
 
-import type { Maybe,Result } from '@shared/core';
-import { none,Ok, some } from '@shared/core';
+import type { Maybe, Result } from '@shared/core';
+import { none, some } from 'fp-ts/lib/Option';
+import { Ok } from '@shared/core';
 
 import { performanceMonitor } from '../../observability/monitoring/performance-monitor';
 

@@ -61,12 +61,12 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       this.emit('cache:event', { ...event, tier: 'L1' });
     });
 
-    this.l2Cache.on('cache:event', (event) => {
+    this.l2Cache.on('cache:event', (event: any) => {
       this.emit('cache:event', { ...event, tier: 'L2' });
     });
 
     // Handle promotion events
-    this.l2Cache.on('cache:hit', (event) => {
+    this.l2Cache.on('cache:hit', (event: any) => {
       this.considerPromotion(event.key);
     });
   }
@@ -469,11 +469,11 @@ export class MultiTierAdapter extends BaseCacheAdapter {
       }
 
       if (l1Health.errors) {
-        errors.push(...l1Health.errors.map(e => `L1: ${e}`));
+        errors.push(...l1Health.errors.map((e: any) => `L1: ${e}`));
       }
 
       if (l2Health.errors) {
-        errors.push(...l2Health.errors.map(e => `L2: ${e}`));
+        errors.push(...l2Health.errors.map((e: any) => `L2: ${e}`));
       }
 
       const latency = performance.now() - start;

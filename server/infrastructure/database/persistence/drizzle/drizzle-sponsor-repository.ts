@@ -15,8 +15,9 @@ import {
   validateRepositoryInput,
   validateSearchParams
 } from '@server/infrastructure/database/repository-validation';
-import type { Maybe,Result } from '@shared/core';
-import { Err, none,Ok, some } from '@shared/core';
+import type { Maybe, Result } from '@shared/core';
+import { none, some } from 'fp-ts/lib/Option';
+import { Err, Ok } from '@shared/core';
 import type { Sponsor } from '@server/infrastructure/schema';
 import type { NewSponsor } from '@server/infrastructure/schema/foundation';
 import { sponsors } from '@server/infrastructure/schema';

@@ -404,8 +404,8 @@ function compareReports(before: BenchmarkReport, after: BenchmarkReport): void {
     const beforeResult = before.results[i];
     const afterResult = after.results[i];
 
-    const change = ((afterResult.avgTime - beforeResult.avgTime) / beforeResult.avgTime) * 100;
-    const ratio = afterResult.avgTime / beforeResult.avgTime;
+    const change = ((afterResult!.avgTime - beforeResult!.avgTime) / beforeResult!.avgTime) * 100;
+    const ratio = afterResult!.avgTime / beforeResult!.avgTime;
     
     let status = '✅ OK';
     if (ratio > threshold) {
@@ -416,9 +416,9 @@ function compareReports(before: BenchmarkReport, after: BenchmarkReport): void {
     }
 
     console.log(
-      beforeResult.operation.padEnd(25) +
-      beforeResult.avgTime.toFixed(3).padEnd(15) +
-      afterResult.avgTime.toFixed(3).padEnd(15) +
+      beforeResult!.operation.padEnd(25) +
+      beforeResult!.avgTime.toFixed(3).padEnd(15) +
+      afterResult!.avgTime.toFixed(3).padEnd(15) +
       `${change > 0 ? '+' : ''}${change.toFixed(1)}%`.padEnd(15) +
       status
     );

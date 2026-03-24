@@ -26,7 +26,7 @@ export function Cache(options: {
       // Generate cache key
       const key = options.keyGenerator
         ? options.keyGenerator(...args)
-        : `${target.constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
+        : `${(target as any).constructor.name}:${propertyKey}:${JSON.stringify(args)}`;
 
       try {
         // Try to get from cache first

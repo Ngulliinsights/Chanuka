@@ -3,29 +3,59 @@
  * Provides typed API client for integration tests
  */
 
+import type { ApiResponse } from '../../../shared/types/api/contracts/core.contracts';
+import type {
+  CreateBillRequest,
+  CreateBillResponse,
+  GetBillResponse,
+  UpdateBillRequest,
+  UpdateBillResponse,
+  ListBillsResponse,
+} from '../../../shared/types/api/contracts/bill.contract';
+import type {
+  CreateUserResponse,
+  GetUserResponse,
+  UpdateUserResponse,
+  CreateUserRequest,
+  UpdateUserRequest,
+} from '../../../shared/types/api/contracts/user.contract';
+import type {
+  CreateCommentRequest,
+  CreateCommentResponse,
+  ListCommentsResponse,
+} from '../../../shared/types/api/contracts/comment.contract';
+import type {
+  SearchRequest,
+  SearchResponse,
+} from '../../../shared/types/api/contracts/search.contract';
+import type {
+  GetNotificationsResponse,
+  MarkNotificationReadResponse,
+} from '../../../shared/types/api/contracts/notification.contract';
+
 export interface TestApiClient {
   // Bills
-  createBill(data: any): Promise<any>;
-  getBill(id: string): Promise<any>;
-  updateBill(id: string, data: any): Promise<any>;
-  listBills(params?: any): Promise<any>;
+  createBill(data: CreateBillRequest): Promise<ApiResponse<CreateBillResponse>>;
+  getBill(id: string): Promise<ApiResponse<GetBillResponse>>;
+  updateBill(id: string, data: UpdateBillRequest): Promise<ApiResponse<UpdateBillResponse>>;
+  listBills(params?: Record<string, string>): Promise<ApiResponse<ListBillsResponse>>;
   
   // Users
-  createUser(data: any): Promise<any>;
-  getUser(id: string): Promise<any>;
-  updateUser(id: string, data: any): Promise<any>;
-  authenticateUser(credentials: any): Promise<any>;
+  createUser(data: CreateUserRequest): Promise<ApiResponse<CreateUserResponse>>;
+  getUser(id: string): Promise<ApiResponse<GetUserResponse>>;
+  updateUser(id: string, data: UpdateUserRequest): Promise<ApiResponse<UpdateUserResponse>>;
+  authenticateUser(credentials: { email: string; password: string }): Promise<ApiResponse<{ token: string }>>;
   
   // Comments
-  createComment(data: any): Promise<any>;
-  getComments(billId: string): Promise<any>;
+  createComment(data: CreateCommentRequest): Promise<ApiResponse<CreateCommentResponse>>;
+  getComments(billId: string): Promise<ApiResponse<ListCommentsResponse>>;
   
   // Search
-  search(query: string, params?: any): Promise<any>;
+  search(query: string, params?: Record<string, string>): Promise<ApiResponse<SearchResponse>>;
   
   // Notifications
-  getNotifications(userId: string): Promise<any>;
-  markNotificationRead(id: string): Promise<any>;
+  getNotifications(userId: string): Promise<ApiResponse<GetNotificationsResponse>>;
+  markNotificationRead(id: string): Promise<ApiResponse<MarkNotificationReadResponse>>;
 }
 
 /**
@@ -34,7 +64,7 @@ export interface TestApiClient {
 export function createTestApiClient(baseUrl: string): TestApiClient {
   const apiUrl = `${baseUrl}/api`;
   
-  async function request(method: string, path: string, data?: any) {
+  async function request<T>(method: string, path: string, data?: unknown): Promise<ApiResponse<T>> {
     const response = await fetch(`${apiUrl}${path}`, {
       method,
       headers: {
@@ -47,7 +77,7 @@ export function createTestApiClient(baseUrl: string): TestApiClient {
       throw new Error(`API request failed: ${response.status} ${response.statusText}`);
     }
     
-    return response.json();
+    return response.json() as Promise<ApiResponse<T>>;
   }
   
   return {

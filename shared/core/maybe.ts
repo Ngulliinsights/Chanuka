@@ -193,3 +193,36 @@ export function combineMaybes<T>(values: Maybe<T>[]): Maybe<T[]> {
   
   return result;
 }
+
+/**
+ * Constructs a Some (present) Maybe value
+ * Alias for returning a Maybe value directly (identity function)
+ * 
+ * @template T - Value type
+ * @param value The value to wrap in a Maybe
+ * @returns The value as a Maybe (not null)
+ * 
+ * @example
+ * ```typescript
+ * const user = some(foundUser); // Maybe<User>
+ * ```
+ */
+export function some<T>(value: T): Maybe<T> {
+  return value;
+}
+
+/**
+ * Constructs a None (absent) Maybe value
+ * Alias for null
+ * 
+ * @template T - Value type  
+ * @returns null (representing absence)
+ * 
+ * @example
+ * ```typescript
+ * const user = none<User>(); // Maybe<User> (null)
+ * ```
+ */
+export function none<T = unknown>(): Maybe<T> {
+  return null;
+}

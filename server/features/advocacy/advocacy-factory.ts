@@ -1,99 +1,129 @@
 // ============================================================================
 // ADVOCACY COORDINATION - Service Factory
 // ============================================================================
+// Orchestrates creation and lifetime management of all advocacy services via
+// dependency injection. Call createAdvocacyService() at startup, wire the
+// result with setAdvocacyService(), then resolve via getAdvocacyService().
+// ============================================================================
 
-import { ActionCoordinator } from '@server/features/advocacy/application/action-coordinator';
+import { ActionCoordinator, type IActionRepository } from '@server/features/advocacy/application/action-coordinator';
 import { CampaignService } from '@server/features/advocacy/application/campaign-service';
-import { CoalitionBuilder } from '@server/features/advocacy/application/coalition-builder';
+import { CoalitionBuilder, type ICoalitionCampaignRepository } from '@server/features/advocacy/application/coalition-builder';
 import { ImpactTracker } from '@server/features/advocacy/application/impact-tracker';
+import { AdvocacyNotificationService } from '@server/features/advocacy/application/notification-service';
+import { RepresentativeContactService } from '@server/features/advocacy/application/representative-contact-service';
 import { getAdvocacyConfig } from '@server/features/advocacy/config/advocacy-config';
 import { InMemoryAdvocacyEventPublisher } from '@server/features/advocacy/domain/events/advocacy-events';
+// eslint-disable-next-line import/no-unresolved
+import { type ICampaignRepository } from '@server/features/advocacy/domain/repositories/campaign-repository';
 import { CampaignDomainService } from '@server/features/advocacy/domain/services/campaign-domain-service';
-// Repository implementations removed - using direct service calls
-import { NotificationService } from '@server/features/advocacy/infrastructure/services/notification-service';
-import { RepresentativeContactService } from '@server/features/advocacy/infrastructure/services/representative-contact-service';
+import { DrizzleActionRepository } from '@server/features/advocacy/infrastructure/repositories/drizzle-action-repository';
+import { DrizzleCampaignRepository } from '@server/features/advocacy/infrastructure/repositories/drizzle-campaign-repository';
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export interface AdvocacyServiceDependencies {
   campaignService: CampaignService;
   actionCoordinator: ActionCoordinator;
   coalitionBuilder: CoalitionBuilder;
   impactTracker: ImpactTracker;
-  notificationService: NotificationService;
+  notificationService: AdvocacyNotificationService;
   representativeContactService: RepresentativeContactService;
 }
 
-export function createAdvocacyService(): AdvocacyServiceDependencies {
-  // Configuration
+// ============================================================================
+// Factory
+// ============================================================================
+
+/**
+ * Creates a fully-wired set of advocacy services.
+ *
+ * Instantiates Drizzle-based repositories and orchestrates service composition.
+ * Wire the result into the application at startup:
+ * ```ts
+ * setAdvocacyService(createAdvocacyService());
+ * ```
+ *
+ * To use alternative repository implementations, inject them as parameters:
+ * ```ts
+ * setAdvocacyService(createAdvocacyService(customCampaignRepo, customActionRepo));
+ * ```
+ */
+export function createAdvocacyService(
+  campaignRepository?: ICoalitionCampaignRepository,
+  actionRepository?: IActionRepository,
+): AdvocacyServiceDependencies {
   const config = getAdvocacyConfig();
-  
-  // Event publisher
+
+  // Use provided implementations or create default Drizzle-based ones
+  // DrizzleCampaignRepository implements both ICampaignRepository and ICoalitionCampaignRepository
+  const campaignRepo = (campaignRepository ??
+    new DrizzleCampaignRepository()) as ICampaignRepository & ICoalitionCampaignRepository;
+  const actionRepo   = (actionRepository ?? new DrizzleActionRepository()) as IActionRepository;
+
+  // Shared infrastructure
   const eventPublisher = new InMemoryAdvocacyEventPublisher();
-  
-  // Repositories
-  const campaignRepository = new CampaignRepositoryImpl(database);
-  const actionRepository = new ActionRepositoryImpl(database);
-  
+
   // Domain services
-  const campaignDomainService = new CampaignDomainService(
-    campaignRepository,
-    actionRepository
-  );
-  
+  const campaignDomainService = new CampaignDomainService(campaignRepo);
+
   // Infrastructure services
-  const notificationService = new NotificationService(config.notifications);
+  const notificationService          = new AdvocacyNotificationService(config.notifications);
   const representativeContactService = new RepresentativeContactService(config.representatives);
-  
-  // Application services
-  const campaignService = new CampaignService(
-    campaignRepository,
-    campaignDomainService
+
+  // Application services (orchestrate domain + infrastructure)
+  const campaignService    = new CampaignService(campaignRepo, campaignDomainService);
+  const actionCoordinator  = new ActionCoordinator(actionRepo, campaignRepo);
+  const coalitionBuilder   = new CoalitionBuilder(campaignRepo, actionRepo, eventPublisher);
+  const impactTracker      = new ImpactTracker(
+    campaignRepo,
+    (event) => eventPublisher.publish(event)
   );
-  
-  const actionCoordinator = new ActionCoordinator(
-    actionRepository,
-    campaignRepository
-  );
-  
-  const coalitionBuilder = new CoalitionBuilder(
-    campaignRepository,
-    actionRepository,
-    eventPublisher
-  );
-  
-  const impactTracker = new ImpactTracker(
-    campaignRepository,
-    actionRepository,
-    eventPublisher
-  );
-  
+
   return {
     campaignService,
     actionCoordinator,
     coalitionBuilder,
     impactTracker,
     notificationService,
-    representativeContactService
+    representativeContactService,
   };
 }
 
-// Singleton instance for application use
-let advocacyServiceInstance: AdvocacyServiceDependencies | null = null;
+// ============================================================================
+// Singleton Lifecycle
+// ============================================================================
 
-export function getAdvocacyService(): AdvocacyServiceDependencies {
-  if (!advocacyServiceInstance) {
-    advocacyServiceInstance = createAdvocacyService();
-  }
-  return advocacyServiceInstance;
-}
+let instance: AdvocacyServiceDependencies | null = null;
 
-// For testing - allows injection of mock dependencies
+/**
+ * Registers the application-wide advocacy service instance.
+ * Must be called once during app startup before any request is handled.
+ */
 export function setAdvocacyService(service: AdvocacyServiceDependencies): void {
-  advocacyServiceInstance = service;
+  instance = service;
 }
 
-// Reset for testing
+/**
+ * Returns the registered advocacy service instance.
+ *
+ * @throws {Error} if called before `setAdvocacyService`.
+ */
+export function getAdvocacyService(): AdvocacyServiceDependencies {
+  if (!instance) {
+    throw new Error(
+      'Advocacy service has not been initialized.\n' +
+      'Call setAdvocacyService(createAdvocacyService(campaignRepo, actionRepo)) during app startup.',
+    );
+  }
+  return instance;
+}
+
+/**
+ * Clears the registered instance. Intended for use in tests only.
+ */
 export function resetAdvocacyService(): void {
-  advocacyServiceInstance = null;
+  instance = null;
 }
-
-

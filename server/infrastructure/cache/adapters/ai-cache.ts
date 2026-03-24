@@ -11,7 +11,8 @@
 
 import { performance } from 'perf_hooks';
 
-import { CacheService, getDefaultCache } from '../../cache/index';
+import type { CacheService } from '../../cache/types';
+import { getDefaultCache } from '../../cache/index';
 import { logger } from '../../observability';
 
 export interface AICacheOptions {
@@ -193,28 +194,14 @@ export class AICache {
 
       await this.baseCache.set(cacheKey, entry, ttl);
 
-      logger.info({ component: 'Chanuka', error: {
+      logger.info({
         service,
         operation,
         key: cacheKey,
         ttl,
         cost: entry.cost,
         accuracy: entry.accuracy
-      } instanceof Error ? {
-        service,
-        operation,
-        key: cacheKey,
-        ttl,
-        cost: entry.cost,
-        accuracy: entry.accuracy
-      }.message : String({
-        service,
-        operation,
-        key: cacheKey,
-        ttl,
-        cost: entry.cost,
-        accuracy: entry.accuracy
-      }) }, 'AI Cache Set');
+      }, 'AI Cache Set');
 
       // Trigger cache warming for related operations if enabled
       if (this.options.enableCacheWarming) {
@@ -289,19 +276,11 @@ export class AICache {
           return;
         }
 
-        logger.info({ component: 'Chanuka', error: {
+        logger.info({
           service: entry.service,
           operation: entry.operation,
           key: entry.key
-        } instanceof Error ? {
-          service: entry.service,
-          operation: entry.operation,
-          key: entry.key
-        }.message : String({
-          service: entry.service,
-          operation: entry.operation,
-          key: entry.key
-        }) }, 'Warming AI cache');
+        }, 'Warming AI cache');
 
         // Generate the data
         const data = await entry.factory();
@@ -445,17 +424,11 @@ export class AICache {
   ): void {
     // This would implement intelligent cache warming based on patterns
     // For now, just log the warming opportunity
-    logger.info({ component: 'Chanuka', error: {
+    logger.info({ component: 'Chanuka', data: {
       service,
       operation,
-      inputHash: this.hashInput(inputData instanceof Error ? {
-      service,
-      operation,
-      inputHash: this.hashInput(inputData.message : String({
-      service,
-      operation,
-      inputHash: this.hashInput(inputData) }, 'Cache warming opportunity detected')
-    });
+      inputHash: this.hashInput(inputData)
+    } }, 'Cache warming opportunity detected');
   }
 
   private recordCacheHit(service: string, cost: number, responseTime: number): void {

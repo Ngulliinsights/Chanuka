@@ -97,7 +97,7 @@ export class CacheCompressor {
    */
   private browserDecompress(compressedData: unknown): unknown {
     if (compressedData.__compressed) {
-      return compressedData.data; // Would be decompressed data
+      return (compressedData as any).data; // Would be decompressed data
     }
     return compressedData;
   }
@@ -133,7 +133,7 @@ export class CacheCompressor {
         // const zlib = require('zlib');
         // return zlib.gunzipSync(compressedData.data).toString('utf8');
         
-        return compressedData.data; // Would be decompressed data
+        return (compressedData as any).data; // Would be decompressed data
       } catch (error) {
         throw new Error(`Decompression failed: ${error}`);
       }

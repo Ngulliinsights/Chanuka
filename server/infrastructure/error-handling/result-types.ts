@@ -382,3 +382,12 @@ function retryableFromStatus(status: number): boolean {
 function generateId(): string {
   return `err_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Compatibility Alias
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Alias for `safeAsync`. Used extensively in the migration layer.
+ */
+export const withResultHandling = safeAsync;

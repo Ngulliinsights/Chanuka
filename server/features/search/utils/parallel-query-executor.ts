@@ -43,17 +43,17 @@ export class ParallelQueryExecutor {
         const task = tasks[index];
         
         if (result.status === 'fulfilled') {
-          resultMap[task.name] = result.value;
+          resultMap[task!.name] = result.value;
         } else {
-          resultMap[task.name] = {
-            name: task.name,
-            data: task.fallback || null,
+          resultMap[task!.name] = {
+            name: task!.name,
+            data: task!.fallback || null,
             success: false,
             duration: Date.now() - startTime,
             error: result.reason
           };
           
-          logger.error({ component: 'Search', error: result.reason }, `Query task ${task.name} failed`);
+          logger.error({ component: 'Search', error: result.reason }, `Query task ${task!.name} failed`);
         }
       });
 

@@ -32,7 +32,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           .select({ interest: user_interests.interest })
           .from(user_interests)
           .where(eq(user_interests.user_id, user_id));
-        return rows.map(r => r.interest);
+        return rows.map((r: any) => r.interest);
       },
       `recommendation:interests:${user_id}`
     );
@@ -45,7 +45,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           .select({ bill_id: bill_engagement.bill_id })
           .from(bill_engagement)
           .where(eq(bill_engagement.user_id, user_id));
-        return [...new Set(rows.map(r => r.bill_id as number))] as number[];
+        return [...new Set(rows.map((r: any) => r.bill_id as number))] as number[];
       },
       `recommendation:engaged:${user_id}`
     );
@@ -58,7 +58,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
     return this.executeRead(
       async (db) => {
         const rows = await db.select().from(bills).where(inArray(bills.id, ids));
-        return rows.map(r => this.toPlain(r));
+        return rows.map((r: any) => this.toPlain(r as any));
       },
       `recommendation:bills:${ids.slice(0, 5).join(',')}`
     );
@@ -73,10 +73,10 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           .select({ bill_id: bill_tags.bill_id })
           .from(bill_tags)
           .where(inArray(bill_tags.tag, tags));
-        const bill_ids = [...new Set(tagRows.map(r => r.bill_id as number))].filter((id: unknown) => !excludeIds.includes(id as number));
+        const bill_ids = [...new Set(tagRows.map((r: any) => r.bill_id as number))].filter((id: unknown) => !excludeIds.includes(id as number));
         if (!bill_ids.length) return [];
         const rows = await db.select().from(bills).where(inArray(bills.id, bill_ids));
-        return rows.map(r => this.toPlain(r));
+        return rows.map((r: any) => this.toPlain(r as any));
       },
       `recommendation:tags:${tags.slice(0, 3).join(',')}`
     );
@@ -94,7 +94,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           .groupBy(bill_engagement.bill_id)
           .orderBy(desc(sql`sum(${bill_engagement.engagement_score})`))
           .limit(limit);
-        return rows.map(r => r.bill_id);
+        return rows.map((r: any) => r.bill_id);
       },
       `recommendation:trending:${days}:${limit}`
     );
@@ -119,7 +119,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           .having(sql`count(distinct ${user_interests.interest}) >= ${minShared}`)
           .orderBy(desc(sql`count(distinct ${user_interests.interest})`))
           .limit(50);
-        return rows.map(r => r.user_id);
+        return rows.map((r: any) => r.user_id);
       },
       `recommendation:similar:${user_id}`
     );
@@ -136,7 +136,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
           })
           .from(bill_engagement)
           .where(inArray(bill_engagement.user_id, user_ids));
-        return rows.map(r => ({
+        return rows.map((r: any) => ({
           user_id: r.user_id,
           bill_id: r.bill_id as number,
           score: r.score ?? 0
@@ -204,7 +204,7 @@ export class RecommendationRepository extends BaseRepository<PlainBill> {
     return this.executeRead(
       async (db) => {
         const rows = await db.select({ tag: bill_tags.tag }).from(bill_tags).where(eq(bill_tags.bill_id, bill_id));
-        return rows.map(r => r.tag);
+        return rows.map((r: any) => r.tag);
       },
       `recommendation:bill:tags:${bill_id}`
     );

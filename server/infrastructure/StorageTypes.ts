@@ -1,5 +1,10 @@
-import { InsertUser, InsertUserProgress, User, UserProgress } from './types';
+// Types for storage interface - some from schema, others typed as unknown (legacy)
+import type { User, NewUser as InsertUser } from './schema';
 import { QueryResult, QueryResultRow } from 'pg';
+
+// Legacy type aliases (not in current schema, using unknown)
+export type InsertUserProgress = unknown;
+export type UserProgress = unknown;
 
 export interface TransactionClient {
   query<T extends QueryResultRow>(queryText: string, values?: unknown[]): Promise<QueryResult<T>>;

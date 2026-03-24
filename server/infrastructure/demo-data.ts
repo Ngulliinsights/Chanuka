@@ -654,7 +654,7 @@ export class DemoDataService {
         bills.title.toLowerCase().includes(searchTerm) ||
         bills.description?.toLowerCase().includes(searchTerm) ||
         bills.summary?.toLowerCase().includes(searchTerm) ||
-        bills.tags?.some(tag => tag.toLowerCase().includes(searchTerm))
+        bills.tags?.some((tag: any) => tag.toLowerCase().includes(searchTerm))
       );
     }
 

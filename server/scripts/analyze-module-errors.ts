@@ -56,11 +56,11 @@ function parseCompilerOutput(output: string): CompilationError[] {
     if (match) {
       const [, file, lineNum, colNum, code, message] = match;
       errors.push({
-        file: file.trim(),
+        file: file!.trim(),
         line: parseInt(lineNum, 10),
         column: parseInt(colNum, 10),
         code,
-        message: message.trim(),
+        message: message!.trim(),
         category: code as ErrorCategory
       });
     }

@@ -415,12 +415,12 @@ export class DashboardService {
       }
 
       summary.recent.push({
-        id: alert.id,
-        component: alert.component,
-        severity: alert.threshold.severity,
-        message: `${alert.metric} = ${alert.currentValue} (threshold: ${alert.threshold.operator} ${alert.threshold.value})`,
-        timestamp: alert.timestamp,
-        resolved: alert.resolved
+        id: (alert as any).id,
+        component: (alert as any).component,
+        severity: (alert as any).threshold.severity,
+        message: `${(alert as any).metric} = ${(alert as any).currentValue} (threshold: ${(alert as any).threshold.operator} ${(alert as any).threshold.value})`,
+        timestamp: (alert as any).timestamp,
+        resolved: (alert as any).resolved
       });
     }
 
@@ -503,8 +503,8 @@ export class DashboardService {
    * Generate rollback summary
    */
   private generateRollbackSummary(rollbackHistory: unknown[]): RollbackSummary {
-    const activeRollbacks = rollbackHistory.filter(r => r.status === 'in_progress');
-    const completedRollbacks = rollbackHistory.filter(r => r.status === 'completed');
+    const activeRollbacks = rollbackHistory.filter(r => (r as any).status === 'in_progress');
+    const completedRollbacks = rollbackHistory.filter(r => (r as any).status === 'completed');
     const successRate = rollbackHistory.length > 0 
       ? (completedRollbacks.length / rollbackHistory.length) * 100 
       : 100;
@@ -514,10 +514,10 @@ export class DashboardService {
       activeRollbacks: activeRollbacks.length,
       successRate,
       recentRollbacks: rollbackHistory.slice(0, 5).map(r => ({
-        component: r.component,
-        reason: r.reason,
-        timestamp: r.timestamp,
-        status: r.status
+        component: (r as any).component,
+        reason: (r as any).reason,
+        timestamp: (r as any).timestamp,
+        status: (r as any).status
       }))
     };
   }
@@ -548,25 +548,25 @@ export class DashboardService {
     let score = 100;
     
     // Response time impact (max -30 points)
-    const responseTimeRatio = current.responseTime / baseline.responseTime;
+    const responseTimeRatio = (current as any).responseTime / (baseline as any).responseTime;
     if (responseTimeRatio > 1.2) {
       score -= Math.min(30, (responseTimeRatio - 1) * 50);
     }
     
     // Error rate impact (max -40 points)
-    const errorRateRatio = current.errorRate / baseline.errorRate;
+    const errorRateRatio = (current as any).errorRate / (baseline as any).errorRate;
     if (errorRateRatio > 1.5) {
       score -= Math.min(40, (errorRateRatio - 1) * 60);
     }
     
     // Memory usage impact (max -20 points)
-    const memoryRatio = current.memoryUsage / baseline.memoryUsage;
+    const memoryRatio = (current as any).memoryUsage / (baseline as any).memoryUsage;
     if (memoryRatio > 1.1) {
       score -= Math.min(20, (memoryRatio - 1) * 100);
     }
     
     // Throughput impact (max -10 points)
-    const throughputRatio = current.throughput / baseline.throughput;
+    const throughputRatio = (current as any).throughput / (baseline as any).throughput;
     if (throughputRatio < 0.9) {
       score -= Math.min(10, (1 - throughputRatio) * 50);
     }

@@ -1,357 +1,396 @@
 // ============================================================================
-// ADVOCACY COORDINATION - Coalition Builder Service
+// ADVOCACY COORDINATION — Coalition Builder Service
 // ============================================================================
 
-// Repository interfaces removed - using direct service calls
-import { CoalitionOpportunity } from '@server/types/index';
-import { logger } from '@server/infrastructure/observability';
 import { AdvocacyErrors } from '@server/features/advocacy/domain/errors/advocacy-errors';
+import type { ICampaignRepository } from '@server/features/advocacy/domain/repositories/campaign-repository';
+import type { Campaign } from '@server/features/advocacy/domain/types';
+import { logger } from '@server/infrastructure/observability';
+import { CoalitionOpportunity } from '@server/types/index';
 
+// ============================================================================
+// Scoring constants
+// ============================================================================
+
+const SCORE = {
+  SAME_BILL:        0.4,
+  SAME_CATEGORY:    0.2,
+  TAG_PER_MATCH:    0.1,
+  TAG_MAX:          0.3,
+  GEO_OVERLAP:      0.1,
+  OBJECTIVE_MATCH:  0.2,
+  THRESHOLD_OPPORTUNITY: 0.6,
+  THRESHOLD_PROPOSAL:    0.5,
+} as const;
+
+const IMPACT = {
+  PARTICIPANT_DIVISOR: 10,
+  PARTICIPANT_MAX:     30,
+  ALIGNMENT_WEIGHT:    40,
+  STRENGTH_PER_ITEM:   5,
+  ACTION_PER_ITEM:     2,
+  SAME_BILL_BONUS:     20,
+} as const;
+
+// ============================================================================
+// Supporting interfaces
+// ============================================================================
+
+/**
+ * Extends {@link Campaign} with optional fields populated by enriched views
+ * (e.g. full-text search results). Keeps the base type lean while allowing
+ * coalition logic to consume richer data when available.
+ */
+interface EnrichedCampaign extends Campaign {
+  organizationName?: string;
+  category?: string;
+  tags?: string[];
+  targetCounties?: string[];
+  objectives?: string[];
+}
+
+/** Minimal action repository contract for coalition action coordination. */
+export interface IActionRepository {
+  findByCampaign(campaign_id: string): Promise<unknown[]>;
+}
+
+/** Contract for the domain event bus used by coalition workflows. */
+export interface AdvocacyEventPublisher {
+  publish(event: AdvocacyDomainEvent): Promise<void>;
+}
+
+/** Base type for all advocacy domain events. */
+export interface AdvocacyDomainEvent {
+  readonly eventType: string;
+  readonly occurredAt: Date;
+}
+
+/**
+ * Extends {@link ICampaignRepository} with coalition-specific discovery.
+ * Kept separate to avoid coupling the base contract to coalition-only
+ * persistence concerns.
+ */
+export interface ICoalitionCampaignRepository extends ICampaignRepository {
+  /**
+   * Returns campaigns that share bill, category, or tag overlap with the
+   * given campaign — candidates for coalition formation.
+   */
+  findPotentialCoalitions(campaign_id: string): Promise<Array<{ campaign_id: string }>>;
+}
+
+// ============================================================================
+// Domain events
+// ============================================================================
+
+class CoalitionOpportunityIdentifiedEvent implements AdvocacyDomainEvent {
+  readonly eventType  = 'CoalitionOpportunityIdentified';
+  readonly occurredAt = new Date();
+
+  constructor(
+    public readonly sourceCampaignId: string,
+    public readonly targetCampaignId: string,
+    public readonly alignmentScore:   number,
+    public readonly sharedConcerns:   string[],
+  ) {}
+}
+
+class CoalitionFormedEvent implements AdvocacyDomainEvent {
+  readonly eventType  = 'CoalitionFormed';
+  readonly occurredAt = new Date();
+
+  constructor(
+    public readonly coalitionId:       string,
+    public readonly campaignIds:       string[],
+    public readonly sharedObjectives:  string[],
+  ) {}
+}
+
+// ============================================================================
+// Value types
+// ============================================================================
 
 export interface CoalitionProposal {
-  id: string;
+  id:                   string;
   initiatingCampaignId: string;
-  targetCampaignIds: string[];
-  proposedObjectives: string[];
-  proposedActions: string[];
-  estimatedImpact: number;
-  status: 'proposed' | 'accepted' | 'rejected' | 'expired';
-  created_at: Date;
-  expires_at: Date;
+  targetCampaignIds:    string[];
+  proposedObjectives:   string[];
+  proposedActions:      string[];
+  estimatedImpact:      number;
+  status:               'proposed' | 'accepted' | 'rejected' | 'expired';
+  created_at:           Date;
+  expires_at:           Date;
 }
 
 export interface Coalition {
-  id: string;
-  name: string;
-  description: string;
-  campaignIds: string[];
-  sharedObjectives: string[];
-  coordinatedActions: string[];
-  status: 'active' | 'paused' | 'dissolved';
-  created_at: Date;
-  updated_at: Date;
+  id:                  string;
+  name:                string;
+  description:         string;
+  campaignIds:         string[];
+  sharedObjectives:    string[];
+  coordinatedActions:  string[];
+  status:              'active' | 'paused' | 'dissolved';
+  created_at:          Date;
+  updated_at:          Date;
 }
+
+interface CompatibilityResult {
+  alignmentScore:          number;
+  sharedConcerns:          string[];
+  complementaryStrengths:  string[];
+  suggestedActions:        string[];
+}
+
+// ============================================================================
+// Service
+// ============================================================================
 
 export class CoalitionBuilder {
   constructor(
-    private campaignRepository: ICampaignRepository,
-    private actionRepository: IActionRepository,
-    private eventPublisher: AdvocacyEventPublisher
+    private readonly campaignRepository: ICoalitionCampaignRepository,
+    private readonly actionRepository:   IActionRepository,
+    private readonly eventPublisher:     AdvocacyEventPublisher,
   ) {}
 
-  /**
-   * Identifies potential coalition opportunities for a campaign
-   */
-  async identifyCoalitionOpportunities(campaign_id: string): Promise<CoalitionOpportunity[]> {
-    try {
-      const campaign = await this.campaignRepository.findById(campaign_id);
-      if (!campaign) {
-        throw AdvocacyErrors.campaignNotFound(campaign_id);
-      }
+  // ── Public methods ──────────────────────────────────────────────────────
 
-      // Find potential coalition partners
-      const potentialCoalitions = await this.campaignRepository.findPotentialCoalitions(campaign_id);
-      
+  async identifyCoalitionOpportunities(campaign_id: string): Promise<CoalitionOpportunity[]> {
+    return this.withErrorHandling('identifyCoalitionOpportunities', { campaign_id }, async () => {
+      const campaign = await this.requireCampaign(campaign_id);
+      const candidates = await this.campaignRepository.findPotentialCoalitions(campaign_id);
+
       const opportunities: CoalitionOpportunity[] = [];
 
-      for (const coalition of potentialCoalitions) {
-        const partnerCampaign = await this.campaignRepository.findById(coalition.campaign_id);
-        if (!partnerCampaign) continue;
+      for (const { campaign_id: partnerId } of candidates) {
+        const partner = await this.campaignRepository.findById(partnerId);
+        if (!partner) continue;
 
-        // Analyze compatibility
-        const compatibility = await this.analyzeCompatibility(campaign, partnerCampaign);
-        
-        if (compatibility.alignmentScore >= 0.6) {
-          const opportunity: CoalitionOpportunity = {
-            id: `coalition-opp-${ campaign_id }-${coalition.campaign_id}`,
-            bill_id: campaign.bill_id,
-            sharedConcerns: compatibility.sharedConcerns,
-            potentialPartners: [{
-              user_id: partnerCampaign.organizerId,
-              organizationName: partnerCampaign.organizationName,
-              alignmentScore: compatibility.alignmentScore,
-              complementaryStrengths: compatibility.complementaryStrengths
-            }],
-            suggestedActions: compatibility.suggestedActions,
-            estimatedImpact: this.calculateEstimatedImpact(campaign, partnerCampaign, compatibility)
-          };
+        const compatibility = await this.analyzeCompatibility(campaign, partner);
+        if (compatibility.alignmentScore < SCORE.THRESHOLD_OPPORTUNITY) continue;
 
-          opportunities.push(opportunity);
+        const enriched = partner as EnrichedCampaign;
 
-          // Publish event for potential coalition
-          await this.eventPublisher.publish(new CoalitionOpportunityIdentifiedEvent(
-            campaign_id,
-            coalition.campaign_id,
-            compatibility.alignmentScore,
-            compatibility.sharedConcerns
-          ));
-        }
+        opportunities.push({
+          id:       `coalition-opp-${campaign_id}-${partnerId}`,
+          bill_id:  campaign.billId ?? '',
+          sharedConcerns:    compatibility.sharedConcerns,
+          suggestedActions:  compatibility.suggestedActions,
+          estimatedImpact:   this.calculateEstimatedImpact(campaign, partner, compatibility),
+          potentialPartners: [{
+            user_id:                enriched.organizerId,
+            organizationName:       enriched.organizationName,
+            alignmentScore:         compatibility.alignmentScore,
+            complementaryStrengths: compatibility.complementaryStrengths,
+          }],
+        });
+
+        await this.eventPublisher.publish(new CoalitionOpportunityIdentifiedEvent(
+          campaign_id, partnerId, compatibility.alignmentScore, compatibility.sharedConcerns,
+        ));
       }
 
-      // Sort by estimated impact
       opportunities.sort((a, b) => b.estimatedImpact - a.estimatedImpact);
 
-      logger.info({ 
-        campaign_id,
-        opportunityCount: opportunities.length,
-        component: 'CoalitionBuilder' 
-      }, 'Coalition opportunities identified');
+      logger.info({ campaign_id, opportunityCount: opportunities.length, component: 'CoalitionBuilder' },
+        'Coalition opportunities identified');
 
       return opportunities;
-    } catch (error) {
-      logger.error('Failed to identify coalition opportunities', error, { 
-        campaign_id,
-        component: 'CoalitionBuilder' 
-      });
-      throw error;
-    }
+    });
   }
 
-  /**
-   * Proposes a coalition between campaigns
-   */
   async proposeCoalition(
     initiatingCampaignId: string,
-    targetCampaignIds: string[],
-    proposedObjectives: string[],
-    proposerId: string
+    targetCampaignIds:    string[],
+    proposedObjectives:   string[],
+    proposerId:           string,
   ): Promise<CoalitionProposal> {
-    try {
-      // Validate initiating campaign
-      const initiatingCampaign = await this.campaignRepository.findById(initiatingCampaignId);
-      if (!initiatingCampaign) {
-        throw AdvocacyErrors.campaignNotFound(initiatingCampaignId);
-      }
+    return this.withErrorHandling('proposeCoalition', { initiatingCampaignId, targetCampaignIds }, async () => {
+      const initiator = await this.requireCampaign(initiatingCampaignId);
 
-      // Check if proposer has authority
-      if (initiatingCampaign.organizerId !== proposerId) {
+      if (initiator.organizerId !== proposerId) {
         throw AdvocacyErrors.campaignAccessDenied(initiatingCampaignId, proposerId);
       }
 
-      // Validate target campaigns
-      const targetCampaigns = [];
-      for (const targetId of targetCampaignIds) {
-        const campaign = await this.campaignRepository.findById(targetId);
-        if (!campaign) {
-          throw AdvocacyErrors.campaignNotFound(targetId);
-        }
-        if (campaign.status !== 'active') {
-          throw AdvocacyErrors.campaignStatus(campaign.status, 'form coalition with');
-        }
-        targetCampaigns.push(campaign);
-      }
+      const targets = await Promise.all(targetCampaignIds.map(id => this.requireActiveCampaign(id)));
 
-      // Analyze compatibility with all targets
-      const compatibilityScores = [];
-      for (const targetCampaign of targetCampaigns) {
-        const compatibility = await this.analyzeCompatibility(initiatingCampaign, targetCampaign);
-        compatibilityScores.push(compatibility.alignmentScore);
-      }
+      const scores = await Promise.all(targets.map(t => this.analyzeCompatibility(initiator, t)));
+      const averageCompatibility = scores.reduce((sum, s) => sum + s.alignmentScore, 0) / scores.length;
 
-      const averageCompatibility = compatibilityScores.reduce((sum, score) => sum + score, 0) / compatibilityScores.length;
-      
-      if (averageCompatibility < 0.5) {
-        throw new AdvocacyErrors.IncompatibleCampaignsError(
-          initiatingCampaignId,
-          targetCampaignIds.join(', ')
+      if (averageCompatibility < SCORE.THRESHOLD_PROPOSAL) {
+        throw new Error(
+          `Campaigns are insufficiently compatible for coalition formation ` +
+          `(score: ${averageCompatibility.toFixed(2)}). ` +
+          `Initiating: ${initiatingCampaignId}, targets: ${targetCampaignIds.join(', ')}`,
         );
       }
 
-      // Create coalition proposal
       const proposal: CoalitionProposal = {
-        id: `coalition-proposal-${Date.now()}`,
+        id:                   `coalition-proposal-${Date.now()}`,
         initiatingCampaignId,
         targetCampaignIds,
         proposedObjectives,
-        proposedActions: await this.generateCoordinatedActions(initiatingCampaign, targetCampaigns),
-        estimatedImpact: Math.round(averageCompatibility * 100),
-        status: 'proposed',
-        created_at: new Date(),
-        expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+        proposedActions:      await this.generateCoordinatedActions(initiator, targets),
+        estimatedImpact:      Math.round(averageCompatibility * 100),
+        status:               'proposed',
+        created_at:           new Date(),
+        expires_at:           new Date(Date.now() + 7 * 24 * 60 * 60 * 1_000),
       };
 
-      // Store proposal (this would be in a coalition_proposals table)
-      // For now, we'll just log it
-      logger.info({ 
-        proposalId: proposal.id,
-        initiatingCampaignId,
-        targetCampaignIds,
-        component: 'CoalitionBuilder' 
-      }, 'Coalition proposal created');
+      logger.info({ proposalId: proposal.id, initiatingCampaignId, targetCampaignIds, component: 'CoalitionBuilder' },
+        'Coalition proposal created');
 
       return proposal;
-    } catch (error) {
-      logger.error('Failed to propose coalition', error, { 
-        initiatingCampaignId,
-        targetCampaignIds,
-        component: 'CoalitionBuilder' 
-      });
-      throw error;
-    }
+    });
   }
 
   /**
-   * Forms a coalition from accepted proposals
+   * Creates a {@link Coalition} from an accepted proposal.
+   *
+   * @param proposalId       - Proposal to materialize. Full lookup is wired
+   *                           once the `coalition_proposals` table is available.
+   * @param acceptingUserId  - Reserved for the authorization check on proposal
+   *                           acceptance; enforced once persistence is wired.
    */
   async formCoalition(
-    proposalId: string,
-    coalitionName: string,
+    proposalId:          string,
+    coalitionName:       string,
     coalitionDescription: string,
-    acceptingUserId: string
+    acceptingUserId:     string,
   ): Promise<Coalition> {
-    try {
-      // In a real implementation, this would retrieve the proposal from database
-      // For now, we'll create a mock coalition
-      
+    return this.withErrorHandling('formCoalition', { proposalId }, async () => {
+      // TODO: retrieve proposal from coalition_proposals table, validate
+      //       that acceptingUserId is among the target campaign organizers,
+      //       and populate campaignIds / sharedObjectives from the proposal.
+      void acceptingUserId;
+
       const coalition: Coalition = {
-        id: `coalition-${Date.now()}`,
-        name: coalitionName,
-        description: coalitionDescription,
-        campaignIds: [], // Would be populated from proposal
-        sharedObjectives: [],
-        coordinatedActions: [],
-        status: 'active',
-        created_at: new Date(),
-        updated_at: new Date()
+        id:                  `coalition-${Date.now()}`,
+        name:                coalitionName,
+        description:         coalitionDescription,
+        campaignIds:         [],
+        sharedObjectives:    [],
+        coordinatedActions:  [],
+        status:              'active',
+        created_at:          new Date(),
+        updated_at:          new Date(),
       };
 
-      // Publish coalition formed event
       await this.eventPublisher.publish(new CoalitionFormedEvent(
-        coalition.id,
-        coalition.campaignIds,
-        coalition.sharedObjectives
+        coalition.id, coalition.campaignIds, coalition.sharedObjectives,
       ));
 
-      logger.info({ 
-        coalitionId: coalition.id,
-        name: coalitionName,
-        component: 'CoalitionBuilder' 
-      }, 'Coalition formed');
+      logger.info({ coalitionId: coalition.id, name: coalitionName, component: 'CoalitionBuilder' },
+        'Coalition formed');
 
       return coalition;
-    } catch (error) {
-      logger.error('Failed to form coalition', error, { 
-        proposalId,
-        component: 'CoalitionBuilder' 
-      });
-      throw error;
-    }
+    });
   }
 
-  /**
-   * Gets active coalitions for a campaign
-   */
   async getCampaignCoalitions(campaign_id: string): Promise<Coalition[]> {
-    try {
-      // In a real implementation, this would query the coalitions table
-      // For now, return empty array
+    return this.withErrorHandling('getCampaignCoalitions', { campaign_id }, async () => {
+      // TODO: query coalition_members table once persistence is wired up.
       return [];
-    } catch (error) {
-      logger.error('Failed to get campaign coalitions', error, { 
-        campaign_id,
-        component: 'CoalitionBuilder' 
-      });
-      throw error;
-    }
+    });
   }
 
   /**
-   * Coordinates actions across coalition members
+   * @param actionDetails   - Action payload; used once the action schema is finalized.
+   * @param coordinatorId   - Validated against coalition membership on full implementation.
    */
   async coordinateCoalitionActions(
-    coalitionId: string,
-    actionType: string,
-    actionDetails: any,
-    coordinatorId: string
+    coalitionId:    string,
+    actionType:     string,
+    actionDetails:  Record<string, unknown>,
+    coordinatorId:  string,
   ): Promise<string[]> {
-    try {
-      // In a real implementation, this would:
-      // 1. Validate coalition membership
-      // 2. Create coordinated actions for all member campaigns
-      // 3. Notify coalition members
-      
+    return this.withErrorHandling('coordinateCoalitionActions', { coalitionId, actionType }, async () => {
+      // TODO: validate coalition membership via coordinatorId, persist actions
+      //       derived from actionDetails, and notify member campaigns.
+      void actionDetails;
+      void coordinatorId;
+
       const actionIds: string[] = [];
-      
-      logger.info({ 
-        coalitionId,
-        actionType,
-        actionCount: actionIds.length,
-        component: 'CoalitionBuilder' 
-      }, 'Coalition actions coordinated');
+
+      logger.info({ coalitionId, actionType, actionCount: actionIds.length, component: 'CoalitionBuilder' },
+        'Coalition actions coordinated');
 
       return actionIds;
-    } catch (error) {
-      logger.error('Failed to coordinate coalition actions', error, { 
-        coalitionId,
-        actionType,
-        component: 'CoalitionBuilder' 
-      });
-      throw error;
-    }
+    });
   }
 
-  /**
-   * Analyzes compatibility between two campaigns
-   */
-  private async analyzeCompatibility(campaign1: unknown, campaign2: unknown): Promise<{
-    alignmentScore: number;
-    sharedConcerns: string[];
-    complementaryStrengths: string[];
-    suggestedActions: string[];
-  }> {
-    let alignmentScore = 0;
-    const sharedConcerns: string[] = [];
-    const complementaryStrengths: string[] = [];
-    const suggestedActions: string[] = [];
+  // ── Private helpers ─────────────────────────────────────────────────────
 
-    // Same bill = high alignment
-    if (campaign1.bill_id === campaign2.bill_id) {
-      alignmentScore += 0.4;
+  /** Resolves a campaign or throws a domain-safe not-found error. */
+  private async requireCampaign(campaign_id: string): Promise<Campaign> {
+    const campaign = await this.campaignRepository.findById(campaign_id);
+    if (!campaign) throw AdvocacyErrors.campaignNotFound(campaign_id);
+    return campaign;
+  }
+
+  /** Resolves a campaign and asserts it is active. */
+  private async requireActiveCampaign(campaign_id: string): Promise<Campaign> {
+    const campaign = await this.requireCampaign(campaign_id);
+    if (campaign.status !== 'active') {
+      throw AdvocacyErrors.campaignStatus(campaign.status, 'form coalition with');
+    }
+    return campaign;
+  }
+
+  private async analyzeCompatibility(
+    campaign1: Campaign,
+    campaign2: Campaign,
+  ): Promise<CompatibilityResult> {
+    const c1 = campaign1 as EnrichedCampaign;
+    const c2 = campaign2 as EnrichedCampaign;
+
+    let alignmentScore = 0;
+    const sharedConcerns:         string[] = [];
+    const complementaryStrengths: string[] = [];
+    const suggestedActions:       string[] = [];
+
+    // ── Same bill ────────────────────────────────────────────────────────
+    if (c1.billId && c1.billId === c2.billId) {
+      alignmentScore += SCORE.SAME_BILL;
       sharedConcerns.push('Same legislation');
       suggestedActions.push('Coordinate messaging', 'Joint committee testimony');
     }
 
-    // Same category = medium alignment
-    if (campaign1.category === campaign2.category) {
-      alignmentScore += 0.2;
-      sharedConcerns.push(`Both focus on ${campaign1.category}`);
+    // ── Same category ────────────────────────────────────────────────────
+    if (c1.category && c1.category === c2.category) {
+      alignmentScore += SCORE.SAME_CATEGORY;
+      sharedConcerns.push(`Both focus on ${c1.category}`);
     }
 
-    // Overlapping tags = variable alignment
-    const sharedTags = campaign1.tags.filter((tag: string) => campaign2.tags.includes(tag));
+    // ── Shared tags ──────────────────────────────────────────────────────
+    const sharedTags = this.intersection(c1.tags ?? [], c2.tags ?? []);
     if (sharedTags.length > 0) {
-      alignmentScore += Math.min(sharedTags.length * 0.1, 0.3);
+      alignmentScore += Math.min(sharedTags.length * SCORE.TAG_PER_MATCH, SCORE.TAG_MAX);
       sharedConcerns.push(...sharedTags);
     }
 
-    // Overlapping counties = coordination opportunity
-    const sharedCounties = campaign1.targetCounties.filter((county: string) => 
-      campaign2.targetCounties.includes(county)
-    );
+    // ── Geographic overlap ───────────────────────────────────────────────
+    const sharedCounties = this.intersection(c1.targetCounties ?? [], c2.targetCounties ?? []);
     if (sharedCounties.length > 0) {
-      alignmentScore += 0.1;
+      alignmentScore += SCORE.GEO_OVERLAP;
       complementaryStrengths.push('Geographic overlap for local coordination');
       suggestedActions.push('Joint local events', 'Coordinated county outreach');
     }
 
-    // Complementary objectives
-    const objectiveOverlap = this.findObjectiveOverlap(campaign1.objectives, campaign2.objectives);
+    // ── Shared objectives ────────────────────────────────────────────────
+    const objectiveOverlap = this.findObjectiveOverlap(c1.objectives ?? [], c2.objectives ?? []);
     if (objectiveOverlap.length > 0) {
-      alignmentScore += 0.2;
+      alignmentScore += SCORE.OBJECTIVE_MATCH;
       sharedConcerns.push(...objectiveOverlap);
       suggestedActions.push('Unified position statement', 'Joint advocacy strategy');
     }
 
-    // Different organization types can be complementary
-    if (campaign1.organizationName && campaign2.organizationName && 
-        campaign1.organizationName !== campaign2.organizationName) {
+    // ── Cross-org diversity ──────────────────────────────────────────────
+    if (c1.organizationName && c2.organizationName && c1.organizationName !== c2.organizationName) {
       complementaryStrengths.push('Different organizational perspectives');
       suggestedActions.push('Cross-sector advocacy', 'Diverse stakeholder representation');
     }
 
-    // Participant size complementarity
-    const sizeDifference = Math.abs(campaign1.participantCount - campaign2.participantCount);
-    if (sizeDifference > 50) {
+    // ── Scale diversity ──────────────────────────────────────────────────
+    if (Math.abs(c1.participantCount - c2.participantCount) > 50) {
       complementaryStrengths.push('Different scale campaigns for broader reach');
     }
 
@@ -359,96 +398,106 @@ export class CoalitionBuilder {
       alignmentScore: Math.min(alignmentScore, 1.0),
       sharedConcerns,
       complementaryStrengths,
-      suggestedActions
+      suggestedActions,
     };
   }
 
-  /**
-   * Calculates estimated impact of coalition
-   */
-  private calculateEstimatedImpact(campaign1: unknown, campaign2: unknown, compatibility: unknown): number {
-    let impact = 0;
+  private calculateEstimatedImpact(
+    campaign1:     Campaign,
+    campaign2:     Campaign,
+    compatibility: CompatibilityResult,
+  ): number {
+    const { participantCount: p1, billId: b1 } = campaign1 as EnrichedCampaign;
+    const { participantCount: p2, billId: b2 } = campaign2 as EnrichedCampaign;
 
-    // Base impact from participant count
-    const totalParticipants = campaign1.participantCount + campaign2.participantCount;
-    impact += Math.min(totalParticipants / 10, 30); // Max 30 points from participants
-
-    // Alignment bonus
-    impact += compatibility.alignmentScore * 40; // Max 40 points from alignment
-
-    // Diversity bonus (different approaches can be more effective)
-    if (compatibility.complementaryStrengths.length > 0) {
-      impact += compatibility.complementaryStrengths.length * 5; // Max varies
-    }
-
-    // Action coordination potential
-    impact += compatibility.suggestedActions.length * 2;
-
-    // Same bill = higher impact potential
-    if (campaign1.bill_id === campaign2.bill_id) {
-      impact += 20;
-    }
+    const impact =
+      Math.min((p1 + p2) / IMPACT.PARTICIPANT_DIVISOR, IMPACT.PARTICIPANT_MAX) +
+      compatibility.alignmentScore              * IMPACT.ALIGNMENT_WEIGHT +
+      compatibility.complementaryStrengths.length * IMPACT.STRENGTH_PER_ITEM +
+      compatibility.suggestedActions.length     * IMPACT.ACTION_PER_ITEM +
+      (b1 && b1 === b2 ? IMPACT.SAME_BILL_BONUS : 0);
 
     return Math.round(Math.min(impact, 100));
   }
 
   /**
-   * Finds overlapping objectives between campaigns
+   * Keyword-based objective overlap detection.
+   * Replace with an NLP similarity call once that service is available.
    */
   private findObjectiveOverlap(objectives1: string[], objectives2: string[]): string[] {
-    const overlap: string[] = [];
-    
+    const overlap = new Set<string>();
+    const tokenize = (s: string) => s.toLowerCase().split(' ').filter(w => w.length > 3);
+
     for (const obj1 of objectives1) {
+      const words1 = new Set(tokenize(obj1));
       for (const obj2 of objectives2) {
-        // Simple keyword matching - in production, this would use NLP
-        const words1 = obj1.toLowerCase().split(' ');
-        const words2 = obj2.toLowerCase().split(' ');
-        
-        const commonWords = words1.filter(word => 
-          words2.includes(word) && word.length > 3 // Ignore short words
-        );
-        
-        if (commonWords.length >= 2) {
-          overlap.push(`Shared focus on ${commonWords.join(', ')}`);
+        const common = tokenize(obj2).filter(w => words1.has(w));
+        if (common.length >= 2) {
+          overlap.add(`Shared focus on ${common.join(', ')}`);
         }
       }
     }
-    
-    return [...new Set(overlap)]; // Remove duplicates
+
+    return [...overlap];
+  }
+
+  private async generateCoordinatedActions(
+    initiator: Campaign,
+    targets:   Campaign[],
+  ): Promise<string[]> {
+    const ic = initiator as EnrichedCampaign;
+    const tc = targets   as EnrichedCampaign[];
+
+    const actions: string[] = [
+      'Develop unified messaging framework',
+      'Coordinate social media campaigns',
+      'Plan joint advocacy events',
+    ];
+
+    if (tc.some(c => c.billId && c.billId === ic.billId)) {
+      actions.push(
+        'Prepare joint committee testimony',
+        'Coordinate legislative meetings',
+        'Develop shared position paper',
+      );
+    }
+
+    const allCounties = new Set([
+      ...(ic.targetCounties ?? []),
+      ...tc.flatMap(c => c.targetCounties ?? []),
+    ]);
+
+    if (allCounties.size > 1) {
+      actions.push('Coordinate multi-county outreach', 'Plan regional advocacy tour');
+    }
+
+    return actions;
+  }
+
+  /** Returns items present in both arrays (order-preserving, deduped). */
+  private intersection<T>(a: T[], b: T[]): T[] {
+    const setB = new Set(b);
+    return [...new Set(a.filter(v => setB.has(v)))];
   }
 
   /**
-   * Generates coordinated actions for coalition
+   * Wraps an async operation in uniform error handling.
+   * Logs at `error` level and re-throws so callers receive the original error.
    */
-  private async generateCoordinatedActions(initiatingCampaign: unknown, targetCampaigns: unknown[]): Promise<string[]> {
-    const actions: string[] = [];
-    
-    // Standard coalition actions
-    actions.push('Develop unified messaging framework');
-    actions.push('Coordinate social media campaigns');
-    actions.push('Plan joint advocacy events');
-    
-    // Bill-specific actions
-    if (targetCampaigns.some(c => c.bill_id === initiatingCampaign.bill_id)) {
-      actions.push('Prepare joint committee testimony');
-      actions.push('Coordinate legislative meetings');
-      actions.push('Develop shared position paper');
+  private async withErrorHandling<T>(
+    operation: string,
+    context:   Record<string, unknown>,
+    fn:        () => Promise<T>,
+  ): Promise<T> {
+    try {
+      return await fn();
+    } catch (error) {
+      logger.error({
+        error: error instanceof Error ? error.message : String(error),
+        component: 'CoalitionBuilder',
+        ...context,
+      }, `Failed to ${operation}`);
+      throw error;
     }
-    
-    // Geographic coordination
-    const allCounties = [
-      ...initiatingCampaign.targetCounties,
-      ...targetCampaigns.flatMap((c: unknown) => c.targetCounties)
-    ];
-    const uniqueCounties = [...new Set(allCounties)];
-    
-    if (uniqueCounties.length > 1) {
-      actions.push('Coordinate multi-county outreach');
-      actions.push('Plan regional advocacy tour');
-    }
-    
-    return actions;
   }
 }
-
-

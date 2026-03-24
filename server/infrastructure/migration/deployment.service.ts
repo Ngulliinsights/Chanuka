@@ -504,7 +504,7 @@ export class DeploymentService {
       totalResponseTime += status.metrics.responseTime;
 
       totalValidations += status.validationResults.length;
-      passedValidations += status.validationResults.filter(r => r.passed).length;
+      passedValidations += status.validationResults.filter(r => (r as any).passed).length;
     }
 
     const componentCount = this.deploymentStatus.size;

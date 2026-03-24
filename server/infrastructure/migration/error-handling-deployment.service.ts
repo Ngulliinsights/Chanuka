@@ -527,7 +527,7 @@ export class ErrorHandlingDeploymentService {
     switch (errorType) {
       case 'validation':
         const validationResult = errorAdapter.createValidationError(
-          [{ field: testData.field, message: testData.message }],
+          [{ field: (testData as any).field, message: (testData as Error).message }],
           context
         );
         if (validationResult.isErr()) {
@@ -537,7 +537,7 @@ export class ErrorHandlingDeploymentService {
       
       case 'authentication':
         const authResult = errorAdapter.createAuthenticationError(
-          testData.reason,
+          (testData as any).reason,
           context
         );
         if (authResult.isErr()) {
@@ -547,8 +547,8 @@ export class ErrorHandlingDeploymentService {
       
       case 'not_found':
         const notFoundResult = errorAdapter.createNotFoundError(
-          testData.resource,
-          testData.id,
+          (testData as any).resource,
+          (testData as any).id,
           context
         );
         if (notFoundResult.isErr()) {

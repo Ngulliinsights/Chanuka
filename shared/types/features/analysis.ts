@@ -177,3 +177,76 @@ export interface AnalysisHistoryEntry {
   confidence: number;
   summary?: string;
 }
+
+/**
+ * Alias for backward compatibility with ComprehensiveAnalysisResult
+ */
+export type ComprehensiveAnalysisResult = ComprehensiveBillAnalysis;
+
+// ============================================================================
+// Analytics and Engagement Types (stub definitions)
+// ============================================================================
+
+/**
+ * Comment engagement trends - tracks engagement metrics over time
+ */
+export interface CommentEngagementTrends {
+  timeperiod: string;
+  engagementScore: number;
+  commentCount: number;
+  averageSentiment?: number;
+}
+
+/**
+ * Engagement leaderboard - ranks entities by engagement
+ */
+export interface EngagementLeaderboard {
+  rank: number;
+  entity_id: string;
+  entity_type: 'bill' | 'comment' | 'user' | 'sponsor';
+  engagementScore: number;
+  changeInRank?: number;
+}
+
+/**
+ * General analysis result type - flexible structure for various analysis types
+ */
+export interface AnalysisResult {
+  id?: string;
+  type?: string;
+  data?: Record<string, unknown>;
+  confidence: number;
+  result?: Record<string, unknown>;
+  analysis_type?: string;
+  metadata?: Record<string, unknown>;
+  timestamp?: Date;
+}
+
+/**
+ * ML-based implementation workaround detection
+ */
+export interface ImplementationWorkaroundDetection {
+  workaroundId?: string;
+  workaroundDetected?: boolean;
+  riskLevel?: 'low' | 'medium' | 'high' | 'critical';
+  affectedSections?: string[];
+  explanation?: string;
+  mitigation?: string;
+  description?: string;
+  concernLevel?: 'low' | 'medium' | 'high' | 'critical';
+  [key: string]: unknown; // Allow additional properties
+}
+
+/**
+ * Similarity analysis results
+ */
+export interface SimilarityAnalysis {
+  billId: string;
+  comparisonBillId: string;
+  similarityScore: number;
+  matchedSections: Array<{
+    sectionA: string;
+    sectionB: string;
+    similarity: number;
+  }>;
+}

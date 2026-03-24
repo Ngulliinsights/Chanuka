@@ -42,21 +42,11 @@ class AdminError extends Error {
 
 // --- Constants and Types ---
 
-const USER_ROLES = ['citizen', 'expert', 'admin', 'journalist', 'advocate'] as const;
-type UserRole = (typeof USER_ROLES)[number];
+import { AuthenticatedRequest, UserRole } from "@shared/core/types/auth.types";
 
 // Database type for transactions
 type DatabaseTransaction = PostgresJsDatabase<typeof schema>;
 
-// Extend Express Request type to include authenticated user information
-interface AuthenticatedRequest extends Request {
-  user?: {
-    id: string;
-    role: UserRole;
-    email: string;
-    name: string;
-  };
-}
 
 // Query executor types (optional module)
 interface SlowQuery {
@@ -90,8 +80,8 @@ export const router: Router = Router();
  * Errors are automatically caught and passed to the unified error middleware
  */
 function asyncHandler(fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
   };
 }
 

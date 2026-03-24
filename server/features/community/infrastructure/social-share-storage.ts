@@ -30,7 +30,7 @@ export class SocialShareStorage extends BaseStorage<SocialShare> {
   }
 
   async trackSocialShare(share: InsertSocialShare): Promise<SocialShare> {
-    return this.withTransaction(async (tx) => {
+    return this.withTransaction(async (tx: any) => {
       const result = await tx.insert(social_shares).values({
         ...share,
         shareDate: share.shareDate || new Date(),

@@ -280,7 +280,7 @@ export class RecommendationEngine {
 
     // Direct tag matches
     const tagMatches = user_interests.filter(interest =>
-      bill_tags.some(tag => tag.toLowerCase().includes(interest.toLowerCase()))
+      bill_tags.some((tag: any) => tag.toLowerCase().includes(interest.toLowerCase()))
     ).length;
     score += tagMatches * 0.5;
 
@@ -318,7 +318,7 @@ export class RecommendationEngine {
     const tags1 = bill1.tags || [];
     const tags2 = bill2.tags || [];
     if (tags1.length > 0 && tags2.length > 0) {
-      const overlap = tags1.filter(tag => tags2.includes(tag)).length;
+      const overlap = tags1.filter((tag: any) => tags2.includes(tag as any)).length;
       const maxTags = Math.max(tags1.length, tags2.length);
       similarity += (overlap / maxTags) * 0.5;
       if (overlap > 0) reasons.push('Similar tags');
@@ -345,7 +345,7 @@ export class RecommendationEngine {
     // Tag overlap
     const tags1 = bill1.tags || [];
     const tags2 = bill2.tags || [];
-    const tagOverlap = tags1.filter(tag => tags2.includes(tag)).length;
+    const tagOverlap = tags1.filter((tag: any) => tags2.includes(tag as any)).length;
     if (tagOverlap > 0) {
       reasons.push(`${tagOverlap} shared tag(s)`);
     }

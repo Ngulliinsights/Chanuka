@@ -421,10 +421,10 @@ export class NotificationSchedulerService {
     const allUsers = await readDatabase.select({ id: users.id, preferences: users.preferences }).from(user);
     
     return allUsers
-      .map(userData => ({ user_id: userData.id,
+      .map((userData: any) => ({ user_id: userData.id,
         preferences: userData.preferences || { }
       }))
-      .filter(userData => {
+      .filter((userData: any) => {
         const prefs = userData.preferences as unknown;
         return prefs?.billTracking?.advancedSettings?.digestSchedule?.enabled === true;
       });

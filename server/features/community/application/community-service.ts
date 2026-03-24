@@ -282,7 +282,7 @@ export class CommunityService {
         .offset(offset);
 
       // 5. Sanitize outputs (XSS prevention)
-      const comments = results.map(row => 
+      const comments = results.map((row: any) => 
         Comment.create({
           id: row.id,
           billId: row.bill_id,

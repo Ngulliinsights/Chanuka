@@ -101,6 +101,8 @@ export {
   // Migration helpers (Boom Result ↔ Service Result)
   toBoomResult,
   toServiceResult,
+  // Compatibility alias
+  withResultHandling,
 } from './result-types';
 
 // ─────────────────────────────────────────────────────────────────────────────

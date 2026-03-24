@@ -75,14 +75,14 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
         operation: 'search',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -176,14 +176,14 @@ router.post('/admin/rebuild-index', authenticateToken, requireRole(['admin']), a
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
         operation: 'rebuildIndex',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -225,14 +225,14 @@ router.get('/stream', asyncHandler(async (req: Request, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
         operation: 'streamSearch',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -346,14 +346,14 @@ router.get('/postgresql', asyncHandler(async (req: Request, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
         operation: 'postgresqlSearch',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }
@@ -656,14 +656,14 @@ router.post('/export', asyncHandler(async (req: Request, res: Response) => {
     throw boomFromStandardized({
       category: 'VALIDATION',
       code: 'VALIDATION_FAILED',
-      message: error.message,
-      userMessage: error.message,
+      message: error!.message,
+      userMessage: error!.message,
       severity: 'LOW',
       isRetryable: false,
       context: {
         service: 'SearchController',
         operation: 'exportSearch',
-        field: error.path.join('.'),
+        field: error!.path.join('.'),
       },
     });
   }

@@ -17,7 +17,7 @@ export {
 export type { BillServices } from './bill.factory';
 
 // Legacy Services (for backward compatibility)
-export { BillService, billService } from './application/bill-service';
+export { cachedBillService } from './application/bill-service';
 export { BillServiceAdapter } from './application/bill-service-adapter';
 
 // Integration Components (NEW - Cross-Feature Integration)

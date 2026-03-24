@@ -243,7 +243,7 @@ export class CoalitionFinderService {
 
     // Group argList by stakeholder
     argList.forEach(arg => {
-      arg.affectedGroups?.forEach((group: string) => {
+      (arg as any).affectedGroups?.forEach((group: string) => {
         if (!stakeholderMap.has(group)) {
           stakeholderMap.set(group, []);
         }
@@ -334,7 +334,7 @@ export class CoalitionFinderService {
   }
 
   private determineGroupPosition(argList: unknown[]): 'support' | 'oppose' | 'neutral' | 'conditional' {
-    const positions = argList.map(arg => arg.position || 'neutral');
+    const positions = argList.map(arg => (arg as any).position || 'neutral');
     const supportCount = positions.filter(p => p === 'support').length;
     const opposeCount = positions.filter(p => p === 'oppose').length;
     const conditionalCount = positions.filter(p => p === 'conditional').length;
@@ -348,10 +348,10 @@ export class CoalitionFinderService {
 
   private extractKeyArguments(argList: unknown[]): string[] {
     return argList
-      .filter(arg => arg.type === 'claim' && arg.confidence > 0.7)
-      .sort((a, b) => b.confidence - a.confidence)
+      .filter(arg => (arg as any).type === 'claim' && (arg as any).confidence > 0.7)
+      .sort((a, b) => (b as any).confidence - (a as any).confidence)
       .slice(0, 3)
-      .map(arg => arg.normalizedText);
+      .map(arg => (arg as any).normalizedText);
   }
 
   private buildDemographics(argList: unknown[]): StakeholderProfile['demographics'] {
@@ -361,7 +361,7 @@ export class CoalitionFinderService {
 
     argList.forEach(arg => {
       if (arg.userDemographics) {
-        const demo = arg.userDemographics;
+        const demo = (arg as any).userDemographics;
         
         if (demo.county) {
           geographicDistribution.set(demo.county, 
@@ -388,7 +388,7 @@ export class CoalitionFinderService {
   }
 
   private calculateParticipationLevel(argList: unknown[]): number {
-    const uniqueUsers = new Set(argList.map(arg => arg.user_id)).size;
+    const uniqueUsers = new Set(argList.map(arg => (arg as any).user_id)).size;
     const totalArguments = argList.length;
     
     // Normalize participation level (0-100)
@@ -400,7 +400,7 @@ export class CoalitionFinderService {
 
     // Boost for organized groups
     const organizationalAffiliations = argList
-      .map(arg => arg.userDemographics?.organizationAffiliation)
+      .map(arg => (arg as any).userDemographics?.organizationAffiliation)
       .filter(Boolean);
     
     if (organizationalAffiliations.length > 0) {
@@ -408,7 +408,7 @@ export class CoalitionFinderService {
     }
 
     // Boost for evidence-backed argList
-    const evidenceCount = argList.filter(arg => arg.evidenceQuality !== 'none').length;
+    const evidenceCount = argList.filter(arg => (arg as any).evidenceQuality !== 'none').length;
     score += Math.min(20, evidenceCount * 2);
 
     // Boost for high-confidence argList
@@ -426,9 +426,9 @@ export class CoalitionFinderService {
         const profile1 = profiles[i];
         const profile2 = profiles[j];
         
-        const shared = this.findSharedConcerns(profile1.primaryConcerns, profile2.primaryConcerns);
+        const shared = this.findSharedConcerns(profile1!.primaryConcerns, profile2!.primaryConcerns);
         if (shared.length > 0) {
-          const key = `${profile1.group}|${profile2.group}`;
+          const key = `${profile1!.group}|${profile2!.group}`;
           sharedConcerns.set(key, shared);
         }
       }
@@ -603,10 +603,10 @@ export class CoalitionFinderService {
         const profile2 = profiles[j];
 
         // Different positions but potential for tactical alliance
-        if (profile1.position !== profile2.position) {
+        if (profile1!.position !== profile2!.position) {
           const sharedConcerns = this.findSharedConcerns(
-            profile1.primaryConcerns,
-            profile2.primaryConcerns
+            profile1!.primaryConcerns,
+            profile2!.primaryConcerns
           );
 
           if (sharedConcerns.length > 0) {

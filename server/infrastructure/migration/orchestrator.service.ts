@@ -409,7 +409,7 @@ export class MigrationOrchestrator {
     try {
       await rollbackService.triggerAutomaticRollback(
         componentName, 
-        `Automatic rollback triggered by alert: ${alert.metric} = ${alert.currentValue}`
+        `Automatic rollback triggered by alert: ${(alert as any).metric} = ${(alert as any).currentValue}`
       );
       
       this.migrationStatus!.rollbacksTriggered++;

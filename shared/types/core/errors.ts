@@ -186,3 +186,8 @@ export class AppError extends Error {
     };
   }
 }
+
+/**
+ * BaseError - Alias for AppError (backward compatibility)
+ */
+export class BaseError extends AppError {}

@@ -1,5 +1,5 @@
 import { User } from '@server/features/users/domain/entities/user';
-import { BaseError  } from '@shared/core';
+import { BaseError } from '@shared/types/core/errors';
 
 /**
  * Custom error classes for bill domain operations

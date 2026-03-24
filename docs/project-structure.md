@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 21, 2026 at 10:30 AM
+**Generated:** March 23, 2026 at 11:51 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,594
+**Total Items:** 4,632
 
 ```
 .
@@ -2104,6 +2104,7 @@
 │   │   ├── ADR-026-natural-branching-architecture.md
 │   │   ├── ADR-027-bills-feature-server-implementation.md
 │   │   ├── ADR-028-analysis-feature-client-implementation.md
+│   │   ├── ADR-029-presentation-layer-http-organization.md
 │   │   └── README.md
 │   ├── architecture/
 │   │   ├── ai-code-review/
@@ -2349,6 +2350,7 @@
 │   │   │   │   │   ├── chanuka_final_poems_original_v1.0.md
 │   │   │   │   │   ├── chanuka_funder_table_original_v1.0.md
 │   │   │   │   │   ├── data_strategy_original_v1.0.md
+│   │   │   │   │   ├── strategic_additions_poems_original_v1.0.md
 │   │   │   │   │   └── strategic_funding_plan_original_v1.0.md
 │   │   │   │   └── brand-roadmap_original_v1.0.md
 │   │   │   ├── application_docs/
@@ -2387,6 +2389,8 @@
 │   │   │   │   ├── chanuka_serpent_dove.md
 │   │   │   │   ├── chanuka_timeline_gantt.md
 │   │   │   │   ├── chanuka_webapp_copy.md
+│   │   │   │   ├── chanuka-manifesto.docx
+│   │   │   │   ├── chanuka-strategic-synthesis.docx
 │   │   │   │   ├── civic_engagement_framework.md
 │   │   │   │   ├── Constitutional Normalization in Kenya_ The CDF Paradigm and the Erosion of Democratic Memory.md
 │   │   │   │   ├── constitutional_analysis_framework.md
@@ -2705,6 +2709,7 @@
 │   ├── add-js-extensions.ts
 │   ├── analyze-bundle.cjs
 │   ├── analyze-dependencies.ts
+│   ├── analyze-errors.js
 │   ├── analyze-infrastructure.ts
 │   ├── apply-schema-direct.ts
 │   ├── audit-quality.test.ts
@@ -2833,14 +2838,19 @@
 │   │   │   │   │   └── advocacy-errors.ts
 │   │   │   │   ├── events/
 │   │   │   │   │   └── advocacy-events.ts
-│   │   │   │   └── services/
-│   │   │   │       └── campaign-domain-service.ts
+│   │   │   │   ├── repositories/
+│   │   │   │   │   └── campaign-repository.ts
+│   │   │   │   ├── services/
+│   │   │   │   │   └── campaign-domain-service.ts
+│   │   │   │   └── types.ts
 │   │   │   ├── infrastructure/
+│   │   │   │   ├── repositories/
 │   │   │   │   └── services/
 │   │   │   │       ├── notification-service.ts
 │   │   │   │       └── representative-contact-service.ts
 │   │   │   ├── presentation/
-│   │   │   │   └── advocacy-router.ts
+│   │   │   │   └── http/
+│   │   │   │       └── advocacy-router.ts
 │   │   │   ├── types/
 │   │   │   │   └── index.ts
 │   │   │   ├── advocacy-factory.ts
@@ -3641,7 +3651,6 @@
 │   │   │   │   └── strategies.ts
 │   │   │   ├── adapters-factory-integration.test.ts
 │   │   │   ├── advanced-caching.service.ts
-│   │   │   ├── ai-cache.ts
 │   │   │   ├── CACHE_PATTERNS.md
 │   │   │   ├── cache-core.test.ts
 │   │   │   ├── cache-factory.ts
@@ -4025,22 +4034,31 @@
 │   ├── routes/
 │   ├── scripts/
 │   │   ├── seeds/
+│   │   ├── analyze-errors.js
 │   │   ├── analyze-module-errors.ts
 │   │   ├── api-race-condition-detector.ts
+│   │   ├── bulk-fix-types-r2.js
+│   │   ├── bulk-fix-types.js
 │   │   ├── deploy-repository-migration.ts
 │   │   ├── deploy-websocket-migration.ts
 │   │   ├── error-analysis.ts
 │   │   ├── execute-websocket-migration.ts
 │   │   ├── final-migration-validation.ts
+│   │   ├── fix-braces.js
 │   │   ├── fix-constants-imports.ts
 │   │   ├── fix-db-imports.ts
 │   │   ├── fix-invalid-imports.ts
 │   │   ├── fix-logger-calls.ts
+│   │   ├── fix-logger-structure.js
+│   │   ├── fix-logger.js
 │   │   ├── fix-module-resolution.ts
 │   │   ├── fix-mvp-core-features.ts
 │   │   ├── fix-return-statements.js
 │   │   ├── fix-shared-core-imports.ts
 │   │   ├── fix-shared-imports.js
+│   │   ├── fix-ts1005-global.js
+│   │   ├── fix-ts1005-v3.js
+│   │   ├── fix-ts1005.js
 │   │   ├── migrate-database-access.ts
 │   │   ├── migration-runner.ts
 │   │   ├── quick-fix-common-errors.ts
@@ -4081,6 +4099,7 @@
 │   │   ├── service/
 │   │   │   └── index.ts
 │   │   ├── common.ts
+│   │   ├── express.d.ts
 │   │   ├── index.ts
 │   │   ├── jest-extensions.d.ts
 │   │   └── shared-schema-short.d.ts
@@ -4539,6 +4558,7 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
+├── analyze-ts-errors.js
 ├── API_ARCHITECTURE_ANALYSIS.md
 ├── API_CONTRACT_AUDIT.md
 ├── API_MIGRATION_GUIDE.md
@@ -4549,8 +4569,10 @@
 ├── build_verbose.txt
 ├── build.full.log
 ├── CHANGELOG.md
+├── CODEBASE_IMPORT_AUDIT.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
+├── current_build.log
 ├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
 ├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
@@ -4561,6 +4583,11 @@
 ├── DOCUMENTATION_REMEDIATION_VISUAL_SUMMARY.md
 ├── drizzle.config.ts
 ├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_ANALYSIS.md
+├── error_fix.plan
+├── ERROR_FIXING_COMPLETE_SUMMARY.md
+├── ERROR_FIXING_FINAL_STATUS.md
+├── ERROR_FIXING_IMPLEMENTATION_REPORT.md
+├── errors_check.txt
 ├── errors_full.txt
 ├── errors_unique.txt
 ├── errors.txt
@@ -4568,8 +4595,11 @@
 ├── final_build_test.log
 ├── final_build.log
 ├── fix_orphaned_exports.py
+├── fix-syntax.cjs
+├── fix-syntax2.cjs
 ├── fix.cjs
 ├── generate-structure.mjs
+├── git-diff.txt
 ├── implementation_plan.md
 ├── knip.config.ts
 ├── nginx.conf
@@ -4584,20 +4614,28 @@
 ├── REFACTORING_COMPLETION_STATUS.md
 ├── RESTORATION_STRATEGY.md
 ├── router_files.txt
+├── SERVER_ERROR_FIX_PLAN_COMPLETE.md
+├── server_errors.log
+├── server_type_check.txt
 ├── SERVER_TYPE_MIGRATION_MAP.md
 ├── shared_build.log
 ├── start-dev.js
 ├── start-error.log
+├── SUSTAINABLE_SOLUTIONS_COMPLETE.md
 ├── tailwind.config.js
 ├── TASK_4_ENDPOINT_AUDIT.md
 ├── TASK_4_STRATEGIC_RECOMMENDATIONS.md
+├── TEMPORARY_SOLUTIONS_ACTION_PLAN.md
+├── TEMPORARY_SOLUTIONS_AUDIT.md
+├── TEMPORARY_SOLUTIONS_DEPENDENCY_MAP.md
 ├── tsc_errors.txt
 ├── tsc_errors2.txt
-├── tsc_output.txt
+├── tsc_full_output.txt
 ├── tsc-errors.txt
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json
+├── unique_errors.txt
 ├── vitest.setup.ts
 └── vitest.workspace.ts
 ```

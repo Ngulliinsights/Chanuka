@@ -136,10 +136,10 @@ export class UserDomainService {
       }, 'user_registration');
 
       // Unwrap the DatabaseResult to get the actual UserAggregate
-      if (!txResult.data) {
+      if (!(txResult as any).data) {
         throw new Error('Transaction failed to return data');
       }
-      return txResult.data;
+      return (txResult as any).data;
     }, { service: 'UserDomainService', operation: 'registerUser' });
   }
 
@@ -229,10 +229,10 @@ export class UserDomainService {
       }, 'profile_update');
 
       // Unwrap the DatabaseResult
-      if (!txResult.data) {
+      if (!(txResult as any).data) {
         throw new Error('Transaction failed to return data');
       }
-      return txResult.data;
+      return (txResult as any).data;
     }, { service: 'UserDomainService', operation: 'updateUserProfile' });
   }
 
@@ -288,10 +288,10 @@ export class UserDomainService {
       }, 'interests_update');
 
       // Unwrap the DatabaseResult
-      if (!txResult.data) {
+      if (!(txResult as any).data) {
         throw new Error('Transaction failed to return data');
       }
-      return txResult.data;
+      return (txResult as any).data;
     }, { service: 'UserDomainService', operation: 'updateUserInterests' });
   }
 
@@ -349,10 +349,10 @@ export class UserDomainService {
       }, 'verification_submission');
 
       // Unwrap the DatabaseResult
-      if (!txResult.data) {
+      if (!(txResult as any).data) {
         throw new Error('Transaction failed to return data');
       }
-      return txResult.data;
+      return (txResult as any).data;
     }, { service: 'UserDomainService', operation: 'submitVerification' });
   }
 

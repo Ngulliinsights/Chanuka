@@ -46,13 +46,13 @@ export function boomErrorMiddleware(
     } else if (error.name === 'ValidationError') {
       // Handle other validation errors
       boomError = Boom.badRequest(error.message || 'Validation failed');
-    } else if (error.code === 'UNAUTHORIZED' || error.status === 401) {
+    } else if (error.code === 'UNAUTHORIZED' || (error as any).status === 401) {
       // Authentication errors
       boomError = Boom.unauthorized(error.message || 'Authentication required');
-    } else if (error.code === 'FORBIDDEN' || error.status === 403) {
+    } else if (error.code === 'FORBIDDEN' || (error as any).status === 403) {
       // Authorization errors
       boomError = Boom.forbidden(error.message || 'Access denied');
-    } else if (error.code === 'NOT_FOUND' || error.status === 404) {
+    } else if (error.code === 'NOT_FOUND' || (error as any).status === 404) {
       // Not found errors
       boomError = Boom.notFound(error.message || 'Resource not found');
     } else if (error.type === 'entity.parse.failed') {
@@ -61,13 +61,13 @@ export function boomErrorMiddleware(
     } else if (error.type === 'entity.too.large') {
       // Request size errors
       boomError = Boom.entityTooLarge('Request entity too large');
-    } else if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
+    } else if (error.code === 'ETIMEDOUT' || (error as Error).message?.includes('timeout')) {
       // Timeout errors
       boomError = Boom.clientTimeout('Request timeout');
     } else {
       // Generic server errors
-      const statusCode = error.status || error.statusCode || 500;
-      const message = error.message || 'Internal server error';
+      const statusCode = (error as any).status || (error as any).statusCode || 500;
+      const message = (error as Error).message || 'Internal server error';
 
       if (statusCode >= 500) {
         boomError = Boom.internal(message);

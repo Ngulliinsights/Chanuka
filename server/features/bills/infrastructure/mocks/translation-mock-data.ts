@@ -53,7 +53,7 @@ export function getMockTranslation(billId: string, clauseRef?: string): ClauseTr
   const translations = mockTranslations[billId] || mockTranslations['default'];
   
   if (clauseRef) {
-    const found = translations.find(t => t.clauseRef === clauseRef);
+    const found = translations!.find(t => t.clauseRef === clauseRef);
     return found ? [found] : [];
   }
   
@@ -62,5 +62,5 @@ export function getMockTranslation(billId: string, clauseRef?: string): ClauseTr
 
 export function getMockClauses(billId: string): string[] {
   const translations = mockTranslations[billId] || mockTranslations['default'];
-  return translations.map(t => t.clauseRef);
+  return translations!.map(t => t.clauseRef);
 }

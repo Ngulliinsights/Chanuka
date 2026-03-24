@@ -12,6 +12,15 @@
 // ============================================================================
 export * from './foundation';
 export type * from './foundation';
+
+// Explicitly re-export tables that are dropped by export * collisions
+// Explicitly re-export tables that are dropped by export * collisions
+export { 
+  user_sessions, 
+  oauth_providers, 
+  oauth_tokens
+} from './foundation';
+
 // Explicit type exports for repository interfaces (re-exports for clarity)
 export type { Bill, NewBill } from './foundation';
 export type { User, NewUser, UserProfile, NewUserProfile } from './foundation';
@@ -26,11 +35,10 @@ export * from './gazette';
 
 // Citizen Participation (includes notifications)
 export * from './citizen_participation';
-export type { notifications } from './citizen_participation';
 
 // Integrity Operations (content moderation)
 export * from './integrity_operations';
-export type { content_reports, moderation_queue } from './integrity_operations';
+export { content_reports, moderation_queue, moderation_action } from './integrity_operations';
 
 // Constitutional Intelligence
 export * from './constitutional_intelligence';
@@ -57,7 +65,7 @@ export * from './political_economy';
 export * from './impact_measurement';
 
 // Safeguards (may have duplicate exports)
-// export * from './safeguards';
+export * from './safeguards';
 
 // Advanced Discovery
 export * from './advanced_discovery';

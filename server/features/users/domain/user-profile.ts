@@ -76,8 +76,8 @@ export class UserProfileService {
     if (validated.organization) validated.organization = validated.organization.trim();
     if (validated.expertise) {
       validated.expertise = validated.expertise
-        .map((e) => e.trim())
-        .filter((e) => e.length > 0);
+        .map((e: any) => e.trim())
+        .filter((e: any) => e.length > 0);
     }
     return validated;
   }
@@ -97,8 +97,8 @@ export class UserProfileService {
   private validateAndSanitizeInterests(interests: string[]): string[] {
     return user_interestsSchema
       .parse(interests)
-      .map((i) => i.trim())
-      .filter((i) => i.length > 0);
+      .map((i: any) => i.trim())
+      .filter((i: any) => i.length > 0);
   }
 
   private validateAndSanitizePreferences(
@@ -107,8 +107,8 @@ export class UserProfileService {
     const validated = userPreferencesSchema.partial().parse(preferences);
     if (validated.billCategories) {
       validated.billCategories = validated.billCategories
-        .map((c) => c.trim())
-        .filter((c) => c.length > 0);
+        .map((c: any) => c.trim())
+        .filter((c: any) => c.length > 0);
     }
     return validated;
   }
@@ -177,7 +177,7 @@ export class UserProfileService {
         logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserProfile',
-          context: { user_id, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user profile');
+          context: { user_id, error } }, 'Failed to get user profile');
         logger.warn({ component: 'server' }, `Using fallback data for user profile: ${user_id}`);
         return {
           id: user_id,
@@ -248,7 +248,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserProfile',
-        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user profile');
+        context: { user_id: sanitizedUserId, error } }, 'Failed to update user profile');
       logger.warn({ component: 'server' }, `Using fallback data for user profile update: ${sanitizedUserId}`);
 
       const cached = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
@@ -284,7 +284,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserInterests',
-        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user interests');
+        context: { user_id: sanitizedUserId, error } }, 'Failed to update user interests');
       logger.warn({ component: 'server' }, `Cannot update user interests: database unavailable for user ${sanitizedUserId}`);
       return { success: false };
     }
@@ -316,7 +316,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserBasicInfo',
-        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user basic info');
+        context: { user_id: sanitizedUserId, error } }, 'Failed to update user basic info');
       logger.warn({ component: 'server' }, `Using fallback data for user basic info update: ${sanitizedUserId}`);
 
       const cachedProfile = await cacheService.get(cacheKeys.USER_PROFILE(sanitizedUserId));
@@ -410,7 +410,7 @@ export class UserProfileService {
         logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserPreferences',
-          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user preferences');
+          context: { user_id: sanitizedUserId, error } }, 'Failed to get user preferences');
         logger.warn({ component: 'server' }, `Using fallback preferences for user: ${sanitizedUserId}`);
         return { ...DEFAULT_PREFERENCES };
       }
@@ -445,7 +445,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserPreferences',
-        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user preferences');
+        context: { user_id: sanitizedUserId, error } }, 'Failed to update user preferences');
       logger.warn(
         `Cannot update user preferences: database unavailable for user ${sanitizedUserId}`,
       );
@@ -496,7 +496,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserVerificationStatus',
-        context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user verification status');
+        context: { user_id: sanitizedUserId, error } }, 'Failed to update user verification status');
       logger.warn(
         `Cannot update user verification status: database unavailable for user ${sanitizedUserId}`,
       );
@@ -543,7 +543,7 @@ export class UserProfileService {
         logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserVerificationStatus',
-          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user verification status');
+          context: { user_id: sanitizedUserId, error } }, 'Failed to get user verification status');
         logger.warn({ component: 'server' }, `Using fallback verification status for user: ${sanitizedUserId}`);
         return { verification_status: 'pending', verificationDocuments: null, canSubmitDocuments: true };
       }
@@ -656,7 +656,7 @@ export class UserProfileService {
         logger.error({ error,
           component: 'UserProfileService',
           operation: 'getUserEngagementHistory',
-          context: { user_id: sanitizedUserId, error: } instanceof Error ? }.message : String(}) }, 'Failed to get user engagement history');
+          context: { user_id: sanitizedUserId, error } }, 'Failed to get user engagement history');
         logger.warn({ component: 'server' }, `Using fallback engagement history for user: ${sanitizedUserId}`);
         return {
           totalBillsTracked: 0,
@@ -756,7 +756,7 @@ export class UserProfileService {
       logger.error({ error,
         component: 'UserProfileService',
         operation: 'updateUserEngagement',
-        context: { user_id: sanitizedUserId, bill_id: sanitizedBillId, engagement_type, error: } instanceof Error ? }.message : String(}) }, 'Failed to update user engagement');
+        context: { user_id: sanitizedUserId, bill_id: sanitizedBillId, engagement_type, error } }, 'Failed to update user engagement');
       logger.warn(
         `Cannot update user engagement: database unavailable for user ${sanitizedUserId}, bill ${sanitizedBillId}`,
       );

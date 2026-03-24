@@ -16,6 +16,7 @@ export interface ResponseMetadata {
     cached?: boolean;
     cacheHit?: boolean;
   };
+  source?: string;
 }
 
 // Base API Response Structure
@@ -24,12 +25,14 @@ export interface ApiResponse<T = unknown> {
   data?: T;
   error?: ApiError;
   message?: string;
-  metadata?: ResponseMetadata;
+  metadata?: ResponseMetadata | Record<string, unknown>;
+  timestamp: string;
 }
 
 export interface ApiError {
   code: string;
   message: string;
+  statusCode?: number;
   details?: Record<string, any>;
   correlationId?: string;
   stack?: string; // Development only

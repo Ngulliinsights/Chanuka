@@ -171,12 +171,12 @@ export class MigrationInfrastructure {
     };
     
     const results = await validationService.runValidationCheckpoint(component, context);
-    const allPassed = results.every(r => r.passed);
+    const allPassed = results.every((r: any) => r.passed);
     
     console.log(`[Migration Infrastructure] Validation checkpoint ${allPassed ? 'PASSED' : 'FAILED'} for ${component}`);
     
     if (!allPassed) {
-      const criticalIssues = results.reduce((sum, r) => sum + r.criticalIssues, 0);
+      const criticalIssues = results.reduce((sum: any, r: any) => sum + r.criticalIssues, 0);
       console.error(`[Migration Infrastructure] Found ${criticalIssues} critical issues in validation`);
     }
     
@@ -248,7 +248,7 @@ export class MigrationInfrastructure {
     
     // Check for active rollbacks
     const activeRollbacks = rollbackService.getRollbackHistory(5)
-      .filter(r => r.status === 'in_progress');
+      .filter((r: any) => r.status === 'in_progress');
     
     if (activeRollbacks.length > 0) {
       issues.push(`${activeRollbacks.length} rollbacks currently in progress`);

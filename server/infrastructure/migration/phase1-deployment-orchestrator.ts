@@ -247,8 +247,8 @@ export class Phase1DeploymentOrchestrator {
     report.validationSummary = {
       overallPassed: validationCheckpoints.passed,
       totalCheckpoints: validationCheckpoints.results.length,
-      passedCheckpoints: validationCheckpoints.results.filter(r => r.passed).length,
-      failedCheckpoints: validationCheckpoints.results.filter(r => !r.passed).length,
+      passedCheckpoints: validationCheckpoints.results.filter(r => (r as any).passed).length,
+      failedCheckpoints: validationCheckpoints.results.filter(r => !(r as any).passed).length,
       details: validationCheckpoints.results
     };
 

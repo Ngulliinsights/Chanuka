@@ -446,4 +446,5 @@ class PerformanceBenchmarking {
 }
 
 // Export singleton instance
+export const performanceBenchmarking = PerformanceBenchmarking.getInstance();
 export const performanceBenchmark = new PerformanceBenchmark();
