@@ -1,4 +1,18 @@
 {
+  /**
+   * ROOT TYPESCRIPPT CONFIGURATION - Monorepo Base Config
+   *
+   * PROJECT REFERENCES & COMPOSITE STRATEGY:
+   * - Root: composite=false (coordinates workspaces, not itself a buildable project)
+   * - Server (server/tsconfig.json): composite=true (builds independently, generates .tsbuildinfo)
+   * - Client (client/tsconfig.json): composite=false (uses Vite bundler instead of tsc)
+   * - Shared (shared/tsconfig.json): composite=true (outputs declarations for client/server)
+   *
+   * This strategy allows:
+   * - Server: Fast incremental builds via tsc with project references
+   * - Client: Leverages Vite bundler for faster dev experience
+   * - Shared: Serves as typed library consumed by both
+   */
   "files": [],
   "references": [
     { "path": "./client" },

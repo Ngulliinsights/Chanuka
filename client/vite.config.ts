@@ -1,3 +1,19 @@
+/**
+ * VITE CONFIGURATION - DEVELOPMENT & MODE-AWARE SETUP
+ *
+ * This is the base configuration used for development and server-side mode handling.
+ * It provides:
+ * - Environment variable validation (VITE_SENTRY_DSN, VITE_GOOGLE_ANALYTICS_ID)
+ * - CSP (Content Security Policy) headers with nonce generation
+ * - Mode-specific behavior (development vs production)
+ *
+ * IMPORTANT: For production builds, use vite.production.config.ts instead:
+ *   npm run build:production  → uses vite.production.config.ts
+ *
+ * For development:
+ *   npm run dev  → uses this config
+ */
+
 import crypto from 'crypto'
 import path from 'path'
 import { fileURLToPath } from 'url'

@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 24, 2026 at 01:09 PM
+**Generated:** March 25, 2026 at 06:27 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,623
+**Total Items:** 4,558
 
 ```
 .
@@ -2846,9 +2846,10 @@
 │   │   │   │   │   └── campaign-domain-service.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── infrastructure/
-│   │   │   │   └── repositories/
-│   │   │   │       ├── drizzle-action-repository.ts
-│   │   │   │       └── drizzle-campaign-repository.ts
+│   │   │   │   ├── repositories/
+│   │   │   │   │   ├── drizzle-action-repository.ts
+│   │   │   │   │   └── drizzle-campaign-repository.ts
+│   │   │   │   └── services/
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
 │   │   │   │       └── advocacy-router.ts
@@ -2996,6 +2997,10 @@
 │   │   │   │   └── structure-extractor.ts
 │   │   │   ├── infrastructure/
 │   │   │   │   ├── cache/
+│   │   │   │   │   ├── comment-cache.ts
+│   │   │   │   │   ├── EVIDENCE_CACHE_REFACTORING.md
+│   │   │   │   │   ├── evidence-cache.ts
+│   │   │   │   │   ├── index.ts
 │   │   │   │   │   └── nlp-cache.ts
 │   │   │   │   └── nlp/
 │   │   │   │       ├── entity-extractor.ts
@@ -3598,13 +3603,13 @@
 │   │   └── search-suggestions.ts
 │   ├── infrastructure/
 │   │   ├── adapters/
-│   │   │   ├── mappings/
-│   │   │   │   ├── bill-mapping.ts
-│   │   │   │   ├── comment-mapping.ts
-│   │   │   │   ├── index.ts
-│   │   │   │   ├── notification-mapping.ts
-│   │   │   │   └── user-mapping.ts
-│   │   │   └── drizzle-adapter.ts
+│   │   │   └── mappings/
+│   │   │       ├── bill-mapping.ts
+│   │   │       ├── comment-mapping.ts
+│   │   │       ├── index.ts
+│   │   │       ├── notification-mapping.ts
+│   │   │       ├── types.ts
+│   │   │       └── user-mapping.ts
 │   │   ├── auth/
 │   │   │   ├── auth-service.ts
 │   │   │   ├── auth.ts
@@ -3652,7 +3657,6 @@
 │   │   │   │   ├── cache-warmer.ts
 │   │   │   │   └── strategies.ts
 │   │   │   ├── adapters-factory-integration.test.ts
-│   │   │   ├── advanced-caching.service.ts
 │   │   │   ├── CACHE_PATTERNS.md
 │   │   │   ├── cache-core.test.ts
 │   │   │   ├── cache-factory.ts
@@ -3665,7 +3669,6 @@
 │   │   │   ├── decorators.ts
 │   │   │   ├── factory.test.ts
 │   │   │   ├── factory.ts
-│   │   │   ├── icaching-service.ts
 │   │   │   ├── index.ts
 │   │   │   ├── intelligent-cache.ts
 │   │   │   ├── interfaces.ts
@@ -3674,7 +3677,6 @@
 │   │   │   ├── README.md
 │   │   │   ├── REFACTORING_PLAN.md
 │   │   │   ├── server-cache-wrapper.ts
-│   │   │   ├── simple-factory.ts
 │   │   │   ├── single-flight-cache.ts
 │   │   │   ├── test-basic.ts
 │   │   │   ├── test-comprehensive.ts
@@ -4125,10 +4127,18 @@
 │   │   ├── response-helpers.ts
 │   │   └── validation.ts
 │   ├── dev.ts
+│   ├── dump_exports.js
+│   ├── fix-analytics-2.js
+│   ├── fix-analytics.js
+│   ├── graph_errors.txt
 │   ├── index.ts
 │   ├── loader.mjs
 │   ├── package.json
 │   ├── project.json
+│   ├── resolve-paths-hook.mjs
+│   ├── resolve-paths.mjs
+│   ├── test_resolution.js
+│   ├── test_resolution.ts
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   ├── vite.ts
@@ -4234,7 +4244,6 @@
 │   │   │   │   ├── community.contracts.ts
 │   │   │   │   ├── core.contracts.ts
 │   │   │   │   ├── endpoint-registry.ts
-│   │   │   │   ├── endpoint.ts
 │   │   │   │   ├── endpoints.ts
 │   │   │   │   ├── feature-flags.contracts.ts
 │   │   │   │   ├── government-data.contracts.ts
@@ -4341,7 +4350,6 @@
 │   │   ├── validation/
 │   │   │   ├── index.ts
 │   │   │   └── schemas.ts
-│   │   ├── IMPORT_PATTERNS.md
 │   │   ├── index.ts
 │   │   ├── ml.ts
 │   │   ├── performance.ts
@@ -4398,28 +4406,13 @@
 │   │   ├── errors.ts
 │   │   ├── index.ts
 │   │   └── test-schemas.ts
-│   ├── check.txt
 │   ├── fails.json
 │   ├── index.ts
 │   ├── package.json
-│   ├── parse_vitest.cjs
 │   ├── project.json
-│   ├── results.txt
-│   ├── test.log
-│   ├── tests-full.log
-│   ├── transform-results.json
-│   ├── tsc_output.txt
 │   ├── tsconfig.json
 │   ├── vite.config.ts
-│   ├── vitest_fails.txt
-│   ├── vitest_final.txt
-│   ├── vitest_json.txt
-│   ├── vitest_latest.json
-│   ├── vitest_output.txt
-│   ├── vitest_verbose.txt
-│   ├── vitest-results.json
-│   ├── vitest.config.ts
-│   └── vitest.config.ts.timestamp-1773170209356-4515c2fab4e16.mjs
+│   └── vitest.config.ts
 ├── tests/
 │   ├── e2e/
 │   │   └── test-results/
@@ -4547,51 +4540,14 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
-├── ADVOCACY_MODERNIZATION_SUMMARY.md
-├── ADVOCACY_MODERNIZATION_VERIFICATION.md
-├── analyze-ts-errors.js
-├── API_ARCHITECTURE_ANALYSIS.md
-├── API_CONTRACT_AUDIT.md
-├── API_MIGRATION_GUIDE.md
-├── build_current.log
-├── build_err.log
-├── build_final.log
-├── build_output.txt
-├── build_verbose.txt
-├── build.full.log
 ├── CHANGELOG.md
-├── CODEBASE_IMPORT_AUDIT.md
 ├── CONTRIBUTING.md
 ├── cspell.config.yaml
-├── current_build.log
-├── CUsersACCESSG~1AppDataLocalTemptest-output.txt
-├── DOCKER_DATABASE_SETUP.md
 ├── docker-compose.neo4j.yml
 ├── docker-compose.yml
 ├── Dockerfile
 ├── Dockerfile.client
-├── DOCUMENTATION_REMEDIATION_RECOMMENDATIONS.md
-├── DOCUMENTATION_REMEDIATION_VISUAL_SUMMARY.md
-├── drizzle.config.ts
-├── ELECTORAL_ACCOUNTABILITY_INTEGRATION_ANALYSIS.md
-├── error_fix.plan
-├── ERROR_FIXING_COMPLETE_SUMMARY.md
-├── ERROR_FIXING_FINAL_STATUS.md
-├── ERROR_FIXING_IMPLEMENTATION_REPORT.md
-├── errors_check.txt
-├── errors_full.txt
-├── errors_unique.txt
-├── errors.txt
-├── feature_consolidation_analysis.md
-├── final_build_test.log
-├── final_build.log
-├── fix_orphaned_exports.py
-├── fix-syntax.cjs
-├── fix-syntax2.cjs
-├── fix.cjs
 ├── generate-structure.mjs
-├── git-diff.txt
-├── implementation_plan.md
 ├── knip.config.ts
 ├── nginx.conf
 ├── nx.json
@@ -4602,31 +4558,10 @@
 ├── postcss.config.js
 ├── QUICK_START.md
 ├── README.md
-├── REFACTORING_COMPLETION_STATUS.md
-├── RESTORATION_STRATEGY.md
-├── router_files.txt
-├── SERVER_ERROR_FIX_PLAN_COMPLETE.md
-├── server_errors.log
-├── server_type_check.txt
-├── SERVER_TYPE_MIGRATION_MAP.md
-├── shared_build.log
-├── start-dev.js
-├── start-error.log
-├── SUSTAINABLE_SOLUTIONS_COMPLETE.md
 ├── tailwind.config.js
-├── TASK_4_ENDPOINT_AUDIT.md
-├── TASK_4_STRATEGIC_RECOMMENDATIONS.md
-├── TEMPORARY_SOLUTIONS_ACTION_PLAN.md
-├── TEMPORARY_SOLUTIONS_AUDIT.md
-├── TEMPORARY_SOLUTIONS_DEPENDENCY_MAP.md
-├── tsc_errors.txt
-├── tsc_errors2.txt
-├── tsc_full_output.txt
-├── tsc-errors.txt
 ├── tsconfig.json
 ├── tsconfig.tsbuildinfo
 ├── typedoc.json
-├── unique_errors.txt
 ├── vitest.setup.ts
 └── vitest.workspace.ts
 ```

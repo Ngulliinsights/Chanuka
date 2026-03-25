@@ -11,7 +11,7 @@
     "moduleResolution": "bundler",
     "baseUrl": ".",
     "resolveJsonModule": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
 
     // Type Checking - Full strict mode enabled
     "strict": true,

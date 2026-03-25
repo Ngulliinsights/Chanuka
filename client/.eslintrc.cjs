@@ -51,8 +51,8 @@ module.exports = {
     }],
     // Allow type-only imports from server (type erasure happens at compile time)
     'no-restricted-imports': 'off',
-    // Disable import order warnings as they're non-critical and cause too many warnings
-    'import/order': 'off',
+    // Use root-defined alphabetical import sorting for consistency across all workspaces
+    'import/order': 'warn',
   },
   overrides: [
     {

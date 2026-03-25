@@ -7,7 +7,7 @@
 export * from './core.contracts';
 
 // Endpoint contract system
-export * from './endpoint';
+export * from './endpoints';
 
 // Feature-specific contracts
 export * from './government-data.contracts';

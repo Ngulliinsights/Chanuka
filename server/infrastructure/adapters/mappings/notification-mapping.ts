@@ -5,7 +5,7 @@
  * Handles notification-specific data validation and transformations.
  */
 
-import { EntityMapping } from '@server/infrastructure/adapters/drizzle-adapter';
+import { EntityMapping } from './types';
 import { notifications } from '@server/infrastructure/schema';
 
 import { Notification } from '@server/features/notifications/domain/entities/notification';

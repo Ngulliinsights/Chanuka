@@ -1,3 +1,27 @@
+/**
+ * VITE PRODUCTION CONFIGURATION - BUILD OPTIMIZATION
+ *
+ * This configuration is specifically designed for production builds.
+ * It is explicitly used via package.json scripts:
+ *   npm run build:production  → vite build --config vite.production.config.ts --mode production
+ *   npm run build:staging     → vite build --config vite.production.config.ts --mode staging
+ *   etc.
+ *
+ * This config focuses on production optimizations:
+ * - React plugin setup
+ * - HTML minification
+ * - Gzip and Brotli compression
+ * - Bundle analysis and visualization
+ * - Advanced Terser minification
+ * - Optimized chunk splitting for vendors
+ *
+ * Environment validation and CSP are handled by vite.config.ts before this runs.
+ *
+ * Why separate configs?
+ * - vite.config.ts: Dev mode + environment setup
+ * - vite.production.config.ts: Production-specific optimizations (smaller bundle, better perf)
+ */
+
 import { resolve } from 'path'
 
 import react from '@vitejs/plugin-react'

@@ -83,7 +83,7 @@ import {
   GetBillEngagementParamsSchema,
   GetBillEngagementResponseSchema,
 } from './bill.schemas';
-import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery } from './endpoint';
+import { ApiEndpoint, ApiEndpointWithParams, ApiEndpointWithQuery } from './endpoints';
 import type {
   CreateNotificationRequest,
   CreateNotificationResponse,

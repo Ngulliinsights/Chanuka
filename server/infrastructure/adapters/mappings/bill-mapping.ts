@@ -5,7 +5,7 @@
  * Handles complex bill data and validation.
  */
 
-import { EntityMapping } from '@server/infrastructure/adapters/drizzle-adapter';
+import { EntityMapping } from './types';
 import { bills } from '@server/infrastructure/schema';
 
 type BillRow = typeof bills.$inferSelect;

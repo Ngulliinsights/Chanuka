@@ -1,3 +1,21 @@
+/**
+ * ROOT ESLINT CONFIGURATION - Monorepo Linting Standards
+ *
+ * IMPORT SORTING CONVENTION (STANDARDIZED ACROSS ALL WORKSPACES):
+ * This root config defines the canonical import/order rule using alphabetical sorting.
+ * All workspaces (client, server, shared) inherit and use this rule via:
+ *   "import/order": "warn"  (enable this rule from root config)
+ *
+ * Why standardized import sorting?
+ * - Consistency: Same pattern across all codebases
+ * - Reduced merge conflicts: Predictable import organization
+ * - Improved readability: Users know where to find imports
+ * - Auto-fixable: ESLint can automatically sort imports
+ *
+ * Pattern: builtin → external → internal → parent → sibling → index (alphabetically)
+ * See workspaces ESLint configs (client/.eslintrc.cjs, server/.eslintrc.cjs, shared/.eslintrc.cjs)
+ */
+
 module.exports = {
   root: true,
   env: {

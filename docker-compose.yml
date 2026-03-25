@@ -1,5 +1,17 @@
 version: "3.8"
 
+# Docker Compose Configuration for Chanuka Platform
+# 
+# Service Naming Convention:
+# - Backend/Server: 'app' (backend API server)
+# - Frontend: 'client-dev' (development with hot reload), 'client-prod' (production static)
+# - Infrastructure: 'postgres' (database), 'redis' (cache), 'nginx' (reverse proxy)
+#
+# Usage:
+#   Development:  docker-compose up -d app postgres redis
+#   Dev Frontend: docker-compose --profile dev up -d client-dev
+#   Production:   docker-compose --profile prod up -d
+
 services:
   # Main application (backend)
   app:

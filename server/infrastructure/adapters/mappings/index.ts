@@ -11,4 +11,4 @@ export { BillEntityMapping, billEntityMapping, type BillEntity } from './bill-ma
 export { NotificationEntityMapping, notificationEntityMapping } from './notification-mapping';
 
 // Re-export the base EntityMapping interface
-export type { EntityMapping } from '../drizzle-adapter';
+export type { EntityMapping } from './types';
