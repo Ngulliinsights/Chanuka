@@ -1,82 +1,34 @@
 /**
  * Unified Cache Factory
  *
- * Comprehensive cache factory that combines the best features from all existing
- * cache implementations with adapter pattern, advanced features, and clustering support.
+ * Comprehensive cache factory combining adapter pattern, advanced features,
+ * and clustering support with event-driven architecture.
  */
 
-import { EventEmitter } from 'events';
+// cspell:ignore mdel
 
-import type {
-  CacheAdapter,
-  CacheMetrics,
-  CacheHealthStatus
-} from './core/interfaces';
-import { Result, ok, err } from '@shared/core/primitives/types/result';
-import { isDestroyable, isTagInvalidatable, isCustomHealthCheckable } from './interfaces';
+import { err, ok, Result } from '@shared/core/primitives/types/result';
+import { EventEmitter } from 'events';
 
 import { BrowserAdapter } from './adapters/browser-adapter';
 import { MemoryAdapter } from './adapters/memory-adapter';
 import { MultiTierAdapter } from './adapters/multi-tier-adapter';
-import { CacheClusterManager, ClusterNode } from './clustering/cluster-manager';
+import { CacheClusterManager, ClusterConfig, ClusterNode, type ClusterOptions } from './clustering/cluster-manager';
 import { CacheCompressor } from './compression/cache-compressor';
+import type { CacheAdapter, CacheHealthStatus, CacheMetrics } from './core/interfaces';
+import { isCustomHealthCheckable, isDestroyable, isTagInvalidatable } from './interfaces';
+import type { MetricsCollectorConfig } from './monitoring/metrics-collector';
 import { CacheMetricsCollector } from './monitoring/metrics-collector';
-import { CacheTagManager } from './tagging/tag-manager';
-import type {
-  EvictionOptions,
-  CompressionOptions,
-  SerializationOptions
-} from './types';
-
-// Import strategies
+import { CircuitBreakerStrategy } from './strategies/circuit-breaker-strategy';
 import { CompressionStrategy } from './strategies/compression-strategy';
 import { TaggingStrategy } from './strategies/tagging-strategy';
-import { CircuitBreakerStrategy } from './strategies/circuit-breaker-strategy';
-
-// Import adapters
-
-// Import utilities
+import { CacheTagManager } from './tagging/tag-manager';
+import type { CompressionOptions, EvictionOptions, SerializationOptions } from './types';
 import { CacheWarmer, WarmingStrategy } from './warming/cache-warmer';
 
-export interface UnifiedCacheConfig {
-  // Base config properties
-  provider: 'redis' | 'memory' | 'multi-tier' | 'browser';
-  defaultTtlSec: number;
-  keyPrefix?: string;
-  maxMemoryMB?: number;
-  enableMetrics?: boolean;
-  enableCompression?: boolean;
-  compressionThreshold?: number;
-
-  // Extended properties
-  // Adapter configurations
-  memoryConfig?: MemoryAdapterConfig;
-  redisConfig?: RedisAdapterConfig;
-  browserConfig?: BrowserAdapterConfig;
-  multiTierConfig?: MultiTierAdapterConfig;
-
-  // Advanced features
-  compressionOptions?: CompressionOptions;
-  serializationOptions?: SerializationOptions;
-  warmingStrategy?: WarmingStrategy;
-  evictionOptions?: EvictionOptions;
-
-  // Clustering
-  enableClustering?: boolean;
-  clusterNodes?: ClusterNode[];
-  clusterOptions?: ClusterOptions;
-
-  // Monitoring and metrics
-  enableAdvancedMetrics?: boolean;
-  metricsCollectionInterval?: number;
-  healthCheckInterval?: number;
-
-  // Circuit breaker
-  enableCircuitBreaker?: boolean;
-  circuitBreakerThreshold?: number;
-  circuitBreakerTimeout?: number;
-  circuitBreakerResetTimeout?: number;
-}
+// ---------------------------------------------------------------------------
+// Config interfaces
+// ---------------------------------------------------------------------------
 
 export interface MemoryAdapterConfig {
   maxSize?: number;
@@ -114,95 +66,272 @@ export interface MultiTierAdapterConfig {
   keyPrefix?: string;
 }
 
-export interface ClusterOptions {
-  maxRetries?: number;
-  retryDelay?: number;
-  enableReadReplicas?: boolean;
-  replicaCount?: number;
+export interface UnifiedCacheConfig {
+  provider: 'redis' | 'memory' | 'multi-tier' | 'browser';
+  defaultTtlSec: number;
+  keyPrefix?: string;
+  maxMemoryMB?: number;
+
+  memoryConfig?: MemoryAdapterConfig;
+  redisConfig?: RedisAdapterConfig;
+  browserConfig?: BrowserAdapterConfig;
+  multiTierConfig?: MultiTierAdapterConfig;
+
+  compressionOptions?: CompressionOptions;
+  serializationOptions?: SerializationOptions;
+  warmingStrategy?: WarmingStrategy;
+  evictionOptions?: EvictionOptions;
+
+  enableMetrics?: boolean;
+  enableCompression?: boolean;
+  compressionThreshold?: number;
+  enableAdvancedMetrics?: boolean;
+  metricsCollectionInterval?: number;
+  healthCheckInterval?: number;
+
+  enableClustering?: boolean;
+  clusterNodes?: ClusterNode[];
+  clusterOptions?: ClusterOptions;
+
+  enableCircuitBreaker?: boolean;
+  circuitBreakerThreshold?: number;
+  circuitBreakerTimeout?: number;
+  circuitBreakerResetTimeout?: number;
 }
+
+// ---------------------------------------------------------------------------
+// Shared empty-metrics sentinel
+// ---------------------------------------------------------------------------
+
+const EMPTY_METRICS: CacheMetrics = {
+  hits: 0,
+  misses: 0,
+  hitRate: 0,
+  operations: 0,
+  errors: 0,
+  memoryUsage: 0,
+  keyCount: 0,
+  avgLatency: 0,
+  maxLatency: 0,
+  minLatency: 0,
+  avgResponseTime: 0,
+};
+
+const DEGRADED_HEALTH: CacheHealthStatus = { status: 'degraded', latency: 0 };
+
+// ---------------------------------------------------------------------------
+// Base adapter wrapper — eliminates boilerplate across all decorator classes
+// ---------------------------------------------------------------------------
+
+/**
+ * Transparent pass-through wrapper. Subclasses override only the methods they
+ * need to intercept, keeping each decorator focused and concise.
+ */
+abstract class BaseAdapterWrapper implements CacheAdapter {
+  readonly name: string;
+  readonly version: string;
+  readonly config: Record<string, unknown>;
+
+  constructor(protected readonly adapter: CacheAdapter, namePrefix: string) {
+    this.name    = `${namePrefix}(${adapter.name ?? 'unknown'})`;
+    this.version = adapter.version ?? '1.0.0';
+    this.config  = (adapter.config as Record<string, unknown>) ?? {};
+  }
+
+  get<T>(key: string): Promise<T | null>   { return this.adapter.get<T>(key); }
+  set<T>(key: string, value: T, ttl?: number): Promise<void> { return this.adapter.set(key, value, ttl); }
+
+  del(key: string): Promise<boolean>       { return this.adapter.del?.(key)    ?? Promise.resolve(false); }
+  delete(key: string): Promise<boolean>    { return this.del(key); }
+  has(key: string): Promise<boolean>       { return this.adapter.exists?.(key) ?? Promise.resolve(false); }
+  exists(key: string): Promise<boolean>    { return this.has(key); }
+  clear(): Promise<void>                   { return this.adapter.clear?.()     ?? Promise.resolve(); }
+  getMetrics(): CacheMetrics               { return this.adapter.getMetrics?.() ?? EMPTY_METRICS; }
+  getHealth(): Promise<CacheHealthStatus>  { return this.adapter.getHealth?.() ?? Promise.resolve(DEGRADED_HEALTH); }
+
+  mget<T>(keys: string[]): Promise<Array<T | null>>                                { return this.adapter.mget?.<T>(keys)  ?? Promise.resolve([]); }
+  mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void>  { return this.adapter.mset?.(entries)  ?? Promise.resolve(); }
+  mdel(keys: string[]): Promise<number>                                            { return this.adapter.mdel?.(keys)     ?? Promise.resolve(0); }
+  increment(key: string, delta = 1): Promise<number>                               { return this.adapter.increment?.(key, delta) ?? Promise.resolve(0); }
+  decrement(key: string, delta = 1): Promise<number>                               { return this.adapter.decrement?.(key, delta) ?? Promise.resolve(0); }
+  expire(key: string, ttlSeconds: number): Promise<boolean>                        { return this.adapter.expire?.(key, ttlSeconds) ?? Promise.resolve(false); }
+  ttl(key: string): Promise<number>                                                { return this.adapter.ttl?.(key) ?? Promise.resolve(-1); }
+}
+
+// ---------------------------------------------------------------------------
+// Decorator: Compression
+// ---------------------------------------------------------------------------
+
+class CompressedCacheAdapter extends BaseAdapterWrapper {
+  constructor(adapter: CacheAdapter, private readonly compression: CompressionStrategy) {
+    super(adapter, 'compressed');
+  }
+
+  override async get<T>(key: string): Promise<T | null> {
+    const raw = await this.adapter.get<T>(key);
+    return raw === null ? null : this.compression.decompress(raw);
+  }
+
+  override async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+    await this.adapter.set(key, await this.compression.compress(value), ttl);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Decorator: Tagging
+// ---------------------------------------------------------------------------
+
+class TaggedCacheAdapter extends BaseAdapterWrapper {
+  constructor(adapter: CacheAdapter, private readonly tagging: TaggingStrategy) {
+    super(adapter, 'tagged');
+  }
+
+  override async del(key: string): Promise<boolean> {
+    const deleted = await (this.adapter.del?.(key) ?? Promise.resolve(false));
+    if (deleted) this.tagging.removeKey(key);
+    return deleted;
+  }
+
+  /** Delete alias inherits the tag-cleanup side-effect via del(). */
+  override delete(key: string): Promise<boolean> { return this.del(key); }
+}
+
+// ---------------------------------------------------------------------------
+// Decorator: Metrics
+// ---------------------------------------------------------------------------
+
+class MetricsCacheAdapter extends BaseAdapterWrapper {
+  constructor(
+    adapter: CacheAdapter,
+    private readonly collector: CacheMetricsCollector,
+    private readonly cacheName: string,
+  ) {
+    super(adapter, 'metrics');
+  }
+
+  private track<T>(op: string, fn: () => Promise<T>): Promise<T> {
+    const start = Date.now();
+    return fn().then(
+      result => {
+        this.collector.emit('operation', { cache: this.cacheName, op, success: true,  duration: Date.now() - start });
+        return result;
+      },
+      error => {
+        this.collector.emit('operation', { cache: this.cacheName, op, success: false, duration: Date.now() - start });
+        throw error;
+      },
+    );
+  }
+
+  override get<T>(key: string): Promise<T | null>             { return this.track('get', () => this.adapter.get<T>(key)); }
+  override set<T>(key: string, value: T, ttl?: number): Promise<void> { return this.track('set', () => this.adapter.set(key, value, ttl)); }
+  override del(key: string): Promise<boolean>                 { return this.track('del', () => this.adapter.del?.(key) ?? Promise.resolve(false)); }
+  override delete(key: string): Promise<boolean>              { return this.del(key); }
+
+  override getMetrics(): CacheMetrics {
+    const base = this.adapter.getMetrics?.() ?? EMPTY_METRICS;
+    return { ...base, avgResponseTime: base.avgLatency ?? 0 };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Decorator: Circuit-Breaker
+// ---------------------------------------------------------------------------
+
+class CircuitBreakerCacheAdapter extends BaseAdapterWrapper {
+  constructor(adapter: CacheAdapter, private readonly breaker: CircuitBreakerStrategy) {
+    super(adapter, 'circuit-breaker');
+  }
+
+  override get<T>(key: string): Promise<T | null>             { return this.breaker.execute(() => this.adapter.get<T>(key)); }
+  override set<T>(key: string, value: T, ttl?: number): Promise<void> { return this.breaker.execute(() => this.adapter.set(key, value, ttl)); }
+  override del(key: string): Promise<boolean>                 { return this.breaker.execute(() => this.adapter.del?.(key) ?? Promise.resolve(false)); }
+  override delete(key: string): Promise<boolean>              { return this.del(key); }
+
+  override getMetrics(): CacheMetrics {
+    const base = this.adapter.getMetrics?.() ?? EMPTY_METRICS;
+    return { ...base, avgResponseTime: base.avgLatency ?? 0 };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Factory
+// ---------------------------------------------------------------------------
 
 /**
  * Unified Cache Factory
  *
- * Creates and manages cache instances with comprehensive features including:
+ * Creates and manages named cache instances with:
  * - Multiple adapter types (memory, Redis, browser, multi-tier)
- * - Advanced features (compression, tagging, warming, clustering)
- * - Comprehensive metrics and monitoring
- * - Circuit breaker pattern
- * - Event-driven architecture
+ * - Layered decorators (compression, tagging, metrics, circuit-breaker)
+ * - Optional cluster management
+ * - Aggregated health and metrics reporting
+ * - Event-driven lifecycle notifications
  */
 export class UnifiedCacheFactory extends EventEmitter {
-  private static instance: UnifiedCacheFactory;
-  private cacheInstances = new Map<string, CacheAdapter>();
-  private metricsCollector: CacheMetricsCollector;
-  private tagManager: CacheTagManager;
-  private warmer: CacheWarmer;
-  private clusterManager?: CacheClusterManager;
-  private compressor: CacheCompressor;
+  private static instance: UnifiedCacheFactory | undefined;
 
-  constructor(private config: UnifiedCacheConfig) {
+  private readonly instances   = new Map<string, CacheAdapter>();
+  private readonly metrics:    CacheMetricsCollector;
+  private readonly tags:       CacheTagManager;
+  private readonly warmer:     CacheWarmer;
+  private readonly compressor: CacheCompressor;
+  private readonly cluster:    CacheClusterManager | undefined;
+
+  constructor(private readonly config: UnifiedCacheConfig) {
     super();
     this.setMaxListeners(50);
 
-    // Initialize core components
-    const metricsConfig: any = {};
-    if (config.enableAdvancedMetrics !== undefined) {
-      metricsConfig.enableAdvancedMetrics = config.enableAdvancedMetrics;
-    }
-    if (config.metricsCollectionInterval !== undefined) {
-      metricsConfig.collectionInterval = config.metricsCollectionInterval;
-    }
-    this.metricsCollector = new CacheMetricsCollector(metricsConfig);
+    const metricsConfig: MetricsCollectorConfig = {};
+    if (config.enableAdvancedMetrics    !== undefined) metricsConfig.enableAdvancedMetrics = config.enableAdvancedMetrics;
+    if (config.metricsCollectionInterval !== undefined) metricsConfig.collectionInterval   = config.metricsCollectionInterval;
 
-    this.tagManager = new CacheTagManager();
-    this.warmer = new CacheWarmer(config.warmingStrategy);
+    this.metrics    = new CacheMetricsCollector(metricsConfig);
+    this.tags       = new CacheTagManager();
+    this.warmer     = new CacheWarmer(config.warmingStrategy);
     this.compressor = new CacheCompressor(config.compressionOptions);
 
-    // Initialize clustering if enabled
-    if (config.enableClustering && config.clusterNodes) {
-      const clusterConfig: any = {
-        nodes: config.clusterNodes,
-      };
-      if (config.clusterOptions !== undefined) {
-        clusterConfig.options = config.clusterOptions;
-      }
-      this.clusterManager = new CacheClusterManager(clusterConfig);
+    if (config.enableClustering && config.clusterNodes?.length) {
+      const clusterConfig: ClusterConfig = { nodes: config.clusterNodes };
+      if (config.clusterOptions !== undefined) clusterConfig.options = config.clusterOptions;
+      this.cluster = new CacheClusterManager(clusterConfig);
     }
 
-    this.setupEventHandlers();
+    this.bindInternalEvents();
   }
 
-  /**
-   * Get singleton instance
-   */
+  // ---------------------------------------------------------------------------
+  // Singleton management
+  // ---------------------------------------------------------------------------
+
+  /** Returns (or lazily creates) the process-wide singleton instance. */
   static getInstance(config: UnifiedCacheConfig): UnifiedCacheFactory {
-    if (!UnifiedCacheFactory.instance) {
-      UnifiedCacheFactory.instance = new UnifiedCacheFactory(config);
-    }
+    UnifiedCacheFactory.instance ??= new UnifiedCacheFactory(config);
     return UnifiedCacheFactory.instance;
   }
 
-  /**
-   * Create cache instance based on configuration
-   */
-  async createCache(name: string = 'default'): Promise<Result<CacheAdapter, Error>> {
+  /** Clears the singleton reference so a fresh instance can be created. */
+  private static resetInstance(): void {
+    UnifiedCacheFactory.instance = undefined;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Public API
+  // ---------------------------------------------------------------------------
+
+  /** Create (or retrieve) a named cache instance. */
+  async createCache(name = 'default'): Promise<Result<CacheAdapter, Error>> {
+    const existing = this.instances.get(name);
+    if (existing) return ok(existing);
+
+    const adapterResult = await this.createAdapter();
+    if (adapterResult.isErr()) return adapterResult;
+
     try {
-      if (this.cacheInstances.has(name)) {
-        return ok(this.cacheInstances.get(name)!);
-      }
-
-      const adapter = await this.createAdapter();
-      if (adapter.isErr()) {
-        return adapter;
-      }
-
-      // Wrap with advanced features
-      const enhancedAdapter = await this.enhanceAdapter(adapter.value, name);
-
-      this.cacheInstances.set(name, enhancedAdapter);
-      this.emit('cache:created', { name, adapter: enhancedAdapter });
-
-      return ok(enhancedAdapter);
+      const enhanced = await this.decorateAdapter(adapterResult.value, name);
+      this.instances.set(name, enhanced);
+      this.emit('cache:created', { name, adapter: enhanced });
+      return ok(enhanced);
     } catch (error) {
       const cacheError = error instanceof Error ? error : new Error(String(error));
       this.emit('cache:error', { name, error: cacheError });
@@ -210,768 +339,284 @@ export class UnifiedCacheFactory extends EventEmitter {
     }
   }
 
-  /**
-   * Get existing cache instance
-   */
-  getCache(name: string = 'default'): Result<CacheAdapter, Error> {
-    const cache = this.cacheInstances.get(name);
-    if (!cache) {
-      return err(new Error(`Cache instance '${name}' not found`));
-    }
-    return ok(cache);
+  /** Retrieve an existing named cache instance. */
+  getCache(name = 'default'): Result<CacheAdapter, Error> {
+    const cache = this.instances.get(name);
+    return cache
+      ? ok(cache)
+      : err(new Error(`Cache instance '${name}' not found. Call createCache() first.`));
   }
 
-  /**
-   * Destroy cache instance
-   */
-  async destroyCache(name: string = 'default'): Promise<Result<void, Error>> {
-    const cache = this.cacheInstances.get(name);
-    if (!cache) {
-      return err(new Error(`Cache instance '${name}' not found`));
-    }
+  /** Destroy a named cache instance and release its resources. */
+  async destroyCache(name = 'default'): Promise<Result<void, Error>> {
+    const cache = this.instances.get(name);
+    if (!cache) return err(new Error(`Cache instance '${name}' not found`));
 
     try {
-      if (isDestroyable(cache)) {
-        await cache.destroy();
-      }
-
-      this.cacheInstances.delete(name);
+      if (isDestroyable(cache)) await cache.destroy();
+      this.instances.delete(name);
       this.emit('cache:destroyed', { name });
-
       return ok(undefined);
     } catch (error) {
-      const cacheError = error instanceof Error ? error : new Error(String(error));
-      return err(cacheError);
+      return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
-  /**
-   * Get all cache instances
-   */
-  getAllCaches(): Map<string, CacheAdapter> {
-    return new Map(this.cacheInstances);
+  /** Snapshot of all live cache instances (read-only copy). */
+  getAllCaches(): ReadonlyMap<string, CacheAdapter> {
+    return new Map(this.instances);
   }
 
-  /**
-   * Get factory metrics
-   */
+  /** Factory-level metrics summary across all managed instances. */
   getMetrics(): {
     instances: number;
     totalOperations: number;
     totalErrors: number;
     uptime: number;
-    clusterHealth?: any;
+    clusterHealth?: unknown;
   } {
-    const aggregatedMetrics = this.metricsCollector.getAggregatedMetrics();
-
+    const m = this.metrics.getAggregatedMetrics();
     return {
-      instances: this.cacheInstances.size,
-      totalOperations: aggregatedMetrics.totalOperations || 0,
-      totalErrors: aggregatedMetrics.totalErrors || 0,
-      uptime: aggregatedMetrics.uptime || 0,
-      clusterHealth: this.clusterManager?.getHealth(),
+      instances:       this.instances.size,
+      totalOperations: m.totalOperations ?? 0,
+      totalErrors:     m.totalErrors     ?? 0,
+      uptime:          m.uptime          ?? 0,
+      clusterHealth:   this.cluster?.getHealth(),
     };
   }
 
   /**
-   * Warm up all caches
+   * Pre-warm cache entries by running their factory functions.
+   * Returns a partial-failure summary — individual errors do not abort the batch.
    */
   async warmUpAll(entries: Array<{
     cache: string;
     key: string;
-    factory: () => Promise<any>;
+    factory: () => Promise<unknown>;
     ttl?: number;
     tags?: string[];
-  }>): Promise<Result<void, Error>> {
+  }>): Promise<Result<{ succeeded: number; failed: number }, Error>> {
     try {
-      const promises = entries.map(async ({ cache: cacheName, key, factory, ttl, tags }) => {
-        const cacheResult = this.getCache(cacheName);
-        if (cacheResult.isErr()) {
-          throw cacheResult.error;
-        }
+      const results = await Promise.allSettled(
+        entries.map(async ({ cache: cacheName, key, factory, ttl, tags }) => {
+          const cacheResult = this.getCache(cacheName);
+          if (cacheResult.isErr()) throw cacheResult.error;
 
-        const value = await factory();
-        await cacheResult.value.set(key, value, ttl);
+          await cacheResult.value.set(key, await factory(), ttl);
 
-        if (tags && tags.length > 0) {
-          await this.tagManager.addTags(cacheName, key, tags);
-        }
-      });
+          if (tags?.length) await this.tags.addTags(cacheName, key, tags);
+        }),
+      );
 
-      await Promise.allSettled(promises);
-      return ok(undefined);
-    } catch (error) {
-      const cacheError = error instanceof Error ? error : new Error(String(error));
-      return err(cacheError);
-    }
-  }
+      const failed    = results.filter(r => r.status === 'rejected').length;
+      const succeeded = results.length - failed;
 
-  /**
-   * Invalidate by tags across all caches
-   */
-  async invalidateByTags(tags: string[]): Promise<Result<number, Error>> {
-    try {
-      let totalInvalidated = 0;
-
-      for (const [, cache] of this.cacheInstances) {
-        if (isTagInvalidatable(cache)) {
-          const count = await cache.invalidateByTags(tags);
-          totalInvalidated += count;
-        }
+      if (failed > 0) {
+        const reasons = results
+          .filter((r): r is PromiseRejectedResult => r.status === 'rejected')
+          .map(r => String(r.reason))
+          .join('; ');
+        this.emit('cache:warmup:partial', { succeeded, failed, reasons });
       }
 
-      return ok(totalInvalidated);
+      return ok({ succeeded, failed });
     } catch (error) {
-      const cacheError = error instanceof Error ? error : new Error(String(error));
-      return err(cacheError);
+      return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
-  /**
-   * Get health status of all caches
-   */
+  /** Invalidate cache entries by tag across all managed instances. */
+  async invalidateByTags(tags: string[]): Promise<Result<number, Error>> {
+    try {
+      let total = 0;
+      for (const [, cache] of this.instances) {
+        if (isTagInvalidatable(cache)) total += await cache.invalidateByTags(tags);
+      }
+      return ok(total);
+    } catch (error) {
+      return err(error instanceof Error ? error : new Error(String(error)));
+    }
+  }
+
+  /** Aggregated health status across all managed instances. */
   async getHealth(): Promise<{
     overall: 'healthy' | 'degraded' | 'unhealthy';
     caches: Record<string, CacheHealthStatus>;
-    cluster?: any;
+    cluster?: unknown;
   }> {
-    const cacheHealth: Record<string, CacheHealthStatus> = {};
+    const caches: Record<string, CacheHealthStatus> = {};
 
-    for (const [name, cache] of this.cacheInstances) {
-      if (isCustomHealthCheckable(cache)) {
-        cacheHealth[name] = await cache.getHealth() as CacheHealthStatus;
-      }
-    }
+    await Promise.all(
+      Array.from(this.instances.entries()).map(async ([name, cache]) => {
+        if (isCustomHealthCheckable(cache)) {
+          caches[name] = (await cache.getHealth()) as CacheHealthStatus;
+        }
+      }),
+    );
 
-    // Determine overall health
-    const unhealthyCaches = Object.values(cacheHealth).filter(h => h.status === 'unhealthy').length;
-    const degradedCaches = Object.values(cacheHealth).filter(h => h.status === 'degraded').length;
+    const statuses  = Object.values(caches);
+    const unhealthy = statuses.filter(h => h.status === 'unhealthy').length;
+    const degraded  = statuses.filter(h => h.status === 'degraded').length;
 
-    let overall: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
-    if (unhealthyCaches > 0) {
-      overall = 'unhealthy';
-    } else if (degradedCaches > 0) {
-      overall = 'degraded';
-    }
+    const overall: 'healthy' | 'degraded' | 'unhealthy' =
+      unhealthy > 0 ? 'unhealthy' : degraded > 0 ? 'degraded' : 'healthy';
 
-    return {
-      overall,
-      caches: cacheHealth,
-      cluster: this.clusterManager?.getHealth(),
-    };
+    return { overall, caches, cluster: this.cluster?.getHealth() };
   }
 
-  /**
-   * Shutdown factory and all caches
-   */
+  /** Gracefully shut down all caches, the cluster, and background collectors. */
   async shutdown(): Promise<Result<void, Error>> {
     try {
-      const promises = Array.from(this.cacheInstances.keys()).map(name =>
-        this.destroyCache(name)
-      );
-
-      await Promise.all(promises);
-
-      if (this.clusterManager) {
-        await this.clusterManager.shutdown();
-      }
-
-      this.metricsCollector.stop();
+      await Promise.all(Array.from(this.instances.keys()).map(n => this.destroyCache(n)));
+      await this.cluster?.shutdown();
+      this.metrics.stop();
       this.removeAllListeners();
-
+      UnifiedCacheFactory.resetInstance();
       return ok(undefined);
-    } catch (error) {
-      const cacheError = error instanceof Error ? error : new Error(String(error));
-      return err(cacheError);
-    }
-  }
-
-  // Private methods
-
-  private async createAdapter(): Promise<Result<CacheAdapter, Error>> {
-    const { provider } = this.config;
-
-    switch (provider) {
-      case 'memory':
-        return this.createMemoryAdapter();
-
-      case 'redis':
-        return this.createRedisAdapter();
-
-      case 'browser':
-        return this.createBrowserAdapter();
-
-      case 'multi-tier':
-        return this.createMultiTierAdapter();
-
-      default:
-        return err(new Error(`Unsupported cache provider: ${provider}`));
-    }
-  }
-
-  private async createMemoryAdapter(): Promise<Result<MemoryAdapter, Error>> {
-    try {
-      const config = this.config.memoryConfig || {};
-      const adapterConfig: any = {
-        maxSize: config.maxSize || 10000,
-        cleanupInterval: config.cleanupInterval || 60000,
-        enableLRU: config.enableLRU !== false,
-        defaultTtlSec: config.defaultTtlSec || this.config.defaultTtlSec,
-      };
-      const keyPrefix = config.keyPrefix || this.config.keyPrefix;
-      if (keyPrefix !== undefined) {
-        adapterConfig.keyPrefix = keyPrefix;
-      }
-      const adapter = new MemoryAdapter(adapterConfig);
-
-      return ok(adapter);
     } catch (error) {
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
-  private async createRedisAdapter(): Promise<Result<CacheAdapter, Error>> {
-    // Note: RedisAdapter is not yet implemented
-    // This method is kept for future implementation
+  // ---------------------------------------------------------------------------
+  // Private — adapter construction
+  // ---------------------------------------------------------------------------
+
+  private async createAdapter(): Promise<Result<CacheAdapter, Error>> {
+    switch (this.config.provider) {
+      case 'memory':     return this.buildMemoryAdapter();
+      case 'redis':      return this.buildRedisAdapter();
+      case 'browser':    return this.buildBrowserAdapter();
+      case 'multi-tier': return this.buildMultiTierAdapter();
+      default:
+        return err(new Error(`Unsupported cache provider: ${(this.config as UnifiedCacheConfig).provider}`));
+    }
+  }
+
+  private buildMemoryAdapter(): Result<CacheAdapter, Error> {
+    try {
+      const cfg = this.config.memoryConfig ?? {};
+      return ok(new MemoryAdapter({
+        maxSize:         cfg.maxSize         ?? 10_000,
+        cleanupInterval: cfg.cleanupInterval ?? 60_000,
+        enableLRU:       cfg.enableLRU       !== false,
+        defaultTtlSec:   cfg.defaultTtlSec   ?? this.config.defaultTtlSec,
+        ...(cfg.keyPrefix ?? this.config.keyPrefix ? { keyPrefix: cfg.keyPrefix ?? this.config.keyPrefix } : {}),
+      }) as unknown as CacheAdapter);
+    } catch (error) {
+      return err(error instanceof Error ? error : new Error(String(error)));
+    }
+  }
+
+  private buildRedisAdapter(): Result<CacheAdapter, Error> {
     return err(new Error('Redis adapter is not yet implemented. Use memory or multi-tier provider.'));
   }
 
-  private async createBrowserAdapter(): Promise<Result<BrowserAdapter, Error>> {
+  private buildBrowserAdapter(): Result<CacheAdapter, Error> {
     try {
-      const config = this.config.browserConfig || {};
-      const adapterConfig: any = {
-        storageType: config.storageType || 'localStorage',
-        maxSize: config.maxSize || 1000,
-        defaultTtlSec: config.defaultTtlSec || this.config.defaultTtlSec,
-      };
-      const keyPrefix = config.keyPrefix || this.config.keyPrefix;
-      if (keyPrefix !== undefined) {
-        adapterConfig.keyPrefix = keyPrefix;
-      }
-      const adapter = new BrowserAdapter(adapterConfig);
-
-      return ok(adapter);
+      const cfg = this.config.browserConfig ?? {};
+      return ok(new BrowserAdapter({
+        storageType:   cfg.storageType   ?? 'localStorage',
+        maxSize:       cfg.maxSize       ?? 1_000,
+        defaultTtlSec: cfg.defaultTtlSec ?? this.config.defaultTtlSec,
+        ...(cfg.keyPrefix ?? this.config.keyPrefix ? { keyPrefix: cfg.keyPrefix ?? this.config.keyPrefix } : {}),
+      }) as unknown as CacheAdapter);
     } catch (error) {
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
-  private async createMultiTierAdapter(): Promise<Result<MultiTierAdapter, Error>> {
+  private buildMultiTierAdapter(): Result<CacheAdapter, Error> {
+    const cfg = this.config.multiTierConfig;
+    if (!cfg) return err(new Error('multiTierConfig is required when provider is "multi-tier"'));
+
     try {
-      const config = this.config.multiTierConfig;
-      if (!config) {
-        return err(new Error('Multi-tier configuration is required'));
-      }
-
-      const adapterConfig: any = {
-        l1Config: config.l1Config,
-        l2Config: config.l2Config,
-        promotionStrategy: config.promotionStrategy || 'lru',
-        enableMetrics: config.enableMetrics ?? true,
-      };
-      const keyPrefix = config.keyPrefix || this.config.keyPrefix;
-      if (keyPrefix !== undefined) {
-        adapterConfig.keyPrefix = keyPrefix;
-      }
-      const adapter = new MultiTierAdapter(adapterConfig);
-
-      return ok(adapter);
+      return ok(new MultiTierAdapter({
+        l1Config:           cfg.l1Config,
+        l2Config:           cfg.l2Config,
+        promotionStrategy:  cfg.promotionStrategy ?? 'lru',
+        enableMetrics:      cfg.enableMetrics      ?? true,
+        ...(cfg.keyPrefix ?? this.config.keyPrefix ? { keyPrefix: cfg.keyPrefix ?? this.config.keyPrefix } : {}),
+      }) as unknown as CacheAdapter);
     } catch (error) {
       return err(error instanceof Error ? error : new Error(String(error)));
     }
   }
 
-  private async enhanceAdapter(adapter: CacheAdapter, name: string): Promise<CacheAdapter> {
-    // Create strategies
-    const compressionStrategy = this.config.enableCompression
-      ? new CompressionStrategy(this.compressor)
-      : undefined;
+  // ---------------------------------------------------------------------------
+  // Private — adapter decoration pipeline
+  // ---------------------------------------------------------------------------
 
-    const taggingStrategy = new TaggingStrategy(this.tagManager, name);
+  private async decorateAdapter(base: CacheAdapter, name: string): Promise<CacheAdapter> {
+    let adapter = base;
 
-    const circuitBreakerStrategy = this.config.enableCircuitBreaker
-      ? new CircuitBreakerStrategy({
-          threshold: this.config.circuitBreakerThreshold || 5,
-          timeout: this.config.circuitBreakerTimeout || 60000,
-          resetTimeout: this.config.circuitBreakerResetTimeout || 300000,
-        })
-      : undefined;
-
-    // Wrap with compression if enabled
-    if (compressionStrategy) {
-      adapter = new CompressedCacheAdapter(adapter, compressionStrategy);
+    if (this.config.enableCompression) {
+      adapter = new CompressedCacheAdapter(adapter, new CompressionStrategy(this.compressor));
     }
 
-    // Wrap with tagging support
-    adapter = new TaggedCacheAdapter(adapter, taggingStrategy);
+    adapter = new TaggedCacheAdapter(adapter, new TaggingStrategy(this.tags, name));
+    adapter = new MetricsCacheAdapter(adapter, this.metrics, name);
 
-    // Wrap with metrics collection
-    adapter = new MetricsCacheAdapter(adapter, this.metricsCollector, name);
-
-    // Wrap with circuit breaker if enabled
-    if (circuitBreakerStrategy) {
-      adapter = new CircuitBreakerCacheAdapter(adapter, circuitBreakerStrategy);
+    if (this.config.enableCircuitBreaker) {
+      adapter = new CircuitBreakerCacheAdapter(
+        adapter,
+        new CircuitBreakerStrategy({
+          threshold:    this.config.circuitBreakerThreshold    ?? 5,
+          timeout:      this.config.circuitBreakerTimeout      ?? 60_000,
+          resetTimeout: this.config.circuitBreakerResetTimeout ?? 300_000,
+        }),
+      );
     }
 
-    // Wrap with clustering if enabled
-    if (this.clusterManager) {
-      adapter = await this.clusterManager.wrapAdapter(adapter, name);
+    if (this.cluster) {
+      adapter = await this.cluster.wrapAdapter(adapter, name);
     }
 
     return adapter;
   }
 
-  private setupEventHandlers(): void {
-    // Forward events from metrics collector
-    this.metricsCollector.on('metrics:collected', (data) => {
-      this.emit('factory:metrics', data);
-    });
+  // ---------------------------------------------------------------------------
+  // Private — event wiring
+  // ---------------------------------------------------------------------------
 
-    // Forward events from warmer
-    this.warmer.on('warming:complete', (data) => {
-      this.emit('factory:warming:complete', data);
-    });
-
-    // Forward events from cluster manager
-    if (this.clusterManager) {
-      this.clusterManager.on('cluster:event', (data) => {
-        this.emit('factory:cluster:event', data);
-      });
-    }
+  private bindInternalEvents(): void {
+    this.metrics.on('metrics:collected', data => this.emit('factory:metrics', data));
+    this.warmer.on('warming:complete',   data => this.emit('factory:warming:complete', data));
+    this.cluster?.on('cluster:event',   data => this.emit('factory:cluster:event', data));
   }
 }
 
-// Enhanced adapter wrappers
-
-class CompressedCacheAdapter implements CacheAdapter {
-  readonly name: string;
-  readonly version: string;
-  readonly config: any;
-
-  constructor(
-    private adapter: CacheAdapter,
-    private compressionStrategy: CompressionStrategy
-  ) {
-    this.name = adapter.name || 'compressed-wrapper';
-    this.version = adapter.version || '1.0.0';
-    this.config = adapter.config || {};
-  }
-
-  async get<T>(key: string): Promise<T | null> {
-    const result = await this.adapter.get<T>(key);
-    if (result === null) return null;
-
-    // Decompress if needed
-    const decompressed = await this.compressionStrategy.decompress(result);
-    return decompressed;
-  }
-
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    // Compress if needed
-    const compressed = await this.compressionStrategy.compress(value);
-    await this.adapter.set(key, compressed, ttl);
-  }
-
-  // Delegate other methods
-  async del(key: string): Promise<boolean> {
-    return this.adapter.del ? await this.adapter.del(key) : false;
-  }
-
-  async exists(key: string): Promise<boolean> {
-    return this.adapter.exists ? await this.adapter.exists(key) : false;
-  }
-
-  async clear(): Promise<void> {
-    if (this.adapter.clear) {
-      await this.adapter.clear();
-    }
-  }
-
-  getMetrics(): CacheMetrics {
-    return this.adapter.getMetrics ? this.adapter.getMetrics() : {
-      hits: 0,
-      misses: 0,
-      hitRate: 0,
-      operations: 0,
-      errors: 0,
-      memoryUsage: 0,
-      keyCount: 0,
-      avgLatency: 0,
-      maxLatency: 0,
-      minLatency: 0,
-      avgResponseTime: 0
-    };
-  }
-
-  // Additional required methods
-  async mget<T>(keys: string[]): Promise<Array<T | null>> {
-    return this.adapter.mget ? await this.adapter.mget<T>(keys) : [];
-  }
-
-  async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
-    if (this.adapter.mset) {
-      await this.adapter.mset(entries);
-    }
-  }
-
-  async mdel(keys: string[]): Promise<number> {
-    return this.adapter.mdel ? await this.adapter.mdel(keys) : 0;
-  }
-
-  async increment(key: string, delta = 1): Promise<number> {
-    return this.adapter.increment ? await this.adapter.increment(key, delta) : 0;
-  }
-
-  async decrement(key: string, delta = 1): Promise<number> {
-    return this.adapter.decrement ? await this.adapter.decrement(key, delta) : 0;
-  }
-
-  async expire(key: string, ttlSeconds: number): Promise<boolean> {
-    return this.adapter.expire ? await this.adapter.expire(key, ttlSeconds) : false;
-  }
-
-  async ttl(key: string): Promise<number> {
-    return this.adapter.ttl ? await this.adapter.ttl(key) : -1;
-  }
-}
-
-class TaggedCacheAdapter implements CacheAdapter {
-  readonly name: string;
-  readonly version: string;
-  readonly config: any;
-
-  constructor(
-    private adapter: CacheAdapter,
-    private taggingStrategy: TaggingStrategy
-  ) {
-    this.name = adapter.name || 'tagged-wrapper';
-    this.version = adapter.version || '1.0.0';
-    this.config = adapter.config || {};
-  }
-
-  async get<T>(key: string): Promise<T | null> {
-    return this.adapter.get<T>(key);
-  }
-
-  async set<T>(key: string, value: T, ttl?: number): Promise<void> {
-    await this.adapter.set(key, value, ttl);
-  }
-
-  async del(key: string): Promise<boolean> {
-    const result = await this.adapter.del ? await this.adapter.del(key) : false;
-    if (result) {
-      this.taggingStrategy.removeKey(key);
-    }
-    return result;
-  }
-
-  async exists(key: string): Promise<boolean> {
-    return this.adapter.exists ? await this.adapter.exists(key) : false;
-  }
-
-  async clear(): Promise<void> {
-    if (this.adapter.clear) {
-      await this.adapter.clear();
-    }
-  }
-
-  getMetrics(): CacheMetrics {
-    return this.adapter.getMetrics ? this.adapter.getMetrics() : {
-      hits: 0,
-      misses: 0,
-      hitRate: 0,
-      operations: 0,
-      errors: 0,
-      memoryUsage: 0,
-      keyCount: 0,
-      avgLatency: 0,
-      maxLatency: 0,
-      minLatency: 0,
-      avgResponseTime: 0
-    };
-  }
-
-  // Additional required methods
-  async mget<T>(keys: string[]): Promise<Array<T | null>> {
-    return this.adapter.mget ? await this.adapter.mget<T>(keys) : [];
-  }
-
-  async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
-    if (this.adapter.mset) {
-      await this.adapter.mset(entries);
-    }
-  }
-
-  async mdel(keys: string[]): Promise<number> {
-    return this.adapter.mdel ? await this.adapter.mdel(keys) : 0;
-  }
-
-  async increment(key: string, delta = 1): Promise<number> {
-    return this.adapter.increment ? await this.adapter.increment(key, delta) : 0;
-  }
-
-  async decrement(key: string, delta = 1): Promise<number> {
-    return this.adapter.decrement ? await this.adapter.decrement(key, delta) : 0;
-  }
-
-  async expire(key: string, ttlSeconds: number): Promise<boolean> {
-    return this.adapter.expire ? await this.adapter.expire(key, ttlSeconds) : false;
-  }
-
-  async ttl(key: string): Promise<number> {
-    return this.adapter.ttl ? await this.adapter.ttl(key) : -1;
-  }
-}
-
-class MetricsCacheAdapter implements CacheAdapter {
-  readonly name: string;
-  readonly version: string;
-  readonly config: any;
-
-  constructor(
-    private adapter: CacheAdapter,
-    private metricsCollector: any,
-    private cacheName: string
-  ) {
-    this.name = adapter.name || 'metrics-wrapper';
-    this.version = adapter.version || '1.0.0';
-    this.config = adapter.config || {};
-  }
-
-  async get<T>(key: string): Promise<T | null> {
-    const start = Date.now();
-    try {
-      const result = await this.adapter.get<T>(key);
-      const duration = Date.now() - start;
-
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'get', true, duration);
-      }
-
-      return result;
-    } catch (error) {
-      const duration = Date.now() - start;
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'get', false, duration);
-      }
-      throw error;
-    }
-  }
-
-  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
-    const start = Date.now();
-    try {
-      await this.adapter.set(key, value, ttlSeconds);
-      const duration = Date.now() - start;
-
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'set', true, duration);
-      }
-    } catch (error) {
-      const duration = Date.now() - start;
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'set', false, duration);
-      }
-      throw error;
-    }
-  }
-
-  async del(key: string): Promise<boolean> {
-    const start = Date.now();
-    try {
-      const result = await this.adapter.del(key);
-      const duration = Date.now() - start;
-
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'delete', true, duration);
-      }
-
-      return result;
-    } catch (error) {
-      const duration = Date.now() - start;
-      if (this.metricsCollector?.recordOperation) {
-        this.metricsCollector.recordOperation(this.cacheName, 'delete', false, duration);
-      }
-      throw error;
-    }
-  }
-
-  async exists(key: string): Promise<boolean> {
-    return this.adapter.exists ? await this.adapter.exists(key) : false;
-  }
-
-  async clear(): Promise<void> {
-    return this.adapter.clear ? await this.adapter.clear() : undefined;
-  }
-
-  // Additional required methods from CacheService interface
-  async mget<T>(keys: string[]): Promise<Array<T | null>> {
-    return this.adapter.mget ? await this.adapter.mget<T>(keys) : [];
-  }
-
-  async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
-    if (this.adapter.mset) {
-      await this.adapter.mset(entries);
-    }
-  }
-
-  async mdel(keys: string[]): Promise<number> {
-    if (this.adapter.mdel) {
-      return await this.adapter.mdel(keys);
-    }
-    return 0;
-  }
-
-  async increment(key: string, delta = 1): Promise<number> {
-    return this.adapter.increment ? await this.adapter.increment(key, delta) : 0;
-  }
-
-  async decrement(key: string, delta = 1): Promise<number> {
-    return this.adapter.decrement ? await this.adapter.decrement(key, delta) : 0;
-  }
-
-  async expire(key: string, ttlSeconds: number): Promise<boolean> {
-    return this.adapter.expire ? await this.adapter.expire(key, ttlSeconds) : false;
-  }
-
-  async ttl(key: string): Promise<number> {
-    return this.adapter.ttl ? await this.adapter.ttl(key) : -1;
-  }
-
-  async getHealth(): Promise<any> {
-    return this.adapter.getHealth ? await this.adapter.getHealth() : { status: 'unknown' };
-  }
-
-  getMetrics(): any {
-    const baseMetrics = this.adapter.getMetrics ? this.adapter.getMetrics() : {
-      hits: 0,
-      misses: 0,
-      hitRate: 0,
-      operations: 0,
-      errors: 0,
-      memoryUsage: 0,
-      keyCount: 0,
-      avgLatency: 0,
-      maxLatency: 0,
-      minLatency: 0
-    };
-
-    // Add avgResponseTime if missing
-    return {
-      ...baseMetrics,
-      avgResponseTime: baseMetrics.avgLatency || 0
-    };
-  }
-}
-
-class CircuitBreakerCacheAdapter implements CacheAdapter {
-  readonly name: string;
-  readonly version: string;
-  readonly config: any;
-
-  constructor(
-    private adapter: CacheAdapter,
-    private circuitBreakerStrategy: CircuitBreakerStrategy
-  ) {
-    this.name = adapter.name || 'circuit-breaker-wrapper';
-    this.version = adapter.version || '1.0.0';
-    this.config = adapter.config || {};
-  }
-
-  async get<T>(key: string): Promise<T | null> {
-    return this.circuitBreakerStrategy.execute(() => this.adapter.get<T>(key));
-  }
-
-  async set<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
-    return this.circuitBreakerStrategy.execute(() => this.adapter.set(key, value, ttlSeconds));
-  }
-
-  async del(key: string): Promise<boolean> {
-    return this.circuitBreakerStrategy.execute(() => this.adapter.del(key));
-  }
-
-  // Delegate other methods
-  async exists(key: string): Promise<boolean> {
-    return this.adapter.exists ? await this.adapter.exists(key) : false;
-  }
-
-  async clear(): Promise<void> {
-    return this.adapter.clear ? await this.adapter.clear() : undefined;
-  }
-
-  // Additional required methods from CacheService interface
-  async mget<T>(keys: string[]): Promise<Array<T | null>> {
-    return this.adapter.mget ? await this.adapter.mget<T>(keys) : [];
-  }
-
-  async mset<T>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void> {
-    if (this.adapter.mset) {
-      await this.adapter.mset(entries);
-    }
-  }
-
-  async mdel(keys: string[]): Promise<number> {
-    return this.adapter.mdel ? await this.adapter.mdel(keys) : 0;
-  }
-
-  async increment(key: string, delta = 1): Promise<number> {
-    return this.adapter.increment ? await this.adapter.increment(key, delta) : 0;
-  }
-
-  async decrement(key: string, delta = 1): Promise<number> {
-    return this.adapter.decrement ? await this.adapter.decrement(key, delta) : 0;
-  }
-
-  async expire(key: string, ttlSeconds: number): Promise<boolean> {
-    return this.adapter.expire ? await this.adapter.expire(key, ttlSeconds) : false;
-  }
-
-  async ttl(key: string): Promise<number> {
-    return this.adapter.ttl ? await this.adapter.ttl(key) : -1;
-  }
-
-  async getHealth(): Promise<any> {
-    return this.adapter.getHealth ? await this.adapter.getHealth() : { status: 'unknown' };
-  }
-
-  getMetrics(): any {
-    const baseMetrics = this.adapter.getMetrics ? this.adapter.getMetrics() : {
-      hits: 0,
-      misses: 0,
-      hitRate: 0,
-      operations: 0,
-      errors: 0,
-      memoryUsage: 0,
-      keyCount: 0,
-      avgLatency: 0,
-      maxLatency: 0,
-      minLatency: 0
-    };
-
-    return {
-      ...baseMetrics,
-      avgResponseTime: baseMetrics.avgLatency || 0
-    };
-  }
-}
-
-// Export convenience functions
-
+// ---------------------------------------------------------------------------
+// Module-level convenience helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Create a one-off default cache from config without holding a factory reference.
+ *
+ * For long-lived applications prefer `UnifiedCacheFactory.getInstance()` so that
+ * metrics, health checks, and cluster state are retained across calls.
+ */
 export function createUnifiedCache(config: UnifiedCacheConfig): Promise<Result<CacheAdapter, Error>> {
-  const factory = new UnifiedCacheFactory(config);
-  return factory.createCache('default');
+  return new UnifiedCacheFactory(config).createCache('default');
 }
 
-export function getUnifiedCache(_name: string = 'default'): any {
-  // Return a simple error for now
-  throw new Error('Cache factory not initialized');
+/**
+ * Retrieve a named cache from the process-wide singleton.
+ *
+ * @throws If the singleton has not been initialised via `UnifiedCacheFactory.getInstance()`.
+ */
+export function getUnifiedCache(name = 'default'): Result<CacheAdapter, Error> {
+  if (!UnifiedCacheFactory['instance']) {
+    return err(new Error('Cache factory has not been initialised. Call UnifiedCacheFactory.getInstance(config) first.'));
+  }
+  return (UnifiedCacheFactory['instance'] as UnifiedCacheFactory).getCache(name);
 }
 
+/** Shut down the process-wide singleton if one exists. No-ops otherwise. */
 export async function shutdownUnifiedCache(): Promise<Result<void, Error>> {
-  // Note: shutdownUnifiedCache needs a config to get the instance
-  // For now, return ok since we can't shutdown without config
-  return ok(undefined);
+  const inst = UnifiedCacheFactory['instance'] as UnifiedCacheFactory | undefined;
+  return inst ? inst.shutdown() : ok(undefined);
 }
 
-
-
+// Re-export for backward compatibility
+export { cacheFactory, SimpleCacheFactory } from './factory';

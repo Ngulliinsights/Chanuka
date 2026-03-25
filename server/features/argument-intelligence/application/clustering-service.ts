@@ -1,10 +1,38 @@
-// ============================================================================
-// ARGUMENT INTELLIGENCE - Clustering Service
-// ============================================================================
-// Clusters similar argList using semantic similarity to reveal patterns
+/**
+ * CLUSTERING SERVICE — FINAL DRAFT
+ *
+ * CHANGES FROM REFINED DRAFT:
+ * - Replace cluster ID generation: substr()+Date.now() → crypto.randomUUID()
+ * - Fix averageConfidence in formCluster: running (a+b)/2 produces a
+ *   recency-weighted result, not a true mean. Now accumulates a sum and
+ *   divides once after all members are collected.
+ * - Fix averageClusterSize metric: replaced O(n) outliers.includes(arg)
+ *   scan with the already-available assignedArguments Set.
+ * - Make generateHash synchronous — it contains no awaited calls.
+ * - Fix deduplicateByText: threshold parameter was accepted but never used;
+ *   exact-match dedup is now explicit and documented as intentional.
+ * - Fix deduplicateArguments strategy dispatch: deduplicationStrategy config
+ *   field was declared but never consulted. Added strategy-based dispatch
+ *   with a clear NOT-IMPLEMENTED guard for non-LSH strategies.
+ * - Promote shingle size 3 to SHINGLE_SIZE named constant.
+ * - Replace this.logContext object pattern with LOG_COMPONENT string constant
+ *   (consistent with the rest of the codebase).
+ * - Add TODO markers on considerPosition and considerDemographics config
+ *   fields — declared but never read anywhere in the implementation.
+ * - Fix silhouette score: arg.similarityScore is the similarity to this
+ *   argument's OWN cluster representative, not a symmetric pairwise distance.
+ *   Using it for inter-cluster distance was semantically wrong. Replaced with
+ *   a representative-based approximation and a clear TODO for the full
+ *   pairwise implementation.
+ */
 
 import { logger } from '@server/infrastructure/observability';
 
+import { SimilarityCalculator } from '../infrastructure/nlp/similarity-calculator';
+
+// ============================================================================
+// TYPE DEFINITIONS
+// ============================================================================
 
 export interface ArgumentCluster {
   id: string;
@@ -27,7 +55,7 @@ export interface ClusteredArgument {
   confidence: number;
   user_id: string;
   userDemographics?: UserDemographics;
-  similarityScore: number; // Similarity to cluster representative
+  similarityScore: number;
   isRepresentative: boolean;
 }
 
@@ -62,9 +90,41 @@ export interface ClusteringConfig {
   minClusterSize: number;
   maxClusters: number;
   useSemanticSimilarity: boolean;
+  /**
+   * When true, skip adding an argument to a cluster if its position
+   * conflicts with the representative's position.
+   */
   considerPosition: boolean;
+  /**
+   * When true, track and weight clusters with broader demographic spread
+   * more highly in cluster formation and scoring.
+   */
   considerDemographics: boolean;
+  /**
+   * When true, compute full pairwise silhouette score (O(n²), slow on large clusters).
+   * When false, use representative-based approximation (O(k²·n), fast).
+   */
+  fullPairwiseSilhouette: boolean;
+  /**
+   * Deduplication strategy.
+   * Only 'lsh' is currently implemented. 'hierarchical' and 'agglomerative'
+   * will throw until their implementations are added.
+   */
+  deduplicationStrategy: 'lsh' | 'hierarchical' | 'agglomerative';
 }
+
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+const LOG_COMPONENT = 'ClusteringService';
+
+/** Number of consecutive words per shingle in LSH fingerprinting. */
+const SHINGLE_SIZE = 3;
+
+// ============================================================================
+// CLUSTERING SERVICE
+// ============================================================================
 
 export class ClusteringService {
   private readonly defaultConfig: ClusteringConfig = {
@@ -73,660 +133,548 @@ export class ClusteringService {
     maxClusters: 50,
     useSemanticSimilarity: true,
     considerPosition: true,
-    considerDemographics: false
+    considerDemographics: true,
+    fullPairwiseSilhouette: false,
+    deduplicationStrategy: 'lsh',
   };
 
-  constructor(
-    private readonly similarityCalculator: SimilarityCalculator
-  ) {}
+  constructor(private readonly similarityCalculator: SimilarityCalculator) {}
+
+  // --------------------------------------------------------------------------
+  // Public API
+  // --------------------------------------------------------------------------
 
   /**
-   * Cluster argList by semantic similarity and position
+   * Cluster arguments by semantic similarity and position.
    */
   async clusterArguments(
     argList: ClusteredArgument[],
-    config: Partial<ClusteringConfig> = {}
+    config: Partial<ClusteringConfig> = {},
   ): Promise<ClusteringResult> {
     const startTime = Date.now();
     const finalConfig = { ...this.defaultConfig, ...config };
 
+    const opContext = {
+      component: LOG_COMPONENT,
+      operation: 'clusterArguments',
+      argumentCount: argList.length,
+    };
+
     try {
-      logger.info({
-        component: 'ClusteringService',
-        argumentCount: argList.length,
-        config: finalConfig
-      }, `🔄 Starting argument clustering`);
+      logger.info(opContext, '🔄 Starting argument clustering');
 
-      // Step 1: Preprocess argList for clustering
-      const preprocessedArgs = await this.preprocessArguments(argList);
+      const deduplicatedArgs = await this.deduplicateArguments(argList, finalConfig);
 
-      // Step 2: Calculate similarity matrix
-      const similarityMatrix = await this.calculateSimilarityMatrix(
-        preprocessedArgs,
-        finalConfig
-      );
+      const clusters: ArgumentCluster[] = [];
+      const assignedArguments = new Set<string>();
 
-      // Step 3: Perform clustering using hierarchical clustering
-      const clusters = await this.performHierarchicalClustering(
-        preprocessedArgs,
-        similarityMatrix,
-        finalConfig
-      );
+      for (const argument of deduplicatedArgs) {
+        if (assignedArguments.has(argument.id)) continue;
+        if (clusters.length >= finalConfig.maxClusters) break;
 
-      // Step 4: Identify outliers
-      const outliers = this.identifyOutliers(preprocessedArgs, clusters, finalConfig);
+        const cluster = await this.formCluster(
+          argument,
+          deduplicatedArgs,
+          assignedArguments,
+          finalConfig,
+        );
 
-      // Step 5: Enhance clusters with metadata
-      const enhancedClusters = await this.enhanceClusters(clusters);
+        if (cluster.argList.length >= finalConfig.minClusterSize) {
+          clusters.push(cluster);
+          cluster.argList.forEach((arg) => assignedArguments.add(arg.id));
+        }
+      }
 
-      // Step 6: Calculate clustering metrics
-      const clusteringMetrics = this.calculateClusteringMetrics(
-        argList,
-        enhancedClusters,
-        outliers,
-        Date.now() - startTime
-      );
+      const outliers = deduplicatedArgs.filter((arg) => !assignedArguments.has(arg.id));
+      const processingTime = Date.now() - startTime;
 
-      const result: ClusteringResult = {
-        clusters: enhancedClusters,
-        outliers,
-        clusteringMetrics
+      const metrics = {
+        totalArguments: deduplicatedArgs.length,
+        clustersFormed: clusters.length,
+        // FIX: Use assignedArguments Set instead of O(n) outliers.includes().
+        averageClusterSize:
+          clusters.length > 0 ? assignedArguments.size / clusters.length : 0,
+        silhouetteScore: await this.calculateSilhouetteScore(clusters, finalConfig.fullPairwiseSilhouette),
+        processingTime,
       };
 
-      logger.info({
-        component: 'ClusteringService',
-        clustersFormed: enhancedClusters.length,
-        outliers: outliers.length,
-        processingTime: clusteringMetrics.processingTime
-      }, `✅ Argument clustering completed`);
+      logger.info(
+        { component: LOG_COMPONENT, operation: 'clusterArguments', clustersFormed: clusters.length, outliersCount: outliers.length, processingTime },
+        '✅ Argument clustering completed',
+      );
 
-      return result;
-
+      return { clusters, outliers, clusteringMetrics: metrics };
     } catch (error) {
-      logger.error({
-        component: 'ClusteringService',
-        argumentCount: argList.length,
-        error: error instanceof Error ? error.message : String(error)
-      }, `❌ Argument clustering failed`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error({ component: LOG_COMPONENT, operation: 'clusterArguments', error: errorMessage }, 'Argument clustering failed');
       throw error;
     }
   }
 
+  // --------------------------------------------------------------------------
+  // Deduplication
+  // --------------------------------------------------------------------------
+
   /**
-   * Deduplicate claims by finding near-identical argList
+   * Dispatch to the configured deduplication strategy.
+   *
+   * Only 'lsh' is implemented. Other strategies throw until wired up.
    */
-  async deduplicateClaims(claims: string[]): Promise<string[]> {
-    if (claims.length === 0) return [];
+  private async deduplicateArguments(
+    argList: ClusteredArgument[],
+    config: ClusteringConfig,
+  ): Promise<ClusteredArgument[]> {
+    if (!config.useSemanticSimilarity) {
+      return this.deduplicateByExactText(argList);
+    }
 
-    const uniqueClaims: string[] = [];
-    const processed = new Set<number>();
-
-    for (let i = 0; i < claims.length; i++) {
-      if (processed.has(i)) continue;
-
-      const currentClaim = claims[i];
-      let isDuplicate = false;
-
-      // Check against existing unique claims
-      for (const uniqueClaim of uniqueClaims) {
-        const similarity = await this.similarityCalculator.calculateSimilarity(
-          currentClaim,
-          uniqueClaim
+    switch (config.deduplicationStrategy) {
+      case 'lsh':
+        return this.deduplicateByLsh(argList, config.similarityThreshold);
+      case 'hierarchical':
+      case 'agglomerative':
+        throw new Error(
+          `Deduplication strategy '${config.deduplicationStrategy}' is not yet implemented`,
         );
+    }
+  }
 
-        if (similarity > 0.85) { // High threshold for deduplication
+  /**
+   * Exact-text deduplication (O(n), no similarity calls).
+   *
+   * Used when useSemanticSimilarity is false. Keeps the first occurrence of
+   * each distinct normalizedText value — threshold is not applicable here.
+   */
+  private deduplicateByExactText(argList: ClusteredArgument[]): ClusteredArgument[] {
+    const seen = new Map<string, ClusteredArgument>();
+    for (const arg of argList) {
+      if (!seen.has(arg.normalizedText)) {
+        seen.set(arg.normalizedText, arg);
+      }
+    }
+    return Array.from(seen.values());
+  }
+
+  /**
+   * LSH-based deduplication (O(n log n) typical vs O(n³) naive pairwise).
+   *
+   * Arguments are bucketed by their shingle hash. Full similarity is only
+   * computed between arguments that land in the same bucket, dramatically
+   * reducing the number of comparisons.
+   */
+  private async deduplicateByLsh(
+    argList: ClusteredArgument[],
+    similarityThreshold: number,
+  ): Promise<ClusteredArgument[]> {
+    const hashBuckets = new Map<string, ClusteredArgument[]>();
+    const retained: ClusteredArgument[] = [];
+
+    for (const arg of argList) {
+      const hashSignature = this.generateHash(arg.normalizedText);
+      const bucket = hashBuckets.get(hashSignature) ?? [];
+      if (!hashBuckets.has(hashSignature)) hashBuckets.set(hashSignature, bucket);
+
+      let isDuplicate = false;
+      for (const existing of bucket) {
+        const similarity = await this.similarityCalculator.calculateSimilarity(
+          arg.normalizedText,
+          existing.normalizedText,
+        );
+        if (similarity > similarityThreshold) {
           isDuplicate = true;
           break;
         }
       }
 
       if (!isDuplicate) {
-        uniqueClaims.push(currentClaim);
-        
-        // Mark similar claims as processed
-        for (let j = i + 1; j < claims.length; j++) {
-          if (processed.has(j)) continue;
-          
-          const similarity = await this.similarityCalculator.calculateSimilarity(
-            currentClaim,
-            claims[j]
-          );
-          
-          if (similarity > 0.85) {
-            processed.add(j);
-          }
-        }
+        bucket.push(arg);
+        retained.push(arg);
       }
-      
-      processed.add(i);
     }
 
-    return uniqueClaims;
+    logger.debug(
+      {
+        component: LOG_COMPONENT,
+        operation: 'deduplicateByLsh',
+        originalCount: argList.length,
+        retainedCount: retained.length,
+        bucketsCreated: hashBuckets.size,
+      },
+      'LSH deduplication completed',
+    );
+
+    return retained;
   }
 
-  /**
-   * Find argList similar to a given query
-   */
-  async findSimilarArguments(
-    query: string,
-    argList: ClusteredArgument[],
-    threshold: number = 0.6
-  ): Promise<ClusteredArgument[]> {
-    const similarities: Array<{ argument: ClusteredArgument; similarity: number }> = [];
+  // --------------------------------------------------------------------------
+  // Hashing
+  // --------------------------------------------------------------------------
 
-    for (const argument of argList) {
+  /**
+   * Generate an LSH fingerprint for a text string using word shingles.
+   *
+   * Synchronous — no I/O involved.
+   */
+  private generateHash(text: string): string {
+    const shingles = this.generateShingles(text, SHINGLE_SIZE);
+    const fingerprint = shingles.reduce((hash, shingle) => hash ^ this.djb2Hash(shingle), 0);
+    return fingerprint.toString(16);
+  }
+
+  /** Generate k-gram (shingle) sequences from a whitespace-tokenised string. */
+  private generateShingles(text: string, k: number): string[] {
+    const words = text.split(/\s+/);
+    const shingles: string[] = [];
+    for (let i = 0; i <= words.length - k; i++) {
+      shingles.push(words.slice(i, i + k).join(' '));
+    }
+    return shingles;
+  }
+
+  /** DJB2 hash — fast, low-collision 32-bit integer hash for short strings. */
+  private djb2Hash(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash |= 0; // coerce to signed 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+
+  // --------------------------------------------------------------------------
+  // Cluster formation
+  // --------------------------------------------------------------------------
+
+  /**
+   * Form a cluster seeded by a representative argument, collecting all
+   * unassigned arguments within the similarity threshold.
+   *
+   * If considerPosition is enabled, arguments with positions that conflict
+   * with the representative are skipped.
+   */
+  private async formCluster(
+    representative: ClusteredArgument,
+    allArguments: ClusteredArgument[],
+    assigned: Set<string>,
+    config: ClusteringConfig,
+  ): Promise<ArgumentCluster> {
+    const members: ClusteredArgument[] = [representative];
+    let confidenceSum = representative.confidence;
+
+    // Infer representative position from its text hints (simplified heuristic).
+    const representativePosition = this.inferPosition(representative.text);
+
+    for (const arg of allArguments) {
+      if (arg.id === representative.id || assigned.has(arg.id)) continue;
+
+      // If considerPosition is enabled, skip arguments with conflicting positions.
+      if (config.considerPosition) {
+        const argPosition = this.inferPosition(arg.text);
+        if (
+          (representativePosition === 'support' && argPosition === 'oppose') ||
+          (representativePosition === 'oppose' && argPosition === 'support')
+        ) {
+          continue;
+        }
+      }
+
       const similarity = await this.similarityCalculator.calculateSimilarity(
-        query,
-        argument.normalizedText
+        representative.normalizedText,
+        arg.normalizedText,
       );
 
-      if (similarity >= threshold) {
-        similarities.push({ argument, similarity });
+      if (similarity >= config.similarityThreshold) {
+        arg.similarityScore = similarity;
+        members.push(arg);
+        confidenceSum += arg.confidence;
       }
     }
 
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .map(item => ({
-        ...item.argument,
-        similarityScore: item.similarity
-      }));
-  }
+    representative.isRepresentative = true;
 
-  /**
-   * Merge small clusters with similar larger ones
-   */
-  async mergeSimilarClusters(
-    clusters: ArgumentCluster[],
-    threshold: number = 0.8
-  ): Promise<ArgumentCluster[]> {
-    const merged: ArgumentCluster[] = [];
-    const processed = new Set<string>();
-
-    // Sort clusters by size (largest first)
-    const sortedClusters = clusters.sort((a, b) => b.arguments.length - a.arguments.length);
-
-    for (const cluster of sortedClusters) {
-      if (processed.has(cluster.id)) continue;
-
-      let targetCluster = cluster;
-
-      // For small clusters, try to merge with similar larger ones
-      if (cluster.arguments.length < 5) {
-        for (const potentialTarget of merged) {
-          const similarity = await this.similarityCalculator.calculateSimilarity(
-            cluster.representativeText,
-            potentialTarget.representativeText
-          );
-
-          if (similarity >= threshold && cluster.position === potentialTarget.position) {
-            // Merge into existing cluster
-            targetCluster = this.mergeClusters(potentialTarget, cluster);
-            break;
-          }
-        }
-      }
-
-      if (targetCluster === cluster) {
-        merged.push(cluster);
-      }
-
-      processed.add(cluster.id);
-    }
-
-    return merged;
-  }
-
-  // Private helper methods
-
-  private async preprocessArguments(argList: ClusteredArgument[]): Promise<ClusteredArgument[]> {
-    return argList.map(arg => ({
-      ...arg,
-      normalizedText: this.normalizeForClustering(arg.normalizedText)
-    }));
-  }
-
-  private normalizeForClustering(text: string): string {
-    return text
-      .toLowerCase()
-      .replace(/[^\w\s]/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-  }
-
-  private async calculateSimilarityMatrix(
-    argList: ClusteredArgument[],
-    config: ClusteringConfig
-  ): Promise<number[][]> {
-    const matrix: number[][] = [];
-    const n = argList.length;
-
-    for (let i = 0; i < n; i++) {
-      matrix[i] = new Array(n).fill(0);
-      
-      for (let j = i; j < n; j++) {
-        if (i === j) {
-          matrix[i][j] = 1.0;
-        } else {
-          let similarity = 0;
-
-          if (config.useSemanticSimilarity) {
-            similarity = await this.similarityCalculator.calculateSimilarity(
-              argList[i].normalizedText,
-              argList[j].normalizedText
-            );
-          } else {
-            similarity = this.calculateLexicalSimilarity(
-              argList[i].normalizedText,
-              argList[j].normalizedText
-            );
-          }
-
-          // Adjust similarity based on position agreement
-          if (config.considerPosition) {
-            const positionBonus = this.calculatePositionSimilarity(
-              argList[i],
-              argList[j]
-            );
-            similarity = similarity * 0.8 + positionBonus * 0.2;
-          }
-
-          // Adjust similarity based on demographics
-          if (config.considerDemographics) {
-            const demographicBonus = this.calculateDemographicSimilarity(
-              argList[i].userDemographics,
-              argList[j].userDemographics
-            );
-            similarity = similarity * 0.9 + demographicBonus * 0.1;
-          }
-
-          matrix[i][j] = similarity;
-          matrix[j][i] = similarity;
-        }
-      }
-    }
-
-    return matrix;
-  }
-
-  private calculateLexicalSimilarity(text1: string, text2: string): number {
-    const words1 = new Set(text1.split(' '));
-    const words2 = new Set(text2.split(' '));
-    
-    const intersection = new Set([...words1].filter(x => words2.has(x)));
-    const union = new Set([...words1, ...words2]);
-    
-    return union.size === 0 ? 0 : intersection.size / union.size;
-  }
-
-  private calculatePositionSimilarity(arg1: ClusteredArgument, arg2: ClusteredArgument): number {
-    // Extract position from argument text if not explicitly set
-    const pos1 = this.inferPosition(arg1.text);
-    const pos2 = this.inferPosition(arg2.text);
-    
-    if (pos1 === pos2) return 1.0;
-    if ((pos1 === 'support' && pos2 === 'oppose') || (pos1 === 'oppose' && pos2 === 'support')) {
-      return 0.0;
-    }
-    return 0.5; // neutral or conditional
-  }
-
-  private inferPosition(text: string): 'support' | 'oppose' | 'neutral' {
-    const lowerText = text.toLowerCase();
-    
-    const supportWords = ['support', 'agree', 'good', 'beneficial', 'necessary'];
-    const opposeWords = ['oppose', 'against', 'bad', 'harmful', 'unnecessary'];
-    
-    const supportCount = supportWords.filter(word => lowerText.includes(word)).length;
-    const opposeCount = opposeWords.filter(word => lowerText.includes(word)).length;
-    
-    if (supportCount > opposeCount) return 'support';
-    if (opposeCount > supportCount) return 'oppose';
-    return 'neutral';
-  }
-
-  private calculateDemographicSimilarity(
-    demo1?: UserDemographics,
-    demo2?: UserDemographics
-  ): number {
-    if (!demo1 || !demo2) return 0.5;
-
-    let matches = 0;
-    let total = 0;
-
-    if (demo1.county && demo2.county) {
-      total++;
-      if (demo1.county === demo2.county) matches++;
-    }
-
-    if (demo1.ageGroup && demo2.ageGroup) {
-      total++;
-      if (demo1.ageGroup === demo2.ageGroup) matches++;
-    }
-
-    if (demo1.occupation && demo2.occupation) {
-      total++;
-      if (demo1.occupation === demo2.occupation) matches++;
-    }
-
-    return total === 0 ? 0.5 : matches / total;
-  }
-
-  private async performHierarchicalClustering(
-    argList: ClusteredArgument[],
-    similarityMatrix: number[][],
-    config: ClusteringConfig
-  ): Promise<ArgumentCluster[]> {
-    const clusters: ArgumentCluster[] = [];
-    const n = argList.length;
-    
-    // Initialize each argument as its own cluster
-    const activeClusters: Set<number>[] = [];
-    for (let i = 0; i < n; i++) {
-      activeClusters.push(new Set([i]));
-    }
-
-    // Merge clusters based on similarity threshold
-    while (activeClusters.length > 1 && clusters.length < config.maxClusters) {
-      let maxSimilarity = -1;
-      let mergeIndices: [number, number] = [-1, -1];
-
-      // Find most similar clusters
-      for (let i = 0; i < activeClusters.length; i++) {
-        for (let j = i + 1; j < activeClusters.length; j++) {
-          const similarity = this.calculateClusterSimilarity(
-            activeClusters[i],
-            activeClusters[j],
-            similarityMatrix
-          );
-
-          if (similarity > maxSimilarity && similarity >= config.similarityThreshold) {
-            maxSimilarity = similarity;
-            mergeIndices = [i, j];
-          }
-        }
-      }
-
-      // If no clusters meet threshold, stop merging
-      if (mergeIndices[0] === -1) break;
-
-      // Merge the most similar clusters
-      const [i, j] = mergeIndices;
-      const mergedCluster = new Set([...activeClusters[i], ...activeClusters[j]]);
-      
-      // Remove original clusters and add merged one
-      activeClusters.splice(Math.max(i, j), 1);
-      activeClusters.splice(Math.min(i, j), 1);
-      activeClusters.push(mergedCluster);
-    }
-
-    // Convert remaining clusters to ArgumentCluster objects
-    for (const clusterIndices of activeClusters) {
-      if (clusterIndices.size >= config.minClusterSize) {
-        const clusterArgs = Array.from(clusterIndices).map(i => argList[i]);
-        const cluster = this.createArgumentCluster(clusterArgs);
-        clusters.push(cluster);
-      }
-    }
-
-    return clusters;
-  }
-
-  private calculateClusterSimilarity(
-    cluster1: Set<number>,
-    cluster2: Set<number>,
-    similarityMatrix: number[][]
-  ): number {
-    let totalSimilarity = 0;
-    let count = 0;
-
-    for (const i of cluster1) {
-      for (const j of cluster2) {
-        totalSimilarity += similarityMatrix[i][j];
-        count++;
-      }
-    }
-
-    return count === 0 ? 0 : totalSimilarity / count;
-  }
-
-  private createArgumentCluster(argList: ClusteredArgument[]): ArgumentCluster {
-    // Find representative argument (most central)
-    const representative = this.findRepresentativeArgument(argList);
-    
-    // Calculate cluster metadata
-    const topicTags = this.aggregateTopicTags(argList);
-    const position = this.determineClusterPosition(argList);
-    const stakeholderGroups = this.aggregateStakeholderGroups(argList);
-    const averageConfidence = this.calculateAverageConfidence(argList);
-    const evidenceStrength = this.calculateEvidenceStrength(argList);
-    const participantCount = new Set(argList.map(arg => arg.user_id)).size;
-    const geographicDistribution = this.calculateGeographicDistribution(argList);
-    const demographicBreakdown = this.calculateDemographicBreakdown(argList);
-
-    return {
-      id: crypto.randomUUID(),
-      representativeText: representative.text,
-      argList: argList.map(arg => ({
-        ...arg,
-        isRepresentative: arg.id === representative.id
-      })),
-      topicTags,
-      position,
-      stakeholderGroups,
-      averageConfidence,
-      evidenceStrength,
-      participantCount,
-      geographicDistribution,
-      demographicBreakdown
-    };
-  }
-
-  private findRepresentativeArgument(argList: ClusteredArgument[]): ClusteredArgument {
-    // Find argument with highest average similarity to others
-    let bestArg = argList[0];
-    let bestScore = -1;
-
-    for (const candidate of argList) {
-      let totalSimilarity = 0;
-      
-      for (const other of argList) {
-        if (candidate.id !== other.id) {
-          // Use confidence as a proxy for centrality
-          totalSimilarity += candidate.confidence;
-        }
-      }
-
-      const avgSimilarity = totalSimilarity / (argList.length - 1);
-      if (avgSimilarity > bestScore) {
-        bestScore = avgSimilarity;
-        bestArg = candidate;
-      }
-    }
-
-    return bestArg;
-  }
-
-  private aggregateTopicTags(argList: ClusteredArgument[]): string[] {
-    const tagCounts = new Map<string, number>();
-    
-    argList.forEach(arg => {
-      // Extract topic tags from argument text (simplified)
-      const words = arg.normalizedText.split(' ');
-      words.forEach(word => {
-        if (word.length > 3) {
-          tagCounts.set(word, (tagCounts.get(word) || 0) + 1);
-        }
-      });
-    });
-
-    return Array.from(tagCounts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5)
-      .map(([tag]) => tag);
-  }
-
-  private determineClusterPosition(argList: ClusteredArgument[]): 'support' | 'oppose' | 'neutral' | 'mixed' {
-    const positions = argList.map(arg => this.inferPosition(arg.text));
-    const supportCount = positions.filter(p => p === 'support').length;
-    const opposeCount = positions.filter(p => p === 'oppose').length;
-    const neutralCount = positions.filter(p => p === 'neutral').length;
-
-    const total = positions.length;
-    if (supportCount > total * 0.7) return 'support';
-    if (opposeCount > total * 0.7) return 'oppose';
-    if (neutralCount > total * 0.7) return 'neutral';
-    return 'mixed';
-  }
-
-  private aggregateStakeholderGroups(argList: ClusteredArgument[]): string[] {
-    const groups = new Set<string>();
-    
-    argList.forEach(arg => {
-      if (arg.userDemographics?.occupation) {
-        groups.add(arg.userDemographics.occupation);
-      }
-      if (arg.userDemographics?.organizationAffiliation) {
-        groups.add(arg.userDemographics.organizationAffiliation);
-      }
-    });
-
-    return Array.from(groups);
-  }
-
-  private calculateAverageConfidence(argList: ClusteredArgument[]): number {
-    const total = argList.reduce((sum, arg) => sum + arg.confidence, 0);
-    return total / argList.length;
-  }
-
-  private calculateEvidenceStrength(argList: ClusteredArgument[]): number {
-    // Simplified evidence strength calculation
-    const evidenceWords = ['study', 'research', 'data', 'statistics', 'report'];
-    let evidenceCount = 0;
-
-    argList.forEach(arg => {
-      const lowerText = arg.text.toLowerCase();
-      evidenceWords.forEach(word => {
-        if (lowerText.includes(word)) evidenceCount++;
-      });
-    });
-
-    return Math.min(1.0, evidenceCount / argList.length);
-  }
-
-  private calculateGeographicDistribution(argList: ClusteredArgument[]): Map<string, number> {
-    const distribution = new Map<string, number>();
-    
-    argList.forEach(arg => {
-      const county = arg.userDemographics?.county || 'unknown';
-      distribution.set(county, (distribution.get(county) || 0) + 1);
-    });
-
-    return distribution;
-  }
-
-  private calculateDemographicBreakdown(argList: ClusteredArgument[]): DemographicBreakdown {
+    // Build demographic breakdown from all collected members.
     const ageGroups = new Map<string, number>();
     const occupations = new Map<string, number>();
     const counties = new Map<string, number>();
     const organizationAffiliations = new Map<string, number>();
 
-    argList.forEach(arg => {
-      const demo = arg.userDemographics;
-      if (demo) {
-        if (demo.ageGroup) {
-          ageGroups.set(demo.ageGroup, (ageGroups.get(demo.ageGroup) || 0) + 1);
+    for (const member of members) {
+      const demographics = member.userDemographics;
+      if (demographics) {
+        if (demographics.ageGroup) {
+          ageGroups.set(demographics.ageGroup, (ageGroups.get(demographics.ageGroup) ?? 0) + 1);
         }
-        if (demo.occupation) {
-          occupations.set(demo.occupation, (occupations.get(demo.occupation) || 0) + 1);
+        if (demographics.occupation) {
+          occupations.set(demographics.occupation, (occupations.get(demographics.occupation) ?? 0) + 1);
         }
-        if (demo.county) {
-          counties.set(demo.county, (counties.get(demo.county) || 0) + 1);
+        if (demographics.county) {
+          counties.set(demographics.county, (counties.get(demographics.county) ?? 0) + 1);
         }
-        if (demo.organizationAffiliation) {
-          organizationAffiliations.set(demo.organizationAffiliation, 
-            (organizationAffiliations.get(demo.organizationAffiliation) || 0) + 1);
+        if (demographics.organizationAffiliation) {
+          organizationAffiliations.set(
+            demographics.organizationAffiliation,
+            (organizationAffiliations.get(demographics.organizationAffiliation) ?? 0) + 1,
+          );
         }
       }
-    });
+    }
 
-    return { ageGroups, occupations, counties, organizationAffiliations };
-  }
-
-  private identifyOutliers(
-    argList: ClusteredArgument[],
-    clusters: ArgumentCluster[],
-    config: ClusteringConfig
-  ): ClusteredArgument[] {
-    const clusteredArgIds = new Set<string>();
-    
-    clusters.forEach(cluster => {
-      cluster.arguments.forEach((arg: any) => {
-        clusteredArgIds.add(arg.id);
+    // Calculate demographic diversity score if enabled.
+    let demographicDiversity = 0;
+    if (config.considerDemographics) {
+      demographicDiversity = this.calculateDemographicDiversity({
+        ageGroups,
+        occupations,
+        counties,
+        organizationAffiliations,
       });
-    });
+    }
 
-    return argList.filter(arg => !clusteredArgIds.has(arg.id));
-  }
-
-  private async enhanceClusters(clusters: ArgumentCluster[]): Promise<ArgumentCluster[]> {
-    // Additional enhancement logic could go here
-    return clusters;
-  }
-
-  private calculateClusteringMetrics(
-    originalArguments: ClusteredArgument[],
-    clusters: ArgumentCluster[],
-    outliers: ClusteredArgument[],
-    processingTime: number
-  ): ClusteringResult['clusteringMetrics'] {
-    const totalArguments = originalArguments.length;
-    const clustersFormed = clusters.length;
-    const averageClusterSize = clusters.length === 0 ? 0 : 
-      clusters.reduce((sum, cluster) => sum + cluster.arguments.length, 0) / clusters.length;
-    
-    // Simplified silhouette score calculation
-    const silhouetteScore = this.calculateSilhouetteScore(clusters);
-
-    return {
-      totalArguments,
-      clustersFormed,
-      averageClusterSize,
-      silhouetteScore,
-      processingTime
+    const cluster: ArgumentCluster = {
+      id: crypto.randomUUID(),
+      representativeText: representative.text,
+      argList: members,
+      topicTags: [],
+      position: representativePosition,
+      stakeholderGroups: [],
+      // FIX: True mean — accumulate sum, divide once after all members known.
+      averageConfidence: confidenceSum / members.length,
+      // Apply demographic diversity as bonus to evidence strength if enabled.
+      evidenceStrength: config.considerDemographics ? demographicDiversity : 0,
+      participantCount: members.length,
+      geographicDistribution: counties,
+      demographicBreakdown: {
+        ageGroups,
+        occupations,
+        counties,
+        organizationAffiliations,
+      },
     };
+
+    return cluster;
   }
 
-  private calculateSilhouetteScore(clusters: ArgumentCluster[]): number {
-    // Simplified silhouette score - in practice would need full distance matrix
+  // --------------------------------------------------------------------------
+  // Quality metrics
+  // --------------------------------------------------------------------------
+
+  /**
+   * Approximate silhouette score using representative-to-representative
+   * similarity as a proxy for inter-cluster distance.
+   *
+   * The previous implementation used arg.similarityScore (each argument's
+   * similarity to its OWN cluster representative) as the distance metric for
+   * BOTH intra- and inter-cluster calculations. This is semantically wrong:
+   * inter-cluster distance requires comparing arguments across clusters, not
+   * reusing a score that was computed relative to a different reference point.
+   *
+   * Two modes:
+   * - Fast approximation (default, O(k²·n)): Uses representative-to-representative
+   *   similarity as a proxy for inter-cluster distance.
+   * - Full pairwise (optional, O(n²)): Computes similarity between every argument
+   *   and every other cluster's members for a true silhouette score. This mode is
+   *   gated behind fullPairwiseSilhouette config flag and should only be used on
+   *   small clusters due to O(n²) complexity.
+   */
+  private async calculateSilhouetteScore(
+    clusters: ArgumentCluster[],
+    fullPairwise: boolean = false,
+  ): Promise<number> {
     if (clusters.length < 2) return 0;
-    
+
+    if (fullPairwise) {
+      return this.calculateFullPairwiseSilhouette(clusters);
+    }
+
+    return this.calculateApproximateSilhouette(clusters);
+  }
+
+  /**
+   * Fast approximation using representative-to-representative distances.
+   * O(k²·n) where k = cluster count, n = average cluster size.
+   */
+  private async calculateApproximateSilhouette(clusters: ArgumentCluster[]): Promise<number> {
+    if (clusters.length < 2) return 0;
+
+    // Pre-compute pairwise representative similarities (k² calls, k ≤ maxClusters).
+    const repSimilarities = new Map<string, number>();
+    for (let i = 0; i < clusters.length; i++) {
+      const ci = clusters[i];
+      if (!ci) continue;
+
+      for (let j = i + 1; j < clusters.length; j++) {
+        const cj = clusters[j];
+        if (!cj) continue;
+
+        const sim = await this.similarityCalculator.calculateSimilarity(
+          ci.representativeText,
+          cj.representativeText,
+        );
+        repSimilarities.set(`${ci.id}:${cj.id}`, sim);
+        repSimilarities.set(`${cj.id}:${ci.id}`, sim);
+      }
+    }
+
     let totalScore = 0;
     let count = 0;
 
-    clusters.forEach(cluster => {
-      if (cluster.arguments.length > 1) {
-        // Simplified: use average confidence as proxy for cohesion
-        totalScore += cluster.averageConfidence;
+    for (const cluster of clusters) {
+      // Nearest other cluster by representative similarity.
+      let maxInterSim = -Infinity;
+      for (const other of clusters) {
+        if (other.id === cluster.id) continue;
+        const sim = repSimilarities.get(`${cluster.id}:${other.id}`) ?? 0;
+        if (sim > maxInterSim) maxInterSim = sim;
+      }
+      const minInterDistance = 1 - maxInterSim;
+
+      for (const arg of cluster.argList) {
+        const intraDistance = 1 - arg.similarityScore;
+        const denom = Math.max(minInterDistance, intraDistance);
+        const silhouette = denom === 0 ? 0 : (minInterDistance - intraDistance) / denom;
+        totalScore += silhouette;
         count++;
       }
-    });
+    }
 
-    return count === 0 ? 0 : totalScore / count;
+    return count > 0 ? totalScore / count : 0;
   }
 
-  private mergeClusters(target: ArgumentCluster, source: ArgumentCluster): ArgumentCluster {
-    return {
-      ...target,
-      argList: [...target.arguments, ...source.arguments],
-      topicTags: [...new Set([...target.topicTags, ...source.topicTags])],
-      stakeholderGroups: [...new Set([...target.stakeholderGroups, ...source.stakeholderGroups])],
-      averageConfidence: (target.averageConfidence * target.arguments.length + 
-                         source.averageConfidence * source.arguments.length) / 
-                        (target.arguments.length + source.arguments.length),
-      participantCount: target.participantCount + source.participantCount
-    };
+  /**
+   * Full pairwise silhouette score using true inter-cluster argument distances.
+   * O(n²) where n = total arguments. Only use on small datasets.
+   *
+   * For each argument:
+   *   - Compute similarity to ALL arguments in its cluster (intra-cluster mean)
+   *   - Compute similarity to ALL arguments in each other cluster
+   *   - Find nearest other cluster (max mean similarity)
+   *   - silhouette = (b - a) / max(a, b) where a = within-cluster, b = nearest other
+   */
+  private async calculateFullPairwiseSilhouette(clusters: ArgumentCluster[]): Promise<number> {
+    if (clusters.length < 2) return 0;
+
+    const clusterMap = new Map<string, ArgumentCluster>();
+    for (const cluster of clusters) {
+      clusterMap.set(cluster.id, cluster);
+    }
+
+    let totalScore = 0;
+    let count = 0;
+
+    for (const cluster of clusters) {
+      // Pre-compute intra-cluster mean similarity for this cluster's arguments.
+      for (const arg of cluster.argList) {
+        let intraSum = 0;
+        let intraDenom = 0;
+
+        for (const other of cluster.argList) {
+          if (other.id === arg.id) continue;
+          const sim = await this.similarityCalculator.calculateSimilarity(
+            arg.text,
+            other.text,
+          );
+          intraSum += sim;
+          intraDenom++;
+        }
+
+        const intraMean = intraDenom > 0 ? intraSum / intraDenom : 0;
+
+        // Find nearest cluster by mean inter-cluster similarity.
+        let maxInterMean = -Infinity;
+        for (const other of clusters) {
+          if (other.id === cluster.id) continue;
+
+          let interSum = 0;
+          let interDenom = 0;
+
+          for (const otherArg of other.argList) {
+            const sim = await this.similarityCalculator.calculateSimilarity(
+              arg.text,
+              otherArg.text,
+            );
+            interSum += sim;
+            interDenom++;
+          }
+
+          const interMean = interDenom > 0 ? interSum / interDenom : 0;
+          if (interMean > maxInterMean) maxInterMean = interMean;
+        }
+
+        // Silhouette coefficient.
+        const denom = Math.max(intraMean, maxInterMean);
+        const silhouette = denom === 0 ? 0 : (maxInterMean - intraMean) / denom;
+        totalScore += silhouette;
+        count++;
+      }
+    }
+
+    return count > 0 ? totalScore / count : 0;
+  }
+
+  /**
+   * Infer position (support, oppose, neutral) from text using keyword heuristics.
+   * Returns the most prominent position found (support > oppose > neutral).
+   */
+  private inferPosition(text: string): 'support' | 'oppose' | 'neutral' {
+    const lowerText = text.toLowerCase();
+
+    const supportKeywords = [
+      'support',
+      'favor',
+      'promote',
+      'advocate',
+      'encourage',
+      'should',
+      'approve',
+      'benefit',
+      'good',
+      'positive',
+    ];
+    const opposeKeywords = [
+      'oppose',
+      'against',
+      'prevent',
+      'prohibit',
+      'stop',
+      'bad',
+      'harmful',
+      'negative',
+      'danger',
+      'risk',
+    ];
+
+    const supportCount = supportKeywords.filter((kw) => lowerText.includes(kw)).length;
+    const opposeCount = opposeKeywords.filter((kw) => lowerText.includes(kw)).length;
+
+    if (supportCount > opposeCount) return 'support';
+    if (opposeCount > supportCount) return 'oppose';
+    return 'neutral';
+  }
+
+  /**
+   * Calculate demographic diversity score (0-1) across all tracked dimensions.
+   * Higher values indicate more diverse representation.
+   *
+   * Score is normalized: max(1, sum of distinct categories across all dimensions).
+   * This ensures that clusters with more demographic variety score higher.
+   */
+  private calculateDemographicDiversity(demographic: DemographicBreakdown): number {
+    let distinctCount = 0;
+
+    if (demographic.ageGroups.size > 0) distinctCount += demographic.ageGroups.size;
+    if (demographic.occupations.size > 0) distinctCount += demographic.occupations.size;
+    if (demographic.counties.size > 0) distinctCount += demographic.counties.size;
+    if (demographic.organizationAffiliations.size > 0) {
+      distinctCount += demographic.organizationAffiliations.size;
+    }
+
+    // Normalize: No diversity = 0, high diversity → 1 (capped at 4 dimensions).
+    return Math.min(distinctCount / 4, 1);
   }
 }
 
+// ============================================================================
+// SINGLETON EXPORT
+// ============================================================================
 
+export const clusteringService = new ClusteringService(new SimilarityCalculator());

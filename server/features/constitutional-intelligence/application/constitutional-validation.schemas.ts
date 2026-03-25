@@ -1,15 +1,14 @@
 /**
  * Constitutional Intelligence Feature - Validation Schemas
- * 
+ *
  * Zod schemas for validating constitutional analysis inputs.
  * Uses common schemas from validation helpers for consistency.
  */
 
-import { z } from 'zod';
-import { CommonSchemas } from '@server/infrastructure/validation/validation-helpers';
+import { CommonSchemas, z } from '@server/infrastructure/validation/validation-helpers';
 
 // ============================================================================
-// Constitutional Analysis Enums
+// Enums
 // ============================================================================
 
 export const ConstitutionalArticleSchema = z.enum([
@@ -28,7 +27,7 @@ export const ConstitutionalArticleSchema = z.enum([
   'amendment_8',
   'amendment_10',
   'amendment_14',
-  'other'
+  'other',
 ]);
 
 export const ConcernSeveritySchema = z.enum([
@@ -36,7 +35,7 @@ export const ConcernSeveritySchema = z.enum([
   'minor',
   'moderate',
   'significant',
-  'critical'
+  'critical',
 ]);
 
 export const ConstitutionalPrincipleSchema = z.enum([
@@ -49,7 +48,7 @@ export const ConstitutionalPrincipleSchema = z.enum([
   'religious_freedom',
   'commerce_clause',
   'necessary_and_proper',
-  'supremacy_clause'
+  'supremacy_clause',
 ]);
 
 export const AnalysisConfidenceSchema = z.enum([
@@ -57,45 +56,83 @@ export const AnalysisConfidenceSchema = z.enum([
   'low',
   'medium',
   'high',
-  'very_high'
+  'very_high',
+]);
+
+export const OverallAssessmentSchema = z.enum([
+  'constitutional',
+  'likely_constitutional',
+  'questionable',
+  'likely_unconstitutional',
+  'unconstitutional',
 ]);
 
 // ============================================================================
-// Constitutional Analysis Schemas
+// Shared sub-schemas
+// ============================================================================
+
+const PrecedentRefSchema = z.object({
+  case_name: z.string().min(2).max(200),
+  citation: z.string().min(2).max(200),
+  relevance: z.string().min(1).max(1000),
+  url: CommonSchemas.url.optional(),
+});
+
+const ConcernSummarySchema = z.object({
+  article: ConstitutionalArticleSchema,
+  principle: ConstitutionalPrincipleSchema,
+  severity: ConcernSeveritySchema,
+  description: z.string().min(50).max(2000),
+});
+
+const YearSchema = z
+  .string()
+  .regex(/^\d{4}$/)
+  .refine(
+    (y) => {
+      const year = Number(y);
+      return year >= 1776 && year <= new Date().getFullYear();
+    },
+    { message: 'Year must be between 1776 and the current year' },
+  );
+
+// ============================================================================
+// Analysis Schemas
 // ============================================================================
 
 export const AnalyzeBillSchema = z.object({
   bill_id: CommonSchemas.id,
   analysis_depth: z.enum(['basic', 'standard', 'comprehensive']).default('standard'),
-  focus_areas: z.array(ConstitutionalPrincipleSchema).max(10).optional(),
+  focus_areas: z.array(ConstitutionalPrincipleSchema).min(1).max(10).optional(),
   include_precedents: z.boolean().default(true),
   include_recommendations: z.boolean().default(true),
 });
 
 export const AnalyzeTextSchema = z.object({
   text: z.string().min(50).max(50000),
-  context: z.object({
-    bill_id: CommonSchemas.id.optional(),
-    section: z.string().max(200).optional(),
-    jurisdiction: z.string().max(100).optional(),
-  }).optional(),
-  focus_areas: z.array(ConstitutionalPrincipleSchema).optional(),
+  context: z
+    .object({
+      bill_id: CommonSchemas.id.optional(),
+      section: z.string().min(1).max(200).optional(),
+      jurisdiction: z.string().min(1).max(100).optional(),
+    })
+    .optional(),
+  focus_areas: z.array(ConstitutionalPrincipleSchema).min(1).optional(),
   include_precedents: z.boolean().default(true),
 });
 
 export const CompareWithPrecedentSchema = z.object({
   bill_id: CommonSchemas.id,
   precedent_case: z.string().min(5).max(200),
-  comparison_aspects: z.array(z.enum([
-    'legal_reasoning',
-    'constitutional_basis',
-    'scope',
-    'implications'
-  ])).min(1).max(4).optional(),
+  comparison_aspects: z
+    .array(z.enum(['legal_reasoning', 'constitutional_basis', 'scope', 'implications']))
+    .min(1)
+    .max(4)
+    .optional(),
 });
 
 // ============================================================================
-// Concern Reporting Schemas
+// Concern Schemas
 // ============================================================================
 
 export const ReportConcernSchema = z.object({
@@ -105,33 +142,28 @@ export const ReportConcernSchema = z.object({
   severity: ConcernSeveritySchema,
   description: z.string().min(50).max(5000),
   legal_basis: z.string().min(20).max(2000),
-  precedents: z.array(z.object({
-    case_name: z.string().max(200),
-    citation: z.string().max(200),
-    relevance: z.string().max(1000),
-    url: CommonSchemas.url.optional(),
-  })).max(10).optional(),
-  suggested_revision: z.string().max(5000).optional(),
+  precedents: z.array(PrecedentRefSchema).max(10).optional(),
+  suggested_revision: z.string().min(1).max(5000).optional(),
 });
 
 export const ValidateConcernSchema = z.object({
   concern_id: CommonSchemas.id,
   is_valid: z.boolean(),
-  expert_opinion: z.string().max(2000).optional(),
-  supporting_precedents: z.array(z.string().max(200)).max(10).optional(),
+  expert_opinion: z.string().min(1).max(2000).optional(),
+  supporting_precedents: z.array(z.string().min(2).max(200)).max(10).optional(),
   confidence: AnalysisConfidenceSchema,
 });
 
 // ============================================================================
-// Precedent Analysis Schemas
+// Precedent Schemas
 // ============================================================================
 
 export const SearchPrecedentsSchema = z.object({
   query: CommonSchemas.searchQuery,
   article: ConstitutionalArticleSchema.optional(),
   principle: ConstitutionalPrincipleSchema.optional(),
-  date_from: z.string().regex(/^\d{4}$/).optional(), // Year format
-  date_to: z.string().regex(/^\d{4}$/).optional(),
+  year_from: YearSchema.optional(),
+  year_to: YearSchema.optional(),
   court_level: z.enum(['supreme_court', 'appellate', 'district', 'all']).default('all'),
   limit: CommonSchemas.limit.optional(),
 });
@@ -145,35 +177,38 @@ export const GetRelevantPrecedentsSchema = z.object({
 export const AnalyzePrecedentImpactSchema = z.object({
   bill_id: CommonSchemas.id,
   precedent_case: z.string().min(5).max(200),
-  impact_areas: z.array(z.enum([
-    'constitutionality',
-    'enforcement',
-    'interpretation',
-    'scope'
-  ])).optional(),
+  impact_areas: z
+    .array(z.enum(['constitutionality', 'enforcement', 'interpretation', 'scope']))
+    .min(1)
+    .optional(),
 });
 
 // ============================================================================
-// Rights Impact Analysis Schemas
+// Rights Impact Schemas
 // ============================================================================
 
 export const AnalyzeRightsImpactSchema = z.object({
   bill_id: CommonSchemas.id,
-  rights_categories: z.array(z.enum([
-    'civil_rights',
-    'civil_liberties',
-    'property_rights',
-    'privacy_rights',
-    'voting_rights',
-    'due_process'
-  ])).optional(),
-  affected_groups: z.array(z.string().max(100)).max(20).optional(),
+  rights_categories: z
+    .array(
+      z.enum([
+        'civil_rights',
+        'civil_liberties',
+        'property_rights',
+        'privacy_rights',
+        'voting_rights',
+        'due_process',
+      ]),
+    )
+    .min(1)
+    .optional(),
+  affected_groups: z.array(z.string().min(1).max(100)).max(20).optional(),
 });
 
 export const GetBalancingTestSchema = z.object({
   bill_id: CommonSchemas.id,
-  right1: z.string().max(200),
-  right2: z.string().max(200),
+  right1: z.string().min(2).max(200),
+  right2: z.string().min(2).max(200),
   include_precedents: z.boolean().default(true),
 });
 
@@ -227,20 +262,15 @@ export const SubmitExpertReviewSchema = z.object({
   bill_id: CommonSchemas.id,
   expert_id: CommonSchemas.id,
   analysis: z.string().min(100).max(10000),
-  concerns: z.array(z.object({
-    article: ConstitutionalArticleSchema,
-    principle: ConstitutionalPrincipleSchema,
-    severity: ConcernSeveritySchema,
-    description: z.string().max(2000),
-  })).max(20),
-  overall_assessment: z.enum(['constitutional', 'likely_constitutional', 'questionable', 'likely_unconstitutional', 'unconstitutional']),
+  concerns: z.array(ConcernSummarySchema).max(20),
+  overall_assessment: OverallAssessmentSchema,
   confidence: AnalysisConfidenceSchema,
 });
 
 export const GetExpertReviewsSchema = z.object({
   bill_id: CommonSchemas.id,
   expert_id: CommonSchemas.id.optional(),
-  min_confidence: AnalysisConfidenceSchema.optional(),
+  confidence: AnalysisConfidenceSchema.optional(),
 });
 
 // ============================================================================
@@ -268,3 +298,4 @@ export type ConstitutionalArticle = z.infer<typeof ConstitutionalArticleSchema>;
 export type ConcernSeverity = z.infer<typeof ConcernSeveritySchema>;
 export type ConstitutionalPrinciple = z.infer<typeof ConstitutionalPrincipleSchema>;
 export type AnalysisConfidence = z.infer<typeof AnalysisConfidenceSchema>;
+export type OverallAssessment = z.infer<typeof OverallAssessmentSchema>;

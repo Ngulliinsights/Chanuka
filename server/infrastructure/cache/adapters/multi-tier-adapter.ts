@@ -18,6 +18,8 @@ import { MemoryAdapter, type MemoryAdapterConfig } from './memory-adapter';
 
 export interface MultiTierAdapterConfig {
   l1Config: MemoryAdapterConfig;
+  // Note: L2 Redis is not fully implemented yet, using MemoryAdapter as fallback
+  l2Config?: MemoryAdapterConfig;
   promotionStrategy?: PromotionStrategy;
   promotionThreshold?: number;
   enableL1Warmup?: boolean;
@@ -28,7 +30,7 @@ export interface MultiTierAdapterConfig {
 
 export class MultiTierAdapter extends BaseCacheAdapter {
   private l1Cache: MemoryAdapter;
-  private l2Cache: RedisAdapter;
+  private l2Cache: MemoryAdapter; // Using MemoryAdapter for L2 until Redis is fully implemented
   private promotionStrategy: PromotionStrategy;
   private promotionThreshold: number;
   private enableL1Warmup: boolean;
@@ -46,8 +48,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
     this.enableL1Warmup = config.enableL1Warmup !== false;
 
     // Initialize cache tiers
+    // Using MemoryAdapter for L2 until Redis is fully implemented
     this.l1Cache = new MemoryAdapter(config.l1Config);
-    this.l2Cache = new RedisAdapter(config.l2Config);
+    this.l2Cache = new MemoryAdapter(config.l2Config || { maxMemoryMB: 50, defaultTtlSec: config.defaultTtlSec || 3600 });
 
     this.setupEventHandlers();
   }
@@ -422,11 +425,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
   /**
    * Invalidate by tags in both tiers
    */
-  async invalidateByTags(tags: string[]): Promise<number> {
-    // Only L2 supports tag invalidation for now
-    if (this.l2Cache.invalidateByTags) {
-      return this.l2Cache.invalidateByTags(tags);
-    }
+  async invalidateByTags(_tags: string[]): Promise<number> {
+    // L2 (MemoryAdapter) doesn't support tag invalidation
+    // This is a limitation until proper Redis is implemented
     return 0;
   }
 
@@ -434,9 +435,9 @@ export class MultiTierAdapter extends BaseCacheAdapter {
    * Warm up cache with critical data
    */
   async warmUp(entries: Array<{ key: string; value: unknown; options?: CacheOptions }>): Promise<void> {
-    // Warm up L2 tier
-    if (this.l2Cache.warmUp) {
-      await this.l2Cache.warmUp(entries);
+    // For L2, just set the values directly (warmUp not available on MemoryAdapter)
+    for (const entry of entries) {
+      await this.l2Cache.set(entry.key, entry.value, entry.options?.ttl);
     }
 
     // For L1, set the values directly

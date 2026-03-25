@@ -23,7 +23,9 @@ export type {
   CacheEntry,
   CacheConfig,
   EvictionPolicy,
-  PromotionStrategy
+  PromotionStrategy,
+  CacheService,
+  CacheKeyGenerator
 } from './types';
 
 // Unified cache config types
@@ -39,10 +41,6 @@ export { BaseCacheAdapter } from './core/base-adapter';
 
 // Adapters
 export { MemoryAdapter } from './adapters/memory-adapter';
-
-// Simple factory (working)
-export { SimpleCacheFactory, cacheFactory } from './simple-factory';
-export type { SimpleCacheConfig } from './simple-factory';
 
 // Test utilities
 export { testCachingSystem } from './test-comprehensive';
@@ -67,17 +65,20 @@ export {
 } from './cache-wrappers';
 
 // Convenience export for default cache service
-export { createCacheService, createSimpleCacheService, getDefaultCache, initializeDefaultCache } from './factory';
+export { createCacheService, createSimpleCacheService, getDefaultCache, initializeDefaultCache, SimpleCacheFactory, cacheFactory } from './factory';
 
-// Create a default cache service instance for convenience
+// Create a default cache service instance for convenience (also exported as 'cache')
 import { createSimpleCacheService } from './factory';
 export const cacheService = createSimpleCacheService();
+export const cache = createSimpleCacheService();
 
 // Server-specific cache wrapper with convenience methods
 export { ServerCacheWrapper, serverCache } from './server-cache-wrapper';
 
-// Cache key generation and invalidation
+// Cache key generation and invalidation - use key-generator.ts for CacheKeys class
 export { cacheKeys, createCacheInvalidation } from './cache-keys';
+export { cacheKeys as keyGenerator } from './key-generator';
+export { CacheKeys } from './key-generator';
 
 // Cache TTL constants for common use cases
 export const CACHE_TTL = {
@@ -90,8 +91,5 @@ export const CACHE_TTL = {
   QUERIES: 300,           // 5 minutes
   ANALYTICS: 900          // 15 minutes
 } as const;
-
-// Note: Advanced features like MultiTierAdapter, BrowserAdapter, and UnifiedCacheFactory
-// are available but may require additional configuration and dependencies
 
 

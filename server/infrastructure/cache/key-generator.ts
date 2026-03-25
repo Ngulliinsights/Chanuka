@@ -1,457 +1,377 @@
 /**
  * Cache Key Generator
- * 
- * Centralized cache key generation for consistent naming across the application
- * Standardized format: {prefix}:{feature}:{entity}:{id}:{variant}
+ *
+ * Centralised cache key generation for consistent naming across the application.
+ * Standardised format: {prefix}:{feature}:{entity}[:{id}][:{variant}][:{meta=val}…]
  */
 
 import { logger } from '../observability';
 import type { CacheKeyGenerator } from './types';
 
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const KEY_SEPARATOR  = ':';
+const MAX_KEY_LENGTH = 250;
+const HASH_MAX_LEN   = 50;
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
 export interface KeyComponents {
-  feature: string;
-  entity: string;
-  id?: string | number;
-  variant?: string;
+  feature:   string;
+  entity:    string;
+  id?:       string | number;
+  variant?:  string;
   metadata?: Record<string, string>;
 }
 
+// ---------------------------------------------------------------------------
+// Helpers (module-private)
+// ---------------------------------------------------------------------------
+
+/**
+ * Base-64 encode a string and truncate to `HASH_MAX_LEN` characters.
+ * Used to keep variable-length user input (queries, filters, params)
+ * within the key length budget.
+ */
+function hashSegment(value: string): string {
+  if (value.length <= HASH_MAX_LEN) return value;
+  return Buffer.from(value).toString('base64').slice(0, HASH_MAX_LEN);
+}
+
+// ---------------------------------------------------------------------------
+// CacheKeys
+// ---------------------------------------------------------------------------
+
 export class CacheKeys implements CacheKeyGenerator {
-  private static instance: CacheKeys;
-  private keyPrefix: string;
-  private readonly MAX_KEY_LENGTH = 250;
-  private readonly KEY_SEPARATOR = ':';
+  private static instance: CacheKeys | undefined;
 
-  constructor(keyPrefix: string = 'app') {
-    this.keyPrefix = keyPrefix;
-  }
+  constructor(private readonly keyPrefix: string = 'app') {}
 
-  static getInstance(keyPrefix?: string): CacheKeys {
-    if (!CacheKeys.instance) {
-      CacheKeys.instance = new CacheKeys(keyPrefix);
+  // -------------------------------------------------------------------------
+  // Singleton
+  // -------------------------------------------------------------------------
+
+  /**
+   * Return the process-wide singleton.
+   *
+   * @throws If called a second time with a *different* prefix — prevents silent
+   *         misconfiguration that would generate keys under the wrong namespace.
+   */
+  static getInstance(keyPrefix = 'app'): CacheKeys {
+    if (CacheKeys.instance) {
+      if (CacheKeys.instance.keyPrefix !== keyPrefix) {
+        throw new Error(
+          `CacheKeys singleton already initialised with prefix "${CacheKeys.instance.keyPrefix}". ` +
+          `Cannot re-initialise with "${keyPrefix}".`,
+        );
+      }
+      return CacheKeys.instance;
     }
+    CacheKeys.instance = new CacheKeys(keyPrefix);
     return CacheKeys.instance;
   }
 
+  /** Reset the singleton — intended for testing only. */
+  static resetInstance(): void {
+    CacheKeys.instance = undefined;
+  }
+
+  // -------------------------------------------------------------------------
+  // Core builder
+  // -------------------------------------------------------------------------
+
   /**
-   * Build standardized cache key from components
+   * Build a standardised cache key from structured components.
+   * Throws (and logs) when the assembled key exceeds `MAX_KEY_LENGTH` or
+   * contains control characters.
    */
   buildKey(components: KeyComponents): string {
     const parts = [this.keyPrefix, components.feature, components.entity];
-    
-    if (components.id !== undefined) {
-      parts.push(String(components.id));
-    }
-    
-    if (components.variant) {
-      parts.push(components.variant);
-    }
-    
+
+    if (components.id !== undefined)  parts.push(String(components.id));
+    if (components.variant)           parts.push(components.variant);
     if (components.metadata) {
-      Object.entries(components.metadata).forEach(([key, value]) => {
-        parts.push(`${key}=${value}`);
-      });
+      for (const [k, v] of Object.entries(components.metadata)) {
+        parts.push(`${k}=${v}`);
+      }
     }
-    
-    const key = parts.join(this.KEY_SEPARATOR);
-    
+
+    const key = parts.join(KEY_SEPARATOR);
+
     if (!this.validateKey(key)) {
       logger.warn({ key, components }, 'Generated invalid cache key');
-      throw new Error(`Invalid cache key: ${key}`);
+      throw new Error(`Invalid cache key generated: "${key}"`);
     }
-    
+
     return key;
   }
 
-  /**
-   * Hash long values for cache keys
-   */
-  private hashValue(value: string): string {
-    if (value.length <= 50) return value;
-    return Buffer.from(value).toString('base64').substring(0, 50);
+  // -------------------------------------------------------------------------
+  // Private
+  // -------------------------------------------------------------------------
+
+  private fmt(path: string): string {
+    return this.keyPrefix ? `${this.keyPrefix}${KEY_SEPARATOR}${path}` : path;
   }
 
-  /**
-   * Format key with optional prefix
-   */
-  private formatKey(key: string): string {
-    return this.keyPrefix ? `${this.keyPrefix}:${key}` : key;
-  }
+  // -------------------------------------------------------------------------
+  // Property keys
+  // -------------------------------------------------------------------------
 
-  /**
-   * Property-related cache keys
-   */
-  property(id: number): string {
-    return this.formatKey(`property:${id}`);
-  }
+  property(id: number):             string { return this.fmt(`property:${id}`); }
+  propertyDetails(id: number):      string { return this.fmt(`property:details:${id}`); }
+  propertyImages(id: number):       string { return this.fmt(`property:images:${id}`); }
+  propertyVerification(id: number): string { return this.fmt(`property:verification:${id}`); }
 
   properties(filters: string): string {
-    const filterHash = Buffer.from(filters).toString('base64');
-    return this.formatKey(`properties:${filterHash}`);
+    return this.fmt(`properties:${hashSegment(filters)}`);
   }
 
-  propertyDetails(id: number): string {
-    return this.formatKey(`property:details:${id}`);
-  }
+  // -------------------------------------------------------------------------
+  // User keys
+  // -------------------------------------------------------------------------
 
-  propertyImages(id: number): string {
-    return this.formatKey(`property:images:${id}`);
-  }
+  user(id: number):                 string { return this.fmt(`user:${id}`); }
+  userProfile(id: number):          string { return this.fmt(`user:profile:${id}`); }
+  user_profiles(id: number):        string { return this.fmt(`user:profile:${id}`); }
+  userByUsername(username: string): string { return this.fmt(`user:username:${username}`); }
+  userSession(sessionId: string):   string { return this.fmt(`user:session:${sessionId}`); }
+  userPermissions(id: number):      string { return this.fmt(`user:permissions:${id}`); }
+  userSettings(id: number):         string { return this.fmt(`settings:${id}`); }
+  settings(user_id: number):        string { return this.fmt(`settings:${user_id}`); }
 
-  propertyVerification(id: number): string {
-    return this.formatKey(`property:verification:${id}`);
-  }
+  // Legacy aliases — kept for backward compatibility; prefer the camelCase equivalents above.
+  /** @deprecated Use {@link userProfile} */
+  USER_PROFILE(id: number | string): string { return this.fmt(`user:profile:${id}`); }
+  /** @deprecated Use a dedicated `billDetails` key once the billing module is introduced. */
+  BILL_DETAILS(id: number | string): string { return this.fmt(`bill:details:${id}`); }
 
-  /**
-   * User-related cache keys
-   */
-  user(id: number): string {
-    return this.formatKey(`user:${id}`);
-  }
+  // -------------------------------------------------------------------------
+  // Review keys
+  // -------------------------------------------------------------------------
 
-  userByUsername(username: string): string {
-    return this.formatKey(`user:username:${username}`);
-  }
+  reviews(propertyId: number):    string { return this.fmt(`reviews:property:${propertyId}`); }
+  reviewsByUser(userId: number):  string { return this.fmt(`reviews:user:${userId}`); }
+  reviewStats(propertyId: number): string { return this.fmt(`reviews:stats:${propertyId}`); }
 
-  user_profiles(id: number): string {
-    return this.formatKey(`user:profile:${id}`);
-  }
+  // -------------------------------------------------------------------------
+  // Search keys
+  // -------------------------------------------------------------------------
 
-  userSession(session_id: string): string {
-    return this.formatKey(`user:session:${session_id}`);
-  }
+  searchResults(query: string):       string { return this.fmt(`search:${hashSegment(query)}`); }
+  searchSuggestions(query: string):   string { return this.fmt(`search:suggestions:${hashSegment(query)}`); }
+  searchFilters(category: string):    string { return this.fmt(`search:filters:${category}`); }
 
-  userPermissions(id: number): string {
-    return this.formatKey(`user:permissions:${id}`);
-  }
+  // -------------------------------------------------------------------------
+  // Trust & security keys
+  // -------------------------------------------------------------------------
 
-  /**
-   * Review-related cache keys
-   */
-  reviews(propertyId: number): string {
-    return this.formatKey(`reviews:property:${propertyId}`);
-  }
+  trustScore(userId: string):           string { return this.fmt(`trust:score:${userId}`); }
+  riskAssessment(userId: string):       string { return this.fmt(`risk:assessment:${userId}`); }
+  fraudDetection(propertyId: number):   string { return this.fmt(`fraud:detection:${propertyId}`); }
+  securityEvent(eventId: string):       string { return this.fmt(`security:event:${eventId}`); }
 
-  reviewsByUser(user_id: number): string { return this.formatKey(`reviews:user:${user_id }`);
-  }
+  // -------------------------------------------------------------------------
+  // API keys
+  // -------------------------------------------------------------------------
 
-  reviewStats(propertyId: number): string {
-    return this.formatKey(`reviews:stats:${propertyId}`);
-  }
-
-  /**
-   * Search-related cache keys
-   */
-  searchResults(query: string): string {
-    const queryHash = Buffer.from(query).toString('base64');
-    return this.formatKey(`search:${queryHash}`);
-  }
-
-  searchSuggestions(query: string): string {
-    const queryHash = Buffer.from(query).toString('base64');
-    return this.formatKey(`search:suggestions:${queryHash}`);
-  }
-
-  searchFilters(category: string): string {
-    return this.formatKey(`search:filters:${category}`);
-  }
-
-  /**
-   * Trust and security cache keys
-   */
-  trustScore(user_id: string): string { return this.formatKey(`trust:score:${user_id }`);
-  }
-
-  fraudDetection(propertyId: number): string {
-    return this.formatKey(`fraud:detection:${propertyId}`);
-  }
-
-  riskAssessment(user_id: string): string { return this.formatKey(`risk:assessment:${user_id }`);
-  }
-
-  securityEvent(eventId: string): string {
-    return this.formatKey(`security:event:${eventId}`);
-  }
-
-  /**
-   * API response cache keys
-   */
   apiResponse(endpoint: string, params: string): string {
-    const paramsHash = Buffer.from(params).toString('base64');
-    return this.formatKey(`api:${endpoint}:${paramsHash}`);
+    return this.fmt(`api:${endpoint}:${hashSegment(params)}`);
   }
 
   apiRateLimit(identifier: string, endpoint: string): string {
-    return this.formatKey(`rate_limit:${identifier}:${endpoint}`);
+    return this.fmt(`rate_limit:${identifier}:${endpoint}`);
   }
 
-  /**
-   * Land verification cache keys
-   */
-  landVerification(propertyId: number): string {
-    return this.formatKey(`land:verification:${propertyId}`);
-  }
+  // -------------------------------------------------------------------------
+  // Land verification keys
+  // -------------------------------------------------------------------------
 
-  landDocuments(propertyId: number): string {
-    return this.formatKey(`land:documents:${propertyId}`);
-  }
+  landVerification(propertyId: number): string { return this.fmt(`land:verification:${propertyId}`); }
+  landDocuments(propertyId: number):    string { return this.fmt(`land:documents:${propertyId}`); }
+  landOwnership(propertyId: number):    string { return this.fmt(`land:ownership:${propertyId}`); }
 
-  landOwnership(propertyId: number): string {
-    return this.formatKey(`land:ownership:${propertyId}`);
-  }
+  // -------------------------------------------------------------------------
+  // Analytics keys
+  // -------------------------------------------------------------------------
 
-  /**
-   * Analytics and metrics cache keys
-   */
-  analytics(metric: string, period: string): string {
-    return this.formatKey(`analytics:${metric}:${period}`);
-  }
+  analytics(metric: string, period: string):       string { return this.fmt(`analytics:${metric}:${period}`); }
+  dashboardData(userId: number, dashboard: string): string { return this.fmt(`dashboard:${dashboard}:${userId}`); }
+  reportData(reportId: string):                    string { return this.fmt(`report:${reportId}`); }
 
-  dashboardData(user_id: number, dashboard: string): string {
-    return this.formatKey(`dashboard:${dashboard}:${ user_id }`);
-  }
+  // -------------------------------------------------------------------------
+  // Configuration keys
+  // -------------------------------------------------------------------------
 
-  reportData(report_id: string): string {
-    return this.formatKey(`report:${report_id}`);
-  }
+  config(section: string):       string { return this.fmt(`config:${section}`); }
+  featureFlag(flagName: string): string { return this.fmt(`feature:${flagName}`); }
 
-  /**
-   * Configuration and settings cache keys
-   */
-  config(section: string): string {
-    return this.formatKey(`config:${section}`);
-  }
+  // -------------------------------------------------------------------------
+  // Notification keys
+  // -------------------------------------------------------------------------
 
-  featureFlag(flagName: string): string {
-    return this.formatKey(`feature:${flagName}`);
-  }
+  notifications(userId: number):            string { return this.fmt(`notifications:${userId}`); }
+  notificationPreferences(userId: number):  string { return this.fmt(`notifications:preferences:${userId}`); }
 
-  settings(user_id: number): string { return this.formatKey(`settings:${user_id }`);
-  }
+  // -------------------------------------------------------------------------
+  // Messaging keys
+  // -------------------------------------------------------------------------
 
-  /**
-    * Notification cache keys
-    */
-  notifications(user_id: number): string { return this.formatKey(`notifications:${user_id }`);
-  }
+  messages(conversationId: string):   string { return this.fmt(`messages:${conversationId}`); }
+  messageThread(threadId: string):    string { return this.fmt(`messages:thread:${threadId}`); }
 
-  notificationPreferences(user_id: number): string { return this.formatKey(`notifications:preferences:${user_id }`);
-  }
+  /** Returns a stable key for the shared comment-votes collection. */
+  commentVotes(): string { return this.fmt('comment_votes'); }
 
-  /**
-    * Comment voting cache keys
-    */
-  COMMENT_VOTES: string = this.formatKey('comment_votes');
+  // -------------------------------------------------------------------------
+  // File & media keys
+  // -------------------------------------------------------------------------
 
-  /**
-   * Communication cache keys
-   */
-  messages(conversationId: string): string {
-    return this.formatKey(`messages:${conversationId}`);
-  }
+  fileMetadata(fileId: string):                       string { return this.fmt(`file:metadata:${fileId}`); }
+  imageProcessing(imageId: string, variant: string):  string { return this.fmt(`image:${variant}:${imageId}`); }
 
-  messageThread(threadId: string): string {
-    return this.formatKey(`messages:thread:${threadId}`);
-  }
+  // -------------------------------------------------------------------------
+  // Geolocation keys
+  // -------------------------------------------------------------------------
 
-  /**
-   * File and media cache keys
-   */
-  fileMetadata(fileId: string): string {
-    return this.formatKey(`file:metadata:${fileId}`);
-  }
-
-  imageProcessing(imageId: string, variant: string): string {
-    return this.formatKey(`image:${variant}:${imageId}`);
-  }
-
-  /**
-   * Geolocation cache keys
-   */
   geocoding(address: string): string {
-    const addressHash = Buffer.from(address).toString('base64');
-    return this.formatKey(`geo:coding:${addressHash}`);
+    return this.fmt(`geo:coding:${hashSegment(address)}`);
   }
 
   reverseGeocoding(lat: number, lng: number): string {
-    return this.formatKey(`geo:reverse:${lat}:${lng}`);
+    return this.fmt(`geo:reverse:${lat}:${lng}`);
   }
 
-  /**
-   * External API cache keys
-   */
+  // -------------------------------------------------------------------------
+  // External API keys
+  // -------------------------------------------------------------------------
+
   externalApi(service: string, endpoint: string, params: string): string {
-    const paramsHash = Buffer.from(params).toString('base64');
-    return this.formatKey(`external:${service}:${endpoint}:${paramsHash}`);
+    return this.fmt(`external:${service}:${endpoint}:${hashSegment(params)}`);
   }
 
-  /**
-   * Validation cache keys
-   */
+  // -------------------------------------------------------------------------
+  // Misc domain keys
+  // -------------------------------------------------------------------------
+
   validationResult(schema: string, dataHash: string): string {
-    return this.formatKey(`validation:${schema}:${dataHash}`);
+    return this.fmt(`validation:${schema}:${dataHash}`);
   }
 
-  /**
-   * Health check cache keys
-   */
   healthCheck(service: string): string {
-    return this.formatKey(`health:${service}`);
+    return this.fmt(`health:${service}`);
   }
 
-  /**
-   * Utility methods for cache key management
-   */
+  // -------------------------------------------------------------------------
+  // Key composition utilities
+  // -------------------------------------------------------------------------
 
   /**
-   * Generate cache key with tags for invalidation
+   * Pair a key with a set of invalidation tags.
+   * Tags are namespaced under the current prefix so they don't collide
+   * across environments.
    */
   withTags(baseKey: string, tags: string[]): { key: string; tags: string[] } {
     return {
-      key: baseKey,
-      tags: tags.map(tag => this.formatKey(`tag:${tag}`)),
+      key:  baseKey,
+      tags: tags.map(tag => this.fmt(`tag:${tag}`)),
     };
   }
 
   /**
-   * Generate time-based cache key
+   * Append a time-bucket suffix so the key naturally expires on a fixed
+   * cadence without needing an explicit TTL change.
+   *
+   * @param intervalMinutes - Bucket size in minutes (default: 5)
    */
-  withTimestamp(baseKey: string, intervalMinutes: number = 5): string {
-    const now = new Date();
-    const interval = Math.floor(now.getTime() / (intervalMinutes * 60 * 1000));
-    return `${baseKey}:${interval}`;
+  withTimestamp(baseKey: string, intervalMinutes = 5): string {
+    const bucket = Math.floor(Date.now() / (intervalMinutes * 60_000));
+    return `${baseKey}${KEY_SEPARATOR}${bucket}`;
   }
 
-  /**
-   * Generate user-specific cache key
-   */
-  withUser(baseKey: string, user_id: number): string {
-    return `${baseKey}:user:${ user_id }`;
+  /** Scope a key to a specific user. */
+  withUser(baseKey: string, userId: number): string {
+    return `${baseKey}${KEY_SEPARATOR}user${KEY_SEPARATOR}${userId}`;
   }
 
-  /**
-   * Generate environment-specific cache key
-   */
+  /** Scope a key to a deployment environment. */
   withEnvironment(baseKey: string, environment: string): string {
-    return `${baseKey}:env:${environment}`;
+    return `${baseKey}${KEY_SEPARATOR}env${KEY_SEPARATOR}${environment}`;
   }
 
-  /**
-   * Generate versioned cache key
-   */
+  /** Append a version suffix for schema-versioned caches. */
   withVersion(baseKey: string, version: string): string {
-    return `${baseKey}:v${version}`;
+    return `${baseKey}${KEY_SEPARATOR}v${version}`;
+  }
+
+  // -------------------------------------------------------------------------
+  // Validation & parsing
+  // -------------------------------------------------------------------------
+
+  /**
+   * Return `true` if `key` is a well-formed cache key:
+   * - Within the allowed length
+   * - Free of control characters
+   * - Contains at least one separator (i.e. has meaningful structure)
+   */
+  validateKey(key: string): boolean {
+    if (key.length > MAX_KEY_LENGTH)      return false;
+    if (/[\r\n\t\f\v\0]/.test(key))       return false;
+    if (!key.includes(KEY_SEPARATOR))     return false;
+    return true;
   }
 
   /**
-   * Parse cache key to extract components
+   * Decompose a key back into its logical segments.
+   *
+   * Metadata segments are expected to follow the `key=value` encoding used
+   * by {@link buildKey}.
    */
   parseKey(key: string): {
-    prefix?: string | undefined;
-    type: string;
+    prefix:    string | undefined;
+    type:      string;
     identifier: string;
-    metadata?: Record<string, string> | undefined;
+    metadata:  Record<string, string> | undefined;
   } {
-    const parts = key.split(':');
-    
-    if (this.keyPrefix && parts[0] === this.keyPrefix) {
-      parts.shift(); // Remove prefix
-    }
+    const parts = key.split(KEY_SEPARATOR);
+    const hasPrefix = this.keyPrefix && parts[0] === this.keyPrefix;
 
-    const [type = 'default', identifier = 'unknown', ...metadata] = parts;
-    
-    const metadataObj: Record<string, string> = {};
-    for (let i = 0; i < metadata.length; i += 2) {
-      const key = metadata[i];
-      const value = metadata[i + 1];
-      if (key && value) {
-        metadataObj[key] = value;
+    if (hasPrefix) parts.shift();
+
+    const [type = 'unknown', identifier = 'unknown', ...rest] = parts;
+
+    const metadata: Record<string, string> = {};
+    for (const segment of rest) {
+      const eq = segment.indexOf('=');
+      if (eq !== -1) {
+        metadata[segment.slice(0, eq)] = segment.slice(eq + 1);
       }
     }
 
     return {
-      prefix: this.keyPrefix,
+      prefix:     hasPrefix ? this.keyPrefix : undefined,
       type,
       identifier,
-      metadata: Object.keys(metadataObj).length > 0 ? metadataObj : undefined,
+      metadata:   Object.keys(metadata).length > 0 ? metadata : undefined,
     };
   }
 
   /**
-   * Validate cache key format
+   * Build a Redis-style glob pattern for bulk invalidation.
+   *
+   * @example cacheKeys.pattern('property') // → "app:property:*"
    */
-  validateKey(key: string): boolean {
-    try {
-      // Check length
-      if (key.length > 250) return false;
-      
-      // Check for invalid characters
-      if (/[\r\n\t\f\v\0]/.test(key)) return false;
-      
-      // Check structure
-      const parts = key.split(':');
-      if (parts.length < 2) return false;
-      
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  /**
-   * Generate cache key pattern for invalidation
-   */
-  pattern(type: string, wildcard: string = '*'): string {
-    return this.formatKey(`${type}:${wildcard}`);
+  pattern(type: string, wildcard = '*'): string {
+    return this.fmt(`${type}${KEY_SEPARATOR}${wildcard}`);
   }
 }
 
-// Export singleton instance
+// ---------------------------------------------------------------------------
+// Module-level singleton
+// ---------------------------------------------------------------------------
+
 export const cacheKeys = CacheKeys.getInstance();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

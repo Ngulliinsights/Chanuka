@@ -140,6 +140,19 @@ interface CompatibilityResult {
   suggestedActions:        string[];
 }
 
+export interface CoalitionRecommendation {
+  id:                    string;
+  targetCampaignId:      string;
+  targetCampaignName:    string;
+  alignmentScore:        number;
+  sharedObjectives:      string[];
+  sharedConcerns:        string[];
+  complementaryStrengths:string[];
+  suggestedActions:      string[];
+  estimatedImpact:       number;
+  recommendedApproach:   string;
+}
+
 // ============================================================================
 // Service
 // ============================================================================
@@ -289,6 +302,57 @@ export class CoalitionBuilder {
     return this.withErrorHandling('getCampaignCoalitions', { campaign_id }, async () => {
       // TODO: query coalition_members table once persistence is wired up.
       return [];
+    });
+  }
+
+  /**
+   * Get coalition recommendations for a specific campaign.
+   * Identifies compatible campaigns and provides actionable recommendations
+   * for forming coalitions to amplify advocacy impact.
+   */
+  async getCoalitionRecommendations(campaign_id: string): Promise<CoalitionRecommendation[]> {
+    return this.withErrorHandling('getCoalitionRecommendations', { campaign_id }, async () => {
+      const campaign = await this.requireActiveCampaign(campaign_id);
+      const potentialCoalitions = await this.campaignRepository.findPotentialCoalitions(campaign_id);
+      
+      const recommendations: CoalitionRecommendation[] = [];
+
+      for (const potential of potentialCoalitions) {
+        const targetCampaign = await this.campaignRepository.findById(potential.campaign_id);
+        if (!targetCampaign || targetCampaign.status !== 'active') continue;
+
+        const compatibility = await this.analyzeCompatibility(campaign, targetCampaign);
+        
+        // Only recommend campaigns with sufficient alignment
+        if (compatibility.alignmentScore >= SCORE.THRESHOLD_OPPORTUNITY) {
+          const estimatedImpact = this.calculateEstimatedImpact(campaign, targetCampaign, compatibility);
+          
+          recommendations.push({
+            id: `recommendation-${campaign_id}-${targetCampaign.id}`,
+            targetCampaignId: targetCampaign.id,
+            targetCampaignName: targetCampaign.title,
+            alignmentScore: compatibility.alignmentScore,
+            sharedObjectives: (campaign as EnrichedCampaign).objectives?.filter(
+              obj => (targetCampaign as EnrichedCampaign).objectives?.includes(obj)
+            ) || [],
+            sharedConcerns: compatibility.sharedConcerns,
+            complementaryStrengths: compatibility.complementaryStrengths,
+            suggestedActions: compatibility.suggestedActions,
+            estimatedImpact,
+            recommendedApproach: `Coalition opportunity with ${targetCampaign.title} - ${compatibility.alignmentScore >= 0.8 ? 'high' : 'moderate'} alignment`,
+          });
+        }
+      }
+
+      // Sort by alignment score (descending)
+      recommendations.sort((a, b) => b.alignmentScore - a.alignmentScore);
+
+      logger.info(
+        { campaign_id, recommendationCount: recommendations.length, component: 'CoalitionBuilder' },
+        'Coalition recommendations generated'
+      );
+
+      return recommendations;
     });
   }
 

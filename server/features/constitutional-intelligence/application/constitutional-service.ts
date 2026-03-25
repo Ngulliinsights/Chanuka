@@ -1,16 +1,18 @@
 /**
- * Constitutional Intelligence Service
- * 
- * Service for analyzing bills for constitutional compliance
+ * Constitutional Service
+ *
+ * Execution and orchestration layer. Owns the cache, runs ML analysis,
+ * manages expert review and monitoring. Single source of truth for
+ * constitutional analysis results.
  */
 
-import { logger } from '@server/infrastructure/observability';
-import { constitutionalAnalyzer } from '@server/features/ml/models/constitutional-analyzer';
 import type { ConstitutionalAnalysisInput, ConstitutionalAnalysisResult } from '@server/features/ml/models/types';
+import { constitutionalAnalyzer } from '@server/features/ml/models/constitutional-analyzer';
 import { cacheService } from '@server/infrastructure/cache';
-import { bills } from '@server/infrastructure/schema';
-import { expertReviewWorkflow, type ExpertReviewRequest } from './expert-review-workflow';
+import { logger } from '@server/infrastructure/observability';
+
 import { constitutionalMonitoring } from './monitoring-integration';
+import { expertReviewWorkflow, type ExpertReviewRequest } from './expert-review-workflow';
 
 export interface ConstitutionalAnalysisRequest {
   billId: string;
@@ -27,87 +29,76 @@ export interface ConstitutionalServiceResult extends ConstitutionalAnalysisResul
   processingTime: number;
 }
 
-/**
- * Constitutional Intelligence Service
- */
-export class ConstitutionalService {
-  private readonly CACHE_TTL = 3600; // 1 hour
+const CACHE_TTL_SECONDS = 3600;
 
-  /**
-   * Analyze a bill for constitutional compliance
-   */
-  async analyzeBill(request: ConstitutionalAnalysisRequest): Promise<ConstitutionalAnalysisResult> {
+export class ConstitutionalService {
+  // ─── Core Analysis ────────────────────────────────────────────────────────
+
+  async analyzeBill(request: ConstitutionalAnalysisRequest): Promise<ConstitutionalServiceResult> {
     const startTime = Date.now();
 
-    try {
-      logger.info({
-        message: 'Analyzing bill for constitutional compliance',
-        component: 'ConstitutionalService',
-        billId: request.billId,
-        billType: request.billType,
-      });
+    logger.info({
+      message: 'Analyzing bill for constitutional compliance',
+      component: 'ConstitutionalService',
+      billId: request.billId,
+      billType: request.billType,
+    });
 
-      // Check cache first
-      const cacheKey = `constitutional:${request.billId}`;
-      const cached = await cacheService.get(cacheKey);
+    try {
+      const cached = await cacheService.get<ConstitutionalServiceResult>(this.cacheKey(request.billId));
       if (cached) {
         logger.info({
           message: 'Returning cached constitutional analysis',
           component: 'ConstitutionalService',
           billId: request.billId,
         });
-        return cached as ConstitutionalAnalysisResult;
+        return cached;
       }
 
-      // Prepare input for analyzer
       const input: ConstitutionalAnalysisInput = {
-        billText: request.billText,
+        billSection: request.billText,
         billTitle: request.billTitle,
-        billType: request.billType,
-        affectedInstitutions: request.affectedInstitutions,
-        proposedChanges: request.proposedChanges,
+        context: request.billType,
       };
 
-      // Run analysis
-      const analysis = await constitutionalAnalyzer.analyze(input);
-
+      const tierResult = await constitutionalAnalyzer.analyze(input);
       const processingTime = Date.now() - startTime;
 
-      const result: ConstitutionalAnalysisResult = {
-        ...analysis,
+      // Unwrap the result from TierResult
+      const analysisResult = tierResult.result;
+
+      const result: ConstitutionalServiceResult = {
+        ...(analysisResult as ConstitutionalAnalysisResult),
         billId: request.billId,
         analyzedAt: new Date().toISOString(),
         processingTime,
       };
 
-      // Cache result
-      await cacheService.set(cacheKey, result, this.CACHE_TTL);
-
-      // Record monitoring metrics
-      constitutionalMonitoring.recordAnalysis(
-        processingTime,
-        analysis.alignmentScore,
-        analysis.violations,
-        false
-      );
+      await Promise.all([
+        cacheService.set(this.cacheKey(request.billId), result, CACHE_TTL_SECONDS),
+        constitutionalMonitoring.recordAnalysis(
+          processingTime,
+          analysisResult.riskScore * 100,
+          analysisResult.riskLevel ? [{ violationType: 'constitutional_risk', severity: analysisResult.riskLevel }] : [],
+          false
+        ),
+      ]);
 
       logger.info({
         message: 'Constitutional analysis completed',
         component: 'ConstitutionalService',
         billId: request.billId,
-        alignmentScore: analysis.alignmentScore,
-        violations: analysis.violations.length,
+        riskLevel: analysisResult.riskLevel,
+        riskScore: analysisResult.riskScore,
         processingTime,
       });
 
       return result;
     } catch (error) {
-      // Record error in monitoring
       constitutionalMonitoring.recordError(
         error instanceof Error ? error : new Error(String(error)),
-        request.billId
+        request.billId,
       );
-
       logger.error({
         message: 'Constitutional analysis failed',
         component: 'ConstitutionalService',
@@ -118,23 +109,13 @@ export class ConstitutionalService {
     }
   }
 
-  /**
-   * Get constitutional analysis by bill ID
-   */
-  async getAnalysis(billId: string): Promise<ConstitutionalAnalysisResult | null> {
+  /** Returns the cached result for a bill, or null if not yet analyzed. */
+  async getAnalysis(billId: string): Promise<ConstitutionalServiceResult | null> {
     try {
-      const cacheKey = `constitutional:${billId}`;
-      const cached = await cacheService.get(cacheKey);
-      
-      if (cached) {
-        // Record cache hit
-        constitutionalMonitoring.recordAnalysis(0, 0, [], true);
-      }
-      
-      return cached as ConstitutionalAnalysisResult | null;
+      return await cacheService.get<ConstitutionalServiceResult>(this.cacheKey(billId));
     } catch (error) {
       logger.error({
-        message: 'Failed to get constitutional analysis',
+        message: 'Failed to retrieve constitutional analysis',
         component: 'ConstitutionalService',
         billId,
         error: error instanceof Error ? error.message : String(error),
@@ -143,31 +124,8 @@ export class ConstitutionalService {
     }
   }
 
-  /**
-   * Get constitutional statistics
-   */
-  async getStatistics(): Promise<{
-    totalAnalyses: number;
-    averageAlignmentScore: number;
-    violationsByType: Record<string, number>;
-    violationsBySeverity: Record<string, number>;
-  }> {
-    // In a real implementation, this would query from database
-    // For now, return default values
-    return {
-      totalAnalyses: 0,
-      averageAlignmentScore: 0,
-      violationsByType: {},
-      violationsBySeverity: {},
-    };
-  }
-
-  /**
-   * Clear analysis cache for a bill
-   */
   async clearCache(billId: string): Promise<void> {
-    const cacheKey = `constitutional:${billId}`;
-    await cacheService.del(cacheKey);
+    await cacheService.del(this.cacheKey(billId));
     logger.info({
       message: 'Cleared constitutional analysis cache',
       component: 'ConstitutionalService',
@@ -175,59 +133,43 @@ export class ConstitutionalService {
     });
   }
 
-  /**
-   * Create expert review request
-   */
-  async createReviewRequest(
-    analysisId: string,
-    billId: string,
-    expertIds: string[]
-  ) {
+  // ─── Expert Review (Delegated) ─────────────────────────────────────────────
+
+  async createReviewRequest(analysisId: string, billId: string, expertIds: string[]) {
     return expertReviewWorkflow.createReviewRequest(analysisId, billId, expertIds);
   }
 
-  /**
-   * Submit expert review
-   */
   async submitReview(request: ExpertReviewRequest) {
     return expertReviewWorkflow.submitReview(request);
   }
 
-  /**
-   * Get reviews for analysis
-   */
   async getReviewsForAnalysis(analysisId: string) {
     return expertReviewWorkflow.getReviewsForAnalysis(analysisId);
   }
 
-  /**
-   * Get pending reviews for expert
-   */
   async getPendingReviews(expertId: string) {
     return expertReviewWorkflow.getPendingReviews(expertId);
   }
 
-  /**
-   * Get review statistics
-   */
   async getReviewStatistics() {
     return expertReviewWorkflow.getReviewStatistics();
   }
 
-  /**
-   * Get monitoring metrics
-   */
+  // ─── Monitoring ────────────────────────────────────────────────────────────
+
   async getMonitoringMetrics() {
     return constitutionalMonitoring.getMetrics();
   }
 
-  /**
-   * Health check
-   */
   async healthCheck() {
     return constitutionalMonitoring.healthCheck();
   }
+
+  // ─── Private ───────────────────────────────────────────────────────────────
+
+  cacheKey(billId: string): string {
+    return `constitutional:${billId}`;
+  }
 }
 
-// Singleton instance
 export const constitutionalService = new ConstitutionalService();

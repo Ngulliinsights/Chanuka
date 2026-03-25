@@ -6,6 +6,7 @@
 // ============================================================================
 
 import { logger } from '@server/infrastructure/observability';
+import { sanitizeString } from '@server/infrastructure/validation/validation-utils';
 import { RepresentativeContact } from '@server/types/index';
 
 // ============================================================================
@@ -406,6 +407,21 @@ export class RepresentativeContactService {
     if (!message?.trim())           throw new Error('message content is required');
     if (!senderInfo?.user_id)       throw new Error('senderInfo.user_id is required');
     if (!senderInfo?.name)          throw new Error('senderInfo.name is required');
+
+    // Sanitize and re-validate message length after normalization
+    const sanitized = sanitizeString(message);
+    if (sanitized.length === 0) {
+      throw new Error('message content cannot be empty or only whitespace');
+    }
+    if (sanitized.length > 5000) {
+      throw new Error('message content exceeds maximum length of 5000 characters');
+    }
+
+    // Sanitize sender name
+    const sanitizedName = sanitizeString(senderInfo.name);
+    if (sanitizedName.length === 0) {
+      throw new Error('sender name cannot be empty or only whitespace');
+    }
   }
 
   // --------------------------------------------------------------------------

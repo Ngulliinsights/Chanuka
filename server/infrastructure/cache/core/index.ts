@@ -25,8 +25,8 @@ export type {
 export { BaseCacheAdapter } from './base-adapter';
 
 // Re-export Result types for convenience
-export type { Result } from '../../primitives/types/result';
-export { ok, err, isOk, isErr } from '../../primitives/types/result';
+export type { Result } from '@shared/core/primitives/types/result';
+export { ok, err, isOk, isErr } from '@shared/core/primitives/types/result';
 
 
 

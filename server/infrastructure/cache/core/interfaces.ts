@@ -11,6 +11,10 @@ export interface CacheService {
   del(key: string): Promise<boolean>;
   exists(key: string): Promise<boolean>;
   
+  // Alias methods for backward compatibility
+  delete(key: string): Promise<boolean>;
+  has(key: string): Promise<boolean>;
+  
   // Batch operations
   mget<T = any>(keys: string[]): Promise<Array<T | null>>;
   mset<T = any>(entries: Array<{ key: string; value: T; ttl?: number }>): Promise<void>;
@@ -26,6 +30,8 @@ export interface CacheService {
   keys?(pattern: string): Promise<string[]>;
   invalidateByPattern?(pattern: string): Promise<number>;
   invalidateByTags?(tags: string[]): Promise<number>;
+  deletePattern?(pattern: string): Promise<number>;
+  deleteByTag?(tag: string): Promise<number>;
   
   // Cache management
   clear?(): Promise<void>;
@@ -35,6 +41,9 @@ export interface CacheService {
   // Health and metrics
   getHealth?(): Promise<CacheHealthStatus>;
   getMetrics?(): CacheMetrics;
+  
+  // Get or set pattern
+  getOrSetCache?<T>(key: string, factory: () => Promise<T>, ttl?: number): Promise<T>;
   
   // Lifecycle
   connect?(): Promise<void>;

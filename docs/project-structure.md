@@ -1,8 +1,8 @@
 # Project Structure
 
-**Generated:** March 23, 2026 at 11:51 PM
+**Generated:** March 24, 2026 at 01:09 PM
 **Max Depth:** 7 levels
-**Total Items:** 4,632
+**Total Items:** 4,623
 
 ```
 .
@@ -2827,7 +2827,9 @@
 │   │   │   │   ├── campaign-service.ts
 │   │   │   │   ├── coalition-builder.ts
 │   │   │   │   ├── impact-tracker.ts
-│   │   │   │   └── monitoring-integration.ts
+│   │   │   │   ├── monitoring-integration.ts
+│   │   │   │   ├── notification-service.ts
+│   │   │   │   └── representative-contact-service.ts
 │   │   │   ├── config/
 │   │   │   │   └── advocacy-config.ts
 │   │   │   ├── domain/
@@ -2844,10 +2846,9 @@
 │   │   │   │   │   └── campaign-domain-service.ts
 │   │   │   │   └── types.ts
 │   │   │   ├── infrastructure/
-│   │   │   │   ├── repositories/
-│   │   │   │   └── services/
-│   │   │   │       ├── notification-service.ts
-│   │   │   │       └── representative-contact-service.ts
+│   │   │   │   └── repositories/
+│   │   │   │       ├── drizzle-action-repository.ts
+│   │   │   │       └── drizzle-campaign-repository.ts
 │   │   │   ├── presentation/
 │   │   │   │   └── http/
 │   │   │   │       └── advocacy-router.ts
@@ -3303,6 +3304,7 @@
 │   │   │   │   │   ├── alert-delivery.service.ts
 │   │   │   │   │   ├── alert-preference-management.service.ts
 │   │   │   │   │   ├── alerting-service.ts
+│   │   │   │   │   ├── channel-delivery.service.ts
 │   │   │   │   │   └── notification.service.ts
 │   │   │   │   ├── use-cases/
 │   │   │   │   ├── notification-orchestrator.ts
@@ -4123,23 +4125,10 @@
 │   │   ├── response-helpers.ts
 │   │   └── validation.ts
 │   ├── dev.ts
-│   ├── dump_exports.js
-│   ├── fix-analytics-2.js
-│   ├── fix-analytics.js
-│   ├── graph_errors.txt
 │   ├── index.ts
 │   ├── loader.mjs
 │   ├── package.json
 │   ├── project.json
-│   ├── resolve-paths-hook.mjs
-│   ├── resolve-paths.mjs
-│   ├── test_resolution.js
-│   ├── test_resolution.ts
-│   ├── ts_errors.txt
-│   ├── ts_final.txt
-│   ├── ts_final3.txt
-│   ├── tsc_errors.txt
-│   ├── tsc_output.txt
 │   ├── tsconfig.json
 │   ├── vite.config.ts
 │   ├── vite.ts
@@ -4558,6 +4547,8 @@
 │   ├── performance-regression.test.ts
 │   ├── playwright.config.ts
 │   └── README.md
+├── ADVOCACY_MODERNIZATION_SUMMARY.md
+├── ADVOCACY_MODERNIZATION_VERIFICATION.md
 ├── analyze-ts-errors.js
 ├── API_ARCHITECTURE_ANALYSIS.md
 ├── API_CONTRACT_AUDIT.md

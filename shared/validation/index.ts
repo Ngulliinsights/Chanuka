@@ -21,6 +21,9 @@
  * ```
  */
 
+// Re-export Zod for use in validation schemas
+export { z } from 'zod';
+
 // Export all schemas
 export * from './schemas';
 

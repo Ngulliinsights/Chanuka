@@ -2,7 +2,7 @@
  * Comprehensive test for the caching system
  */
 
-import { SimpleCacheFactory } from './simple-factory';
+import { SimpleCacheFactory } from './factory';
 
 async function testCachingSystem() {
   console.log('🧪 Testing caching system...');

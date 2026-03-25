@@ -1,36 +1,92 @@
+/**
+ * Argument Intelligence Service
+ *
+ * Consolidated service for argument intelligence operations using Drizzle ORM.
+ * Provides argument storage, claim extraction, evidence management, legislative
+ * brief generation, and synthesis job tracking with standardized error handling,
+ * strong type safety, and structured logging throughout.
+ */
+
+import { readDatabase, writeDatabase } from '@server/infrastructure/database';
 import { logger } from '@server/infrastructure/observability';
-import { performanceMonitor } from '@server/infrastructure/observability/monitoring';
-import { readDatabase, writeDatabase, withTransaction } from '@server/infrastructure/database/connection';
 import {
-  type Argument,
   argument_relationships,
-  type ArgumentRelationship,
   argumentTable,
-  type Claim,
   claims,
-  type Evidence,
   evidence,
-  legislative_briefs,
-  type LegislativeBrief,
-  synthesis_jobs
-} from '@server/infrastructure/schema';
-import { db } from '@server/infrastructure/database';
-import { and, asc, count, desc, eq, like, or, sql } from 'drizzle-orm';
+} from '@server/infrastructure/schema/argument_intelligence';
+import { desc, eq, sql } from 'drizzle-orm';
+
+// ============================================================================
+// CUSTOM ERRORS
+// ============================================================================
+
+export class ArgumentNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Argument not found: ${id}`);
+    this.name = 'ArgumentNotFoundError';
+  }
+}
+
+export class BriefNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Legislative brief not found: ${id}`);
+    this.name = 'BriefNotFoundError';
+  }
+}
+
+export class JobNotFoundError extends Error {
+  constructor(id: string) {
+    super(`Synthesis job not found: ${id}`);
+    this.name = 'JobNotFoundError';
+  }
+}
 
 // ============================================================================
 // TYPE DEFINITIONS
 // ============================================================================
 
-export interface BillArgumentSynthesis {
-  bill_id: string;
-  majorClaims: SynthesizedClaim[];
-  evidenceBase: EvidenceAssessment[];
-  stakeholderPositions: StakeholderPosition[];
-  consensusAreas: string[];
-  controversialPoints: string[];
-  legislativeBrief: string;
-  lastUpdated: Date;
+export type ArgumentPosition = 'support' | 'oppose' | 'neutral' | 'conditional';
+export type ClaimType = 'factual' | 'normative' | 'causal' | 'predictive';
+export type EvidenceType = 'statistical' | 'anecdotal' | 'expert_opinion' | 'legal_precedent' | 'comparative';
+export type VerificationStatus = 'verified' | 'unverified' | 'disputed' | 'false';
+export type SynthesisJobStatus = 'pending' | 'processing' | 'completed' | 'failed';
+export type SynthesisJobType = 'brief' | 'analysis';
+
+export interface UserContext {
+  county?: string;
+  ageGroup?: string;
+  occupation?: string;
+  organizationAffiliation?: string;
 }
+
+export interface ArgumentInput {
+  bill_id: string;
+  text: string;
+  position: ArgumentPosition;
+  /** 0–1 confidence score */
+  confidence: number;
+  userContext?: UserContext;
+}
+
+export interface ClaimInput {
+  text: string;
+  type?: ClaimType;
+}
+
+export interface EvidenceInput {
+  text: string;
+  source: string;
+  /** Initial credibility override (0–1). Defaults to 0.5. */
+  credibilityScore?: number;
+}
+
+export interface PaginationOptions {
+  limit?: number;
+  offset?: number;
+}
+
+// ---- Synthesis / Brief shapes -----------------------------------------------
 
 export interface SynthesizedClaim {
   claimText: string;
@@ -42,19 +98,30 @@ export interface SynthesizedClaim {
 }
 
 export interface EvidenceAssessment {
-  evidenceType: 'statistical' | 'anecdotal' | 'expert_opinion' | 'legal_precedent' | 'comparative';
+  evidenceType: EvidenceType;
   source: string;
-  verificationStatus: 'verified' | 'unverified' | 'disputed' | 'false';
+  verificationStatus: VerificationStatus;
   credibilityScore: number;
   citationCount: number;
 }
 
 export interface StakeholderPosition {
   stakeholderGroup: string;
-  position: 'support' | 'oppose' | 'neutral' | 'conditional';
+  position: ArgumentPosition;
   keyArguments: string[];
   evidenceProvided: string[];
   participantCount: number;
+}
+
+export interface BillArgumentSynthesis {
+  bill_id: string;
+  majorClaims: SynthesizedClaim[];
+  evidenceBase: EvidenceAssessment[];
+  stakeholderPositions: StakeholderPosition[];
+  consensusAreas: string[];
+  controversialPoints: string[];
+  legislativeBrief: string;
+  lastUpdated: Date;
 }
 
 export interface StoredBrief {
@@ -70,7 +137,105 @@ export interface StoredBrief {
   appendices: string;
   metadata: string;
   generatedAt: Date;
-  updated_at?: Date;
+  updated_at: Date;
+}
+
+export interface SynthesisJob {
+  id: string;
+  bill_id: string;
+  job_type: SynthesisJobType;
+  status: SynthesisJobStatus;
+  result?: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+// ============================================================================
+// INTERNAL UTILITIES
+// ============================================================================
+
+/**
+ * Wraps an async operation with consistent structured error logging and
+ * re-throws the original error so callers can handle it appropriately.
+ */
+async function withErrorHandling<T>(
+  context: Record<string, unknown>,
+  operation: string,
+  fn: () => Promise<T>
+): Promise<T> {
+  const opContext = { ...context, operation };
+  logger.debug(opContext, `Starting ${operation}`);
+  try {
+    const result = await fn();
+    return result;
+  } catch (error) {
+    logger.error(
+      {
+        ...opContext,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      },
+      `Failed: ${operation}`
+    );
+    throw error;
+  }
+}
+
+/** Clamp a number to [0, 1]. */
+function clampScore(value: number): number {
+  return Math.max(0, Math.min(1, value));
+}
+
+/** Truncate a string to a maximum byte-safe length. */
+function truncate(text: string, maxLength = 200): string {
+  return text.length > maxLength ? text.substring(0, maxLength) : text;
+}
+
+/** Serialize a value to a JSON string safely. */
+function toJson(value: unknown): string {
+  return JSON.stringify(value);
+}
+
+// ============================================================================
+// IN-MEMORY STORES
+//
+// These are intentionally thin wrappers around Maps.  When the schema is
+// extended to include `legislative_briefs` and `synthesis_jobs` tables,
+// replace the Map operations with Drizzle inserts/selects without touching
+// the public method signatures.
+// ============================================================================
+
+class InMemoryStore<T extends { id: string }> {
+  private readonly store = new Map<string, T>();
+
+  set(record: T): T {
+    this.store.set(record.id, record);
+    return record;
+  }
+
+  get(id: string): T | null {
+    return this.store.get(id) ?? null;
+  }
+
+  filter(predicate: (record: T) => boolean): T[] {
+    return [...this.store.values()].filter(predicate);
+  }
+
+  update(id: string, patch: Partial<Omit<T, 'id'>>): T | null {
+    const existing = this.store.get(id);
+    if (!existing) return null;
+    const updated = { ...existing, ...patch } as T;
+    this.store.set(id, updated);
+    return updated;
+  }
+
+  delete(id: string): boolean {
+    return this.store.delete(id);
+  }
+
+  size(): number {
+    return this.store.size;
+  }
 }
 
 // ============================================================================
@@ -78,184 +243,216 @@ export interface StoredBrief {
 // ============================================================================
 
 /**
- * ArgumentIntelligenceService - Consolidated service for argument intelligence operations
- * * This service replaces the repository pattern with direct Drizzle ORM usage,
- * providing comprehensive argument processing, clustering, evidence validation,
- * and brief generation capabilities.
+ * Core service for argument processing, claim extraction, evidence validation,
+ * legislative brief generation, and synthesis job lifecycle management.
  */
 export class ArgumentIntelligenceService {
+  private readonly logCtx = { component: 'ArgumentIntelligenceService' };
 
+  // Replace these with DB-backed repositories once schema is extended.
+  private readonly briefs = new InMemoryStore<StoredBrief>();
+  private readonly jobs = new InMemoryStore<SynthesisJob>();
 
   // ============================================================================
   // ARGUMENT OPERATIONS
   // ============================================================================
 
   /**
-   * Store a processed argument in the database
+   * Persist a single processed argument.
+   * Confidence is clamped to [0, 1] before storage.
    */
-  // TODO: Replace 'any' with proper type definition
-  async storeArgument(argumentData: unknown): Promise<Argument> {
-    const logContext = { component: 'ArgumentIntelligenceService', operation: 'storeArgument' };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing processed argument');
-
-    try {
+  async storeArgument(input: ArgumentInput) {
+    return withErrorHandling(this.logCtx, 'storeArgument', async () => {
       const now = new Date();
-      const [newArgument] = await withTransaction(async (tx) => {
-        return tx
-          .insert(argumentTable)
-          .values({
-            ...argumentData,
-            created_at: now,
-            updated_at: now
-          })
-          .returning();
-      });
+      const confidence = clampScore(input.confidence);
 
-      logger.info({
-        ...logContext,
-        argument_id: newArgument.id
-      }, '✅ Argument stored successfully');
+      const [stored] = await writeDatabase
+        .insert(argumentTable)
+        .values({
+          id: crypto.randomUUID(),
+          bill_id: input.bill_id,
+          argument_text: input.text,
+          argument_summary: truncate(input.text),
+          position: input.position,
+          strength_score: confidence.toString(),
+          confidence_score: confidence.toString(),
+          extraction_method: 'automated',
+          support_count: 0,
+          opposition_count: 0,
+          citizen_endorsements: 0,
+          is_verified: false,
+          created_at: now,
+          updated_at: now,
+        })
+        .returning();
 
-      return newArgument;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store argument');
-      throw error;
-    }
+      logger.info({ ...this.logCtx, argumentId: stored.id }, 'Argument stored');
+      return stored;
+    });
   }
 
   /**
-   * Get argList for a specific bill
+   * Bulk-insert multiple arguments in a single DB round-trip.
+   * Returns all inserted rows in insertion order.
    */
-  async getArgumentsForBill(bill_id: string): Promise<Argument[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getArgumentsForBill',
-      bill_id
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching argList for bill');
+  async bulkStoreArguments(inputs: ArgumentInput[]) {
+    return withErrorHandling(this.logCtx, 'bulkStoreArguments', async () => {
+      if (inputs.length === 0) return [];
 
-    try {
-      const results = await readDatabase(async (db: any) => {
-        return db
-          .select()
-          .from(argumentTable)
-          .where(eq(argumentTable.bill_id, bill_id))
-          .orderBy(desc(argumentTable.created_at));
+      const now = new Date();
+      const rows = inputs.map((input) => {
+        const confidence = clampScore(input.confidence);
+        return {
+          id: crypto.randomUUID(),
+          bill_id: input.bill_id,
+          argument_text: input.text,
+          argument_summary: truncate(input.text),
+          position: input.position,
+          strength_score: confidence.toString(),
+          confidence_score: confidence.toString(),
+          extraction_method: 'automated',
+          support_count: 0,
+          opposition_count: 0,
+          citizen_endorsements: 0,
+          is_verified: false,
+          created_at: now,
+          updated_at: now,
+        };
       });
 
-      logger.debug({ ...logContext, count: results.length }, '✅ Arguments retrieved');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch argList for bill');
-      throw error;
-    }
+      const stored = await writeDatabase
+        .insert(argumentTable)
+        .values(rows)
+        .returning();
+
+      logger.info(
+        { ...this.logCtx, count: stored.length },
+        'Bulk arguments stored'
+      );
+      return stored;
+    });
   }
 
   /**
-   * Search argList by text content
+   * Retrieve arguments for a bill, newest first.
+   * Supports cursor-based pagination via limit/offset.
    */
-  async searchArguments(searchText: string, limit: number = 50): Promise<Argument[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'searchArguments',
-      searchText,
-      limit
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Searching argList');
-
-    try {
-      const searchPattern = `%${searchText}%`;
-      const results = await readDatabase(async (db: any) => {
-        return db
+  async getArgumentsForBill(
+    billId: string,
+    { limit = 100, offset = 0 }: PaginationOptions = {}
+  ) {
+    return withErrorHandling(
+      { ...this.logCtx, billId },
+      'getArgumentsForBill',
+      async () => {
+        const args = await readDatabase
           .select()
           .from(argumentTable)
-          .where(
-            or(
-              like(argumentTable.content, searchPattern),
-              like(argumentTable.summary, searchPattern)
-            )
-          )
+          .where(eq(argumentTable.bill_id, billId))
+          .orderBy(desc(argumentTable.created_at))
           .limit(limit)
-          .orderBy(desc(argumentTable.created_at));
-      });
+          .offset(offset);
 
-      logger.debug({ ...logContext, count: results.length }, '✅ Argument search completed');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to search argList');
-      throw error;
-    }
+        logger.info(
+          { ...this.logCtx, billId, count: args.length },
+          'Arguments retrieved'
+        );
+        return args;
+      }
+    );
+  }
+
+  /**
+   * Retrieve all relationship edges originating from a given argument.
+   */
+  async getArgumentRelationships(argumentId: string) {
+    return withErrorHandling(
+      { ...this.logCtx, argumentId },
+      'getArgumentRelationships',
+      async () => {
+        const relationships = await readDatabase
+          .select()
+          .from(argument_relationships)
+          .where(
+            eq(argument_relationships.source_argument_id, argumentId)
+          );
+
+        logger.info(
+          { ...this.logCtx, argumentId, count: relationships.length },
+          'Argument relationships retrieved'
+        );
+        return relationships;
+      }
+    );
   }
 
   // ============================================================================
-  // CLAIMS OPERATIONS
+  // CLAIM OPERATIONS
   // ============================================================================
 
   /**
-   * Store extracted claims
+   * Extract, classify, and persist claims derived from a source argument.
+   * Supports an optional per-claim type; defaults to 'factual'.
    */
-  // TODO: Replace 'any' with proper type definition
-  async storeClaims(claimsData: unknown[]): Promise<Claim[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'storeClaims',
-      count: claimsData.length
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing extracted claims');
+  async extractClaims(argumentId: string, claimInputs: ClaimInput[]) {
+    return withErrorHandling(
+      { ...this.logCtx, argumentId },
+      'extractClaims',
+      async () => {
+        if (claimInputs.length === 0) return [];
 
-    try {
-      const now = new Date();
-      const claimsWithTimestamps = claimsData.map(claim => ({
-        ...claim,
-        created_at: now,
-        updated_at: now
-      }));
+        const now = new Date();
+        const rows = claimInputs.map(({ text, type = 'factual' }) => ({
+          id: crypto.randomUUID(),
+          claim_text: text,
+          claim_summary: truncate(text),
+          claim_type: type,
+          verification_status: 'unverified' as VerificationStatus,
+          supporting_arguments: toJson([argumentId]),
+          support_count: 0,
+          citation_count: 0,
+          created_at: now,
+          updated_at: now,
+        }));
 
-      const newClaims = await withTransaction(async (tx) => {
-        return tx
+        const stored = await writeDatabase
           .insert(claims)
-          .values(claimsWithTimestamps)
+          .values(rows)
           .returning();
-      });
 
-      logger.info({
-        ...logContext,
-        stored_count: newClaims.length
-      }, '✅ Claims stored successfully');
-
-      return newClaims;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store claims');
-      throw error;
-    }
+        logger.info(
+          { ...this.logCtx, argumentId, count: stored.length },
+          'Claims extracted and stored'
+        );
+        return stored;
+      }
+    );
   }
 
   /**
-   * Get claims for a specific argument
+   * Find all claims whose `supporting_arguments` JSONB array contains the
+   * given argumentId.  Uses a native PostgreSQL JSONB containment operator
+   * for index-friendly lookups.
    */
-  async getClaimsForArgument(argumentId: string): Promise<Claim[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getClaimsForArgument',
-      argumentId
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching claims for argument');
-
-    try {
-      const results = await readDatabase(async (db: any) => {
-        return db
+  async getSupportingClaims(argumentId: string) {
+    return withErrorHandling(
+      { ...this.logCtx, argumentId },
+      'getSupportingClaims',
+      async () => {
+        const relatedClaims = await readDatabase
           .select()
           .from(claims)
-          .where(eq(claims.argument_id, argumentId))
-          .orderBy(asc(claims.position));
-      });
+          .where(
+            sql`${claims.supporting_arguments} @> ${toJson([argumentId])}::jsonb`
+          );
 
-      logger.debug({ ...logContext, count: results.length }, '✅ Claims retrieved');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch claims for argument');
-      throw error;
-    }
+        logger.info(
+          { ...this.logCtx, argumentId, count: relatedClaims.length },
+          'Supporting claims retrieved'
+        );
+        return relatedClaims;
+      }
+    );
   }
 
   // ============================================================================
@@ -263,750 +460,339 @@ export class ArgumentIntelligenceService {
   // ============================================================================
 
   /**
-   * Store evidence records
+   * Store evidence items linked to a source argument.
+   * Credibility score is clamped to [0, 1]; defaults to 0.5 when omitted.
    */
-  // TODO: Replace 'any' with proper type definition
-  async storeEvidence(evidenceData: unknown[]): Promise<Evidence[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'storeEvidence',
-      count: evidenceData.length
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing evidence records');
+  async storeEvidence(argumentId: string, evidenceItems: EvidenceInput[]) {
+    return withErrorHandling(
+      { ...this.logCtx, argumentId },
+      'storeEvidence',
+      async () => {
+        if (evidenceItems.length === 0) return [];
 
-    try {
-      const now = new Date();
-      const evidenceWithTimestamps = evidenceData.map(evidence => ({
-        ...evidence,
-        created_at: now,
-        updated_at: now
-      }));
-
-      const newEvidence = await withTransaction(async (tx) => {
-        return tx
-          .insert(evidence)
-          .values(evidenceWithTimestamps)
-          .returning();
-      });
-
-      logger.info({
-        ...logContext,
-        stored_count: newEvidence.length
-      }, '✅ Evidence stored successfully');
-
-      return newEvidence;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store evidence');
-      throw error;
-    }
-  }
-
-  /**
-   * Get evidence for a specific claim
-   */
-  async getEvidenceForClaim(claimId: string): Promise<Evidence[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getEvidenceForClaim',
-      claimId
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching evidence for claim');
-
-    try {
-      const results = await readDatabase(async (db: any) => {
-        return db
-          .select()
-          .from(evidence)
-          .where(eq(evidence.claim_id, claimId))
-          .orderBy(desc(evidence.credibility_score));
-      });
-
-      logger.debug({ ...logContext, count: results.length }, '✅ Evidence retrieved');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch evidence for claim');
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // LEGISLATIVE BRIEFS OPERATIONS
-  // ============================================================================
-
-  /**
-   * Store a generated legislative brief
-   */
-  // TODO: Replace 'any' with proper type definition
-  async storeBrief(briefData: unknown): Promise<LegislativeBrief> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'storeBrief',
-      briefType: (briefData as any).brief_type
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing legislative brief');
-
-    try {
-      const now = new Date();
-      const [newBrief] = await withTransaction(async (tx) => {
-        return tx
-          .insert(legislative_briefs)
-          .values({
-            ...briefData,
-            created_at: now,
-            updated_at: now
-          })
-          .returning();
-      });
-
-      logger.info({
-        ...logContext,
-        brief_id: newBrief.id
-      }, '✅ Legislative brief stored successfully');
-
-      return newBrief;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store legislative brief');
-      throw error;
-    }
-  }
-
-  /**
-   * Get briefs for a specific bill
-   */
-  async getBriefsForBill(bill_id: string): Promise<LegislativeBrief[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getBriefsForBill',
-      bill_id
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching briefs for bill');
-
-    try {
-      const results = await readDatabase(async (db: any) => {
-        return db
-          .select()
-          .from(legislative_briefs)
-          .where(eq(legislative_briefs.bill_id, bill_id))
-          .orderBy(desc(legislative_briefs.created_at));
-      });
-
-      logger.debug({ ...logContext, count: results.length }, '✅ Briefs retrieved');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch briefs for bill');
-      throw error;
-    }
-  }
-
-  /**
-   * Get a specific brief by ID
-   */
-  async getBriefById(briefId: string): Promise<LegislativeBrief | null> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getBriefById',
-      briefId
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching brief by ID');
-
-    try {
-      const [brief] = await readDatabase(async (db: any) => {
-        return db
-          .select()
-          .from(legislative_briefs)
-          .where(eq(legislative_briefs.id, briefId))
-          .limit(1);
-      });
-
-      if (!brief) {
-        logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Brief not found');
-      }
-
-      return brief || null;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch brief by ID');
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // SYNTHESIS OPERATIONS
-  // ============================================================================
-
-  /**
-   * Store bill argument synthesis
-   */
-  async storeBillSynthesis(synthesis: BillArgumentSynthesis): Promise<void> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'storeBillSynthesis',
-      bill_id: synthesis.bill_id
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing bill synthesis');
-
-    try {
-      const now = new Date();
-      await withTransaction(async (tx) => {
-        await tx
-          .insert(synthesis_jobs)
-          .values({
-            id: `synthesis_${synthesis.bill_id}_${Date.now()}`,
-            bill_id: synthesis.bill_id,
-            job_type: 'bill_synthesis',
-            status: 'completed',
-            input_data: JSON.stringify({
-              majorClaims: synthesis.majorClaims,
-              evidenceBase: synthesis.evidenceBase,
-              stakeholderPositions: synthesis.stakeholderPositions,
-              consensusAreas: synthesis.consensusAreas,
-              controversialPoints: synthesis.controversialPoints
-            }),
-            output_data: synthesis.legislativeBrief,
+        const now = new Date();
+        const rows = evidenceItems.map(
+          ({ text, source, credibilityScore = 0.5 }) => ({
+            id: crypto.randomUUID(),
+            source_argument_id: argumentId,
+            evidence_type: 'document',
+            title: truncate(text),
+            description: text,
+            source_url: source,
+            credibility_score: clampScore(credibilityScore).toString(),
+            citation_count: 0,
             created_at: now,
             updated_at: now,
-            completed_at: synthesis.lastUpdated
-          });
-      });
+          })
+        );
 
-      logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, '✅ Bill synthesis stored successfully');
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store bill synthesis');
-      throw error;
-    }
-  }
-
-  /**
-   * Get bill argument synthesis
-   */
-  async getBillSynthesis(bill_id: string): Promise<BillArgumentSynthesis | null> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getBillSynthesis',
-      bill_id
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching bill synthesis');
-
-    try {
-      const [synthesis] = await readDatabase(async (db: any) => {
-        return db
-          .select()
-          .from(synthesis_jobs)
-          .where(
-            and(
-              eq(synthesis_jobs.bill_id, bill_id),
-              eq(synthesis_jobs.job_type, 'bill_synthesis'),
-              eq(synthesis_jobs.status, 'completed')
-            )
-          )
-          .orderBy(desc(synthesis_jobs.completed_at))
-          .limit(1);
-      });
-
-      if (!synthesis) {
-        logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Bill synthesis not found');
-        return null;
-      }
-
-      const inputData = this.parseJson(synthesis.input_data, {});
-
-      return {
-        bill_id: synthesis.bill_id,
-        majorClaims: (inputData as any).majorClaims || [],
-        evidenceBase: (inputData as any).evidenceBase || [],
-        stakeholderPositions: (inputData as any).stakeholderPositions || [],
-        consensusAreas: (inputData as any).consensusAreas || [],
-        controversialPoints: (inputData as any).controversialPoints || [],
-        legislativeBrief: synthesis.output_data || '',
-        lastUpdated: synthesis.completed_at || synthesis.updated_at
-      };
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch bill synthesis');
-      return null;
-    }
-  }
-
-  // ============================================================================
-  // ARGUMENT RELATIONSHIPS OPERATIONS
-  // ============================================================================
-
-  /**
-   * Store argument relationships (clustering, similarity, etc.)
-   */
-  // TODO: Replace 'any' with proper type definition
-  async storeArgumentRelationships(relationships: unknown[]): Promise<ArgumentRelationship[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'storeArgumentRelationships',
-      count: relationships.length
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Storing argument relationships');
-
-    try {
-      const now = new Date();
-      const relationshipsWithTimestamps = relationships.map(rel => ({
-        ...rel,
-        created_at: now,
-        updated_at: now
-      }));
-
-      const newRelationships = await withTransaction(async (tx) => {
-        return tx
-          .insert(argument_relationships)
-          .values(relationshipsWithTimestamps)
+        const stored = await writeDatabase
+          .insert(evidence)
+          .values(rows)
           .returning();
-      });
 
-      logger.info({
-        ...logContext,
-        stored_count: newRelationships.length
-      }, '✅ Argument relationships stored successfully');
-
-      return newRelationships;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to store argument relationships');
-      throw error;
-    }
+        logger.info(
+          { ...this.logCtx, argumentId, count: stored.length },
+          'Evidence stored'
+        );
+        return stored;
+      }
+    );
   }
 
   /**
-   * Get related argList for clustering and similarity analysis
+   * Retrieve evidence items for a bill that meet a minimum credibility
+   * threshold. Filters evidence that supports arguments for the given bill.
+   *
+   * @param billId       - Target bill.
+   * @param minCredibility - Minimum credibility (0–1). Defaults to 0.8.
+   * @param options      - Pagination options.
    */
-  async getRelatedArguments(argumentId: string, relationshipType?: string): Promise<ArgumentRelationship[]> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getRelatedArguments',
-      argumentId,
-      relationshipType
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Fetching related argList');
-
-    try {
-      const results = await readDatabase(async (db: any) => {
-        let query = db
+  async getVerifiedEvidence(
+    billId: string,
+    minCredibility = 0.8,
+    { limit = 50, offset = 0 }: PaginationOptions = {}
+  ) {
+    return withErrorHandling(
+      { ...this.logCtx, billId, minCredibility },
+      'getVerifiedEvidence',
+      async () => {
+        // Query evidence with credibility above threshold that supports arguments for this bill
+        // Note: We filter evidence.supports_arguments using PostgreSQL's array contains operator (@>)
+        const query = readDatabase
           .select()
-          .from(argument_relationships)
+          .from(evidence)
+          .innerJoin(
+            argumentTable,
+            sql`${evidence.supports_arguments} @> ARRAY[${argumentTable.id}]::uuid[]`
+          )
           .where(
-            or(
-              eq(argument_relationships.source_argument_id, argumentId),
-              eq(argument_relationships.target_argument_id, argumentId)
-            )
+            sql`${argumentTable.bill_id} = ${billId} AND CAST(${evidence.credibility_score} AS NUMERIC) >= ${minCredibility}`
+          )
+          .orderBy(desc(evidence.credibility_score))
+          .limit(limit)
+          .offset(offset);
+
+        const results = await query;
+        const evidenceRows = results.map((row: { evidence: typeof evidence.$inferSelect }) => row.evidence);
+
+        logger.info(
+          { ...this.logCtx, billId, count: evidenceRows.length },
+          'Verified evidence retrieved'
+        );
+        return evidenceRows;
+      }
+    );
+  }
+
+  // ============================================================================
+  // LEGISLATIVE BRIEF OPERATIONS
+  // ============================================================================
+
+  /**
+   * Build and persist a legislative brief from a bill synthesis.
+   * Truncates the executive summary to 500 characters.
+   */
+  async generateLegislativeBrief(
+    billId: string,
+    synthesis: BillArgumentSynthesis
+  ): Promise<StoredBrief> {
+    return withErrorHandling(
+      { ...this.logCtx, billId },
+      'generateLegislativeBrief',
+      async () => {
+        const now = new Date();
+
+        const recommendations = synthesis.controversialPoints.length
+          ? `Review contested areas: ${synthesis.controversialPoints.join('; ')}`
+          : 'No major contested areas identified.';
+
+        const brief: StoredBrief = {
+          id: crypto.randomUUID(),
+          bill_id: billId,
+          briefType: 'comprehensive',
+          targetAudience: 'policymakers',
+          executiveSummary: truncate(synthesis.legislativeBrief, 500),
+          keyFindings: toJson(synthesis.majorClaims),
+          stakeholderAnalysis: toJson(synthesis.stakeholderPositions),
+          evidenceAssessment: toJson(synthesis.evidenceBase),
+          recommendationsSection: recommendations,
+          appendices: toJson({
+            consensusAreas: synthesis.consensusAreas,
+            lastUpdated: synthesis.lastUpdated,
+          }),
+          metadata: toJson({
+            version: 1,
+            generatedBy: 'ArgumentIntelligenceService',
+          }),
+          generatedAt: now,
+          updated_at: now,
+        };
+
+        this.briefs.set(brief);
+
+        logger.info(
+          { ...this.logCtx, billId, briefId: brief.id },
+          'Legislative brief generated'
+        );
+        return brief;
+      }
+    );
+  }
+
+  /**
+   * Retrieve a previously generated legislative brief by its ID.
+   * Returns `null` when no brief with that ID exists.
+   */
+  async getLegislativeBrief(briefId: string): Promise<StoredBrief | null> {
+    return withErrorHandling(
+      { ...this.logCtx, briefId },
+      'getLegislativeBrief',
+      async () => {
+        const brief = this.briefs.get(briefId);
+
+        if (!brief) {
+          logger.warn({ ...this.logCtx, briefId }, 'Brief not found');
+        } else {
+          logger.info({ ...this.logCtx, briefId }, 'Brief retrieved');
+        }
+
+        return brief;
+      }
+    );
+  }
+
+  /**
+   * List all briefs generated for a given bill, ordered newest first.
+   */
+  async getBriefsForBill(billId: string): Promise<StoredBrief[]> {
+    return withErrorHandling(
+      { ...this.logCtx, billId },
+      'getBriefsForBill',
+      async () => {
+        const results = this.briefs
+          .filter((b) => b.bill_id === billId)
+          .sort(
+            (a, b) => b.generatedAt.getTime() - a.generatedAt.getTime()
           );
 
-        if (relationshipType) {
-          query = query.where(eq(argument_relationships.relationship_type, relationshipType));
+        logger.info(
+          { ...this.logCtx, billId, count: results.length },
+          'Briefs listed for bill'
+        );
+        return results;
+      }
+    );
+  }
+
+  /**
+   * Delete a brief by ID.  Returns `true` if the brief existed and was
+   * removed, `false` if it was not found.
+   */
+  async deleteLegislativeBrief(briefId: string): Promise<boolean> {
+    return withErrorHandling(
+      { ...this.logCtx, briefId },
+      'deleteLegislativeBrief',
+      async () => {
+        const deleted = this.briefs.delete(briefId);
+        logger.info(
+          { ...this.logCtx, briefId, deleted },
+          deleted ? 'Brief deleted' : 'Brief not found for deletion'
+        );
+        return deleted;
+      }
+    );
+  }
+
+  // ============================================================================
+  // SYNTHESIS JOB OPERATIONS
+  // ============================================================================
+
+  /**
+   * Create a new synthesis job in `pending` state.
+   */
+  async createSynthesisJob(
+    billId: string,
+    jobType: SynthesisJobType
+  ): Promise<SynthesisJob> {
+    return withErrorHandling(
+      { ...this.logCtx, billId, jobType },
+      'createSynthesisJob',
+      async () => {
+        const now = new Date();
+        const job: SynthesisJob = {
+          id: crypto.randomUUID(),
+          bill_id: billId,
+          job_type: jobType,
+          status: 'pending',
+          created_at: now,
+          updated_at: now,
+        };
+
+        this.jobs.set(job);
+
+        logger.info(
+          { ...this.logCtx, billId, jobId: job.id },
+          'Synthesis job created'
+        );
+        return job;
+      }
+    );
+  }
+
+  /**
+   * Transition a synthesis job to a new status and optionally attach a
+   * serialized result payload.  Throws `JobNotFoundError` if the job does
+   * not exist so callers are not silently misled.
+   */
+  async updateSynthesisJobStatus(
+    jobId: string,
+    status: SynthesisJobStatus,
+    result?: string
+  ): Promise<SynthesisJob> {
+    return withErrorHandling(
+      { ...this.logCtx, jobId, status },
+      'updateSynthesisJobStatus',
+      async () => {
+        const patch: Partial<SynthesisJob> = {
+          status,
+          updated_at: new Date(),
+          ...(result !== undefined ? { result } : {}),
+        };
+
+        const updated = this.jobs.update(jobId, patch);
+        if (!updated) throw new JobNotFoundError(jobId);
+
+        logger.info(
+          { ...this.logCtx, jobId, status },
+          'Synthesis job status updated'
+        );
+        return updated;
+      }
+    );
+  }
+
+  /**
+   * Retrieve a synthesis job by ID.  Returns `null` if not found.
+   */
+  async getSynthesisJob(jobId: string): Promise<SynthesisJob | null> {
+    return withErrorHandling(
+      { ...this.logCtx, jobId },
+      'getSynthesisJob',
+      async () => {
+        const job = this.jobs.get(jobId);
+
+        if (!job) {
+          logger.warn({ ...this.logCtx, jobId }, 'Synthesis job not found');
         }
 
-        return query.orderBy(desc(argument_relationships.strength));
-      });
-
-      logger.debug({ ...logContext, count: results.length }, '✅ Related argList retrieved');
-      return results;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to fetch related argList');
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // STATISTICS AND ANALYTICS
-  // ============================================================================
-
-  /**
-   * Get argument statistics for a bill
-   */
-  // TODO: Replace 'any' with proper type definition
-  async getArgumentStatistics(bill_id: string): Promise<any> {
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'getArgumentStatistics',
-      bill_id
-    };
-    logger.debug({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Calculating argument statistics');
-
-    try {
-      const [stats, claimStats, evidenceStats] = await readDatabase(async (db: any) => {
-        const statsPromise = db
-          .select({
-            totalArguments: count(),
-            avgConfidenceScore: sql<number>`AVG(${argumentTable.confidence_score})`,
-            avgSentimentScore: sql<number>`AVG(${argumentTable.sentiment_score})`
-          })
-          .from(argumentTable)
-          .where(eq(argumentTable.bill_id, bill_id));
-
-        const claimStatsPromise = db
-          .select({
-            totalClaims: count()
-          })
-          .from(claims)
-          .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
-          .where(eq(argumentTable.bill_id, bill_id));
-
-        const evidenceStatsPromise = db
-          .select({
-            totalEvidence: count(),
-            avgCredibilityScore: sql<number>`AVG(${evidence.credibility_score})`
-          })
-          .from(evidence)
-          .innerJoin(claims, eq(evidence.claim_id, claims.id))
-          .innerJoin(argumentTable, eq(claims.argument_id, argumentTable.id))
-          .where(eq(argumentTable.bill_id, bill_id));
-
-        return Promise.all([statsPromise, claimStatsPromise, evidenceStatsPromise]);
-      });
-
-      const [statsResult] = stats;
-      const [claimStatsResult] = claimStats;
-      const [evidenceStatsResult] = evidenceStats;
-
-      const statistics = {
-        argList: {
-          total: statsResult.totalArguments,
-          avgConfidenceScore: statsResult.avgConfidenceScore,
-          avgSentimentScore: statsResult.avgSentimentScore
-        },
-        claims: {
-          total: claimStatsResult.totalClaims
-        },
-        evidence: {
-          total: evidenceStatsResult.totalEvidence,
-          avgCredibilityScore: evidenceStatsResult.avgCredibilityScore
-        }
-      };
-
-      logger.debug({ ...logContext, statistics }, '✅ Argument statistics calculated');
-      return statistics;
-    } catch (error) {
-      logger.error({ ...logContext, error }, 'Failed to calculate argument statistics');
-      throw error;
-    }
-  }
-
-  // ============================================================================
-  // UTILITY METHODS
-  // ============================================================================
-
-  /**
-   * Safely parse JSON with fallback
-   */
-  // TODO: Replace 'any' with proper type definition
-  private parseJson(jsonString: string | null, fallback: unknown = null): unknown {
-    if (!jsonString) return fallback;
-
-    try {
-      return JSON.parse(jsonString);
-    } catch (error) {
-      logger.warn({
-        component: 'ArgumentIntelligenceService',
-        jsonString: jsonString?.substring(0, 100),
-        error
-      }, 'Failed to parse JSON, using fallback');
-      return fallback;
-    }
-  }
-
-  // ============================================================================
-  // COMMENT PROCESSING
-  // ============================================================================
-
-  /**
-   * Process a comment through the argument intelligence pipeline
-   * This is the main entry point for real-time comment analysis
-   */
-  async processComment(request: {
-    text: string;
-    billId: string;
-    userId: string;
-    commentId?: string;
-    userDemographics?: {
-      expertise?: string[];
-      organization?: string | null;
-      reputation_score?: number | null;
-    };
-    submissionContext?: {
-      commentType?: string;
-      parentId?: string;
-      timestamp?: Date;
-    };
-  }): Promise<{
-    argumentId: string;
-    claimsExtracted: number;
-    evidenceFound: number;
-    position: string;
-    confidence: number;
-  }> {
-    const operationId = performanceMonitor.startOperation('argument-intelligence', 'processComment', {
-      billId: request.billId,
-      userId: request.userId,
-      textLength: request.text.length,
-    });
-
-    const logContext = {
-      component: 'ArgumentIntelligenceService',
-      operation: 'processComment',
-      billId: request.billId,
-      userId: request.userId,
-    };
-
-    logger.info({ error: logContext instanceof Error ? logContext.message : String(logContext) }, 'Processing comment through argument intelligence');
-
-    try {
-      // Store the argument with basic extraction
-      const argument = await this.storeArgument({
-        bill_id: request.billId,
-        user_id: request.userId,
-        comment_id: request.commentId,
-        argument_text: request.text,
-        argument_type: this.detectArgumentType(request.text),
-        position: this.detectPosition(request.text),
-        strength: this.calculateStrength(request.text),
-        confidence: this.calculateConfidence(request.text),
-        metadata: JSON.stringify({
-          userDemographics: request.userDemographics,
-          submissionContext: request.submissionContext,
-          processedAt: new Date().toISOString(),
-        }),
-      });
-
-      // Extract claims from the text
-      const extractedClaims = this.extractClaims(request.text);
-      const claims = await this.storeClaims(
-        extractedClaims.map((claim) => ({
-          argument_id: argument.id,
-          claim_text: claim.text,
-          claim_type: claim.type,
-          confidence: claim.confidence,
-          supporting_evidence: JSON.stringify(claim.evidence || []),
-        }))
-      );
-
-      // Extract evidence
-      const extractedEvidence = this.extractEvidence(request.text);
-      const evidence = await this.storeEvidence(
-        extractedEvidence.map((ev) => ({
-          claim_id: claims[0]?.id || argument.id, // Link to first claim or argument
-          evidence_text: ev.text,
-          evidence_type: ev.type,
-          source: ev.source,
-          verification_status: 'unverified',
-          credibility_score: ev.credibility,
-        }))
-      );
-
-      performanceMonitor.endOperation(operationId, true, {
-        claimsExtracted: claims.length,
-        evidenceFound: evidence.length,
-      });
-
-      logger.info({
-        ...logContext,
-        argumentId: argument.id,
-        claimsExtracted: claims.length,
-        evidenceFound: evidence.length,
-      }, 'Comment processed successfully');
-
-      return {
-        argumentId: argument.id,
-        claimsExtracted: claims.length,
-        evidenceFound: evidence.length,
-        position: argument.position,
-        confidence: argument.confidence,
-      };
-    } catch (error) {
-      performanceMonitor.endOperation(operationId, false, error as Error);
-
-      logger.error({
-        ...logContext,
-        error: error instanceof Error ? error.message : String(error),
-      }, 'Failed to process comment');
-      throw error;
-    }
+        return job;
+      }
+    );
   }
 
   /**
-   * Detect argument type from text
+   * List all jobs for a bill, optionally filtered by status.
    */
-  private detectArgumentType(text: string): string {
-    const lowerText = text.toLowerCase();
+  async getSynthesisJobsForBill(
+    billId: string,
+    statusFilter?: SynthesisJobStatus
+  ): Promise<SynthesisJob[]> {
+    return withErrorHandling(
+      { ...this.logCtx, billId, statusFilter },
+      'getSynthesisJobsForBill',
+      async () => {
+        const results = this.jobs.filter(
+          (j) =>
+            j.bill_id === billId &&
+            (statusFilter === undefined || j.status === statusFilter)
+        );
 
-    if (lowerText.includes('evidence') || lowerText.includes('data') || lowerText.includes('study')) {
-      return 'evidence-based';
-    }
-    if (lowerText.includes('should') || lowerText.includes('must') || lowerText.includes('ought')) {
-      return 'normative';
-    }
-    if (lowerText.includes('because') || lowerText.includes('therefore') || lowerText.includes('thus')) {
-      return 'causal';
-    }
-    if (lowerText.includes('similar') || lowerText.includes('like') || lowerText.includes('compared')) {
-      return 'comparative';
-    }
-
-    return 'general';
+        logger.info(
+          { ...this.logCtx, billId, count: results.length },
+          'Synthesis jobs retrieved for bill'
+        );
+        return results;
+      }
+    );
   }
 
   /**
-   * Detect position from text
+   * Permanently remove a synthesis job by ID.
    */
-  private detectPosition(text: string): string {
-    const lowerText = text.toLowerCase();
-
-    const supportWords = ['support', 'agree', 'favor', 'approve', 'endorse', 'beneficial', 'positive'];
-    const opposeWords = ['oppose', 'disagree', 'against', 'reject', 'harmful', 'negative', 'concern'];
-
-    const supportCount = supportWords.filter((word) => lowerText.includes(word)).length;
-    const opposeCount = opposeWords.filter((word) => lowerText.includes(word)).length;
-
-    if (supportCount > opposeCount) return 'support';
-    if (opposeCount > supportCount) return 'oppose';
-
-    return 'neutral';
-  }
-
-  /**
-   * Calculate argument strength
-   */
-  private calculateStrength(text: string): number {
-    let strength = 0.5; // Base strength
-
-    // Length factor (longer argList tend to be more detailed)
-    if (text.length > 200) strength += 0.1;
-    if (text.length > 500) strength += 0.1;
-
-    // Evidence indicators
-    if (text.includes('evidence') || text.includes('data') || text.includes('study')) {
-      strength += 0.15;
-    }
-
-    // Reasoning indicators
-    if (text.includes('because') || text.includes('therefore') || text.includes('thus')) {
-      strength += 0.1;
-    }
-
-    // Source citations
-    if (text.includes('http') || text.includes('www') || text.includes('source:')) {
-      strength += 0.15;
-    }
-
-    return Math.min(strength, 1.0);
-  }
-
-  /**
-   * Calculate confidence score
-   */
-  private calculateConfidence(text: string): number {
-    let confidence = 0.6; // Base confidence
-
-    // Clear structure
-    if (text.split('.').length > 2) confidence += 0.1;
-
-    // Specific claims
-    if (text.includes('specifically') || text.includes('particularly')) {
-      confidence += 0.1;
-    }
-
-    // Hedging reduces confidence
-    if (text.includes('maybe') || text.includes('perhaps') || text.includes('might')) {
-      confidence -= 0.1;
-    }
-
-    return Math.max(0.1, Math.min(confidence, 1.0));
-  }
-
-  /**
-   * Extract claims from text
-   */
-  private extractClaims(text: string): Array<{
-    text: string;
-    type: string;
-    confidence: number;
-    evidence?: string[];
-  }> {
-    const claims: Array<{ text: string; type: string; confidence: number; evidence?: string[] }> = [];
-
-    // Split by sentences
-    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 10);
-
-    for (const sentence of sentences) {
-      const trimmed = sentence.trim();
-      if (trimmed.length < 20) continue; // Skip very short sentences
-
-      claims.push({
-        text: trimmed,
-        type: this.detectArgumentType(trimmed),
-        confidence: this.calculateConfidence(trimmed),
-        evidence: [],
-      });
-    }
-
-    return claims;
-  }
-
-  /**
-   * Extract evidence from text
-   */
-  private extractEvidence(text: string): Array<{
-    text: string;
-    type: string;
-    source: string;
-    credibility: number;
-  }> {
-    const evidence: Array<{ text: string; type: string; source: string; credibility: number }> = [];
-
-    // Look for URLs
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    const urls = text.match(urlRegex) || [];
-
-    for (const url of urls) {
-      evidence.push({
-        text: `Source: ${url}`,
-        type: 'external_source',
-        source: url,
-        credibility: 0.7,
-      });
-    }
-
-    // Look for statistical claims
-    const numberRegex = /\d+(\.\d+)?%|\d+(\.\d+)?\s*(million|billion|thousand)/gi;
-    const numbers = text.match(numberRegex) || [];
-
-    if (numbers.length > 0) {
-      evidence.push({
-        text: `Statistical claim: ${numbers.join(', ')}`,
-        type: 'statistical',
-        source: 'user_provided',
-        credibility: 0.5,
-      });
-    }
-
-    return evidence;
-  }
-
-  /**
-   * Health check for the service
-   */
-  async healthCheck(): Promise<{ status: string; timestamp: Date }> {
-    try {
-      // Simple query to test database connectivity
-      await readDatabase(async (db: any) => {
-        return readDatabase.select({ count: count() }).from(argumentTable).limit(1);
-      });
-
-      return {
-        status: 'healthy',
-        timestamp: new Date()
-      };
-    } catch (error) {
-      logger.error({
-        component: 'ArgumentIntelligenceService',
-        error
-      }, 'Health check failed');
-
-      return {
-        status: 'unhealthy',
-        timestamp: new Date()
-      };
-    }
+  async deleteSynthesisJob(jobId: string): Promise<boolean> {
+    return withErrorHandling(
+      { ...this.logCtx, jobId },
+      'deleteSynthesisJob',
+      async () => {
+        const deleted = this.jobs.delete(jobId);
+        logger.info(
+          { ...this.logCtx, jobId, deleted },
+          deleted ? 'Job deleted' : 'Job not found for deletion'
+        );
+        return deleted;
+      }
+    );
   }
 }
 
@@ -1014,7 +800,4 @@ export class ArgumentIntelligenceService {
 // SINGLETON EXPORT
 // ============================================================================
 
-/**
- * Singleton instance of ArgumentIntelligenceService for application-wide use.
- */
 export const argumentIntelligenceService = new ArgumentIntelligenceService();

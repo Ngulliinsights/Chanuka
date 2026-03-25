@@ -1,43 +1,32 @@
 /**
- * Constitutional Intelligence Service - Complete Infrastructure Integration
+ * Constitutional Intelligence Service
+ *
+ * Read and audit layer. Resolves analyses through ConstitutionalService first
+ * (cache), then falls back to the database for records that predate the cache
+ * or survived a flush. Emits a security audit event on every access.
  */
 
-import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import { inputSanitizationService, securityAuditService } from '@server/features/security';
-import { cacheService, cacheKeys, CACHE_TTL } from '@server/infrastructure/cache';
 import { readDatabase } from '@server/infrastructure/database';
+import { safeAsync } from '@server/infrastructure/error-handling/result-types';
 import { constitutional_analyses } from '@server/infrastructure/schema/constitutional_intelligence';
 import { eq } from 'drizzle-orm';
 
+import { constitutionalService, type ConstitutionalServiceResult } from './constitutional-service';
+
+type StoredAnalysis = typeof constitutional_analyses.$inferSelect;
+
 export class ConstitutionalIntelligenceService {
-  async analyzeConstitutionality(billId: string) {
-    return safeAsync(async () => {
+  async analyzeConstitutionality(billId: string): Promise<ConstitutionalServiceResult | StoredAnalysis | null> {
+    const result = await safeAsync(async () => {
       const sanitizedBillId = inputSanitizationService.sanitizeString(billId);
 
-      // Legal analysis caching (1 hour)
-      const cacheKey = typeof cacheKeys !== 'undefined' && cacheKeys.entity 
-        ? cacheKeys.entity('constitutional-analysis', sanitizedBillId) 
-        : `constitutional-analysis:${sanitizedBillId}`;
-        
-      if (typeof cacheService !== 'undefined') {
-        const cached = await cacheService.get<any>(cacheKey);
-        if (cached) return cached;
-      }
+      // Primary path: resolve through the service layer (cache-backed).
+      const cached = await constitutionalService.getAnalysis(sanitizedBillId);
 
-      const analysis = await readDatabase
-        .select()
-        .from(constitutional_analyses)
-        .where(eq(constitutional_analyses.bill_id, sanitizedBillId))
-        .limit(1);
+      // Fallback path: database for records that predate or outlived the cache.
+      const analysis: ConstitutionalServiceResult | StoredAnalysis | null = cached ?? await this.fetchFromDatabase(sanitizedBillId);
 
-      const result = analysis[0] || { bill_id: sanitizedBillId, is_constitutional: true, concerns: [] };
-      
-      if (typeof cacheService !== 'undefined') {
-        const ttl = typeof CACHE_TTL !== 'undefined' ? CACHE_TTL.HOUR : 3600;
-        await cacheService.set(cacheKey, result, ttl);
-      }
-
-      // High-severity logging for constitutional analysis
       await securityAuditService.logSecurityEvent({
         event_type: 'constitutional_analysis_accessed',
         severity: 'high',
@@ -46,8 +35,23 @@ export class ConstitutionalIntelligenceService {
         success: true,
       });
 
-      return result;
+      return analysis;
     }, { service: 'ConstitutionalIntelligenceService', operation: 'analyzeConstitutionality' });
+
+    // Unwrap the Result type - return the value or null on error
+    return result.isOk() ? result.value : null;
+  }
+
+  // ─── Private ───────────────────────────────────────────────────────────────
+
+  private async fetchFromDatabase(billId: string): Promise<StoredAnalysis | null> {
+    const [row] = await readDatabase
+      .select()
+      .from(constitutional_analyses)
+      .where(eq(constitutional_analyses.bill_id, billId))
+      .limit(1);
+
+    return row ?? null;
   }
 }
 

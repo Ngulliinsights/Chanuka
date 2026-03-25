@@ -6,7 +6,7 @@
  * more robust design that follows functional programming principles.
  */
 
-import { Result } from '../primitives/types/result';
+import { Result } from '@shared/core/primitives/types/result';
 
 /**
  * Health status for cache adapters

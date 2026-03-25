@@ -162,6 +162,37 @@ export const GetActionsSchema = PaginationSchema.extend({
   end_date:    z.string().datetime().optional(),
 });
 
+/** Submit feedback on completed action */
+export const ActionFeedbackSchema = z.object({
+  rating:   z.number().int().min(1).max(5),
+  comment:  z.string().max(1_000).optional(),
+});
+
+/** Complete action with outcome data */
+export const CompleteActionSchema = z.object({
+  outcome: z.object({
+    successful: z.boolean(),
+    impactNotes: z.string().max(2_000).optional(),
+  }).optional(),
+  actualTimeMinutes: z.number().int().positive().optional(),
+});
+
+/** Skip action with optional reason */
+export const SkipActionSchema = z.object({
+  reason: z.string().max(500).optional(),
+});
+
+// ============================================================================
+// Impact Tracking schemas
+// ============================================================================
+
+export const RecordImpactSchema = z.object({
+  impactType: z.string().max(100),
+  value: z.union([z.number(), z.string()]),
+  description: z.string().max(2_000).optional(),
+  evidenceLinks: z.array(z.string().url()).max(10).optional(),
+});
+
 // ============================================================================
 // Target schemas
 // ============================================================================

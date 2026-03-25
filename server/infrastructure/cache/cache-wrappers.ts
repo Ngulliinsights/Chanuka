@@ -8,7 +8,10 @@
  * - Pattern-based invalidation
  */
 
-import { cacheService, createCacheService } from './simple-factory';
+import { createSimpleCacheService } from './factory';
+
+// Create cache service instance for wrappers
+const cacheService = createSimpleCacheService();
 
 /**
  * Cache warming service - pre-loads cache entries on startup
